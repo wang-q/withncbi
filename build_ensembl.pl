@@ -28,7 +28,7 @@ my $username = $Config->{database}{username};
 my $password = $Config->{database}{password};
 
 my $do_checksum = 0;
-my $do_init_db  = 1;
+my $do_initdb   = 0;
 
 my $db = "test";
 my $ensembl_dir;
@@ -46,7 +46,7 @@ GetOptions(
     'db=s'       => \$db,
     'ensembl=s'  => \$ensembl_dir,
     'checksum'   => \$do_checksum,
-    'init_db=s'  => \$do_init_db,
+    'initdb'     => \$do_initdb,
 ) or pod2usage(2);
 
 pod2usage(1) if $help;
@@ -131,7 +131,7 @@ else {
     #----------------------------#
     # init database
     #----------------------------#
-    if ($do_init_db) {
+    if ($do_initdb) {
 
         # Ingore mysql 4.0 compatible file
         my @sql_files
@@ -208,13 +208,13 @@ __END__
         --password      password
         --checksum      do checksum
         --ensembl       dir stored ensembl mysqldump files
-        --init_db       do init database
+        --initdb        do init database
 
     # run the following command to check the downloaded files
     perl build_ensembl.pl --checksum
     
     # run the following command to build ensembl database
-    perl build_ensembl.pl --db=human_48 --init_db=1 --ensembl=human_48/
+    perl build_ensembl.pl --initdb --db=human_48 --ensembl=human_48/
 
 =head1 OPTIONS
 
