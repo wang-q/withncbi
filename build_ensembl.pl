@@ -11,8 +11,9 @@ use Archive::Extract;
 use File::Spec::Functions qw(rel2abs);
 use File::Find::Rule;
 
-use FindBin;
 use AlignDB::Stopwatch;
+
+use FindBin;
 
 #----------------------------------------------------------#
 # GetOpt section
@@ -21,16 +22,16 @@ my $Config = Config::Tiny->new;
 $Config = Config::Tiny->read("$FindBin::Bin/../alignDB.ini");
 
 # Database init values
-my $server   = $Config->{database}->{server};
-my $port     = $Config->{database}->{port};
-my $username = $Config->{database}->{username};
-my $password = $Config->{database}->{password};
+my $server   = $Config->{database}{server};
+my $port     = $Config->{database}{port};
+my $username = $Config->{database}{username};
+my $password = $Config->{database}{password};
 
 my $do_checksum = 0;
 my $do_init_db  = 1;
 
-my $db          = "test";
-my $ensembl_dir = q{F:/Downloads/human_48/};
+my $db = "test";
+my $ensembl_dir;
 
 my $man  = 0;
 my $help = 0;
@@ -44,7 +45,7 @@ GetOptions(
     'password=s' => \$password,
     'db=s'       => \$db,
     'ensembl=s'  => \$ensembl_dir,
-    'checksum=s' => \$do_checksum,
+    'checksum'   => \$do_checksum,
     'init_db=s'  => \$do_init_db,
 ) or pod2usage(2);
 
@@ -210,7 +211,7 @@ __END__
         --init_db       do init database
 
     # run the following command to check the downloaded files
-    perl build_ensembl.pl --checksum=1
+    perl build_ensembl.pl --checksum
     
     # run the following command to build ensembl database
     perl build_ensembl.pl --db=human_48 --init_db=1 --ensembl=human_48/
