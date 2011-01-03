@@ -62,8 +62,8 @@ GetOptions(
     'ensembl=s'  => \$ensembl_db,
     'align_id=s' => \$align_id,
     'CLASS=s'    => \$CLASS,
-    'size=i'  => \$wave_window_size,
-    'step=i' => \$wave_window_step,
+    'size=i'     => \$wave_window_size,
+    'step=i'     => \$wave_window_step,
 ) or pod2usage(2);
 
 pod2usage(1) if $help;
@@ -76,14 +76,20 @@ my $stopwatch = AlignDB::Stopwatch->new;
 $stopwatch->start_message("Drawing picture for $db...");
 
 my $gc_obj = AlignDB::GC->new(
-    mysql            => "$db:$server",
-    user             => $username,
-    passwd           => $password,
+    mysql  => "$db:$server",
+    user   => $username,
+    passwd => $password,
+);
+AlignDB::GC->meta->apply($gc_obj);
+my %opt = (
     wave_window_size => $wave_window_size,
     wave_window_step => $wave_window_step,
     vicinal_size     => $vicinal_size,
     fall_range       => $fall_range,
 );
+for my $key ( sort keys %opt ) {
+    $gc_obj->$key( $opt{$key} );
+}
 
 my $ensembl = AlignDB::Ensembl->new(
     server => $server,
