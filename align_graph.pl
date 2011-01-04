@@ -128,7 +128,7 @@ my $align_query_sth = $dbh->prepare($align_query);
 my $isw_query = q{
     SELECT i.isw_id, i.isw_start, i.isw_end, i.isw_pi,
            e.isw_feature1, e.isw_feature2,
-           (i.isw_target_gc_ratio + i.isw_query_gc_ratio) / 2 isw_gc
+           i.isw_average_gc isw_gc
     FROM isw i, isw_extra e, indel
     WHERE i.indel_id = indel.indel_id
     AND i.isw_id = e.isw_id
