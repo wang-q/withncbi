@@ -28,20 +28,16 @@ my $Config = Config::Tiny->new;
 $Config = Config::Tiny->read("$FindBin::Bin/../alignDB.ini");
 
 # Database init values
-my $server   = $Config->{database}->{server};
-my $port     = $Config->{database}->{port};
-my $username = $Config->{database}->{username};
-my $password = $Config->{database}->{password};
-my $db       = $Config->{database}->{db};
+my $server     = $Config->{database}{server};
+my $port       = $Config->{database}{port};
+my $username   = $Config->{database}{username};
+my $password   = $Config->{database}{password};
+my $db         = $Config->{database}{db};
+my $ensembl_db = $Config->{database}{ensembl};
 
 # graph init values
-my $CLASS = $Config->{graph}->{class};    # GD or GD::SVG
-my $width = $Config->{graph}->{width};
-
-# separate from the one of database section
-# default if undef
-my $ensembl_db = $Config->{graph}->{ensembl};
-my $graph_file = "";
+my $CLASS = $Config->{graph}{class};    # GD or GD::SVG
+my $width = $Config->{graph}{width};
 
 # coverage on target or query
 my $goal = "target";
@@ -58,7 +54,6 @@ GetOptions(
     'username=s' => \$username,
     'password=s' => \$password,
     'ensembl=s'  => \$ensembl_db,
-    'output=s'   => \$graph_file,
     'class=s'    => \$CLASS,
     'width=i'    => \$width,
     'goal=s'     => \$goal,
@@ -84,14 +79,14 @@ my $dbh = $alignDB_obj->dbh;
 
 # ensembl object
 my $kary_adaptor;
-if ( length $ensembl_db > 0 ) {
+if ($ensembl_db) {
     my $ensembl = AlignDB::Ensembl->new(
         server => $server,
         db     => $ensembl_db,
         user   => $username,
         passwd => $password,
     );
-    my $db_adaptor = $ensembl->get_db_adaptor;
+    my $db_adaptor = $ensembl->db_adaptor;
     $kary_adaptor = $db_adaptor->get_KaryotypeBandAdaptor;
 }
 
@@ -246,7 +241,7 @@ my $ftr = 'Bio::Graphics::Feature';
         );
     }
 
-    foreach my $chr_info (@chr_infos) {
+    for my $chr_info (@chr_infos) {
         my $chr_name     = $chr_info->{chr_name};
         my $chr_set      = $chr_info->{chr_set};
         my $chr_length   = $chr_info->{chr_length};
@@ -285,7 +280,7 @@ my $ftr = 'Bio::Graphics::Feature';
                 -height    => 10,
                 -font      => 'gdSmallFont',
                 -linewidth => 1,
-                -bgcolor   => 'blue',
+                -bgcolor   => 'lightblue',
                 -connector => 'solid',
             );
 
@@ -321,7 +316,7 @@ my $ftr = 'Bio::Graphics::Feature';
                 gvar    => 'purple',
                 stalk   => 'green',
             };
-            foreach (@$band) {
+            for (@$band) {
                 my $source   = $_->stain;
                 my $band_ftr = Bio::Graphics::Feature->new(
                     -start => $_->start,
@@ -340,7 +335,7 @@ my $ftr = 'Bio::Graphics::Feature';
                 }
             }
 
-            foreach my $source ( sort keys %$band_seg ) {
+            for my $source ( sort keys %$band_seg ) {
                 my $band_segment = $ftr->new(
                     -segments => $band_seg->{$source},
                     -name     => $source,
@@ -362,7 +357,7 @@ my $ftr = 'Bio::Graphics::Feature';
             $largest_chr,
             -glyph     => 'line',
             -bump      => 0,
-            -height    => 20,
+            -height    => 1,
             -linewidth => 1,
             -bgcolor   => 'turquoise',
             -fgcolor   => 'turquoise',
@@ -371,11 +366,10 @@ my $ftr = 'Bio::Graphics::Feature';
 
     my $gd = $panel->gd;
     my $type = ( $CLASS eq 'GD' ) ? 'png' : 'svg';
-    $graph_file = ">$db.$goal.$type" unless $graph_file;
-    open PICFH, ">$graph_file";
-    binmode PICFH;
-    print PICFH $gd->$type;
-    close PICFH;
+    open my $pic_fh, '>', "$db.$goal.$type";
+    binmode $pic_fh;
+    print {$pic_fh} $gd->$type;
+    close $pic_fh;
 }
 
 $stopwatch->end_message;
