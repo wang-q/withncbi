@@ -118,9 +118,9 @@ my ( $coding_set, $repeat_set );
 {
     print "Prepare align\n";
     my $query = q{
-        SELECT e.align_feature5, e.align_feature6
-        FROM align_extra e
-        WHERE e.align_id = ?
+        SELECT align_coding_runlist, align_repeats_runlist
+        FROM align
+        WHERE align_id = ?
     };
     my $sth = $dbh->prepare($query);
 
