@@ -24,6 +24,13 @@ use AlignDB::Stopwatch;
 my $Config = Config::Tiny->new;
 $Config = Config::Tiny->read("$FindBin::Bin/../alignDB.ini");
 
+# record ARGV and Config
+my $stopwatch = AlignDB::Stopwatch->new(
+    program_name => $0,
+    program_argv => [@ARGV],
+    program_conf => $Config,
+);
+
 # Database init values
 my $server   = $Config->{database}{server};
 my $port     = $Config->{database}{port};
@@ -53,7 +60,6 @@ pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
 #----------------------------------------------------------#
 # Init objects
 #----------------------------------------------------------#
-my $stopwatch = AlignDB::Stopwatch->new;
 $stopwatch->start_message("Update tdna of $db...");
 
 my $obj = AlignDB::Ofg->new(
@@ -61,6 +67,7 @@ my $obj = AlignDB::Ofg->new(
     user   => $username,
     passwd => $password,
     max_in_distance => 0, # don't need inside windows
+    max_out_distance => 10, # don't need inside windows
 );
 
 # Database handler
@@ -108,6 +115,16 @@ DumpFile('tdna.yml', {tdna => \@all_tdna, chr => \%chr_tdna_set});
 $obj->insert_ofg( $align_ids, \@all_tdna, \%chr_tdna_set );
 
 $stopwatch->end_message;
+
+# store program running meta info to database
+# this AlignDB object is just for storing meta info
+END {
+    AlignDB::Ofg->new(
+        mysql  => "$db:$server",
+        user   => $username,
+        passwd => $password,
+    )->add_meta_stopwatch($stopwatch);
+}
 exit;
 
 __END__
