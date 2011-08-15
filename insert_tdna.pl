@@ -97,6 +97,7 @@ my %chr_tdna_set;
         my ($chr, $pos) = split /:/, $pos_str;
         $chr =~ s/chr0?//i;
         $pos =~ s/^0+//;
+        next unless $chr =~ /^\d+$/;
         my $set = AlignDB::IntSpan->new($pos);
         push @all_tdna, {chr => $chr, set => $set, tag => 'all'};
         if ( !exists $chr_tdna_set{$chr} ) {
