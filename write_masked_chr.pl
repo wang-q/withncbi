@@ -6,14 +6,13 @@ use autodie;
 use Getopt::Long;
 use Pod::Usage;
 use Config::Tiny;
-use YAML qw(Dump Load DumpFile LoadFile);
+use YAML::XS qw(Dump Load DumpFile LoadFile);
 
 use Bio::EnsEMBL::DBSQL::DBAdaptor;
 use Bio::EnsEMBL::DBSQL::SliceAdaptor;
 
 use File::Find::Rule;
 use String::Compare;
-use String::LCSS_XS qw(lcss);
 use List::Util qw(reduce);
 use List::MoreUtils qw(zip);
 
@@ -121,8 +120,13 @@ if ($dir_fa) {
     my @files = sort File::Find::Rule->file->name('*.fa')->in($dir_fa);
 
     my @chrs = @files;
-    @chrs = remove_lcss(@chrs);    # remove path
-    @chrs = remove_lcss(@chrs);    # remove extend
+    while (1) {
+        my $lcss = lcss(@chrs);
+        last unless $lcss;
+        print "LCSS [$lcss]\n";
+        my $rx = quotemeta $lcss;
+        $chrs[$_] =~ s/$rx// for 0 .. $#chrs;
+    }
     my $file_of = { zip( @chrs, @files ) };
 
     for my $file_chr ( sort @chrs ) {
@@ -159,32 +163,25 @@ if ($dir_fa) {
 
 $stopwatch->end_message;
 
-sub longest {
-    my @strs = @_;
-
-    my @commons;
-    for my $i ( 0 .. $#strs ) {
-        for my $j ( 0 .. $i ) {
-            my $common = lcss( $strs[$i], $strs[$j] );
-            push @commons, $common;
+# comes from
+# http://stackoverflow.com/questions/499967/how-do-i-determine-the-longest-similar-portion-of-several-strings
+sub lcss {
+    return '' unless @_;
+    return $_[0] if @_ == 1;
+    my $i          = 0;
+    my $first      = shift;
+    my $min_length = length($first);
+    for (@_) {
+        $min_length = length($_) if length($_) < $min_length;
+    }
+INDEX: for my $ch ( split //, $first ) {
+        last INDEX unless $i < $min_length;
+        for my $string (@_) {
+            last INDEX if substr( $string, $i, 1 ) ne $ch;
         }
     }
-
-    no warnings 'all';
-    my $longest = reduce { lcss( $a, $b ) } @commons;
-    use warnings;
-
-    return $longest;
-}
-
-sub remove_lcss {
-    my @strs = @_;
-
-    my $longest = longest(@strs);
-    $longest = quotemeta $longest;
-    $strs[$_] =~ s/$longest// for 0 .. $#strs;
-
-    return @strs;
+    continue { $i++ }
+    return substr $first, 0, $i;
 }
 
 __END__
