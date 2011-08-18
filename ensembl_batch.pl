@@ -66,12 +66,12 @@ my $version = $dispatch->{meta}{version};
 #----------------------------------------------------------#
 # Write .axt files from alignDB
 #----------------------------------------------------------#
-if ( $dispatch->{process}{core} ) {
-    for my $sp (@species) {
-        print "$sp\n";
+for my $sp (@species) {
+    print "$sp\n";
+    if ( $species_ref->{$sp}{core} ) {
         my ( $ensembl_dir, $ensembl_db ) = match_ensembl( $sp, 'core' );
-        if ( $species_ref->{$sp} ) {
-            $ensembl_db = $species_ref->{$sp};
+        if ( $species_ref->{$sp}{db} ) {
+            $ensembl_db = $species_ref->{$sp}{db};
         }
 
         my $cmd
@@ -80,6 +80,7 @@ if ( $dispatch->{process}{core} ) {
             . " --port=$port"
             . " -u=$username"
             . " --password=$password"
+            . " --initdb"
             . " --db=$ensembl_db"
             . " --ensembl=$ensembl_dir";
 
@@ -111,7 +112,10 @@ sub match_ensembl {
     }
 
     my $ensembl_db
-        = substr( $genus, 0, 1 ) . substr( $species, 0, 3 ) . "_$version";
+        = lc( substr( $genus, 0, 1 ) )
+        . substr( $species, 0, 3 )
+        . "_$type"
+        . "_$version";
 
     return ( $ensembl_dir, $ensembl_db );
 }
