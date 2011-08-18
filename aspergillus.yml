@@ -1,0 +1,20 @@
+---
+dir:
+  mysql: "/home/wangq/data/ensemblgenomes5_58/fungi/mysql/"
+  fasta: "/homw/wangq/data/ensemblgenomes5_58/fungi/fasta/"
+species:
+  "Aspergillus clavatus": ~
+  "Aspergillus flavus": ~
+  "Aspergillus fumigatus": ~
+  "Aspergillus nidulans": ~
+  "Aspergillus niger": ~
+  "Aspergillus oryzae": ~
+  "Aspergillus terreus": ~
+  "Neosartorya fischeri": ~
+  "Neurospora crassa": ~
+meta:
+  version: 58
+process:
+  core: 1
+  masked_seq: 0
+  initrc: 1
