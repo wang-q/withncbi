@@ -135,9 +135,10 @@ for my $row (@chrs) {
         $goal_chr_set->add($runlist);
     }
 
-    my $covered_length = $goal_chr_set->cardinality;
-    my $coverage       = $covered_length / $chr_length * 100;
+    my $coverage = $goal_chr_set->size / $chr_length * 100;
     $coverage = sprintf "%.2f", $coverage;
+    my $overlap = $overlap_set->size / $chr_length * 100;
+    $overlap = sprintf "%.2f", $overlap;
 
     if ( $chr_length > $largest ) {
         $largest = $chr_length;
@@ -158,6 +159,7 @@ for my $row (@chrs) {
         goal_chr_set => $goal_chr_set,
         overlap_set  => $overlap_set,
         coverage     => $coverage,
+        overlap      => $overlap,
         band         => $band,
     };
 
@@ -167,21 +169,30 @@ for my $row (@chrs) {
 #----------------------------#
 # write a chr yaml
 #----------------------------#
-my $full_chr_set        = {};
-my $full_overlap_set    = {};
-my $full_nonoverlap_set = {};
-for my $chr_info (@chr_infos) {
-    my $chr_name     = $chr_info->{chr_name};
-    my $goal_chr_set = $chr_info->{goal_chr_set};
-    my $overlap_set  = $chr_info->{overlap_set};
+{
+    my $full_chr_info       = {};
+    my $full_chr_set        = {};
+    my $full_overlap_set    = {};
+    my $full_nonoverlap_set = {};
+    for my $chr_info (@chr_infos) {
+        my $chr_name = $chr_info->{chr_name};
 
-    $full_chr_set->{$chr_name}        = $goal_chr_set;
-    $full_overlap_set->{$chr_name}    = $overlap_set;
-    $full_nonoverlap_set->{$chr_name} = $goal_chr_set->diff($overlap_set);
+        $full_chr_info->{$chr_name} = {
+            chr_name   => $chr_info->{chr_name},
+            chr_length => $chr_info->{chr_length},
+            coverage   => $chr_info->{coverage},
+            overlap    => $chr_info->{overlap},
+        };
+        $full_chr_set->{$chr_name}     = $chr_info->{goal_chr_set};
+        $full_overlap_set->{$chr_name} = $chr_info->{overlap_set};
+        $full_nonoverlap_set->{$chr_name}
+            = $chr_info->{goal_chr_set}->diff( $chr_info->{overlap_set} );
+    }
+    DumpFile( "$db.$goal.yml",            $full_chr_set );
+    DumpFile( "$db.$goal.info.yml",       $full_chr_info );
+    DumpFile( "$db.$goal.overlap.yml",    $full_overlap_set );
+    DumpFile( "$db.$goal.nonoverlap.yml", $full_nonoverlap_set );
 }
-DumpFile( "$db.$goal.yml",            $full_chr_set );
-DumpFile( "$db.$goal.overlap.yml",    $full_overlap_set );
-DumpFile( "$db.$goal.nonoverlap.yml", $full_nonoverlap_set );
 
 #----------------------------#
 # draw pic
@@ -247,6 +258,7 @@ my $ftr = 'Bio::Graphics::Feature';
         my $chr_length   = $chr_info->{chr_length};
         my $goal_chr_set = $chr_info->{goal_chr_set};
         my $coverage     = $chr_info->{coverage};
+        my $overlap      = $chr_info->{overlap};
         my $band         = $chr_info->{band};
 
         my $chr_segment = $ftr->new(
@@ -259,7 +271,7 @@ my $ftr = 'Bio::Graphics::Feature';
             my $title
                 = "$chr_name: "
                 . format_bytes($chr_length) . " bp"
-                . " | Coverage: $coverage%";
+                . " | Coverage: $coverage% | overlap: $overlap%";
             $panel->add_track(
                 $chr_segment,
                 -glyph        => 'text_in_box',

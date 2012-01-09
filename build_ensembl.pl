@@ -95,11 +95,17 @@ if ($do_checksum) {
     }
 
     my $checksum_error = 0;
-    foreach my $file ( sort keys %checksum_of ) {
+    my $error_of       = {
+        non_exist     => [],
+        running_error => [],
+        wrong_sum     => [],
+    };
+    for my $file ( sort keys %checksum_of ) {
         my $abs_file = rel2abs( $file, $ensembl_dir );
         if ( !-e $abs_file ) {
             print "$file: file does not exist\n";
             $checksum_error++;
+            push @{ $error_of->{non_exist} }, $file;
             next;
         }
         my $sum_output = `sum $abs_file`;
@@ -108,10 +114,12 @@ if ($do_checksum) {
         if ( !$run_sum_ok ) {
             print "$file: run checksum error\n";
             $checksum_error++;
+            push @{ $error_of->{running_error} }, $file;
         }
         elsif ( $actual_sum != $checksum_of{$file} ) {
             print "$file: wrong checksum value\n";
             $checksum_error++;
+            push @{ $error_of->{wrong_sum} }, $file;
         }
         else {
             print "$file: checksum OK\n";
@@ -122,8 +130,15 @@ if ($do_checksum) {
         $stopwatch->block_message( "Checksum OK", 1 );
     }
     else {
-        $stopwatch->block_message(
-            "Checksum ERROR in $checksum_error file(s)", 1 );
+        my $message = "Checksum ERROR in $checksum_error file(s)\n";
+        for my $key ( keys %{$error_of} ) {
+            my @array = @{ $error_of->{$key} };
+            if ( scalar @array ) {
+                $message .= "[$key]:\n";
+                $message .= join "\n", map { " " x 4 . $_  } @array;
+            }
+        }
+        $stopwatch->block_message( $message, 1 );
     }
 }
 else {
@@ -172,13 +187,17 @@ else {
         = File::Find::Rule->file->name( '*.txt.table.gz', '*.txt.gz' )
         ->in($ensembl_dir);
 
-    foreach my $table_file ( sort @table_files ) {
+    for my $table_file ( sort @table_files ) {
         my $archive = Archive::Extract->new( archive => $table_file, );
         $archive->extract( to => $ensembl_dir )
             or die "Can't extract: " . $archive->error;
         my ($abs_table_file) = @{ $archive->files };
         $abs_table_file = rel2abs( $abs_table_file, $archive->extract_path );
 
+        # ensembl suggest use --fields_escaped_by=\\
+        # But by mysql's default, \ within the input is taken as an escape
+        # character that signifies a special sequence.
+        # So I ingore this
         my $cmd
             = "mysqlimport -h$server -P$port -u$username -p$password --local";
         system("$cmd $db $abs_table_file");

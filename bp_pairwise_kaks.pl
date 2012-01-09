@@ -1,6 +1,6 @@
-#!C:\Perl\bin\perl.exe -w
+#!C:\strawberry\perl\bin\perl.exe -w
 use strict;
-# $Id: pairwise_kaks.PLS,v 1.12 2006/07/04 22:23:29 mauricio Exp $
+# $Id: pairwise_kaks.PLS 15088 2008-12-04 02:49:09Z bosborne $
 # Author Jason Stajich <jason-at-bioperl-dot-org>
 
 =head1 NAME

@@ -10,6 +10,11 @@ use YAML qw(Dump Load DumpFile LoadFile);
 use File::Find::Rule;
 use File::Spec;
 use Path::Class;
+use File::Basename;
+use String::Compare;
+use Set::Light;
+
+use Template;
 
 use AlignDB::Stopwatch;
 
@@ -29,7 +34,9 @@ my $username = $Config->{database}{username};
 my $password = $Config->{database}{password};
 
 # write_axt parameter
-my $yml_file = "$FindBin::Bin/aspergillus.yml";
+my $yml_file = "$FindBin::Bin/fungi.yml";
+
+my $run;
 
 my $man  = 0;
 my $help = 0;
@@ -42,6 +49,7 @@ GetOptions(
     'username=s'   => \$username,
     'password=s'   => \$password,
     'y|yml_file=s' => \$yml_file,
+    'r|run'        => \$run,
 ) or pod2usage(2);
 
 pod2usage(1) if $help;
@@ -59,65 +67,160 @@ my $mysql_dir = dir( $dispatch->{dir}{mysql} );
 my $fasta_dir = dir( $dispatch->{dir}{fasta} );
 
 my $species_ref = $dispatch->{species};
-my @species     = sort keys %{$species_ref};
 
-my $version = $dispatch->{meta}{version};
+my $version     = $dispatch->{meta}{version};
+my $initrc_file = $dispatch->{meta}{initrc_file};
 
 #----------------------------------------------------------#
 # Write .axt files from alignDB
 #----------------------------------------------------------#
-for my $sp (@species) {
+my $initrc_str;
+for my $sp ( sort keys %{$species_ref} ) {
     print "$sp\n";
-    if ( $species_ref->{$sp}{core} ) {
-        my ( $ensembl_dir, $ensembl_db ) = match_ensembl( $sp, 'core' );
-        if ( $species_ref->{$sp}{db} ) {
-            $ensembl_db = $species_ref->{$sp}{db};
+
+    my (@aliases);
+    {
+        my ( $genus, $species, $strain ) = split " ", $sp;
+
+        if ($species) {
+            my $str = lc( substr( $genus, 0, 1 ) . substr( $species, 0, 3 ) );
+            push @aliases, $str;
+            push @aliases, $genus . '_' . $species;
+            push @aliases, substr( $genus, 0, 1 ) . $species;
+            push @aliases, substr( $genus, 0, 1 ) . '_' . $species;
         }
-
-        my $cmd
-            = "perl $FindBin::Bin/build_ensembl.pl"
-            . " -s=$server"
-            . " --port=$port"
-            . " -u=$username"
-            . " --password=$password"
-            . " --initdb"
-            . " --db=$ensembl_db"
-            . " --ensembl=$ensembl_dir";
-
-        $stopwatch->block_message("Build ensembl for $sp");
-        $stopwatch->block_message($cmd);
-        system $cmd;
-        $stopwatch->block_message("Finish build");
+        else {
+            my $str = lc $genus;
+            push @aliases, $str;
+            push @aliases, $genus;
+        }
     }
+
+    #print Dump { dirs => \@dirs, db_base => $db_base, aliases => \@aliases};
+
+    # build databases
+    for my $group (qw{core funcgen otherfeatures variation compara}) {
+        if ( $species_ref->{$sp}{$group} ) {
+            my $ensembl_db = build_db( $sp, $group, $mysql_dir, $run );
+            if ( $species_ref->{$sp}{initrc} ) {
+                my $aliases_ref = [@aliases];
+                push @{$aliases_ref}, $aliases[0] . "_$group" . "_$version";
+                push @{$aliases_ref}, $aliases[0] . "_$version"
+                    if $group eq 'core';
+                if ( ref $species_ref->{$sp}{$group} eq 'HASH'
+                    and exists $species_ref->{$sp}{$group}{aliases} )
+                {
+                    push @{$aliases_ref},
+                        @{ $species_ref->{$sp}{$group}{aliases} };
+                }
+                $initrc_str
+                    .= build_initrc( $sp, $group, $ensembl_db, $aliases_ref );
+            }
+        }
+    }
+}
+
+{
+    open my $out_fh, ">", $initrc_file;
+    print {$out_fh} $initrc_str;
+    close $out_fh;
 }
 
 $stopwatch->end_message;
 
-sub match_ensembl {
-    my $sp   = shift;
-    my $type = shift;
+sub build_db {
+    my $sp        = shift;
+    my $group     = shift;
+    my $mysql_dir = shift;
+    my $run       = shift;
 
-    my ( $genus, $species ) = split " ", $sp;
-
-    my $str = join "_", ( $genus, $species, $type );
-    $str = lc $str;
-
-    my $ensembl_dir;
-    while ( my $child = $mysql_dir->next ) {
-        next unless -d $child;
-        my $dir = $child->stringify;
-        my $flag = index $dir, $str;
-        next if $flag == -1;
-        $ensembl_dir = $dir;
+    my %score_of;
+    my ( $genus, $species, $strain ) = split " ", $sp;
+    my $set = Set::Light->new(qw{ core funcgen otherfeatures variation });
+    my $str;
+    if ( $set->has($group) ) {
+        $str = lc join "_", grep {$_} ( $genus, $species, $strain, $group );
+    }
+    else {
+        $str = lc join "_", ( 'ensembl', $group, $genus  );
     }
 
-    my $ensembl_db
-        = lc( substr( $genus, 0, 1 ) )
-        . substr( $species, 0, 3 )
-        . "_$type"
-        . "_$version";
+    while ( my $child = $mysql_dir->next ) {
+        next unless -d $child;
+        my $dir      = $child->stringify;
+        my $base_dir = basename($dir);
+        my $score    = String::Compare::char_by_char( $base_dir, $str );
+        $score_of{$dir} = $score;
+    }
 
-    return ( $ensembl_dir, $ensembl_db );
+    my ($ensembl_dir)
+        = sort { $score_of{$b} <=> $score_of{$a} } keys %score_of;
+    my $ensembl_db = basename($ensembl_dir);
+    print "Find $ensembl_db for $str\n";
+
+    my $cmd
+        = "perl $FindBin::Bin/build_ensembl.pl"
+        . " -s=$server"
+        . " --port=$port"
+        . " -u=$username"
+        . " --password=$password"
+        . " --initdb"
+        . " --db=$ensembl_db"
+        . " --ensembl=$ensembl_dir";
+
+    $stopwatch->block_message("Build ensembl for $ensembl_db");
+    $stopwatch->block_message($cmd);
+    system $cmd if $run;
+    $stopwatch->block_message("Finish build");
+
+    return $ensembl_db;
+}
+
+sub build_initrc {
+    my $sp          = shift;
+    my $group       = shift;
+    my $db          = shift;
+    my $aliases_ref = shift;
+
+    my $text = <<'EOF';
+{    # [% sp %]
+    Bio::EnsEMBL::DBSQL::DBAdaptor->new(
+        -host    => $host,
+        -user    => $user,
+        -pass    => $pass,
+        -port    => $port,
+        -species => '[% sp %]',
+        -group   => '[% group %]',
+        -dbname  => '[% db %]',
+    );
+
+    my @aliases = (
+[% FOREACH item IN aliases -%]
+        '[% item %]',
+[% END -%]
+    );
+
+    Bio::EnsEMBL::Utils::ConfigRegistry->add_alias(
+        -species => '[% sp %]',
+        -alias   => \@aliases,
+    );
+}
+
+EOF
+
+    my $tt = Template->new;
+    my $output;
+    $tt->process(
+        \$text,
+        {   sp      => $sp,
+            group   => $group,
+            db      => $db,
+            aliases => $aliases_ref,
+        },
+        \$output
+    ) or die Template->error;
+
+    return $output;
 }
 
 __END__
@@ -153,17 +256,6 @@ Prints the manual page and exits.
 =back
 
 =head1 DESCRIPTION
-
-format 1: chr1.yml
-  --- 1-25744,815056-817137
-  
-  output axt: chr1/chr1.axt
-format 2: bin1.yml
-  ---
-  chr1: '1-25744,815056-817137'
-
-  output axt: bin1/chr1.axt
-
 
 =cut
 
