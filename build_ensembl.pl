@@ -1,6 +1,7 @@
 #!/usr/bin/perl
 use strict;
 use warnings;
+use autodie;
 
 use Getopt::Long;
 use Pod::Usage;
@@ -135,7 +136,7 @@ if ($do_checksum) {
             my @array = @{ $error_of->{$key} };
             if ( scalar @array ) {
                 $message .= "[$key]:\n";
-                $message .= join "\n", map { " " x 4 . $_  } @array;
+                $message .= join "\n", map { " " x 4 . $_ } @array;
             }
         }
         $stopwatch->block_message( $message, 1 );
@@ -199,8 +200,23 @@ else {
         # character that signifies a special sequence.
         # So I ingore this
         my $cmd
-            = "mysqlimport -h$server -P$port -u$username -p$password --local";
-        system("$cmd $db $abs_table_file");
+            = "mysqlimport -h$server -P$port -u$username -p$password --local"
+            . " --fields_escaped_by=\\\\ --fields-terminated-by='\\t'"
+            . " --use-threads=4"
+            . "  $db $abs_table_file";
+        system($cmd);
+
+        ## Most wired bug
+        ## import success in cmd line but warning when system() on Windows
+        #if ( $^O eq 'MSWin32' ) {
+        #    my $bat = $db . '.bat';
+        #    open my $fh, '>', $bat;
+        #    print {$fh} "$cmd $db $abs_table_file\n";
+        #    system $bat;
+        #}
+        #else {
+        #    system("$cmd $db $abs_table_file");
+        #}
 
         unlink $abs_table_file;
     }
