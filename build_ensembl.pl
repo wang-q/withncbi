@@ -202,7 +202,7 @@ else {
         my $cmd
             = "mysqlimport -h$server -P$port -u$username -p$password --local"
             . " --fields_escaped_by=\\\\ --fields-terminated-by='\\t'"
-            . " --use-threads=4"
+            #. " --use-threads=4"
             . "  $db $abs_table_file";
         system($cmd);
 
