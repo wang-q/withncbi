@@ -12,6 +12,7 @@ use Bio::EnsEMBL::DBSQL::DBAdaptor;
 use Bio::EnsEMBL::DBSQL::SliceAdaptor;
 
 use File::Find::Rule;
+use File::Basename;
 use String::Compare;
 use List::Util qw(reduce);
 use List::MoreUtils qw(zip);
@@ -119,7 +120,7 @@ else {
 if ($dir_fa) {
     my @files = sort File::Find::Rule->file->name('*.fa')->in($dir_fa);
 
-    my @chrs = @files;
+    my @chrs = map { basename $_ , ".fa" } @files; # strip dir and suffix
     while (1) {
         my $lcss = lcss(@chrs);
         last unless $lcss;
@@ -189,7 +190,8 @@ __END__
 =head1 NAME
 
     write_masked_chr.pl - just like RepeatMasker does, but use ensembl
-                            annotations
+                          annotations.
+                          And it change fasta headers for you.
 
 =head1 SYNOPSIS
 
@@ -204,6 +206,12 @@ __END__
         --feature           mask which feature, default is "repeat"
         -y, --yaml_file     use a exists yaml file as annotation
         --dir               .fa dir
+    
+    > perl write_masked_chr.pl -e arabidopsis_58 
+    > perl write_masked_chr.pl --dir e:\data\alignment\arabidopsis\ath_58\ -y e:\wq\Scripts\alignDB\util\arabidopsis_58_repeat.yml
+    
+    $ perl write_masked_chr.pl -e nip_65
+    $ perl write_masked_chr.pl --dir /home/wangq/data/alignment/rice/nip_65 -y nip_65_repeat.yml
 
 =head1 OPTIONS
 
