@@ -21,15 +21,14 @@ use FindBin;
 #----------------------------------------------------------#
 # GetOpt section
 #----------------------------------------------------------#
-my $in_dir
-    = 'd:/wq/Scripts/alignDB/extra/AthvsSix.crude';    # Specify location here
+my $in_dir           = '.';           # Specify location here
 my $out_dir          = undef;         # Specify output dir here
 my $length_threshold = 1000;          # Set the threshold of alignment length
 my $aln_prog         = 'clustalw';    # Default alignment program
 
 my $quick_mode   = undef;    # quick mode
-my $indel_expand = 25;      # in quick mode, expand indel regoin
-my $indel_join   = 25;      # in quick mode, join adjacent indel regions
+my $indel_expand = 50;       # in quick mode, expand indel regoin
+my $indel_join   = 50;       # in quick mode, join adjacent indel regions
 
 my $no_trim = 0;             # trim outgroup only sequence
 
@@ -87,24 +86,24 @@ my $worker = sub {
     my ( $seq_of, $seq_names ) = read_fasta($infile);
 
     if ($quick_mode) {
-        $seq_of = realign_quick($seq_of, $seq_names);
+        $seq_of = realign_quick( $seq_of, $seq_names );
     }
     else {
-        $seq_of = realign_all($seq_of, $seq_names);
+        $seq_of = realign_all( $seq_of, $seq_names );
     }
-    
-    $seq_of = trim_hf($seq_of, $seq_names);
-    
-    if (! $no_trim) {
-        $seq_of = trim_outgroup($seq_of, $seq_names);
+
+    $seq_of = trim_hf( $seq_of, $seq_names );
+
+    if ( !$no_trim ) {
+        $seq_of = trim_outgroup( $seq_of, $seq_names );
     }
-    
+
     my $outfile = basename($infile);
     $outfile = $out_dir . "/$outfile";
-    
+
     open my $out_fh, '>', $outfile
         or die("Cannot open OUT file $outfile");
-    for my $name (@{$seq_names}) {
+    for my $name ( @{$seq_names} ) {
         my $seq = $seq_of->{$name};
         print {$out_fh} ">", $name, "\n";
         print {$out_fh} $seq, "\n";
@@ -132,18 +131,18 @@ exit;
 sub realign_all {
     my $seq_of    = shift;
     my $seq_names = shift;
-    
+
     my @seqs;
-    for (@{$seq_names}) {
+    for ( @{$seq_names} ) {
         push @seqs, $seq_of->{$_};
     }
 
-    my $realigned_seqs =  multi_align( \@seqs, $aln_prog );
-    
-    for my $i (0 .. scalar @{$seq_names} - 1) {
-        $seq_of->{$seq_names->[$i]} = $realigned_seqs->[$i];
+    my $realigned_seqs = multi_align( \@seqs, $aln_prog );
+
+    for my $i ( 0 .. scalar @{$seq_names} - 1 ) {
+        $seq_of->{ $seq_names->[$i] } = $realigned_seqs->[$i];
     }
-    
+
     return $seq_of;
 }
 
@@ -225,12 +224,12 @@ sub trim_hf {
     # header indels
     while (1) {
         my @first_column;
-        for (@{$seq_names}) {
+        for ( @{$seq_names} ) {
             my $first_base = substr( $seq_of->{$_}, 0, 1 );
             push @first_column, $first_base;
         }
         if ( any { $_ eq '-' } @first_column ) {
-            for (@{$seq_names}) {
+            for ( @{$seq_names} ) {
                 substr( $seq_of->{$_}, 0, 1, '' );
             }
         }
@@ -242,12 +241,12 @@ sub trim_hf {
     # footer indels
     while (1) {
         my (@last_column);
-        for (@{$seq_names}) {
+        for ( @{$seq_names} ) {
             my $last_base = substr( $seq_of->{$_}, -1, 1 );
             push @last_column, $last_base;
         }
         if ( any { $_ eq '-' } @last_column ) {
-            for (@{$seq_names}) {
+            for ( @{$seq_names} ) {
                 substr( $seq_of->{$_}, -1, 1, '' );
             }
         }
@@ -295,7 +294,7 @@ sub trim_outgroup {
         my $seg_end   = $_->[1];
         for (@$seq_names) {
             substr(
-                $seq_of->{$_} ,
+                $seq_of->{$_},
                 $seg_start - 1,
                 $seg_end - $seg_start + 1, ''
             );
