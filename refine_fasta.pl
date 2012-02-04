@@ -6,6 +6,7 @@ use Getopt::Long;
 use Pod::Usage;
 use YAML qw(Dump Load DumpFile LoadFile);
 
+use File::Spec;
 use File::Find::Rule;
 use File::Basename;
 use List::Util qw(first max maxstr min minstr reduce shuffle sum);
@@ -21,8 +22,8 @@ use FindBin;
 #----------------------------------------------------------#
 # GetOpt section
 #----------------------------------------------------------#
-my $in_dir           = '.';           # Specify location here
-my $out_dir          = undef;         # Specify output dir here
+my $in_dir = '.';    # Specify location here
+my $out_dir;         # Specify output dir here
 my $length_threshold = 1000;          # Set the threshold of alignment length
 my $aln_prog         = 'clustalw';    # Default alignment program
 
@@ -59,16 +60,16 @@ pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
 # make output dir
 #----------------------------------------------------------#
 unless ($out_dir) {
-    $out_dir = $in_dir . "_$aln_prog";
-    $out_dir = $out_dir . "_quick" if $quick_mode;
+    $out_dir = File::Spec->rel2abs($in_dir) . "_$aln_prog";
+        $out_dir = $out_dir . "_quick" if $quick_mode;
 }
 unless ( -e $out_dir ) {
     mkdir $out_dir, 0777
-        or die "Cannot create \"$out_dir\" directory: $!";
+        or die "Cannot create [$out_dir] directory: $!";
 }
 
 #----------------------------------------------------------#
-# Search for all files and push their paths to @dir_fiels
+# Search for all files
 #----------------------------------------------------------#
 my @files
     = File::Find::Rule->file()->name( '*.fa', '*.fas', '*.fasta' )->in($in_dir);
