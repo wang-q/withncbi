@@ -9,6 +9,7 @@ use YAML qw(Dump Load DumpFile LoadFile);
 
 use File::Spec;
 use File::Find::Rule;
+use File::Basename;
 use Bio::AlignIO;
 
 use AlignDB::Stopwatch;
@@ -24,6 +25,7 @@ my $length_threshold = 1000;    # Set the threshold of alignment length
 my $target_id        = 9606;    # taxon id of human
 my $has_outgroup;    # Treate last sequence as outgroup and move it to top
 my $subset;          # get sequences of listed names, seperated by comma
+my $block;           # write galaxy style blocked fasta
 
 # run in parallel mode
 my $parallel = 1;
@@ -40,6 +42,7 @@ GetOptions(
     'id=i'         => \$target_id,
     'has_outgroup' => \$has_outgroup,
     'subset=s'     => \$subset,
+    'block'        => \$block,
     'parallel=i'   => \$parallel,
 ) or pod2usage(2);
 
@@ -58,6 +61,7 @@ if ($subset) {
 
 unless ($out_dir) {
     $out_dir = File::Spec->rel2abs($in_dir) . "_fasta";
+    $out_dir = $out_dir . "_block" if $block;
     $out_dir = $out_dir . "_$subset" if $subset;
     $out_dir = $out_dir . "_ref_first" if $has_outgroup;
 }
@@ -83,7 +87,9 @@ my $worker = sub {
         -format => 'maf'
     );
 
+    my $count;
 ALN: while ( my $aln = $in->next_aln ) {
+        $count++;
 
         my $align_length  = $aln->length;
         my $num_sequences = $aln->num_sequences;
@@ -117,17 +123,39 @@ ALN: while ( my $aln = $in->next_aln ) {
         }
 
         # output
-        my ( undef, $chr ) = split /\./, $seq_of->{$target}->display_id;
-        my $start = $seq_of->{$target}->start;
-        my $end   = $seq_of->{$target}->end;
+        if ($block) {
+            my $outfile = basename($infile);
+            $outfile = $out_dir . "/$outfile" . ".fas";
 
-        open my $fh, '>',
-            $out_dir . "/id3702" . "_$chr" . "_$start" . "_$end.fas";
-        for (@names) {
-            print {$fh} ">$_\n";
-            print {$fh} $seq_of->{$_}->seq, "\n";
+            open my $fh, ">>", $outfile;
+            for my $species (@names) {
+                my ( undef, $chr ) = split /\./,
+                    $seq_of->{$species}->display_id;
+                my $start  = $seq_of->{$species}->start;
+                my $end    = $seq_of->{$species}->end;
+                my $strand = $seq_of->{$species}->strand;
+                print {$fh} ">$species.$chr";
+                print {$fh} "($strand):$start-$end";
+                print {$fh} "|species=$species";
+                print {$fh} "\n";
+                print {$fh} $seq_of->{$species}->seq, "\n";
+            }
+            print {$fh} "\n";
+            close $fh;
         }
-        close $fh;
+        else {
+            my ( undef, $chr ) = split /\./, $seq_of->{$target}->display_id;
+            my $start = $seq_of->{$target}->start;
+            my $end   = $seq_of->{$target}->end;
+
+            open my $fh, '>',
+                $out_dir . "/id$target_id" . "_$chr" . "_$start" . "_$end.fas";
+            for my $species (@names) {
+                print {$fh} ">$species\n";
+                print {$fh} $seq_of->{$species}->seq, "\n";
+            }
+            close $fh;
+        }
     }
 };
 

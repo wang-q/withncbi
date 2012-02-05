@@ -1,6 +1,7 @@
 #!/usr/bin/perl
 use strict;
 use warnings;
+use autodie;
 
 use Getopt::Long;
 use Pod::Usage;
@@ -11,6 +12,7 @@ use File::Find::Rule;
 use File::Basename;
 use List::Util qw(first max maxstr min minstr reduce shuffle sum);
 use List::MoreUtils qw(any all);
+use Math::Combinatorics;
 
 use AlignDB::IntSpan;
 use AlignDB::Stopwatch;
@@ -32,6 +34,7 @@ my $indel_expand = 50;       # in quick mode, expand indel regoin
 my $indel_join   = 50;       # in quick mode, join adjacent indel regions
 
 my $no_trim = 0;             # trim outgroup only sequence
+my $block;                   # input is galaxy style blocked fasta
 
 # run in parallel mode
 my $parallel = 1;
@@ -40,17 +43,18 @@ my $man  = 0;
 my $help = 0;
 
 GetOptions(
-    'help|?'     => \$help,
-    'man'        => \$man,
-    'in_dir=s'   => \$in_dir,
-    'out_dir=s'  => \$out_dir,
-    'length=i'   => \$length_threshold,
-    'msa=s'      => \$aln_prog,
-    'quick'      => \$quick_mode,
-    'no_trim'    => \$no_trim,
-    'expand=i'   => \$indel_expand,
-    'join=i'     => \$indel_join,
-    'parallel=i' => \$parallel,
+    'help|?'      => \$help,
+    'man'         => \$man,
+    'i|in_dir=s'  => \$in_dir,
+    'o|out_dir=s' => \$out_dir,
+    'length=i'    => \$length_threshold,
+    'msa=s'       => \$aln_prog,
+    'quick'       => \$quick_mode,
+    'no_trim'     => \$no_trim,
+    'expand=i'    => \$indel_expand,
+    'join=i'      => \$indel_join,
+    'block'       => \$block,
+    'parallel=i'  => \$parallel,
 ) or pod2usage(2);
 
 pod2usage(1) if $help;
@@ -61,7 +65,7 @@ pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
 #----------------------------------------------------------#
 unless ($out_dir) {
     $out_dir = File::Spec->rel2abs($in_dir) . "_$aln_prog";
-        $out_dir = $out_dir . "_quick" if $quick_mode;
+    $out_dir = $out_dir . "_quick" if $quick_mode;
 }
 unless ( -e $out_dir ) {
     mkdir $out_dir, 0777
@@ -87,16 +91,14 @@ my $worker = sub {
     my ( $seq_of, $seq_names ) = read_fasta($infile);
 
     if ($quick_mode) {
-        $seq_of = realign_quick( $seq_of, $seq_names );
+        realign_quick( $seq_of, $seq_names );
     }
     else {
-        $seq_of = realign_all( $seq_of, $seq_names );
+        realign_all( $seq_of, $seq_names );
     }
-
-    $seq_of = trim_hf( $seq_of, $seq_names );
-
+    trim_hf( $seq_of, $seq_names );
     if ( !$no_trim ) {
-        $seq_of = trim_outgroup( $seq_of, $seq_names );
+        trim_outgroup( $seq_of, $seq_names );
     }
 
     my $outfile = basename($infile);
@@ -112,6 +114,63 @@ my $worker = sub {
     close $out_fh;
 };
 
+my $worker_block = sub {
+    my $infile = shift;
+
+    my $stopwatch = AlignDB::Stopwatch->new;
+    print "Process $infile\n";
+
+    # don't use $/ = "\n\n", which cause bioperl panic
+    open my $in_fh, "<", $infile;
+    my $content = '';
+    while ( my $line = <$in_fh> ) {
+        if ( $line =~ /^\s+$/ and $content =~ /\S/) {
+            my @lines = grep {/\S/} split /\n/, $content;
+            $content = '';
+            die "headers not equal to seqs\n" if @lines % 2;
+
+            my ( $seq_of, $seq_names ) = ( {}, [] );
+            my $names = [ 0 .. @lines / 2 - 1 ];    # store simplified name
+            while (@lines) {
+                my $name = shift @lines;
+                $name =~ s/^\>//;
+                chomp $name;
+                my $seq = shift @lines;
+                chomp $seq;
+                push @{$seq_names}, $name;
+                my $idx = scalar @{$seq_names} - 1;
+                $seq_of->{$idx} = $seq;
+            }
+
+            if ($quick_mode) {
+                realign_quick( $seq_of, $names );
+            }
+            else {
+                realign_all( $seq_of, $names );
+            }
+            trim_hf( $seq_of, $names );
+            if ( !$no_trim ) {
+                trim_outgroup( $seq_of, $names );
+            }
+
+            my $outfile = basename($infile);
+            $outfile = $out_dir . "/$outfile";
+
+            open my $out_fh, '>>', $outfile;
+            for my $i ( @{$names} ) {
+                print {$out_fh} ">", $seq_names->[$i], "\n";
+                print {$out_fh} $seq_of->{$i}, "\n";
+            }
+            print {$out_fh} "\n";
+            close $out_fh;
+        }
+        else {
+            $content .= $line;
+        }
+    }
+    close $in_fh;
+};
+
 # process each .fasta files
 my $stopwatch = AlignDB::Stopwatch->new;
 
@@ -119,7 +178,7 @@ my @jobs = sort @files;
 my $run  = AlignDB::Run->new(
     parallel => $parallel,
     jobs     => \@jobs,
-    code     => $worker,
+    code     => $block ? $worker_block : $worker,
 );
 $run->run;
 
@@ -144,7 +203,7 @@ sub realign_all {
         $seq_of->{ $seq_names->[$i] } = $realigned_seqs->[$i];
     }
 
-    return $seq_of;
+    return;
 }
 
 #----------------------------#
@@ -212,7 +271,7 @@ sub realign_quick {
         }
     }
 
-    return $seq_of;
+    return;
 }
 
 #----------------------------#
@@ -256,7 +315,7 @@ sub trim_hf {
         }
     }
 
-    return $seq_of;
+    return;
 }
 
 #----------------------------#
@@ -302,7 +361,7 @@ sub trim_outgroup {
         }
     }
 
-    return $seq_of;
+    return;
 }
 
 __END__
