@@ -65,15 +65,18 @@ unless ($out_dir) {
     $out_dir = $out_dir . "_$subset" if $subset;
     $out_dir = $out_dir . "_ref_first" if $has_outgroup;
 }
-unless ( -e $out_dir ) {
-    mkdir $out_dir, 0777
-        or die "Cannot create [$out_dir] directory: $!";
+if ( !-e $out_dir ) {
+    mkdir $out_dir, 0777;
+}
+elsif ($block) {
+    print "We are going to output blocked fasta.\n";
+    die "$out_dir exists, you should remove it first to avoid errors.\n";
 }
 
 #----------------------------------------------------------#
 # Search for all files
 #----------------------------------------------------------#
-my @files = File::Find::Rule->file()->name('*.maf')->in($in_dir);
+my @files = File::Find::Rule->file->name('*.maf')->in($in_dir);
 printf "\n----Total .maf Files: %4s----\n\n", scalar @files;
 
 #----------------------------------------------------------#

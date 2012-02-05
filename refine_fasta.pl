@@ -67,16 +67,19 @@ unless ($out_dir) {
     $out_dir = File::Spec->rel2abs($in_dir) . "_$aln_prog";
     $out_dir = $out_dir . "_quick" if $quick_mode;
 }
-unless ( -e $out_dir ) {
-    mkdir $out_dir, 0777
-        or die "Cannot create [$out_dir] directory: $!";
+if ( !-e $out_dir ) {
+    mkdir $out_dir, 0777;
+}
+elsif ($block) {
+    print "We are going to output blocked fasta.\n";
+    die "$out_dir exists, you should remove it first to avoid errors.\n";
 }
 
 #----------------------------------------------------------#
 # Search for all files
 #----------------------------------------------------------#
 my @files
-    = File::Find::Rule->file()->name( '*.fa', '*.fas', '*.fasta' )->in($in_dir);
+    = File::Find::Rule->file->name( '*.fa', '*.fas', '*.fasta' )->in($in_dir);
 printf "\n----Total .fasta Files: %4s----\n\n", scalar @files;
 
 #----------------------------------------------------------#
