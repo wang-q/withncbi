@@ -112,6 +112,8 @@ my $worker = sub {
         print {$out_fh} $seq, "\n";
     }
     close $out_fh;
+
+    print "Done.\n\n";
 };
 
 my $worker_block = sub {
@@ -124,7 +126,7 @@ my $worker_block = sub {
     open my $in_fh, "<", $infile;
     my $content = '';
     while ( my $line = <$in_fh> ) {
-        if ( $line =~ /^\s+$/ and $content =~ /\S/) {
+        if ( $line =~ /^\s+$/ and $content =~ /\S/ ) {
             my @lines = grep {/\S/} split /\n/, $content;
             $content = '';
             die "headers not equal to seqs\n" if @lines % 2;
@@ -169,6 +171,7 @@ my $worker_block = sub {
         }
     }
     close $in_fh;
+    print "Done.\n\n";
 };
 
 # process each .fasta files

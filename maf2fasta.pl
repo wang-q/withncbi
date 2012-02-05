@@ -157,6 +157,8 @@ ALN: while ( my $aln = $in->next_aln ) {
             close $fh;
         }
     }
+
+    print ".fas file generated.\n\n";
 };
 
 # process each .fasta files
