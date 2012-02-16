@@ -137,8 +137,9 @@ ALN: while ( my $aln = $in->next_aln ) {
                 my $start  = $seq_of->{$species}->start;
                 my $end    = $seq_of->{$species}->end;
                 my $strand = $seq_of->{$species}->strand;
-                print {$fh} ">$species.$chr";
-                print {$fh} "($strand):$start-$end";
+                print {$fh} ">$species.$chr(";
+                print {$fh} $strand > 0 ? "+" : "-";
+                print {$fh} "):$start-$end";
                 print {$fh} "|species=$species";
                 print {$fh} "\n";
                 print {$fh} $seq_of->{$species}->seq, "\n";
