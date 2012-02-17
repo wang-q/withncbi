@@ -26,15 +26,14 @@ use FindBin;
 #----------------------------------------------------------#
 my $in_dir = '.';    # Specify location here
 my $out_dir;         # Specify output dir here
-my $length_threshold = 1000;          # Set the threshold of alignment length
-my $aln_prog         = 'clustalw';    # Default alignment program
+my $aln_prog = 'clustalw';    # Default alignment program
 
-my $quick_mode   = undef;    # quick mode
-my $indel_expand = 50;       # in quick mode, expand indel regoin
-my $indel_join   = 50;       # in quick mode, join adjacent indel regions
+my $quick_mode   = undef;     # quick mode
+my $indel_expand = 50;        # in quick mode, expand indel regoin
+my $indel_join   = 50;        # in quick mode, join adjacent indel regions
 
-my $no_trim = 0;             # trim outgroup only sequence
-my $block;                   # input is galaxy style blocked fasta
+my $no_trim = 0;              # trim outgroup only sequence
+my $block;                    # input is galaxy style blocked fasta
 
 # run in parallel mode
 my $parallel = 1;
@@ -47,7 +46,6 @@ GetOptions(
     'man'         => \$man,
     'i|in_dir=s'  => \$in_dir,
     'o|out_dir=s' => \$out_dir,
-    'length=i'    => \$length_threshold,
     'msa=s'       => \$aln_prog,
     'quick'       => \$quick_mode,
     'no_trim'     => \$no_trim,
