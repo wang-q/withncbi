@@ -83,7 +83,7 @@ mkdir [% item.dir %]
 # sra to fastq (pair end)
 [% stkbin_dir %]/fastq-dump [% item.file %] \
     --split-files --gzip -O [% item.dir %]
-[ $? -ne 0 ] && echo [% item.name %] failed >> [% base_dir %]/fail.log && exit 255
+[ $? -ne 0 ] && echo `date` [% item.name %] [fastq dump] failed >> [% base_dir %]/fail.log && exit 255
 
 # align pair reads to reference genome
 bwa aln -q 15 -t [% parallel %] [% ref_seq %] [% item.dir %]/[% item.name %]_1.fastq.gz \
@@ -172,7 +172,7 @@ samtools mpileup -uf [% ref_seq %] [% item.dir %]/[% item.name %].recal.bam \
 seqtk fq2fa [% item.dir %]/[% item.name %].fq 20 > [% item.dir %]/[% item.name %].fa
 
 # let's clean up
-find process/ERR038793/ -type f \
+find [% item.dir %] -type f \
     -name "*.sai"    -o -name "*.fastq.gz" \
     -o -name "*.bam" -o -name "*.bai" \
     -o -name "*.sam" -o -name "*.intervals" \
