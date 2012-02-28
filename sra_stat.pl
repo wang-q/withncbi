@@ -64,14 +64,20 @@ for my $name ( sort keys %{$yml} ) {
             my $srr = $info->{srr}[$i];
             my $url = $info->{downloads}[$i];
 
+            my $spot = $info->{srr_info}{$srr}{spot};
+            my $base = $info->{srr_info}{$srr}{base};
+
             my $rg_str
                 = '@RG'
                 . "\tID:$srr"
                 . "\tLB:$srx"
-                . "\tPL:ILLUMINA"
+                . "\tPL:$platform"
                 . "\tSM:$name";
-            $csv->print( $out_fh,
-                [ $name, $srx, $platform, $layout, $srr, $rg_str ] );
+            $csv->print(
+                $out_fh,
+                [   $name, $srx, $platform, $layout, $srr, $spot, $base, $rg_str
+                ]
+            );
             print {$ftp_fh} $url, "\n";
         }
     }
@@ -87,7 +93,7 @@ __END__
     sra_stat.pl - stats for sra
 
 =head1 SYNOPSIS
-    perl sra_stat.pl --in_dir G:/S288CvsRM11 --msa muscle --quick
+    perl sra_stat.pl -y DGRP.yml -p illumina -l pair
 
     sra_stat.pl [options]
       Options:
