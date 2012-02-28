@@ -99,23 +99,24 @@ bwa aln -q 15 -t [% parallel %] [% ref_seq %] [% item.dir %]/[% item.name %]_2.f
 bwa sampe -r "@RG\tID:[% item.name %]\tLB:[% item.name %]\tPL:ILLUMINA\tSM:[% item.name %]" \
     [% ref_seq %] \
     [% item.dir %]/[% item.name %]*.sai [% item.dir %]/[% item.name %]*.fastq.gz \
-    > [% item.dir %]/[% item.name %].sam
+    | gzip > [% item.dir %]/[% item.name %].sam.gz
 [ $? -ne 0 ] && echo `date` [% item.name %] [bwa sampe] failed >> [% base_dir %]/fail.log && exit 255
 
-# conver sam to bam
-samtools view -bS [% item.dir %]/[% item.name %].sam -o [% item.dir %]/[% item.name %].bam
-
-# sort bam
-samtools sort [% item.dir %]/[% item.name %].bam [% item.dir %]/[% item.name %].sorted
+# convert sam to bam and sort
+samtools view -uS [% item.dir %]/[% item.name %].sam.gz \
+    | samtools sort -n - [% item.dir %]/[% item.name %].tmp1
+samtools fixmate [% item.dir %]/[% item.name %].tmp1.bam - \
+    | samtools sort - [% item.dir %]/[% item.name %].sort
+rm [% item.dir %]/[% item.name %].tmp1.bam
 
 # index bam
-samtools index [% item.dir %]/[% item.name %].sorted.bam
+samtools index [% item.dir %]/[% item.name %].sort.bam
 
 # index regions for realignment
 java -Xmx[% memory %]g -jar [% gatkbin_dir %]/GenomeAnalysisTK.jar -nt [% parallel %] \
     -T RealignerTargetCreator \
     -R [% ref_seq %] \
-    -I [% item.dir %]/[% item.name %].sorted.bam  \
+    -I [% item.dir %]/[% item.name %].sort.bam  \
     --out [% item.dir %]/[% item.name %].intervals
 [ $? -ne 0 ] && echo `date` [% item.name %] [gatk target] failed >> [% base_dir %]/fail.log && exit 255
 
@@ -123,14 +124,14 @@ java -Xmx[% memory %]g -jar [% gatkbin_dir %]/GenomeAnalysisTK.jar -nt [% parall
 java -Xmx[% memory %]g -jar [% gatkbin_dir %]/GenomeAnalysisTK.jar \
     -T IndelRealigner \
     -R [% ref_seq %] \
-    -I [% item.dir %]/[% item.name %].sorted.bam \
+    -I [% item.dir %]/[% item.name %].sort.bam \
     -targetIntervals [% item.dir %]/[% item.name %].intervals \
-    --out [% item.dir %]/[% item.name %].realigned.bam
+    --out [% item.dir %]/[% item.name %].realign.bam
 [ $? -ne 0 ] && echo `date` [% item.name %] [gatk realign] failed >> [% base_dir %]/fail.log && exit 255
 
 # dup marking
 java -Xmx[% memory %]g -jar [% pcdbin_dir %]/MarkDuplicates.jar \
-    INPUT=[% item.dir %]/[% item.name %].realigned.bam \
+    INPUT=[% item.dir %]/[% item.name %].realign.bam \
     OUTPUT=[% item.dir %]/[% item.name %].dedup.bam \
     METRICS_FILE=[% item.dir %]/output.metrics \
     ASSUME_SORTED=true \
@@ -159,7 +160,7 @@ java -Xmx[% memory %]g -jar [% gatkbin_dir %]/GenomeAnalysisTK.jar \
     -R [% ref_seq %] \
     -I [% item.dir %]/[% item.name %].dedup.bam \
     -o [% item.dir %]/[% item.name %].recal.bam \
-    -recalFile process/ERR038793/recal_data.csv
+    -recalFile [% item.dir %]/recal_data.csv
 [ $? -ne 0 ] && echo `date` [% item.name %] [gatk recal] failed >> [% base_dir %]/fail.log && exit 255
 
 # generate fastq from bam
@@ -175,8 +176,7 @@ seqtk fq2fa [% item.dir %]/[% item.name %].fq 20 > [% item.dir %]/[% item.name %
 find [% item.dir %] -type f \
     -name "*.sai"    -o -name "*.fastq.gz" \
     -o -name "*.bam" -o -name "*.bai" \
-    -o -name "*.sam" -o -name "*.intervals" \
-    -o -name "*.csv" -o -name "*.metrics" \
+    -o -name "*.csv" -o -name "*.intervals" \
     | grep -v "recal" | xargs rm
 
 echo run time is $(expr `date +%s` - $start_time) s
