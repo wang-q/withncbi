@@ -25,26 +25,26 @@ my $store_dir = shift
     my $tt = Template->new;
 
     my @data = (
-        { taxon => 900501, name => "Line138", coverage => 34, },
-        { taxon => 900502, name => "Line176", coverage => 38.48, },
-        { taxon => 900503, name => "Line181", coverage => 30.66, },
-        { taxon => 900504, name => "Line208", coverage => 34.51, },
-        { taxon => 900505, name => "Line321", coverage => 41.75, },
-        { taxon => 900506, name => "Line332", coverage => 31.53, },
-        { taxon => 900507, name => "Line375", coverage => 41.91, },
-        { taxon => 900508, name => "Line38",  coverage => 34.1, },
-        { taxon => 900509, name => "Line380", coverage => 36.73, },
-        { taxon => 900510, name => "Line391", coverage => 47.62, },
-        { taxon => 900511, name => "Line40",  coverage => 41.27, },
-        { taxon => 900512, name => "Line406", coverage => 30.3, },
-        { taxon => 900513, name => "Line443", coverage => 33.35, },
-        { taxon => 900514, name => "Line517", coverage => 45.97, },
-        { taxon => 900515, name => "Line57",  coverage => 38.28, },
-        { taxon => 900516, name => "Line727", coverage => 33.64, },
-        { taxon => 900517, name => "Line738", coverage => 31.74, },
-        { taxon => 900518, name => "Line757", coverage => 32.87, },
-        { taxon => 900519, name => "Line852", coverage => 40.42, },
-        { taxon => 900520, name => "Line897", coverage => 32.81, },
+        { taxon => 900501, name => "DGRP-138", coverage => 34, },
+        { taxon => 900502, name => "DGRP-176", coverage => 38.48, },
+        { taxon => 900503, name => "DGRP-181", coverage => 30.66, },
+        { taxon => 900504, name => "DGRP-208", coverage => 34.51, },
+        { taxon => 900505, name => "DGRP-321", coverage => 41.75, },
+        { taxon => 900506, name => "DGRP-332", coverage => 31.53, },
+        { taxon => 900507, name => "DGRP-375", coverage => 41.91, },
+        { taxon => 900508, name => "DGRP-38",  coverage => 34.1, },
+        { taxon => 900509, name => "DGRP-380", coverage => 36.73, },
+        { taxon => 900510, name => "DGRP-391", coverage => 47.62, },
+        { taxon => 900511, name => "DGRP-40",  coverage => 41.27, },
+        { taxon => 900512, name => "DGRP-406", coverage => 30.3, },
+        { taxon => 900513, name => "DGRP-443", coverage => 33.35, },
+        { taxon => 900514, name => "DGRP-517", coverage => 45.97, },
+        { taxon => 900515, name => "DGRP-57",  coverage => 38.28, },
+        { taxon => 900516, name => "DGRP-727", coverage => 33.64, },
+        { taxon => 900517, name => "DGRP-738", coverage => 31.74, },
+        { taxon => 900518, name => "DGRP-757", coverage => 32.87, },
+        { taxon => 900519, name => "DGRP-852", coverage => 40.42, },
+        { taxon => 900520, name => "DGRP-897", coverage => 32.81, },
     );
 
     my @files = File::Find::Rule->file->name('*.gz')->in($seq_dir);
@@ -311,9 +311,9 @@ EOF
 
     my $strains_of = {
         Dmelvs21 => [
-            qw{ Dsim_65 Line138 Line176 Line181 Line208 Line321 Line332 Line375
-                Line38 Line380 Line391 Line40 Line406 Line443 Line517 Line57
-                Line727 Line738 Line757 Line852 Line897 }
+            qw{ Dsim_65 DGRP-138 DGRP-176 DGRP-181 DGRP-208 DGRP-321 DGRP-332
+                DGRP-375 DGRP-38 DGRP-380 DGRP-391 DGRP-40 DGRP-406 DGRP-443
+                DGRP-517 DGRP-57 DGRP-727 DGRP-738 DGRP-757 DGRP-852 DGRP-897 }
         ],
     };
 
@@ -371,12 +371,12 @@ EOF
 
     my $tt         = Template->new;
     my $strains_of = {
-        DmelvsVIIGE40x =>
-            [ qw{ Dsim_65 Line321 Line375 Line391 Line40 Line517 Line852 } ],
+        DmelvsVIIGE40x => [
+            qw{ Dsim_65 DGRP-321 DGRP-375 DGRP-391 DGRP-40 DGRP-517 DGRP-852 }],
         DmelvsXXI => [
-            qw{ Dsim_65 Line138 Line176 Line181 Line208 Line321 Line332 Line375
-                Line38 Line380 Line391 Line40 Line406 Line443 Line517 Line57
-                Line727 Line738 Line757 Line852 Line897 }
+            qw{ Dsim_65 DGRP-138 DGRP-176 DGRP-181 DGRP-208 DGRP-321 DGRP-332
+                DGRP-375 DGRP-38 DGRP-380 DGRP-391 DGRP-40 DGRP-406 DGRP-443
+                DGRP-517 DGRP-57 DGRP-727 DGRP-738 DGRP-757 DGRP-852 DGRP-897 }
         ],
     };
 
