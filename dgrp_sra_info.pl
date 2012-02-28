@@ -9,6 +9,7 @@ use YAML qw(Dump Load DumpFile LoadFile);
 use WWW::Mechanize;
 use Regexp::Common qw(balanced);
 use List::MoreUtils qw(uniq zip);
+use HTML::TableExtract;
 
 my $srs_worker = sub {
     my $term = shift;
@@ -16,14 +17,15 @@ my $srs_worker = sub {
     my $mech = WWW::Mechanize->new;
     $mech->stack_depth(0);    # no history to save memory
 
-    my $url_part = "http://www.ncbi.nlm.nih.gov/biosample/?term=";
-    my $url      = $url_part . $term;
+    my $url_part1 = "http://www.ncbi.nlm.nih.gov/biosample/?term=";
+    my $url_part2 = "&from=begin&to=end&dispmax=200";
+    my $url       = $url_part1 . $term . $url_part2;
     print $url, "\n";
 
     my @srx;
 
     $mech->get($url);
-    
+
     # this link exists in both summary and detailed pages
     $mech->follow_link(
         text_regex => qr{SRS\d+},
@@ -57,10 +59,27 @@ my $srx_worker = sub {
         sample   => "",
         library  => "",
         platform => "",
-        layout => "",
+        layout   => "",
     };
 
     $mech->get($url);
+
+    my $page = $mech->content;
+    my $te   = HTML::TableExtract->new;
+    $te->parse($page);
+
+    my %srr_info;
+    for my $ts ( $te->table_states ) {
+        for my $row ( $ts->rows ) {
+            for my $cell (@$row) {
+                $cell =~ s/,//g;
+                $cell =~ s/\s+//g;
+            }
+            next unless $row->[0] =~ /\d+/;
+            $srr_info{ $row->[1] } = { spot => $row->[2], base => $row->[3] };
+        }
+    }
+    $info->{srr_info} = \%srr_info;
 
     {
         my @links = $mech->find_all_links(
@@ -147,7 +166,7 @@ my @ids = (
     774, 820, 287, 335, 358, 360, 399, 732, 357, 486, 437, 304, 362, 380,
     306,
 );
-@ids =  uniq(@ids);
+@ids = uniq(@ids);
 
 my $master = {};
 for my $id (@ids) {
