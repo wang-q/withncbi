@@ -11,10 +11,10 @@ use String::Compare;
 use YAML qw(Dump Load DumpFile LoadFile);
 
 my $store_dir = shift
-    || File::Spec->catdir( $ENV{HOME}, "data/alignment/human" );
+    || File::Spec->catdir( $ENV{HOME}, "data/alignment/primates" );
 
 {    # on linux
-    my $data_dir    = File::Spec->catdir( $ENV{HOME}, "data/alignment/human" );
+    my $data_dir    = File::Spec->catdir( $ENV{HOME}, "data/alignment/primates" );
     my $pl_dir      = File::Spec->catdir( $ENV{HOME}, "Scripts" );
     my $kentbin_dir = File::Spec->catdir( $ENV{HOME}, "bin/x86_64" );
 
@@ -360,7 +360,7 @@ EOF
 }
 
 {    # on windows
-    my $data_dir = File::Spec->catdir("d:/data/alignment/human");
+    my $data_dir = File::Spec->catdir("d:/data/alignment/primates");
     my $pl_dir   = File::Spec->catdir("d:/wq/Scripts");
 
     my $tt = Template->new;
@@ -404,7 +404,7 @@ EOF
 }
 
 {    # multiz
-    my $data_dir = File::Spec->catdir( $ENV{HOME}, "data/alignment/human" );
+    my $data_dir = File::Spec->catdir( $ENV{HOME}, "data/alignment/primates" );
     my $pl_dir   = File::Spec->catdir( $ENV{HOME}, "Scripts" );
 
     my $tt         = Template->new;
