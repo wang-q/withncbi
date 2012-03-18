@@ -141,17 +141,6 @@ bsub -q mpi_2 -n 8 -J [% item.name %]-rm RepeatMasker [% item.dir %]/*.fasta -sp
 
 [% END -%]
 
-#----------------------------#
-# find failed rm jobs
-#----------------------------#
-[% FOREACH item IN data -%]
-# [% item.name %] [% item.coverage %]
-find [% item.dir %] -name "*fasta" \
-    | perl -e \
-    'while(<>) {chomp; s/\.fasta$//; next if -e qq{$_.fasta.masked}; next if -e qq{$_.fa}; print qq{ bsub -n 8 -J [% item.name %]_ RepeatMasker $_.fasta -species rice -xsmall --parallel 8 \n};}' >> catchup.txt
-
-[% END -%]
-
 # find [% data_dir %] -name "*.fasta.masked" | sed "s/\.fasta\.masked$//" | xargs -i echo mv {}.fasta.masked {}.fa | sh
 
 EOF
@@ -164,6 +153,33 @@ EOF
             kentbin_dir => $kentbin_dir
         },
         File::Spec->catfile( $store_dir, "rm.sh" )
+    ) or die Template->error;
+
+    $text = <<'EOF';
+#!/bin/bash
+cd [% data_dir %]
+
+#----------------------------#
+# find failed rm jobs
+#----------------------------#
+[% FOREACH item IN data -%]
+# [% item.name %] [% item.coverage %]
+find [% item.dir %] -name "*fasta" \
+    | perl -e \
+    'while(<>) {chomp; s/\.fasta$//; next if -e qq{$_.fasta.masked}; next if -e qq{$_.fa}; print qq{ bsub -n 8 -J [% item.name %]_ RepeatMasker $_.fasta -species rice -xsmall --parallel 8 \n};}' >> catchup.txt
+
+[% END -%]
+
+EOF
+
+    $tt->process(
+        \$text,
+        {   data        => \@data,
+            data_dir    => $data_dir,
+            pl_dir      => $pl_dir,
+            kentbin_dir => $kentbin_dir
+        },
+        File::Spec->catfile( $store_dir, "rm_failed.sh" )
     ) or die Template->error;
 
     $text = <<'EOF';
@@ -245,9 +261,9 @@ cd [% data_dir %]
 #----------------------------#
 [% FOREACH item IN data -%]
 # [% item.name %] [% item.coverage %]
-find [% data_dir %]/Dmelvs[% item.name %]/axtNet -name "*.axt.gz" | xargs gzip -d
+find [% data_dir %]/Nipvs[% item.name %]/axtNet -name "*.axt.gz" | xargs gzip -d
 perl [% pl_dir %]/alignDB/extra/two_way_batch.pl -d Nipvs[% item.name %] -t="39947,Nip" -q "[% item.taxon %],[% item.name %]" -a [% data_dir %]/Nipvs[% item.name %] -at 10000 -st 0 --parallel 8 --run 1-3,21,40
-gzip [% data_dir %]/Dmelvs[% item.name %]/axtNet/*.axt
+gzip [% data_dir %]/Nipvs[% item.name %]/axtNet/*.axt
 
 [% END -%]
 
@@ -269,7 +285,7 @@ EOF
 #----------------------------#
 [% FOREACH item IN data -%]
 # [% item.name %] [% item.coverage %]
-cd [% data_dir %]/Dmelvs[% item.name %]/
+cd [% data_dir %]/Nipvs[% item.name %]/
 
 tar -czvf lav.tar.gz   [*.lav   --remove-files
 tar -czvf psl.tar.gz   [*.psl   --remove-files
