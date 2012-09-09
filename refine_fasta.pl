@@ -32,7 +32,8 @@ my $quick_mode   = undef;     # quick mode
 my $indel_expand = 50;        # in quick mode, expand indel regoin
 my $indel_join   = 50;        # in quick mode, join adjacent indel regions
 
-my $no_trim = 0;              # trim outgroup only sequence
+my $no_trim    = 0;           # trim outgroup only sequence
+my $no_hf_trim = 0;           # trim header and footer indels
 my $block;                    # input is galaxy style blocked fasta
 
 # run in parallel mode
@@ -49,6 +50,7 @@ GetOptions(
     'msa=s'       => \$aln_prog,
     'quick'       => \$quick_mode,
     'no_trim'     => \$no_trim,
+    'no_hf_trim'  => \$no_hf_trim,
     'expand=i'    => \$indel_expand,
     'join=i'      => \$indel_join,
     'block'       => \$block,
@@ -97,7 +99,9 @@ my $worker = sub {
     else {
         realign_all( $seq_of, $seq_names );
     }
-    trim_hf( $seq_of, $seq_names );
+    if ( !$no_hf_trim ) {
+        trim_hf( $seq_of, $seq_names );
+    }
     if ( !$no_trim ) {
         trim_outgroup( $seq_of, $seq_names );
     }
@@ -151,7 +155,9 @@ my $worker_block = sub {
             else {
                 realign_all( $seq_of, $names );
             }
-            trim_hf( $seq_of, $names );
+            if ( !$no_hf_trim ) {
+                trim_hf( $seq_of, $names );
+            }
             if ( !$no_trim ) {
                 trim_outgroup( $seq_of, $names );
             }
@@ -285,6 +291,10 @@ sub trim_hf {
     my $seq_of    = shift;
     my $seq_names = shift;
 
+    # record bp chopped
+    my $header_chop_base = {};
+    my $footer_chop_base = {};
+
     # header indels
     while (1) {
         my @first_column;
@@ -294,7 +304,10 @@ sub trim_hf {
         }
         if ( any { $_ eq '-' } @first_column ) {
             for ( @{$seq_names} ) {
-                substr( $seq_of->{$_}, 0, 1, '' );
+                my $base = substr( $seq_of->{$_}, 0, 1, '' );
+                if ( $base ne '-' ) {
+                    $header_chop_base->{$seq_names}++;
+                }
             }
         }
         else {
@@ -311,7 +324,10 @@ sub trim_hf {
         }
         if ( any { $_ eq '-' } @last_column ) {
             for ( @{$seq_names} ) {
-                substr( $seq_of->{$_}, -1, 1, '' );
+                my $base = substr( $seq_of->{$_}, -1, 1, '' );
+                if ( $base ne '-' ) {
+                    $header_chop_base->{$seq_names}++;
+                }
             }
         }
         else {
@@ -319,7 +335,7 @@ sub trim_hf {
         }
     }
 
-    return;
+    return ( $header_chop_base, $footer_chop_base );
 }
 
 #----------------------------#
