@@ -32,8 +32,8 @@ my $quick_mode   = undef;     # quick mode
 my $indel_expand = 50;        # in quick mode, expand indel regoin
 my $indel_join   = 50;        # in quick mode, join adjacent indel regions
 
-my $no_trim    = 0;           # trim outgroup only sequence
-my $no_hf_trim = 1;           # trim header and footer indels
+my $no_trim = 0;              # trim outgroup only sequence
+my $hf_trim = 0;              # trim header and footer indels
 my $block;                    # input is galaxy style blocked fasta
 
 # run in parallel mode
@@ -50,7 +50,7 @@ GetOptions(
     'msa=s'       => \$aln_prog,
     'quick'       => \$quick_mode,
     'no_trim'     => \$no_trim,
-    'no_hf_trim'  => \$no_hf_trim,
+    'hf_trim'     => \$hf_trim,
     'expand=i'    => \$indel_expand,
     'join=i'      => \$indel_join,
     'block'       => \$block,
@@ -99,7 +99,7 @@ my $worker = sub {
     else {
         realign_all( $seq_of, $seq_names );
     }
-    if ( !$no_hf_trim ) {
+    if ($hf_trim) {
         trim_hf( $seq_of, $seq_names );
     }
     if ( !$no_trim ) {
@@ -155,7 +155,7 @@ my $worker_block = sub {
             else {
                 realign_all( $seq_of, $names );
             }
-            if ( !$no_hf_trim ) {
+            if ($hf_trim) {
                 trim_hf( $seq_of, $names );
             }
             if ( !$no_trim ) {
