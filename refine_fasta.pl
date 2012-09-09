@@ -33,7 +33,7 @@ my $indel_expand = 50;        # in quick mode, expand indel regoin
 my $indel_join   = 50;        # in quick mode, join adjacent indel regions
 
 my $no_trim    = 0;           # trim outgroup only sequence
-my $no_hf_trim = 0;           # trim header and footer indels
+my $no_hf_trim = 1;           # trim header and footer indels
 my $block;                    # input is galaxy style blocked fasta
 
 # run in parallel mode
