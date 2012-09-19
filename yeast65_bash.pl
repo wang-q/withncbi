@@ -24,13 +24,21 @@ my $store_dir = shift
         # high coverage
         {   taxon    => 574961,
             name     => 'JAY291',
-            coverage => '12x 454; 58x solexa s; 95x solexa p',
+            coverage => '12x 454; 58x solexa se; 95x solexa pe',
         },
         {   taxon    => 538975,
             name     => 'Sigma1278b',
             coverage => '45x sanger/solexa',
         },
-        { taxon => 643680, name => 'EC1118', coverage => '24x unknown', },
+        {   taxon    => 643680,
+            name     => 'EC1118',
+            coverage => '17.6x 454; 4.1+1.9x sanger',
+        },
+        {   taxon    => 721032,
+            name     => 'Kyokai_no__7',
+            coverage => '9.1x sanger',
+        },
+
 
         # wustl 11 yeast strains
         {   taxon    => 929587,
@@ -72,11 +80,6 @@ my $store_dir = shift
         { taxon => 764100, name => 'VL3',         coverage => '20x 454', },
 
         { taxon => 1095001, name => 'EC9_8', coverage => '30x 454', },
-        {   taxon    => 721032,
-            name     => 'Kyokai_no__7',
-            coverage => '9.1x sanger',
-        },
-
         { taxon => 545124, name => 'AWRI1631', coverage => '7x 454', },
         { taxon => 538975, name => 'M22',      coverage => '2.6x sanger', },
         { taxon => 538976, name => 'YPS163',   coverage => '2.8x sanger', },
@@ -106,7 +109,7 @@ cd [% data_dir %]
 #----------------------------#
 [% FOREACH item IN data -%]
 # [% item.name %] [% item.coverage %]
-perl [% pl_dir %]/blastz/bz.pl -dt [% data_dir %]/S288C -dq [% data_dir %]/[% item.name %] -dl [% data_dir %]/S288Cvs[% item.name %] -s set01 -p 4 --noaxt -pb lastz --lastz
+perl [% pl_dir %]/blastz/bz.pl -dt [% data_dir %]/S288C -dq [% data_dir %]/[% item.name %] -dl [% data_dir %]/S288Cvs[% item.name %] -s set01 -p 8 --noaxt -pb lastz --lastz
 
 [% END -%]
 
@@ -115,7 +118,7 @@ perl [% pl_dir %]/blastz/bz.pl -dt [% data_dir %]/S288C -dq [% data_dir %]/[% it
 #----------------------------#
 [% FOREACH item IN data -%]
 # [% item.name %] [% item.coverage %]
-perl [% pl_dir %]/blastz/lpcna.pl -dt [% data_dir %]/S288C -dq [% data_dir %]/[% item.name %] -dl [% data_dir %]/S288Cvs[% item.name %] -p 4
+perl [% pl_dir %]/blastz/lpcna.pl -dt [% data_dir %]/S288C -dq [% data_dir %]/[% item.name %] -dl [% data_dir %]/S288Cvs[% item.name %] -p 8
 
 [% END -%]
 
@@ -180,7 +183,7 @@ EOF
 #----------------------------#
 [% FOREACH item IN data -%]
 # [% item.name %] [% item.coverage %]
-perl [% pl_dir %]/blastz/amp.pl -syn -dt [% data_dir %]/S288C -dq [% data_dir %]/[% item.name %] -dl [% data_dir %]/S288Cvs[% item.name %] -p 4
+perl [% pl_dir %]/blastz/amp.pl -syn -dt [% data_dir %]/S288C -dq [% data_dir %]/[% item.name %] -dl [% data_dir %]/S288Cvs[% item.name %] -p 8
 
 [% END -%]
 
@@ -204,7 +207,7 @@ cd [% data_dir %]
 [% FOREACH item IN data -%]
 # [% item.name %]
 find [% data_dir %]/S288Cvs[% item.name %]/axtNet -name "*.axt.gz" | xargs gzip -d
-perl [% pl_dir %]/alignDB/extra/two_way_batch.pl -d S288Cvs[% item.name %] -t="4932,S288C" -q "[% item.taxon %],[% item.name %]" -a [% data_dir %]/S288Cvs[% item.name %] -at 1000 -st 1000000 --parallel 4 --run 1-3,21,40
+perl [% pl_dir %]/alignDB/extra/two_way_batch.pl -d S288Cvs[% item.name %] -t="4932,S288C" -q "[% item.taxon %],[% item.name %]" -a [% data_dir %]/S288Cvs[% item.name %] -at 1000 -st 1000000 --parallel 8 --run 1-3,21,40
 gzip [% data_dir %]/S288Cvs[% item.name %]/axtNet/*.axt
 
 [% END -%]
@@ -272,13 +275,13 @@ perl [% pl_dir %]/alignDB/extra/join_dbs.pl --crude_only \
     --no_insert=1 --trimmed_fasta=1 --length 1000
 
 perl [% pl_dir %]/alignDB/util/refine_fasta.pl \
-    --msa mafft -p 4 \
+    --msa mafft -p 8 \
     -i [% data_dir %]/[% item.goal_db %].crude \
     -o [% data_dir %]/[% item.goal_db %]_mafft
 
 perl [% pl_dir %]/tool/catfasta2phyml.pl -f [% data_dir %]/[% item.goal_db %]_mafft/*.fas > [% data_dir %]/all.fasta
 
-perl [% pl_dir %]/alignDB/extra/multi_way_batch.pl -d [% item.goal_db %] -e yeast_65 -f [% data_dir %]/[% item.goal_db %]_mafft  -lt 1000 -st 1000000 --parallel 4 --run 1-3,21,40
+perl [% pl_dir %]/alignDB/extra/multi_way_batch.pl -d [% item.goal_db %] -e yeast_65 -f [% data_dir %]/[% item.goal_db %]_mafft  -lt 1000 -st 1000000 --parallel 8 --run 1-3,21,40
 
 [% END -%]
 EOF
@@ -296,35 +299,51 @@ EOF
 
     my $tt         = Template->new;
     my $strains_of = {
-        S288CvsYJM78Spar => [qw{ Spar YJM789 }],
-        S288CvsIII       => [qw{ Spar RM11 YJM789 }],
+        #S288CvsYJM789Spar => [qw{ Spar YJM789 }],
+        #S288CvsIII       => [qw{ Spar RM11 YJM789 }],
+        #
+        ## 10k target length > Spar
+        #S288CvsXVIIIGE10m => [
+        #    qw{ Spar RM11 YJM789 JAY291 Sigma1278b EC1118 T7 AWRI796 FostersO
+        #        FostersB Lalvin_QA23 Vin13 VL3 Kyokai_no__7 DBVPG6765 SK1 W303
+        #        Y55 }
+        #],
 
-        # 10k sum-align > Spar
-        S288CvsXVIIIGE10m => [
-            qw{ Spar RM11 YJM789 JAY291 Sigma1278b EC1118 T7 AWRI796 FostersO
-                FostersB Lalvin_QA23 Vin13 VL3 Kyokai_no__7 DBVPG6765 SK1 W303
-                Y55 }
+        # 10k target length > Spar,
+        # exclude abnormal ins/del ones ( all from wine 454)
+        # VL3 Vin13 Lalvin_QA23 AWRI796 FostersO FostersB
+        #S288CvsXIIGE10m => [
+        #    qw{ Spar AWRI1631 AWRI796 CBS_7960 DBVPG6765 EC1118 EC9_8 FostersB
+        #    FostersO JAY291 Kyokai_no__7 Lalvin_QA23 PW5 RM11 SK1 Sigma1278b T7
+        #    UC5 VL3 Vin13 W303 Y55 YJM269 YJM789 }
+        #],
+        #S288CvsXIIGE10m => [
+        #    qw{ Spar AWRI1631 CBS_7960 DBVPG6765 EC1118 EC9_8 JAY291
+        #    Kyokai_no__7 PW5 RM11 SK1 Sigma1278b T7 UC5 W303 Y55 YJM269 YJM789 }
+        #],
+        S288CvsVIII => [
+            qw{ Spar EC1118 JAY291 Kyokai_no__7 RM11 Sigma1278b T7 YJM789 }
         ],
 
-        # 1k avg-align > Spar
-        S288CvsXVIIIGE8k => [
-            qw{ Spar RM11 YJM789 JAY291 Sigma1278b EC1118 PW5 T7 UC5 YJM269
-                AWRI796 FostersO FostersB Lalvin_QA23 Vin13 VL3 EC9_8
-                Kyokai_no__7 }
-        ],
-        S288CvsXXIIGE8k => [
-            qw{ Spar RM11 YJM789 JAY291 Sigma1278b EC1118 PW5 T7 UC5 YJM269
-                AWRI796 FostersO FostersB Lalvin_QA23 Vin13 VL3 EC9_8
-                Kyokai_no__7 DBVPG6765 SK1 W303 Y55 }
-        ],
-
-        # CLIB382 lacks 4 chr
-        S288CvsXXXI => [
-            qw{ Spar RM11 YJM789 JAY291 Sigma1278b EC1118 CBS_7960 CLIB215
-                CLIB324 FL100 PW5 T7 T73 UC5 Y10 YJM269 AWRI796 FostersO
-                FostersB Lalvin_QA23 Vin13 VL3 EC9_8 Kyokai_no__7 AWRI1631 M22
-                YPS163 DBVPG6765 SK1 W303 Y55 }
-        ],
+        ## 1k avg-align > Spar
+        #S288CvsXVIIIGE8k => [
+        #    qw{ Spar RM11 YJM789 JAY291 Sigma1278b EC1118 PW5 T7 UC5 YJM269
+        #        AWRI796 FostersO FostersB Lalvin_QA23 Vin13 VL3 EC9_8
+        #        Kyokai_no__7 }
+        #],
+        #S288CvsXXIIGE8k => [
+        #    qw{ Spar RM11 YJM789 JAY291 Sigma1278b EC1118 PW5 T7 UC5 YJM269
+        #        AWRI796 FostersO FostersB Lalvin_QA23 Vin13 VL3 EC9_8
+        #        Kyokai_no__7 DBVPG6765 SK1 W303 Y55 }
+        #],
+        #
+        ## CLIB382 lacks 4 chr
+        #S288CvsXXXI => [
+        #    qw{ Spar RM11 YJM789 JAY291 Sigma1278b EC1118 CBS_7960 CLIB215
+        #        CLIB324 FL100 PW5 T7 T73 UC5 Y10 YJM269 AWRI796 FostersO
+        #        FostersB Lalvin_QA23 Vin13 VL3 EC9_8 Kyokai_no__7 AWRI1631 M22
+        #        YPS163 DBVPG6765 SK1 W303 Y55 }
+        #],
     };
 
     my @data;
@@ -351,7 +370,7 @@ perl [% pl_dir %]/blastz/mz.pl \
     [% END -%]
     --tree [% data_dir %]/33way.nwk \
     --out [% data_dir %]/[% item.out_dir %] \
-    -syn -p 4
+    -syn -p 8
 
 [% END -%]
 
@@ -372,7 +391,7 @@ EOF
 [% FOREACH item IN data -%]
 # [% item.out_dir %]
 perl [% pl_dir %]/alignDB/util/maf2fasta.pl \
-    --has_outgroup --id 4932 -p 4 --block \
+    --has_outgroup --id 4932 -p 8 --block \
     -i [% data_dir %]/[% item.out_dir %] \
     -o [% data_dir %]/[% item.out_dir %]_fasta
 
@@ -384,7 +403,7 @@ perl [% pl_dir %]/alignDB/util/maf2fasta.pl \
 [% FOREACH item IN data -%]
 # [% item.out_dir %]
 perl [% pl_dir %]/alignDB/util/refine_fasta.pl \
-    --msa mafft --block -p 4 \
+    --msa mafft --block -p 8 \
     -i [% data_dir %]/[% item.out_dir %]_fasta \
     -o [% data_dir %]/[% item.out_dir %]_mafft
 
@@ -393,14 +412,14 @@ perl [% pl_dir %]/alignDB/util/refine_fasta.pl \
 #----------------------------#
 # muscle-quick
 #----------------------------#
-[% FOREACH item IN data -%]
-# [% item.out_dir %]
-perl [% pl_dir %]/alignDB/util/refine_fasta.pl \
-    --msa muscle --quick --block -p 4 \
-    -i [% data_dir %]/[% item.out_dir %]_fasta \
-    -o [% data_dir %]/[% item.out_dir %]_muscle
-
-[% END -%]
+#[% FOREACH item IN data -%]
+## [% item.out_dir %]
+#perl [% pl_dir %]/alignDB/util/refine_fasta.pl \
+#    --msa muscle --quick --block -p 8 \
+#    -i [% data_dir %]/[% item.out_dir %]_fasta \
+#    -o [% data_dir %]/[% item.out_dir %]_muscle
+#
+#[% END -%]
 
 #----------------------------#
 # clean
@@ -435,7 +454,7 @@ perl [% pl_dir %]/alignDB/extra/multi_way_batch.pl \
     -d [% item.out_dir %] -e yeast_65 \
     --block --id 4932 \
     -f [% data_dir %]/[% item.out_dir %]_mafft  \
-    -lt 5000 -st 1000000 --parallel 4 --run 1-3,21,40
+    -lt 5000 -st 1000000 --parallel 8 --run 1-3,21,40,43
 
 [% END -%]
 
