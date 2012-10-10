@@ -114,7 +114,7 @@ my %chr_data_set;
     close $data_fh;
 }
 
-DumpFile('spo11.yml', {data => \@all_data, chr => \%chr_data_set});
+#DumpFile('spo11.yml', {data => \@all_data, chr => \%chr_data_set});
 
 #----------------------------#
 # INSERT INTO ofg and ofgsw
