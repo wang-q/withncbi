@@ -12,12 +12,12 @@ use List::Util qw(first max maxstr min minstr reduce shuffle sum);
 
 use AlignDB::IntSpan;
 use AlignDB::Window;
+use AlignDB::Stopwatch;
 
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 use AlignDB::Ofg;
 use AlignDB::Position;
-use AlignDB::Stopwatch;
 
 #----------------------------------------------------------#
 # GetOpt section

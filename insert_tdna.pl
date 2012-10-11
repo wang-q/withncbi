@@ -108,7 +108,7 @@ my %chr_tdna_set;
     close $tdna_fh;
 }
 
-DumpFile('tdna.yml', {tdna => \@all_tdna, chr => \%chr_tdna_set});
+#DumpFile('tdna.yml', {tdna => \@all_tdna, chr => \%chr_tdna_set});
 
 #----------------------------#
 # INSERT INTO ofg and ofgsw
