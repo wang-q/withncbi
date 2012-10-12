@@ -40,19 +40,21 @@ my $password = $Config->{database}{password};
 my $db       = $Config->{database}{db};
 
 my $tag = "gce";
+my $style = "center";
 
 my $man  = 0;
 my $help = 0;
 
 GetOptions(
-    'help|?'     => \$help,
-    'man'        => \$man,
-    'server=s'   => \$server,
-    'port=i'     => \$port,
-    'db=s'       => \$db,
-    'username=s' => \$username,
-    'password=s' => \$password,
-    'tag=s'      => \$tag,
+    'help|?'       => \$help,
+    'man'          => \$man,
+    's|server=s'   => \$server,
+    'p|port=i'     => \$port,
+    'd|db=s'       => \$db,
+    'u|username=s' => \$username,
+    'p|password=s' => \$password,
+    't|tag=s'      => \$tag,
+    'style=s'      => \$style,
 ) or pod2usage(2);
 
 pod2usage(1) if $help;
@@ -73,6 +75,7 @@ my $obj = AlignDB::Ofg->new(
     mysql  => "$db:$server",
     user   => $username,
     passwd => $password,
+    style  => $style,
 );
 
 # Database handler
@@ -156,7 +159,7 @@ __END__
 
 =head1 SYNOPSIS
 
-    insert_gene.pl [options]
+    insert_nat08.pl [options]
      Options:
        --help            brief help message
        --man             full documentation

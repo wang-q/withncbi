@@ -165,7 +165,6 @@ __END__
        --db              database name
        --username        username
        --password        password
-       
 
 =head1 OPTIONS
 
