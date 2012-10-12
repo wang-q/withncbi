@@ -39,7 +39,7 @@ my $username = $Config->{database}{username};
 my $password = $Config->{database}{password};
 my $db       = $Config->{database}{db};
 
-my $data_file = "$FindBin::Bin/spo11/S288C_Spo11_Multimap.txt";
+my $tag = "hot";
 
 my $man  = 0;
 my $help = 0;
@@ -52,11 +52,17 @@ GetOptions(
     'db=s'       => \$db,
     'username=s' => \$username,
     'password=s' => \$password,
-    'file=s'      => \$data_file,
+    'tag=s'      => \$tag,
 ) or pod2usage(2);
 
 pod2usage(1) if $help;
 pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
+
+my $data_of = {
+    hot => "$FindBin::Bin/spo11/spo11_hot.csv",
+    all => "$FindBin::Bin/spo11/S288C_Spo11_Multimap.txt",
+};
+my $data_file = $data_of->{$tag};
 
 #----------------------------------------------------------#
 # Init objects
@@ -67,8 +73,6 @@ my $obj = AlignDB::Ofg->new(
     mysql  => "$db:$server",
     user   => $username,
     passwd => $password,
-    max_in_distance => 0, # don't need inside windows
-    max_out_distance => 10, # don't need inside windows
 );
 
 # Database handler
@@ -88,24 +92,34 @@ my $align_ids = $obj->get_align_ids;
 my @all_data;
 my %chr_data_set;
 {
+
     # read in gce info
     open my $data_fh, '<', $data_file;
-    <$data_fh>; # omit head line
+    <$data_fh>;    # omit head line
     while ( my $string = <$data_fh> ) {
         next unless defined $string;
         chomp $string;
-        my ($chr, $start, $end) = (split /\t/, $string)[1, 3, 4];
-        $chr =~ s/chr0?//i;
-        next unless $chr =~ /^\d+$/;
-        $chr = Roman($chr);
-        next unless $chr =~ /^\w+$/;
+        my ( $chr, $start, $end );
+
+        if ( $tag eq 'hot' ) {
+            ( $chr, $start, $end ) = ( split /\,/, $string )[ 0, 1, 2 ];
+            $chr =~ s/chr0?//i;
+            next unless $chr =~ /^\w+$/;
+        }
+        else {
+            ( $chr, $start, $end ) = ( split /\t/, $string )[ 1, 3, 4 ];
+            $chr =~ s/chr0?//i;
+            next unless $chr =~ /^\d+$/;
+            $chr = Roman($chr);
+            next unless $chr =~ /^\w+$/;
+        }
         next unless $start =~ /^\d+$/;
-        next unless $end =~ /^\d+$/;
-        if ($start > $end) {
-            ($start, $end) = ($end, $start);
+        next unless $end   =~ /^\d+$/;
+        if ( $start > $end ) {
+            ( $start, $end ) = ( $end, $start );
         }
         my $set = AlignDB::IntSpan->new("$start-$end");
-        push @all_data, {chr => $chr, set => $set, tag => 'all'};
+        push @all_data, { chr => $chr, set => $set, tag => $tag };
         if ( !exists $chr_data_set{$chr} ) {
             $chr_data_set{$chr} = AlignDB::IntSpan->new;
         }
@@ -113,8 +127,6 @@ my %chr_data_set;
     }
     close $data_fh;
 }
-
-#DumpFile('spo11.yml', {data => \@all_data, chr => \%chr_data_set});
 
 #----------------------------#
 # INSERT INTO ofg and ofgsw
@@ -138,11 +150,11 @@ __END__
 
 =head1 NAME
 
-    insert_gce.pl - Add annotation info to alignDB
+    insert_spo11.pl - Add annotation info to alignDB
 
 =head1 SYNOPSIS
 
-    insert_gene.pl [options]
+    insert_spo11.pl [options]
      Options:
        --help            brief help message
        --man             full documentation
@@ -150,7 +162,6 @@ __END__
        --db              database name
        --username        username
        --password        password
-       --ensembl         ensembl database name
        
 
 =head1 OPTIONS
