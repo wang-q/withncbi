@@ -7,16 +7,17 @@ use Pod::Usage;
 use Config::Tiny;
 use YAML qw(Dump Load DumpFile LoadFile);
 
+use Roman;
 use List::Util qw(first max maxstr min minstr reduce shuffle sum);
 
 use AlignDB::IntSpan;
 use AlignDB::Window;
+use AlignDB::Stopwatch;
 
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 use AlignDB::Ofg;
 use AlignDB::Position;
-use AlignDB::Stopwatch;
 
 #----------------------------------------------------------#
 # GetOpt section
@@ -24,14 +25,21 @@ use AlignDB::Stopwatch;
 my $Config = Config::Tiny->new;
 $Config = Config::Tiny->read("$FindBin::Bin/../alignDB.ini");
 
-# Database init values
-my $server   = $Config->{database}->{server};
-my $port     = $Config->{database}->{port};
-my $username = $Config->{database}->{username};
-my $password = $Config->{database}->{password};
-my $db       = $Config->{database}->{db};
+# record ARGV and Config
+my $stopwatch = AlignDB::Stopwatch->new(
+    program_name => $0,
+    program_argv => [@ARGV],
+    program_conf => $Config,
+);
 
-my $gce_db = $Config->{gce}->{db};
+# Database init values
+my $server   = $Config->{database}{server};
+my $port     = $Config->{database}{port};
+my $username = $Config->{database}{username};
+my $password = $Config->{database}{password};
+my $db       = $Config->{database}{db};
+
+my $tag = "gce";
 
 my $man  = 0;
 my $help = 0;
@@ -44,16 +52,21 @@ GetOptions(
     'db=s'       => \$db,
     'username=s' => \$username,
     'password=s' => \$password,
-    'gce=s'      => \$gce_db,
+    'tag=s'      => \$tag,
 ) or pod2usage(2);
 
 pod2usage(1) if $help;
 pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
 
+my $data_of = {
+    gce => "$FindBin::Bin/nat08/event_intervals.txt",
+    hs  => "$FindBin::Bin/nat08/hot_spots.txt",
+};
+my $data_file = $data_of->{$tag};
+
 #----------------------------------------------------------#
 # Init objects
 #----------------------------------------------------------#
-my $stopwatch = AlignDB::Stopwatch->new;
 $stopwatch->start_message("Update gce-related tables of $db...");
 
 my $obj = AlignDB::Ofg->new(
@@ -65,10 +78,6 @@ my $obj = AlignDB::Ofg->new(
 # Database handler
 my $dbh = $obj->dbh;
 
-# gce db handler
-my $gce_dbh
-    = DBI->connect( "dbi:mysql:$gce_db:$server", $username, $password );
-
 #----------------------------------------------------------#
 # start update
 #----------------------------------------------------------#
@@ -77,74 +86,73 @@ my $gce_dbh
 $obj->empty_ofg_tables;
 
 # alignments
-my @align_ids = @{ $obj->get_align_ids };
+my $align_ids = $obj->get_align_ids;
 
 # all gce
-my @all_gce;
-my %chr_gce_set;
+my @all_data;
+my %chr_data_set;
 {
-    my $gce_query_sth = $gce_dbh->prepare(
-        q{
-        SELECT gce_chr,
-               gce_runlist,
-               gce_type
-          FROM gce
-        }
-    );
-    $gce_query_sth->execute;
-    while ( my @row = $gce_query_sth->fetchrow_array ) {
-        my ( $chr, $runlist, $type ) = @row;
-        my $set = AlignDB::IntSpan->new($runlist);
-        push @all_gce,
-            { chr => $chr, set => $set, tag => 'all', type => $type };
-        if ( !exists $chr_gce_set{$chr} ) {
-            $chr_gce_set{$chr} = AlignDB::IntSpan->new;
-        }
-        $chr_gce_set{$chr}->merge($set);
-    }
-    $gce_query_sth->finish;
-}
 
-# gce hotspot
-my @all_hs;
-my %chr_hs_set;
-{
-    my $hs_query_sth = $gce_dbh->prepare(
-        q{
-        SELECT hotspot_chr,
-               hotspot_runlist,
-               hotspot_type
-          FROM hotspot
+    # read in gce info
+    open my $data_fh, '<', $data_file;
+    <$data_fh>;    # omit head line
+    while ( my $string = <$data_fh> ) {
+        next unless defined $string;
+        chomp $string;
+        my ( $chr, $start, $end, $type );
+
+        if ( $tag eq 'gce' ) {
+            ( $chr, $start, $end, $type )
+                = ( split /\t/, $string )[ 0, 1, 2, 6 ];
         }
-    );
-    $hs_query_sth->execute;
-    while ( my @row = $hs_query_sth->fetchrow_array ) {
-        my ( $chr, $runlist, $type ) = @row;
-        my $set = AlignDB::IntSpan->new($runlist);
-        push @all_hs,
-            { chr => $chr, set => $set, tag => 'hotspot', type => $type };
-        if ( !exists $chr_hs_set{$chr} ) {
-            $chr_hs_set{$chr} = AlignDB::IntSpan->new;
+        else {
+            ( $chr, $start, $end, $type )
+                = ( split /\t/, $string )[ 0, 1, 2, 3 ];
         }
-        $chr_hs_set{$chr}->merge($set);
+
+        $chr =~ s/chr0?//i;
+        next unless $chr =~ /^\d+$/;
+        $chr = Roman($chr);
+        next unless $chr   =~ /^\w+$/;
+        next unless $start =~ /^\d+$/;
+        next unless $end   =~ /^\d+$/;
+        if ( $start > $end ) {
+            ( $start, $end ) = ( $end, $start );
+        }
+        my $set = AlignDB::IntSpan->new("$start-$end");
+        push @all_data,
+            { chr => $chr, set => $set, tag => $tag, type => $type };
+        if ( !exists $chr_data_set{$chr} ) {
+            $chr_data_set{$chr} = AlignDB::IntSpan->new;
+        }
+        $chr_data_set{$chr}->merge($set);
     }
-    $hs_query_sth->finish;
+    close $data_fh;
 }
 
 #----------------------------#
 # INSERT INTO ofg and ofgsw
 #----------------------------#
-$obj->insert_ofg( \@align_ids, \@all_gce, \%chr_gce_set );
-$obj->insert_ofg( \@align_ids, \@all_hs,  \%chr_hs_set );
+$obj->insert_ofg( $align_ids, \@all_data, \%chr_data_set );
 
 $stopwatch->end_message;
+
+# store program running meta info to database
+# this AlignDB object is just for storing meta info
+END {
+    AlignDB::Ofg->new(
+        mysql  => "$db:$server",
+        user   => $username,
+        passwd => $password,
+    )->add_meta_stopwatch($stopwatch);
+}
 exit;
 
 __END__
 
 =head1 NAME
 
-    insert_gce.pl - Add annotation info to alignDB
+    insert_nat08.pl - Add annotation info to alignDB
 
 =head1 SYNOPSIS
 
@@ -156,8 +164,6 @@ __END__
        --db              database name
        --username        username
        --password        password
-       --ensembl         ensembl database name
-       
 
 =head1 OPTIONS
 
