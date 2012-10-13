@@ -11,13 +11,15 @@ use Roman;
 use List::Util qw(first max maxstr min minstr reduce shuffle sum);
 
 use AlignDB::IntSpan;
+use AlignDB::Run;
 use AlignDB::Window;
 use AlignDB::Stopwatch;
 
 use FindBin;
 use lib "$FindBin::Bin/../lib";
+use AlignDB;
+use AlignDB::Multi;
 use AlignDB::Ofg;
-use AlignDB::Position;
 
 #----------------------------------------------------------#
 # GetOpt section
@@ -42,6 +44,14 @@ my $db       = $Config->{database}{db};
 my $tag = "gce";
 my $style = "center";
 
+# run in parallel mode
+my $parallel = $Config->{generate}{parallel};
+
+# number of alignments process in one child process
+my $batch_number = $Config->{feature}{batch};
+
+my $multi;
+
 my $man  = 0;
 my $help = 0;
 
@@ -55,6 +65,9 @@ GetOptions(
     'p|password=s' => \$password,
     't|tag=s'      => \$tag,
     'style=s'      => \$style,
+    'parallel=i'   => \$parallel,
+    'batch=i'      => \$batch_number,
+    'multi'        => \$multi,
 ) or pod2usage(2);
 
 pod2usage(1) if $help;
@@ -69,34 +82,36 @@ my $data_file = $data_of->{$tag};
 #----------------------------------------------------------#
 # Init objects
 #----------------------------------------------------------#
-$stopwatch->start_message("Update gce-related tables of $db...");
+$stopwatch->start_message("Update data of $db...");
 
-my $obj = AlignDB::Ofg->new(
-    mysql  => "$db:$server",
-    user   => $username,
-    passwd => $password,
-    style  => $style,
-);
+my @jobs;
+{
+    my $obj = AlignDB->new(
+        mysql  => "$db:$server",
+        user   => $username,
+        passwd => $password,
+    );
 
-# Database handler
-my $dbh = $obj->dbh;
+    print "Emptying tables...\n";
+
+    # empty tables
+    $obj->empty_table( 'ofg',   'with_window' );
+    $obj->empty_table( 'ofgsw', 'with_window' );
+
+    my @align_ids = @{ $obj->get_align_ids };
+
+    while ( scalar @align_ids ) {
+        my @batching = splice @align_ids, 0, $batch_number;
+        push @jobs, [@batching];
+    }
+}
 
 #----------------------------------------------------------#
-# start update
+# read data
 #----------------------------------------------------------#
-
-# empty tables
-$obj->empty_ofg_tables;
-
-# alignments
-my $align_ids = $obj->get_align_ids;
-
-# all gce
 my @all_data;
 my %chr_data_set;
 {
-
-    # read in gce info
     open my $data_fh, '<', $data_file;
     <$data_fh>;    # omit head line
     while ( my $string = <$data_fh> ) {
@@ -122,6 +137,7 @@ my %chr_data_set;
         if ( $start > $end ) {
             ( $start, $end ) = ( $end, $start );
         }
+        next if $end - $start < 10;
         my $set = AlignDB::IntSpan->new("$start-$end");
         push @all_data,
             { chr => $chr, set => $set, tag => $tag, type => $type };
@@ -133,17 +149,50 @@ my %chr_data_set;
     close $data_fh;
 }
 
-#----------------------------#
-# INSERT INTO ofg and ofgsw
-#----------------------------#
-$obj->insert_ofg( $align_ids, \@all_data, \%chr_data_set );
+#----------------------------------------------------------#
+# worker
+#----------------------------------------------------------#
+my $worker = sub {
+    my $job       = shift;
+    my @align_ids = @$job;
+
+    my $obj;
+    if ( !$multi ) {
+        $obj = AlignDB->new(
+            mysql  => "$db:$server",
+            user   => $username,
+            passwd => $password,
+        );
+    }
+    else {
+        $obj = AlignDB::Multi->new(
+            mysql  => "$db:$server",
+            user   => $username,
+            passwd => $password,
+        );
+    }
+    AlignDB::Ofg->meta->apply($obj);
+    $obj->style($style);
+
+    $obj->insert_ofg( \@align_ids, \@all_data, \%chr_data_set );
+};
+
+#----------------------------------------------------------#
+# start update
+#----------------------------------------------------------#
+my $run = AlignDB::Run->new(
+    parallel => $parallel,
+    jobs     => \@jobs,
+    code     => $worker,
+);
+$run->run;
 
 $stopwatch->end_message;
 
 # store program running meta info to database
 # this AlignDB object is just for storing meta info
 END {
-    AlignDB::Ofg->new(
+    AlignDB->new(
         mysql  => "$db:$server",
         user   => $username,
         passwd => $password,
