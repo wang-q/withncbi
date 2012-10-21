@@ -80,7 +80,7 @@ elsif ($block) {
 #----------------------------------------------------------#
 my @files
     = File::Find::Rule->file->name( '*.fa', '*.fas', '*.fasta' )->in($in_dir);
-printf "\n----Total .fasta Files: %4s----\n\n", scalar @files;
+printf "\n----Total .fas Files: %4s----\n\n", scalar @files;
 
 #----------------------------------------------------------#
 # realign
