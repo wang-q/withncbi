@@ -414,7 +414,7 @@ cd [% data_dir %]
 #----------------------------#
 # mafft
 perl [% pl_dir %]/alignDB/extra/multi_way_batch.pl \
-    -d [% data_dir %]/fas_mft -e human_65 \
+    -d HumanvsXI -e human_65 \
     --block --id 9606 \
     -f [% data_dir %]/fas_mft  \
     -lt 5000 -st 0 --parallel [% parallel %] --run 1-3,21,40
