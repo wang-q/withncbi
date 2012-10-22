@@ -43,6 +43,7 @@ my $db       = $Config->{database}{db};
 
 my $tag   = "gc";
 my $style = "center";
+my $noclean; # do not clean ofg tables
 
 # run in parallel mode
 my $parallel = $Config->{generate}{parallel};
@@ -68,6 +69,7 @@ GetOptions(
     'parallel=i'   => \$parallel,
     'batch=i'      => \$batch_number,
     'multi'        => \$multi,
+    'noclean'      => \$noclean,
 ) or pod2usage(2);
 
 pod2usage(1) if $help;
@@ -92,11 +94,13 @@ my @jobs;
         passwd => $password,
     );
 
-    print "Emptying tables...\n";
+    if ( !$noclean ) {
+        print "Emptying tables...\n";
 
-    # empty tables
-    $obj->empty_table( 'ofg',   'with_window' );
-    $obj->empty_table( 'ofgsw', 'with_window' );
+        # empty tables
+        $obj->empty_table( 'ofg',   'with_window' );
+        $obj->empty_table( 'ofgsw', 'with_window' );
+    }
 
     my @align_ids = @{ $obj->get_align_ids };
 
