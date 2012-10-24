@@ -266,7 +266,7 @@ perl [% pl_dir %]/alignDB/util/refine_fasta.pl \
 
 perl [% pl_dir %]/tool/catfasta2phyml.pl -f [% data_dir %]/[% item.goal_db %]_mafft/*.fas > [% data_dir %]/all.fasta
 
-perl [% pl_dir %]/alignDB/extra/multi_way_batch.pl -d [% item.goal_db %] -e yeast_65 -f [% data_dir %]/[% item.goal_db %]_mafft  -lt 1000 -st 1000000 --parallel 8 --run 1-3,21,40,43
+perl [% pl_dir %]/alignDB/extra/multi_way_batch.pl -d [% item.goal_db %] -e yeast_65 -f [% data_dir %]/[% item.goal_db %]_mafft  -lt 1000 -st 0 --parallel 8 --run 1-3,21,40,43
 
 [% END -%]
 EOF
@@ -306,13 +306,13 @@ EOF
                 DBVPG6044 DBVPG6765 L1528 SK1 UWOPS83 UWOPS87 W303 YPS128 }
         ],
         
-        # branch a
+        # branch A
         S288CvsX_A => [
             qw{ Spar RM11 YJM789 EC1118 JAY291 Sigma1278b DBVPG6765 L1528
             UWOPS87 W303 }
         ],
         
-        # branch b
+        # branch B
         S288CvsVII_B => [
             qw{ Spar Kyokai_no__7 T7 DBVPG6044 SK1 UWOPS83 YPS128 }
         ],
@@ -428,7 +428,7 @@ perl [% pl_dir %]/alignDB/extra/multi_way_batch.pl \
     -d [% item.out_dir %] -e yeast_65 \
     --block --id 4932 \
     -f [% data_dir %]/[% item.out_dir %]_mafft  \
-    -lt 5000 -st 1000000 --parallel 8 --run 1-3,21,40,43
+    -lt 5000 -st 0 --parallel 8 --run 1-3,21,40,43
 
 [% END -%]
 
