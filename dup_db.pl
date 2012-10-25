@@ -8,8 +8,7 @@ use Config::Tiny;
 use YAML qw(Dump Load DumpFile LoadFile);
 
 use FindBin;
-use lib "$FindBin::Bin/../lib";
-use AlignDB;
+
 use AlignDB::Stopwatch;
 
 #----------------------------------------------------------#
@@ -33,6 +32,7 @@ my $password = $Config->{database}{password};
 my $db       = $Config->{database}{db};
 
 my $goal_db;
+my $file_dump;
 
 my $man  = 0;
 my $help = 0;
@@ -46,6 +46,7 @@ GetOptions(
     'username=s' => \$username,
     'password=s' => \$password,
     'goal=s'     => \$goal_db,
+    'file=s'     => \$file_dump,
 ) or pod2usage(2);
 
 pod2usage(1) if $help;
@@ -53,6 +54,9 @@ pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
 
 unless ($goal_db) {
     $goal_db = $db . "_dup";
+}
+unless ($file_dump) {
+    $file_dump = $db . ".dump.sql";
 }
 
 #----------------------------------------------------------#
@@ -63,32 +67,30 @@ $stopwatch->start_message("Operation start...");
 my $str       = " -h$server -P$port -u$username -p$password ";
 my $drop      = "mysql $str -e \"DROP DATABASE IF EXISTS $goal_db;\"";
 my $create    = "mysql $str -e \"CREATE DATABASE $goal_db;\"";
-my $duplicate = "mysqldump $str $db | mysql $str $goal_db";
+my $dump      = "mysqldump $str $db > $file_dump";
+my $duplicate = "mysql $str $goal_db < $file_dump";
 
-print "#drop\n$drop\n";
+print "#drop\n$drop\n\n";
 system($drop);
-print "#create\n$create\n";
+print "#create\n$create\n\n";
 system($create );
-print "#duplicate\n$duplicate\n";
+print "#dump\n$dump\n\n";
+system($dump);
+print "#duplicate\n$duplicate\n\n";
 system($duplicate);
 
 $stopwatch->end_message;
-
-## store program running meta info to database
-#END {
-#    $obj->add_meta_stopwatch($stopwatch);
-#}
 
 __END__
 
 
 =head1 NAME
 
-    init_alignDB.pl - Initiate alignDB
+    dup_db.pl - Duplicate a database
 
 =head1 SYNOPSIS
 
-    init_alignDB.pl [options]
+    dup_db.pl [options]
       Options:
         --help          brief help message
         --man           full documentation
