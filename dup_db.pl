@@ -38,51 +38,59 @@ my $man  = 0;
 my $help = 0;
 
 GetOptions(
-    'help|?'     => \$help,
-    'man'        => \$man,
-    'server=s'   => \$server,
-    'port=i'     => \$port,
-    'db=s'       => \$db,
-    'username=s' => \$username,
-    'password=s' => \$password,
-    'goal=s'     => \$goal_db,
-    'file=s'     => \$file_dump,
+    'help|?'       => \$help,
+    'man'          => \$man,
+    's|server=s'   => \$server,
+    'P|port=i'     => \$port,
+    'd|db=s'       => \$db,
+    'u|username=s' => \$username,
+    'p|password=s' => \$password,
+    'f|file=s'     => \$file_dump,
+    'g|goal=s'     => \$goal_db,
 ) or pod2usage(2);
 
 pod2usage(1) if $help;
 pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
-
-unless ($goal_db) {
-    $goal_db = $db . "_dup";
-}
-unless ($file_dump) {
-    $file_dump = $db . ".dump.sql";
-}
 
 #----------------------------------------------------------#
 # call mysql
 #----------------------------------------------------------#
 $stopwatch->start_message("Operation start...");
 
-my $str       = " -h$server -P$port -u$username -p$password ";
-my $drop      = "mysql $str -e \"DROP DATABASE IF EXISTS $goal_db;\"";
-my $create    = "mysql $str -e \"CREATE DATABASE $goal_db;\"";
-my $dump      = "mysqldump $str $db > $file_dump";
-my $duplicate = "mysql $str $goal_db < $file_dump";
+my $str = " -h$server -P$port -u$username -p$password ";
 
-print "#drop\n$drop\n\n";
-system($drop);
-print "#create\n$create\n\n";
-system($create );
-print "#dump\n$dump\n\n";
-system($dump);
-print "#duplicate\n$duplicate\n\n";
-system($duplicate);
+# dump db
+if ($file_dump) {
+    if ( !-e $file_dump ) {
+        my $dump = "mysqldump $str $db > $file_dump";
+        print "#dump\n$dump\n\n";
+        system($dump);
+    }
+}
+else {
+    $file_dump = $db . ".dump.sql";
+    my $dump = "mysqldump $str $db > $file_dump";
+    print "#dump\n$dump\n\n";
+    system($dump);
+}
+
+# load dump
+if ($goal_db) {
+    my $drop      = "mysql $str -e \"DROP DATABASE IF EXISTS $goal_db;\"";
+    my $create    = "mysql $str -e \"CREATE DATABASE $goal_db;\"";
+    my $duplicate = "mysql $str $goal_db < $file_dump";
+
+    print "#drop\n$drop\n\n";
+    system($drop);
+    print "#create\n$create\n\n";
+    system($create );
+    print "#duplicate\n$duplicate\n\n";
+    system($duplicate);
+}
 
 $stopwatch->end_message;
 
 __END__
-
 
 =head1 NAME
 
@@ -92,15 +100,16 @@ __END__
 
     dup_db.pl [options]
       Options:
-        --help          brief help message
-        --man           full documentation
-        --server        MySQL server IP/Domain name
-        --port          MySQL server port
-        --db            database name
-        --username      username
-        --password      password
-        --init_sql      init sql filename
-      
+        --help              brief help message
+        --man               full documentation
+        --server            MySQL server IP/Domain name
+        --port              MySQL server port
+        --db                database name
+        --username          username
+        --password          password
+        --file              dump file name
+        --goal              dup db name
+
 =head1 OPTIONS
 
 =over 8
