@@ -133,11 +133,15 @@ if ($dir_fa) {
 
     my @matched_files;
     for my $ftr_chr ( keys %{$ftr_of} ) {
+        my $ftr_chr_cmp = $ftr_chr;
+        if ($ftr_chr_cmp =~ /^chr/) {
+            $ftr_chr_cmp =~ s/chr//;
+        }
 
         # use the most similar file name
         my ($file_chr) = map { $_->[0] }
             sort { $b->[1] <=> $a->[1] }
-            map { [ $_, compare( $_, $ftr_chr ) ] } keys %{$file_of};
+            map { [ $_, compare( $_, $ftr_chr_cmp ) ] } keys %{$file_of};
 
         printf "Write masked seq for ftr_chr %8s file_chr %8s\n", $ftr_chr,
             $file_chr;
