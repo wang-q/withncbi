@@ -98,16 +98,13 @@ my $parallel = 12;
             @subdirs_mysql;
         $item->{mysql} = $mysql;
 
-        $item->{db} = $item->{name} . "_65";
+        $item->{db} = lc $item->{name} . "_65";
 
         # prepare working dir
         my $dir = File::Spec->catdir( $data_dir, $item->{name} );
         mkdir $dir if !-e $dir;
         $item->{dir} = $dir;
     }
-
-    #my $basecount = File::Spec->catfile( $data_dir, "basecount.txt" );
-    #remove( \1, $basecount ) if -e $basecount;
 
     # taxon.csv
     my $text = <<'EOF';
@@ -151,7 +148,9 @@ find [% item.fasta %] -name "*dna.toplevel*" | xargs gzip -d -c > toplevel.fa
 [% kentbin_dir %]/faSplit byname toplevel.filtered.fa .
 rm toplevel.fa toplevel.filtered.fa listFile
 
-~/perl5/bin/rename 's/fa$/fasta/' *.fa
+[% IF item.name != 'Afum' and item.name != 'Aory' -%]
+rename 's/fa$/fasta/' *.fa
+[% END -%]
 
 [% END -%]
 
@@ -175,6 +174,7 @@ cd [% data_dir %]
 # Ensembl annotation or RepeatMasker
 #----------------------------#
 [% FOREACH item IN data -%]
+[% IF item.name == 'Afum' or item.name == 'Aory' -%]
 # [% item.name %] [% item.coverage %]
 echo [% item.name %]
 
@@ -185,14 +185,14 @@ if [ ! -f [% item.db %]_repeat.yml ]; then perl [% pl_dir %]/alignDB/util/write_
 perl [% pl_dir %]/alignDB/util/write_masked_chr.pl -y [% item.db %]_repeat.yml --dir [% item.dir %]
 
 find . -name "*fa" | xargs rm
-~/perl5/bin/rename 's/\.masked//' *.fa.masked
-~/perl5/bin/rename 's/^/chr/' *.fa
+rename 's/\.masked//' *.fa.masked
+rename 's/^/chr/' *.fa
 
 if [ -f chrUn.fasta ];
 then
     [% kentbin_dir %]/faSplit about [% item.dir %]/chrUn.fasta 100000000 [% item.dir %]/;
     rm [% item.dir %]/chrUn.fasta;    
-    ~/perl5/bin/rename 's/fa$/fasta/' [0-9][0-9].fa;
+    rename 's/fa$/fasta/' [0-9][0-9].fa;
 fi;
 
 RepeatMasker [% item.dir %]/*.fasta -species Fungi -xsmall --parallel [% parallel %]
@@ -202,6 +202,16 @@ then
 fi;
 find [% item.dir %] -type f -name "*fasta*" | xargs rm 
 
+[% ELSE %]
+# [% item.name %] [% item.coverage %]
+echo [% item.name %]
+
+cd [% item.dir %]
+RepeatMasker [% item.dir %]/*.fasta -species Fungi -xsmall --parallel [% parallel %]
+rename 's/fasta.masked$/fa/' *.fasta.masked
+find [% item.dir %]  -type f -name "*fasta*" | xargs rm
+
+[% END -%]
 [% END -%]
 
 EOF

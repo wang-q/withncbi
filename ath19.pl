@@ -306,9 +306,7 @@ cd [% data_dir %]
 #----------------------------#
 [% FOREACH item IN data -%]
 # [% item.name %] [% item.coverage %]
-find [% data_dir %]/Athvs[% item.name FILTER ucfirst %]/axtNet -name "*.axt.gz" | parallel gzip -d
 perl [% pl_dir %]/alignDB/extra/two_way_batch.pl -d Athvs[% item.name FILTER ucfirst %] -t="3702,Ath" -q "[% item.taxon %],[% item.name %]" -a [% data_dir %]/Athvs[% item.name FILTER ucfirst %] -at 10000 -st 0 --parallel [% parallel %] --run 1-3,21,40
-find [% data_dir %]/Athvs[% item.name FILTER ucfirst %]/axtNet -name "*.axt" | parallel gzip
 
 [% END -%]
 
@@ -326,22 +324,6 @@ EOF
 
     $text = <<'EOF';
 #!/bin/bash
-    
-#----------------------------#
-# tar-gzip
-#----------------------------#
-[% FOREACH item IN data -%]
-# [% item.name %] [% item.coverage %]
-cd [% data_dir %]/Athvs[% item.name %]/
-
-tar -czvf lav.tar.gz   [*.lav   --remove-files
-tar -czvf psl.tar.gz   [*.psl   --remove-files
-tar -czvf chain.tar.gz [*.chain --remove-files
-gzip *.chain
-gzip net/*
-gzip axtNet/*.axt
-
-[% END -%]
 
 #----------------------------#
 # clean RepeatMasker outputs
@@ -356,8 +338,8 @@ gzip axtNet/*.axt
 #----------------------------#
 # clean pairwise maf
 #----------------------------#
-find [% data_dir %] -name "mafSynNet" | xargs rm -fr
-find [% data_dir %] -name "mafNet" | xargs rm -fr
+# find [% data_dir %] -name "mafSynNet" | xargs rm -fr
+# find [% data_dir %] -name "mafNet" | xargs rm -fr
 
 #----------------------------#
 # gzip maf, fas
@@ -369,7 +351,6 @@ find [% data_dir %] -name "*.maf.fas" | parallel gzip
 # clean maf-fasta
 #----------------------------#
 # rm -fr [% data_dir %]/*_fasta
-
 
 EOF
     $tt->process(
