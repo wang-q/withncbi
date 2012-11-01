@@ -12,6 +12,7 @@ use YAML qw(Dump Load DumpFile LoadFile);
 
 my $store_dir = shift
     || File::Spec->catdir( $ENV{HOME}, "data/alignment/aspergillus" );
+my $parallel = 12;
 
 {    # on linux
     my $data_dir
@@ -22,6 +23,8 @@ my $store_dir = shift
     # ensembl genomes 65
     my $fasta_dir = File::Spec->catdir( $ENV{HOME},
         "data/ensemblgenomes12_65/fungi/fasta" );
+    my $mysql_dir = File::Spec->catdir( $ENV{HOME},
+        "data/ensemblgenomes12_65/fungi/mysql" );
 
     my $tt = Template->new;
 
@@ -73,6 +76,7 @@ my $store_dir = shift
     );
 
     my @subdirs_fasta = File::Find::Rule->directory->in($fasta_dir);
+    my @subdirs_mysql = File::Find::Rule->directory->in($mysql_dir);
 
     for my $item (@data) {
         my $folder = $item->{sciname};
@@ -84,8 +88,17 @@ my $store_dir = shift
         # match the most similar name
         my ($fasta) = map { $_->[0] }
             sort { $b->[1] <=> $a->[1] }
-            map { [ $_, compare( lc basename($_), $folder ) ] } @subdirs_fasta;
+            map { [ $_, compare( lc basename($_), $folder . "/dna" ) ] }
+            @subdirs_fasta;
         $item->{fasta} = $fasta;
+
+        my ($mysql) = map { $_->[0] }
+            sort { $b->[1] <=> $a->[1] }
+            map { [ $_, compare( lc basename($_), $folder . "_core" ) ] }
+            @subdirs_mysql;
+        $item->{mysql} = $mysql;
+
+        $item->{db} = $item->{name} . "_65";
 
         # prepare working dir
         my $dir = File::Spec->catdir( $data_dir, $item->{name} );
@@ -151,7 +164,7 @@ EOF
             pl_dir      => $pl_dir,
             kentbin_dir => $kentbin_dir
         },
-        File::Spec->catfile( $store_dir, "auto_aspergillus_file.sh" )
+        File::Spec->catfile( $store_dir, "file.sh" )
     ) or die Template->error;
 
     $text = <<'EOF';
@@ -159,17 +172,37 @@ EOF
 cd [% data_dir %]
 
 #----------------------------#
-# RepeatMasker
+# Ensembl annotation or RepeatMasker
 #----------------------------#
 [% FOREACH item IN data -%]
 # [% item.name %] [% item.coverage %]
 echo [% item.name %]
-bsub -n 8 -J [% item.name %]-RM RepeatMasker [% item.dir %]/*.fasta -species Fungi -xsmall --parallel 8;
+
+cd [% item.dir %]
+
+if [ ! -f [% item.db %]_repeat.yml ]; then perl [% pl_dir %]/alignDB/util/build_ensembl.pl --initdb --db [% item.db %] --ensembl [% item.mysql %];  fi;
+if [ ! -f [% item.db %]_repeat.yml ]; then perl [% pl_dir %]/alignDB/util/write_masked_chr.pl -e [% item.db %]; fi;
+perl [% pl_dir %]/alignDB/util/write_masked_chr.pl -y [% item.db %]_repeat.yml --dir [% item.dir %]
+
+find . -name "*fa" | xargs rm
+~/perl5/bin/rename 's/\.masked//' *.fa.masked
+~/perl5/bin/rename 's/^/chr/' *.fa
+
+if [ -f chrUn.fasta ];
+then
+    [% kentbin_dir %]/faSplit about [% item.dir %]/chrUn.fasta 100000000 [% item.dir %]/;
+    rm [% item.dir %]/chrUn.fasta;    
+    ~/perl5/bin/rename 's/fa$/fasta/' [0-9][0-9].fa;
+fi;
+
+RepeatMasker [% item.dir %]/*.fasta -species Fungi -xsmall --parallel [% parallel %]
+if [ -f *.fasta.masked ];
+then
+    rename 's/fasta.masked$/fa/' *.fasta.masked;
+fi;
+find [% item.dir %] -type f -name "*fasta*" | xargs rm 
 
 [% END -%]
-
-# find [% data_dir %] -name "*.fasta.masked" | sed "s/\.fasta\.masked$//" | xargs -i echo mv {}.fasta.masked {}.fa | sh
-# find [% data_dir %] -type f -name "*fasta*" | xargs rm 
 
 EOF
 
@@ -178,9 +211,10 @@ EOF
         {   data        => \@data,
             data_dir    => $data_dir,
             pl_dir      => $pl_dir,
-            kentbin_dir => $kentbin_dir
+            kentbin_dir => $kentbin_dir,
+            parallel    => $parallel,
         },
-        File::Spec->catfile( $store_dir, "auto_aspergillus_rm.sh" )
+        File::Spec->catfile( $store_dir, "ensemblrm.sh" )
     ) or die Template->error;
 
     $text = <<'EOF';
@@ -188,12 +222,29 @@ EOF
 cd [% data_dir %]
 
 #----------------------------#
-# blastz
+# blastz Afum
 #----------------------------#
 [% FOREACH item IN data -%]
 [% IF item.name != 'Afum' -%]
 # [% item.name %] [% item.coverage %]
-bsub -n 8 -J [% item.name %]-bz perl [% pl_dir %]/blastz/bz.pl -dt [% data_dir %]/Afum -dq [% data_dir %]/[% item.name %] -dl [% data_dir %]/Afumvs[% item.name %] -s set01 -p 8 --noaxt -pb lastz --lastz
+perl [% pl_dir %]/blastz/bz.pl \
+    -dt [% data_dir %]/Afum -dq [% data_dir %]/[% item.name %] \
+    -dl [% data_dir %]/Afumvs[% item.name %] \
+    -s set01 -p [% parallel %] --noaxt -pb lastz --lastz
+
+[% END -%]
+[% END -%]
+
+#----------------------------#
+# blastz Aory
+#----------------------------#
+[% FOREACH item IN data -%]
+[% IF item.name != 'Aory' -%]
+# [% item.name %] [% item.coverage %]
+perl [% pl_dir %]/blastz/bz.pl \
+    -dt [% data_dir %]/Aory -dq [% data_dir %]/[% item.name %] \
+    -dl [% data_dir %]/Aoryvs[% item.name %] \
+    -s set01 -p [% parallel %] --noaxt -pb lastz --lastz
 
 [% END -%]
 [% END -%]
@@ -204,9 +255,10 @@ EOF
         {   data        => \@data,
             data_dir    => $data_dir,
             pl_dir      => $pl_dir,
-            kentbin_dir => $kentbin_dir
+            kentbin_dir => $kentbin_dir,
+            parallel    => $parallel,
         },
-        File::Spec->catfile( $store_dir, "auto_aspergillus_bz.sh" )
+        File::Spec->catfile( $store_dir, "bz.sh" )
     ) or die Template->error;
 
     $text = <<'EOF';
@@ -214,12 +266,27 @@ EOF
 cd [% data_dir %]
 
 #----------------------------#
-# lpcna
+# lpcna Afum
 #----------------------------#
 [% FOREACH item IN data -%]
 [% IF item.name != 'Afum' -%]
 # [% item.name %] [% item.coverage %]
-perl [% pl_dir %]/blastz/lpcna.pl -dt [% data_dir %]/Afum -dq [% data_dir %]/[% item.name %] -dl [% data_dir %]/Afumvs[% item.name %] -p 8
+perl [% pl_dir %]/blastz/lpcna.pl \
+    -dt [% data_dir %]/Afum -dq [% data_dir %]/[% item.name %] \
+    -dl [% data_dir %]/Afumvs[% item.name %] -p [% parallel %]
+
+[% END -%]
+[% END -%]
+
+#----------------------------#
+# lpcna Aory
+#----------------------------#
+[% FOREACH item IN data -%]
+[% IF item.name != 'Aory' -%]
+# [% item.name %] [% item.coverage %]
+perl [% pl_dir %]/blastz/lpcna.pl \
+    -dt [% data_dir %]/Aory -dq [% data_dir %]/[% item.name %] \
+    -dl [% data_dir %]/Aoryvs[% item.name %] -p [% parallel %]
 
 [% END -%]
 [% END -%]
@@ -230,21 +297,37 @@ EOF
         {   data        => \@data,
             data_dir    => $data_dir,
             pl_dir      => $pl_dir,
-            kentbin_dir => $kentbin_dir
+            kentbin_dir => $kentbin_dir,
+            parallel    => $parallel,
         },
-        File::Spec->catfile( $store_dir, "auto_aspergillus_lpcna.sh" )
+        File::Spec->catfile( $store_dir, "lpcna.sh" )
     ) or die Template->error;
 
     $text = <<'EOF';
 #!/bin/bash
     
 #----------------------------#
-# amp
+# amp Afum
 #----------------------------#
 [% FOREACH item IN data -%]
 [% IF item.name != 'Afum' -%]
 # [% item.name %] [% item.coverage %]
-perl [% pl_dir %]/blastz/amp.pl -syn -dt [% data_dir %]/Afum -dq [% data_dir %]/[% item.name %] -dl [% data_dir %]/Afumvs[% item.name %] -p 8
+perl [% pl_dir %]/blastz/amp.pl -syn \
+    -dt [% data_dir %]/Afum -dq [% data_dir %]/[% item.name %] \
+    -dl [% data_dir %]/Afumvs[% item.name %] -p [% parallel %]
+
+[% END -%]
+[% END -%]
+    
+#----------------------------#
+# amp
+#----------------------------#
+[% FOREACH item IN data -%]
+[% IF item.name != 'Aory' -%]
+# [% item.name %] [% item.coverage %]
+perl [% pl_dir %]/blastz/amp.pl -syn \
+    -dt [% data_dir %]/Aory -dq [% data_dir %]/[% item.name %] \
+    -dl [% data_dir %]/Aoryvs[% item.name %] -p [% parallel %]
 
 [% END -%]
 [% END -%]
@@ -255,9 +338,10 @@ EOF
         {   data        => \@data,
             data_dir    => $data_dir,
             pl_dir      => $pl_dir,
-            kentbin_dir => $kentbin_dir
+            kentbin_dir => $kentbin_dir,
+            parallel    => $parallel,
         },
-        File::Spec->catfile( $store_dir, "auto_aspergillus_amp.sh" )
+        File::Spec->catfile( $store_dir, "amp.sh" )
     ) or die Template->error;
 
     $text = <<'EOF';
@@ -270,12 +354,27 @@ cd [% data_dir %]
 [% FOREACH item IN data -%]
 [% IF item.name != 'Afum' -%]
 # [% item.name %]
-find [% data_dir %]/Afumvs[% item.name %]/axtNet -name "*.axt.gz" | xargs gzip -d
-perl [% pl_dir %]/alignDB/extra/two_way_batch.pl -d Afumvs[% item.name %] -t="330879,Afum" -q "[% item.taxon %],[% item.name %]" -a [% data_dir %]/Afumvs[% item.name %] -at 10000 -st 1000000 --parallel 8 --run 1-3,21,40
-gzip [% data_dir %]/Afumvs[% item.name %]/axtNet/*.axt
+perl [% pl_dir %]/alignDB/extra/two_way_batch.pl \
+    -d Afumvs[% item.name %] \
+    -t="330879,Afum" -q "[% item.taxon %],[% item.name %]" \
+    -a [% data_dir %]/Afumvs[% item.name %] \
+    -at 5000 -st 0 -ct 0 --parallel [% parallel %] --run 1-3,21,40
 
 [% END -%]
 [% END -%]
+
+[% FOREACH item IN data -%]
+[% IF item.name != 'Aory' -%]
+# [% item.name %]
+perl [% pl_dir %]/alignDB/extra/two_way_batch.pl \
+    -d Aoryvs[% item.name %] \
+    -t="5062,Aory" -q "[% item.taxon %],[% item.name %]" \
+    -a [% data_dir %]/Aoryvs[% item.name %] \
+    -at 5000 -st 0 -ct 0 --parallel [% parallel %] --run 1-3,21,40
+
+[% END -%]
+[% END -%]
+
 
 EOF
     $tt->process(
@@ -283,30 +382,13 @@ EOF
         {   data     => \@data,
             data_dir => $data_dir,
             pl_dir   => $pl_dir,
+            parallel => $parallel,
         },
-        File::Spec->catfile( $store_dir, "auto_aspergillus_stat.sh" )
+        File::Spec->catfile( $store_dir, "pair_stat.sh" )
     ) or die Template->error;
 
     $text = <<'EOF';
 #!/bin/bash
-    
-#----------------------------#
-# tar-gzip
-#----------------------------#
-[% FOREACH item IN data -%]
-[% IF item.name != 'Afum' -%]
-# [% item.name %] [% item.coverage %]
-cd [% data_dir %]/Afumvs[% item.name FILTER ucfirst %]/
-
-tar -czvf lav.tar.gz   [*.lav   --remove-files
-tar -czvf psl.tar.gz   [*.psl   --remove-files
-tar -czvf chain.tar.gz [*.chain --remove-files
-gzip *.chain
-gzip net/*
-gzip axtNet/*.axt
-
-[% END -%]
-[% END -%]
 
 #----------------------------#
 # clean RepeatMasker outputs
@@ -321,8 +403,8 @@ gzip axtNet/*.axt
 #----------------------------#
 # clean pairwise maf
 #----------------------------#
-find [% data_dir %] -name "mafSynNet" | xargs rm -fr
-find [% data_dir %] -name "mafNet" | xargs rm -fr
+# find [% data_dir %] -name "mafSynNet" | xargs rm -fr
+# find [% data_dir %] -name "mafNet" | xargs rm -fr
 
 #----------------------------#
 # gzip maf, fas
@@ -341,9 +423,9 @@ EOF
         {   data        => \@data,
             data_dir    => $data_dir,
             pl_dir      => $pl_dir,
-            kentbin_dir => $kentbin_dir
+            kentbin_dir => $kentbin_dir,
         },
-        File::Spec->catfile( $store_dir, "auto_aspergillus_clean.sh" )
+        File::Spec->catfile( $store_dir, "clean.sh" )
     ) or die Template->error;
 }
 
@@ -372,17 +454,17 @@ EOF
 #----------------------------#
 # mz
 #----------------------------#
-find . -name "*MT.synNet*" | xargs rm
+# find . -name "*MT.synNet*" | xargs rm
 
 [% FOREACH item IN data -%]
 # [% item.out_dir %]
-bsub -q mpi_2 -n 8 -J [% item.out_dir %]-mz perl [% pl_dir %]/blastz/mz.pl \
+perl [% pl_dir %]/blastz/mz.pl \
     [% FOREACH st IN item.strains -%]
     -d [% data_dir %]/Afumvs[% st %] \
     [% END -%]
     --tree [% data_dir %]/8way.nwk \
     --out [% data_dir %]/[% item.out_dir %] \
-    -syn -p 8
+    -syn -p [% parallel %]
 
 [% END -%]
 
@@ -392,8 +474,9 @@ EOF
         {   data     => \@data,
             data_dir => $data_dir,
             pl_dir   => $pl_dir,
+            parallel => $parallel,
         },
-        File::Spec->catfile( $store_dir, "auto_aspergillus_mz.sh" )
+        File::Spec->catfile( $store_dir, "mz.sh" )
     ) or die Template->error;
 
     $text = <<'EOF';
@@ -403,7 +486,7 @@ EOF
 [% FOREACH item IN data -%]
 # [% item.out_dir %]
 perl [% pl_dir %]/alignDB/util/maf2fasta.pl \
-    --has_outgroup --id 330879 -p 8 --block \
+    --has_outgroup --id 330879 -p [% parallel %] --block \
     -i [% data_dir %]/[% item.out_dir %] \
     -o [% data_dir %]/[% item.out_dir %]_fasta
 
@@ -414,8 +497,8 @@ perl [% pl_dir %]/alignDB/util/maf2fasta.pl \
 #----------------------------#
 [% FOREACH item IN data -%]
 # [% item.out_dir %]
-bsub -q mpi_2 -n 8 -J [% item.out_dir %]-mft perl [% pl_dir %]/alignDB/util/refine_fasta.pl \
-    --msa mafft --block -p 8 \
+perl [% pl_dir %]/alignDB/util/refine_fasta.pl \
+    --msa mafft --block -p [% parallel %] \
     -i [% data_dir %]/[% item.out_dir %]_fasta \
     -o [% data_dir %]/[% item.out_dir %]_mft
 
@@ -426,31 +509,23 @@ bsub -q mpi_2 -n 8 -J [% item.out_dir %]-mft perl [% pl_dir %]/alignDB/util/refi
 #----------------------------#
 #[% FOREACH item IN data -%]
 ## [% item.out_dir %]
-#bsub -q mpi_2 -n 8 -J [% item.out_dir %]-msl perl [% pl_dir %]/alignDB/util/refine_fasta.pl \
-#    --msa muscle --quick --block -p 8 \
+#perl [% pl_dir %]/alignDB/util/refine_fasta.pl \
+#    --msa muscle --quick --block -p [% parallel %] \
 #    -i [% data_dir %]/[% item.out_dir %]_fasta \
 #    -o [% data_dir %]/[% item.out_dir %]_mslq
 #
 #[% END -%]
 
-#----------------------------#
-# clean
-#----------------------------#
-[% FOREACH item IN data -%]
-# [% item.out_dir %]
-cd [% data_dir %]
-rm -fr [% item.out_dir %]_fasta
-
-[% END -%]
-
 EOF
+
     $tt->process(
         \$text,
         {   data     => \@data,
             data_dir => $data_dir,
             pl_dir   => $pl_dir,
+            parallel => $parallel,
         },
-        File::Spec->catfile( $store_dir, "auto_aspergillus_maf_fasta.sh" )
+        File::Spec->catfile( $store_dir, "maf_fasta.sh" )
     ) or die Template->error;
 
     $text = <<'EOF';
@@ -466,7 +541,7 @@ perl [% pl_dir %]/alignDB/extra/multi_way_batch.pl \
     -d [% item.out_dir %] -e Afum_65 \
     --block --id 330879 \
     -f [% data_dir %]/[% item.out_dir %]_mft  \
-    -lt 5000 -st 1000000 --parallel 8 --run 1-3,21,40
+    -lt 5000 -st 0 -ct 0 --parallel [% parallel %] --run 1-3,21,40
 
 [% END -%]
 
@@ -476,7 +551,8 @@ EOF
         {   data     => \@data,
             data_dir => $data_dir,
             pl_dir   => $pl_dir,
+            parallel => $parallel,
         },
-        File::Spec->catfile( $store_dir, "auto_aspergillus_multi.sh" )
+        File::Spec->catfile( $store_dir, "multi.sh" )
     ) or die Template->error;
 }
