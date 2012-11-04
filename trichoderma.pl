@@ -11,81 +11,60 @@ use String::Compare;
 use YAML qw(Dump Load DumpFile LoadFile);
 
 my $store_dir = shift
-    || File::Spec->catdir( $ENV{HOME}, "data/alignment/plasmodium" );
+    || File::Spec->catdir( $ENV{HOME}, "data/alignment/trichoderma" );
 my $parallel = 12;
 
 {    # on linux
     my $data_dir
-        = File::Spec->catdir( $ENV{HOME}, "data/alignment/plasmodium" );
+        = File::Spec->catdir( $ENV{HOME}, "data/alignment/trichoderma" );
     my $pl_dir      = File::Spec->catdir( $ENV{HOME}, "Scripts" );
     my $kentbin_dir = File::Spec->catdir( $ENV{HOME}, "bin/x86_64" );
 
     # ensembl genomes 65
-    my $fasta_dir = File::Spec->catdir( $ENV{HOME},
-        "data/ensemblgenomes12_65/protists/fasta" );
-    my $mysql_dir = File::Spec->catdir( $ENV{HOME},
-        "data/ensemblgenomes12_65/protists/mysql" );
+    my $fasta_dir
+        = File::Spec->catdir( $ENV{HOME}, "data/alignment/trichoderma/WGS" );
 
     my $tt = Template->new;
 
     my @data = (
-        {   taxon    => 5823,
-            name     => "Pber",
-            sciname  => "Plasmodium berghei",
-            coverage => "8x sanger",
+        {   taxon    => 452589,
+            name     => "Tatr",
+            sciname  => "Trichoderma atroviride",
+            prefix   => "ABDG02",
+            coverage => "8.26x Sanger",
         },
-        {   taxon    => 5825,
-            name     => "Pcha",
-            sciname  => "Plasmodium chabaudi",
-            coverage => "8x sanger",
+        {   taxon    => 431241,
+            name     => "Tree",
+            sciname  => "Trichoderma reesei",
+            prefix   => "AAIL02",
+            coverage => "9x Sanger",
         },
-        {   taxon     => 36329,
-            name      => "Pfal",
-            sciname   => "Plasmodium falciparum",
-            coverage  => "8x sanger",
-        },
-        {   taxon     => 5851,
-            name      => "Pkno",
-            sciname   => "Plasmodium knowlesi",
-            coverage  => "8x sanger",
-        },
-        {   taxon    => 5855,
-            name     => "Pviv",
-            sciname  => "Plasmodium vivax",
-            coverage => "10x sanger",
+        {   taxon    => 413071,
+            name     => "Tvir",
+            sciname  => "Trichoderma virens",
+            prefix   => "ABDF02",
+            coverage => "8.05x Sanger",
         },
     );
 
-    my @subdirs_fasta = File::Find::Rule->directory->in($fasta_dir);
-    my @subdirs_mysql = File::Find::Rule->directory->in($mysql_dir);
+    my @files_fasta = File::Find::Rule->file->name('*.fasta.gz')->in($fasta_dir);
 
     for my $item (@data) {
-        my $folder = $item->{sciname};
-        $folder =~ s/ /_/g;
-        $folder = lc $folder;
-
-        #$folder .= "/dna";
 
         # match the most similar name
         my ($fasta) = map { $_->[0] }
             sort { $b->[1] <=> $a->[1] }
-            map { [ $_, compare( lc basename($_), $folder . "/dna" ) ] }
-            @subdirs_fasta;
+            map { [ $_, compare( basename($_), $item->{prefix} ) ] }
+            @files_fasta;
         $item->{fasta} = $fasta;
-
-        my ($mysql) = map { $_->[0] }
-            sort { $b->[1] <=> $a->[1] }
-            map { [ $_, compare( lc basename($_), $folder . "_core" ) ] }
-            @subdirs_mysql;
-        $item->{mysql} = $mysql;
-
-        $item->{db} = lc $item->{name} . "_65";
 
         # prepare working dir
         my $dir = File::Spec->catdir( $data_dir, $item->{name} );
         mkdir $dir if !-e $dir;
         $item->{dir} = $dir;
     }
+    
+    print Dump \@data;
 
     # taxon.csv
     my $text = <<'EOF';
@@ -102,7 +81,7 @@ EOF
     # chr_length.csv
     $text = <<'EOF';
 [% FOREACH item IN data -%]
-[% item.taxon %],chrUn,999999999,[% item.name %]/ensemblgenomes65
+[% item.taxon %],chrUn,999999999,[% item.name %]/WGS
 [% END -%]
 EOF
     $tt->process(
@@ -123,12 +102,15 @@ cd [% data_dir %]
 echo [% item.name %]
 
 cd [% item.dir %]
-find [% item.fasta %] -name "*dna.toplevel*" | xargs gzip -d -c > toplevel.fa
-[% kentbin_dir %]/faCount toplevel.fa | perl -aln -e 'next if $F[0] eq 'total'; print $F[0] if $F[1] > 100000; print $F[0] if $F[1] > 10000  and $F[6]/$F[1] < 0.05' | uniq > listFile
+gzip -d -c [% item.fasta %] > toplevel.fa
+perl -p -i -e '/>/ and s/\>gi\|(\d+).*/\>gi_$1/' toplevel.fa
+[% kentbin_dir %]/faCount toplevel.fa | perl -aln -e 'next if $F[0] eq 'total'; print $F[0] if $F[1] > 100000; print $F[0] if $F[1] > 5000 and $F[6]/$F[1] < 0.05' | uniq > listFile
 [% kentbin_dir %]/faSomeRecords toplevel.fa listFile toplevel.filtered.fa
 [% kentbin_dir %]/faSplit byname toplevel.filtered.fa .
 rm toplevel.fa toplevel.filtered.fa listFile
 
+rename 's/fa$/fasta/' *.fa;
+    
 [% END -%]
 
 EOF
@@ -148,35 +130,14 @@ EOF
 cd [% data_dir %]
 
 #----------------------------#
-# Ensembl annotation or RepeatMasker
+# RepeatMasker
 #----------------------------#
 [% FOREACH item IN data -%]
 # [% item.name %] [% item.coverage %]
 echo [% item.name %]
 
 cd [% item.dir %]
-
-if [ ! -f [% item.db %]_repeat.yml ]; then perl [% pl_dir %]/alignDB/util/build_ensembl.pl --initdb --db [% item.db %] --ensembl [% item.mysql %];  fi;
-if [ ! -f [% item.db %]_repeat.yml ]; then perl [% pl_dir %]/alignDB/util/write_masked_chr.pl -e [% item.db %]; fi;
-perl [% pl_dir %]/alignDB/util/write_masked_chr.pl -y [% item.db %]_repeat.yml --dir [% item.dir %]
-
-find . -name "*fa" | xargs rm
-rename 's/\.masked//' *.fa.masked
-rename 's/^/chr/' *.fa
-
-if [ -f chrUn.fasta ];
-then
-    [% kentbin_dir %]/faSplit about [% item.dir %]/chrUn.fasta 100000000 [% item.dir %]/;
-    rm [% item.dir %]/chrUn.fasta;    
-    rename 's/fa$/fasta/' [0-9][0-9].fa;
-fi;
-
 RepeatMasker [% item.dir %]/*.fasta -species Fungi -xsmall --parallel [% parallel %]
-if [ -f *.fasta.masked ];
-then
-    rename 's/fasta.masked$/fa/' *.fasta.masked;
-    find [% item.dir %] -type f -name "*fasta*" | xargs rm;
-fi;
 
 [% END -%]
 
@@ -190,7 +151,42 @@ EOF
             kentbin_dir => $kentbin_dir,
             parallel    => $parallel,
         },
-        File::Spec->catfile( $store_dir, "ensemblrm.sh" )
+        File::Spec->catfile( $store_dir, "rm.sh" )
+    ) or die Template->error;
+
+    $text = <<'EOF';
+#!/bin/bash
+cd [% data_dir %]
+
+#----------------------------#
+# RepeatMasker
+#----------------------------#
+[% FOREACH item IN data -%]
+# [% item.name %] [% item.coverage %]
+echo [% item.name %]
+
+for i in [% item.dir %]/*.fasta;
+do
+    if [ -f $i.masked ];
+    then
+        rename 's/fasta.masked$/fa/' $i.masked;
+        find [% item.dir %] -type f -name "`basename $i`*" | xargs rm 
+    fi;
+done;
+
+[% END -%]
+
+EOF
+
+    $tt->process(
+        \$text,
+        {   data        => \@data,
+            data_dir    => $data_dir,
+            pl_dir      => $pl_dir,
+            kentbin_dir => $kentbin_dir,
+            parallel    => $parallel,
+        },
+        File::Spec->catfile( $store_dir, "clean-rm.sh" )
     ) or die Template->error;
 
     $text = <<'EOF';
@@ -385,7 +381,7 @@ EOF
 #
 #    my $text = <<'EOF';
 ##!/bin/bash
-#    
+#
 ##----------------------------#
 ## mz
 ##----------------------------#
@@ -465,7 +461,7 @@ EOF
 #
 #    $text = <<'EOF';
 ##!/bin/bash
-#    
+#
 ##----------------------------#
 ## multi_way_batch
 ##----------------------------#
