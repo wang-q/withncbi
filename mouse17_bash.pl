@@ -391,11 +391,13 @@ EOF
         MousevsVIIIGE25xW =>
             [qw{ 129P2 A_J AKR_J C3H_HeJ CBA_J LP_J NOD WSB_Ei }],
 
-        # use this
         MousevsXIIC => [
             qw{ 129P2 A_J AKR_J BALBc_J C3H_HeJ CBA_J DBA_2J LP_J NOD NZO WSB_Ei
                 CAST_Ei }
         ],
+        
+        # use this
+        # MousevsSpretus_Ei got better segment_cv_indel_3 result
         MousevsXIIS => [
             qw{ 129P2 A_J AKR_J BALBc_J C3H_HeJ CBA_J DBA_2J LP_J NOD NZO WSB_Ei
                 Spretus_Ei }

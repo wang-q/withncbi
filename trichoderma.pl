@@ -322,11 +322,6 @@ EOF
 #!/bin/bash
 
 #----------------------------#
-# clean RepeatMasker outputs
-#----------------------------#
-# find [% data_dir %] -name "*.fasta*" | xargs rm
-
-#----------------------------#
 # only keeps chr.2bit files
 #----------------------------#
 # find [% data_dir %] -name "*.fa" | xargs rm

@@ -400,7 +400,7 @@ bsub -q mpi_2 -n 8 -J [% item.out_dir %]-mz perl [% pl_dir %]/blastz/mz.pl \
     [% FOREACH st IN item.strains -%]
     -d [% data_dir %]/Athvs[% st FILTER ucfirst %] \
     [% END -%]
-    --tree [% data_dir %]/19way.nwk \
+    --tree [% data_dir %]/20way.nwk \
     --out [% data_dir %]/[% item.out_dir %] \
     -syn -p 8
 
