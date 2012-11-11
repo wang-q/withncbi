@@ -83,11 +83,11 @@ $obj->empty_ofg_tables;
 # alignments
 my $align_ids = $obj->get_align_ids;
 
-# all gce
+# all ofg
 my @all_tdna;
 my %chr_tdna_set;
 {
-    # read in gce info
+    # read in ofg info
     open my $tdna_fh, '<', $tdna_file;
     while ( my $string = <$tdna_fh> ) {
         next unless defined $string;
@@ -132,38 +132,18 @@ __END__
 
 =head1 NAME
 
-    insert_gce.pl - Add annotation info to alignDB
+    insert_tdna.pl - Add annotation info to alignDB
 
 =head1 SYNOPSIS
 
-    insert_gene.pl [options]
-     Options:
-       --help            brief help message
-       --man             full documentation
-       --server          MySQL server IP/Domain name
-       --db              database name
-       --username        username
-       --password        password
-       --ensembl         ensembl database name
-       
-
-=head1 OPTIONS
-
-=over 8
-
-=item B<-help>
-
-Print a brief help message and exits.
-
-=item B<-man>
-
-Prints the manual page and exits.
-
-=back
-
-=head1 DESCRIPTION
-
-B<This program> will read the given input file(s) and do someting
-useful with the contents thereof.
+    insert_tdna.pl [options]
+      Options:
+        --help            brief help message
+        --man             full documentation
+        --server          MySQL server IP/Domain name
+        --db              database name
+        --username        username
+        --password        password
+        --ensembl         ensembl database name
 
 =cut
