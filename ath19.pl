@@ -117,7 +117,7 @@ my $parallel = 12;
     # taxon.csv
     my $text = <<'EOF';
 [% FOREACH item IN data -%]
-[% item.taxon %],Arabidopsis,thaliana,[% item.name %],,
+[% item.taxon %],Arabidopsis,thaliana,[% item.name %],[% item.name %],
 [% END -%]
 EOF
     $tt->process(
@@ -126,16 +126,57 @@ EOF
         File::Spec->catfile( $store_dir, "taxon.csv" )
     ) or die Template->error;
 
-    # chr_length.csv
+    # chr_length_chrUn.csv
     $text = <<'EOF';
 [% FOREACH item IN data -%]
-[% item.taxon %],chrUn,999999999,[% item.name %]/arabidopsis19/1001
+[% item.taxon %],chrUn,999999999,[% item.name %]/arabidopsis19/nature2011
 [% END -%]
 EOF
     $tt->process(
         \$text,
         { data => \@data, },
-        File::Spec->catfile( $store_dir, "chr_length.csv" )
+        File::Spec->catfile( $store_dir, "chr_length_chrUn.csv" )
+    ) or die Template->error;
+
+    $text = <<'EOF';
+#!/bin/bash
+cd [% data_dir %]
+
+if [ -f real_chr.csv ]; then
+    rm real_chr.csv;
+fi;
+
+[% FOREACH item IN data -%]
+perl -aln -F"\t" -e 'print qq{[% item.taxon %],$F[0],$F[1],[% item.name %]/arabidopsis19/nature2011}' [% item.dir %]/chr.sizes >> real_chr.csv
+[% END -%]
+
+cat chr_length_chrUn.csv real_chr.csv > chr_length.csv
+rm real_chr.csv
+
+EOF
+    $tt->process(
+        \$text,
+        {   data     => \@data,
+            data_dir => $data_dir,
+        },
+        File::Spec->catfile( $store_dir, "real_chr.sh" )
+    ) or die Template->error;
+
+    # id2name.csv
+    $text = <<'EOF';
+[% FOREACH item IN data -%]
+[% item.taxon %],[% item.name %]
+[% END -%]
+EOF
+    $tt->process(
+        \$text,
+        {   data => [
+                { name => "ath_65",    taxon => 3702 },
+                { name => "lyrata_65", taxon => 59689 },
+                @data
+            ],
+        },
+        File::Spec->catfile( $store_dir, "id2name.csv" )
     ) or die Template->error;
 
     $text = <<'EOF';
@@ -370,7 +411,7 @@ EOF
 
     my $tt         = Template->new;
     my $strains_of = {
-        AthvsV   => [qw{ lyrata_65 Bur_0 Zu_0 No_0 Ler_0  }],
+        AthvsV     => [qw{ lyrata_65 Bur_0 Zu_0 No_0 Ler_0  }],
         AthvsXVIII => [
             qw{ lyrata_65 Bur_0 Can_0 Ct_1 Edi_0 Hi_0 Kn_0 Ler_0 Mt_0 No_0 Oy_0 Po_0
                 Rsch_4 Tsu_0 Wil_2 Ws_0 Wu_0 Zu_0 }

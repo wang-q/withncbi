@@ -22,7 +22,6 @@ my $store_dir = shift
     my $pl_dir      = File::Spec->catdir( $ENV{HOME}, "Scripts" );
     my $kentbin_dir = File::Spec->catdir( $ENV{HOME}, "bin/x86_64" );
 
-    my $tt   = Template->new;
     my @data = (
 
         # the best
@@ -63,7 +62,80 @@ my $store_dir = shift
         { taxon => 901512, name => "DBVPG6044", coverage => "32x illumina", },
     );
 
+    for my $item ( sort @data ) {
+        my $name = $item->{name};
+
+        # prepare working dir
+        my $dir = File::Spec->catdir( $data_dir, $name );
+        mkdir $dir if !-e $dir;
+        $item->{dir} = $dir;
+    }
+
+    print Dump \@data;
+
+    my $tt = Template->new;
+
+    # taxon.csv
     my $text = <<'EOF';
+[% FOREACH item IN data -%]
+[% item.taxon %],Saccharomyces,cerevisiae,[% item.name %],[% item.name %],
+[% END -%]
+EOF
+    $tt->process(
+        \$text,
+        { data => \@data, },
+        File::Spec->catfile( $store_dir, "taxon.csv" )
+    ) or die Template->error;
+
+    # chr_length_chrUn.csv
+    $text = <<'EOF';
+[% FOREACH item IN data -%]
+[% item.taxon %],chrUn,999999999,[% item.name %]/WGS/sgrp2
+[% END -%]
+EOF
+    $tt->process(
+        \$text,
+        { data => \@data, },
+        File::Spec->catfile( $store_dir, "chr_length_chrUn.csv" )
+    ) or die Template->error;
+
+    $text = <<'EOF';
+#!/bin/bash
+cd [% data_dir %]
+
+if [ -f real_chr.csv ]; then
+    rm real_chr.csv;
+fi;
+
+[% FOREACH item IN data -%]
+perl -aln -F"\t" -e 'print qq{[% item.taxon %],$F[0],$F[1],[% item.name %]/WGS/sgrp2}' [% item.dir %]/chr.sizes >> real_chr.csv
+[% END -%]
+
+cat chr_length_chrUn.csv real_chr.csv > chr_length.csv
+rm real_chr.csv
+
+EOF
+    $tt->process(
+        \$text,
+        {   data     => \@data,
+            data_dir => $data_dir,
+        },
+        File::Spec->catfile( $store_dir, "real_chr.sh" )
+    ) or die Template->error;
+
+    # id2name.csv
+    $text = <<'EOF';
+[% FOREACH item IN data -%]
+[% item.taxon %],[% item.name %]
+[% END -%]
+EOF
+    $tt->process(
+        \$text,
+        { data => [ { name => "S288C", taxon => 4932 }, @data ], },
+        File::Spec->catfile( $store_dir, "id2name.csv" )
+    ) or die Template->error;
+
+    $text = <<'EOF';
 #!/bin/bash
 cd [% data_dir %]
 
@@ -203,11 +275,13 @@ EOF
 }
 
 {    # multi
-    my $data_dir = File::Spec->catdir( $ENV{HOME}, "data/alignment/yeast_combine" );
-    my $pl_dir   = File::Spec->catdir( $ENV{HOME}, "Scripts" );
+    my $data_dir
+        = File::Spec->catdir( $ENV{HOME}, "data/alignment/yeast_combine" );
+    my $pl_dir = File::Spec->catdir( $ENV{HOME}, "Scripts" );
 
     my $tt         = Template->new;
     my $strains_of = {
+
         # combine
         S288Cvs16_COM => [
             qw{ Spar RM11 YJM789 EC1118 JAY291 Kyokai_no__7 Sigma1278b T7
@@ -270,19 +344,18 @@ EOF
 
     my $tt         = Template->new;
     my $strains_of = {
-        
+
         S288CvsYJM789Spar => [qw{ Spar YJM789 }],
-        S288CvsIII       => [qw{ Spar RM11 YJM789 }],
+        S288CvsIII        => [qw{ Spar RM11 YJM789 }],
 
         # from wgs
-        S288CvsVIII_WGS => [
-            qw{ Spar RM11 YJM789 EC1118 JAY291 Kyokai_no__7 Sigma1278b T7 }
-        ],
-        
+        S288CvsVIII_WGS =>
+            [ qw{ Spar RM11 YJM789 EC1118 JAY291 Kyokai_no__7 Sigma1278b T7 } ],
+
         # from sgrp2
         S288CvsXI_SGRP2 => [
             qw{ Spar RM11 YJM789 DBVPG6044 DBVPG6765 L1528 SK1 UWOPS83 UWOPS87
-            W303 YPS128 }
+                W303 YPS128 }
         ],
 
         # combine
@@ -290,17 +363,16 @@ EOF
             qw{ Spar RM11 YJM789 EC1118 JAY291 Kyokai_no__7 Sigma1278b T7
                 DBVPG6044 DBVPG6765 L1528 SK1 UWOPS83 UWOPS87 W303 YPS128 }
         ],
-        
+
         # branch A
         S288CvsX_A => [
             qw{ Spar RM11 YJM789 EC1118 JAY291 Sigma1278b DBVPG6765 L1528
-            UWOPS87 W303 }
+                UWOPS87 W303 }
         ],
-        
+
         # branch B
-        S288CvsVII_B => [
-            qw{ Spar Kyokai_no__7 T7 DBVPG6044 SK1 UWOPS83 YPS128 }
-        ],
+        S288CvsVII_B =>
+            [ qw{ Spar Kyokai_no__7 T7 DBVPG6044 SK1 UWOPS83 YPS128 } ],
     };
 
     my @data;

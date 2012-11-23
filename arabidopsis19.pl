@@ -12,6 +12,7 @@ use YAML qw(Dump Load DumpFile LoadFile);
 
 my $store_dir = shift
     || File::Spec->catdir( $ENV{HOME}, "data/alignment/arabidopsis19" );
+my $parallel = 12;
 {    # on linux
     my $data_dir
         = File::Spec->catdir( $ENV{HOME}, "data/alignment/arabidopsis19" );
@@ -21,8 +22,6 @@ my $store_dir = shift
     # nature 2011
     my $seq_dir
         = File::Spec->catdir( $ENV{HOME}, "data/1001/19genomes/fasta/MASKED" );
-
-    my $tt = Template->new;
 
     my @data = (
         { taxon => 900201, name => "Bur_0",  origin => "Ireland" },
@@ -63,6 +62,7 @@ my $store_dir = shift
 
     my $basecount = File::Spec->catfile( $data_dir, "basecount.txt" );
     remove( \1, $basecount ) if -e $basecount;
+    my $tt = Template->new;
 
     # taxon.csv
     my $text = <<'EOF';
