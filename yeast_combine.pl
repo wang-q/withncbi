@@ -345,12 +345,13 @@ EOF
     my $tt         = Template->new;
     my $strains_of = {
 
+        S288CvsRM11Spar   => [qw{ Spar RM11 }],
         S288CvsYJM789Spar => [qw{ Spar YJM789 }],
         S288CvsIII        => [qw{ Spar RM11 YJM789 }],
 
         # from wgs
         S288CvsVIII_WGS =>
-            [ qw{ Spar RM11 YJM789 EC1118 JAY291 Kyokai_no__7 Sigma1278b T7 } ],
+            [qw{ Spar RM11 YJM789 EC1118 JAY291 Kyokai_no__7 Sigma1278b T7 }],
 
         # from sgrp2
         S288CvsXI_SGRP2 => [
@@ -372,7 +373,7 @@ EOF
 
         # branch B
         S288CvsVII_B =>
-            [ qw{ Spar Kyokai_no__7 T7 DBVPG6044 SK1 UWOPS83 YPS128 } ],
+            [qw{ Spar Kyokai_no__7 T7 DBVPG6044 SK1 UWOPS83 YPS128 }],
     };
 
     my @data;
