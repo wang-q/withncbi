@@ -12,7 +12,7 @@ use YAML qw(Dump Load DumpFile LoadFile);
 
 my $store_dir = shift
     || File::Spec->catdir( $ENV{HOME}, "data/alignment/mouse65" );
-
+my $parallel = 12;
 {    # on linux
     my $data_dir = File::Spec->catdir( $ENV{HOME}, "data/alignment/mouse65" );
     my $pl_dir   = File::Spec->catdir( $ENV{HOME}, "Scripts" );
@@ -20,8 +20,6 @@ my $store_dir = shift
 
     # nature 2011
     my $seq_dir = File::Spec->catdir( $ENV{HOME}, "data/sanger/23012012" );
-
-    my $tt = Template->new;
 
     my @data = (
         { taxon => 900302, name => "129P2",       coverage => 43.78, },
@@ -42,7 +40,6 @@ my $store_dir = shift
         { taxon => 900316, name => "Spretus_Ei",  coverage => 26.68, },
         { taxon => 900317, name => "WSB_Ei",      coverage => 18.26, },
     );
-
     my @subdirs = File::Find::Rule->directory->in($seq_dir);
 
     for my $item ( sort @data ) {
@@ -59,11 +56,23 @@ my $store_dir = shift
         mkdir $dir if !-e $dir;
         $item->{dir} = $dir;
     }
+    
+    print Dump \@data;
+
+    my @data_with_exists = (
+        {   name  => "mouse",
+            taxon => 10090,
+            dir   => File::Spec->catdir( $data_dir, "mouse" )
+        },
+        @data
+    );
+
+    my $tt = Template->new;
 
     # taxon.csv
     my $text = <<'EOF';
 [% FOREACH item IN data -%]
-[% item.taxon %],Mus,musculus,[% item.name %],,
+[% item.taxon %],Mus,musculus,[% item.name %],[% item.name %],
 [% END -%]
 EOF
     $tt->process(
@@ -72,7 +81,7 @@ EOF
         File::Spec->catfile( $store_dir, "taxon.csv" )
     ) or die Template->error;
 
-    # chr_length.csv
+    # chr_length_chrUn.csv
     $text = <<'EOF';
 [% FOREACH item IN data -%]
 [% item.taxon %],chrUn,999999999,[% item.name %]/mouse17/sanger
@@ -80,8 +89,52 @@ EOF
 EOF
     $tt->process(
         \$text,
-        { data => \@data, },
-        File::Spec->catfile( $store_dir, "chr_length.csv" )
+        { data => \@data_with_exists, },
+        File::Spec->catfile( $store_dir, "chr_length_chrUn.csv" )
+    ) or die Template->error;
+
+    $text = <<'EOF';
+#!/bin/bash
+cd [% data_dir %]
+
+if [ -f real_chr.csv ]; then
+    rm real_chr.csv;
+fi;
+
+[% FOREACH item IN data -%]
+perl -aln -F"\t" -e 'print qq{[% item.taxon %],$F[0],$F[1],[% item.name %]/mouse17/sanger}' [% item.dir %]/chr.sizes >> real_chr.csv
+[% END -%]
+
+cat chr_length_chrUn.csv real_chr.csv > chr_length.csv
+rm real_chr.csv
+
+echo Run the following cmds to merge csv files
+echo
+echo perl [% pl_dir %]/alignDB/util/merge_csv.pl -t [% pl_dir %]/alignDB/init/taxon.csv -m [% data_dir %]/taxon.csv
+echo
+echo perl [% pl_dir %]/alignDB/util/merge_csv.pl -t [% pl_dir %]/alignDB/init/chr_length.csv -m [% data_dir %]/chr_length.csv
+echo
+
+EOF
+    $tt->process(
+        \$text,
+        {   data     => \@data_with_exists,
+            data_dir => $data_dir,
+            pl_dir   => $pl_dir,
+        },
+        File::Spec->catfile( $store_dir, "real_chr.sh" )
+    ) or die Template->error;
+
+    # id2name.csv
+    $text = <<'EOF';
+[% FOREACH item IN data -%]
+[% item.taxon %],[% item.name %]
+[% END -%]
+EOF
+    $tt->process(
+        \$text,
+        { data => \@data_with_exists, },
+        File::Spec->catfile( $store_dir, "id2name.csv" )
     ) or die Template->error;
 
     $text = <<'EOF';
@@ -127,7 +180,7 @@ EOF
             pl_dir      => $pl_dir,
             kentbin_dir => $kentbin_dir
         },
-        File::Spec->catfile( $store_dir, "auto_mouse17_file.sh" )
+        File::Spec->catfile( $store_dir, "file.sh" )
     ) or die Template->error;
 
     $text = <<'EOF';
@@ -165,7 +218,7 @@ EOF
             pl_dir      => $pl_dir,
             kentbin_dir => $kentbin_dir
         },
-        File::Spec->catfile( $store_dir, "auto_mouse17_rm.sh" )
+        File::Spec->catfile( $store_dir, "rm.sh" )
     ) or die Template->error;
 
     $text = <<'EOF';
@@ -198,7 +251,7 @@ EOF
             pl_dir      => $pl_dir,
             kentbin_dir => $kentbin_dir
         },
-        File::Spec->catfile( $store_dir, "auto_mouse17_bz.sh" )
+        File::Spec->catfile( $store_dir, "bz.sh" )
     ) or die Template->error;
 
     $text = <<'EOF';
@@ -221,27 +274,11 @@ EOF
             pl_dir      => $pl_dir,
             kentbin_dir => $kentbin_dir
         },
-        File::Spec->catfile( $store_dir, "auto_mouse17_amp.sh" )
+        File::Spec->catfile( $store_dir, "amp.sh" )
     ) or die Template->error;
 
     $text = <<'EOF';
 #!/bin/bash
-    
-#----------------------------#
-# tar-gzip
-#----------------------------#
-[% FOREACH item IN data -%]
-# [% item.name %] [% item.coverage %]
-cd [% data_dir %]/Athvs[% item.name %]/
-
-tar -czvf lav.tar.gz   [*.lav   --remove-files
-tar -czvf psl.tar.gz   [*.psl   --remove-files
-tar -czvf chain.tar.gz [*.chain --remove-files
-gzip *.chain
-gzip net/*
-gzip axtNet/*.axt
-
-[% END -%]
 
 #----------------------------#
 # clean RepeatMasker outputs
@@ -279,7 +316,7 @@ EOF
             pl_dir      => $pl_dir,
             kentbin_dir => $kentbin_dir
         },
-        File::Spec->catfile( $store_dir, "auto_mouse17_clean.sh" )
+        File::Spec->catfile( $store_dir, "clean.sh" )
     ) or die Template->error;
 }
 
@@ -316,8 +353,8 @@ REM #----------------------------#
 REM # stat
 REM #----------------------------#
 [% FOREACH item IN data -%]
-REM # [% item.name %] [% item.coverage %]
-perl [% pl_dir %]\alignDB\extra\two_way_batch.pl -d Mousevs[% item.name %] -t="10090,Mouse" -q "[% item.taxon %],[% item.name %]" -a [% data_dir %]\Mousevs[% item.name %] -at 1000 -st 10000000 --parallel 4 --run 1-3,21,40
+# [% item.name %] [% item.coverage %]
+perl [% pl_dir %]/alignDB/extra/two_way_batch.pl -d Mousevs[% item.name %] -t="10090,Mouse" -q "[% item.taxon %],[% item.name %]" -a [% data_dir %]/Mousevs[% item.name %] -at 1000 -st 10000000 --parallel 4 --run 1-3,21,40
 
 [% END -%]
 
@@ -328,7 +365,7 @@ EOF
             data_dir => $data_dir,
             pl_dir   => $pl_dir,
         },
-        File::Spec->catfile( $store_dir, "auto_mouse17_stat.sh" )
+        File::Spec->catfile( $store_dir, "stat.sh" )
     ) or die Template->error;
 
     my $strains_of = {
@@ -370,7 +407,7 @@ EOF
     $tt->process(
         \$text,
         { data => \@group, data_dir => $data_dir, pl_dir => $pl_dir, },
-        File::Spec->catfile( $store_dir, "auto_mouse17_joins.sh" )
+        File::Spec->catfile( $store_dir, "joins.sh" )
     ) or die Template->error;
 }
 
@@ -445,7 +482,7 @@ EOF
             data_dir => $data_dir,
             pl_dir   => $pl_dir,
         },
-        File::Spec->catfile( $store_dir, "auto_mouse17_mz.sh" )
+        File::Spec->catfile( $store_dir, "mz.sh" )
     ) or die Template->error;
 
     $text = <<'EOF';
@@ -492,7 +529,7 @@ EOF
             data_dir => $data_dir,
             pl_dir   => $pl_dir,
         },
-        File::Spec->catfile( $store_dir, "auto_mouse17_maf_fasta.sh" )
+        File::Spec->catfile( $store_dir, "maf_fasta.sh" )
     ) or die Template->error;
 
     $text = <<'EOF';
@@ -506,9 +543,9 @@ EOF
 # mafft
 perl [% pl_dir %]/alignDB/extra/multi_way_batch.pl \
     -d [% item.out_dir %] -e mouse_65 \
-    --block --id 10090 \
+    --block --id [% data_dir %]/id2name.csv \
     -f [% data_dir %]/[% item.out_dir %]_mft  \
-    -lt 5000 -st 10000000 --parallel 4 --run 1-3,21,40
+    -lt 5000 -st 0 -ct 0 --parallel [% parallel %] --run common
 
 [% END -%]
 
@@ -518,7 +555,8 @@ EOF
         {   data     => \@data,
             data_dir => $data_dir,
             pl_dir   => $pl_dir,
+            parallel => $parallel,
         },
-        File::Spec->catfile( $store_dir, "auto_mouse17_multi.sh" )
+        File::Spec->catfile( $store_dir, "multi.sh" )
     ) or die Template->error;
 }

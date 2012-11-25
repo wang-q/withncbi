@@ -113,6 +113,18 @@ my $parallel = 12;
 
     print Dump \@data;
 
+    my @data_with_exists = (
+        {   name  => "ath_65",
+            taxon => 3702,
+            dir   => File::Spec->catdir( $data_dir, "ath_65" )
+        },
+        {   name  => "lyrata_65",
+            taxon => 59689,
+            dir   => File::Spec->catdir( $data_dir, "lyrata_65" )
+        },
+        @data
+    );
+
     my $tt = Template->new;
 
     # taxon.csv
@@ -135,18 +147,7 @@ EOF
 EOF
     $tt->process(
         \$text,
-        {   data => [
-                {   name  => "ath_65",
-                    taxon => 3702,
-                    dir   => File::Spec->catdir( $data_dir, "ath_65" )
-                },
-                {   name  => "lyrata_65",
-                    taxon => 59689,
-                    dir   => File::Spec->catdir( $data_dir, "lyrata_65" )
-                },
-                @data
-            ],
-        },
+        { data => \@data_with_exists, },
         File::Spec->catfile( $store_dir, "chr_length_chrUn.csv" )
     ) or die Template->error;
 
@@ -175,17 +176,7 @@ echo
 EOF
     $tt->process(
         \$text,
-        {   data => [
-                {   name  => "ath_65",
-                    taxon => 3702,
-                    dir   => File::Spec->catdir( $data_dir, "ath_65" )
-                },
-                {   name  => "lyrata_65",
-                    taxon => 59689,
-                    dir   => File::Spec->catdir( $data_dir, "lyrata_65" )
-                },
-                @data
-            ],
+        {   data     => \@data_with_exists,
             data_dir => $data_dir,
             pl_dir   => $pl_dir,
         },
@@ -200,12 +191,7 @@ EOF
 EOF
     $tt->process(
         \$text,
-        {   data => [
-                { name => "ath_65",    taxon => 3702 },
-                { name => "lyrata_65", taxon => 59689 },
-                @data
-            ],
-        },
+        { data => \@data_with_exists, },
         File::Spec->catfile( $store_dir, "id2name.csv" )
     ) or die Template->error;
 

@@ -12,6 +12,7 @@ use YAML qw(Dump Load DumpFile LoadFile);
 
 my $store_dir = shift
     || File::Spec->catdir( $ENV{HOME}, "data/alignment/dpgp" );
+my $parallel = 12;
 
 {    # on linux
     my $data_dir    = File::Spec->catdir( $ENV{HOME}, "data/alignment/dpgp" );
@@ -45,10 +46,21 @@ my $store_dir = shift
         { taxon => 900721, name => "ZS37",  coverage => 39.11, },
     );
 
+    my @data_with_exists = (
+        {   name  => "Dmel_65",
+            taxon => 7227,
+            dir   => File::Spec->catdir( $data_dir, "Dmel_65" )
+        },
+        {   name  => "Dsim_65",
+            taxon => 7240,
+            dir   => File::Spec->catdir( $data_dir, "Dsim_65" )
+        },
+        @data
+    );
+
     my @files = File::Find::Rule->file->name('*.vcf.fasta')->in($seq_dir);
 
     for my $item ( sort @data ) {
-        my $name = $item->{name};
 
         # match the most similar name
         my ($file) = map { $_->[0] }
@@ -57,7 +69,7 @@ my $store_dir = shift
         $item->{seq} = $file;
 
         # prepare working dir
-        my $dir = File::Spec->catdir( $data_dir, $name );
+        my $dir = File::Spec->catdir( $data_dir, $item->{name} );
         mkdir $dir if !-e $dir;
         $item->{dir} = $dir;
     }
@@ -69,7 +81,7 @@ my $store_dir = shift
     # taxon.csv
     my $text = <<'EOF';
 [% FOREACH item IN data -%]
-[% item.taxon %],Drosophila,melanogaster,[% item.name %],,
+[% item.taxon %],Drosophila,melanogaster,[% item.name %],[% item.name %],
 [% END -%]
 EOF
     $tt->process(
@@ -86,8 +98,52 @@ EOF
 EOF
     $tt->process(
         \$text,
-        { data => \@data, },
-        File::Spec->catfile( $store_dir, "chr_length.csv" )
+        { data => \@data_with_exists, },
+        File::Spec->catfile( $store_dir, "chr_length_chrUn.csv" )
+    ) or die Template->error;
+
+    $text = <<'EOF';
+#!/bin/bash
+cd [% data_dir %]
+
+if [ -f real_chr.csv ]; then
+    rm real_chr.csv;
+fi;
+
+[% FOREACH item IN data -%]
+perl -aln -F"\t" -e 'print qq{[% item.taxon %],$F[0],$F[1],[% item.name %]/DPGP}' [% item.dir %]/chr.sizes >> real_chr.csv
+[% END -%]
+
+cat chr_length_chrUn.csv real_chr.csv > chr_length.csv
+rm real_chr.csv
+
+echo Run the following cmds to merge csv files
+echo
+echo perl [% pl_dir %]/alignDB/util/merge_csv.pl -t [% pl_dir %]/alignDB/init/taxon.csv -m [% data_dir %]/taxon.csv
+echo
+echo perl [% pl_dir %]/alignDB/util/merge_csv.pl -t [% pl_dir %]/alignDB/init/chr_length.csv -m [% data_dir %]/chr_length.csv
+echo
+
+EOF
+    $tt->process(
+        \$text,
+        {   data     => \@data_with_exists,
+            data_dir => $data_dir,
+            pl_dir   => $pl_dir,
+        },
+        File::Spec->catfile( $store_dir, "real_chr.sh" )
+    ) or die Template->error;
+
+    # id2name.csv
+    $text = <<'EOF';
+[% FOREACH item IN data -%]
+[% item.taxon %],[% item.name %]
+[% END -%]
+EOF
+    $tt->process(
+        \$text,
+        { data => \@data_with_exists, },
+        File::Spec->catfile( $store_dir, "id2name.csv" )
     ) or die Template->error;
 
     $text = <<'EOF';
@@ -117,7 +173,7 @@ EOF
             pl_dir      => $pl_dir,
             kentbin_dir => $kentbin_dir
         },
-        File::Spec->catfile( $store_dir, "auto_dpgp_file.sh" )
+        File::Spec->catfile( $store_dir, "file.sh" )
     ) or die Template->error;
 
     $text = <<'EOF';
@@ -129,22 +185,9 @@ cd [% data_dir %]
 #----------------------------#
 [% FOREACH item IN data -%]
 # [% item.name %] [% item.coverage %]
-bsub -q mpi_2 -n 8 -J [% item.name %]-rm RepeatMasker [% item.dir %]/*.fasta -species Flies -xsmall --parallel 8
+RepeatMasker [% item.dir %]/*.fasta -species Flies -xsmall --parallel [% parallel %]
 
 [% END -%]
-
-#----------------------------#
-# find failed rm jobs
-#----------------------------#
-[% FOREACH item IN data -%]
-# [% item.name %] [% item.coverage %]
-find [% item.dir %] -name "*fasta" \
-    | perl -e \
-    'while(<>) {chomp; s/\.fasta$//; next if -e qq{$_.fasta.masked}; next if -e qq{$_.fa}; print qq{ bsub -n 8 -J [% item.name %]_ RepeatMasker $_.fasta -species Flies -xsmall --parallel 8 \n};}' >> catchup.txt
-
-[% END -%]
-
-# find [% data_dir %] -name "*.fasta.masked" | sed "s/\.fasta\.masked$//" | xargs -i echo mv {}.fasta.masked {}.fa | sh
 
 EOF
 
@@ -153,9 +196,76 @@ EOF
         {   data        => \@data,
             data_dir    => $data_dir,
             pl_dir      => $pl_dir,
-            kentbin_dir => $kentbin_dir
+            kentbin_dir => $kentbin_dir,
+            parallel    => $parallel,
         },
-        File::Spec->catfile( $store_dir, "auto_dpgp_rm.sh" )
+        File::Spec->catfile( $store_dir, "rm.sh" )
+    ) or die Template->error;
+
+    $text = <<'EOF';
+#!/bin/bash
+cd [% data_dir %]
+
+#----------------------------#
+# find failed rm jobs
+#----------------------------#
+[% FOREACH item IN data -%]
+# [% item.name %] [% item.coverage %]
+find [% item.dir %] -name "*fasta" \
+    | perl -e \
+    'while(<>) {chomp; s/\.fasta$//; next if -e qq{$_.fasta.masked}; next if -e qq{$_.fa}; print qq{ RepeatMasker $_.fasta -species Flies -xsmall --parallel [% parallel %] \n};}' >> catchup.txt
+
+[% END -%]
+
+EOF
+
+    $tt->process(
+        \$text,
+        {   data        => \@data,
+            data_dir    => $data_dir,
+            pl_dir      => $pl_dir,
+            kentbin_dir => $kentbin_dir,
+            parallel    => $parallel,
+        },
+        File::Spec->catfile( $store_dir, "rm_failed.sh" )
+    ) or die Template->error;
+
+    $text = <<'EOF';
+#!/bin/bash
+cd [% data_dir %]
+
+#----------------------------#
+# RepeatMasker
+#----------------------------#
+[% FOREACH item IN data -%]
+# [% item.name %] [% item.coverage %]
+echo [% item.name %]
+
+for i in [% item.dir %]/*.fasta;
+do
+    if [ -f $i.masked ];
+    then
+        rename 's/fasta.masked$/fa/' $i.masked;
+        find [% item.dir %] -type f -name "`basename $i`*" | xargs rm 
+    fi;
+done;
+
+[% END -%]
+
+echo Please check the following files
+find [% data_dir %] -name "*.fasta"
+
+EOF
+
+    $tt->process(
+        \$text,
+        {   data        => \@data,
+            data_dir    => $data_dir,
+            pl_dir      => $pl_dir,
+            kentbin_dir => $kentbin_dir,
+            parallel    => $parallel,
+        },
+        File::Spec->catfile( $store_dir, "clean-rm.sh" )
     ) or die Template->error;
 
     $text = <<'EOF';
@@ -188,7 +298,7 @@ EOF
             pl_dir      => $pl_dir,
             kentbin_dir => $kentbin_dir
         },
-        File::Spec->catfile( $store_dir, "auto_dpgp_bz.sh" )
+        File::Spec->catfile( $store_dir, "bz.sh" )
     ) or die Template->error;
 
     $text = <<'EOF';
@@ -211,7 +321,7 @@ EOF
             pl_dir      => $pl_dir,
             kentbin_dir => $kentbin_dir
         },
-        File::Spec->catfile( $store_dir, "auto_dpgp_amp.sh" )
+        File::Spec->catfile( $store_dir, "amp.sh" )
     ) or die Template->error;
 
     $text = <<'EOF';
@@ -235,27 +345,11 @@ EOF
             data_dir => $data_dir,
             pl_dir   => $pl_dir,
         },
-        File::Spec->catfile( $store_dir, "auto_dpgp_stat.sh" )
+        File::Spec->catfile( $store_dir, "stat.sh" )
     ) or die Template->error;
 
     $text = <<'EOF';
 #!/bin/bash
-    
-#----------------------------#
-# tar-gzip
-#----------------------------#
-[% FOREACH item IN data -%]
-# [% item.name %] [% item.coverage %]
-cd [% data_dir %]/Dmelvs[% item.name %]/
-
-tar -czvf lav.tar.gz   [*.lav   --remove-files
-tar -czvf psl.tar.gz   [*.psl   --remove-files
-tar -czvf chain.tar.gz [*.chain --remove-files
-gzip *.chain
-gzip net/*
-gzip axtNet/*.axt
-
-[% END -%]
 
 #----------------------------#
 # clean RepeatMasker outputs
@@ -293,7 +387,7 @@ EOF
             pl_dir      => $pl_dir,
             kentbin_dir => $kentbin_dir
         },
-        File::Spec->catfile( $store_dir, "auto_dpgp_clean.sh" )
+        File::Spec->catfile( $store_dir, "clean.sh" )
     ) or die Template->error;
 }
 
@@ -354,7 +448,7 @@ EOF
     $tt->process(
         \$text,
         { data => \@group, data_dir => $data_dir, pl_dir => $pl_dir, },
-        File::Spec->catfile( $store_dir, "auto_dpgp_joins.sh" )
+        File::Spec->catfile( $store_dir, "joins.sh" )
     ) or die Template->error;
 }
 
@@ -410,7 +504,7 @@ EOF
             data_dir => $data_dir,
             pl_dir   => $pl_dir,
         },
-        File::Spec->catfile( $store_dir, "auto_dpgp_mz.sh" )
+        File::Spec->catfile( $store_dir, "mz.sh" )
     ) or die Template->error;
 
     $text = <<'EOF';
@@ -457,7 +551,7 @@ EOF
             data_dir => $data_dir,
             pl_dir   => $pl_dir,
         },
-        File::Spec->catfile( $store_dir, "auto_dpgp_maf_fasta.sh" )
+        File::Spec->catfile( $store_dir, "maf_fasta.sh" )
     ) or die Template->error;
 
     $text = <<'EOF';
@@ -471,9 +565,9 @@ EOF
 # mafft
 perl [% pl_dir %]/alignDB/extra/multi_way_batch.pl \
     -d [% item.out_dir %] -e fly_65 \
-    --block --id 7227 \
+    --block --id [% data_dir %]/id2name.csv \
     -f [% data_dir %]/[% item.out_dir %]_mft  \
-    -lt 5000 -st 1000000 --parallel 8 --run 1-3,21,40
+    -lt 5000 -st 0 -ct 0 --parallel [% parallel %] --run common
 
 [% END -%]
 
@@ -483,7 +577,8 @@ EOF
         {   data     => \@data,
             data_dir => $data_dir,
             pl_dir   => $pl_dir,
+            parallel => $parallel,
         },
-        File::Spec->catfile( $store_dir, "auto_dpgp_multi.sh" )
+        File::Spec->catfile( $store_dir, "multi.sh" )
     ) or die Template->error;
 }
