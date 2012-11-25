@@ -484,9 +484,9 @@ EOF
 # mafft
 perl [% pl_dir %]/alignDB/extra/multi_way_batch.pl \
     -d [% item.out_dir %] -e yeast_65 \
-    --block --id 4932 \
+    --block --id [% data_dir %]/id2name.csv \
     -f [% data_dir %]/[% item.out_dir %]_mafft  \
-    -lt 5000 -st 0 --parallel 8 --run 1-3,21,40,43
+    -lt 5000 -st 0 -ct 0 --parallel 8 --run 1-3,21,40,43
 
 [% END -%]
 

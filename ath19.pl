@@ -96,7 +96,6 @@ my $parallel = 12;
     my @files = File::Find::Rule->file->name('*.vcf.fasta')->in($seq_dir);
 
     for my $item ( sort @data ) {
-        my $name = $item->{name};
 
         # match the most similar name
         my ($file) = map { $_->[0] }
@@ -105,7 +104,7 @@ my $parallel = 12;
         $item->{seq} = $file;
 
         # prepare working dir
-        my $dir = File::Spec->catdir( $data_dir, $name );
+        my $dir = File::Spec->catdir( $data_dir, $item->{name} );
         mkdir $dir if !-e $dir;
         $item->{dir} = $dir;
     }
@@ -222,8 +221,6 @@ RepeatMasker [% item.dir %]/*.fasta -species arabidopsis -xsmall --parallel [% p
 
 [% END -%]
 
-# find [% data_dir %] -name "*.fasta.masked" | sed "s/\.fasta\.masked$//" | xargs -i echo mv {}.fasta.masked {}.fa | sh
-
 EOF
 
     $tt->process(
@@ -270,11 +267,53 @@ EOF
 cd [% data_dir %]
 
 #----------------------------#
+# RepeatMasker
+#----------------------------#
+[% FOREACH item IN data -%]
+# [% item.name %] [% item.coverage %]
+echo [% item.name %]
+
+for i in [% item.dir %]/*.fasta;
+do
+    if [ -f $i.masked ];
+    then
+        rename 's/fasta.masked$/fa/' $i.masked;
+        find [% item.dir %] -type f -name "`basename $i`*" | xargs rm 
+    fi;
+done;
+
+[% END -%]
+
+echo Please check the following files
+find [% data_dir %] -name "*.fasta"
+
+EOF
+
+    $tt->process(
+        \$text,
+        {   data        => \@data,
+            data_dir    => $data_dir,
+            pl_dir      => $pl_dir,
+            kentbin_dir => $kentbin_dir,
+            parallel    => $parallel,
+        },
+        File::Spec->catfile( $store_dir, "clean-rm.sh" )
+    ) or die Template->error;
+
+    $text = <<'EOF';
+#!/bin/bash
+cd [% data_dir %]
+
+#----------------------------#
 # blastz
 #----------------------------#
 [% FOREACH item IN data -%]
 # [% item.name %] [% item.coverage %]
-perl [% pl_dir %]/blastz/bz.pl -dt [% data_dir %]/ath_65 -dq [% data_dir %]/[% item.name %] -dl [% data_dir %]/Athvs[% item.name FILTER ucfirst %] -s set01 -p [% parallel %] --noaxt -pb lastz --lastz
+perl [% pl_dir %]/blastz/bz.pl \
+    -dt [% data_dir %]/ath_65 \
+    -dq [% data_dir %]/[% item.name %] \
+    -dl [% data_dir %]/Athvs[% item.name FILTER ucfirst %] \
+    -s set01 -p [% parallel %] --noaxt -pb lastz --lastz
 
 [% END -%]
 
@@ -299,7 +338,11 @@ cd [% data_dir %]
 #----------------------------#
 [% FOREACH item IN data -%]
 # [% item.name %] [% item.coverage %]
-perl [% pl_dir %]/blastz/lpcna.pl -dt [% data_dir %]/ath_65 -dq [% data_dir %]/[% item.name %] -dl [% data_dir %]/Athvs[% item.name FILTER ucfirst %] -p [% parallel %]
+perl [% pl_dir %]/blastz/lpcna.pl \
+    -dt [% data_dir %]/ath_65 \
+    -dq [% data_dir %]/[% item.name %] \
+    -dl [% data_dir %]/Athvs[% item.name FILTER ucfirst %] \
+    -p [% parallel %]
 
 [% END -%]
 
@@ -323,7 +366,11 @@ EOF
 #----------------------------#
 [% FOREACH item IN data -%]
 # [% item.name %] [% item.coverage %]
-perl [% pl_dir %]/blastz/amp.pl -syn -dt [% data_dir %]/ath_65 -dq [% data_dir %]/[% item.name %] -dl [% data_dir %]/Athvs[% item.name FILTER ucfirst %] -p [% parallel %]
+perl [% pl_dir %]/blastz/amp.pl -syn \
+    -dt [% data_dir %]/ath_65 \
+    -dq [% data_dir %]/[% item.name %] \
+    -dl [% data_dir %]/Athvs[% item.name FILTER ucfirst %] \
+    -p [% parallel %]
 
 [% END -%]
 
@@ -357,7 +404,6 @@ EOF
         {   data => [ { name => "lyrata_65", taxon => 59689 }, @data ],
             data_dir => $data_dir,
             pl_dir   => $pl_dir,
-            ,
             parallel => $parallel,
         },
         File::Spec->catfile( $store_dir, "pair_stat.sh" )
@@ -440,7 +486,7 @@ perl [% pl_dir %]/blastz/mz.pl \
     [% FOREACH st IN item.strains -%]
     -d [% data_dir %]/Athvs[% st FILTER ucfirst %] \
     [% END -%]
-    --tree [% data_dir %]/19way.nwk \
+    --tree [% data_dir %]/20way.nwk \
     --out [% data_dir %]/[% item.out_dir %] \
     -syn -p [% parallel %]
 
@@ -516,9 +562,9 @@ EOF
 # mafft
 perl [% pl_dir %]/alignDB/extra/multi_way_batch.pl \
     -d [% item.out_dir %] -e ath_65 \
-    --block --id 3702 \
+    --block --id [% data_dir %]/id2name.csv \
     -f [% data_dir %]/[% item.out_dir %]_mft  \
-    -lt 5000 -st 0 --parallel [% parallel %] --run 1-3,21,40
+    -lt 5000 -st 0 -ct 0 --parallel [% parallel %] --run common
 
 [% END -%]
 
