@@ -29,22 +29,24 @@ GetOptions(
 pod2usage(1) if $help;
 pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
 
-for ($file_target, $file_merge) {
+for ( $file_target, $file_merge ) {
     die "Can't find file [$_]\n" unless -e $_;
 }
 
 #----------------------------------------------------------#
 # apply
 #----------------------------------------------------------#
-my ($count_t, $count_m) = (0, 0);
+my ( $count_t, $count_m ) = ( 0, 0 );
 
 # read in merge
-my $id_m = [];
+my $id_m   = [];
 my $line_m = [];
 {
     open my $fh, '<', $file_merge;
     while (<$fh>) {
-        push @{$id_m}, (split /,/)[0];
+        chomp;
+        next unless $_;
+        push @{$id_m}, ( split /,/ )[0];
         push @{$line_m}, $_;
         $count_m++;
     }
@@ -56,13 +58,15 @@ my $line_t = [];
 {
     open my $fh, '<', $file_target;
     while (<$fh>) {
-        my $id = (split /,/)[0];
-        if ( grep { $_ eq $id } @{$id_m}) {
+        chomp;
+        next unless $_;
+        my $id = ( split /,/ )[0];
+        if ( grep { $_ eq $id } @{$id_m} ) {
             $count_t++;
             next;
         }
         else {
-            push @{$line_t} , $_;
+            push @{$line_t}, $_;
         }
     }
     close $fh;
@@ -72,8 +76,8 @@ my $line_t = [];
 {
     push @{$line_t}, @{$line_m};
     open my $fh, '>', $file_target;
-    for (@{$line_t}) {
-        print {$fh} $_;
+    for ( @{$line_t} ) {
+        print {$fh} $_, "\n";
     }
     close $fh;
 }
