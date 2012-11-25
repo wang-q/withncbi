@@ -12,7 +12,7 @@ use YAML qw(Dump Load DumpFile LoadFile);
 
 my $store_dir = shift
     || File::Spec->catdir( $ENV{HOME}, "data/alignment/rice" );
-
+my $parallel = 12;
 {    # on linux
     my $data_dir    = File::Spec->catdir( $ENV{HOME}, "data/alignment/rice" );
     my $pl_dir      = File::Spec->catdir( $ENV{HOME}, "Scripts" );
@@ -72,12 +72,24 @@ my $store_dir = shift
 
     print Dump \@data;
 
+    my @data_with_exists = (
+        {   name  => "nip_65",
+            taxon => 39947,
+            dir   => File::Spec->catdir( $data_dir, "nip_65" )
+        },
+        {   name  => "9311_65",
+            taxon => 39946,
+            dir   => File::Spec->catdir( $data_dir, "9311_65" )
+        },
+        @data
+    );
+
     my $tt = Template->new;
 
     # taxon.csv
     my $text = <<'EOF';
 [% FOREACH item IN data -%]
-[% item.taxon %],Oryza,sativa,[% item.name %],,
+[% item.taxon %],Oryza,sativa,[% item.name %],[% item.name %],
 [% END -%]
 EOF
     $tt->process(
@@ -86,7 +98,7 @@ EOF
         File::Spec->catfile( $store_dir, "taxon.csv" )
     ) or die Template->error;
 
-    # chr_length.csv
+    # chr_length_chrUn.csv
     $text = <<'EOF';
 [% FOREACH item IN data -%]
 [% item.taxon %],chrUn,999999999,[% item.name %]/rice50
@@ -94,9 +106,54 @@ EOF
 EOF
     $tt->process(
         \$text,
-        { data => \@data, },
-        File::Spec->catfile( $store_dir, "chr_length.csv" )
+        { data => \@data_with_exists, },
+        File::Spec->catfile( $store_dir, "chr_length_chrUn.csv" )
     ) or die Template->error;
+
+    $text = <<'EOF';
+#!/bin/bash
+cd [% data_dir %]
+
+if [ -f real_chr.csv ]; then
+    rm real_chr.csv;
+fi;
+
+[% FOREACH item IN data -%]
+perl -aln -F"\t" -e 'print qq{[% item.taxon %],$F[0],$F[1],[% item.name %]/rice50}' [% item.dir %]/chr.sizes >> real_chr.csv
+[% END -%]
+
+cat chr_length_chrUn.csv real_chr.csv > chr_length.csv
+rm real_chr.csv
+
+echo Run the following cmds to merge csv files
+echo
+echo perl [% pl_dir %]/alignDB/util/merge_csv.pl -t [% pl_dir %]/alignDB/init/taxon.csv -m [% data_dir %]/taxon.csv
+echo
+echo perl [% pl_dir %]/alignDB/util/merge_csv.pl -t [% pl_dir %]/alignDB/init/chr_length.csv -m [% data_dir %]/chr_length.csv
+echo
+
+EOF
+    $tt->process(
+        \$text,
+        {   data     => \@data_with_exists,
+            data_dir => $data_dir,
+            pl_dir   => $pl_dir,
+        },
+        File::Spec->catfile( $store_dir, "real_chr.sh" )
+    ) or die Template->error;
+
+    # id2name.csv
+    $text = <<'EOF';
+[% FOREACH item IN data -%]
+[% item.taxon %],[% item.name %]
+[% END -%]
+EOF
+    $tt->process(
+        \$text,
+        { data => \@data_with_exists, },
+        File::Spec->catfile( $store_dir, "id2name.csv" )
+    ) or die Template->error;
+
 
     $text = <<'EOF';
 #!/bin/bash
@@ -449,9 +506,9 @@ EOF
 # mafft
 perl [% pl_dir %]/alignDB/extra/multi_way_batch.pl \
     -d [% item.out_dir %] -e nip_65 \
-    --block --id 39947 \
+    --block --id [% data_dir %]/id2name.csv \
     -f [% data_dir %]/[% item.out_dir %]_mft  \
-    -lt 5000 -st 0 --parallel 8 --run 1-3,21,40
+    -lt 5000 -st 0 -ct 0 --parallel [% parallel %] --run common
 
 [% END -%]
 
@@ -461,6 +518,7 @@ EOF
         {   data     => \@data,
             data_dir => $data_dir,
             pl_dir   => $pl_dir,
+            parallel => $parallel,
         },
         File::Spec->catfile( $store_dir, "multi.sh" )
     ) or die Template->error;
