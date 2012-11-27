@@ -88,10 +88,7 @@ my $worker = sub {
         -format => 'maf'
     );
 
-    my $count;
 ALN: while ( my $aln = $in->next_aln ) {
-        $count++;
-
         my $align_length  = $aln->length;
         my $num_sequences = $aln->num_sequences;
 
