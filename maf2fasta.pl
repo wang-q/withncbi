@@ -22,7 +22,6 @@ use AlignDB::Run;
 my $in_dir = '.';    # Specify location here
 my $out_dir;         # Specify output dir here
 my $length_threshold = 1000;    # Set the threshold of alignment length
-my $target_id        = 9606;    # taxon id of human
 my $has_outgroup;    # Treate last sequence as outgroup and move it to top
 my $subset;          # get sequences of listed names, seperated by comma
 my $block;           # write galaxy style blocked fasta
@@ -39,7 +38,6 @@ GetOptions(
     'i|in_dir=s'   => \$in_dir,
     'o|out_dir=s'  => \$out_dir,
     'length=i'     => \$length_threshold,
-    'id=i'         => \$target_id,
     'has_outgroup' => \$has_outgroup,
     'subset=s'     => \$subset,
     'block'        => \$block,
@@ -152,8 +150,7 @@ ALN: while ( my $aln = $in->next_aln ) {
             my $start = $seq_of->{$target}->start;
             my $end   = $seq_of->{$target}->end;
 
-            open my $fh, '>',
-                $out_dir . "/id$target_id" . "_$chr" . "_$start" . "_$end.fas";
+            open my $fh, '>', $out_dir . "/$chr" . "-$start" . "-$end.fas";
             for my $species (@names) {
                 print {$fh} ">$species\n";
                 print {$fh} $seq_of->{$species}->seq, "\n";
