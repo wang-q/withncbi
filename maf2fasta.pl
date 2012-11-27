@@ -10,7 +10,7 @@ use YAML qw(Dump Load DumpFile LoadFile);
 use File::Spec;
 use File::Find::Rule;
 use File::Basename;
-use Bio::AlignIO;
+use IO::Zlib;
 
 use AlignDB::Stopwatch;
 use AlignDB::Util qw(:all);
@@ -29,6 +29,8 @@ my $block;           # write galaxy style blocked fasta
 # run in parallel mode
 my $parallel = 1;
 
+my $gzip;            # open .maf.gz
+
 my $man  = 0;
 my $help = 0;
 
@@ -42,6 +44,7 @@ GetOptions(
     'subset=s'     => \$subset,
     'block'        => \$block,
     'parallel=i'   => \$parallel,
+    'gzip'         => \$gzip,
 ) or pod2usage(2);
 
 pod2usage(1) if $help;
@@ -74,8 +77,16 @@ elsif ($block) {
 #----------------------------------------------------------#
 # Search for all files
 #----------------------------------------------------------#
-my @files = File::Find::Rule->file->name('*.maf')->in($in_dir);
-printf "\n----Total .maf Files: %4s----\n\n", scalar @files;
+my @files;
+if ( !$gzip ) {
+    @files = sort File::Find::Rule->file->name('*.maf')->in($in_dir);
+    printf "\n----Total .maf Files: %4s----\n\n", scalar @files;
+}
+if ( scalar @files == 0 or $gzip ) {
+    @files = sort File::Find::Rule->file->name('*.maf.gz')->in($in_dir);
+    printf "\n----Total .maf.gz Files: %4s----\n\n", scalar @files;
+    $gzip++;
+}
 
 #----------------------------------------------------------#
 # run
@@ -83,76 +94,103 @@ printf "\n----Total .maf Files: %4s----\n\n", scalar @files;
 my $worker = sub {
     my $infile = shift;
 
-    my $in = Bio::AlignIO->new(
-        -file   => $infile,
-        -format => 'maf'
-    );
+    my $in_fh;
+    if ( !$gzip ) {
+        open $in_fh, '<', $infile;
+    }
+    else {
+        $in_fh = IO::Zlib->new( $infile, "rb" );
+    }
 
-ALN: while ( my $aln = $in->next_aln ) {
-        my $align_length  = $aln->length;
-        my $num_sequences = $aln->num_sequences;
+    my $content = '';
+ALN: while ( my $line = <$in_fh> ) {
+        if ( $line =~ /^\s+$/ and $content =~ /\S/ ) {    # meet blank line
+            my @slines = grep {/\S/} split /\n/, $content;
+            $content = '';
 
-        next if $align_length < $length_threshold;
+            # parse maf
+            my @names;
+            my $info_of = {};
+            for my $sline (@slines) {
+                my ( $s, $src, $start, $size, $strand, $srcsize, $text )
+                    = split /\s+/, $sline;
 
-        my @names;
-        my $seq_of = {};
-        foreach my $seq ( $aln->each_seq ) {
-            my $seq_id = $seq->display_id;
-            my ($species) = split /\./, $seq_id;
-            push @names, $species;
-            $seq_of->{$species} = $seq;
-        }
+                my ( $species, $chr_name ) = split /\./, $src;
+                $chr_name = $species if !defined $chr_name;
 
-        if ($subset) {
-            my $name_str = join " ", @names;
-            my @subsets = split ",", $subset;
-            next ALN if $num_sequences < @subsets;
-            for (@subsets) {
-                next ALN if $name_str !~ /$_/;
+                # adjust coordinates to be one-based inclusive
+                $start = $start + 1;
+
+                push @names, $species;
+                $info_of->{$species} = {
+                    seq        => $text,
+                    name       => $species,
+                    chr_name   => $chr_name,
+                    chr_start  => $start,
+                    chr_end    => $start + $size - 1,
+                    chr_strand => $strand,
+                };
             }
-            @names = @subsets;
-        }
-        my $target = $names[0];
 
-        # if $subset, this will never been executed
-        if ($has_outgroup) {
-            my $outgoup = pop @names;
-            unshift @names, $outgoup;
-        }
+            if ($subset) {
+                my $name_str = join " ", @names;
+                my @subsets = split ",", $subset;
+                next ALN if scalar @names < scalar @subsets;
+                for (@subsets) {
+                    next ALN if $name_str !~ /$_/;
+                }
+                @names = @subsets;
+            }
+            my $target = $names[0];
 
-        # output
-        if ($block) {
-            my $outfile = basename($infile);
-            $outfile = $out_dir . "/$outfile" . ".fas";
+            # if $subset, this will never been executed
+            if ($has_outgroup) {
+                my $outgoup = pop @names;
+                unshift @names, $outgoup;
+            }
 
-            open my $fh, ">>", $outfile;
-            for my $species (@names) {
-                my ( undef, $chr ) = split /\./,
-                    $seq_of->{$species}->display_id;
-                my $start  = $seq_of->{$species}->start;
-                my $end    = $seq_of->{$species}->end;
-                my $strand = $seq_of->{$species}->strand;
-                print {$fh} ">$species.$chr(";
-                print {$fh} $strand > 0 ? "+" : "-";
-                print {$fh} "):$start-$end";
-                print {$fh} "|species=$species";
+            # output
+            if ($block) {
+                my $outfile = basename($infile);
+                $outfile = $out_dir . "/$outfile" . ".fas";
+
+                open my $fh, ">>", $outfile;
+                for my $species (@names) {
+                    my $chr    = $info_of->{$species}{chr_name};
+                    my $start  = $info_of->{$species}{chr_start};
+                    my $end    = $info_of->{$species}{chr_end};
+                    my $strand = $info_of->{$species}{chr_strand};
+                    print {$fh} ">$species.$chr($strand)";
+                    print {$fh} ":$start-$end";
+                    print {$fh} "|species=$species";
+                    print {$fh} "\n";
+                    print {$fh} $info_of->{$species}{seq}, "\n";
+                }
                 print {$fh} "\n";
-                print {$fh} $seq_of->{$species}->seq, "\n";
+                close $fh;
             }
-            print {$fh} "\n";
-            close $fh;
-        }
-        else {
-            my ( undef, $chr ) = split /\./, $seq_of->{$target}->display_id;
-            my $start = $seq_of->{$target}->start;
-            my $end   = $seq_of->{$target}->end;
+            else {
+                my $chr   = $info_of->{$target}{chr_name};
+                my $start = $info_of->{$target}{chr_start};
+                my $end   = $info_of->{$target}{chr_end};
 
-            open my $fh, '>', $out_dir . "/$chr" . "-$start" . "-$end.fas";
-            for my $species (@names) {
-                print {$fh} ">$species\n";
-                print {$fh} $seq_of->{$species}->seq, "\n";
+                open my $fh, '>', $out_dir . "/$chr" . "-$start" . "-$end.fas";
+                for my $species (@names) {
+                    print {$fh} ">$species\n";
+                    print {$fh} $info_of->{$species}{seq} . "\n";
+                }
+                close $fh;
             }
-            close $fh;
+        }
+        elsif ( $line =~ /^#/ ) {    # comments
+            next;
+        }
+        elsif ( $line =~ /^s\s/ ) {    # s line, contain info and seq
+            $content .= $line;
+        }
+        else {                         # a, i, e, q lines
+                # just ommit it
+                # see http://genome.ucsc.edu/FAQ/FAQformat.html#format5
         }
     }
 
