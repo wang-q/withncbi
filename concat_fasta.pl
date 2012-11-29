@@ -7,6 +7,7 @@ use Getopt::Long;
 use Pod::Usage;
 use YAML qw(Dump Load DumpFile LoadFile);
 
+use File::Spec;
 use File::Find::Rule;
 use List::Util qw(first max maxstr min minstr reduce shuffle sum);
 use List::MoreUtils qw(any all uniq);
@@ -19,11 +20,11 @@ use FindBin;
 #----------------------------------------------------------#
 # GetOpt section
 #----------------------------------------------------------#
-my $in_dir;    # Specify location here
-my $out_file = 'concat.fasta';    # Specify output file here
+my $in_dir;      # Specify location here
+my $out_file;    # Specify output file here
 
-my $wrap = 60;
-my $gzip;                         # open .fas.gz
+my $wrap = 0;
+my $gzip;        # open .fas.gz
 
 my $man  = 0;
 my $help = 0;
@@ -43,6 +44,12 @@ pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
 #----------------------------------------------------------#
 # Search for all files
 #----------------------------------------------------------#
+unless ($out_file) {
+    my @dirs = File::Spec->splitdir( File::Spec->rel2abs($in_dir) );
+    $dirs[-1] .= ".concat.fas";
+    $out_file = File::Spec->catfile(@dirs);
+}
+
 my @files;
 if ( !$gzip ) {
     @files = sort File::Find::Rule->file->name( '*.fa', '*.fas', '*.fasta' )
@@ -57,7 +64,7 @@ if ( scalar @files == 0 or $gzip ) {
 }
 
 #----------------------------------------------------------#
-# realign
+# run
 #----------------------------------------------------------#
 # process each .fasta files
 my $stopwatch = AlignDB::Stopwatch->new;
@@ -193,25 +200,13 @@ __END__
     concat_fasta.pl - realign fasta file
 
 =head1 SYNOPSIS
-    perl concat_fasta.pl --in_dir G:/S288CvsRM11 --msa muscle --quick
+    perl concat_fasta.pl --in_dir G:/S288CvsRM11 -o S288CvsRM11.fasta
 
     concat_fasta.pl [options]
       Options:
         --help              brief help message
         --man               full documentation
         --in_dir            fasta files' location
-        --out_dir           output location
-        --length            length threshold
-        --msa               alignment program
-        --quick             use quick mode
-        --no_trim           don't trim outgroup sequence (the first one)
-        --expand            in quick mode, expand indel region
-        --join              in quick mode, join adjacent indel regions
-        --parallel          run in parallel mode
-
-=head1 DESCRIPTION
-
-B<This program> will read the given input file(s) and do someting
-useful with the contents thereof.
+        --out_file          output location
 
 =cut
