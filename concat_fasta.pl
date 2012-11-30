@@ -23,19 +23,26 @@ use FindBin;
 my $in_dir;      # Specify location here
 my $out_file;    # Specify output file here
 
+my $sampling;    # random sampling
+my $total_length = 1_000_000;    # when exceed this, quit
+
+my $relaxed_phylip;
 my $wrap = 0;
-my $gzip;        # open .fas.gz
+my $gzip;                        # open .fas.gz
 
 my $man  = 0;
 my $help = 0;
 
 GetOptions(
-    'help|?'       => \$help,
-    'man'          => \$man,
-    'i|in_dir=s'   => \$in_dir,
-    'o|out_file=s' => \$out_file,
-    'w|wrap=i'     => \$wrap,
-    'gzip'         => \$gzip,
+    'help|?'              => \$help,
+    'man'                 => \$man,
+    'i|in_dir=s'          => \$in_dir,
+    'o|out_file=s'        => \$out_file,
+    's|sampling'          => \$sampling,
+    'l|total_length=i'    => \$total_length,
+    'p|rp|relaxed_phylip' => \$relaxed_phylip,
+    'w|wrap=i'            => \$wrap,
+    'gzip'                => \$gzip,
 ) or pod2usage(2);
 
 pod2usage(1) if $help;
@@ -46,7 +53,7 @@ pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
 #----------------------------------------------------------#
 unless ($out_file) {
     my @dirs = File::Spec->splitdir( File::Spec->rel2abs($in_dir) );
-    $dirs[-1] .= ".concat.fas";
+    $dirs[-1] .= $relaxed_phylip ? ".concat.phy" : ".concat.fas";
     $out_file = File::Spec->catfile(@dirs);
 }
 
@@ -72,27 +79,51 @@ my $stopwatch = AlignDB::Stopwatch->new;
 my $all_names = gather_names( \@files, $gzip );
 print Dump $all_names;
 
-my $all_seq_of = {};
+my $seq_of_ary = [];
 for my $file (@files) {
     print "Process $file\n";
-    my $count = concat_seq( $file, $all_names, $all_seq_of, $gzip );
+    my $count = gather_seq( $file, $all_names, $seq_of_ary, $gzip );
     print "Add $count sequence blocks\n";
 }
 
-open my $out_fh, '>', $out_file;
-for my $name ( @{$all_names} ) {
-    print {$out_fh} ">$name\n";
-    my $seq_length = length $all_seq_of->{$name};
-    $all_seq_of->{$name} = uc $all_seq_of->{$name};
-    if ($wrap) {
-        for ( my $pos = 0; $pos < $seq_length; $pos += $wrap ) {
-            print {$out_fh} substr( $all_seq_of->{$name}, $pos, $wrap ), "\n";
-        }
+my $all_seq_of = {};
+if ($sampling) {
+    while (1) {
+        my $rand_idx = int rand $#{$seq_of_ary};
+        $all_seq_of->{$_} .= $seq_of_ary->[$rand_idx]{$_} for @{$all_names};
+        last if length $all_seq_of->{ $all_names->[0] } > $total_length;
     }
-    else {
+}
+else {
+    for my $idx ( 0 .. $#{$seq_of_ary} ) {
+        $all_seq_of->{$_} .= $seq_of_ary->[$idx]{$_} for @{$all_names};
+    }
+}
+my $seq_length = length $all_seq_of->{ $all_names->[0] };
+
+open my $out_fh, '>', $out_file;
+if ($relaxed_phylip) {
+    print {$out_fh} scalar @{$all_names}, " $seq_length\n";
+    for my $name ( @{$all_names} ) {
+        print {$out_fh} "$name ";
         print {$out_fh} $all_seq_of->{$name}, "\n";
     }
 }
+else {
+    for my $name ( @{$all_names} ) {
+        print {$out_fh} ">$name\n";
+        if ($wrap) {
+            for ( my $pos = 0; $pos < $seq_length; $pos += $wrap ) {
+                print {$out_fh} substr( $all_seq_of->{$name}, $pos, $wrap ),
+                    "\n";
+            }
+        }
+        else {
+            print {$out_fh} $all_seq_of->{$name}, "\n";
+        }
+    }
+}
+close $out_fh;
 
 $stopwatch->block_message( "All files have been processed.", "duration" );
 exit;
@@ -127,10 +158,10 @@ sub gather_names {
     return \@names;
 }
 
-sub concat_seq {
+sub gather_seq {
     my $infile     = shift;
     my $all_names  = shift;
-    my $all_seq_of = shift;
+    my $ary_seq_of = shift;
     my $gzip       = shift;
 
     my $count = 0;
@@ -162,7 +193,7 @@ sub concat_seq {
 
                 my $seq = shift @lines;
                 chomp $seq;
-                $seq_of->{$name} = $seq;
+                $seq_of->{$name} = uc $seq;
             }
 
             my $align_length = length $seq_of->{ $seq_names->[0] };
@@ -179,8 +210,10 @@ sub concat_seq {
                 if ( !$flag ) {
                     $seq_of->{$name} = '-' x $align_length;
                 }
-                $all_seq_of->{$name} .= $seq_of->{$name};
             }
+
+            # collect seq_of
+            push @{$seq_of_ary}, $seq_of;
 
             $count++;
         }
