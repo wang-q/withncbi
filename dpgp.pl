@@ -433,7 +433,7 @@ perl [% pl_dir %]/alignDB/extra/join_dbs.pl --crude_only \
     --queries [% item.queries %] \
     --no_insert=1 --trimmed_fasta=1 --length 10000
 
-perl [% pl_dir %]/alignDB/util/refine_fasta.pl \
+perl [% pl_dir %]/blastz/refine_fasta.pl \
     --msa mafft -p 4 \
     -i [% data_dir %]/[% item.goal_db %].crude \
     -o [% data_dir %]/[% item.goal_db %]_mft
@@ -513,7 +513,7 @@ EOF
 #----------------------------#
 [% FOREACH item IN data -%]
 # [% item.out_dir %]
-perl [% pl_dir %]/alignDB/util/maf2fasta.pl \
+perl [% pl_dir %]/blastz/maf2fasta.pl \
     --has_outgroup --id 7227 -p 8 --block \
     -i [% data_dir %]/[% item.out_dir %] \
     -o [% data_dir %]/[% item.out_dir %]_fasta
@@ -525,7 +525,7 @@ perl [% pl_dir %]/alignDB/util/maf2fasta.pl \
 #----------------------------#
 [% FOREACH item IN data -%]
 # [% item.out_dir %]
-bsub -q mpi_2 -n 8 -J [% item.out_dir %]-mft perl [% pl_dir %]/alignDB/util/refine_fasta.pl \
+bsub -q mpi_2 -n 8 -J [% item.out_dir %]-mft perl [% pl_dir %]/blastz/refine_fasta.pl \
     --msa mafft --block -p 8 \
     -i [% data_dir %]/[% item.out_dir %]_fasta \
     -o [% data_dir %]/[% item.out_dir %]_mft
@@ -537,7 +537,7 @@ bsub -q mpi_2 -n 8 -J [% item.out_dir %]-mft perl [% pl_dir %]/alignDB/util/refi
 #----------------------------#
 #[% FOREACH item IN data -%]
 ## [% item.out_dir %]
-#bsub -q mpi_2 -n 8 -J [% item.out_dir %]-msl perl [% pl_dir %]/alignDB/util/refine_fasta.pl \
+#bsub -q mpi_2 -n 8 -J [% item.out_dir %]-msl perl [% pl_dir %]/blastz/refine_fasta.pl \
 #    --msa muscle --block -p 8 \
 #    -i [% data_dir %]/[% item.out_dir %]_fasta \
 #    -o [% data_dir %]/[% item.out_dir %]_msl
@@ -600,7 +600,7 @@ fi
 # concat mafft fas to relaxed phylip
 if [ ! -f [% data_dir %]/phylo/[% item.out_dir %].phy ]
 then
-    perl [% pl_dir %]/alignDB/util/concat_fasta.pl \
+    perl [% pl_dir %]/blastz/concat_fasta.pl \
         -i [% data_dir %]/[% item.out_dir %]_mft  \
         -o [% data_dir %]/phylo/[% item.out_dir %].phy \
         -p

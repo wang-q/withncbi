@@ -248,7 +248,7 @@ fi
 # maf to fas
 #----------------------------#
 echo maf to fas
-perl [% pl_dir %]/alignDB/util/maf2fasta.pl --has_outgroup --id 9606 \
+perl [% pl_dir %]/blastz/maf2fasta.pl --has_outgroup --id 9606 \
     --parallel [% parallel %] --block --length 5000 \
     -i [% data_dir %]/maf \
     -o [% data_dir %]/fas
@@ -380,7 +380,7 @@ cd [% data_dir %]
 # mafft
 #----------------------------#
 # [% item.out_dir %]
-perl [% pl_dir %]/alignDB/util/refine_fasta.pl \
+perl [% pl_dir %]/blastz/refine_fasta.pl \
     --msa mafft --block --parallel [% parallel %] \
     -i [% data_dir %]/fas_final \
     -o [% data_dir %]/fas_mft
@@ -389,7 +389,7 @@ perl [% pl_dir %]/alignDB/util/refine_fasta.pl \
 # muscle
 #----------------------------#
 ## [% item.out_dir %]
-#perl [% pl_dir %]/alignDB/util/refine_fasta.pl \
+#perl [% pl_dir %]/blastz/refine_fasta.pl \
 #    --msa muscle --block --parallel [% parallel %] \
 #    -i [% data_dir %]/fas_final \
 #    -o [% data_dir %]/fas_msl

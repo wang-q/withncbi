@@ -383,7 +383,7 @@ EOF
 #----------------------------#
 [% FOREACH item IN data -%]
 # [% item.out_dir %]
-perl [% pl_dir %]/alignDB/util/maf2fasta.pl \
+perl [% pl_dir %]/blastz/maf2fasta.pl \
     --has_outgroup --id 44689 -p 8 --block \
     -i [% data_dir %]/[% item.out_dir %] \
     -o [% data_dir %]/[% item.out_dir %]_fasta
@@ -395,7 +395,7 @@ perl [% pl_dir %]/alignDB/util/maf2fasta.pl \
 #----------------------------#
 [% FOREACH item IN data -%]
 # [% item.out_dir %]
-bsub -q mpi_2 -n 8 -J [% item.out_dir %]-mft perl [% pl_dir %]/alignDB/util/refine_fasta.pl \
+bsub -q mpi_2 -n 8 -J [% item.out_dir %]-mft perl [% pl_dir %]/blastz/refine_fasta.pl \
     --msa mafft --block -p 8 \
     -i [% data_dir %]/[% item.out_dir %]_fasta \
     -o [% data_dir %]/[% item.out_dir %]_mft
@@ -407,7 +407,7 @@ bsub -q mpi_2 -n 8 -J [% item.out_dir %]-mft perl [% pl_dir %]/alignDB/util/refi
 #----------------------------#
 #[% FOREACH item IN data -%]
 ## [% item.out_dir %]
-#bsub -q mpi_2 -n 8 -J [% item.out_dir %]-msl perl [% pl_dir %]/alignDB/util/refine_fasta.pl \
+#bsub -q mpi_2 -n 8 -J [% item.out_dir %]-msl perl [% pl_dir %]/blastz/refine_fasta.pl \
 #    --msa muscle --block -p 8 \
 #    -i [% data_dir %]/[% item.out_dir %]_fasta \
 #    -o [% data_dir %]/[% item.out_dir %]_msl

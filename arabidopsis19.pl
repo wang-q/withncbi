@@ -589,7 +589,7 @@ EOF
 #----------------------------#
 [% FOREACH item IN data -%]
 # [% item.out_dir %]
-perl [% pl_dir %]/alignDB/util/maf2fasta.pl \
+perl [% pl_dir %]/blastz/maf2fasta.pl \
     --has_outgroup -p [% parallel %] --block \
     -i [% data_dir %]/[% item.out_dir %] \
     -o [% data_dir %]/[% item.out_dir %]_fasta
@@ -601,7 +601,7 @@ perl [% pl_dir %]/alignDB/util/maf2fasta.pl \
 #----------------------------#
 [% FOREACH item IN data -%]
 # [% item.out_dir %]
-perl [% pl_dir %]/alignDB/util/refine_fasta.pl \
+perl [% pl_dir %]/blastz/refine_fasta.pl \
     --msa mafft --block -p [% parallel %] \
     -i [% data_dir %]/[% item.out_dir %]_fasta \
     -o [% data_dir %]/[% item.out_dir %]_mft
@@ -613,7 +613,7 @@ perl [% pl_dir %]/alignDB/util/refine_fasta.pl \
 #----------------------------#
 #[% FOREACH item IN data -%]
 ## [% item.out_dir %]
-#perl [% pl_dir %]/alignDB/util/refine_fasta.pl \
+#perl [% pl_dir %]/blastz/refine_fasta.pl \
 #    --msa muscle --block -p [% parallel %] \
 #    -i [% data_dir %]/[% item.out_dir %]_fasta \
 #    -o [% data_dir %]/[% item.out_dir %]_msl
@@ -677,7 +677,7 @@ fi
 # concat mafft fas to relaxed phylip
 if [ ! -f [% data_dir %]/phylo/[% item.out_dir %].phy ]
 then
-    perl [% pl_dir %]/alignDB/util/concat_fasta.pl \
+    perl [% pl_dir %]/blastz/concat_fasta.pl \
         -i [% data_dir %]/[% item.out_dir %]_mft  \
         -o [% data_dir %]/phylo/[% item.out_dir %].phy \
         -p
