@@ -15,6 +15,7 @@ use YAML qw(Dump Load DumpFile LoadFile);
 #----------------------------------------------------------#
 my $store_dir = shift
     || File::Spec->catdir( $ENV{HOME}, "data/alignment/yeast_combine" );
+my $parallel = 12;
 
 {    # on linux
     my $data_dir
@@ -402,7 +403,7 @@ perl [% pl_dir %]/blastz/mz.pl \
     [% END -%]
     --tree [% data_dir %]/17way_ml.nwk \
     --out [% data_dir %]/[% item.out_dir %] \
-    -syn -p 8
+    -syn -p [% parallel %]
 
 [% END -%]
 
@@ -412,6 +413,7 @@ EOF
         {   data     => \@data,
             data_dir => $data_dir,
             pl_dir   => $pl_dir,
+            parallel => $parallel,
         },
         File::Spec->catfile( $store_dir, "mz.sh" )
     ) or die Template->error;
@@ -423,7 +425,7 @@ EOF
 [% FOREACH item IN data -%]
 # [% item.out_dir %]
 perl [% pl_dir %]/alignDB/util/maf2fasta.pl \
-    --has_outgroup --id 4932 -p 8 --block \
+    --has_outgroup -p [% parallel %] --block \
     -i [% data_dir %]/[% item.out_dir %] \
     -o [% data_dir %]/[% item.out_dir %]_fasta
 
@@ -435,9 +437,9 @@ perl [% pl_dir %]/alignDB/util/maf2fasta.pl \
 [% FOREACH item IN data -%]
 # [% item.out_dir %]
 perl [% pl_dir %]/alignDB/util/refine_fasta.pl \
-    --msa mafft --block -p 8 \
+    --msa mafft --block -p [% parallel %] \
     -i [% data_dir %]/[% item.out_dir %]_fasta \
-    -o [% data_dir %]/[% item.out_dir %]_mafft
+    -o [% data_dir %]/[% item.out_dir %]_mft
 
 [% END -%]
 
@@ -453,22 +455,13 @@ perl [% pl_dir %]/alignDB/util/refine_fasta.pl \
 #
 #[% END -%]
 
-#----------------------------#
-# clean
-#----------------------------#
-[% FOREACH item IN data -%]
-# [% item.out_dir %]
-cd [% data_dir %]
-rm -fr [% item.out_dir %]_fasta
-
-[% END -%]
-
 EOF
     $tt->process(
         \$text,
         {   data     => \@data,
             data_dir => $data_dir,
             pl_dir   => $pl_dir,
+            parallel => $parallel,
         },
         File::Spec->catfile( $store_dir, "maf_fasta.sh" )
     ) or die Template->error;
@@ -485,8 +478,8 @@ EOF
 perl [% pl_dir %]/alignDB/extra/multi_way_batch.pl \
     -d [% item.out_dir %] -e yeast_65 \
     --block --id [% data_dir %]/id2name.csv \
-    -f [% data_dir %]/[% item.out_dir %]_mafft  \
-    -lt 5000 -st 0 -ct 0 --parallel 8 --run 1-3,21,40,43
+    -f [% data_dir %]/[% item.out_dir %]_mft  \
+    -lt 5000 -st 0 -ct 0 --parallel [% parallel %] --run common
 
 [% END -%]
 
@@ -496,8 +489,70 @@ EOF
         {   data     => \@data,
             data_dir => $data_dir,
             pl_dir   => $pl_dir,
+            parallel => $parallel,
         },
         File::Spec->catfile( $store_dir, "multi.sh" )
+    ) or die Template->error;
+
+    $text = <<'EOF';
+#!/bin/bash
+cd [% data_dir %]
+
+if [ ! -d [% data_dir %]/phylo ]
+then
+    mkdir [% data_dir %]/phylo
+fi
+
+#----------------------------#
+# concat
+#----------------------------#
+[% FOREACH item IN data -%]
+[% IF item.strains.size > 3 -%]
+# [% item.out_dir %]
+# concat mafft fas to relaxed phylip
+if [ ! -f [% data_dir %]/phylo/[% item.out_dir %].phy ]
+then
+    perl [% pl_dir %]/alignDB/util/concat_fasta.pl \
+        -i [% data_dir %]/[% item.out_dir %]_mft  \
+        -o [% data_dir %]/phylo/[% item.out_dir %].phy \
+        -p
+fi
+
+[% END -%]
+[% END -%]
+
+cd [% data_dir %]/phylo
+
+#----------------------------#
+# phylo with raxml (ML + rapid bootstrap)
+#----------------------------#
+[% FOREACH item IN data -%]
+[% IF item.strains.size > 3 -%]
+# [% item.out_dir %]
+if [ -f [% data_dir %]/phylo/[% item.out_dir %].phy.reduced ]
+then
+    raxml -T 6 -f a -m GTRGAMMA -p $RANDOM -N 100 -x $RANDOM -O \
+        -o Spar -n [% item.out_dir %] \
+        -s [% data_dir %]/phylo/[% item.out_dir %].phy.reduced
+elif [ -f [% data_dir %]/phylo/[% item.out_dir %].phy ]
+then
+    raxml -T 6 -f a -m GTRGAMMA -p $RANDOM -N 100 -x $RANDOM \
+        -o Spar -n [% item.out_dir %] \
+        -s [% data_dir %]/phylo/[% item.out_dir %].phy
+fi
+
+[% END -%]
+[% END -%]
+
+EOF
+    $tt->process(
+        \$text,
+        {   data     => \@data,
+            data_dir => $data_dir,
+            pl_dir   => $pl_dir,
+            parallel => $parallel,
+        },
+        File::Spec->catfile( $store_dir, "phylo.sh" )
     ) or die Template->error;
 
 }

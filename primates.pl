@@ -564,4 +564,66 @@ EOF
         },
         File::Spec->catfile( $store_dir, "multi.sh" )
     ) or die Template->error;
+
+    $text = <<'EOF';
+#!/bin/bash
+cd [% data_dir %]
+
+if [ ! -d [% data_dir %]/phylo ]
+then
+    mkdir [% data_dir %]/phylo
+fi
+
+#----------------------------#
+# concat
+#----------------------------#
+[% FOREACH item IN data -%]
+[% IF item.out_dir == 'HumanvsCGOR' -%]
+# [% item.out_dir %]
+# concat mafft fas to relaxed phylip
+if [ ! -f [% data_dir %]/phylo/[% item.out_dir %].phy ]
+then
+    perl [% pl_dir %]/alignDB/util/concat_fasta.pl \
+        -i [% data_dir %]/[% item.out_dir %]_mft  \
+        -o [% data_dir %]/phylo/[% item.out_dir %].phy \
+        -p
+fi
+
+[% END -%]
+[% END -%]
+
+cd [% data_dir %]/phylo
+
+#----------------------------#
+# phylo with raxml (ML + rapid bootstrap)
+#----------------------------#
+[% FOREACH item IN data -%]
+[% IF item.out_dir == 'HumanvsCGOR' -%]
+# [% item.out_dir %]
+if [ -f [% data_dir %]/phylo/[% item.out_dir %].phy.reduced ]
+then
+    raxml -T 6 -f a -m GTRGAMMA -p $RANDOM -N 100 -x $RANDOM -O \
+        -o rhesus -n [% item.out_dir %] \
+        -s [% data_dir %]/phylo/[% item.out_dir %].phy.reduced
+elif [ -f [% data_dir %]/phylo/[% item.out_dir %].phy ]
+then
+    raxml -T 6 -f a -m GTRGAMMA -p $RANDOM -N 100 -x $RANDOM \
+        -o rhesus -n [% item.out_dir %] \
+        -s [% data_dir %]/phylo/[% item.out_dir %].phy
+fi
+
+[% END -%]
+[% END -%]
+
+EOF
+    $tt->process(
+        \$text,
+        {   data     => \@data,
+            data_dir => $data_dir,
+            pl_dir   => $pl_dir,
+            parallel => $parallel,
+        },
+        File::Spec->catfile( $store_dir, "phylo.sh" )
+    ) or die Template->error;
+
 }
