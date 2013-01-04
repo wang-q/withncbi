@@ -18,7 +18,6 @@ use AlignDB::Stopwatch;
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 use AlignDB;
-use AlignDB::Multi;
 use AlignDB::Ofg;
 
 #----------------------------------------------------------#
@@ -50,8 +49,6 @@ my $parallel = $Config->{generate}{parallel};
 # number of alignments process in one child process
 my $batch_number = $Config->{feature}{batch};
 
-my $multi;
-
 my $man  = 0;
 my $help = 0;
 
@@ -67,7 +64,6 @@ GetOptions(
     'style=s'      => \$style,
     'parallel=i'   => \$parallel,
     'batch=i'      => \$batch_number,
-    'multi'        => \$multi,
 ) or pod2usage(2);
 
 pod2usage(1) if $help;
@@ -132,7 +128,7 @@ my %chr_data_set;
             next unless $chr =~ /^\w+$/;
         }
         next unless $start =~ /^\d+$/;
-        next unless $end   =~ /^\d+$/;
+        next unless $end =~ /^\d+$/;
         if ( $start > $end ) {
             ( $start, $end ) = ( $end, $start );
         }
@@ -153,21 +149,11 @@ my $worker = sub {
     my $job       = shift;
     my @align_ids = @$job;
 
-    my $obj;
-    if ( !$multi ) {
-        $obj = AlignDB->new(
-            mysql  => "$db:$server",
-            user   => $username,
-            passwd => $password,
-        );
-    }
-    else {
-        $obj = AlignDB::Multi->new(
-            mysql  => "$db:$server",
-            user   => $username,
-            passwd => $password,
-        );
-    }
+    my $obj = AlignDB->new(
+        mysql  => "$db:$server",
+        user   => $username,
+        passwd => $password,
+    );
     AlignDB::Ofg->meta->apply($obj);
     $obj->style($style);
 

@@ -18,7 +18,6 @@ use AlignDB::Stopwatch;
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 use AlignDB;
-use AlignDB::Multi;
 use AlignDB::Ofg;
 
 #----------------------------------------------------------#
@@ -43,7 +42,7 @@ my $db       = $Config->{database}{db};
 
 my $tag   = "gc";
 my $style = "center";
-my $noclean; # do not clean ofg tables
+my $noclean;    # do not clean ofg tables
 
 # run in parallel mode
 my $parallel = $Config->{generate}{parallel};
@@ -68,7 +67,6 @@ GetOptions(
     'style=s'      => \$style,
     'parallel=i'   => \$parallel,
     'batch=i'      => \$batch_number,
-    'multi'        => \$multi,
     'noclean'      => \$noclean,
 ) or pod2usage(2);
 
@@ -123,9 +121,9 @@ my %chr_data_set;
         chomp $string;
         my ( $chr, $start, $end, $type )
             = ( split /\,/, $string )[ 0, 1, 2, 3 ];
-        next unless $chr   =~ /^\d+$/;
+        next unless $chr =~ /^\d+$/;
         next unless $start =~ /^\d+$/;
-        next unless $end   =~ /^\d+$/;
+        next unless $end =~ /^\d+$/;
         if ( $start > $end ) {
             ( $start, $end ) = ( $end, $start );
         }
@@ -148,21 +146,12 @@ my $worker = sub {
     my $job       = shift;
     my @align_ids = @$job;
 
-    my $obj;
-    if ( !$multi ) {
-        $obj = AlignDB->new(
-            mysql  => "$db:$server",
-            user   => $username,
-            passwd => $password,
-        );
-    }
-    else {
-        $obj = AlignDB::Multi->new(
-            mysql  => "$db:$server",
-            user   => $username,
-            passwd => $password,
-        );
-    }
+    my $obj = AlignDB->new(
+        mysql  => "$db:$server",
+        user   => $username,
+        passwd => $password,
+    );
+
     AlignDB::Ofg->meta->apply($obj);
     $obj->style($style);
 

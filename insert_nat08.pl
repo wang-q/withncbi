@@ -18,7 +18,6 @@ use AlignDB::Stopwatch;
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 use AlignDB;
-use AlignDB::Multi;
 use AlignDB::Ofg;
 
 #----------------------------------------------------------#
@@ -41,7 +40,7 @@ my $username = $Config->{database}{username};
 my $password = $Config->{database}{password};
 my $db       = $Config->{database}{db};
 
-my $tag = "gce";
+my $tag   = "gce";
 my $style = "center";
 
 # run in parallel mode
@@ -67,7 +66,6 @@ GetOptions(
     'style=s'      => \$style,
     'parallel=i'   => \$parallel,
     'batch=i'      => \$batch_number,
-    'multi'        => \$multi,
 ) or pod2usage(2);
 
 pod2usage(1) if $help;
@@ -131,9 +129,9 @@ my %chr_data_set;
         $chr =~ s/chr0?//i;
         next unless $chr =~ /^\d+$/;
         $chr = Roman($chr);
-        next unless $chr   =~ /^\w+$/;
+        next unless $chr =~ /^\w+$/;
         next unless $start =~ /^\d+$/;
-        next unless $end   =~ /^\d+$/;
+        next unless $end =~ /^\d+$/;
         if ( $start > $end ) {
             ( $start, $end ) = ( $end, $start );
         }
@@ -156,21 +154,11 @@ my $worker = sub {
     my $job       = shift;
     my @align_ids = @$job;
 
-    my $obj;
-    if ( !$multi ) {
-        $obj = AlignDB->new(
-            mysql  => "$db:$server",
-            user   => $username,
-            passwd => $password,
-        );
-    }
-    else {
-        $obj = AlignDB::Multi->new(
-            mysql  => "$db:$server",
-            user   => $username,
-            passwd => $password,
-        );
-    }
+    my $obj = AlignDB->new(
+        mysql  => "$db:$server",
+        user   => $username,
+        passwd => $password,
+    );
     AlignDB::Ofg->meta->apply($obj);
     $obj->style($style);
 
