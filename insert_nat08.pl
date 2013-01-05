@@ -47,7 +47,7 @@ my $style = "center";
 my $parallel = $Config->{generate}{parallel};
 
 # number of alignments process in one child process
-my $batch_number = $Config->{feature}{batch};
+my $batch_number = $Config->{generate}{batch};
 
 my $multi;
 
