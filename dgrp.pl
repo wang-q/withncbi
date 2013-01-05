@@ -229,7 +229,7 @@ cd [% data_dir %]
 [% FOREACH item IN data -%]
 # [% item.name %] [% item.coverage %]
 find [% data_dir %]/Dmelvs[% item.name %]/axtNet -name "*.axt.gz" | xargs gzip -d
-perl [% pl_dir %]/alignDB/extra/two_way_batch.pl -d Dmelvs[% item.name %] -t="7227,Dmel" -q "[% item.taxon %],[% item.name %]" -a [% data_dir %]/Dmelvs[% item.name %] -at 10000 -st 10000000 --parallel 6 --run 1-3,21,40
+perl [% pl_dir %]/alignDB/extra/two_way_batch.pl -d Dmelvs[% item.name %] -t="7227,Dmel" -q "[% item.taxon %],[% item.name %]" -a [% data_dir %]/Dmelvs[% item.name %] -lt 10000 -st 10000000 --parallel 6 --run 1-3,21,40
 gzip [% data_dir %]/Dmelvs[% item.name %]/axtNet/*.axt
 
 [% END -%]

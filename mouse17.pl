@@ -354,7 +354,7 @@ REM # stat
 REM #----------------------------#
 [% FOREACH item IN data -%]
 # [% item.name %] [% item.coverage %]
-perl [% pl_dir %]/alignDB/extra/two_way_batch.pl -d Mousevs[% item.name %] -t="10090,Mouse" -q "[% item.taxon %],[% item.name %]" -a [% data_dir %]/Mousevs[% item.name %] -at 1000 -st 10000000 --parallel 4 --run 1-3,21,40
+perl [% pl_dir %]/alignDB/extra/two_way_batch.pl -d Mousevs[% item.name %] -t="10090,Mouse" -q "[% item.taxon %],[% item.name %]" -a [% data_dir %]/Mousevs[% item.name %] -lt 1000 -st 10000000 --parallel 4 --run 1-3,21,40
 
 [% END -%]
 

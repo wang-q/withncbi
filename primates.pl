@@ -413,7 +413,7 @@ cd /d [% data_dir %]
 [% FOREACH item IN data -%]
 [% IF item.name != 'human' -%]
 # [% item.name %]
-perl [% pl_dir %]/alignDB/extra/two_way_batch.pl -d Humanvs[% item.name FILTER ucfirst %] -t="9606,human" -q "[% item.taxon %],[% item.name %]" -a [% data_dir %]/Humanvs[% item.name FILTER ucfirst %] -at 10000 -st 10000000 --parallel 4 --run 1-3,21,40
+perl [% pl_dir %]/alignDB/extra/two_way_batch.pl -d Humanvs[% item.name FILTER ucfirst %] -t="9606,human" -q "[% item.taxon %],[% item.name %]" -a [% data_dir %]/Humanvs[% item.name FILTER ucfirst %] -lt 10000 -st 10000000 --parallel 4 --run 1-3,21,40
 
 [% END -%]
 [% END -%]

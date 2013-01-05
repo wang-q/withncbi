@@ -98,7 +98,7 @@ perl [% pl_dir %]/blastz/bz.pl -dt [% data_dir %]/S288C_58 -dq [% data_dir %]/[%
 # stat
 #----------------------------#
 [% FOREACH item IN data -%]
-perl [% pl_dir %]/alignDB/extra/two_way_batch.pl -d S288Cvs[% item.name %] -e yeast_58 -t="4932,S288C" -q "[% item.taxon %],[% item.name %]" -a [% data_dir %]/S288Cvs[% item.name %]_58 -at 5000 -st 1000000 --parallel 4 --run all
+perl [% pl_dir %]/alignDB/extra/two_way_batch.pl -d S288Cvs[% item.name %] -e yeast_58 -t="4932,S288C" -q "[% item.taxon %],[% item.name %]" -a [% data_dir %]/S288Cvs[% item.name %]_58 -lt 5000 -st 1000000 --parallel 4 --run all
 [% END -%]
 
 EOF
@@ -145,7 +145,7 @@ perl [% pl_dir %]/blastz/bz.pl -dt [% data_dir %]/S288C_58 -dq [% data_dir %]/[%
 # stat
 #----------------------------#
 [% FOREACH item IN data -%]
-perl [% pl_dir %]/alignDB/extra/two_way_batch.pl -d S288Cvs[% item.name %] -e yeast_58 -t="4932,S288C" -q "[% item.taxon %],[% item.name %]" -a [% data_dir %]/S288Cvs[% item.name %]_58 -at 5000 -st 1000000 --parallel 4 --run all
+perl [% pl_dir %]/alignDB/extra/two_way_batch.pl -d S288Cvs[% item.name %] -e yeast_58 -t="4932,S288C" -q "[% item.taxon %],[% item.name %]" -a [% data_dir %]/S288Cvs[% item.name %]_58 -lt 5000 -st 1000000 --parallel 4 --run all
 [% END -%]
 
 EOF

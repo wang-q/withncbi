@@ -301,7 +301,7 @@ perl [% pl_dir %]/alignDB/extra/two_way_batch.pl \
     -t "[% data.$i.taxon %],[% data.$i.name %]" \
     -q "[% data.$j.taxon %],[% data.$j.name %]" \
     -a [% data_dir %]/[% data.$i.name %]vs[% data.$j.name %] \
-    -at 5000 -st 0 -ct 0 --parallel [% parallel %] --run 1-3,21,40
+    -lt 5000 -st 0 -ct 0 --parallel [% parallel %] --run 1-3,21,40
 
 [% END -%]
 [% END -%]

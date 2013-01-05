@@ -394,7 +394,7 @@ cd [% data_dir %]
 #----------------------------#
 [% FOREACH item IN data -%]
 # [% item.name %] [% item.coverage %]
-perl [% pl_dir %]/alignDB/extra/two_way_batch.pl -d Athvs[% item.name FILTER ucfirst %] -t="3702,Ath" -q "[% item.taxon %],[% item.name %]" -a [% data_dir %]/Athvs[% item.name FILTER ucfirst %] -at 10000 -st 0 --parallel [% parallel %] --run 1-3,21,40
+perl [% pl_dir %]/alignDB/extra/two_way_batch.pl -d Athvs[% item.name FILTER ucfirst %] -t="3702,Ath" -q "[% item.taxon %],[% item.name %]" -a [% data_dir %]/Athvs[% item.name FILTER ucfirst %] -lt 10000 -st 0 --parallel [% parallel %] --run 1-3,21,40
 
 [% END -%]
 

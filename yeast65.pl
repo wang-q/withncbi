@@ -207,7 +207,7 @@ cd [% data_dir %]
 [% FOREACH item IN data -%]
 # [% item.name %]
 find [% data_dir %]/S288Cvs[% item.name %]/axtNet -name "*.axt.gz" | xargs gzip -d
-perl [% pl_dir %]/alignDB/extra/two_way_batch.pl -d S288Cvs[% item.name %] -t="4932,S288C" -q "[% item.taxon %],[% item.name %]" -a [% data_dir %]/S288Cvs[% item.name %] -at 1000 -st 1000000 --parallel 8 --run 1-3,21,40
+perl [% pl_dir %]/alignDB/extra/two_way_batch.pl -d S288Cvs[% item.name %] -t="4932,S288C" -q "[% item.taxon %],[% item.name %]" -a [% data_dir %]/S288Cvs[% item.name %] -lt 1000 -st 1000000 --parallel 8 --run 1-3,21,40
 gzip [% data_dir %]/S288Cvs[% item.name %]/axtNet/*.axt
 
 [% END -%]

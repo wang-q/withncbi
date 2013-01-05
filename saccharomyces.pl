@@ -605,7 +605,7 @@ perl [% pl_dir %]/alignDB/extra/two_way_batch.pl \
     -t="4932,S288C" \
     -q "[% data.$i.taxon %],[% data.$i.name %]" \
     -a [% data_dir %]/S288Cvs[% data.$i.name %] \
-    -at 5000 -st 0 -ct 0 --parallel [% parallel %] --run 1-3,21,40
+    -lt 5000 -st 0 -ct 0 --parallel [% parallel %] --run 1-3,21,40
 
 [% END -%]
 
@@ -625,7 +625,7 @@ perl [% pl_dir %]/alignDB/extra/two_way_batch.pl \
     -t "[% others.$i.taxon %],[% others.$i.name %]" \
     -q "[% others.$j.taxon %],[% others.$j.name %]" \
     -a [% data_dir %]/[% others.$i.name %]vs[% others.$j.name %] \
-    -at 5000 -st 0 -ct 0 --parallel [% parallel %] --run 1-3,21,40
+    -lt 5000 -st 0 -ct 0 --parallel [% parallel %] --run 1-3,21,40
 
 [% END -%]
 [% END -%]

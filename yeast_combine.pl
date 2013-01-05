@@ -218,7 +218,7 @@ cd [% data_dir %]
 perl [% pl_dir %]/alignDB/extra/two_way_batch.pl -d S288Cvs[% item.name %] \
     -t="4932,S288C" -q "[% item.taxon %],[% item.name %]" \
     -a [% data_dir %]/S288Cvs[% item.name %] \
-    -at 10000 -st 0 -ct 0 --parallel 8 --run 1-3,21,40
+    -lt 10000 -st 0 -ct 0 --parallel 8 --run 1-3,21,40
 
 [% END -%]
 

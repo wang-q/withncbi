@@ -368,7 +368,7 @@ perl [% pl_dir %]/alignDB/extra/two_way_batch.pl \
     -d Afumvs[% item.name %] \
     -t="330879,Afum" -q "[% item.taxon %],[% item.name %]" \
     -a [% data_dir %]/Afumvs[% item.name %] \
-    -at 5000 -st 0 -ct 0 --parallel [% parallel %] --run 1-3,21,40
+    -lt 5000 -st 0 -ct 0 --parallel [% parallel %] --run 1-3,21,40
 
 [% END -%]
 [% END -%]
@@ -380,7 +380,7 @@ perl [% pl_dir %]/alignDB/extra/two_way_batch.pl \
     -d Aoryvs[% item.name %] \
     -t="5062,Aory" -q "[% item.taxon %],[% item.name %]" \
     -a [% data_dir %]/Aoryvs[% item.name %] \
-    -at 5000 -st 0 -ct 0 --parallel [% parallel %] --run 1-3,21,40
+    -lt 5000 -st 0 -ct 0 --parallel [% parallel %] --run 1-3,21,40
 
 [% END -%]
 [% END -%]
