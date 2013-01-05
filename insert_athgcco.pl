@@ -151,7 +151,7 @@ my $worker = sub {
         user   => $username,
         passwd => $password,
     );
-    Moo::Role->apply_roles_to_object( $obj, qw{ AlignDB::Ofg } );
+    AlignDB::Ofg->meta->apply($obj);
     $obj->style($style);
 
     $obj->insert_ofg( \@align_ids, \@all_data, \%chr_data_set );
