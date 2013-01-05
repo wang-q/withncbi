@@ -19,10 +19,10 @@ use AlignDB::Util qw(:all);
 #----------------------------------------------------------#
 # GetOpt section
 #----------------------------------------------------------#
-my $axt_dir = 'F:/S288CvsRM11';    # Specify location here
-my $out_dir = undef;               # Specify output dir here
-my $length_threshold = 5000;       # Get the threshold of alignment length
-my $aln_prog         = 'clustalw'; # Default alignment program
+my $dir_align        = 'F:/S288CvsRM11'; # Specify location here
+my $dir_out          = undef;            # Specify output dir here
+my $length_threshold = 5000;             # Get the threshold of alignment length
+my $aln_prog         = 'clustalw';       # Default alignment program
 
 my $quick_mode   = undef;    # quick mode
 my $expand_indel = 1000;     # in quick mode, expand indel regoin
@@ -35,16 +35,16 @@ my $man  = 0;
 my $help = 0;
 
 GetOptions(
-    'help|?'     => \$help,
-    'man'        => \$man,
-    'axt_dir=s'  => \$axt_dir,
-    'out_dir=s'  => \$out_dir,
-    'length=i'   => \$length_threshold,
-    'msa=s'      => \$aln_prog,
-    'quick'      => \$quick_mode,
-    'expand=i'   => \$expand_indel,
-    'join=i'     => \$join_indel,
-    'parallel=i' => \$parallel,
+    'help|?'         => \$help,
+    'man'            => \$man,
+    'da|dir_align=s' => \$dir_align,
+    'do|dir_out=s'   => \$dir_out,
+    'lt|length=i'    => \$length_threshold,
+    'msa=s'          => \$aln_prog,
+    'quick'          => \$quick_mode,
+    'expand=i'       => \$expand_indel,
+    'join=i'         => \$join_indel,
+    'parallel=i'     => \$parallel,
 ) or pod2usage(2);
 
 pod2usage(1) if $help;
@@ -53,19 +53,19 @@ pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
 #----------------------------------------------------------#
 # make output dir
 #----------------------------------------------------------#
-unless ($out_dir) {
-    $out_dir = $axt_dir . "_$aln_prog";
-    $out_dir = $out_dir . "_quick" if $quick_mode;
+unless ($dir_out) {
+    $dir_out = $dir_align . "_$aln_prog";
+    $dir_out = $dir_out . "_quick" if $quick_mode;
 }
-unless ( -e $out_dir ) {
-    mkdir $out_dir, 0777
-        or die "Cannot create \"$out_dir\" directory: $!";
+unless ( -e $dir_out ) {
+    mkdir $dir_out, 0777
+        or die "Cannot create \"$dir_out\" directory: $!";
 }
 
 #----------------------------------------------------------#
 # Search for all files and push their paths to @dir_fiels
 #----------------------------------------------------------#
-my @axt_files = File::Find::Rule->file()->name('*.axt')->in($axt_dir);
+my @axt_files = File::Find::Rule->file()->name('*.axt')->in($dir_align);
 printf "\n----Total .AXT Files: %4s----\n\n", scalar @axt_files;
 
 if ( scalar @axt_files < $parallel ) {
@@ -83,7 +83,7 @@ my $process_axt = sub {
     $stopwatch->block_message("Process $infile...");
 
     my $outfile = basename($infile);
-    $outfile = $out_dir . "/$outfile";
+    $outfile = $dir_out . "/$outfile";
 
     open my $axt_fh, '<', $infile
         or die("Cannot open IN file $infile");
@@ -113,8 +113,7 @@ my $process_axt = sub {
         if ($quick_mode) {    # only realign regions containing indels
 
             # expand indel set
-            my $first_indel_set
-                = &find_indel_set( $first_line, $expand_indel );
+            my $first_indel_set = &find_indel_set( $first_line, $expand_indel );
             my $second_indel_set
                 = &find_indel_set( $second_line, $expand_indel );
 
@@ -129,11 +128,8 @@ my $process_axt = sub {
                 my $seg_end   = $_->[1];
                 my @segments;
                 foreach ( $first_line, $second_line ) {
-                    my $seg = substr(
-                        $_,
-                        $seg_start - 1,
-                        $seg_end - $seg_start + 1
-                    );
+                    my $seg = substr( $_, $seg_start - 1,
+                        $seg_end - $seg_start + 1 );
                     push @segments, $seg;
                 }
                 my $realign_segments = &multi_align( \@segments, $aln_prog );
@@ -198,17 +194,17 @@ __END__
     perl realign.pl -a=G:/S288CvsRM11 --msa=muscle --quick --expand=1000
 
     realign.pl [options]
-     Options:
-       --help            brief help message
-       --man             full documentation
-       --axt_dir         .axt files' location
-       --out_dir         output files' location
-       --length          length threshold
-       --msa             alignment program
-       --quick           use quick mode   
-       --expand          in quick mode, expand indel region
-       --join            in quick mode, join adjacent indel regions
-       --parallel        run in parallel mode
+      Options:
+        --help              brief help message
+        --man               full documentation
+        --dir_align         .axt files' directory
+        --dir_out           output directory
+        --length            length threshold
+        --msa               alignment program
+        --quick             use quick mode   
+        --expand            in quick mode, expand indel region
+        --join              in quick mode, join adjacent indel regions
+        --parallel          run in parallel mode
 
 =head1 OPTIONS
 

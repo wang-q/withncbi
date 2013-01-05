@@ -18,36 +18,36 @@ use AlignDB::Util qw(:all);
 #----------------------------------------------------------#
 # GetOpt section
 #----------------------------------------------------------#
-my $axt_dir;
-my $out_dir;
+my $dir_align;
+my $dir_out;
 
 my $man  = 0;
 my $help = 0;
 
 GetOptions(
-    'help|?'    => \$help,
-    'man'       => \$man,
-    'axt_dir=s' => \$axt_dir,
-    'out_dir=s' => \$out_dir,
+    'help|?'         => \$help,
+    'man'            => \$man,
+    'da|dir_align=s' => \$dir_align,
+    'do|dir_out=s'   => \$dir_out,
 ) or pod2usage(2);
 
 pod2usage(1) if $help;
 pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
 
-$out_dir ||= $axt_dir . "_rev";
+$dir_out ||= $dir_align . "_rev";
 
 #----------------------------------------------------------#
 # Init objects
 #----------------------------------------------------------#
 my $stopwatch = AlignDB::Stopwatch->new();
-$stopwatch->start_message("Reverse .axt files from axt_dir...");
+$stopwatch->start_message("Reverse .axt files...");
 
-my @axt_files = File::Find::Rule->file()->name('*.axt')->in($axt_dir);
+my @axt_files = File::Find::Rule->file()->name('*.axt')->in($dir_align);
 printf "\n----Total .AXT Files: %4s----\n\n", scalar @axt_files;
 
-unless ( -e $out_dir ) {
-    mkdir $out_dir, 0777
-        or die qq{Cannot create directory: "$out_dir"};
+unless ( -e $dir_out ) {
+    mkdir $dir_out, 0777
+        or die qq{Cannot create directory: "$dir_out"};
 }
 
 #----------------------------------------------------------#
@@ -65,7 +65,7 @@ my $process_axt = sub {
 
     my $out_file = basename($infile);
     $out_file =~ s/(\.axt)$/_rev$1/;
-    open my $out_fh, '>', "$out_dir/$out_file";
+    open my $out_fh, '>', "$dir_out/$out_file";
 
     while (1) {
         my $summary_line = <$axt_fh>;
@@ -125,8 +125,8 @@ __END__
       Options:
         --help          brief help message
         --man           full documentation
-        --axt_dir       .axt files' directory
-        --out_dir       output directory
+        --dir_align     .axt files' directory
+        --dir_out       output directory
 
 =head1 OPTIONS
 
