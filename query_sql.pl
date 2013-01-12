@@ -6,7 +6,7 @@ use Getopt::Long::Descriptive;
 use Config::Tiny;
 use YAML qw(Dump Load DumpFile LoadFile);
 
-use Text::CSV;
+use Text::CSV_XS;
 use Text::Table;
 use DBIx::XHTML_Table;
 
@@ -28,15 +28,15 @@ my ( $opt, $usage ) = describe_options(
     [ 'help|h', 'display this message' ],
     [],
     ['Database init values'],
-    [ 'server=s',   'MySQL IP/Domain', { default => $conf_db->{server} } ],
-    [ 'port=i',     'MySQL port',      { default => $conf_db->{port} } ],
-    [ 'db=s',       'database name',   { default => $conf_db->{db} } ],
-    [ 'username=s', 'username',        { default => $conf_db->{username} } ],
-    [ 'password=s', 'password',        { default => $conf_db->{password} } ],
+    [ 'server|s=s',   'MySQL IP/Domain', { default => $conf_db->{server} } ],
+    [ 'port|P=i',     'MySQL port',      { default => $conf_db->{port} } ],
+    [ 'username|u=s', 'username',        { default => $conf_db->{username} } ],
+    [ 'password|p=s', 'password',        { default => $conf_db->{password} } ],
+    [ 'db|d=s',       'database name',   { default => $conf_db->{db} } ],
     [],
-    [ 'query=s',  'SQL statement', { default => "SELECT * FROM meta" } ],
-    [ 'output=s', 'output filename' ],
-    [   'type=s',
+    [ 'query|q=s',  'SQL statement', { default => "SELECT * FROM meta" } ],
+    [ 'output|o=s', 'output filename' ],
+    [   'type|t=s',
         'output style (csv, neat, table, box and html)',
         { default => "csv" }
     ],
@@ -76,7 +76,7 @@ $sth->execute
     or die $sth->errstr;
 
 if ( $opt->{type} eq 'csv' ) {
-    my $csv = Text::CSV->new;
+    my $csv = Text::CSV_XS->new;
 
     # header line
     my @columns = @{ $sth->{NAME} };
