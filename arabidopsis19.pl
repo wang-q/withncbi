@@ -417,7 +417,12 @@ cd [% data_dir %]
 #----------------------------#
 [% FOREACH item IN data -%]
 # [% item.name %] [% item.coverage %]
-perl [% pl_dir %]/alignDB/extra/two_way_batch.pl -d Athvs[% item.name FILTER ucfirst %] -t="3702,Ath" -q "[% item.taxon %],[% item.name %]" -a [% data_dir %]/Athvs[% item.name FILTER ucfirst %] -lt 10000 -st 0 --parallel [% parallel %] --run 1-3,21,40
+perl [% pl_dir %]/alignDB/extra/two_way_batch.pl \
+    -d Athvs[% item.name FILTER ucfirst %] \
+    -t="3702,Ath" -q "[% item.taxon %],[% item.name %]" \
+    -da [% data_dir %]/Athvs[% item.name FILTER ucfirst %] \
+    -lt 10000 -st 0 -ct 0 --parallel [% parallel %] \
+    --run 1-5,21,40
 
 [% END -%]
 
@@ -509,7 +514,7 @@ REM # multi
 REM #----------------------------#
 perl [% pl_dir %]/alignDB/extra/join_dbs.pl --dbs [% dbs %] --goal_db [% goal_db %] --outgroup [% outgroup %] --target [% target %] --queries [% queries %] --no_insert=1 --trimmed_fasta=1 --length 1000
 
-perl [% pl_dir %]/alignDB/extra/multi_way_batch.pl -d [% goal_db %] -e ath_65 -f [% data_dir %]/[% goal_db %]  -lt 1000 -st 100000 --parallel 4 --run all
+perl [% pl_dir %]/alignDB/extra/multi_way_batch.pl -d [% goal_db %] -e ath_65 -da [% data_dir %]/[% goal_db %]  -lt 1000 -st 100000 --parallel 4 --run all
 
 EOF
 
@@ -518,7 +523,7 @@ EOF
     my $queries = join ',', map { $_ . "query" } ( 1 .. scalar @names - 1 );
     $tt->process(
         \$text,
-        {   goal_db  => "AthvsNineteen",
+        {   goal_db  => "Athvs19",
             outgroup => '0query',
             target   => '0target',
             dbs      => $dbs,
@@ -563,9 +568,9 @@ EOF
 [% FOREACH item IN data -%]
 # [% item.out_dir %]
 perl [% pl_dir %]/blastz/mz.pl \
-    [% FOREACH st IN item.strains -%]
+[% FOREACH st IN item.strains -%]
     -d [% data_dir %]/Athvs[% st FILTER ucfirst %] \
-    [% END -%]
+[% END -%]
     --tree [% data_dir %]/20way.nwk \
     --out [% data_dir %]/[% item.out_dir %] \
     -syn -p [% parallel %]
@@ -590,7 +595,7 @@ EOF
 [% FOREACH item IN data -%]
 # [% item.out_dir %]
 perl [% pl_dir %]/blastz/maf2fasta.pl \
-    --has_outgroup -p [% parallel %] --block \
+    -p [% parallel %] --block \
     -i [% data_dir %]/[% item.out_dir %] \
     -o [% data_dir %]/[% item.out_dir %]_fasta
 
@@ -603,6 +608,7 @@ perl [% pl_dir %]/blastz/maf2fasta.pl \
 # [% item.out_dir %]
 perl [% pl_dir %]/blastz/refine_fasta.pl \
     --msa mafft --block -p [% parallel %] \
+    --outgroup \
     -i [% data_dir %]/[% item.out_dir %]_fasta \
     -o [% data_dir %]/[% item.out_dir %]_mft
 
@@ -643,7 +649,7 @@ EOF
 perl [% pl_dir %]/alignDB/extra/multi_way_batch.pl \
     -d [% item.out_dir %] -e ath_65 \
     --block --id [% data_dir %]/id2name.csv \
-    -f [% data_dir %]/[% item.out_dir %]_mft  \
+    -da [% data_dir %]/[% item.out_dir %]_mft  \
     -lt 5000 -st 0 -ct 0 --parallel [% parallel %] --run common
 
 [% END -%]

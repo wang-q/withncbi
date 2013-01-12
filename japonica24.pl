@@ -455,7 +455,7 @@ EOF
 [% FOREACH item IN data -%]
 # [% item.out_dir %]
 perl [% pl_dir %]/blastz/maf2fasta.pl \
-    --has_outgroup --id 39947 -p 8 --block \
+    -p [% parallel %] --block \
     -i [% data_dir %]/[% item.out_dir %] \
     -o [% data_dir %]/[% item.out_dir %]_fasta
 
@@ -466,8 +466,9 @@ perl [% pl_dir %]/blastz/maf2fasta.pl \
 #----------------------------#
 [% FOREACH item IN data -%]
 # [% item.out_dir %]
-bsub -q mpi_2 -n 8 -J [% item.out_dir %]-mft perl [% pl_dir %]/blastz/refine_fasta.pl \
-    --msa mafft --block -p 8 \
+perl [% pl_dir %]/blastz/refine_fasta.pl \
+    --msa mafft --block -p [% parallel %] \
+    --outgroup \
     -i [% data_dir %]/[% item.out_dir %]_fasta \
     -o [% data_dir %]/[% item.out_dir %]_mft
 
@@ -491,6 +492,7 @@ EOF
         {   data     => \@data,
             data_dir => $data_dir,
             pl_dir   => $pl_dir,
+            parallel => $parallel,
         },
         File::Spec->catfile( $store_dir, "maf_fasta.sh" )
     ) or die Template->error;
@@ -507,7 +509,7 @@ EOF
 perl [% pl_dir %]/alignDB/extra/multi_way_batch.pl \
     -d [% item.out_dir %] -e nip_65 \
     --block --id [% data_dir %]/id2name.csv \
-    -f [% data_dir %]/[% item.out_dir %]_mft  \
+    -da [% data_dir %]/[% item.out_dir %]_mft  \
     -lt 5000 -st 0 -ct 0 --parallel [% parallel %] --run common
 
 [% END -%]

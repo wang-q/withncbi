@@ -425,7 +425,7 @@ EOF
 [% FOREACH item IN data -%]
 # [% item.out_dir %]
 perl [% pl_dir %]/blastz/maf2fasta.pl \
-    --has_outgroup -p [% parallel %] --block \
+    -p [% parallel %] --block \
     -i [% data_dir %]/[% item.out_dir %] \
     -o [% data_dir %]/[% item.out_dir %]_fasta
 
@@ -438,6 +438,7 @@ perl [% pl_dir %]/blastz/maf2fasta.pl \
 # [% item.out_dir %]
 perl [% pl_dir %]/blastz/refine_fasta.pl \
     --msa mafft --block -p [% parallel %] \
+    --outgroup \
     -i [% data_dir %]/[% item.out_dir %]_fasta \
     -o [% data_dir %]/[% item.out_dir %]_mft
 
@@ -478,7 +479,7 @@ EOF
 perl [% pl_dir %]/alignDB/extra/multi_way_batch.pl \
     -d [% item.out_dir %] -e yeast_65 \
     --block --id [% data_dir %]/id2name.csv \
-    -f [% data_dir %]/[% item.out_dir %]_mft  \
+    -da [% data_dir %]/[% item.out_dir %]_mft  \
     -lt 5000 -st 0 -ct 0 --parallel [% parallel %] --run common
 
 [% END -%]

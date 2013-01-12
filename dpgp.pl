@@ -332,9 +332,12 @@ cd [% data_dir %]
 #----------------------------#
 [% FOREACH item IN data -%]
 # [% item.name %] [% item.coverage %]
-find [% data_dir %]/Dmelvs[% item.name %]/axtNet -name "*.axt.gz" | xargs gzip -d
-perl [% pl_dir %]/alignDB/extra/two_way_batch.pl -d Dmelvs[% item.name %] -t="7227,Dmel" -q "[% item.taxon %],[% item.name %]" -a [% data_dir %]/Dmelvs[% item.name %] -lt 10000 -st 10000000 --parallel 6 --run 1-3,21,40
-gzip [% data_dir %]/Dmelvs[% item.name %]/axtNet/*.axt
+perl [% pl_dir %]/alignDB/extra/two_way_batch.pl \
+    -d Dmelvs[% item.name %] \
+    -t="7227,Dmel" -q "[% item.taxon %],[% item.name %]" \
+    -da [% data_dir %]/Dmelvs[% item.name %] \
+    -lt 10000 -st 0 -ct 0 --parallel [% parallel %] \
+    --run 1-5,21,40
 
 [% END -%]
 
@@ -345,7 +348,7 @@ EOF
             data_dir => $data_dir,
             pl_dir   => $pl_dir,
         },
-        File::Spec->catfile( $store_dir, "stat.sh" )
+        File::Spec->catfile( $store_dir, "pair_stat.sh" )
     ) or die Template->error;
 
     $text = <<'EOF';
@@ -440,7 +443,10 @@ perl [% pl_dir %]/blastz/refine_fasta.pl \
 
 perl [% pl_dir %]/tool/catfasta2phyml.pl -f [% data_dir %]/[% item.goal_db %]_mft/*.fas > [% data_dir %]/all.fasta
 
-perl [% pl_dir %]/alignDB/extra/multi_way_batch.pl -d [% item.goal_db %] -e fly_65 -f [% data_dir %]/[% item.goal_db %]_mft  -lt 1000 -st 10000000 --parallel 8 --run all
+perl [% pl_dir %]/alignDB/extra/multi_way_batch.pl \
+    -d [% item.goal_db %] -e fly_65 \
+    -da [% data_dir %]/[% item.goal_db %]_mft \
+    -lt 1000 -st 0 --parallel 8 --run all
 
 [% END -%]
 EOF
@@ -458,7 +464,7 @@ EOF
 
     my $tt         = Template->new;
     my $strains_of = {
-        DmelvsXIV   => [qw{ Dsim_65 CO15N GA185 RG15 SP254 UM526 ZL130 }],
+        #DmelvsIV   => [qw{ Dsim_65 CO15N GA185 RG15 SP254 UM526 ZL130 }],
         DmelvsXVIII => [
             qw{ Dsim_65 CK1 CO15N ED10N FR217 GA185 GU10 KN6 KT1 NG3N
                 RG15 SP254 UG7 UM526 ZI268 ZL130 ZO12 ZS37 }
@@ -487,10 +493,10 @@ EOF
 #----------------------------#
 [% FOREACH item IN data -%]
 # [% item.out_dir %]
-bsub -q mpi_2 -n 8 -J [% item.out_dir %]-mz perl [% pl_dir %]/blastz/mz.pl \
-    [% FOREACH st IN item.strains -%]
+perl [% pl_dir %]/blastz/mz.pl \
+[% FOREACH st IN item.strains -%]
     -d [% data_dir %]/Dmelvs[% st FILTER ucfirst %] \
-    [% END -%]
+[% END -%]
     --tree [% data_dir %]/22way.nwk \
     --out [% data_dir %]/[% item.out_dir %] \
     -syn -p 8
@@ -514,7 +520,7 @@ EOF
 [% FOREACH item IN data -%]
 # [% item.out_dir %]
 perl [% pl_dir %]/blastz/maf2fasta.pl \
-    --has_outgroup --id 7227 -p 8 --block \
+    -p [% parallel %] --block \
     -i [% data_dir %]/[% item.out_dir %] \
     -o [% data_dir %]/[% item.out_dir %]_fasta
 
@@ -525,8 +531,9 @@ perl [% pl_dir %]/blastz/maf2fasta.pl \
 #----------------------------#
 [% FOREACH item IN data -%]
 # [% item.out_dir %]
-bsub -q mpi_2 -n 8 -J [% item.out_dir %]-mft perl [% pl_dir %]/blastz/refine_fasta.pl \
-    --msa mafft --block -p 8 \
+perl [% pl_dir %]/blastz/refine_fasta.pl \
+    --msa mafft --block -p [% parallel %] \
+    --outgroup \
     -i [% data_dir %]/[% item.out_dir %]_fasta \
     -o [% data_dir %]/[% item.out_dir %]_mft
 
@@ -550,6 +557,7 @@ EOF
         {   data     => \@data,
             data_dir => $data_dir,
             pl_dir   => $pl_dir,
+            parallel => $parallel,
         },
         File::Spec->catfile( $store_dir, "maf_fasta.sh" )
     ) or die Template->error;
@@ -566,7 +574,7 @@ EOF
 perl [% pl_dir %]/alignDB/extra/multi_way_batch.pl \
     -d [% item.out_dir %] -e fly_65 \
     --block --id [% data_dir %]/id2name.csv \
-    -f [% data_dir %]/[% item.out_dir %]_mft  \
+    -da [% data_dir %]/[% item.out_dir %]_mft  \
     -lt 5000 -st 0 -ct 0 --parallel [% parallel %] --run common
 
 [% END -%]
