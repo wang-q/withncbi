@@ -51,17 +51,18 @@ my $man  = 0;
 my $help = 0;
 
 GetOptions(
-    'help|?'     => \$help,
-    'man'        => \$man,
-    'server=s'   => \$server,
-    'db=s'       => \$db,
-    'username=s' => \$username,
-    'password=s' => \$password,
-    'align_id=s' => \$align_id,
-    'CLASS=s'    => \$CLASS,
-    'width=i'    => \$width,
-    'size=i'     => \$wave_window_size,
-    'step=i'     => \$wave_window_step,
+    'help|?'       => \$help,
+    'man'          => \$man,
+    's|server=s'   => \$server,
+    'P|port=i'     => \$port,
+    'u|username=s' => \$username,
+    'p|password=s' => \$password,
+    'd|db=s'       => \$db,
+    'align_id=s'   => \$align_id,
+    'CLASS=s'      => \$CLASS,
+    'width=i'      => \$width,
+    'size=i'       => \$wave_window_size,
+    'step=i'       => \$wave_window_step,
 ) or pod2usage(2);
 
 pod2usage(1) if $help;
@@ -78,7 +79,7 @@ my $obj = AlignDB->new(
     user   => $username,
     passwd => $password,
 );
-AlignDB::Ofg->meta->apply($obj);
+AlignDB::GC->meta->apply($obj);
 my %opt = (
     wave_window_size => $wave_window_size,
     wave_window_step => $wave_window_step,
@@ -240,7 +241,8 @@ if ($figure) {
         $panel->add_track(
             $align_segment,
             -glyph => 'text_in_box',
-            -text  => "GC wave | size: $wave_window_size | step: $wave_window_step | "
+            -text =>
+                "GC wave | size: $wave_window_size | step: $wave_window_step | "
                 . "fall range: $fall_range",
             -text_bgcolor => 'lightcyan',
             -height       => 10,
