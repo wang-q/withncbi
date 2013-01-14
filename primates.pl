@@ -540,6 +540,7 @@ EOF
 # mafft
 perl [% pl_dir %]/alignDB/extra/multi_way_batch.pl \
     -d [% item.out_dir %] -e human_65 \
+    --outgroup \
     --block --id [% data_dir %]/id2name.csv \
     -da [% data_dir %]/[% item.out_dir %]_mft  \
     -lt 5000 -st 0 -ct 0 --parallel [% parallel %] --run common
