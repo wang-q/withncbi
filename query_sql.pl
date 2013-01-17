@@ -1,6 +1,7 @@
 #!/usr/bin/perl
 use strict;
 use warnings;
+use autodie;
 
 use Getopt::Long::Descriptive;
 use Config::Tiny;
@@ -35,6 +36,7 @@ my ( $opt, $usage ) = describe_options(
     [ 'db|d=s',       'database name',   { default => $conf_db->{db} } ],
     [],
     [ 'query|q=s',  'SQL statement', { default => "SELECT * FROM meta" } ],
+    [ 'file|f=s',   'SQL file', ],
     [ 'output|o=s', 'output filename' ],
     [   'type|t=s',
         'output style (csv, neat, table, box and html)',
@@ -47,8 +49,6 @@ $usage->die(
             "Write sql query results to a file, supporting multiple styles\n"
     }
 ) if $opt->{help};
-
-$opt->{output} = "$opt->{db}.$opt->{type}" unless $opt->{output};
 
 #----------------------------------------------------------#
 # Init section
@@ -65,88 +65,123 @@ my $obj = AlignDB->new(
 # Database handler
 my $dbh = $obj->dbh;
 
-# Open output file
-open my $out_fh, '>', $opt->{output}
-    or die("Cannot open output file $opt->{output}");
-
 # Execute sql query
-my $sth = $dbh->prepare( $opt->{query} )
-    or die $dbh->errstr;
-$sth->execute
-    or die $sth->errstr;
+if ( $opt->{file} ) {
+    open my $in_fh, '<', $opt->{file};
+    my $content = do { local $/; <$in_fh> };
+    close $in_fh;
+    my @queries = grep {/select/i} split /\;/, $content;
 
-if ( $opt->{type} eq 'csv' ) {
-    my $csv = Text::CSV_XS->new;
-
-    # header line
-    my @columns = @{ $sth->{NAME} };
-    $csv->combine(@columns);
-    print {$out_fh} $csv->string, "\n";
-
-    # all others
-    while ( my @row = $sth->fetchrow_array ) {
-        $csv->combine(@row);
-        print {$out_fh} $csv->string, "\n";
+    for my $i ( 0 .. $#queries ) {
+        print "SQL:\n";
+        print $queries[$i], "\n";
+        my $outfile
+            = $opt->{output} ? $opt->{output} : "$opt->{db}.$opt->{type}";
+        my $index = $i + 1;
+        $outfile =~ s/\.(\w+)$/\.$index.$1/;
+        result( $dbh, $queries[$i], $opt->{type}, $outfile );
     }
 }
-elsif ( $opt->{type} eq 'neat' ) {
-
-    # header line
-    my @columns = @{ $sth->{NAME} };
-    print {$out_fh} DBI::neat_list( \@columns ), "\n";
-
-    # all others
-    while ( my @row = $sth->fetchrow_array ) {
-        print {$out_fh} DBI::neat_list( \@row ), "\n";
-    }
-}
-elsif ( $opt->{type} eq 'box' or $opt->{type} eq 'table' ) {
-    my $is_box = $opt->{type} eq 'box';
-
-    # header line
-    my @columns = map +{ title => $_, align_title => 'center' },
-        @{ $sth->{NAME} };
-    my $c = 0;
-    splice @columns, $_ + $c++, 0, \' | ' for 1 .. $#columns;
-    my @header_border = ( $is_box ? \' |' : () );
-    my $table = Text::Table->new( @header_border, @columns, @header_border );
-
-    # all others
-    while ( my @row = $sth->fetchrow_array ) {
-        $table->load( \@row );
-    }
-    my $rule = $table->rule(qw/- +/);
-    my @rows_border = ( $is_box ? $rule : () );
-    print {$out_fh} join '', @rows_border, $table->title, $rule, $table->body,
-        @rows_border;
-}
-elsif ( $opt->{type} eq 'html' ) {
-    my $columns = $sth->{NAME};
-    my $rows    = $sth->fetchall_arrayref;
-
-    my $table = DBIx::XHTML_Table->new( $rows, $columns );
-    $table->modify( table => { border => 1, } );
-    $table->modify(
-        th => {
-            style => {
-                color      => '#a9b9a9',
-                background => '#444444',
-            }
-        }
-    );
-    $table->modify(
-        tr => { style => { background => [ '#bacaba', '#cbdbcb' ] } } );
-
-    print {$out_fh} $table->output;
+elsif ( $opt->{query} ) {
+    print "SQL:\n";
+    print $opt->{query}, "\n";
+    my $outfile = $opt->{output} ? $opt->{output} : "$opt->{db}.$opt->{type}";
+    result( $dbh, $opt->{query}, $opt->{type}, $outfile );
 }
 else {
-    die "Unknown output style type!\n";
+    warn "Provide a file or a SQL query\n";
 }
-
-close $out_fh;
 
 $stopwatch->end_message;
 exit;
+
+sub result {
+    my $dbh     = shift;
+    my $sql     = shift;
+    my $type    = shift;
+    my $outfile = shift;
+
+    my $sth = $dbh->prepare($sql)
+        or die $dbh->errstr;
+    $sth->execute
+        or die $sth->errstr;
+
+    open my $out_fh, '>', $outfile;
+
+    if ( $type eq 'csv' ) {
+        my $csv = Text::CSV_XS->new;
+
+        # header line
+        my @columns = @{ $sth->{NAME} };
+        $csv->combine(@columns);
+        print {$out_fh} $csv->string . "\n";
+
+        # all others
+        while ( my @row = $sth->fetchrow_array ) {
+            $csv->combine(@row);
+            print {$out_fh} $csv->string . "\n";
+        }
+    }
+    elsif ( $type eq 'neat' ) {
+
+        # header line
+        my @columns = @{ $sth->{NAME} };
+        print {$out_fh} DBI::neat_list( \@columns ) . "\n";
+
+        # all others
+        while ( my @row = $sth->fetchrow_array ) {
+            print {$out_fh} DBI::neat_list( \@row ) . "\n";
+        }
+    }
+    elsif ( $type eq 'box' or $type eq 'table' ) {
+        my $is_box = $type eq 'box';
+
+        # header line
+        my @columns = map +{ title => $_, align_title => 'center' },
+            @{ $sth->{NAME} };
+        my $c = 0;
+        splice @columns, $_ + $c++, 0, \' | ' for 1 .. $#columns;
+        my @header_border = ( $is_box ? \' |' : () );
+        my $table
+            = Text::Table->new( @header_border, @columns, @header_border );
+
+        # all others
+        while ( my @row = $sth->fetchrow_array ) {
+            $table->load( \@row );
+        }
+        my $rule = $table->rule(qw/- +/);
+        my @rows_border = ( $is_box ? $rule : () );
+        print {$out_fh} join '', @rows_border, $table->title, $rule,
+            $table->body,
+            @rows_border;
+    }
+    elsif ( $type eq 'html' ) {
+        my $columns = $sth->{NAME};
+        my $rows    = $sth->fetchall_arrayref;
+
+        my $table = DBIx::XHTML_Table->new( $rows, $columns );
+        $table->modify( table => { border => 1, } );
+        $table->modify(
+            th => {
+                style => {
+                    color      => '#a9b9a9',
+                    background => '#444444',
+                }
+            }
+        );
+        $table->modify(
+            tr => { style => { background => [ '#bacaba', '#cbdbcb' ] } } );
+
+        print {$out_fh} $table->output;
+    }
+    else {
+        die "Unknown output style type!\n";
+    }
+
+    close $out_fh;
+
+    return;
+}
 
 __END__
 
