@@ -59,7 +59,7 @@ GetOptions(
     'help|?'       => \$help,
     'man'          => \$man,
     's|server=s'   => \$server,
-    'p|port=i'     => \$port,
+    'P|port=i'     => \$port,
     'd|db=s'       => \$db,
     'u|username=s' => \$username,
     'p|password=s' => \$password,
