@@ -46,8 +46,7 @@ my $password = $Config->{database}{password};
 my $db       = $Config->{database}{db};
 
 # executable file location
-my $dir_result    = "/home/wangq/data/encode/process";
-my $raw_stat_file = "encode_raw_stat.csv";
+my $info_file = "/home/wangq/data/encode/stat/encode_raw_stat.csv";
 
 my $op = "insert_bed";
 my $dryrun;
@@ -64,6 +63,10 @@ my $count;
 
 # filter by meta info
 my ( @dataType, @cell, @antibody );
+
+my $filename;
+
+my $remove_chr;
 
 # run in parallel mode
 my $parallel = $Config->{generate}{parallel};
@@ -82,6 +85,7 @@ GetOptions(
     'd|db=s'       => \$db,
     'u|username=s' => \$username,
     'p|password=s' => \$password,
+    'i|info=s'     => \$info_file,
     'regex=s'      => \$regex,
     'count=i'      => \$count,
     'dataType=s'   => \@dataType,
@@ -89,6 +93,8 @@ GetOptions(
     'antibody=s'   => \@antibody,
     'op=s'         => \$op,
     'dryrun'       => \$dryrun,
+    'n|name=s'     => \$filename,
+    'r|remove'     => \$remove_chr,
     'style=s'      => \$style,
     'parallel=i'   => \$parallel,
     'batch=i'      => \$batch_number,
@@ -107,13 +113,16 @@ my @ymls;
 {
     my $csv = Text::CSV_XS->new( { binary => 1 } );
     $csv->eol("\n");
-    open my $fh, "<", $raw_stat_file;
+    open my $fh, "<", $info_file;
     while ( my $row = $csv->getline($fh) ) {
         my $yml = {};
         $yml->{dataType}     = $row->[0];
+        $yml->{cell}         = $row->[1];
         $yml->{cell_tag}     = $row->[2];
+        $yml->{antibody}     = $row->[3];
         $yml->{antibody_tag} = $row->[4];
         $yml->{itemCount}    = $row->[5];
+        $yml->{average_size} = $row->[6];
         $yml->{filename}     = $row->[7];
         push @ymls, $yml;
     }
@@ -176,25 +185,74 @@ if ( $op eq "insert_bed" ) {
     exec_cmd( $cmd, $dryrun );
 }
 elsif ( $op eq "merge_to_runlist" ) {
-    my $name = "merge";
-    if (@dataType) {
-        $name .= "_" . join "_", uniq(@dataType);
+    if ( !$filename ) {
+        $filename = "merge";
+        if (@dataType) {
+            $filename .= "_" . join "_", uniq(@dataType);
+        }
+        if (@cell) {
+            $filename .= "_" . join "_", uniq(@cell);
+        }
+        if (@antibody) {
+            $filename .= "_" . join "_", uniq(@antibody);
+        }
+        $filename .= ".yml";
     }
-    if (@cell) {
-        $name .= "_" . join "_", uniq(@cell);
-    }
-    if (@antibody) {
-        $name .= "_" . join "_", uniq(@antibody);
-    }
-    $name .= ".yml";
 
     my $cmd
-        = "perl $FindBin::Bin/../ofg/bed_op.pl" . " --op $op" . " --name $name";
+        = "perl $FindBin::Bin/../ofg/bed_op.pl"
+        . " --op $op"
+        . " --name $filename";
 
     for my $yml (@ymls) {
         $cmd .= " --file " . $yml->{filename};
     }
     exec_cmd( $cmd, $dryrun );
+}
+elsif ( $op eq "bed_diff" ) {
+    my $this_info_file = "diff";
+    if (@dataType) {
+        $this_info_file .= "_" . join "_", uniq(@dataType);
+    }
+    if (@cell) {
+        $this_info_file .= "_" . join "_", uniq(@cell);
+    }
+    if (@antibody) {
+        $this_info_file .= "_" . join "_", uniq(@antibody);
+    }
+    $this_info_file .= ".csv";
+    open my $fh, '>', $this_info_file;
+    for my $yml (@ymls) {
+        print {$fh} $yml->{dataType} . ","
+            . $yml->{cell} . ","
+            . $yml->{cell_tag} . ","
+            . $yml->{antibody} . ","
+            . $yml->{antibody_tag} . ","
+            . $yml->{itemCount} . ","
+            . $yml->{average_size} . ","
+            . $yml->{filename} . ".$op" . "," . "\n";
+    }
+    close $fh;
+
+    my $worker = sub {
+        my $job = shift;
+        my $cmd
+            = "perl $FindBin::Bin/../ofg/bed_op.pl"
+            . " --op $op"
+            . " --name $filename";
+
+        $cmd .= " --file " . $job->{filename};
+        $cmd .= " --remove " if $remove_chr;
+        exec_cmd( $cmd, $dryrun );
+    };
+
+    my $run = AlignDB::Run->new(
+        parallel => $parallel,
+        jobs     => \@ymls,
+        code     => $worker,
+    );
+    $run->run;
+
 }
 
 #----------------------------------------------------------#
