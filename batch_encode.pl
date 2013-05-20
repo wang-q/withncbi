@@ -12,6 +12,7 @@ use File::Basename;
 use File::Find::Rule;
 use List::MoreUtils qw(any all uniq zip);
 use Set::Scalar;
+use File::Spec;
 
 use Text::CSV_XS;
 
@@ -223,6 +224,9 @@ elsif ( $op eq "bed_diff" ) {
     $this_info_file .= ".csv";
     open my $fh, '>', $this_info_file;
     for my $yml (@ymls) {
+        my $newname = File::Spec->catfile( File::Spec->curdir,
+            basename( $yml->{filename} ) . ".$op" );
+        $newname = File::Spec->rel2abs($newname);
         print {$fh} $yml->{dataType} . ","
             . $yml->{cell} . ","
             . $yml->{cell_tag} . ","
@@ -230,7 +234,7 @@ elsif ( $op eq "bed_diff" ) {
             . $yml->{antibody_tag} . ","
             . $yml->{itemCount} . ","
             . $yml->{average_size} . ","
-            . $yml->{filename} . ".$op" . "," . "\n";
+            . $newname . "," . "\n";
     }
     close $fh;
 
