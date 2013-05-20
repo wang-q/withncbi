@@ -321,6 +321,76 @@ if ( !-e $raw_stat_file ) {
         close $fh;
     }
 
+    #{
+    #    my $csv = Text::CSV_XS->new( { binary => 1 } );
+    #    $csv->eol("\n");
+    #
+    #    my ( @cells, @anitbodies );
+    #    {
+    #        my $query = qq{
+    #            SELECT 
+    #                t0.cell_tag,
+    #                count(*) 
+    #            FROM   t0
+    #            WHERE 1 = 1
+    #            AND t0.dataType = 'TFBS'
+    #            AND t0.itemCount >= 1000
+    #            GROUP BY t0.cell_tag
+    #        };
+    #        my $sth = $dbh->prepare($query);
+    #        $sth->execute;
+    #        while ( my @row = $sth->fetchrow_array ) {
+    #            if ( $row[1] >= 3 ) {
+    #                push @cells, $row[0];
+    #            }
+    #        }
+    #    }
+    #    {
+    #        my $query = qq{
+    #            SELECT 
+    #                t0.antibody_tag,
+    #                count(*)
+    #            FROM   t0
+    #            WHERE 1 = 1
+    #            AND t0.dataType = 'TFBS'
+    #            AND t0.itemCount >= 1000
+    #            GROUP BY t0.antibody_tag
+    #        };
+    #        my $sth = $dbh->prepare($query);
+    #        $sth->execute;
+    #        while ( my @row = $sth->fetchrow_array ) {
+    #            if ( $row[1] >= 3 ) {
+    #                push @anitbodies, $row[0];
+    #            }
+    #        }
+    #    }
+    #
+    #    {
+    #        my $in_cells
+    #            = " AND cell_tag IN ("
+    #            . join( ",", map { $dbh->quote($_) } @cells ) . ")\n";
+    #        my $in_antibodies
+    #            = " AND antibody_tag IN ("
+    #            . join( ",", map { $dbh->quote($_) } @anitbodies ) . ")\n";
+    #        my $query = qq{
+    #            SELECT *
+    #            FROM   t0
+    #            WHERE 1 = 1
+    #            AND t0.dataType = 'TFBS'
+    #            AND t0.itemCount >= 1000
+    #        } . $in_antibodies . $in_cells;# . $in_antibodies;
+    #        my $sth = $dbh->prepare($query);
+    #        $sth->execute;
+    #        open my $fh, ">", "encode_tfbs_cell_antibody.csv";
+    #
+    #       #$csv->print( $fh, [qw{cell_tag sum_itemCount average_size count}] );
+    #        while ( my @row = $sth->fetchrow_array ) {
+    #            $csv->print( $fh, [@row] );
+    #        }
+    #        close $fh;
+    #    }
+    #}
+
     {
         my @used = qw{
             ATF3 BATF BCL11A BCL3 BCLAF1 BDP1 BHLHE40 BRCA1 BRF1 BRF2 CCNT2
