@@ -204,14 +204,15 @@ elsif ( $op eq "merge_to_runlist" ) {
         = "perl $FindBin::Bin/../ofg/bed_op.pl"
         . " --op $op"
         . " --name $filename";
+        $cmd .= " --remove " if $remove_chr;
 
     for my $yml (@ymls) {
         $cmd .= " --file " . $yml->{filename};
     }
     exec_cmd( $cmd, $dryrun );
 }
-elsif ( $op eq "bed_diff" ) {
-    my $this_info_file = "diff";
+elsif ( $op eq "bed_diff" or $op eq "bed_intersect" ) {
+    my $this_info_file = $op;
     if (@dataType) {
         $this_info_file .= "_" . join "_", uniq(@dataType);
     }
