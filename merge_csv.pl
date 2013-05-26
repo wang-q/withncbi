@@ -16,14 +16,17 @@ use AlignDB::Stopwatch;
 my $file_target;
 my $file_merge;
 
+my @fields = (0);
+
 my $man  = 0;
 my $help = 0;
 
 GetOptions(
-    'help|?' => \$help,
-    'man'    => \$man,
-    't|ft=s' => \$file_target,
-    'm|fm=s' => \$file_merge,
+    'help|?'     => \$help,
+    'man'        => \$man,
+    't|ft=s'     => \$file_target,
+    'm|fm=s'     => \$file_merge,
+    'f|fields=s' => \@fields,
 ) or pod2usage(2);
 
 pod2usage(1) if $help;
@@ -46,7 +49,7 @@ my $line_m = [];
     while (<$fh>) {
         chomp;
         next unless $_;
-        push @{$id_m}, ( split /,/ )[0];
+        push @{$id_m}, join( "_", ( split /,/ )[@fields] );
         push @{$line_m}, $_;
         $count_m++;
     }
@@ -60,7 +63,7 @@ my $line_t = [];
     while (<$fh>) {
         chomp;
         next unless $_;
-        my $id = ( split /,/ )[0];
+        my $id = join( "_", ( split /,/ )[@fields] );
         if ( grep { $_ eq $id } @{$id_m} ) {
             $count_t++;
             next;
@@ -92,7 +95,7 @@ __END__
 
 =head1 NAME
 
-    merge_csv.pl - Merge two csv files based on the first filed
+    merge_csv.pl - Merge two csv files based on @fields
 
 =head1 SYNOPSIS
 
@@ -102,8 +105,9 @@ __END__
         --man               full documentation
         -t, --ft            target file (output)
         -m, --fm            merge file
+        -f, --fields        fields
 
-    perl merge_csv.pl -t ../init/taxon.csv -m d:\data\alignment\yeast_combine\taxon.csv
+    perl merge_csv.pl -t ../init/taxon.csv -m d:\data\alignment\yeast_combine\taxon.csv 
     perl merge_csv.pl -t ../init/chr_length.csv -m d:\data\alignment\yeast_combine\chr_length.csv
 
 =cut
