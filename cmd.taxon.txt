@@ -1,0 +1,237 @@
+# 0. prepare infomation; store to csv
+
+# 1. 
+cd ~/data/
+mkdir mito
+cd ~/data/mito
+
+# 2. download genbank and fasta
+perl ~/Scripts/alignDB/util/get_seq.pl NC_001284
+
+# 3. convert genbank to gff3
+perl ~/Scripts/alignDB/util/genbank2gff.pl NC_001284.gb > NC_001284.gff
+
+# 4. batch download and convert 
+perl ~/Scripts/alignDB/util/batch_get_seq.pl mito_id_seq.csv
+
+#----------------------------#
+# taxon info
+#----------------------------#
+perl ~/Scripts/alignDB/taxon/strain_info.pl \
+    --file mito_ncbi.csv \
+    --id 343494  \
+    --id 350892  \
+    --id 3555    \
+    --id 84230   \
+    --id 79200   \
+    --id 29656   \
+    --id 42345   \
+    --id 3702    \
+    --id 52824   \
+    --id 3707    \
+    --id 3708    \
+    --id 3712    \
+    --id 145471  \
+    --id 3726    \
+    --id 3649    \
+    --id 37657   \
+    --id 96477   \
+    --id 55564   \
+    --id 181804  \
+    --id 3054    \
+    --id 3055    \
+    --id 351368  \
+    --id 3111    \
+    --id 3144    \
+    --id 574566  \
+    --id 3654    \
+    --id 3663    \
+    --id 54799   \
+    --id 13813   \
+    --id 3046    \
+    --id 3988    \
+    --id 3847    \
+    --id 34305   \
+    --id 56065   \
+    --id 3914    \
+    --id 157791  \
+    --id 3218    \
+    --id 472368  \
+    --id 145475  \
+    --id 73615   \
+    --id 3415    \
+    --id 3197    \
+    --id 41882   \
+    --id 296587  \
+    --id 31312   \
+    --id 37308   \
+    --id 51324   \
+    --id 70448   \
+    --id 3159    \
+    --id 4155    \
+    --id 280637  \
+    --id 4529    \
+    --id 39946   \
+    --id 39947   \
+    --id 4558    \
+    --id 4563    \
+    --id 4565    \
+    --id 15945   \
+    --id 381124  \
+    --id 76912   \
+    --id 4580    \
+    --id 160070  \
+    --id 41880   \
+    --id 3750    \
+    --id 3088    \
+    --id 4097    \
+    --id 93845   \
+    --id 1208065 \
+    --id 29760   \
+    --id 33097   \
+    --id 330485
+
+cd ~/Scripts/alignDB/taxon
+
+#----------------------------#
+# genus
+#----------------------------#
+perl ~/Scripts/alignDB/taxon/strain_bz.pl --file /home/wangq/data/mito/mito_ncbi.csv --seq_dir /home/wangq/data/mito \
+    --name Vigna \
+    -t 3914 \
+    -q 157791
+
+perl ~/Scripts/alignDB/taxon/strain_bz.pl --file /home/wangq/data/mito/mito_ncbi.csv --seq_dir /home/wangq/data/mito \
+    --name Oryza \
+    -t 39947 \
+    -q 39946 \
+    -q 4529
+
+perl ~/Scripts/alignDB/taxon/strain_bz.pl --file /home/wangq/data/mito/mito_ncbi.csv --seq_dir /home/wangq/data/mito \
+    --name Oryza_wog \
+    -t 39947 \
+    -q 39946 \
+    -q 4529 \
+    -o 4529
+
+perl ~/Scripts/alignDB/taxon/strain_bz.pl --file /home/wangq/data/mito/mito_ncbi.csv --seq_dir /home/wangq/data/mito \
+    --name Brassica \
+    -t 3708 \
+    -q 52824 \
+    -q 3707 \
+    -q 3712 \
+    -q 145471
+
+perl ~/Scripts/alignDB/taxon/strain_bz.pl --file /home/wangq/data/mito/mito_ncbi.csv --seq_dir /home/wangq/data/mito \
+    --name Brassica_wog \
+    -t 3708 \
+    -q 52824 \
+    -q 3707 \
+    -q 3712 \
+    -q 145471 \
+    -q 3702 \
+    -o 3702
+
+perl ~/Scripts/alignDB/taxon/strain_bz.pl --file /home/wangq/data/mito/mito_ncbi.csv --seq_dir /home/wangq/data/mito \
+    --name Zea \
+    -t 381124 \
+    -q 15945 \
+    -q 76912 \
+    -q 4580
+
+perl ~/Scripts/alignDB/taxon/strain_bz.pl --file /home/wangq/data/mito/mito_ncbi.csv --seq_dir /home/wangq/data/mito \
+    --name Zea_wog \
+    -t 381124 \
+    -q 15945 \
+    -q 76912 \
+    -q 4580 \
+    -q 39947 \
+    -o 39947
+
+#----------------------------#
+# order
+#----------------------------#
+
+perl ~/Scripts/alignDB/taxon/strain_bz.pl --file /home/wangq/data/mito/mito_ncbi.csv --seq_dir /home/wangq/data/mito \
+    --name Brassicales \
+    -t 3702   \
+    -q 52824  \
+    -q 3707   \
+    -q 3708   \
+    -q 3712   \
+    -q 145471 \
+    -q 3726   \
+    -q 3649   
+
+perl ~/Scripts/alignDB/taxon/strain_bz.pl --file /home/wangq/data/mito/mito_ncbi.csv --seq_dir /home/wangq/data/mito \
+    --name Caryophyllales \
+    -t 350892   \
+    -q 343494  \
+    -q 3555   \
+    -q 37657 
+
+perl ~/Scripts/alignDB/taxon/strain_bz.pl --file /home/wangq/data/mito/mito_ncbi.csv --seq_dir /home/wangq/data/mito \
+    --name Lamiales \
+    -t 472368   \
+    -q 4155  
+
+#----------------------------#
+# family
+#----------------------------#
+
+perl ~/Scripts/alignDB/taxon/strain_bz.pl --file /home/wangq/data/mito/mito_ncbi.csv --seq_dir /home/wangq/data/mito \
+    --name Brassicaceae \
+    -t 3702   \
+    -q 52824  \
+    -q 3707   \
+    -q 3708   \
+    -q 3712   \
+    -q 145471 \
+    -q 3726   
+
+perl ~/Scripts/alignDB/taxon/strain_bz.pl --file /home/wangq/data/mito/mito_ncbi.csv --seq_dir /home/wangq/data/mito \
+    --name Amaranthaceae \
+    -t 350892   \
+    -q 343494  \
+    -q 3555   
+
+perl ~/Scripts/alignDB/taxon/strain_bz.pl --file /home/wangq/data/mito/mito_ncbi.csv --seq_dir /home/wangq/data/mito \
+    --name Cucurbitaceae \
+    -t 3654 \
+    -q 3663
+ 
+ 
+perl ~/Scripts/alignDB/taxon/strain_bz.pl --file /home/wangq/data/mito/mito_ncbi.csv --seq_dir /home/wangq/data/mito \
+    --name Fabaceae \
+    -t 157791   \
+    -q 3847  \
+    -q 34305   \
+    -q 56065   \
+    -q 3914  
+
+perl ~/Scripts/alignDB/taxon/strain_bz.pl --file /home/wangq/data/mito/mito_ncbi.csv --seq_dir /home/wangq/data/mito \
+    --name Poaceae \
+    -t 39947 \
+    -q 4529 \
+    -q 39946 \
+    -q 4558 \
+    -q 4563 \
+    -q 4565 \
+    -q 15945 \
+    -q 381124 \
+    -q 76912 \
+    -q 4580
+
+
+
+
+
+
+
+
+
+
+
+
+
+
