@@ -309,13 +309,13 @@ REM basicstat
 perl [% bat_dir %]/fig/collect_common_basic.pl -d .
 
 REM common chart
-if exist [% name_str %].common.xlsx perl [% bat_dir %]/stat/multi_chart_factory.pl -i [% name_str %].common.xlsx
+if exist [% name_str %].common.xlsx perl [% bat_dir %]/stat/common_chart_factory.pl -i [% name_str %].common.xlsx
 
 REM multi chart
 if exist [% name_str %].multi.xlsx  perl [% bat_dir %]/stat/multi_chart_factory.pl -i [% name_str %].multi.xlsx
 
 REM gc chart\n";
-if exist [% name_str %].gc.xlsx     perl [% bat_dir %]/stat/multi_chart_factory.pl -i [% name_str %].gc.xlsx
+if exist [% name_str %].gc.xlsx     perl [% bat_dir %]/stat/gc_chart_factory.pl -i [% name_str %].gc.xlsx
 
 EOF
     $tt->process(
