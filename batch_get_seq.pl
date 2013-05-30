@@ -19,8 +19,8 @@ while ( my $row = $csv->getline($csv_fh) ) {
     my $seq = $row->[1];
 
     print "id\t$id\tseq\t$seq\n";
-    system "perl $FindBin::Bin/../taxon/get_seq.pl $seq $id";
-    system "perl $FindBin::Bin/../taxon/genbank2gff.pl $id/$seq.gb > $id/$seq.gff";
+    system "perl $FindBin::Bin/../util/get_seq.pl $seq $id";
+    system "perl $FindBin::Bin/../util/genbank2gff.pl $id/$seq.gb > $id/$seq.gff";
 
 }
 close $csv_fh;
