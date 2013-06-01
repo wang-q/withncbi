@@ -20,7 +20,7 @@ while ( my $row = $csv->getline($csv_fh) ) {
 
     print "id\t$id\tseq\t$seq\n";
     system "perl $FindBin::Bin/../util/get_seq.pl $seq $id";
-    system "perl $FindBin::Bin/../util/genbank2gff.pl $id/$seq.gb > $id/$seq.gff";
-
+    system "java -cp $FindBin::Bin/../util/readseq.jar run $id/$seq.gb -f GFF -o $id/$seq.gff";
 }
+
 close $csv_fh;
