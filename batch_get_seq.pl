@@ -4,6 +4,7 @@ use warnings;
 use autodie;
 
 use Text::CSV_XS;
+use File::Copy;
 
 use FindBin;
 
@@ -20,7 +21,9 @@ while ( my $row = $csv->getline($csv_fh) ) {
 
     print "id\t$id\tseq\t$seq\n";
     system "perl $FindBin::Bin/../util/get_seq.pl $seq $id";
-    system "java -cp $FindBin::Bin/../util/readseq.jar run $id/$seq.gb -f GFF -o $id/$seq.gff";
+    system "perl $FindBin::Bin/../util/bp_genbank2gff3.pl $id/$seq.gb";
+
+    move( "$seq.gb.gff", "$id/$seq.gff" );
 }
 
 close $csv_fh;
