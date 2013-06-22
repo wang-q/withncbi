@@ -51,6 +51,16 @@ my $parallel = 12;
             ensembl => "yeast_65",
             join    => "S288CvsSpar",
         },
+        {   taxon   => 3847,
+            name    => "soybean",
+            ensembl => "soybean_65",
+            join    => "S288CvsSpar",
+        },
+        {   taxon   => 51351,
+            name    => "Brap",
+            ensembl => "Brap_71",
+            join    => "S288CvsSpar",
+        },
     );
 
     for my $item ( sort @data ) {
