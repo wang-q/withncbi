@@ -547,6 +547,10 @@ EOF
             qw{ lyrata_65 Bur_0 Can_0 Ct_1 Edi_0 Hi_0 Kn_0 Ler_0 Mt_0 No_0 Oy_0 Po_0
                 Rsch_4 Sf_2 Tsu_0 Wil_2 Ws_0 Wu_0 Zu_0 }
         ],
+        AthvsXVIIIpop => [
+            qw{ Bur_0 Can_0 Ct_1 Edi_0 Hi_0 Kn_0 Ler_0 Mt_0 No_0 Oy_0 Po_0
+                Rsch_4 Sf_2 Tsu_0 Wil_2 Ws_0 Wu_0 Zu_0 }
+        ],
     };
 
     my @data;
