@@ -14,6 +14,7 @@ use AlignDB::Window;
 
 use FindBin;
 use lib "$FindBin::Bin/../lib";
+use AlignDB;
 use AlignDB::Ofg;
 use AlignDB::Position;
 use AlignDB::Stopwatch;
@@ -67,7 +68,7 @@ my $obj = AlignDB::Ofg->new(
     user   => $username,
     passwd => $password,
     max_in_distance => 0, # don't need inside windows
-    max_out_distance => 10, # don't need inside windows
+    max_out_distance => 20, # don't need inside windows
 );
 
 # Database handler

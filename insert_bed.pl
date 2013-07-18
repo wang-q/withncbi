@@ -138,7 +138,6 @@ while (@args) {
         if ( $start > $end ) {
             ( $start, $end ) = ( $end, $start );
         }
-        next if $end - $start < 10;
         my $set = AlignDB::IntSpan->new("$start-$end");
         push @all_data,
             { chr => $chr, set => $set, tag => $tag, type => $type };
