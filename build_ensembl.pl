@@ -196,27 +196,18 @@ else {
         $abs_table_file = rel2abs( $abs_table_file, $archive->extract_path );
 
         # ensembl suggest use --fields_escaped_by=\\
-        # But by mysql's default, \ within the input is taken as an escape
-        # character that signifies a special sequence.
-        # So I ingore this
+        # 
+        # Archive::Extract convert line endings from \n to \r\n, so last fields
+        # was attached a \r
+        # 
+        # Add --lines-terminated-by="\r\n" on Win32
         my $cmd
-            = "mysqlimport -h$server -P$port -u$username -p$password --local"
-            . " --fields_escaped_by=\\\\ --fields-terminated-by='\\t'"
+            = "mysqlimport -h$server -P$port -u$username -p$password"
+            . " --fields_escaped_by=\\\\"
+            . ( $^O eq "MSWin32" ? " --lines-terminated-by=\\r\\n" : "" )
             . " --use-threads=4"
-            . "  $db $abs_table_file";
+            . "  $db --local $abs_table_file";
         system($cmd);
-
-        ## Most wired bug
-        ## import success in cmd line but warning when system() on Windows
-        #if ( $^O eq 'MSWin32' ) {
-        #    my $bat = $db . '.bat';
-        #    open my $fh, '>', $bat;
-        #    print {$fh} "$cmd $db $abs_table_file\n";
-        #    system $bat;
-        #}
-        #else {
-        #    system("$cmd $db $abs_table_file");
-        #}
 
         unlink $abs_table_file;
     }
