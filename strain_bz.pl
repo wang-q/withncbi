@@ -379,11 +379,22 @@ perl [% findbin %]/../../blastz/refine_fasta.pl \
     -o [% working_dir %]/[% name_str %]_mft
 
 #----------------------------#
+# clustalw
+#----------------------------#
+perl [% findbin %]/../../blastz/refine_fasta.pl \
+    --msa clustalw --block -p [% parallel %] \
+[% IF outgroup_id -%]
+    --outgroup \
+[% END -%]
+    -i [% working_dir %]/[% name_str %]_fasta \
+    -o [% working_dir %]/[% name_str %]_clw
+
+#----------------------------#
 # multi_way_batch
 #----------------------------#
 perl [% findbin %]/../extra/multi_way_batch.pl \
     -d [% name_str %] \
-    -da [% working_dir %]/[% name_str %]_mft \
+    -da [% working_dir %]/[% name_str %]_clw \
     --gff_file [% FOREACH acc IN target_accs %][% working_dir %]/[% target_id %]/[% acc %].gff,[% END %] \
     --rm_gff_file [% FOREACH acc IN target_accs %][% working_dir %]/[% target_id %]/[% acc %].rm.gff,[% END %] \
     --block --id [% working_dir %]/id2name.csv \

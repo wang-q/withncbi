@@ -9,6 +9,14 @@ for d in `find $PWD -mindepth 1 -maxdepth 1 -type d | sort `;do \
     echo ; \
 done  > runall.sh
 
+
+for d in ` find $PWD -mindepth 1 -maxdepth 1 -type d -name "*addition*" | sort `;do \
+    echo sh $d/file-rm.sh ; \
+    echo sh $d/pair_cmd.sh ; \
+    echo sh $d/multi_cmd.sh ; \
+    echo ; \
+done  > runall.sh
+
 for d in `find $PWD -mindepth 1 -maxdepth 1 -type d | sort `;do \
     echo sh $d/real_chr.sh ; \
     echo ; \
