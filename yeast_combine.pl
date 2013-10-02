@@ -353,6 +353,9 @@ EOF
         # from wgs
         S288CvsVIII_WGS =>
             [qw{ Spar RM11 YJM789 EC1118 JAY291 Kyokai_no__7 Sigma1278b T7 }],
+            
+        S288CvsVII_WGS_pop =>
+            [qw{ RM11 YJM789 EC1118 JAY291 Kyokai_no__7 Sigma1278b T7 }],
 
         # from sgrp2
         S288CvsXI_SGRP2 => [
@@ -437,8 +440,8 @@ perl [% pl_dir %]/blastz/maf2fasta.pl \
 [% FOREACH item IN data -%]
 # [% item.out_dir %]
 perl [% pl_dir %]/blastz/refine_fasta.pl \
-    --msa mafft --block -p [% parallel %] \
-    --outgroup \
+    --msa mafft -p [% parallel %] \
+    --block [% UNLESS item.out_dir.match('_pop$') %]--outgroup[% END %] \
     -i [% data_dir %]/[% item.out_dir %]_fasta \
     -o [% data_dir %]/[% item.out_dir %]_mft
 
@@ -447,14 +450,15 @@ perl [% pl_dir %]/blastz/refine_fasta.pl \
 #----------------------------#
 # muscle-quick
 #----------------------------#
-#[% FOREACH item IN data -%]
-## [% item.out_dir %]
-#perl [% pl_dir %]/blastz/refine_fasta.pl \
-#    --msa muscle --quick --block -p 8 \
-#    -i [% data_dir %]/[% item.out_dir %]_fasta \
-#    -o [% data_dir %]/[% item.out_dir %]_muscle
-#
-#[% END -%]
+[% FOREACH item IN data -%]
+# [% item.out_dir %]
+perl [% pl_dir %]/blastz/refine_fasta.pl \
+    --msa muscle --quick -p [% parallel %] \
+    --block [% UNLESS item.out_dir.match('_pop$') %]--outgroup[% END %] \
+    -i [% data_dir %]/[% item.out_dir %]_fasta \
+    -o [% data_dir %]/[% item.out_dir %]_msl
+
+[% END -%]
 
 EOF
     $tt->process(
@@ -478,8 +482,8 @@ EOF
 # mafft
 perl [% pl_dir %]/alignDB/extra/multi_way_batch.pl \
     -d [% item.out_dir %] -e yeast_65 \
-    --outgroup \
-    --block --id [% data_dir %]/id2name.csv \
+    --block [% UNLESS item.out_dir.match('_pop$') %]--outgroup[% END %] \
+    --id [% data_dir %]/id2name.csv \
     -da [% data_dir %]/[% item.out_dir %]_mft  \
     -lt 5000 --parallel [% parallel %] --run gene
 

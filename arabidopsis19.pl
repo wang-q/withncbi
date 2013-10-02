@@ -547,7 +547,7 @@ EOF
             qw{ lyrata_65 Bur_0 Can_0 Ct_1 Edi_0 Hi_0 Kn_0 Ler_0 Mt_0 No_0 Oy_0 Po_0
                 Rsch_4 Sf_2 Tsu_0 Wil_2 Ws_0 Wu_0 Zu_0 }
         ],
-        AthvsXVIIIpop => [
+        AthvsXVIII_pop => [
             qw{ Bur_0 Can_0 Ct_1 Edi_0 Hi_0 Kn_0 Ler_0 Mt_0 No_0 Oy_0 Po_0
                 Rsch_4 Sf_2 Tsu_0 Wil_2 Ws_0 Wu_0 Zu_0 }
         ],
@@ -612,7 +612,7 @@ perl [% pl_dir %]/blastz/maf2fasta.pl \
 # [% item.out_dir %]
 perl [% pl_dir %]/blastz/refine_fasta.pl \
     --msa mafft --block -p [% parallel %] \
-    --outgroup \
+    --block [% UNLESS item.out_dir.match('_pop$') %]--outgroup[% END %] \
     -i [% data_dir %]/[% item.out_dir %]_fasta \
     -o [% data_dir %]/[% item.out_dir %]_mft
 
@@ -652,8 +652,8 @@ EOF
 # mafft
 perl [% pl_dir %]/alignDB/extra/multi_way_batch.pl \
     -d [% item.out_dir %] -e ath_65 \
-    --outgroup \
-    --block --id [% data_dir %]/id2name.csv \
+    --block [% UNLESS item.out_dir.match('_pop$') %]--outgroup[% END %] \
+    --id [% data_dir %]/id2name.csv \
     -da [% data_dir %]/[% item.out_dir %]_mft  \
     -lt 5000 -st 0 -ct 0 --parallel [% parallel %] --run common
 

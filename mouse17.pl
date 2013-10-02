@@ -56,7 +56,7 @@ my $parallel = 12;
         mkdir $dir if !-e $dir;
         $item->{dir} = $dir;
     }
-    
+
     print Dump \@data;
 
     my @data_with_exists = (
@@ -416,6 +416,8 @@ EOF
     my $pl_dir   = File::Spec->catdir( $ENV{HOME}, "Scripts" );
 
     my $tt         = Template->new;
+    
+    # ending with "_pop" is without outgroup 
     my $strains_of = {
 
         # coverage > 25x
@@ -428,11 +430,17 @@ EOF
         MousevsVIIIGE25xW =>
             [qw{ 129P2 A_J AKR_J C3H_HeJ CBA_J LP_J NOD WSB_Ei }],
 
+        MousevsXI_pop => [
+            qw{ 129P2 A_J AKR_J BALBc_J C3H_HeJ CBA_J DBA_2J LP_J NOD NZO WSB_Ei }
+        ],
+
+        MousevsIV_pop => [ qw{ WSB_Ei PWK_Ph CAST_Ei Spretus_Ei } ],
+
         MousevsXIIC => [
             qw{ 129P2 A_J AKR_J BALBc_J C3H_HeJ CBA_J DBA_2J LP_J NOD NZO WSB_Ei
                 CAST_Ei }
         ],
-        
+
         # use this
         # MousevsSpretus_Ei got better segment_cv_indel_3 result
         MousevsXIIS => [
@@ -465,13 +473,13 @@ EOF
 #----------------------------#
 [% FOREACH item IN data -%]
 # [% item.out_dir %]
-bsub -q mpi_2 -n 8 -J [% item.out_dir %]-mz perl [% pl_dir %]/blastz/mz.pl \
-    [% FOREACH st IN item.strains -%]
+perl [% pl_dir %]/blastz/mz.pl \
+[% FOREACH st IN item.strains -%]
     -d [% data_dir %]/Mousevs[% st FILTER ucfirst %] \
-    [% END -%]
+[% END -%]
     --tree [% data_dir %]/17way.nwk \
     --out [% data_dir %]/[% item.out_dir %] \
-    -syn -p 8
+    -syn -p [% parallel %]
 
 [% END -%]
 
@@ -481,6 +489,7 @@ EOF
         {   data     => \@data,
             data_dir => $data_dir,
             pl_dir   => $pl_dir,
+            parallel => $parallel,
         },
         File::Spec->catfile( $store_dir, "mz.sh" )
     ) or die Template->error;
@@ -504,8 +513,8 @@ perl [% pl_dir %]/blastz/maf2fasta.pl \
 [% FOREACH item IN data -%]
 # [% item.out_dir %]
 perl [% pl_dir %]/blastz/refine_fasta.pl \
-    --msa mafft --block -p [% parallel %] \
-    --outgroup \
+    --msa mafft -p [% parallel %] \
+    --block [% UNLESS item.out_dir.match('_pop$') %]--outgroup[% END %] \
     -i [% data_dir %]/[% item.out_dir %]_fasta \
     -o [% data_dir %]/[% item.out_dir %]_mft
 
@@ -516,7 +525,7 @@ perl [% pl_dir %]/blastz/refine_fasta.pl \
 #----------------------------#
 #[% FOREACH item IN data -%]
 ## [% item.out_dir %]
-#bsub -q mpi_2 -n 8 -J [% item.out_dir %]-msl perl [% pl_dir %]/blastz/refine_fasta.pl \
+#perl [% pl_dir %]/blastz/refine_fasta.pl \
 #    --msa muscle --block -p 8 \
 #    -i [% data_dir %]/[% item.out_dir %]_fasta \
 #    -o [% data_dir %]/[% item.out_dir %]_msl
@@ -545,10 +554,10 @@ EOF
 # mafft
 perl [% pl_dir %]/alignDB/extra/multi_way_batch.pl \
     -d [% item.out_dir %] -e mouse_65 \
-    --outgroup \
-    --block --id [% data_dir %]/id2name.csv \
+    --block [% UNLESS item.out_dir.match('_pop$') %]--outgroup[% END %] \
+    --id [% data_dir %]/id2name.csv \
     -da [% data_dir %]/[% item.out_dir %]_mft  \
-    -lt 5000 -st 0 -ct 0 --parallel [% parallel %] --run common
+    -lt 5000 --parallel [% parallel %] --run common
 
 [% END -%]
 
