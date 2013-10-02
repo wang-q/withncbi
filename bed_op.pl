@@ -104,7 +104,7 @@ sub read_bed {
         if ( $start > $end ) {
             ( $start, $end ) = ( $end, $start );
         }
-        next if $end - $start < 10;
+        #next if $end - $start < 10;
         my $set = AlignDB::IntSpan->new("$start-$end");
         push @data, { chr => $chr, set => $set, };
     }
