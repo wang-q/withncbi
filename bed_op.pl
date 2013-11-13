@@ -104,6 +104,7 @@ sub read_bed {
         if ( $start > $end ) {
             ( $start, $end ) = ( $end, $start );
         }
+
         #next if $end - $start < 10;
         my $set = AlignDB::IntSpan->new("$start-$end");
         push @data, { chr => $chr, set => $set, };
@@ -176,12 +177,16 @@ sub write_filtered_bed {
         my $set = $item->{set};
 
         if ( $op eq "bed_diff" ) {
-            if ( $chr_data_set->{$chr}->intersect($set)->is_empty ) {
+            if ( exists $chr_data_set->{$chr}
+                and $chr_data_set->{$chr}->intersect($set)->is_empty )
+            {
                 push @filtered, $item;
             }
         }
         elsif ( $op eq "bed_intersect" ) {
-            if ( $chr_data_set->{$chr}->intersect($set)->is_not_empty ) {
+            if ( exists $chr_data_set->{$chr}
+                and $chr_data_set->{$chr}->intersect($set)->is_not_empty )
+            {
                 push @filtered, $item;
             }
         }

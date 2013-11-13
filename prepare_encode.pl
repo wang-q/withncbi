@@ -35,18 +35,23 @@ my $stopwatch = AlignDB::Stopwatch->new(
 );
 
 # executable file location
-my $kent_bin = "/home/wangq/bin/x86_64";
+my $kent_bin      = "/home/wangq/bin/x86_64";
 my $file_metainfo = "/home/wangq/data/encode/files.txt";
-my $dir_result = "/home/wangq/data/encode/process";
+my $dir_result    = "/home/wangq/data/encode/process";
 my $file_encode;
+
+my $bigwig;
 
 my $man  = 0;
 my $help = 0;
 
 GetOptions(
-    'help|?'       => \$help,
-    'man'          => \$man,
-    'f|file=s'     => \$file_encode,
+    'help|?'     => \$help,
+    'man'        => \$man,
+    'f|file=s'   => \$file_encode,
+    'm|meta=s'   => \$file_metainfo,
+    'r|result=s' => \$dir_result,
+    'w|wig'      => \$bigwig,
 ) or pod2usage(2);
 
 pod2usage(1) if $help;
@@ -69,7 +74,8 @@ unless ( -e $dir_result ) {
 
 my $basename = basename($file_encode);
 
-{
+if ( !$bigwig ) {
+
     # bigBedInfo - Show information about a bigBed file.
     # usage:
     #   bigBedInfo file.bb
@@ -78,6 +84,21 @@ my $basename = basename($file_encode);
     #   -chroms - list all chromosomes and their sizes
     #   -zooms - list all zoom levels and theier sizes
     #   -as - get autoSql spec
+    #
+    # version: 4
+    # isCompressed: yes
+    # isSwapped: 0
+    # itemCount: 167,357
+    # primaryDataSize: 1,574,077
+    # primaryIndexSize: 21,196
+    # zoomLevels: 8
+    # chromCount: 24
+    # basesCovered: 25,094,170
+    # meanDepth (of bases covered): 1.000374
+    # minDepth: 1.000000
+    # maxDepth: 2.000000
+    # std of depth: 0.019330
+
     my $cmd
         = "$kent_bin/bigBedInfo"
         . " $file_encode"
@@ -98,6 +119,57 @@ my $basename = basename($file_encode);
         . " $file_encode "
         . " $dir_result/$basename.bed";
     system $cmd if !-e "$dir_result/$basename.bed";
+}
+else {
+    # bigWigInfo - Print out information about bigWig file.
+    # usage:
+    #    bigWigInfo file.bw
+    # options:
+    #    -udcDir=/dir/to/cache - place to put cache for remote bigBed/bigWigs
+    #    -chroms - list all chromosomes and their sizes
+    #    -zooms - list all zoom levels and their sizes
+    #    -minMax - list the min and max on a single line
+    #
+    # version: 4
+    # isCompressed: yes
+    # isSwapped: 0
+    # primaryDataSize: 19,758,044
+    # primaryIndexSize: 78,528
+    # zoomLevels: 9
+    # chromCount: 25
+    # basesCovered: 129,721,134
+    # mean: 0.047313
+    # min: -1.765402
+    # max: 1.942196
+    # std: 0.853118
+    my $cmd
+        = "$kent_bin/bigWigInfo"
+        . " $file_encode"
+        . " > $dir_result/$basename.info.txt";
+    system $cmd if !-e "$dir_result/$basename.info.txt";
+
+# bigWigToWig - Convert bigWig to wig.  This will keep more of the same structure of the
+# original wig than bigWigToBedGraph does, but still will break up large stepped sections
+# into smaller ones.
+# usage:
+#    bigWigToWig in.bigWig out.wig
+# options:
+#    -chrom=chr1 - if set restrict output to given chromosome
+#    -start=N - if set, restrict output to only that over start
+#    -end=N - if set, restict output to only that under end
+#    -udcDir=/dir/to/cache - place to put cache for remote bigBed/bigWigs
+    $cmd
+        = "$kent_bin/bigWigToWig"
+        . " $file_encode "
+        . " $dir_result/$basename.wig";
+    system $cmd if !-e "$dir_result/$basename.wig";
+
+    $cmd
+        = "wig2bed --do-not-sort"
+        . " < $dir_result/$basename.wig"
+        . " > $dir_result/$basename.bed";
+    system $cmd if !-e "$dir_result/$basename.bed";
+
 }
 
 if ( !-e "$dir_result/$basename.yml" ) {
@@ -145,11 +217,15 @@ if ( !-e "$dir_result/$basename.yml" ) {
         }
     }
     close $info_fh;
+
+    if ( !exists $meta{itemCount} ) {
+        ( $meta{itemCount} ) = split /\s+/, `wc -l $dir_result/$basename.bed`;
+    }
     $meta{average_size} = $meta{basesCovered} / $meta{itemCount};
-    
+
     # bed file
     $meta{filename} = "$dir_result/$basename.bed";
-    
+
     DumpFile( "$dir_result/$basename.yml", \%meta );
 
     # MD5 checksum

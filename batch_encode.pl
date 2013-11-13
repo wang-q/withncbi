@@ -168,7 +168,9 @@ if ( $op eq "insert_bed" ) {
         . ( $noclean ? " --noclean" : "" );
 
     for my $yml (@ymls) {
-        if ( $yml->{dataType} eq "DnaseSeq" or $yml->{dataType} eq "FaireSeq" )
+        if (   $yml->{dataType} eq "DnaseSeq"
+            or $yml->{dataType} eq "FaireSeq"
+            or $yml->{dataType} eq "RepliChip" )
         {
             $cmd
                 .= " --tag " . $yml->{cell_tag} . " --file " . $yml->{filename};
@@ -204,7 +206,7 @@ elsif ( $op eq "merge_to_runlist" ) {
         = "perl $FindBin::Bin/../ofg/bed_op.pl"
         . " --op $op"
         . " --name $filename";
-        $cmd .= " --remove " if $remove_chr;
+    $cmd .= " --remove " if $remove_chr;
 
     for my $yml (@ymls) {
         $cmd .= " --file " . $yml->{filename};
