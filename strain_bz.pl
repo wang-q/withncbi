@@ -46,6 +46,8 @@ my $target_id;
 my $outgroup_id;
 my @query_ids;
 
+my $clustalw;
+
 my $name_str = "working";
 
 my $filename = "strains_taxon_info.csv";
@@ -67,6 +69,7 @@ GetOptions(
     'o|r|outgroup=i'  => \$outgroup_id,
     'q|query_ids=i'   => \@query_ids,
     'n|name_str=s'    => \$name_str,
+    'clustalw'        => \$clustalw,
     'parallel=i'      => \$parallel,
 ) or pod2usage(2);
 
@@ -300,6 +303,71 @@ EOF
         File::Spec->catfile( $working_dir, "pair_cmd.sh" )
     ) or die Template->error;
 
+    $text = <<'EOF';
+#!/bin/bash
+# perl [% stopwatch.cmd_line %]
+
+cd [% working_dir %]
+
+# join_dbs.pl
+perl [% findbin %]/../extra/join_dbs.pl \
+    --no_insert --block --trimmed_fasta --length 1000 \
+    --goal_db [% name_str %]_raw --target 0target \
+[% IF outgroup_id -%]
+    --outgroup 0query \
+    --queries [% FOREACH i IN [ 1 .. query_ids.max ] %][% i %]query,[% END %] \
+[% ELSE -%]
+    --queries [% FOREACH i IN [ 0 .. query_ids.max ] %][% i %]query,[% END %] \
+[% END -%]
+    --dbs [% FOREACH id IN query_ids %][% target_id %]vs[% id %],[% END %]
+
+#----------------------------#
+# RAxML
+#----------------------------#
+# raw phylo guiding tree
+if [ ! -d [% working_dir %]/rawphylo ]
+then
+    mkdir [% working_dir %]/rawphylo
+fi
+
+cd [% working_dir %]/rawphylo
+
+rm [% working_dir %]/rawphylo/RAxML*
+
+[% IF query_ids.size > 2 -%]
+perl [% findbin %]/../../blastz/concat_fasta.pl \
+    -i [% working_dir %]/[% name_str %]_raw \
+    -o [% working_dir %]/rawphylo/[% name_str %].phy \
+    -p
+
+raxml -T 5 -f a -m GTRGAMMA -p $RANDOM -N 100 -x $RANDOM \
+[% IF outgroup_id -%]
+    -o [% query_ids.0 %] \
+[% END -%]
+    -n [% name_str %] -s [% working_dir %]/rawphylo/[% name_str %].phy
+
+cp [% working_dir %]/rawphylo/RAxML_best* [% working_dir %]/rawphylo/[% name_str %].nwk
+
+[% ELSE -%]
+echo "(([% target_id %],[% query_ids.1 %]),[% query_ids.0 %]);" > [% working_dir %]/rawphylo/[% name_str %].nwk
+
+[% END -%]
+
+EOF
+    $tt->process(
+        \$text,
+        {   stopwatch   => $stopwatch,
+            parallel    => $parallel,
+            working_dir => $working_dir,
+            findbin     => $FindBin::Bin,
+            name_str    => $name_str,
+            target_id   => $target_id,
+            outgroup_id => $outgroup_id,
+            query_ids   => \@query_ids,
+        },
+        File::Spec->catfile( $working_dir, "rawphylo.sh" )
+    ) or die Template->error;
+
     # cmd.bat
     $text = <<'EOF';
 REM bac_bz.pl
@@ -314,8 +382,8 @@ if exist [% name_str %].common.xlsx perl [% bat_dir %]/stat/common_chart_factory
 REM multi chart
 if exist [% name_str %].multi.xlsx  perl [% bat_dir %]/stat/multi_chart_factory.pl -i [% name_str %].multi.xlsx
 
-REM gc chart\n";
-if exist [% name_str %].gc.xlsx     perl [% bat_dir %]/stat/gc_chart_factory.pl -i [% name_str %].gc.xlsx
+REM gc chart
+if exist [% name_str %].gc.xlsx     perl [% bat_dir %]/stat/gc_chart_factory.pl --add_trend 1 -i [% name_str %].gc.xlsx
 
 EOF
     $tt->process(
@@ -332,7 +400,6 @@ EOF
 
     $text = <<'EOF';
 #!/bin/bash
-# bac_bz.pl
 # perl [% stopwatch.cmd_line %]
 
 cd [% working_dir %]
@@ -348,16 +415,38 @@ then
     rm -fr [% working_dir %]/[% name_str %]_mft
 fi
 
+if [ -d [% working_dir %]/[% name_str %]_clw ]
+then
+    rm -fr [% working_dir %]/[% name_str %]_clw
+fi
+
+if [ -d [% working_dir %]/phylo ]
+then
+    rm -fr [% working_dir %]/phylo
+    mkdir [% working_dir %]/phylo
+fi
+
 #----------------------------#
 # mz
 #----------------------------#
-perl [% findbin %]/../../blastz/mz.pl \
-    [% FOREACH id IN query_ids -%]
-    -d [% working_dir %]/[% target_id %]vs[% id %] \
-    [% END -%]
-    --tree [% working_dir %]/fake_tree.nwk \
-    --out [% working_dir %]/[% name_str %] \
-    -syn -p [% parallel %]
+if [ -f [% working_dir %]/rawphylo/[% name_str %].nwk ]
+then
+    perl [% findbin %]/../../blastz/mz.pl \
+        [% FOREACH id IN query_ids -%]
+        -d [% working_dir %]/[% target_id %]vs[% id %] \
+        [% END -%]
+        --tree [% working_dir %]/rawphylo/[% name_str %].nwk \
+        --out [% working_dir %]/[% name_str %] \
+        -syn -p [% parallel %]
+else
+    perl [% findbin %]/../../blastz/mz.pl \
+        [% FOREACH id IN query_ids -%]
+        -d [% working_dir %]/[% target_id %]vs[% id %] \
+        [% END -%]
+        --tree [% working_dir %]/fake_tree.nwk \
+        --out [% working_dir %]/[% name_str %] \
+        -syn -p [% parallel %]
+fi
 
 #----------------------------#
 # maf2fasta
@@ -378,6 +467,7 @@ perl [% findbin %]/../../blastz/refine_fasta.pl \
     -i [% working_dir %]/[% name_str %]_fasta \
     -o [% working_dir %]/[% name_str %]_mft
 
+[% IF clustalw -%]
 #----------------------------#
 # clustalw
 #----------------------------#
@@ -388,13 +478,18 @@ perl [% findbin %]/../../blastz/refine_fasta.pl \
 [% END -%]
     -i [% working_dir %]/[% name_str %]_fasta \
     -o [% working_dir %]/[% name_str %]_clw
+[% END -%]
 
 #----------------------------#
 # multi_way_batch
 #----------------------------#
 perl [% findbin %]/../extra/multi_way_batch.pl \
     -d [% name_str %] \
+[% IF clustalw -%]
     -da [% working_dir %]/[% name_str %]_clw \
+[% ELSE -%]
+    -da [% working_dir %]/[% name_str %]_mft \
+[% END -%]
     --gff_file [% FOREACH acc IN target_accs %][% working_dir %]/[% target_id %]/[% acc %].gff,[% END %] \
     --rm_gff_file [% FOREACH acc IN target_accs %][% working_dir %]/[% target_id %]/[% acc %].rm.gff,[% END %] \
     --block --id [% working_dir %]/id2name.csv \
@@ -407,12 +502,6 @@ perl [% findbin %]/../extra/multi_way_batch.pl \
 #----------------------------#
 # RAxML
 #----------------------------#
-# raw phylo guiding tree
-if [ ! -d [% working_dir %]/phylo ]
-then
-    mkdir [% working_dir %]/phylo
-fi
-
 cd [% working_dir %]/phylo
 
 perl [% findbin %]/../../blastz/concat_fasta.pl \
@@ -422,12 +511,18 @@ perl [% findbin %]/../../blastz/concat_fasta.pl \
 
 rm [% working_dir %]/phylo/RAxML*
 
-raxml -T 3 -f a -m GTRGAMMA -p $RANDOM -N 100 -x $RANDOM \
+raxml -T 5 -f a -m GTRGAMMA -p $RANDOM -N 100 -x $RANDOM \
 [% IF outgroup_id -%]
     -o [% outgroup_id %] \
 [% END -%]
     -n [% name_str %] -s [% working_dir %]/phylo/[% name_str %].phy
 
+#----------------------------#
+# clean
+#----------------------------#
+rm [% working_dir %]/phylo/[% name_str %].phy
+rm [% working_dir %]/phylo/[% name_str %].phy.reduced
+    
 EOF
     $tt->process(
         \$text,
@@ -441,6 +536,7 @@ EOF
             outgroup_id   => $outgroup_id,
             query_ids     => \@query_ids,
             target_accs   => \@target_accs,
+            clustalw      => $clustalw,
         },
         File::Spec->catfile( $working_dir, "multi_cmd.sh" )
     ) or die Template->error;
