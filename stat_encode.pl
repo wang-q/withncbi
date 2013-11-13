@@ -230,7 +230,7 @@ if ( !-e $raw_stat_file ) {
             FROM   t0
             WHERE 1 = 1
             AND t0.itemCount >= 1000
-            AND t0.dataType IN ('DnaseSeq', 'FaireSeq')
+            AND t0.dataType IN ('DnaseSeq', 'FaireSeq', 'RepliChip')
             ORDER BY t0.cell_tag, t0.dataType
         };
         my $sth = $dbh->prepare($query);
