@@ -655,7 +655,7 @@ perl [% pl_dir %]/alignDB/extra/multi_way_batch.pl \
     --block [% UNLESS item.out_dir.match('_pop$') %]--outgroup[% END %] \
     --id [% data_dir %]/id2name.csv \
     -da [% data_dir %]/[% item.out_dir %]_mft  \
-    -lt 5000 -st 0 -ct 0 --parallel [% parallel %] --run common
+    -lt 5000 --parallel [% parallel %] --run common
 
 [% END -%]
 
