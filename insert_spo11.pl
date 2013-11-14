@@ -93,6 +93,7 @@ my @jobs;
     # empty tables
     $obj->empty_table( 'ofg',   'with_window' );
     $obj->empty_table( 'ofgsw', 'with_window' );
+    $obj->create_column( "ofgsw", "ofgsw_dG",  "DOUBLE" );
 
     my @align_ids = @{ $obj->get_align_ids };
 
