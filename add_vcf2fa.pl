@@ -23,7 +23,7 @@ use AlignDB::Run;
 my $in_dir = '.';    # Specify blocked fasta location here
 my $file_vcf;        # Specify vcf location here
 my $out_dir;         # Specify output dir here
-my $nth = 1;         # which seq is target, start from 0
+my $nth = 0;         # which seq is target, start from 0
 
 my $parallel = 1;    # run in parallel mode
 
@@ -170,11 +170,12 @@ READ: while ( my $line = <$in_fh> ) {
             # insert vars
             my $new_seq = insert_vars( $info, $smaller_vars );
 
-            my $gap_number = $new_seq =~ tr/-/-/;
+            my $gap_number     = $new_seq =~ tr/-/-/;
             my $new_seq_length = length($new_seq) - $gap_number;
             my $new_name
                 = "$new_strain.chrUn(+):1-$new_seq_length|species=$new_strain";
-            push @{$seq_names}, $new_name;
+            splice @{$seq_names}, $nth + 1, 0,
+                $new_name;    # insert new one after target
             $seq_of->{$new_name} = $new_seq;
 
             my $outfile = basename($infile);
