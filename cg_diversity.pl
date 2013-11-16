@@ -144,7 +144,7 @@ my $parallel = 12;
         mkdir $dir if !-e $dir;
         $item->{dir} = $dir;
     }
-    
+
     #for my $d ( qw{ maf } ) {
     #    my $dir = File::Spec->catdir( $data_dir, $d );
     #    mkdir $dir if !-e $dir;
@@ -176,6 +176,45 @@ EOF
         \$text,
         { data => \@data, },
         File::Spec->catfile( $store_dir, "chr_length.csv" )
+    ) or die Template->error;
+
+    $text = <<'EOF';
+#!/bin/bash
+cd [% data_dir %]
+
+perl [% pl_dir %]/alignDB/util/merge_csv.pl -t [% pl_dir %]/alignDB/init/taxon.csv -m [% data_dir %]/taxon.csv
+
+perl [% pl_dir %]/alignDB/util/merge_csv.pl -t [% pl_dir %]/alignDB/init/chr_length.csv -m [% data_dir %]/chr_length.csv
+
+EOF
+    $tt->process(
+        \$text,
+        {   data     => \@data,
+            data_dir => $data_dir,
+            pl_dir   => $pl_dir,
+        },
+        File::Spec->catfile( $store_dir, "merge_chr.sh" )
+    ) or die Template->error;
+
+    # id2name.csv
+    $text = <<'EOF';
+[% FOREACH item IN data -%]
+[% item.taxon %],[% item.name %]
+[% END -%]
+EOF
+    $tt->process(
+        \$text,
+        {   data => [
+                @data,
+                {   name  => "human",
+                    taxon => 9606,
+                },
+                {   name  => "chimp",
+                    taxon => 9598,
+                },
+            ],
+        },
+        File::Spec->catfile( $store_dir, "id2name.csv" )
     ) or die Template->error;
 
     $text = <<'EOF';
@@ -248,7 +287,7 @@ fi
 # maf to fas
 #----------------------------#
 echo maf to fas
-perl [% pl_dir %]/blastz/maf2fasta.pl --has_outgroup --id 9606 \
+perl [% pl_dir %]/blastz/maf2fasta.pl \
     --parallel [% parallel %] --block --length 5000 \
     -i [% data_dir %]/maf \
     -o [% data_dir %]/fas
@@ -320,34 +359,6 @@ EOF
 #----------------------------#
 # tar-gzip
 #----------------------------#
-[% FOREACH item IN data -%]
-# [% item.name %] [% item.coverage %]
-cd [% data_dir %]/Athvs[% item.name %]/
-
-tar -czvf lav.tar.gz   [*.lav   --remove-files
-tar -czvf psl.tar.gz   [*.psl   --remove-files
-tar -czvf chain.tar.gz [*.chain --remove-files
-gzip *.chain
-gzip net/*
-gzip axtNet/*.axt
-
-[% END -%]
-
-#----------------------------#
-# clean RepeatMasker outputs
-#----------------------------#
-# find [% data_dir %] -name "*.fasta*" | xargs rm
-
-#----------------------------#
-# only keeps chr.2bit files
-#----------------------------#
-# find [% data_dir %] -name "*.fa" | xargs rm
-
-#----------------------------#
-# clean pairwise maf
-#----------------------------#
-find [% data_dir %] -name "mafSynNet" | xargs rm -fr
-find [% data_dir %] -name "mafNet" | xargs rm -fr
 
 #----------------------------#
 # gzip maf, fas
@@ -381,23 +392,15 @@ cd [% data_dir %]
 #----------------------------#
 # [% item.out_dir %]
 perl [% pl_dir %]/blastz/refine_fasta.pl \
-    --msa mafft --block --parallel [% parallel %] \
+    --msa mafft --parallel [% parallel %] \
+    --block --outgroup \
     -i [% data_dir %]/fas_final \
     -o [% data_dir %]/fas_mft
-
-#----------------------------#
-# muscle
-#----------------------------#
-## [% item.out_dir %]
-#perl [% pl_dir %]/blastz/refine_fasta.pl \
-#    --msa muscle --block --parallel [% parallel %] \
-#    -i [% data_dir %]/fas_final \
-#    -o [% data_dir %]/fas_msl
 
 EOF
     $tt->process(
         \$text,
-        {   #data     => \@data,
+        {    #data     => \@data,
             data_dir => $data_dir,
             pl_dir   => $pl_dir,
             parallel => $parallel,
@@ -415,14 +418,15 @@ cd [% data_dir %]
 # mafft
 perl [% pl_dir %]/alignDB/extra/multi_way_batch.pl \
     -d HumanvsXI -e human_65 \
-    --block --id 9606 \
-    -f [% data_dir %]/fas_mft  \
-    -lt 5000 -st 0 --parallel [% parallel %] --run 1-3,21,40
+    --block --outgroup \
+    --id [% data_dir %]/id2name.csv \
+    -da [% data_dir %]/fas_mft  \
+    -lt 5000 --parallel [% parallel %] --run common
 
 EOF
     $tt->process(
         \$text,
-        {   #data     => \@data,
+        {    #data     => \@data,
             data_dir => $data_dir,
             pl_dir   => $pl_dir,
             parallel => $parallel,
