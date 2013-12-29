@@ -187,6 +187,31 @@ if ( $op eq "insert_bed" ) {
     }
     exec_cmd( $cmd, $dryrun );
 }
+elsif ( $op eq "count_bed" ) {
+    my $cmd
+        = "perl $FindBin::Bin/../ofg/count_bed.pl"
+        . " -s $server"
+        . " --port $port"
+        . " -u $username"
+        . " --password $password"
+        . " -d $db"
+        . " --batch $batch_number"
+        . " --parallel $parallel"
+        . ( $noclean ? " --noclean" : "" );
+
+    for my $yml (@ymls) {
+        if (   $yml->{dataType} eq "DnaseSeq"
+            or $yml->{dataType} eq "FaireSeq"
+            or $yml->{dataType} eq "RepliChip" )
+        {
+            $cmd .= " --file " . $yml->{filename};
+        }
+        elsif ( $yml->{dataType} eq "TFBS" or $yml->{dataType} eq "Histone" ) {
+            $cmd .= " --file " . $yml->{filename};
+        }
+    }
+    exec_cmd( $cmd, $dryrun );
+}
 elsif ( $op eq "merge_to_runlist" ) {
     if ( !$filename ) {
         $filename = "merge";
