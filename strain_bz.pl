@@ -216,9 +216,6 @@ for f in `find . -name "*.fasta"` ; do
     fi;
 done;
 
-echo Please check the following files
-find [% round2_dir %] -name "*.fasta"
-
 EOF
 
     $tt->process(
