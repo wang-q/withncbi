@@ -196,36 +196,12 @@ __END__
 
 =head1 NAME
 
-    insert_spo11.pl - Add annotation info to alignDB
+    insert_bed.pl - Add annotation info to alignDB
 
 =head1 SYNOPSIS
 
-    insert_spo11.pl [options]
-     Options:
-       --help            brief help message
-       --man             full documentation
-       --server          MySQL server IP/Domain name
-       --db              database name
-       --username        username
-       --password        password
-
-=head1 OPTIONS
-
-=over 8
-
-=item B<-help>
-
-Print a brief help message and exits.
-
-=item B<-man>
-
-Prints the manual page and exits.
-
-=back
-
-=head1 DESCRIPTION
-
-B<This program> will read the given input file(s) and do someting
-useful with the contents thereof.
+perl init/init_alignDB.pl -d S288Cvsself
+perl init/gen_alignDB_genome.pl -d S288Cvsself -t "4932,S288C" --dir d:\data\alignment\self_alignment\S288C\  --parallel 4
+perl ofg/insert_bed.pl -d S288Cvsself --tag hot --type hot -f d:\wq\Scripts\alignDB\ofg\spo11\spo11_hot.bed --batch 10 --parallel 1
 
 =cut
