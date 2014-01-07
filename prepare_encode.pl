@@ -38,9 +38,10 @@ my $stopwatch = AlignDB::Stopwatch->new(
 my $kent_bin      = "/home/wangq/bin/x86_64";
 my $file_metainfo = "/home/wangq/data/encode/files.txt";
 my $dir_result    = "/home/wangq/data/encode/process";
+my $file_chr_size = "/home/wangq/data/encode/human.chr.sizes";
 my $file_encode;
 
-my $bigwig;
+my $filetype = "bigBed";    # bigWig, bed
 
 my $man  = 0;
 my $help = 0;
@@ -51,7 +52,8 @@ GetOptions(
     'f|file=s'   => \$file_encode,
     'm|meta=s'   => \$file_metainfo,
     'r|result=s' => \$dir_result,
-    'w|wig'      => \$bigwig,
+    's|size=s'   => \$file_chr_size,
+    't|type=s'     => \$filetype,
 ) or pod2usage(2);
 
 pod2usage(1) if $help;
@@ -63,8 +65,7 @@ pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
 $stopwatch->start_message("Processing file [$file_encode]");
 
 if ( !-e $file_encode ) {
-    warn "[$file_encode] does not exist.\n";
-    exit;
+    die "[$file_encode] does not exist.\n";
 }
 
 # make dirs
@@ -74,7 +75,7 @@ unless ( -e $dir_result ) {
 
 my $basename = basename($file_encode);
 
-if ( !$bigwig ) {
+if ( $filetype eq "bigBed" ) {
 
     # bigBedInfo - Show information about a bigBed file.
     # usage:
@@ -120,7 +121,55 @@ if ( !$bigwig ) {
         . " $dir_result/$basename.bed";
     system $cmd if !-e "$dir_result/$basename.bed";
 }
-else {
+elsif ( $filetype eq "bed" ) {
+    print "    basename $basename\n";
+    
+    my $cmd;
+    if ( $file_encode =~ /\.gz$/ ) {
+        $cmd
+            = "gunzip -c " . " $file_encode" . " > $dir_result/$basename.bed";
+        system $cmd if !-e "$dir_result/$basename.bed";
+    }
+    else {
+        $cmd = "cp " . " $file_encode" . " $dir_result/$basename.bed";
+        system $cmd if !-e "$dir_result/$basename.bed";
+    }
+    
+    # bedToBigBed v. 4 - Convert bed file to bigBed.
+    # usage:
+    #    bedToBigBed in.bed chrom.sizes out.bb
+    # Where in.bed is in one of the ascii bed formats, but not including track lines
+    # and chrom.sizes is two column: <chromosome name> <size in bases>
+    # and out.bb is the output indexed big bed file.
+    # The in.bed file must be sorted by chromosome,start,
+    #   to sort a bed file, use the unix sort command:
+    #      sort -k1,1 -k2,2n unsorted.bed > sorted.bed
+    # 
+    # options:
+    #    -blockSize=N - Number of items to bundle in r-tree.  Default 256
+    #    -itemsPerSlot=N - Number of data points bundled at lowest level. Default 512
+    #    -bedFields=N - Number of fields that fit standard bed definition.  If undefined
+    #                   assumes all fields in bed are defined.
+    #    -as=fields.as - If have non-standard fields, it's great to put a definition
+    #                    of each field in a row in AutoSql format here.
+    #    -unc - If set, do not use compression.   -tabs - If set, expect fields to be tab separated, normally
+    #            expects white space separator.
+    $cmd
+        = "$kent_bin/bedToBigBed"
+        . " -bedFields=3"
+        . " $dir_result/$basename.bed"
+        . " $file_chr_size"
+        . " $dir_result/$basename.bb";
+    system $cmd if !-e "$dir_result/$basename.bb";
+    
+    $cmd
+        = "$kent_bin/bigBedInfo"
+        . " $dir_result/$basename.bb"
+        . " > $dir_result/$basename.info.txt";
+    system $cmd if !-e "$dir_result/$basename.info.txt";
+}
+elsif ( $filetype eq "bigWig" ) {
+
     # bigWigInfo - Print out information about bigWig file.
     # usage:
     #    bigWigInfo file.bw
@@ -169,7 +218,9 @@ else {
         . " < $dir_result/$basename.wig"
         . " > $dir_result/$basename.bed";
     system $cmd if !-e "$dir_result/$basename.bed";
-
+}
+else {
+    die "Unknown filetype: $filetype\n";
 }
 
 if ( !-e "$dir_result/$basename.yml" ) {
