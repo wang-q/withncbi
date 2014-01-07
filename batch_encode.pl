@@ -63,7 +63,7 @@ my $regex;
 my $count;
 
 # filter by meta info
-my ( @dataType, @cell, @antibody );
+my ( @dataType, @cell, @antibody, @view );
 
 my $filename;
 
@@ -92,6 +92,7 @@ GetOptions(
     'dataType=s'   => \@dataType,
     'cell=s'       => \@cell,
     'antibody=s'   => \@antibody,
+    'view=s'       => \@view,
     'op=s'         => \$op,
     'dryrun'       => \$dryrun,
     'n|name=s'     => \$filename,
@@ -122,9 +123,10 @@ my @ymls;
         $yml->{cell_tag}     = $row->[2];
         $yml->{antibody}     = $row->[3];
         $yml->{antibody_tag} = $row->[4];
-        $yml->{itemCount}    = $row->[5];
-        $yml->{average_size} = $row->[6];
-        $yml->{filename}     = $row->[7];
+        $yml->{view}         = $row->[5];
+        $yml->{itemCount}    = $row->[6];
+        $yml->{average_size} = $row->[7];
+        $yml->{filename}     = $row->[8];
         push @ymls, $yml;
     }
     close $fh;
@@ -151,6 +153,11 @@ if (@antibody) {
     $set->insert($_) for @antibody;
     @ymls = grep { $set->has( $_->{antibody_tag} ) } @ymls;
 }
+if (@view) {
+    my $set = Set::Scalar->new;
+    $set->insert($_) for @view;
+    @ymls = grep { $set->has( $_->{view} ) } @ymls;
+}
 
 printf "Filtered %d\n", scalar @ymls;
 
@@ -173,14 +180,23 @@ if ( $op eq "insert_bed" ) {
             or $yml->{dataType} eq "RepliChip" )
         {
             $cmd
-                .= " --tag " . $yml->{cell_tag} . " --file " . $yml->{filename};
+                .= "\\\n    --tag " . $yml->{cell_tag} . " --file " . $yml->{filename};
         }
         elsif ( $yml->{dataType} eq "TFBS" or $yml->{dataType} eq "Histone" ) {
             $cmd
-                .= " --tag "
+                .= "\\\n    --tag "
                 . $yml->{cell_tag}
                 . " --type "
                 . $yml->{antibody_tag}
+                . " --file "
+                . $yml->{filename};
+        }
+        elsif ( $yml->{dataType} eq "RepliSeq" ) {
+            $cmd
+                .= "\\\n    --tag "
+                . $yml->{cell_tag}
+                . " --type "
+                . $yml->{view}
                 . " --file "
                 . $yml->{filename};
         }
