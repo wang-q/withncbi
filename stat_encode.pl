@@ -100,7 +100,7 @@ if ( !-e $term_yml_file ) {
 }
 
 my @heads
-    = qw{dataType cell cell_tag antibody antibody_tag itemCount average_size filename};
+    = qw{dataType cell cell_tag antibody antibody_tag view itemCount average_size filename};
 my $term_info_of = LoadFile($term_yml_file);
 if ( !-e $raw_stat_file ) {
     print "Gather raw stat\n";
@@ -230,7 +230,7 @@ if ( !-e $raw_stat_file ) {
             FROM   t0
             WHERE 1 = 1
             AND t0.itemCount >= 1000
-            AND t0.dataType IN ('DnaseSeq', 'FaireSeq', 'RepliChip')
+            AND t0.dataType IN ('DnaseSeq', 'FaireSeq', 'RepliChip', 'RepliSeq')
             ORDER BY t0.cell_tag, t0.dataType
         };
         my $sth = $dbh->prepare($query);
