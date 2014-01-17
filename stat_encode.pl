@@ -230,7 +230,7 @@ if ( !-e $raw_stat_file ) {
             FROM   t0
             WHERE 1 = 1
             AND t0.itemCount >= 1000
-            AND t0.dataType IN ('DnaseSeq', 'FaireSeq', 'RepliChip', 'RepliSeq')
+            AND t0.dataType IN ('DnaseSeq', 'FaireSeq', 'Histone', 'RepliChip', 'RepliSeq')
             ORDER BY t0.cell_tag, t0.dataType
         };
         my $sth = $dbh->prepare($query);
@@ -439,6 +439,57 @@ if ( !-e $raw_stat_file ) {
         print "Unused " . $used_set->members . "\n";
         print "$_ " for sort $used_set->members;
         print "\n";
+    }
+
+    {
+        my $csv = Text::CSV_XS->new( { binary => 1 } );
+        $csv->eol("\n");
+
+        my $query = qq{
+            SELECT 
+                t0.antibody_tag,
+                SUM(t0.itemCount),
+                AVG(t0.average_size),
+                count(*)
+            FROM   t0
+            WHERE 1 = 1
+            AND t0.dataType = 'Histone'
+            GROUP BY t0.antibody_tag
+        };
+        my $sth = $dbh->prepare($query);
+        $sth->execute;
+        open my $fh, ">", "encode_histone_antibody.csv";
+        $csv->print( $fh,
+            [qw{antibody_tag sum_itemCount average_size count }] );
+        while ( my @row = $sth->fetchrow_array ) {
+            $csv->print( $fh, [@row] );
+        }
+        close $fh;
+    }
+
+    {
+        my $csv = Text::CSV_XS->new( { binary => 1 } );
+        $csv->eol("\n");
+
+        my $query = qq{
+            SELECT 
+                t0.cell_tag,
+                SUM(t0.itemCount),
+                AVG(t0.average_size),
+                count(*)
+            FROM   t0
+            WHERE 1 = 1
+            AND t0.dataType = 'Histone'
+            GROUP BY t0.cell_tag
+        };
+        my $sth = $dbh->prepare($query);
+        $sth->execute;
+        open my $fh, ">", "encode_histone_cell.csv";
+        $csv->print( $fh, [qw{cell_tag sum_itemCount average_size count}] );
+        while ( my @row = $sth->fetchrow_array ) {
+            $csv->print( $fh, [@row] );
+        }
+        close $fh;
     }
 }
 
