@@ -78,7 +78,7 @@ if ( $opt->{file} ) {
         my $outfile
             = $opt->{output} ? $opt->{output} : "$opt->{db}.$opt->{type}";
         my $index = $i + 1;
-        $outfile =~ s/\.(\w+)$/\.$index.$1/;
+        $outfile =~ s/\.(\w+)$/\.$index.$1/ if @queries > 1;
         result( $dbh, $queries[$i], $opt->{type}, $outfile );
     }
 }
