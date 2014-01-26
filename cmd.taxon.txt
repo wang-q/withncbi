@@ -36,7 +36,7 @@ mkdir mito
 cd ~/data/organelle/mito
 
 perl ~/Scripts/alignDB/taxon/id_seq_dom_select.pl > mito_id_seq.csv
-perl ~/Scripts/alignDB/util/batch_get_seq.pl mito_id_seq.csv
+perl ~/Scripts/alignDB/util/batch_get_seq.pl mito_id_seq.csv  2>&1 | tee mito_seq.log
 
 #----------------------------#
 # taxon info
@@ -124,6 +124,10 @@ mkdir organelle
 cd organelle
 mkdir plastid
 cd ~/data/organelle/plastid
+
+perl ~/Scripts/alignDB/taxon/id_seq_dom_select.pl > plastid_id_seq.csv
+perl ~/Scripts/alignDB/util/batch_get_seq.pl plastid_id_seq.csv  2>&1 | tee plastid_seq.log
+
 
 #----------------------------#
 # taxon info

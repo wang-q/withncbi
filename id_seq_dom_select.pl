@@ -7,7 +7,7 @@ use Mojo::UserAgent;
 use YAML qw(Dump Load DumpFile LoadFile);
 
 my $url
-    = 'http://www.ncbi.nlm.nih.gov/genomes/GenomesGroup.cgi?taxid=2759&opt=plastid';
+    = shift || 'http://www.ncbi.nlm.nih.gov/genomes/GenomesGroup.cgi?taxid=2759&opt=plastid';
 
 #my $url
 #    = 'http://www.ncbi.nlm.nih.gov/genomes/GenomesGroup.cgi?taxid=33090&opt=organelle';
