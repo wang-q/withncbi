@@ -345,8 +345,12 @@ raxml -T 5 -f a -m GTRGAMMA -p $RANDOM -N 100 -x $RANDOM \
 
 cp [% working_dir %]/rawphylo/RAxML_best* [% working_dir %]/rawphylo/[% name_str %].nwk
 
-[% ELSE -%]
+[% ELSIF query_ids.size == 2 -%]
 echo "(([% target_id %],[% query_ids.1 %]),[% query_ids.0 %]);" > [% working_dir %]/rawphylo/[% name_str %].nwk
+
+[% ELSE -%]
+
+echo "([% target_id %],[% query_ids.0 %]);" > [% working_dir %]/rawphylo/[% name_str %].nwk
 
 [% END -%]
 
@@ -420,8 +424,9 @@ fi
 if [ -d [% working_dir %]/phylo ]
 then
     rm -fr [% working_dir %]/phylo
-    mkdir [% working_dir %]/phylo
 fi
+
+mkdir [% working_dir %]/phylo
 
 #----------------------------#
 # mz
@@ -514,12 +519,6 @@ raxml -T 5 -f a -m GTRGAMMA -p $RANDOM -N 100 -x $RANDOM \
 [% END -%]
     -n [% name_str %] -s [% working_dir %]/phylo/[% name_str %].phy
 
-#----------------------------#
-# clean
-#----------------------------#
-rm [% working_dir %]/phylo/[% name_str %].phy
-rm [% working_dir %]/phylo/[% name_str %].phy.reduced
-    
 EOF
     $tt->process(
         \$text,
@@ -536,6 +535,50 @@ EOF
             clustalw      => $clustalw,
         },
         File::Spec->catfile( $working_dir, "multi_cmd.sh" )
+    ) or die Template->error;
+
+    $text = <<'EOF';
+#!/bin/bash
+# perl [% stopwatch.cmd_line %]
+
+cd [% working_dir %]
+
+#----------------------------#
+# multi_way_batch
+#----------------------------#
+perl [% findbin %]/../extra/multi_way_batch.pl \
+    -d [% name_str %] \
+[% IF clustalw -%]
+    -da [% working_dir %]/[% name_str %]_clw \
+[% ELSE -%]
+    -da [% working_dir %]/[% name_str %]_mft \
+[% END -%]
+    --gff_file [% FOREACH acc IN target_accs %][% working_dir %]/[% target_id %]/[% acc %].gff,[% END %] \
+    --rm_gff_file [% FOREACH acc IN target_accs %][% working_dir %]/[% target_id %]/[% acc %].rm.gff,[% END %] \
+    --block --id [% working_dir %]/id2name.csv \
+[% IF outgroup_id -%]
+    --outgroup \
+[% END -%]
+    -lt 1000 --parallel [% parallel %] --batch 5 \
+    --run 1,2,5,10,21,30-32,40-42,44
+
+    
+EOF
+    $tt->process(
+        \$text,
+        {   stopwatch     => $stopwatch,
+            parallel      => $parallel,
+            working_dir   => $working_dir,
+            findbin       => $FindBin::Bin,
+            seq_pair_file => $seq_pair_file,
+            name_str      => $name_str,
+            target_id     => $target_id,
+            outgroup_id   => $outgroup_id,
+            query_ids     => \@query_ids,
+            target_accs   => \@target_accs,
+            clustalw      => $clustalw,
+        },
+        File::Spec->catfile( $working_dir, "multi_db_only.sh" )
     ) or die Template->error;
 }
 
