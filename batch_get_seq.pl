@@ -24,6 +24,8 @@ while ( my $row = $csv->getline($csv_fh) ) {
     system "perl $FindBin::Bin/../util/bp_genbank2gff3.pl $id/$seq.gb";
 
     move( "$seq.gb.gff", "$id/$seq.gff" );
+    
+    print "\n\n";
 }
 
 close $csv_fh;
