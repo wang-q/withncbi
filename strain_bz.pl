@@ -16,6 +16,7 @@ use File::Copy::Recursive qw(fcopy);
 use File::Spec;
 use File::Find::Rule;
 use File::Basename;
+use Cwd qw(realpath);
 
 use Template;
 
@@ -37,7 +38,7 @@ my $stopwatch = AlignDB::Stopwatch->new(
 );
 
 my $working_dir = ".";
-my $seq_dir;    #  will prep_fa from this dir /home/wangq/Scripts/alignDB/taxon
+my $seq_dir;    #  will prep_fa from this dir ~/Scripts/alignDB/taxon
                 #  or use seqs store in $working_dir
 
 my $bat_dir = "d:/wq/Scripts/alignDB";    # Windows alignDB path
@@ -89,6 +90,7 @@ die "$filename doesn't exist\n" unless -e $filename;
     $working_dir = File::Spec->catdir( $working_dir, $name_str );
     $working_dir = File::Spec->rel2abs($working_dir);
     mkdir $working_dir unless -d $working_dir;
+    $working_dir = realpath($working_dir);
     print " " x 4, "Working dir is $working_dir\n";
 }
 
@@ -122,48 +124,47 @@ if ($seq_dir) {
 }
 
 {
+    # write seq_pair.csv and left seq_pair_batch.pl to handle other things
+    print "Create seq_pair.csv\n";
     my $seq_pair_file = File::Spec->catfile( $working_dir, "seq_pair.csv" );
-    {    # write seq_pair.csv and left seq_pair_batch.pl to handle other things
-        print "Create seq_pair [$seq_pair_file]\n";
-        open my $fh, '>', $seq_pair_file;
-        for my $query_id (@query_ids) {
-            print {$fh} File::Spec->catdir( $working_dir, $target_id ), ",",
-                File::Spec->catdir( $working_dir, $query_id ), "\n";
-        }
-        close $fh;
+    open my $fh, '>', $seq_pair_file;
+    for my $query_id (@query_ids) {
+        print {$fh} File::Spec->catdir( $working_dir, $target_id ), ",",
+            File::Spec->catdir( $working_dir, $query_id ), "\n";
     }
+    close $fh;
+}
 
-    {
-        my $id2name_file = File::Spec->catfile( $working_dir, "id2name.csv" );
-        print "Create id2name [$id2name_file]\n";
-        open my $fh, '>', $id2name_file;
-        for my $id ( $target_id, @query_ids ) {
-            print {$fh} "$id,$id\n";
-        }
-        close $fh;
+{
+    print "Create id2name.csv\n";
+    my $id2name_file = File::Spec->catfile( $working_dir, "id2name.csv" );
+    open my $fh, '>', $id2name_file;
+    for my $id ( $target_id, @query_ids ) {
+        print {$fh} "$id,$id\n";
     }
+    close $fh;
+}
 
-    {
-        my $fake_tree_file
-            = File::Spec->catfile( $working_dir, "fake_tree.nwk" );
-        print "Create fake_tree [$fake_tree_file]\n";
-        open my $fh, '>', $fake_tree_file;
-        print {$fh} "(" x scalar(@query_ids) . "$target_id";
-        for my $id (@query_ids) {
-            print {$fh} ",$id)";
-        }
-        print {$fh} ";\n";
-        close $fh;
+{
+    print "Create fake_tree.nwk\n";
+    my $fake_tree_file = File::Spec->catfile( $working_dir, "fake_tree.nwk" );
+    open my $fh, '>', $fake_tree_file;
+    print {$fh} "(" x scalar(@query_ids) . "$target_id";
+    for my $id (@query_ids) {
+        print {$fh} ",$id)";
     }
+    print {$fh} ";\n";
+    close $fh;
+}
 
+{
     my $tt = Template->new;
     my $text;
     my @data
         = map { taxon_info( $_, $working_dir ) } ( $target_id, @query_ids );
 
-    #print Dump \@data;
-
     # taxon.csv
+    print "Create taxon.csv\n";
     $text = <<'EOF';
 [% FOREACH item IN data -%]
 [% item.taxon %],[% item.genus %],[% item.species %],[% item.subname %],[% item.name %],
@@ -176,6 +177,7 @@ EOF
     ) or die Template->error;
 
     # chr_length.csv
+    print "Create chr_length.csv\n";
     $text = <<'EOF';
 [% FOREACH item IN data -%]
 [% item.taxon %],chrUn,999999999,[% item.name %]
@@ -187,7 +189,8 @@ EOF
         File::Spec->catfile( $working_dir, "chr_length_chrUn.csv" )
     ) or die Template->error;
 
-    # rm.sh
+    # file-rm.sh
+    print "Create file-rm.sh\n";
     $text = <<'EOF';
 #!/bin/bash
 
@@ -229,6 +232,8 @@ EOF
         File::Spec->catfile( $working_dir, "file-rm.sh" )
     ) or die Template->error;
 
+    # real_chr.sh
+    print "Create real_chr.sh\n";
     $text = <<'EOF';
 #!/bin/bash
 cd [% working_dir %]
@@ -262,9 +267,11 @@ EOF
         File::Spec->catfile( $working_dir, "real_chr.sh" )
     ) or die Template->error;
 
+    # pair_cmd.sh
+    print "Create pair_cmd.sh\n";
     $text = <<'EOF';
 #!/bin/bash
-# bac_bz.pl
+# strain_bz.pl
 # perl [% stopwatch.cmd_line %]
 
 cd [% working_dir %]
@@ -274,32 +281,30 @@ cd [% working_dir %]
 #----------------------------#
 perl [% findbin %]/../extra/seq_pair_batch.pl \
     -d 1 --parallel [% parallel %] \
-    -f [% seq_pair_file %]  -lt 1000 -r 100-102
+    -f [% working_dir %]/seq_pair.csv -lt 1000 -r 100-102
 
 perl [% findbin %]/../extra/seq_pair_batch.pl \
     -d 1 --parallel [% parallel %] \
-    -f [% seq_pair_file %] \
+    -f [% working_dir %]/seq_pair.csv \
     -lt 1000 -r 1,2,5,21,40
 
 EOF
     $tt->process(
         \$text,
-        {   stopwatch     => $stopwatch,
-            parallel      => $parallel,
-            working_dir   => $working_dir,
-            findbin       => $FindBin::Bin,
-            seq_pair_file => $seq_pair_file,
-            name_str      => $name_str,
-            target_id     => $target_id,
-            outgroup_id   => $outgroup_id,
-            query_ids     => \@query_ids,
-
-           #gff_files     => \@new_gff_files,
-           #sql_cmd       => "mysql -h$server -P$port -u$username -p$password ",
+        {   stopwatch   => $stopwatch,
+            parallel    => $parallel,
+            working_dir => $working_dir,
+            findbin     => $FindBin::Bin,
+            name_str    => $name_str,
+            target_id   => $target_id,
+            outgroup_id => $outgroup_id,
+            query_ids   => \@query_ids,
         },
         File::Spec->catfile( $working_dir, "pair_cmd.sh" )
     ) or die Template->error;
 
+    # rawphylo.sh
+    print "Create rawphylo.sh\n";
     $text = <<'EOF';
 #!/bin/bash
 # perl [% stopwatch.cmd_line %]
@@ -370,8 +375,9 @@ EOF
     ) or die Template->error;
 
     # cmd.bat
+    print "Create cmd.bat\n";
     $text = <<'EOF';
-REM bac_bz.pl
+REM strain_bz.pl
 REM perl [% stopwatch.cmd_line %]
 
 REM basicstat
@@ -396,9 +402,11 @@ EOF
             bat_dir     => $bat_dir,
             name_str    => $name_str,
         },
-        File::Spec->catfile( $working_dir, "cmd.bat" )
+        File::Spec->catfile( $working_dir, "chart.bat" )
     ) or die Template->error;
 
+    # multi_cmd.sh
+    print "Create multi_cmd.sh\n";
     $text = <<'EOF';
 #!/bin/bash
 # perl [% stopwatch.cmd_line %]
@@ -522,21 +530,22 @@ raxml -T 5 -f a -m GTRGAMMA -p $RANDOM -N 100 -x $RANDOM \
 EOF
     $tt->process(
         \$text,
-        {   stopwatch     => $stopwatch,
-            parallel      => $parallel,
-            working_dir   => $working_dir,
-            findbin       => $FindBin::Bin,
-            seq_pair_file => $seq_pair_file,
-            name_str      => $name_str,
-            target_id     => $target_id,
-            outgroup_id   => $outgroup_id,
-            query_ids     => \@query_ids,
-            target_accs   => \@target_accs,
-            clustalw      => $clustalw,
+        {   stopwatch   => $stopwatch,
+            parallel    => $parallel,
+            working_dir => $working_dir,
+            findbin     => $FindBin::Bin,
+            name_str    => $name_str,
+            target_id   => $target_id,
+            outgroup_id => $outgroup_id,
+            query_ids   => \@query_ids,
+            target_accs => \@target_accs,
+            clustalw    => $clustalw,
         },
         File::Spec->catfile( $working_dir, "multi_cmd.sh" )
     ) or die Template->error;
 
+    # multi_db_only.sh
+    print "Create multi_db_only.sh\n";
     $text = <<'EOF';
 #!/bin/bash
 # perl [% stopwatch.cmd_line %]
@@ -566,17 +575,16 @@ perl [% findbin %]/../extra/multi_way_batch.pl \
 EOF
     $tt->process(
         \$text,
-        {   stopwatch     => $stopwatch,
-            parallel      => $parallel,
-            working_dir   => $working_dir,
-            findbin       => $FindBin::Bin,
-            seq_pair_file => $seq_pair_file,
-            name_str      => $name_str,
-            target_id     => $target_id,
-            outgroup_id   => $outgroup_id,
-            query_ids     => \@query_ids,
-            target_accs   => \@target_accs,
-            clustalw      => $clustalw,
+        {   stopwatch   => $stopwatch,
+            parallel    => $parallel,
+            working_dir => $working_dir,
+            findbin     => $FindBin::Bin,
+            name_str    => $name_str,
+            target_id   => $target_id,
+            outgroup_id => $outgroup_id,
+            query_ids   => \@query_ids,
+            target_accs => \@target_accs,
+            clustalw    => $clustalw,
         },
         File::Spec->catfile( $working_dir, "multi_db_only.sh" )
     ) or die Template->error;
