@@ -311,6 +311,100 @@ EOF
         File::Spec->catfile( $working_dir, "self_cmd.sh" )
     ) or die Template->error;
 
+#    # proc_cmd.sh
+#    print "Create proc_cmd.sh\n";
+#    $text = <<'EOF';
+##!/bin/bash
+## perl [% stopwatch.cmd_line %]
+#
+#cd [% working_dir %]
+#
+#[% FOREACH item IN data -%]
+##----------------------------------------------------------#
+## [% item.taxon %] [% item.name %]
+##----------------------------------------------------------#
+#if [ -d [% working_dir %]/[% item.taxon %]_proc ]
+#then
+#    find [% working_dir %]/[% item.taxon %]_proc -type f -not -name "circos.conf" | xargs rm
+#else
+#    mkdir [% working_dir %]/[% item.taxon %]_proc
+#fi
+#
+#if [ ! -d [% working_dir %]/[% item.taxon %]_result ]
+#then
+#    mkdir [% working_dir %]/[% item.taxon %]_result
+#fi
+#
+#
+##----------------------------#
+## coverage
+##----------------------------#
+#cd [% working_dir %]/[% item.taxon %]_proc
+#
+#perl [% findbin %]/../slice/gather_info_axt.pl -l [% length %] -d [% working_dir %]/[% item.taxon %]vsselfalign
+#perl [% findbin %]/../slice/compare_runlist.pl -op intersect -f1 [% item.taxon %]vsselfalign.runlist.0.yml -f2 [% item.taxon %]vsselfalign.runlist.1.yml -o [% item.taxon %]vsselfalign.runlist.i.yml
+#perl [% findbin %]/../slice/compare_runlist.pl -op xor -f1 [% item.taxon %]vsselfalign.runlist.0.yml -f2 [% item.taxon %]vsselfalign.runlist.1.yml -o [% item.taxon %]vsselfalign.runlist.x.yml
+#perl [% findbin %]/../slice/compare_runlist.pl -op union -f1 [% item.taxon %]vsselfalign.runlist.0.yml -f2 [% item.taxon %]vsselfalign.runlist.1.yml -o [% item.taxon %]vsselfalign.runlist.u.yml
+#
+#for op in 0 1 i x u
+#do
+#    perl [% findbin %]/../slice/stat_runlist.pl --size [% working_dir %]/[% item.taxon %]/chr.sizes -f [% item.taxon %]vsselfalign.runlist.$op.yml;
+#done
+#
+#echo "group,name,length,size,coverage" > [% working_dir %]/[% item.taxon %]_result/[% item.taxon %].[% length %].csv
+#for op in 0 1 i x u
+#do
+#    OP=$op perl -nl -e '/^name/ and next; print qq{$ENV{OP},$_};' [% item.taxon %]vsselfalign.runlist.$op.yml.csv;
+#done >> [% working_dir %]/[% item.taxon %]_result/[% item.taxon %].[% length %].csv
+#
+#for op in 0 1 i x u
+#do
+#    rm [% item.taxon %]vsselfalign.runlist.$op.yml;
+#    rm [% item.taxon %]vsselfalign.runlist.$op.yml.csv;
+#done
+#
+##----------------------------#
+## blastn
+##----------------------------#
+#echo "* blast [% item.taxon %]vsselfalign.paralog.fasta"
+#formatdb -p F -o T -i [% item.taxon %]vsselfalign.paralog.fasta
+#blastall -p blastn -F "m D" -m 0 -b 10 -v 10 -e 1e-3 -a 8 -i [% item.taxon %]vsselfalign.paralog.fasta -d [% item.taxon %]vsselfalign.paralog.fasta -o [% item.taxon %]vsselfalign.paralog.blast
+#
+##----------------------------#
+## merge
+##----------------------------#
+#
+#perl [% findbin %]/../slice/blastn_paralog.pl -f [% item.taxon %]vsselfalign.paralog.blast -m 0
+#
+#perl [% findbin %]/../slice/merge_node.pl    -v -f [% item.taxon %]vsselfalign.match.tsv -f [% item.taxon %]vsselfalign.blast.tsv -o [% item.taxon %]vsselfalign.merge.yml
+#perl [% findbin %]/../slice/paralog_graph.pl -v -f [% item.taxon %]vsselfalign.match.tsv -f [% item.taxon %]vsselfalign.blast.tsv -m [% item.taxon %]vsselfalign.merge.yml -o [% item.taxon %]vsselfalign.merge.graph.yml
+#perl [% findbin %]/../slice/cc.pl               -f [% item.taxon %]vsselfalign.merge.graph.yml --size [% working_dir %]/[% item.taxon %]/chr.sizes
+#
+#cp [% item.taxon %]vsselfalign.cc.yml [% working_dir %]/[% item.taxon %]_result
+#mv [% item.taxon %]vsselfalign.cc.csv [% working_dir %]/[% item.taxon %]_result
+#
+##----------------------------#
+## clean
+##----------------------------#
+#find [% working_dir %]/[% item.taxon %]_proc -type f -name "*paralog*" | xargs rm
+#
+#[% END -%]
+#EOF
+#    $tt->process(
+#        \$text,
+#        {   stopwatch   => $stopwatch,
+#            parallel    => $parallel,
+#            working_dir => $working_dir,
+#            findbin     => $FindBin::Bin,
+#            name_str    => $name_str,
+#            target_id   => $target_id,
+#            query_ids   => \@query_ids,
+#            data        => \@data,
+#            length      => $length,
+#        },
+#        File::Spec->catfile( $working_dir, "proc_cmd.sh" )
+#    ) or die Template->error;
+
     # proc_cmd.sh
     print "Create proc_cmd.sh\n";
     $text = <<'EOF';
@@ -335,13 +429,12 @@ then
     mkdir [% working_dir %]/[% item.taxon %]_result
 fi
 
-
-#----------------------------#
-# coverage
-#----------------------------#
 cd [% working_dir %]/[% item.taxon %]_proc
 
-perl [% findbin %]/../slice/gather_info_axt.pl -l [% length %] -d [% working_dir %]/[% item.taxon %]vsselfalign
+#----------------------------#
+# quick and dirty coverage
+#----------------------------#
+perl [% findbin %]/../slice/gather_info_axt.pl -l [% length %] -d [% working_dir %]/[% item.taxon %]vsselfalign --nomatch
 perl [% findbin %]/../slice/compare_runlist.pl -op intersect -f1 [% item.taxon %]vsselfalign.runlist.0.yml -f2 [% item.taxon %]vsselfalign.runlist.1.yml -o [% item.taxon %]vsselfalign.runlist.i.yml
 perl [% findbin %]/../slice/compare_runlist.pl -op xor -f1 [% item.taxon %]vsselfalign.runlist.0.yml -f2 [% item.taxon %]vsselfalign.runlist.1.yml -o [% item.taxon %]vsselfalign.runlist.x.yml
 perl [% findbin %]/../slice/compare_runlist.pl -op union -f1 [% item.taxon %]vsselfalign.runlist.0.yml -f2 [% item.taxon %]vsselfalign.runlist.1.yml -o [% item.taxon %]vsselfalign.runlist.u.yml
@@ -364,29 +457,59 @@ do
 done
 
 #----------------------------#
-# blastn
+# genome blast
 #----------------------------#
-echo "* blast [% item.taxon %]vsselfalign.paralog.fasta"
-formatdb -p F -o T -i [% item.taxon %]vsselfalign.paralog.fasta
-blastall -p blastn -F "m D" -m 0 -b 10 -v 10 -e 1e-3 -a 8 -i [% item.taxon %]vsselfalign.paralog.fasta -d [% item.taxon %]vsselfalign.paralog.fasta -o [% item.taxon %]vsselfalign.paralog.blast
+find [% working_dir %]/[% item.taxon %] -type f -name "*.fa" \
+    | sort | xargs cat \
+    | perl -nl -e '/^>/ or uc; print' \
+    > [% item.taxon %].genome.fasta
+
+echo "* build genome blast db [% item.taxon %].genome.fasta"
+formatdb -p F -o T -i [% item.taxon %].genome.fasta
+
+perl [% findbin %]/../slice/gather_seq_axt.pl -l [% length %] -d [% working_dir %]/[% item.taxon %]vsselfalign
+
+echo "* blast [% item.taxon %]vsselfalign.axt.fasta"
+blastall -p blastn -F "m D" -m 0 -b 10 -v 10 -e 1e-3 -a 8 -i [% item.taxon %]vsselfalign.axt.fasta -d [% item.taxon %].genome.fasta -o [% item.taxon %]vsselfalign.axt.blast
+
+#----------------------------#
+# paralog sequences
+#----------------------------#
+# Omit genome locations in .axt
+# There are errors, especially for queries
+perl [% findbin %]/../slice/blastn_genome_location.pl -f [% item.taxon %]vsselfalign.axt.blast -m 0 -i 90 -c 0.95
+
+#----------------------------#
+# paralog blast
+#----------------------------#
+echo "* build paralog blast db [% item.taxon %]vsselfalign.gl.fasta"
+formatdb -p F -o T -i [% item.taxon %]vsselfalign.gl.fasta
+
+echo "* blast [% item.taxon %]vsselfalign.gl.fasta"
+blastall -p blastn -F "m D" -m 0 -b 10 -v 10 -e 1e-3 -a 8 -i [% item.taxon %]vsselfalign.gl.fasta -d [% item.taxon %]vsselfalign.gl.fasta -o [% item.taxon %]vsselfalign.gl.blast
 
 #----------------------------#
 # merge
 #----------------------------#
+perl [% findbin %]/../slice/blastn_paralog.pl -f [% item.taxon %]vsselfalign.gl.blast -m 0 -i 90 -c 0.9
 
-perl [% findbin %]/../slice/blastn_paralog.pl -f [% item.taxon %]vsselfalign.paralog.blast -m 0
+perl [% findbin %]/../slice/merge_node.pl    -v -f [% item.taxon %]vsselfalign.blast.tsv -o [% item.taxon %]vsselfalign.merge.yml -c 0.9
+perl [% findbin %]/../slice/paralog_graph.pl -v -f [% item.taxon %]vsselfalign.blast.tsv -m [% item.taxon %]vsselfalign.merge.yml --nonself -o [% item.taxon %]vsselfalign.merge.graph.yml
+perl [% findbin %]/../slice/cc.pl               -f [% item.taxon %]vsselfalign.merge.graph.yml 
+perl [% findbin %]/../slice/proc_cc.pl          -f [% item.taxon %]vsselfalign.cc.yml --size [% working_dir %]/[% item.taxon %]/chr.sizes --write
 
-perl [% findbin %]/../slice/merge_node.pl    -v -f [% item.taxon %]vsselfalign.match.tsv -f [% item.taxon %]vsselfalign.blast.tsv -o [% item.taxon %]vsselfalign.merge.yml
-perl [% findbin %]/../slice/paralog_graph.pl -v -f [% item.taxon %]vsselfalign.match.tsv -f [% item.taxon %]vsselfalign.blast.tsv -m [% item.taxon %]vsselfalign.merge.yml -o [% item.taxon %]vsselfalign.merge.graph.yml
-perl [% findbin %]/../slice/cc.pl               -f [% item.taxon %]vsselfalign.merge.graph.yml --size [% working_dir %]/[% item.taxon %]/chr.sizes
-
+#----------------------------#
+# result
+#----------------------------#
 cp [% item.taxon %]vsselfalign.cc.yml [% working_dir %]/[% item.taxon %]_result
 mv [% item.taxon %]vsselfalign.cc.csv [% working_dir %]/[% item.taxon %]_result
 
 #----------------------------#
 # clean
 #----------------------------#
-find [% working_dir %]/[% item.taxon %]_proc -type f -name "*paralog*" | xargs rm
+find [% working_dir %]/[% item.taxon %]_proc -type f -name "*genome.fasta*" | xargs rm
+find [% working_dir %]/[% item.taxon %]_proc -type f -name "*gl.fasta*" | xargs rm
+find [% working_dir %]/[% item.taxon %]_proc -type f -name "*.blast" | xargs rm
 
 [% END -%]
 EOF
