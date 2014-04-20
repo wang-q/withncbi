@@ -94,6 +94,17 @@ die "$filename doesn't exist\n" unless -e $filename;
     print " " x 4, "Working dir is $working_dir\n";
 }
 
+# move $outgroup_id to last
+if ($outgroup_id) {
+    my ($exist) = grep { $_ eq $outgroup_id } @query_ids;
+    if ( !defined $exist ) {
+        die "outgroup does not exist!\n";
+    }
+
+    @query_ids = grep { $_ ne $outgroup_id } @query_ids;
+    push @query_ids, $outgroup_id;
+}
+
 # if seqs is not in working dir, copy them from seq_dir
 my @target_accs;
 if ($seq_dir) {
@@ -316,8 +327,8 @@ perl [% findbin %]/../extra/join_dbs.pl \
     --no_insert --block --trimmed_fasta --length 1000 \
     --goal_db [% name_str %]_raw --target 0target \
 [% IF outgroup_id -%]
-    --outgroup 0query \
-    --queries [% FOREACH i IN [ 1 .. query_ids.max ] %][% i %]query,[% END %] \
+    --outgroup [% query_ids.max %]query \
+    --queries [% maxq = query_ids.max - 1 %][% FOREACH i IN [ 0 .. maxq ] %][% i %]query,[% END %] \
 [% ELSE -%]
     --queries [% FOREACH i IN [ 0 .. query_ids.max ] %][% i %]query,[% END %] \
 [% END -%]
@@ -344,14 +355,14 @@ perl [% findbin %]/../../blastz/concat_fasta.pl \
 
 raxml -T 5 -f a -m GTRGAMMA -p $RANDOM -N 100 -x $RANDOM \
 [% IF outgroup_id -%]
-    -o [% query_ids.0 %] \
+    -o [% outgroup_id %] \
 [% END -%]
     -n [% name_str %] -s [% working_dir %]/rawphylo/[% name_str %].phy
 
 cp [% working_dir %]/rawphylo/RAxML_best* [% working_dir %]/rawphylo/[% name_str %].nwk
 
 [% ELSIF query_ids.size == 2 -%]
-echo "(([% target_id %],[% query_ids.1 %]),[% query_ids.0 %]);" > [% working_dir %]/rawphylo/[% name_str %].nwk
+echo "(([% target_id %],[% query_ids.0 %]),[% query_ids.1 %]);" > [% working_dir %]/rawphylo/[% name_str %].nwk
 
 [% ELSE -%]
 
@@ -458,6 +469,8 @@ else
         -syn -p [% parallel %]
 fi
 
+find [% working_dir %]/[% name_str %] -type f -name "*.maf" | parallel -j [% parallel %] gzip
+
 #----------------------------#
 # maf2fasta
 #----------------------------#
@@ -477,6 +490,8 @@ perl [% findbin %]/../../blastz/refine_fasta.pl \
     -i [% working_dir %]/[% name_str %]_fasta \
     -o [% working_dir %]/[% name_str %]_mft
 
+find [% working_dir %]/[% name_str %]_mft -type f -name "*.fas" | parallel -j [% parallel %] gzip
+
 [% IF clustalw -%]
 #----------------------------#
 # clustalw
@@ -488,6 +503,8 @@ perl [% findbin %]/../../blastz/refine_fasta.pl \
 [% END -%]
     -i [% working_dir %]/[% name_str %]_fasta \
     -o [% working_dir %]/[% name_str %]_clw
+
+find [% working_dir %]/[% name_str %]_mft -type f -name "*.fas" | parallel -j [% parallel %] gzip
 [% END -%]
 
 #----------------------------#
@@ -512,6 +529,7 @@ perl [% findbin %]/../extra/multi_way_batch.pl \
 #----------------------------#
 # RAxML
 #----------------------------#
+[% IF query_ids.size > 2 -%]
 cd [% working_dir %]/phylo
 
 perl [% findbin %]/../../blastz/concat_fasta.pl \
@@ -526,6 +544,9 @@ raxml -T 5 -f a -m GTRGAMMA -p $RANDOM -N 100 -x $RANDOM \
     -o [% outgroup_id %] \
 [% END -%]
     -n [% name_str %] -s [% working_dir %]/phylo/[% name_str %].phy
+
+cp [% working_dir %]/phylo/RAxML_best* [% working_dir %]/phylo/[% name_str %].nwk
+[% END -%]
 
 EOF
     $tt->process(
