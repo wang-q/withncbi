@@ -504,7 +504,7 @@ perl [% findbin %]/../../blastz/refine_fasta.pl \
     -i [% working_dir %]/[% name_str %]_fasta \
     -o [% working_dir %]/[% name_str %]_clw
 
-find [% working_dir %]/[% name_str %]_mft -type f -name "*.fas" | parallel -j [% parallel %] gzip
+find [% working_dir %]/[% name_str %]_clw -type f -name "*.fas" | parallel -j [% parallel %] gzip
 [% END -%]
 
 #----------------------------#
