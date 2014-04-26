@@ -52,7 +52,7 @@ my $length = 1000;
 
 my $name_str = "working";
 
-my $filename = "strains_taxon_info.csv";
+my $taxon_file = "strains_taxon_info.csv";
 
 # run in parallel mode
 my $parallel = $Config->{generate}{parallel};
@@ -63,7 +63,7 @@ my $help = 0;
 GetOptions(
     'help|?'          => \$help,
     'man'             => \$man,
-    'file=s'          => \$filename,
+    'file=s'          => \$taxon_file,
     'w|working_dir=s' => \$working_dir,
     's|seq_dir=s'     => \$seq_dir,
     'b|bat_dir=s'     => \$bat_dir,
@@ -83,7 +83,7 @@ pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
 #----------------------------------------------------------#
 $stopwatch->start_message("Writing strains summary...");
 
-die "$filename doesn't exist\n" unless -e $filename;
+die "--file Taxon file $taxon_file doesn't exist\n" unless -e $taxon_file;
 
 # prepare working dir
 {
@@ -895,7 +895,7 @@ sub taxon_info {
     $dbh->{csv_tables}->{t0} = {
         eol       => "\n",
         sep_char  => ",",
-        file      => $filename,
+        file      => $taxon_file,
         col_names => [
             map { ( $_, $_ . "_id" ) } qw{strain species genus family order}
         ],
