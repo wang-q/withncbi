@@ -33,9 +33,9 @@ my $stopwatch = AlignDB::Stopwatch->new(
 );
 
 # running options
-my $gr_dir = $Config->{path}{gr};
-my $bp_dir = $Config->{path}{bp};
-my $td_dir = $Config->{path}{td};
+my $gr_dir = $Config->{path}{gr};    # genome report
+my $bp_dir = $Config->{path}{bp};    # bioproject
+my $td_dir = $Config->{path}{td};    # taxdmp
 
 # eukaryotes instead of prokaryotes
 my $euk;
