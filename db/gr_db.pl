@@ -59,7 +59,7 @@ GetOptions(
     'd|db=s'       => \$db_name,
     'init_sql=s'   => \$init_sql,
     'file=s'       => \$strain_file,
-    'append=s'     => \$append,
+    'append'       => \$append,
 ) or pod2usage(2);
 
 pod2usage(1) if $help;
@@ -117,6 +117,10 @@ my $dbh = DBI->connect( "dbi:mysql:$db_name:$server", $username, $password );
 #----------------------------#
 if ( !$append ) {
     $stopwatch->block_message("Add code");
+
+    # csv should have the same column number as sql
+    # so I add column code here
+    $dbh->do(q{ ALTER TABLE gr ADD COLUMN code text });
 
     my @references;
     for my $file (
