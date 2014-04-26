@@ -8,7 +8,6 @@ use Pod::Usage;
 use Config::Tiny;
 use YAML qw(Dump Load DumpFile LoadFile);
 
-use DBI;
 use File::Find::Rule;
 use File::Spec;
 use File::Copy;
@@ -17,9 +16,11 @@ use Text::Table;
 use List::MoreUtils qw(uniq);
 use Archive::Extract;
 
+use DBI;
+use Template;
+
 use Bio::Taxon;
 use Bio::DB::Taxonomy;
-use Template;
 
 use AlignDB::IntSpan;
 use AlignDB::Stopwatch;
@@ -30,7 +31,7 @@ use FindBin;
 # GetOpt section
 #----------------------------------------------------------#
 my $Config = Config::Tiny->new;
-$Config = Config::Tiny->read("$FindBin::Bin/../alignDB.ini");
+$Config = Config::Tiny->read("$FindBin::Bin/../config.ini");
 
 # record ARGV and Config
 my $stopwatch = AlignDB::Stopwatch->new(
@@ -40,8 +41,6 @@ my $stopwatch = AlignDB::Stopwatch->new(
 );
 
 # running options
-my $base_dir    = $Config->{bac}{base_dir};
-my $taxon_dir   = $Config->{bac}{taxon_dir};
 my $seq_dir     = "/home/wangq/data/bacteria/bac_seq_dir";
 my $working_dir = ".";
 
@@ -66,18 +65,16 @@ my $server   = $Config->{database}{server};
 my $port     = $Config->{database}{port};
 my $username = $Config->{database}{username};
 my $password = $Config->{database}{password};
-my $db       = $Config->{bac}{db};
-my $db_gr    = $Config->{bac}{db_gr};
+my $db_name  = $Config->{database}{db};
 
-my $gr;
 my $scaffold;
-my $td_dir   = $Config->{bac}{td_dir};      # taxdmp
-my $nb_dir   = $Config->{bac}{nb_dir};      # NCBI genomes bac
-my $nbd_dir  = $Config->{bac}{nbd_dir};     # NCBI genomes bac draft
-my $ngbd_dir = $Config->{bac}{ngbd_dir};    # NCBI genbank genomes bac draft
+my $td_dir   = $Config->{path}{td};      # taxdmp
+my $nb_dir   = $Config->{path}{nb};      # NCBI genomes bac
+my $nbd_dir  = $Config->{path}{nbd};     # NCBI genomes bac draft
+my $ngbd_dir = $Config->{path}{ngbd};    # NCBI genbank genomes bac draft
 
 # run in parallel mode
-my $parallel = $Config->{generate}{parallel};
+my $parallel = $Config->{run}{parallel};
 
 my $man  = 0;
 my $help = 0;
@@ -85,24 +82,21 @@ my $help = 0;
 GetOptions(
     'help|?'          => \$help,
     'man'             => \$man,
-    'server=s'        => \$server,
-    'port=i'          => \$port,
-    'username=s'      => \$username,
-    'password=s'      => \$password,
-    'd|db=s'          => \$db,
-    'db_gr=s'         => \$db_gr,
-    'b|base_dir=s'    => \$base_dir,
-    'x|taxon_dir=s'   => \$taxon_dir,
+    's|server=s'      => \$server,
+    'P|port=i'        => \$port,
+    'u|username=s'    => \$username,
+    'p|password=s'    => \$password,
+    'd|db=s'          => \$db_name,
     'w|working_dir=s' => \$working_dir,
     'p|parent_id=s'   => \$parent_id,
     't|target_id=i'   => \$target_id,
     'o|r|outgroup=i'  => \$outgroup_id,
     'e|exclude=s'     => \$exclude_ids,
     'n|name_str=s'    => \$name_str,
-    'gr'              => \$gr,
     'is_self'         => \$is_self,
     'length=i'        => \$paralog_length,
     'scaffold'        => \$scaffold,
+    'a|aligndb=s'     => \$aligndb,
     'parallel=i'      => \$parallel,
 ) or pod2usage(2);
 
@@ -114,18 +108,15 @@ pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
 #----------------------------------------------------------#
 $stopwatch->start_message("Preparing whole species");
 
-my $dbh = DBI->connect( "dbi:mysql:" . ( $gr ? $db_gr : $db ) . ":$server",
-    $username, $password );
+my $dbh = DBI->connect( "dbi:mysql:$db_name:$server", $username, $password );
 
 my $id_str;
 {    # expand $parent_id
-    $taxon_dir = $td_dir if $gr;
-
     my $taxon_db = Bio::DB::Taxonomy->new(
         -source    => 'flatfile',
-        -directory => $taxon_dir,
-        -nodesfile => "$taxon_dir/nodes.dmp",
-        -namesfile => "$taxon_dir/names.dmp",
+        -directory => $td_dir,
+        -nodesfile => "$td_dir/nodes.dmp",
+        -namesfile => "$td_dir/names.dmp",
     );
     my @parent_ids = split /,/, $parent_id;
 
@@ -143,11 +134,9 @@ my $id_str;
     my $db_id_set = AlignDB::IntSpan->new;
     {
         my $query
-            = $gr
-            ? $scaffold
-                ? q{ SELECT taxonomy_id FROM gr WHERE 1 = 1 }
-                : q{ SELECT taxonomy_id FROM gr WHERE status = 'Complete' }
-            : q{ SELECT taxonomy_id FROM strain WHERE seq_ok = 1 };
+            = $scaffold
+            ? q{ SELECT taxonomy_id FROM gr WHERE 1 = 1 }
+            : q{ SELECT taxonomy_id FROM gr WHERE status = 'Complete' };
         my $sth = $dbh->prepare($query);
         $sth->execute;
         while ( my ($id) = $sth->fetchrow_array ) {
@@ -164,10 +153,11 @@ my $id_str;
 
 {    # making working dir
     if ( !$name_str ) {
-        my $query
-            = $gr
-            ? qq{ SELECT DISTINCT species FROM gr WHERE taxonomy_id IN $id_str }
-            : qq{ SELECT DISTINCT species FROM strain st WHERE st.taxonomy_id IN $id_str };
+        my $query = qq{
+            SELECT DISTINCT species
+            FROM gr
+            WHERE taxonomy_id IN $id_str
+        };
         my $sth = $dbh->prepare($query);
         $sth->execute;
 
@@ -190,10 +180,12 @@ my @query_ids;
 {    # find all strains' taxon ids
 
     # select all strains in this species
-    my $query
-        = $gr
-        ? qq{ SELECT taxonomy_id, organism_name, released_date, status, code FROM gr WHERE taxonomy_id IN $id_str ORDER BY released_date, status, code }
-        : qq{ SELECT taxonomy_id, organism_name, released_date FROM strain WHERE taxonomy_id IN $id_str ORDER BY released_date };
+    my $query = qq{
+        SELECT taxonomy_id, organism_name, released_date, status, code
+        FROM gr
+        WHERE taxonomy_id IN $id_str
+        ORDER BY released_date, status, code
+    };
     my $sth = $dbh->prepare($query);
     $sth->execute;
 
@@ -262,14 +254,12 @@ my @query_ids;
 
 {    # build fasta files
 
-    $base_dir = $nb_dir if $gr;
-
     # read all filenames, then grep
     print "Reading file list\n";
-    my @fna_files = File::Find::Rule->file->name('*.fna')->in($base_dir);
-    my @gff_files = File::Find::Rule->file->name('*.gff')->in($base_dir);
+    my @fna_files = File::Find::Rule->file->name('*.fna')->in($nb_dir);
+    my @gff_files = File::Find::Rule->file->name('*.gff')->in($nb_dir);
     my ( @scaff_files, @contig_files );
-    if ( $gr and $scaffold ) {
+    if ($scaffold) {
         @scaff_files
             = File::Find::Rule->file->name('*.scaffold.fna.tgz')->in($nbd_dir);
         @contig_files
@@ -284,23 +274,12 @@ my @query_ids;
 
         my @accs;    # complete accessions
 
-        if ( !$gr ) {
-            my $query
-                = qq{ SELECT accession FROM seq WHERE taxonomy_id = ? AND replicon like "%chr%" };
-            my $sth = $dbh->prepare($query);
-            $sth->execute($taxon_id);
-            while ( my ($acc) = $sth->fetchrow_array ) {
-                push @accs, $acc;
-            }
-        }
-        else {
-            my $query = qq{ SELECT chr_refseq FROM gr WHERE taxonomy_id = ? };
-            my $sth   = $dbh->prepare($query);
-            $sth->execute($taxon_id);
-            my ($acc) = $sth->fetchrow_array;
-            push @accs,
-                ( map { s/\.\d+$//; $_ } grep {defined} ( split /,/, $acc ) );
-        }
+        my $query = qq{ SELECT chr FROM gr WHERE taxonomy_id = ? };
+        my $sth   = $dbh->prepare($query);
+        $sth->execute($taxon_id);
+        my ($acc) = $sth->fetchrow_array;
+        push @accs,
+            ( map { s/\.\d+$//; $_ } grep {defined} ( split /,/, $acc ) );
 
         # for NZ_CM*** accessions, the following prep_fa() will find nothing
         # AND is $scaffold, prep_scaff() will find the scaffolds
@@ -330,7 +309,6 @@ my @query_ids;
 }
 
 {
-
     my $tt = Template->new;
     my $text;
 
@@ -477,6 +455,8 @@ sub prep_scaff {
         unless ( -e $file ) {
             return "$file not exists!\n";
         }
+
+        # file size less than 1k
         if ( ( stat($file) )[7] < 1024 ) {
             next;
         }
