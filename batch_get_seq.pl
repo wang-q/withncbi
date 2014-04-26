@@ -20,6 +20,11 @@ while ( my $row = $csv->getline($csv_fh) ) {
     my $seq = $row->[1];
 
     print "id\t$id\tseq\t$seq\n";
+    if (-e "$id/$seq.gb") {
+        print "Sequence [$id/$seq.gb] exists, next\n";
+        next;
+    }
+    
     system "perl $FindBin::Bin/../util/get_seq.pl $seq $id";
     system "perl $FindBin::Bin/../util/bp_genbank2gff3.pl $id/$seq.gb";
 
