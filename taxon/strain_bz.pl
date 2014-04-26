@@ -1,6 +1,7 @@
 #!/usr/bin/perl
 use strict;
 use warnings;
+use autodie;
 
 use Getopt::Long;
 use Pod::Usage;
@@ -28,7 +29,7 @@ use AlignDB::Stopwatch;
 # GetOpt section
 #----------------------------------------------------------#
 my $Config = Config::Tiny->new;
-$Config = Config::Tiny->read("$FindBin::Bin/../alignDB.ini");
+$Config = Config::Tiny->read("$FindBin::Bin/../config.ini");
 
 # record ARGV and Config
 my $stopwatch = AlignDB::Stopwatch->new(
@@ -41,8 +42,6 @@ my $working_dir = ".";
 my $seq_dir;    #  will prep_fa from this dir ~/Scripts/alignDB/taxon
                 #  or use seqs store in $working_dir
 
-my $bat_dir = "d:/wq/Scripts/alignDB";    # Windows alignDB path
-
 my $target_id;
 my $outgroup_id;
 my @query_ids;
@@ -53,8 +52,11 @@ my $name_str = "working";
 
 my $filename = "strains_taxon_info.csv";
 
+my $aligndb = $Config->{run}{aligndb};    # current alignDB path
+my $bat_dir = $Config->{run}{bat};        # Windows alignDB path
+
 # run in parallel mode
-my $parallel = $Config->{generate}{parallel};
+my $parallel = $Config->{run}{parallel};
 
 my $man  = 0;
 my $help = 0;
@@ -263,9 +265,9 @@ rm real_chr.csv
 
 echo '# Run the following cmds to merge csv files'
 echo
-echo perl [% findbin %]/../util/merge_csv.pl -t [% findbin %]/../init/taxon.csv -m [% working_dir %]/taxon.csv -f 0 -f 1
+echo perl [% aligndb %]/util/merge_csv.pl -t [% findbin %]/../init/taxon.csv -m [% working_dir %]/taxon.csv -f 0 -f 1
 echo
-echo perl [% findbin %]/../util/merge_csv.pl -t [% findbin %]/../init/chr_length.csv -m [% working_dir %]/chr_length.csv -f 0 -f 1
+echo perl [% aligndb %]/util/merge_csv.pl -t [% findbin %]/../init/chr_length.csv -m [% working_dir %]/chr_length.csv -f 0 -f 1
 echo
 
 EOF
@@ -273,7 +275,7 @@ EOF
         \$text,
         {   data        => \@data,
             working_dir => $working_dir,
-            findbin     => $FindBin::Bin,
+            aligndb     => $aligndb,
         },
         File::Spec->catfile( $working_dir, "real_chr.sh" )
     ) or die Template->error;
@@ -290,11 +292,11 @@ cd [% working_dir %]
 #----------------------------#
 # seq_pair
 #----------------------------#
-perl [% findbin %]/../extra/seq_pair_batch.pl \
+perl [% aligndb %]/extra/seq_pair_batch.pl \
     -d 1 --parallel [% parallel %] \
     -f [% working_dir %]/seq_pair.csv -lt 1000 -r 100-102
 
-perl [% findbin %]/../extra/seq_pair_batch.pl \
+perl [% aligndb %]/extra/seq_pair_batch.pl \
     -d 1 --parallel [% parallel %] \
     -f [% working_dir %]/seq_pair.csv \
     -lt 1000 -r 1,2,5,21,40
@@ -305,7 +307,7 @@ EOF
         {   stopwatch   => $stopwatch,
             parallel    => $parallel,
             working_dir => $working_dir,
-            findbin     => $FindBin::Bin,
+            aligndb     => $aligndb,
             name_str    => $name_str,
             target_id   => $target_id,
             outgroup_id => $outgroup_id,
@@ -323,7 +325,7 @@ EOF
 cd [% working_dir %]
 
 # join_dbs.pl
-perl [% findbin %]/../extra/join_dbs.pl \
+perl [% alignDB %]/extra/join_dbs.pl \
     --no_insert --block --trimmed_fasta --length 1000 \
     --goal_db [% name_str %]_raw --target 0target \
 [% IF outgroup_id -%]
@@ -348,7 +350,7 @@ cd [% working_dir %]/rawphylo
 rm [% working_dir %]/rawphylo/RAxML*
 
 [% IF query_ids.size > 2 -%]
-perl [% findbin %]/../../blastz/concat_fasta.pl \
+perl [% alignDB %]/../blastz/concat_fasta.pl \
     -i [% working_dir %]/[% name_str %]_raw \
     -o [% working_dir %]/rawphylo/[% name_str %].phy \
     -p
@@ -376,7 +378,7 @@ EOF
         {   stopwatch   => $stopwatch,
             parallel    => $parallel,
             working_dir => $working_dir,
-            findbin     => $FindBin::Bin,
+            aligndb     => $aligndb,
             name_str    => $name_str,
             target_id   => $target_id,
             outgroup_id => $outgroup_id,
@@ -409,7 +411,6 @@ EOF
         {   stopwatch   => $stopwatch,
             parallel    => $parallel,
             working_dir => $working_dir,
-            findbin     => $FindBin::Bin,
             bat_dir     => $bat_dir,
             name_str    => $name_str,
         },
@@ -452,7 +453,7 @@ mkdir [% working_dir %]/phylo
 #----------------------------#
 if [ -f [% working_dir %]/rawphylo/[% name_str %].nwk ]
 then
-    perl [% findbin %]/../../blastz/mz.pl \
+    perl [% aligndb %]/../blastz/mz.pl \
         [% FOREACH id IN query_ids -%]
         -d [% working_dir %]/[% target_id %]vs[% id %] \
         [% END -%]
@@ -460,7 +461,7 @@ then
         --out [% working_dir %]/[% name_str %] \
         -syn -p [% parallel %]
 else
-    perl [% findbin %]/../../blastz/mz.pl \
+    perl [% aligndb %]/../blastz/mz.pl \
         [% FOREACH id IN query_ids -%]
         -d [% working_dir %]/[% target_id %]vs[% id %] \
         [% END -%]
@@ -474,7 +475,7 @@ find [% working_dir %]/[% name_str %] -type f -name "*.maf" | parallel -j [% par
 #----------------------------#
 # maf2fasta
 #----------------------------#
-perl [% findbin %]/../../blastz/maf2fasta.pl \
+perl [% aligndb %]/../blastz/maf2fasta.pl \
     -p [% parallel %] --block \
     -i [% working_dir %]/[% name_str %] \
     -o [% working_dir %]/[% name_str %]_fasta
@@ -482,7 +483,7 @@ perl [% findbin %]/../../blastz/maf2fasta.pl \
 #----------------------------#
 # mafft
 #----------------------------#
-perl [% findbin %]/../../blastz/refine_fasta.pl \
+perl [% aligndb %]/../blastz/refine_fasta.pl \
     --msa mafft --block -p [% parallel %] \
 [% IF outgroup_id -%]
     --outgroup \
@@ -496,7 +497,7 @@ find [% working_dir %]/[% name_str %]_mft -type f -name "*.fas" | parallel -j [%
 #----------------------------#
 # clustalw
 #----------------------------#
-perl [% findbin %]/../../blastz/refine_fasta.pl \
+perl [% aligndb %]/../blastz/refine_fasta.pl \
     --msa clustalw --block -p [% parallel %] \
 [% IF outgroup_id -%]
     --outgroup \
@@ -510,7 +511,7 @@ find [% working_dir %]/[% name_str %]_clw -type f -name "*.fas" | parallel -j [%
 #----------------------------#
 # multi_way_batch
 #----------------------------#
-perl [% findbin %]/../extra/multi_way_batch.pl \
+perl [% aligndb %]/extra/multi_way_batch.pl \
     -d [% name_str %] \
 [% IF clustalw -%]
     -da [% working_dir %]/[% name_str %]_clw \
@@ -532,7 +533,7 @@ perl [% findbin %]/../extra/multi_way_batch.pl \
 [% IF query_ids.size > 2 -%]
 cd [% working_dir %]/phylo
 
-perl [% findbin %]/../../blastz/concat_fasta.pl \
+perl [% aligndb %]/../blastz/concat_fasta.pl \
     -i [% working_dir %]/[% name_str %]_mft  \
     -o [% working_dir %]/phylo/[% name_str %].phy \
     -p
@@ -554,7 +555,7 @@ EOF
         {   stopwatch   => $stopwatch,
             parallel    => $parallel,
             working_dir => $working_dir,
-            findbin     => $FindBin::Bin,
+            aligndb     => $aligndb,
             name_str    => $name_str,
             target_id   => $target_id,
             outgroup_id => $outgroup_id,
@@ -576,7 +577,7 @@ cd [% working_dir %]
 #----------------------------#
 # multi_way_batch
 #----------------------------#
-perl [% findbin %]/../extra/multi_way_batch.pl \
+perl [% aligndb %]/extra/multi_way_batch.pl \
     -d [% name_str %] \
 [% IF clustalw -%]
     -da [% working_dir %]/[% name_str %]_clw \
@@ -599,7 +600,7 @@ EOF
         {   stopwatch   => $stopwatch,
             parallel    => $parallel,
             working_dir => $working_dir,
-            findbin     => $FindBin::Bin,
+            aligndb     => $aligndb,
             name_str    => $name_str,
             target_id   => $target_id,
             outgroup_id => $outgroup_id,
