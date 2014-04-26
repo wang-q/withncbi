@@ -1,6 +1,7 @@
 #!/usr/bin/perl
 use strict;
 use warnings;
+use autodie;
 
 use Getopt::Long;
 use Pod::Usage;
@@ -22,7 +23,7 @@ use AlignDB::Stopwatch;
 # GetOpt section
 #----------------------------------------------------------#
 my $Config = Config::Tiny->new;
-$Config = Config::Tiny->read("$FindBin::Bin/../alignDB.ini");
+$Config = Config::Tiny->read("$FindBin::Bin/../config.ini");
 
 # record ARGV and Config
 my $stopwatch = AlignDB::Stopwatch->new(
@@ -34,7 +35,7 @@ my $stopwatch = AlignDB::Stopwatch->new(
 my @ids;
 
 # running options
-my $td_dir = $Config->{bac}{td_dir};
+my $td_dir = $Config->{path}{td};    # taxdmp
 
 my $filename = "strains_taxon_info.csv";
 

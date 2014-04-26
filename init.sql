@@ -12,7 +12,6 @@ create table gr
     scaffolds                       int,
     released_date                   date,
     status                          char(255),
-    code                            char(255),
     species                         char(255),
     species_id                      int,
     genus                           char(255),
@@ -28,3 +27,4 @@ create index organism_name_K on gr
 (
    organism_name
 );
+
