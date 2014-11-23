@@ -265,9 +265,9 @@ rm real_chr.csv
 
 echo '# Run the following cmds to merge csv files'
 echo
-echo perl [% aligndb %]/util/merge_csv.pl -t [% findbin %]/../init/taxon.csv -m [% working_dir %]/taxon.csv -f 0 -f 1
+echo perl [% aligndb %]/util/merge_csv.pl -t [% aligndb %]/init/taxon.csv -m [% working_dir %]/taxon.csv -f 0 -f 1
 echo
-echo perl [% aligndb %]/util/merge_csv.pl -t [% findbin %]/../init/chr_length.csv -m [% working_dir %]/chr_length.csv -f 0 -f 1
+echo perl [% aligndb %]/util/merge_csv.pl -t [% aligndb %]/init/chr_length.csv -m [% working_dir %]/chr_length.csv -f 0 -f 1
 echo
 
 EOF
@@ -293,11 +293,14 @@ cd [% working_dir %]
 # seq_pair
 #----------------------------#
 perl [% aligndb %]/extra/seq_pair_batch.pl \
-    -d 1 --parallel [% parallel %] \
-    -f [% working_dir %]/seq_pair.csv -lt 1000 -r 100-102
+    --dir_as_taxon \
+    --parallel [% parallel %] \
+    -f [% working_dir %]/seq_pair.csv \
+    -lt 1000 -r 100-102
 
 perl [% aligndb %]/extra/seq_pair_batch.pl \
-    -d 1 --parallel [% parallel %] \
+    --dir_as_taxon \
+    --parallel [% parallel %] \
     -f [% working_dir %]/seq_pair.csv \
     -lt 1000 -r 1,2,5,21,40
 
@@ -325,7 +328,7 @@ EOF
 cd [% working_dir %]
 
 # join_dbs.pl
-perl [% alignDB %]/extra/join_dbs.pl \
+perl [% aligndb %]/extra/join_dbs.pl \
     --no_insert --block --trimmed_fasta --length 1000 \
     --goal_db [% name_str %]_raw --target 0target \
 [% IF outgroup_id -%]
@@ -350,7 +353,7 @@ cd [% working_dir %]/rawphylo
 rm [% working_dir %]/rawphylo/RAxML*
 
 [% IF query_ids.size > 2 -%]
-perl [% alignDB %]/../blastz/concat_fasta.pl \
+perl [% aligndb %]/../blastz/concat_fasta.pl \
     -i [% working_dir %]/[% name_str %]_raw \
     -o [% working_dir %]/rawphylo/[% name_str %].phy \
     -p
