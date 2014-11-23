@@ -1,0 +1,245 @@
+mkdir -p ~/data/self_alignment
+cd ~/data/self_alignment
+
+#----------------------------------------------------------#
+# NCBI Genbank download
+#----------------------------------------------------------#
+In page, http://www.ncbi.nlm.nih.gov/assembly/285498, click link "Download the full sequence report".
+Then create "yeast_id_seq.csv" manually and put it in dir "~/data/self_alignment/genome"
+
+# http://www.ncbi.nlm.nih.gov/assembly/?term=txid4893[Organism:exp]
+# http://www.ncbi.nlm.nih.gov/genome/?term=txid4893[Organism:exp]
+ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/Eukaryotes/fungi/
+
+# genus
+# Saccharomyces	4930
+# 
+# Candida	5475
+# Ashbya
+
+#genus	taxid	chr	sca
+Dekkera	5006	0	2
+Eremothecium	33170	3	0
+Kazachstania	71245	2	0
+Kluyveromyces	4910	1	3
+Komagataella	460517	2	1
+Lachancea	300275	2	1
+Nakaseomyces	374468	1	1
+Naumovozyma	278028	2	1
+Tetrapisispora	113604	2	0
+Torulaspora	4948	1	0
+Vanderwaltozyma	374469	0	1
+Zygosaccharomyces	4953	1	2
+
+
+
+
+
+Saccharomyces cerevisiae S288c
+Taxonomy ID: 559292
+http://www.ncbi.nlm.nih.gov/assembly/285498
+
+Saccharomyces cerevisiae RM11-1a
+Taxonomy ID: 285006
+http://www.ncbi.nlm.nih.gov/assembly/GCA_000149365.1/
+
+Saccharomyces cerevisiae Sigma1278b
+Taxonomy ID: 658763
+http://www.ncbi.nlm.nih.gov/assembly/174868
+
+Saccharomyces cerevisiae CEN.PK113-7D
+Taxonomy ID: 889517
+http://www.ncbi.nlm.nih.gov/assembly/GCA_000269885.1
+
+Saccharomyces cerevisiae P283
+Taxonomy ID: 1177187
+http://www.ncbi.nlm.nih.gov/assembly/GCA_000568295.1
+
+Saccharomyces cerevisiae W303
+Taxonomy ID: 580240
+http://www.ncbi.nlm.nih.gov/assembly/GCA_000292815.1
+
+Saccharomyces cerevisiae YJSH1
+Taxonomy ID: 1087981
+http://www.ncbi.nlm.nih.gov/assembly/GCA_000275665.1
+
+Saccharomyces arboricola H-6
+Taxonomy ID: 1160507
+http://www.ncbi.nlm.nih.gov/assembly/426528
+
+Lachancea thermotolerans CBS 6340
+Taxonomy ID: 559295
+http://www.ncbi.nlm.nih.gov/assembly/GCF_000142805.1
+
+Lachancea kluyveri NRRL Y-12651
+Taxonomy ID: 226302
+http://www.ncbi.nlm.nih.gov/assembly/GCA_000149225.1
+
+Kluyveromyces lactis NRRL Y-1140
+Taxonomy ID: 284590
+http://www.ncbi.nlm.nih.gov/assembly/353688
+
+Kazachstania naganishii CBS 8797
+Taxonomy ID: 1071383
+http://www.ncbi.nlm.nih.gov/assembly/561368
+
+Kazachstania africana CBS 2517
+Taxonomy ID: 1071382
+http://www.ncbi.nlm.nih.gov/assembly/450298
+
+Tetrapisispora blattae CBS 6284
+Taxonomy ID: 1071380
+http://www.ncbi.nlm.nih.gov/assembly/561688
+
+Tetrapisispora phaffii CBS 4417
+Taxonomy ID: 1071381
+http://www.ncbi.nlm.nih.gov/assembly/328238
+
+Torulaspora delbrueckii
+Taxonomy ID: 4950
+http://www.ncbi.nlm.nih.gov/assembly/328578
+
+Naumovozyma dairenensis CBS 421
+Taxonomy ID: 1071378
+http://www.ncbi.nlm.nih.gov/assembly/453878
+
+Naumovozyma castellii CBS 4309
+Taxonomy ID: 1064592
+http://www.ncbi.nlm.nih.gov/assembly/327898
+
+Zygosaccharomyces rouxii
+Taxonomy ID: 4956
+http://www.ncbi.nlm.nih.gov/assembly/102228
+
+Eremothecium cymbalariae DBVPG#7215
+Taxonomy ID: 931890
+http://www.ncbi.nlm.nih.gov/assembly/328258
+
+Saccharomycetaceae sp. 'Ashbya aceri'
+Taxonomy ID: 566037
+http://www.ncbi.nlm.nih.gov/assembly/707118
+
+Ashbya gossypii ATCC 10895
+Taxonomy ID: 284811
+http://www.ncbi.nlm.nih.gov/assembly/500488
+
+Candida glabrata
+Taxonomy ID: 5478
+http://www.ncbi.nlm.nih.gov/assembly/354578
+
+Komagataella pastoris CBS 7435
+Taxonomy ID: 981350
+http://www.ncbi.nlm.nih.gov/assembly/299688
+
+Komagataella pastoris GS115
+Taxonomy ID: 644223
+http://www.ncbi.nlm.nih.gov/assembly/102048
+
+cd ~/data/self_alignment/genome
+perl ~/Scripts/alignDB/util/batch_get_seq.pl yeast_id_seq.csv  2>&1 | tee yeast_id_seq.log
+
+#----------------------------#
+# taxon info
+#----------------------------#
+cd /home/wangq/data/self_alignment/genome
+perl ~/Scripts/alignDB/taxon/strain_info.pl \
+    --file yeast_ncbi.csv \
+    --id 559292 \
+    --id 285006 \
+    --id 658763 \
+    --id 559295 \
+    --id 226302
+
+#----------------------------#
+# self align
+#----------------------------#
+cd /home/wangq/data/self_alignment
+
+# Saccharomyces cerevisiae
+# copy sequences (raw)
+perl /home/wangq/Scripts/alignDB/taxon/strain_bz_self.pl \
+    --file /home/wangq/data/self_alignment/genome/yeast_ncbi.csv \
+    -w /home/wangq/data/self_alignment \
+    --seq_dir /home/wangq/data/self_alignment/genome \
+    --name Scer \
+    --length 1000 \
+    -q 285006 \
+    -q 658763 \
+    -t 559292
+
+sh Scer/file-rm.sh
+
+# don't copy sequences (RepeatMasker done)
+perl /home/wangq/Scripts/alignDB/taxon/strain_bz_self.pl \
+    --file /home/wangq/data/self_alignment/genome/yeast_ncbi.csv \
+    -w /home/wangq/data/self_alignment \
+    --name Scer \
+    --length 1000 \
+    -q 285006 \
+    -q 658763 \
+    -t 559292
+
+sh Scer/self_cmd.sh
+sh Scer/proc_cmd.sh
+sh Scer/circos_cmd.sh
+sh Scer/feature_cmd.sh
+sh Scer/pair_stat.sh
+    
+# Lachancea
+# copy sequences (raw)
+perl /home/wangq/Scripts/alignDB/taxon/strain_bz_self.pl \
+    --file /home/wangq/data/self_alignment/genome/yeast_ncbi.csv \
+    -w /home/wangq/data/self_alignment \
+    --seq_dir /home/wangq/data/self_alignment/genome \
+    --name Lachancea \
+    --length 1000 \
+    -q 226302 \
+    -t 559295
+
+sh Scer/file-rm.sh
+
+# simplify fasta header
+perl -nl -e "BEGIN { $i = 1}; if (/>/) {print qq{>$i}; $i++;} else {print}" 559292vsselfalign.cc.copy12.fas > copy12.fasta
+
+
+#----------------------------------------------------------#
+# Manually prepare sequences and annotations ( from ensembl downloads )
+#----------------------------------------------------------#
+mkdir -p ~/data/self_alignment/yeast2/559292
+cd ~/data/self_alignment/yeast2/559292
+
+find /home/wangq/data/ensemblgenomes12_65/fungi/fasta/saccharomyces_cerevisiae/dna/ -name "*dna.toplevel*" | xargs gzip -d -c > toplevel.fa
+~/bin/x86_64/faCount toplevel.fa | perl -aln -e 'next if $F[0] eq 'total'; print $F[0] if $F[1] > 100000; print $F[0] if $F[1] > 10000  and $F[6]/$F[1] < 0.05' | uniq > listFile
+~/bin/x86_64/faSomeRecords toplevel.fa listFile toplevel.filtered.fa
+~/bin/x86_64/faSplit byname toplevel.filtered.fa .
+rm toplevel.fa toplevel.filtered.fa listFile
+
+find /home/wangq/data/ensemblgenomes12_65/fungi/gtf/saccharomyces_cerevisiae/ -name "*gtf.gz"  | xargs gzip -d -c > toplevel.gtf
+# cufflinks tool
+#     -F  full GFF attribute preservation 
+#     -O  process also non-transcript GFF records 
+gffread toplevel.gtf -F -O -o- > toplevel.gff
+
+for f in `find $PWD -type f -name "*.fa" | sort | xargs -i basename {} .fa `;do \
+    cat toplevel.gff | perl -nl -e "/^$f\\t/ and print" > $f.gff;
+done
+
+rm toplevel.gtf toplevel.gff
+
+#----------------------------#
+# self align
+#----------------------------#
+cd /home/wangq/data/self_alignment
+
+perl /home/wangq/Scripts/alignDB/taxon/strain_bz_self.pl \
+    --file /home/wangq/data/self_alignment/genome/yeast_ncbi.csv \
+    -w /home/wangq/data/self_alignment \
+    --name yeast2 \
+    --length 1000 \
+    -t 559292
+
+
+find  /home/wangq/data/self_alignment/yeast2/559292 -type f -name "*.gff" \
+    | xargs perl -anle'/^#/ and next; print $F[2]' \
+    | sort | uniq -c \
+    > bacteria.feature.count

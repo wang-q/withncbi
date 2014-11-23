@@ -148,7 +148,7 @@ perl ~/Scripts/withncbi/taxon/bac_prepare.pl -p 1308    -t 264199 -n Streptococc
 perl ~/Scripts/withncbi/taxon/bac_prepare.pl -p 2285   -n Sulfolobus_acidocaldarius
 perl ~/Scripts/withncbi/taxon/bac_prepare.pl -p 43080   -t 427317 -n Sulfolobus_islandicus
 perl ~/Scripts/withncbi/taxon/bac_prepare.pl -p 274    
-perl ~/Scripts/withncbi/taxon/bac_prepare.pl -p 160    
+perl ~/Scripts/withncbi/taxon/bac_prepare.pl -p 160   -e 455434 -n Treponema_pallidum # two chromosomes in one genome
 perl ~/Scripts/withncbi/taxon/bac_prepare.pl -p 34073  
 perl ~/Scripts/withncbi/taxon/bac_prepare.pl -p 666     -t 243277 -n Vibrio_cholerae
 perl ~/Scripts/withncbi/taxon/bac_prepare.pl -p 672    
