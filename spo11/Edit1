@@ -1,0 +1,4 @@
+
+perl -F/,/ -an -e "/CHROM/ and next; print qq{$F[0]\t$F[1]\t$F[2]\n}" spo11_hot.csv > spo11_hot.bed
+
+
