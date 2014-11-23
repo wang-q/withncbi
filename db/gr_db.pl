@@ -59,6 +59,7 @@ GetOptions(
     'd|db=s'       => \$db_name,
     'init_sql=s'   => \$init_sql,
     'file=s'       => \$strain_file,
+    'gr=s'         => \$gr_dir,
     'append'       => \$append,
 ) or pod2usage(2);
 
@@ -79,7 +80,9 @@ if ( !$append ) {
     my $drh = DBI->install_driver("mysql");    # Driver handle object
     $drh->func( 'dropdb',   $db_name, $server, $username, $password, 'admin' );
     $drh->func( 'createdb', $db_name, $server, $username, $password, 'admin' );
-    $drh->func( 'reload',   $db_name, $server, $username, $password, 'admin' );
+
+    # don't need this and crash under win32
+    #$drh->func( 'reload',   $db_name, $server, $username, $password, 'admin' );
 
     my $dbh
         = DBI->connect( "dbi:mysql:$db_name:$server", $username, $password );
@@ -237,8 +240,14 @@ gr_db.pl
 
 =head1 SYNOPSIS
 
+# linux
 perl gr_db.pl --file prok_strains.csv
 
 perl gr_db.pl --append --file euk_strains.csv
+
+# windows
+perl gr_db.pl --file prok_strains.csv --gr d:/data/NCBI/genomes/GENOME_REPORTS
+
+perl gr_db.pl --append --file euk_strains.csv --gr d:/data/NCBI/genomes/GENOME_REPORTS
 
 =cut

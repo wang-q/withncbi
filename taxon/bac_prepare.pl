@@ -96,7 +96,6 @@ GetOptions(
     'is_self'         => \$is_self,
     'length=i'        => \$paralog_length,
     'scaffold'        => \$scaffold,
-    'a|aligndb=s'     => \$aligndb,
     'parallel=i'      => \$parallel,
 ) or pod2usage(2);
 
@@ -319,7 +318,7 @@ my @query_ids;
 cd [% working_dir %]
 
 [% IF ! redo -%]
-perl [% findbin %]/../taxon/strain_info.pl \
+perl [% findbin %]/strain_info.pl \
     --file [% working_dir %]/info.csv \
 [% FOREACH id IN query_ids -%]
     --id [% id %] \
@@ -328,7 +327,7 @@ perl [% findbin %]/../taxon/strain_info.pl \
 [% END -%]
     
 [% IF ! is_self -%]
-perl [% findbin %]/../taxon/strain_bz.pl \
+perl [% findbin %]/strain_bz.pl \
     --file [% working_dir %]/info.csv \
     -w [% working_dir %]/.. \
 [% IF ! redo -%]
@@ -341,7 +340,7 @@ perl [% findbin %]/../taxon/strain_bz.pl \
     -t [% target_id %]
 
 [% ELSE -%]
-perl [% findbin %]/../taxon/strain_bz_self.pl \
+perl [% findbin %]/strain_bz_self.pl \
     --file [% working_dir %]/info.csv \
     -w [% working_dir %]/.. \
 [% IF ! redo -%]
