@@ -240,7 +240,7 @@ gr_db.pl
 
 =head1 SYNOPSIS
 
-# linux
+# linux, mac
 perl gr_db.pl --file prok_strains.csv
 
 perl gr_db.pl --append --file euk_strains.csv

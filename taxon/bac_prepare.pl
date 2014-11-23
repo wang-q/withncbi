@@ -472,5 +472,5 @@ sub prep_scaff {
 
 __END__
 
-perl bac_prepare.pl --base_dir d:\bacteria\bacteria_101015 --parent 562
+perl bac_prepare.pl --base_dir d:/bacteria/bacteria_101015 --parent 562
 perl d:/wq/Scripts/tool/replace.pl -d d:/wq/Scripts/alignDB/bac -p "cmd.bat" -f /home/wangq -r d:/wq
