@@ -52,8 +52,9 @@ my $name_str = "working";
 
 my $filename = "strains_taxon_info.csv";
 
-my $aligndb = replace_home( $Config->{run}{aligndb} );    # current alignDB path
-my $bat_dir = $Config->{run}{bat};                        # Windows alignDB path
+my $aligndb  = replace_home( $Config->{run}{aligndb} );   # current alignDB path
+my $bat_dir  = $Config->{run}{bat};                       # Windows alignDB path
+my $kent_bin = replace_home( $Config->{run}{kent_bin} );  # exes of Jim Kent
 
 # run in parallel mode
 my $parallel = $Config->{run}{parallel};
@@ -295,12 +296,14 @@ cd [% working_dir %]
 # seq_pair
 #----------------------------#
 perl [% aligndb %]/extra/seq_pair_batch.pl \
+    --bin [% kent_bin %] \
     --dir_as_taxon \
     --parallel [% parallel %] \
     -f [% working_dir %]/seq_pair.csv \
     -lt 1000 -r 100-102
 
 perl [% aligndb %]/extra/seq_pair_batch.pl \
+    --bin [% kent_bin %] \
     --dir_as_taxon \
     --parallel [% parallel %] \
     -f [% working_dir %]/seq_pair.csv \
@@ -313,6 +316,7 @@ EOF
             parallel    => $parallel,
             working_dir => $working_dir,
             aligndb     => $aligndb,
+            kent_bin    => $kent_bin,
             name_str    => $name_str,
             target_id   => $target_id,
             outgroup_id => $outgroup_id,
@@ -462,6 +466,7 @@ then
         [% FOREACH id IN query_ids -%]
         -d [% working_dir %]/[% target_id %]vs[% id %] \
         [% END -%]
+        -bin [% kent_bin %] \
         --tree [% working_dir %]/rawphylo/[% name_str %].nwk \
         --out [% working_dir %]/[% name_str %] \
         -syn -p [% parallel %]
@@ -470,6 +475,7 @@ else
         [% FOREACH id IN query_ids -%]
         -d [% working_dir %]/[% target_id %]vs[% id %] \
         [% END -%]
+        -bin [% kent_bin %] \
         --tree [% working_dir %]/fake_tree.nwk \
         --out [% working_dir %]/[% name_str %] \
         -syn -p [% parallel %]
@@ -561,6 +567,7 @@ EOF
             parallel    => $parallel,
             working_dir => $working_dir,
             aligndb     => $aligndb,
+            kent_bin    => $kent_bin,
             name_str    => $name_str,
             target_id   => $target_id,
             outgroup_id => $outgroup_id,
