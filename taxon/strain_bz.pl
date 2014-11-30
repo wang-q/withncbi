@@ -52,8 +52,8 @@ my $name_str = "working";
 
 my $filename = "strains_taxon_info.csv";
 
-my $aligndb = $Config->{run}{aligndb};    # current alignDB path
-my $bat_dir = $Config->{run}{bat};        # Windows alignDB path
+my $aligndb = replace_home( $Config->{run}{aligndb} );    # current alignDB path
+my $bat_dir = $Config->{run}{bat};                        # Windows alignDB path
 
 # run in parallel mode
 my $parallel = $Config->{run}{parallel};
@@ -179,6 +179,7 @@ if ($seq_dir) {
     # taxon.csv
     print "Create taxon.csv\n";
     $text = <<'EOF';
+taxon_id,genus,species,sub_species,common_name,classification
 [% FOREACH item IN data -%]
 [% item.taxon %],[% item.genus %],[% item.species %],[% item.subname %],[% item.name %],
 [% END -%]
@@ -190,8 +191,9 @@ EOF
     ) or die Template->error;
 
     # chr_length.csv
-    print "Create chr_length.csv\n";
+    print "Create chr_length_chrUn.csv\n";
     $text = <<'EOF';
+taxon_id,chr,length,name,assembly
 [% FOREACH item IN data -%]
 [% item.taxon %],chrUn,999999999,[% item.name %]
 [% END -%]
@@ -263,11 +265,11 @@ perl -aln -F"\t" -e 'print qq{[% item.taxon %],$F[0],$F[1],[% item.name %]}' [% 
 cat chr_length_chrUn.csv real_chr.csv > chr_length.csv
 rm real_chr.csv
 
-echo '# Run the following cmds to merge csv files'
+echo '# If you want, run the following cmds to merge csv files'
 echo
-echo perl [% aligndb %]/util/merge_csv.pl -t [% aligndb %]/init/taxon.csv -m [% working_dir %]/taxon.csv -f 0 -f 1
+echo perl [% aligndb %]/util/merge_csv.pl -t [% aligndb %]/data/taxon.csv -m [% working_dir %]/taxon.csv -f 0 -f 1
 echo
-echo perl [% aligndb %]/util/merge_csv.pl -t [% aligndb %]/init/chr_length.csv -m [% working_dir %]/chr_length.csv -f 0 -f 1
+echo perl [% aligndb %]/util/merge_csv.pl -t [% aligndb %]/data/chr_length.csv -m [% working_dir %]/chr_length.csv -f 0 -f 1
 echo
 
 EOF
@@ -684,6 +686,20 @@ sub prep_fa {
     close $in_fh;
 
     return $basename;
+}
+
+sub replace_home {
+    my $path = shift;
+
+    require File::Spec;
+    require File::HomeDir;
+
+    if ( $path =~ /^\~\// ) {
+        $path =~ s/^\~\///;
+        $path = File::Spec->catdir( File::HomeDir->my_home, $path );
+    }
+
+    return $path;
 }
 
 __END__

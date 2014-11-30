@@ -35,7 +35,7 @@ my $stopwatch = AlignDB::Stopwatch->new(
 my @ids;
 
 # running options
-my $td_dir = $Config->{path}{td};    # taxdmp
+my $td_dir = replace_home( $Config->{path}{td} );    # taxdmp
 
 my $filename = "strains_taxon_info.csv";
 
@@ -46,7 +46,7 @@ GetOptions(
     'help|?' => \$help,
     'man'    => \$man,
     'id=i'   => \@ids,
-    'file=s'   => \$filename,
+    'file=s' => \$filename,
 ) or pod2usage(2);
 
 pod2usage(1) if $help;
@@ -127,6 +127,20 @@ RANK: while (1) {
     }
 
     return;
+}
+
+sub replace_home {
+    my $path = shift;
+
+    require File::Spec;
+    require File::HomeDir;
+
+    if ( $path =~ /^\~\// ) {
+        $path =~ s/^\~\///;
+        $path = File::Spec->catdir( File::HomeDir->my_home, $path );
+    }
+
+    return $path;
 }
 
 __END__
