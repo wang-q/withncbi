@@ -3,18 +3,19 @@ use strict;
 use warnings;
 use autodie;
 
-use Mojo::UserAgent;
+use File::Slurp;
+use Mojo::DOM;
 use YAML qw(Dump Load DumpFile LoadFile);
 
-my $url
-    = shift || 'http://www.ncbi.nlm.nih.gov/genomes/GenomesGroup.cgi?taxid=2759&opt=plastid';
+# 'http://www.ncbi.nlm.nih.gov/genomes/GenomesGroup.cgi?taxid=2759&opt=plastid';
+# 'http://www.ncbi.nlm.nih.gov/genomes/GenomesGroup.cgi?taxid=33090&opt=organelle';
 
-#my $url
-#    = 'http://www.ncbi.nlm.nih.gov/genomes/GenomesGroup.cgi?taxid=33090&opt=organelle';
-    
-my $ua = Mojo::UserAgent->new;
+my $file = shift;
+die "Provide a valid html file!\n" unless $file;
 
-my $dom = $ua->get($url)->res->dom;
+my $html = read_file($file);
+
+my $dom = Mojo::DOM->new($html);
 
 my $string = $dom->find('#Tbl1 tr[bgcolor=#F0F0F0] > td > a')->map(
     sub {
