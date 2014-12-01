@@ -191,22 +191,59 @@ EOF
         File::Spec->catfile( $working_dir, "taxon.csv" )
     ) or die Template->error;
 
-    # chr_length.csv
-    print "Create chr_length_chrUn.csv\n";
+    #----------------------------#
+    # all *.sh files
+    #----------------------------#
+    my $sh_name;
+
+    # real_chr.sh
+    $sh_name = "1_real_chr.sh";
+    print "Create $sh_name\n";
     $text = <<'EOF';
+#!/bin/bash
+cd [% working_dir %]
+
+cat << DELIMITER > chrUn.csv
 taxon_id,chr,length,name,assembly
 [% FOREACH item IN data -%]
 [% item.taxon %],chrUn,999999999,[% item.name %]
 [% END -%]
+DELIMITER
+
+if [ -f real_chr.csv ]; then
+    rm real_chr.csv;
+fi;
+
+[% FOREACH item IN data -%]
+faSize -detailed [% item.dir%]/*.fa > [% item.dir%]/chr.sizes
+perl -aln -F"\t" -e 'print qq{[% item.taxon %],$F[0],$F[1],[% item.name %]}' [% item.dir %]/chr.sizes >> real_chr.csv
+[% END -%]
+
+cat chrUn.csv real_chr.csv > chr_length.csv
+
+rm chrUn.csv
+rm real_chr.csv
+
+echo '# If you want, run the following cmds to merge csv files'
+echo
+echo perl [% aligndb %]/util/merge_csv.pl -t [% aligndb %]/data/taxon.csv -m [% working_dir %]/taxon.csv -f 0 -f 1
+echo
+echo perl [% aligndb %]/util/merge_csv.pl -t [% aligndb %]/data/chr_length.csv -m [% working_dir %]/chr_length.csv -f 0 -f 1
+echo
+
 EOF
     $tt->process(
         \$text,
-        { data => \@data, },
-        File::Spec->catfile( $working_dir, "chr_length_chrUn.csv" )
+        {   data        => \@data,
+            working_dir => $working_dir,
+            aligndb     => $aligndb,
+        },
+        File::Spec->catfile( $working_dir, $sh_name )
     ) or die Template->error;
 
     # file-rm.sh
-    print "Create file-rm.sh\n";
+    $sh_name = "2_file_rm.sh";
+    print "Create $sh_name\n";
     $text = <<'EOF';
 #!/bin/bash
 
@@ -245,46 +282,12 @@ EOF
             target_id   => $target_id,
             query_ids   => \@query_ids,
         },
-        File::Spec->catfile( $working_dir, "file-rm.sh" )
-    ) or die Template->error;
-
-    # real_chr.sh
-    print "Create real_chr.sh\n";
-    $text = <<'EOF';
-#!/bin/bash
-cd [% working_dir %]
-
-if [ -f real_chr.csv ]; then
-    rm real_chr.csv;
-fi;
-
-[% FOREACH item IN data -%]
-faSize -detailed [% item.dir%]/*.fa > [% item.dir%]/chr.sizes
-perl -aln -F"\t" -e 'print qq{[% item.taxon %],$F[0],$F[1],[% item.name %]}' [% item.dir %]/chr.sizes >> real_chr.csv
-[% END -%]
-
-cat chr_length_chrUn.csv real_chr.csv > chr_length.csv
-rm real_chr.csv
-
-echo '# If you want, run the following cmds to merge csv files'
-echo
-echo perl [% aligndb %]/util/merge_csv.pl -t [% aligndb %]/data/taxon.csv -m [% working_dir %]/taxon.csv -f 0 -f 1
-echo
-echo perl [% aligndb %]/util/merge_csv.pl -t [% aligndb %]/data/chr_length.csv -m [% working_dir %]/chr_length.csv -f 0 -f 1
-echo
-
-EOF
-    $tt->process(
-        \$text,
-        {   data        => \@data,
-            working_dir => $working_dir,
-            aligndb     => $aligndb,
-        },
-        File::Spec->catfile( $working_dir, "real_chr.sh" )
+        File::Spec->catfile( $working_dir, $sh_name )
     ) or die Template->error;
 
     # pair_cmd.sh
-    print "Create pair_cmd.sh\n";
+    $sh_name = "3_pair_cmd.sh";
+    print "Create $sh_name\n";
     $text = <<'EOF';
 #!/bin/bash
 # strain_bz.pl
@@ -300,6 +303,8 @@ perl [% aligndb %]/extra/seq_pair_batch.pl \
     --dir_as_taxon \
     --parallel [% parallel %] \
     -f [% working_dir %]/seq_pair.csv \
+    -taxon [% working_dir %]/taxon.csv \
+    -chr [% working_dir %]/chr_length.csv \
     -lt 1000 -r 100-102
 
 perl [% aligndb %]/extra/seq_pair_batch.pl \
@@ -307,6 +312,8 @@ perl [% aligndb %]/extra/seq_pair_batch.pl \
     --dir_as_taxon \
     --parallel [% parallel %] \
     -f [% working_dir %]/seq_pair.csv \
+    -taxon [% working_dir %]/taxon.csv \
+    -chr [% working_dir %]/chr_length.csv \
     -lt 1000 -r 1,2,5,21,40
 
 EOF
@@ -322,11 +329,12 @@ EOF
             outgroup_id => $outgroup_id,
             query_ids   => \@query_ids,
         },
-        File::Spec->catfile( $working_dir, "pair_cmd.sh" )
+        File::Spec->catfile( $working_dir, $sh_name )
     ) or die Template->error;
 
     # rawphylo.sh
-    print "Create rawphylo.sh\n";
+    $sh_name = "4_rawphylo.sh";
+    print "Create $sh_name\n";
     $text = <<'EOF';
 #!/bin/bash
 # perl [% stopwatch.cmd_line %]
@@ -393,41 +401,12 @@ EOF
             outgroup_id => $outgroup_id,
             query_ids   => \@query_ids,
         },
-        File::Spec->catfile( $working_dir, "rawphylo.sh" )
-    ) or die Template->error;
-
-    # cmd.bat
-    print "Create cmd.bat\n";
-    $text = <<'EOF';
-REM strain_bz.pl
-REM perl [% stopwatch.cmd_line %]
-
-REM basicstat
-perl [% bat_dir %]/fig/collect_common_basic.pl -d .
-
-REM common chart
-if exist [% name_str %].common.xlsx perl [% bat_dir %]/stat/common_chart_factory.pl -i [% name_str %].common.xlsx
-
-REM multi chart
-if exist [% name_str %].multi.xlsx  perl [% bat_dir %]/stat/multi_chart_factory.pl -i [% name_str %].multi.xlsx
-
-REM gc chart
-if exist [% name_str %].gc.xlsx     perl [% bat_dir %]/stat/gc_chart_factory.pl --add_trend 1 -i [% name_str %].gc.xlsx
-
-EOF
-    $tt->process(
-        \$text,
-        {   stopwatch   => $stopwatch,
-            parallel    => $parallel,
-            working_dir => $working_dir,
-            bat_dir     => $bat_dir,
-            name_str    => $name_str,
-        },
-        File::Spec->catfile( $working_dir, "chart.bat" )
+        File::Spec->catfile( $working_dir, $sh_name )
     ) or die Template->error;
 
     # multi_cmd.sh
-    print "Create multi_cmd.sh\n";
+    $sh_name = "5_multi_cmd.sh";
+    print "Create $sh_name\n";
     $text = <<'EOF';
 #!/bin/bash
 # perl [% stopwatch.cmd_line %]
@@ -520,32 +499,17 @@ find [% working_dir %]/[% name_str %]_clw -type f -name "*.fas" | parallel -j [%
 [% END -%]
 
 #----------------------------#
-# multi_way_batch
-#----------------------------#
-perl [% aligndb %]/extra/multi_way_batch.pl \
-    -d [% name_str %] \
-[% IF clustalw -%]
-    -da [% working_dir %]/[% name_str %]_clw \
-[% ELSE -%]
-    -da [% working_dir %]/[% name_str %]_mft \
-[% END -%]
-    --gff_file [% FOREACH acc IN target_accs %][% working_dir %]/[% target_id %]/[% acc %].gff,[% END %] \
-    --rm_gff_file [% FOREACH acc IN target_accs %][% working_dir %]/[% target_id %]/[% acc %].rm.gff,[% END %] \
-    --block --id [% working_dir %]/id2name.csv \
-[% IF outgroup_id -%]
-    --outgroup \
-[% END -%]
-    -lt 1000 --parallel [% parallel %] --batch 5 \
-    --run 1,2,5,10,21,30-32,40-42,44
-
-#----------------------------#
 # RAxML
 #----------------------------#
 [% IF query_ids.size > 2 -%]
 cd [% working_dir %]/phylo
 
 perl [% aligndb %]/../blastz/concat_fasta.pl \
+[% IF clustalw -%]
+    -i [% working_dir %]/[% name_str %]_clw \
+[% ELSE -%]
     -i [% working_dir %]/[% name_str %]_mft  \
+[% END -%] 
     -o [% working_dir %]/phylo/[% name_str %].phy \
     -p
 
@@ -575,11 +539,12 @@ EOF
             target_accs => \@target_accs,
             clustalw    => $clustalw,
         },
-        File::Spec->catfile( $working_dir, "multi_cmd.sh" )
+        File::Spec->catfile( $working_dir, $sh_name )
     ) or die Template->error;
 
     # multi_db_only.sh
-    print "Create multi_db_only.sh\n";
+    $sh_name = "6_multi_db_only.sh";
+    print "Create $sh_name\n";
     $text = <<'EOF';
 #!/bin/bash
 # perl [% stopwatch.cmd_line %]
@@ -605,7 +570,6 @@ perl [% aligndb %]/extra/multi_way_batch.pl \
     -lt 1000 --parallel [% parallel %] --batch 5 \
     --run 1,2,5,10,21,30-32,40-42,44
 
-    
 EOF
     $tt->process(
         \$text,
@@ -620,8 +584,42 @@ EOF
             target_accs => \@target_accs,
             clustalw    => $clustalw,
         },
-        File::Spec->catfile( $working_dir, "multi_db_only.sh" )
+        File::Spec->catfile( $working_dir, $sh_name )
     ) or die Template->error;
+
+    # chart.bat
+    print "Create chart.bat\n";
+    $text = <<'EOF';
+REM strain_bz.pl
+REM perl [% stopwatch.cmd_line %]
+
+REM basicstat
+perl [% bat_dir %]/fig/collect_common_basic.pl -d .
+
+REM common chart
+if exist [% name_str %].common.xlsx perl [% bat_dir %]/stat/common_chart_factory.pl -i [% name_str %].common.xlsx
+
+REM multi chart
+if exist [% name_str %].multi.xlsx  perl [% bat_dir %]/stat/multi_chart_factory.pl -i [% name_str %].multi.xlsx
+
+REM gc chart
+if exist [% name_str %].gc.xlsx     perl [% bat_dir %]/stat/gc_chart_factory.pl --add_trend 1 -i [% name_str %].gc.xlsx
+
+EOF
+    $tt->process(
+        \$text,
+        {   stopwatch   => $stopwatch,
+            parallel    => $parallel,
+            working_dir => $working_dir,
+            bat_dir     => $bat_dir,
+            name_str    => $name_str,
+        },
+        File::Spec->catfile( $working_dir, "chart.bat" )
+    ) or die Template->error;
+
+    # message
+    $stopwatch->block_message("Execute *.sh files in order.");
+
 }
 
 #----------------------------#
