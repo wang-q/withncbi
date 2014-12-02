@@ -43,18 +43,20 @@ my $seq_dir;    #  will prep_fa from this dir ~/Scripts/alignDB/taxon
                 #  or use seqs store in $working_dir
 
 my $target_id;
-my $outgroup_id;
 my @query_ids;
+my $outgroup_id;
 
 my $clustalw;
 
 my $name_str = "working";
 
+# all taxons in this project (may also contain unused taxons)
 my $filename = "strains_taxon_info.csv";
 
-my $aligndb  = replace_home( $Config->{run}{aligndb} );   # current alignDB path
-my $bat_dir  = $Config->{run}{bat};                       # Windows alignDB path
-my $kent_bin = replace_home( $Config->{run}{kent_bin} );  # exes of Jim Kent
+my $aligndb  = replace_home( $Config->{run}{aligndb} );     # alignDB path
+my $egaz     = replace_home( $Config->{run}{egaz} );        # egaz path
+my $kent_bin = replace_home( $Config->{run}{kent_bin} );    # exes of Jim Kent
+my $bat_dir  = $Config->{run}{bat};                         # Windows scripts
 
 # run in parallel mode
 my $parallel = $Config->{run}{parallel};
@@ -68,10 +70,9 @@ GetOptions(
     'file=s'          => \$filename,
     'w|working_dir=s' => \$working_dir,
     's|seq_dir=s'     => \$seq_dir,
-    'b|bat_dir=s'     => \$bat_dir,
     't|target_id=i'   => \$target_id,
-    'o|r|outgroup=i'  => \$outgroup_id,
     'q|query_ids=i'   => \@query_ids,
+    'o|r|outgroup=i'  => \$outgroup_id,
     'n|name_str=s'    => \$name_str,
     'clustalw'        => \$clustalw,
     'parallel=i'      => \$parallel,
@@ -149,7 +150,7 @@ if ($seq_dir) {
     close $fh;
 }
 
-{
+{    # use id as species name
     print "Create id2name.csv\n";
     my $id2name_file = File::Spec->catfile( $working_dir, "id2name.csv" );
     open my $fh, '>', $id2name_file;
@@ -174,6 +175,7 @@ if ($seq_dir) {
 {
     my $tt = Template->new;
     my $text;
+    my $sh_name;
     my @data
         = map { taxon_info( $_, $working_dir ) } ( $target_id, @query_ids );
 
@@ -194,7 +196,6 @@ EOF
     #----------------------------#
     # all *.sh files
     #----------------------------#
-    my $sh_name;
 
     # real_chr.sh
     $sh_name = "1_real_chr.sh";
@@ -215,11 +216,12 @@ if [ -f real_chr.csv ]; then
 fi;
 
 [% FOREACH item IN data -%]
-faSize -detailed [% item.dir%]/*.fa > [% item.dir%]/chr.sizes
+[% kent_bin %]/faSize -detailed [% item.dir%]/*.fa > [% item.dir%]/chr.sizes
 perl -aln -F"\t" -e 'print qq{[% item.taxon %],$F[0],$F[1],[% item.name %]}' [% item.dir %]/chr.sizes >> real_chr.csv
 [% END -%]
 
 cat chrUn.csv real_chr.csv > chr_length.csv
+echo "chr_length.csv generated."
 
 rm chrUn.csv
 rm real_chr.csv
@@ -237,6 +239,7 @@ EOF
         {   data        => \@data,
             working_dir => $working_dir,
             aligndb     => $aligndb,
+            kent_bin    => $kent_bin,
         },
         File::Spec->catfile( $working_dir, $sh_name )
     ) or die Template->error;
@@ -367,7 +370,7 @@ cd [% working_dir %]/rawphylo
 rm [% working_dir %]/rawphylo/RAxML*
 
 [% IF query_ids.size > 2 -%]
-perl [% aligndb %]/../blastz/concat_fasta.pl \
+perl [% egaz%]/concat_fasta.pl \
     -i [% working_dir %]/[% name_str %]_raw \
     -o [% working_dir %]/rawphylo/[% name_str %].phy \
     -p
@@ -396,6 +399,7 @@ EOF
             parallel    => $parallel,
             working_dir => $working_dir,
             aligndb     => $aligndb,
+            egaz        => $egaz,
             name_str    => $name_str,
             target_id   => $target_id,
             outgroup_id => $outgroup_id,
@@ -441,7 +445,7 @@ mkdir [% working_dir %]/phylo
 #----------------------------#
 if [ -f [% working_dir %]/rawphylo/[% name_str %].nwk ]
 then
-    perl [% aligndb %]/../blastz/mz.pl \
+    perl [% egaz %]/mz.pl \
         [% FOREACH id IN query_ids -%]
         -d [% working_dir %]/[% target_id %]vs[% id %] \
         [% END -%]
@@ -450,7 +454,7 @@ then
         --out [% working_dir %]/[% name_str %] \
         -syn -p [% parallel %]
 else
-    perl [% aligndb %]/../blastz/mz.pl \
+    perl [% egaz %]/mz.pl \
         [% FOREACH id IN query_ids -%]
         -d [% working_dir %]/[% target_id %]vs[% id %] \
         [% END -%]
@@ -465,7 +469,7 @@ find [% working_dir %]/[% name_str %] -type f -name "*.maf" | parallel -j [% par
 #----------------------------#
 # maf2fasta
 #----------------------------#
-perl [% aligndb %]/../blastz/maf2fasta.pl \
+perl [% egaz %]/maf2fasta.pl \
     -p [% parallel %] --block \
     -i [% working_dir %]/[% name_str %] \
     -o [% working_dir %]/[% name_str %]_fasta
@@ -473,7 +477,7 @@ perl [% aligndb %]/../blastz/maf2fasta.pl \
 #----------------------------#
 # mafft
 #----------------------------#
-perl [% aligndb %]/../blastz/refine_fasta.pl \
+perl [% egaz %]/refine_fasta.pl \
     --msa mafft --block -p [% parallel %] \
 [% IF outgroup_id -%]
     --outgroup \
@@ -487,7 +491,7 @@ find [% working_dir %]/[% name_str %]_mft -type f -name "*.fas" | parallel -j [%
 #----------------------------#
 # clustalw
 #----------------------------#
-perl [% aligndb %]/../blastz/refine_fasta.pl \
+perl [% egaz %]/refine_fasta.pl \
     --msa clustalw --block -p [% parallel %] \
 [% IF outgroup_id -%]
     --outgroup \
@@ -504,7 +508,7 @@ find [% working_dir %]/[% name_str %]_clw -type f -name "*.fas" | parallel -j [%
 [% IF query_ids.size > 2 -%]
 cd [% working_dir %]/phylo
 
-perl [% aligndb %]/../blastz/concat_fasta.pl \
+perl [% egaz %]/concat_fasta.pl \
 [% IF clustalw -%]
     -i [% working_dir %]/[% name_str %]_clw \
 [% ELSE -%]
@@ -531,6 +535,7 @@ EOF
             parallel    => $parallel,
             working_dir => $working_dir,
             aligndb     => $aligndb,
+            egaz        => $egaz,
             kent_bin    => $kent_bin,
             name_str    => $name_str,
             target_id   => $target_id,
@@ -594,16 +599,16 @@ REM strain_bz.pl
 REM perl [% stopwatch.cmd_line %]
 
 REM basicstat
-perl [% bat_dir %]/fig/collect_common_basic.pl -d .
+perl [% bat_dir %]/fig_table/collect_common_basic.pl -d .
 
 REM common chart
-if exist [% name_str %].common.xlsx perl [% bat_dir %]/stat/common_chart_factory.pl -i [% name_str %].common.xlsx
+if exist [% name_str %].common.xlsx perl [% bat_dir %]/alignDB/stat/common_chart_factory.pl -i [% name_str %].common.xlsx
 
 REM multi chart
-if exist [% name_str %].multi.xlsx  perl [% bat_dir %]/stat/multi_chart_factory.pl -i [% name_str %].multi.xlsx
+if exist [% name_str %].multi.xlsx  perl [% bat_dir %]/alignDB/stat/multi_chart_factory.pl -i [% name_str %].multi.xlsx
 
 REM gc chart
-if exist [% name_str %].gc.xlsx     perl [% bat_dir %]/stat/gc_chart_factory.pl --add_trend 1 -i [% name_str %].gc.xlsx
+if exist [% name_str %].gc.xlsx     perl [% bat_dir %]/alignDB/stat/gc_chart_factory.pl --add_trend 1 -i [% name_str %].gc.xlsx
 
 EOF
     $tt->process(

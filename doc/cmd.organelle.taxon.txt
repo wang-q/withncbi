@@ -128,14 +128,16 @@ cd organelle
 mkdir plastid
 cd ~/data/organelle/plastid
 
-perl ~/Scripts/withncbi/taxon/id_seq_dom_select.pl > plastid_id_seq.csv
+perl ~/Scripts/withncbi/taxon/id_seq_dom_select.pl ~/data/organelle/plant_plastid.20141130.html > plastid_id_seq.csv
 perl ~/Scripts/withncbi/util/batch_get_seq.pl plastid_id_seq.csv  2>&1 | tee plastid_seq.log
 
+# count downloaded sequences
+find . -name "*.fasta" | wc -l
 
 #----------------------------#
 # taxon info
 #----------------------------#
-perl ~/Scripts/alignDB/taxon/strain_info.pl \
+perl ~/Scripts/withncbi/taxon/strain_info.pl \
     --file plastid_ncbi.csv \
     --id 2711       \
     --id 2762       \

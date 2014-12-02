@@ -1,6 +1,7 @@
 #!/usr/bin/perl
 use strict;
 use warnings;
+use autodie;
 
 use Getopt::Long;
 use Pod::Usage;
@@ -28,7 +29,7 @@ use AlignDB::Stopwatch;
 # GetOpt section
 #----------------------------------------------------------#
 my $Config = Config::Tiny->new;
-$Config = Config::Tiny->read("$FindBin::Bin/../alignDB.ini");
+$Config = Config::Tiny->read("$FindBin::Bin/../config.ini");
 
 # record ARGV and Config
 my $stopwatch = AlignDB::Stopwatch->new(
@@ -41,8 +42,6 @@ my $working_dir = ".";
 my $seq_dir;    #  will prep_fa from this dir ~/Scripts/alignDB/taxon
                 #  or use seqs store in $working_dir
 
-my $bat_dir = "d:/wq/Scripts/alignDB";    # Windows alignDB path
-
 my $target_id;
 my @query_ids;
 
@@ -52,10 +51,18 @@ my $length = 1000;
 
 my $name_str = "working";
 
-my $taxon_file = "strains_taxon_info.csv";
+# all taxons in this project (may also contain unused taxons)
+my $filename = "strains_taxon_info.csv";
+
+my $aligndb  = replace_home( $Config->{run}{aligndb} );   # current alignDB path
+my $egaz     = replace_home( $Config->{run}{egaz} );      # egaz path
+my $kent_bin = replace_home( $Config->{run}{kent_bin} );  # exes of Jim Kent
+my $bat_dir  = $Config->{run}{bat};                       # Windows alignDB path
+my $blast    = replace_home( $Config->{run}{blast} );     # blast path
+my $circos   = replace_home( $Config->{run}{circos} );    # circos path
 
 # run in parallel mode
-my $parallel = $Config->{generate}{parallel};
+my $parallel = $Config->{run}{parallel};
 
 my $man  = 0;
 my $help = 0;
@@ -63,15 +70,14 @@ my $help = 0;
 GetOptions(
     'help|?'          => \$help,
     'man'             => \$man,
-    'file=s'          => \$taxon_file,
+    'file=s'          => \$filename,
     'w|working_dir=s' => \$working_dir,
     's|seq_dir=s'     => \$seq_dir,
-    'b|bat_dir=s'     => \$bat_dir,
     't|target_id=i'   => \$target_id,
     'q|query_ids=i'   => \@query_ids,
+    'length=i'        => \$length,
     'n|name_str=s'    => \$name_str,
     'clustalw'        => \$clustalw,
-    'length=i'        => \$length,
     'parallel=i'      => \$parallel,
 ) or pod2usage(2);
 
@@ -83,7 +89,7 @@ pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
 #----------------------------------------------------------#
 $stopwatch->start_message("Writing strains summary...");
 
-die "--file Taxon file $taxon_file doesn't exist\n" unless -e $taxon_file;
+die "$filename doesn't exist\n" unless -e $filename;
 
 # prepare working dir
 {
@@ -150,12 +156,14 @@ my $acc_of = {};
 {
     my $tt = Template->new;
     my $text;
+    my $sh_name;
     my @data
         = map { taxon_info( $_, $working_dir ) } ( $target_id, @query_ids );
 
     # taxon.csv
     print "Create taxon.csv\n";
     $text = <<'EOF';
+taxon_id,genus,species,sub_species,common_name,classification
 [% FOREACH item IN data -%]
 [% item.taxon %],[% item.genus %],[% item.species %],[% item.subname %],[% item.name %],
 [% END -%]
@@ -166,21 +174,60 @@ EOF
         File::Spec->catfile( $working_dir, "taxon.csv" )
     ) or die Template->error;
 
-    # chr_length.csv
-    print "Create chr_length.csv\n";
+    #----------------------------#
+    # all *.sh files
+    #----------------------------#
+
+    # real_chr.sh
+    $sh_name = "1_real_chr.sh";
+    print "Create $sh_name\n";
     $text = <<'EOF';
+#!/bin/bash
+cd [% working_dir %]
+
+cat << DELIMITER > chrUn.csv
+taxon_id,chr,length,name,assembly
 [% FOREACH item IN data -%]
 [% item.taxon %],chrUn,999999999,[% item.name %]
 [% END -%]
+DELIMITER
+
+if [ -f real_chr.csv ]; then
+    rm real_chr.csv;
+fi;
+
+[% FOREACH item IN data -%]
+[% kent_bin %]/faSize -detailed [% item.dir%]/*.fa > [% item.dir%]/chr.sizes
+perl -aln -F"\t" -e 'print qq{[% item.taxon %],$F[0],$F[1],[% item.name %]}' [% item.dir %]/chr.sizes >> real_chr.csv
+[% END -%]
+
+cat chrUn.csv real_chr.csv > chr_length.csv
+echo "chr_length.csv generated."
+
+rm chrUn.csv
+rm real_chr.csv
+
+echo '# If you want, run the following cmds to merge csv files'
+echo
+echo perl [% aligndb %]/util/merge_csv.pl -t [% aligndb %]/data/taxon.csv -m [% working_dir %]/taxon.csv -f 0 -f 1
+echo
+echo perl [% aligndb %]/util/merge_csv.pl -t [% aligndb %]/data/chr_length.csv -m [% working_dir %]/chr_length.csv -f 0 -f 1
+echo
+
 EOF
     $tt->process(
         \$text,
-        { data => \@data, },
-        File::Spec->catfile( $working_dir, "chr_length_chrUn.csv" )
+        {   data        => \@data,
+            working_dir => $working_dir,
+            aligndb     => $aligndb,
+            kent_bin    => $kent_bin,
+        },
+        File::Spec->catfile( $working_dir, $sh_name )
     ) or die Template->error;
 
     # file-rm.sh
-    print "Create file-rm.sh\n";
+    $sh_name = "2_file_rm.sh";
+    print "Create $sh_name\n";
     $text = <<'EOF';
 #!/bin/bash
 
@@ -219,48 +266,15 @@ EOF
             target_id   => $target_id,
             query_ids   => \@query_ids,
         },
-        File::Spec->catfile( $working_dir, "file-rm.sh" )
-    ) or die Template->error;
-
-    # real_chr.sh
-    print "Create real_chr.sh\n";
-    $text = <<'EOF';
-#!/bin/bash
-cd [% working_dir %]
-
-if [ -f real_chr.csv ]; then
-    rm real_chr.csv;
-fi;
-
-[% FOREACH item IN data -%]
-faSize -detailed [% item.dir%]/*.fa > [% item.dir%]/chr.sizes
-perl -aln -F"\t" -e 'print qq{[% item.taxon %],$F[0],$F[1],[% item.name %]}' [% item.dir %]/chr.sizes >> real_chr.csv
-[% END -%]
-
-cat chr_length_chrUn.csv real_chr.csv > chr_length.csv
-rm real_chr.csv
-
-echo '# Run the following cmds to merge csv files'
-echo
-echo perl [% findbin %]/../util/merge_csv.pl -t [% findbin %]/../init/taxon.csv -m [% working_dir %]/taxon.csv -f 0 -f 1
-echo
-echo perl [% findbin %]/../util/merge_csv.pl -t [% findbin %]/../init/chr_length.csv -m [% working_dir %]/chr_length.csv -f 0 -f 1
-echo
-
-EOF
-    $tt->process(
-        \$text,
-        {   data        => \@data,
-            working_dir => $working_dir,
-            findbin     => $FindBin::Bin,
-        },
-        File::Spec->catfile( $working_dir, "real_chr.sh" )
+        File::Spec->catfile( $working_dir, $sh_name )
     ) or die Template->error;
 
     # self_cmd.sh
-    print "Create self_cmd.sh\n";
+    $sh_name = "3_self_cmd.sh";
+    print "Create $sh_name\n";
     $text = <<'EOF';
 #!/bin/bash
+# strain_bz_self.pl
 # perl [% stopwatch.cmd_line %]
 
 cd [% working_dir %]
@@ -277,7 +291,7 @@ fi
 #----------------------------#
 # self bz
 #----------------------------#
-perl [% findbin %]/../../blastz/bz.pl \
+perl [% egaz %]/bz.pl \
     --is_self \
     -s set01 -C 0 --noaxt -pb lastz --lastz \
     -dt [% working_dir %]/[% item.taxon %] \
@@ -288,7 +302,8 @@ perl [% findbin %]/../../blastz/bz.pl \
 #----------------------------#
 # lpcna
 #----------------------------#
-perl [% findbin %]/../../blastz/lpcna.pl \
+perl [% egaz %]/lpcna.pl \
+    -bin [% kent_bin %] \
     -dt [% working_dir %]/[% item.taxon %] \
     -dq [% working_dir %]/[% item.taxon %] \
     -dl [% working_dir %]/[% item.taxon %]vsselfalign \
@@ -302,17 +317,20 @@ EOF
         {   stopwatch   => $stopwatch,
             parallel    => $parallel,
             working_dir => $working_dir,
-            findbin     => $FindBin::Bin,
+            aligndb     => $aligndb,
+            egaz        => $egaz,
+            kent_bin    => $kent_bin,
             name_str    => $name_str,
             target_id   => $target_id,
             query_ids   => \@query_ids,
             data        => \@data,
         },
-        File::Spec->catfile( $working_dir, "self_cmd.sh" )
+        File::Spec->catfile( $working_dir, $sh_name )
     ) or die Template->error;
 
     # proc_cmd.sh
-    print "Create proc_cmd.sh\n";
+    $sh_name = "4_proc_cmd.sh";
+    print "Create $sh_name\n";
     $text = <<'EOF';
 #!/bin/bash
 # perl [% stopwatch.cmd_line %]
@@ -340,14 +358,14 @@ cd [% working_dir %]/[% item.taxon %]_proc
 #----------------------------#
 # quick and dirty coverage
 #----------------------------#
-perl [% findbin %]/../slice/gather_info_axt.pl -l [% length %] -d [% working_dir %]/[% item.taxon %]vsselfalign --nomatch
-perl [% findbin %]/../slice/compare_runlist.pl -op intersect -f1 [% item.taxon %]vsselfalign.runlist.0.yml -f2 [% item.taxon %]vsselfalign.runlist.1.yml -o [% item.taxon %]vsselfalign.runlist.i.yml
-perl [% findbin %]/../slice/compare_runlist.pl -op xor -f1 [% item.taxon %]vsselfalign.runlist.0.yml -f2 [% item.taxon %]vsselfalign.runlist.1.yml -o [% item.taxon %]vsselfalign.runlist.x.yml
-perl [% findbin %]/../slice/compare_runlist.pl -op union -f1 [% item.taxon %]vsselfalign.runlist.0.yml -f2 [% item.taxon %]vsselfalign.runlist.1.yml -o [% item.taxon %]vsselfalign.runlist.u.yml
+perl [% aligndb %]/slice/gather_info_axt.pl -l [% length %] -d [% working_dir %]/[% item.taxon %]vsselfalign --nomatch
+perl [% aligndb %]/slice/compare_runlist.pl -op intersect -f1 [% item.taxon %]vsselfalign.runlist.0.yml -f2 [% item.taxon %]vsselfalign.runlist.1.yml -o [% item.taxon %]vsselfalign.runlist.i.yml
+perl [% aligndb %]/slice/compare_runlist.pl -op xor -f1 [% item.taxon %]vsselfalign.runlist.0.yml -f2 [% item.taxon %]vsselfalign.runlist.1.yml -o [% item.taxon %]vsselfalign.runlist.x.yml
+perl [% aligndb %]/slice/compare_runlist.pl -op union -f1 [% item.taxon %]vsselfalign.runlist.0.yml -f2 [% item.taxon %]vsselfalign.runlist.1.yml -o [% item.taxon %]vsselfalign.runlist.u.yml
 
 for op in 0 1 i x u
 do
-    perl [% findbin %]/../slice/stat_runlist.pl --size [% working_dir %]/[% item.taxon %]/chr.sizes -f [% item.taxon %]vsselfalign.runlist.$op.yml;
+    perl [% aligndb %]/slice/stat_runlist.pl --size [% working_dir %]/[% item.taxon %]/chr.sizes -f [% item.taxon %]vsselfalign.runlist.$op.yml;
 done
 
 echo "group,name,length,size,coverage" > [% working_dir %]/[% item.taxon %]_result/[% item.taxon %].[% length %].csv
@@ -371,39 +389,39 @@ find [% working_dir %]/[% item.taxon %] -type f -name "*.fa" \
     > [% item.taxon %].genome.fasta
 
 echo "* build genome blast db [% item.taxon %].genome.fasta"
-formatdb -p F -o T -i [% item.taxon %].genome.fasta
+[% blast %]/bin/formatdb -p F -o T -i [% item.taxon %].genome.fasta
 
-perl [% findbin %]/../slice/gather_seq_axt.pl -l [% length %] -d [% working_dir %]/[% item.taxon %]vsselfalign
+perl [% aligndb %]/slice/gather_seq_axt.pl -l [% length %] -d [% working_dir %]/[% item.taxon %]vsselfalign
 
 echo "* blast [% item.taxon %]vsselfalign.axt.fasta"
-blastall -p blastn -F "m D" -m 0 -b 10 -v 10 -e 1e-3 -a 8 -i [% item.taxon %]vsselfalign.axt.fasta -d [% item.taxon %].genome.fasta -o [% item.taxon %]vsselfalign.axt.blast
+[% blast %]/bin/blastall -p blastn -F "m D" -m 0 -b 10 -v 10 -e 1e-3 -a 8 -i [% item.taxon %]vsselfalign.axt.fasta -d [% item.taxon %].genome.fasta -o [% item.taxon %]vsselfalign.axt.blast
 
 #----------------------------#
 # paralog sequences
 #----------------------------#
 # Omit genome locations in .axt
 # There are errors, especially for queries
-perl [% findbin %]/../slice/blastn_genome_location.pl -f [% item.taxon %]vsselfalign.axt.blast -m 0 -i 90 -c 0.95
+perl [% aligndb %]/slice/blastn_genome_location.pl -f [% item.taxon %]vsselfalign.axt.blast -m 0 -i 90 -c 0.95
 
 #----------------------------#
 # paralog blast
 #----------------------------#
 echo "* build paralog blast db [% item.taxon %]vsselfalign.gl.fasta"
-formatdb -p F -o T -i [% item.taxon %]vsselfalign.gl.fasta
+[% blast %]/bin/formatdb -p F -o T -i [% item.taxon %]vsselfalign.gl.fasta
 
 echo "* blast [% item.taxon %]vsselfalign.gl.fasta"
-blastall -p blastn -F "m D" -m 0 -b 10 -v 10 -e 1e-3 -a 8 -i [% item.taxon %]vsselfalign.gl.fasta -d [% item.taxon %]vsselfalign.gl.fasta -o [% item.taxon %]vsselfalign.gl.blast
+[% blast %]/bin/blastall -p blastn -F "m D" -m 0 -b 10 -v 10 -e 1e-3 -a 8 -i [% item.taxon %]vsselfalign.gl.fasta -d [% item.taxon %]vsselfalign.gl.fasta -o [% item.taxon %]vsselfalign.gl.blast
 
 #----------------------------#
 # merge
 #----------------------------#
-perl [% findbin %]/../slice/blastn_paralog.pl -f [% item.taxon %]vsselfalign.gl.blast -m 0 -i 90 -c 0.9
+perl [% aligndb %]/slice/blastn_paralog.pl -f [% item.taxon %]vsselfalign.gl.blast -m 0 -i 90 -c 0.9
 
-perl [% findbin %]/../slice/merge_node.pl    -v -f [% item.taxon %]vsselfalign.blast.tsv -o [% item.taxon %]vsselfalign.merge.yml -c 0.9
-perl [% findbin %]/../slice/paralog_graph.pl -v -f [% item.taxon %]vsselfalign.blast.tsv -m [% item.taxon %]vsselfalign.merge.yml --nonself -o [% item.taxon %]vsselfalign.merge.graph.yml
-perl [% findbin %]/../slice/cc.pl               -f [% item.taxon %]vsselfalign.merge.graph.yml
-perl [% findbin %]/../slice/proc_cc_chop.pl     -f [% item.taxon %]vsselfalign.cc.yml --size [% working_dir %]/[% item.taxon %]/chr.sizes
-perl [% findbin %]/../slice/proc_cc_stat.pl     -f [% item.taxon %]vsselfalign.cc.yml --size [% working_dir %]/[% item.taxon %]/chr.sizes
+perl [% aligndb %]/slice/merge_node.pl    -v -f [% item.taxon %]vsselfalign.blast.tsv -o [% item.taxon %]vsselfalign.merge.yml -c 0.9
+perl [% aligndb %]/slice/paralog_graph.pl -v -f [% item.taxon %]vsselfalign.blast.tsv -m [% item.taxon %]vsselfalign.merge.yml --nonself -o [% item.taxon %]vsselfalign.merge.graph.yml
+perl [% aligndb %]/slice/cc.pl               -f [% item.taxon %]vsselfalign.merge.graph.yml
+perl [% aligndb %]/slice/proc_cc_chop.pl     -f [% item.taxon %]vsselfalign.cc.yml --size [% working_dir %]/[% item.taxon %]/chr.sizes
+perl [% aligndb %]/slice/proc_cc_stat.pl     -f [% item.taxon %]vsselfalign.cc.yml --size [% working_dir %]/[% item.taxon %]/chr.sizes
 
 #----------------------------#
 # result
@@ -425,14 +443,16 @@ EOF
         {   stopwatch   => $stopwatch,
             parallel    => $parallel,
             working_dir => $working_dir,
-            findbin     => $FindBin::Bin,
+            aligndb     => $aligndb,
+            egaz        => $egaz,
+            blast       => $blast,
             name_str    => $name_str,
             target_id   => $target_id,
             query_ids   => \@query_ids,
             data        => \@data,
             length      => $length,
         },
-        File::Spec->catfile( $working_dir, "proc_cmd.sh" )
+        File::Spec->catfile( $working_dir, $sh_name )
     ) or die Template->error;
 
     # circos.conf
@@ -615,7 +635,6 @@ EOF
             {   stopwatch   => $stopwatch,
                 parallel    => $parallel,
                 working_dir => $working_dir,
-                findbin     => $FindBin::Bin,
                 name_str    => $name_str,
                 taxon_id    => $taxon_id,
             },
@@ -626,7 +645,8 @@ EOF
     }
 
     # circos_cmd.sh
-    print "Create circos_cmd.sh\n";
+    $sh_name = "5_circos_cmd.sh";
+    print "Create $sh_name\n";
     $text = <<'EOF';
 #!/bin/bash
 # perl [% stopwatch.cmd_line %]
@@ -658,7 +678,7 @@ perl -anl -e '/^#/ and next; $F[0] =~ s/\.\d+//; $color = q{}; $F[2] eq q{region
 #----------------------------#
 # run circos
 #----------------------------#
-perl ~/share/circos/bin/circos -noparanoid -conf circos.conf
+[% circos %]/bin/circos -noparanoid -conf circos.conf
 
 [% END -%]
 
@@ -668,17 +688,18 @@ EOF
         {   stopwatch   => $stopwatch,
             parallel    => $parallel,
             working_dir => $working_dir,
-            findbin     => $FindBin::Bin,
+            circos      => $circos,
             name_str    => $name_str,
             target_id   => $target_id,
             query_ids   => \@query_ids,
             data        => \@data,
         },
-        File::Spec->catfile( $working_dir, "circos_cmd.sh" )
+        File::Spec->catfile( $working_dir, $sh_name )
     ) or die Template->error;
 
     # feature_cmd.sh
-    print "Create feature_cmd.sh\n";
+    $sh_name = "6_feature_cmd.sh";
+    print "Create $sh_name\n";
     $text = <<'EOF';
 #!/bin/bash
 # perl [% stopwatch.cmd_line %]
@@ -715,13 +736,13 @@ do
     if [ -s feature.$ftr.[% item.taxon %].bed ]
     then
         # there are some data in .bed file
-        perl [% findbin %]/../ofg/bed_op.pl --op merge_to_runlist --file feature.$ftr.[% item.taxon %].bed --name feature.$ftr.[% item.taxon %].yml;
+        perl [% aligndb %]/ofg/bed_op.pl --op merge_to_runlist --file feature.$ftr.[% item.taxon %].bed --name feature.$ftr.[% item.taxon %].yml;
     else
         # .bed file is empty
         # create empty runlists from chr.sizes
         perl -ane'BEGIN { print qq{---\n} }; print qq{$F[0]: "-"\n}; END {print qq{\n}};' [% working_dir %]/[% item.taxon %]/chr.sizes > feature.$ftr.[% item.taxon %].yml;
     fi;
-    perl [% findbin %]/../slice/stat_runlist.pl --size [% working_dir %]/[% item.taxon %]/chr.sizes -f feature.$ftr.[% item.taxon %].yml;
+    perl [% aligndb %]/slice/stat_runlist.pl --size [% working_dir %]/[% item.taxon %]/chr.sizes -f feature.$ftr.[% item.taxon %].yml;
 done
 
 echo "feature,name,length,size,coverage" > [% working_dir %]/[% item.taxon %]_result/[% item.taxon %].feature.csv
@@ -732,12 +753,12 @@ done >> [% working_dir %]/[% item.taxon %]_result/[% item.taxon %].feature.csv
 
 for ftr in coding repeats ncRNA rRNA tRNA
 do
-    perl [% findbin %]/../slice/compare_runlist.pl -op intersect --mk -f1 [% item.taxon %]vsselfalign.cc.runlist.yml -f2 feature.$ftr.[% item.taxon %].yml -o [% item.taxon %]vsselfalign.cc.runlist.$ftr.yml
+    perl [% aligndb %]/slice/compare_runlist.pl -op intersect --mk -f1 [% item.taxon %]vsselfalign.cc.runlist.yml -f2 feature.$ftr.[% item.taxon %].yml -o [% item.taxon %]vsselfalign.cc.runlist.$ftr.yml
 done
 
 for ftr in coding repeats ncRNA rRNA tRNA
 do
-    perl [% findbin %]/../slice/stat_runlist.pl --mk --size [% working_dir %]/[% item.taxon %]/chr.sizes -f [% item.taxon %]vsselfalign.cc.runlist.$ftr.yml;
+    perl [% aligndb %]/slice/stat_runlist.pl --mk --size [% working_dir %]/[% item.taxon %]/chr.sizes -f [% item.taxon %]vsselfalign.cc.runlist.$ftr.yml;
 done
 
 echo "feature,copy,name,length,size,coverage" > [% working_dir %]/[% item.taxon %]_result/[% item.taxon %]vsselfalign.feature.copies.csv
@@ -763,15 +784,18 @@ EOF
         {   stopwatch   => $stopwatch,
             parallel    => $parallel,
             working_dir => $working_dir,
-            findbin     => $FindBin::Bin,
+            aligndb     => $aligndb,
             name_str    => $name_str,
             target_id   => $target_id,
             query_ids   => \@query_ids,
             data        => \@data,
         },
-        File::Spec->catfile( $working_dir, "feature_cmd.sh" )
+        File::Spec->catfile( $working_dir, $sh_name )
     ) or die Template->error;
 
+    # pair_stat.sh
+    $sh_name = "7_pair_stat.sh";
+    print "Create $sh_name\n";
     $text = <<'EOF';
 #!/bin/bash
 # perl [% stopwatch.cmd_line %]
@@ -783,7 +807,7 @@ cd [% working_dir %]
 # [% item.taxon %] [% item.name %]
 #----------------------------------------------------------#
 # gen_alignDB
-perl [% findbin %]/../extra/two_way_batch.pl \
+perl [% aligndb %]/extra/two_way_batch.pl \
     -d [% item.taxon %]vs[% item.taxon %] \
     -t [% item.taxon %],[% item.taxon %] \
     -q [% item.taxon %],[% item.taxon %] \
@@ -798,7 +822,7 @@ perl [% findbin %]/../extra/two_way_batch.pl \
 # [% name_str %]
 #----------------------------------------------------------#
 # init db
-perl [% findbin %]/../extra/two_way_batch.pl \
+perl [% aligndb %]/extra/two_way_batch.pl \
     -d [% name_str %]_paralog \
     -r 1
 
@@ -809,7 +833,7 @@ perl [% findbin %]/../extra/two_way_batch.pl \
 [% FOREACH item IN data -%]
 # [% item.taxon %]
 # gen_alignDB to existing database
-perl [% findbin %]/../extra/two_way_batch.pl \
+perl [% aligndb %]/extra/two_way_batch.pl \
     -d [% name_str %]_paralog \
     -t [% item.taxon %],[% item.name %] \
     -q [% item.taxon %],[% item.name %] \
@@ -821,7 +845,7 @@ perl [% findbin %]/../extra/two_way_batch.pl \
 #----------------------------#
 # rest steps
 #----------------------------#
-perl [% findbin %]/../extra/two_way_batch.pl \
+perl [% aligndb %]/extra/two_way_batch.pl \
     -d [% name_str %]_paralog \
 [% FOREACH item IN data -%]
     --gff_files [% FOREACH acc IN acc_of.${item.taxon} %][% working_dir %]/[% item.taxon %]/[% acc %].gff,[% END %] \
@@ -836,31 +860,31 @@ EOF
         {   stopwatch   => $stopwatch,
             parallel    => $parallel,
             working_dir => $working_dir,
-            findbin     => $FindBin::Bin,
+            aligndb     => $aligndb,
             name_str    => $name_str,
             data        => \@data,
             acc_of      => $acc_of,
         },
-        File::Spec->catfile( $working_dir, "pair_stat.sh" )
+        File::Spec->catfile( $working_dir, $sh_name )
     ) or die Template->error;
 
-    # cmd.bat
-    print "Create cmd.bat\n";
+    # chart.bat
+    print "Create chart.bat\n";
     $text = <<'EOF';
 REM strain_bz_self.pl
 REM perl [% stopwatch.cmd_line %]
 
 REM basicstat
-perl [% bat_dir %]/fig/collect_common_basic.pl -d .
+perl [% bat_dir %]/fig_table/collect_common_basic.pl -d .
 
 REM common chart
-if exist [% name_str %]_paralog.common.xlsx perl [% bat_dir %]/stat/common_chart_factory.pl -i [% name_str %]_paralog.common.xlsx
+if exist [% name_str %]_paralog.common.xlsx perl [% bat_dir %]/alignDB/stat/common_chart_factory.pl -i [% name_str %]_paralog.common.xlsx
 
 REM multi chart
-if exist [% name_str %]_paralog.multi.xlsx  perl [% bat_dir %]/stat/multi_chart_factory.pl -i [% name_str %]_paralog.multi.xlsx
+if exist [% name_str %]_paralog.multi.xlsx  perl [% bat_dir %]/alignDB/stat/multi_chart_factory.pl -i [% name_str %]_paralog.multi.xlsx
 
 REM gc chart
-if exist [% name_str %]_paralog.gc.xlsx     perl [% bat_dir %]/stat/gc_chart_factory.pl --add_trend 1 -i [% name_str %]_paralog.gc.xlsx
+if exist [% name_str %]_paralog.gc.xlsx     perl [% bat_dir %]/alignDB/stat/gc_chart_factory.pl --add_trend 1 -i [% name_str %]_paralog.gc.xlsx
 
 EOF
     $tt->process(
@@ -868,12 +892,15 @@ EOF
         {   stopwatch   => $stopwatch,
             parallel    => $parallel,
             working_dir => $working_dir,
-            findbin     => $FindBin::Bin,
             bat_dir     => $bat_dir,
             name_str    => $name_str,
         },
         File::Spec->catfile( $working_dir, "chart.bat" )
     ) or die Template->error;
+
+    # message
+    $stopwatch->block_message("Execute *.sh files in order.");
+
 }
 
 #----------------------------#
@@ -895,7 +922,7 @@ sub taxon_info {
     $dbh->{csv_tables}->{t0} = {
         eol       => "\n",
         sep_char  => ",",
-        file      => $taxon_file,
+        file      => $filename,
         col_names => [
             map { ( $_, $_ . "_id" ) } qw{strain species genus family order}
         ],
@@ -947,6 +974,19 @@ sub prep_fa {
     return $basename;
 }
 
+sub replace_home {
+    my $path = shift;
+
+    require File::Spec;
+    require File::HomeDir;
+
+    if ( $path =~ /^\~\// ) {
+        $path =~ s/^\~\///;
+        $path = File::Spec->catdir( File::HomeDir->my_home, $path );
+    }
+
+    return $path;
+}
 __END__
 
 perl bac_strains.pl
