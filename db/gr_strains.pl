@@ -18,6 +18,8 @@ use List::MoreUtils qw(any all uniq);
 use AlignDB::Stopwatch;
 
 use FindBin;
+use lib "$FindBin::Bin/../lib";
+use MyUtil qw(replace_home);
 
 #----------------------------------------------------------#
 # GetOpt section
@@ -33,9 +35,9 @@ my $stopwatch = AlignDB::Stopwatch->new(
 );
 
 # running options
-my $gr_dir = $Config->{path}{gr};    # genome report
-my $bp_dir = $Config->{path}{bp};    # bioproject
-my $td_dir = $Config->{path}{td};    # taxdmp
+my $gr_dir = replace_home( $Config->{path}{gr} );    # genome report
+my $bp_dir = replace_home( $Config->{path}{bp} );    # bioproject
+my $td_dir = replace_home( $Config->{path}{td} );    # taxdmp
 
 # eukaryotes instead of prokaryotes
 my $euk;
@@ -60,7 +62,7 @@ pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
 #----------------------------------------------------------#
 $stopwatch->start_message("Writing strains' summary...");
 
-$stopwatch->block_message("Load ncbi taxdmp");
+$stopwatch->block_message("Load ncbi taxdmp.");
 my $taxon_db = Bio::DB::Taxonomy->new(
     -source    => 'flatfile',
     -directory => $td_dir,
@@ -71,7 +73,7 @@ my $taxon_db = Bio::DB::Taxonomy->new(
 #----------------------------#
 # load tab sep. txt files
 #----------------------------#
-$stopwatch->block_message("Load ncbi genome report and bioproject summary");
+$stopwatch->block_message("Load ncbi genome report and bioproject summary.");
 my $dbh = DBI->connect("DBI:CSV:");
 
 if ( !$euk ) {

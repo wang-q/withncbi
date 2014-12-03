@@ -3,6 +3,9 @@ use strict;
 use warnings;
 use autodie;
 
+use File::Spec;
+use File::HomeDir;
+
 use base 'Exporter';
 use vars qw(@ISA @EXPORT_OK %EXPORT_TAGS);
 @ISA = qw(Exporter);
@@ -11,7 +14,7 @@ use vars qw(@ISA @EXPORT_OK %EXPORT_TAGS);
     all => [
         qw{
             replace_home
-        },
+            },
     ],
 );
 
@@ -20,9 +23,6 @@ use vars qw(@ISA @EXPORT_OK %EXPORT_TAGS);
 sub replace_home {
     my $path = shift;
 
-    require File::Spec;
-    require File::HomeDir;
-
     if ( $path =~ /^\~\// ) {
         $path =~ s/^\~\///;
         $path = File::Spec->catdir( File::HomeDir->my_home, $path );
@@ -30,6 +30,5 @@ sub replace_home {
 
     return $path;
 }
-
 
 1;

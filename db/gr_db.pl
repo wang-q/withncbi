@@ -13,9 +13,11 @@ use Text::CSV_XS;
 use File::Slurp;
 use List::MoreUtils qw(any all uniq);
 
-use FindBin;
-
 use AlignDB::Stopwatch;
+
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+use MyUtil qw(replace_home);
 
 #----------------------------------------------------------#
 # GetOpt section
@@ -41,7 +43,7 @@ my $init_sql = "$FindBin::Bin/../init.sql";
 
 # running options
 my $strain_file = "prok_strains.csv";
-my $gr_dir      = $Config->{path}{gr};
+my $gr_dir      = replace_home( $Config->{path}{gr} );
 
 # append euk
 my $append;
