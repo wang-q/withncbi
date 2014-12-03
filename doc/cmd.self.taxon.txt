@@ -221,8 +221,8 @@ find ~/data/ensemblgenomes12_65/fungi/gtf/saccharomyces_cerevisiae/ -name "*gtf.
 #     -O  process also non-transcript GFF records 
 gffread toplevel.gtf -F -O -o- > toplevel.gff
 
-for f in `find $PWD -type f -name "*.fa" | sort | xargs -i basename {} .fa `;do \
-    cat toplevel.gff | perl -nl -e "/^$f\\t/ and print" > $f.gff;
+for f in `find $PWD -type f -name "*.fa" | sort | parallel basename {} .fa `;do \
+    cat toplevel.gff | perl -nl -e "(/^\#/ or /^$f\\t/) and print" > $f.gff;
 done
 
 rm toplevel.gtf toplevel.gff
