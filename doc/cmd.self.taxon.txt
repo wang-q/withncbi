@@ -136,13 +136,13 @@ Taxonomy ID: 644223
 http://www.ncbi.nlm.nih.gov/assembly/102048
 
 cd ~/data/self_alignment/genome
-perl ~/Scripts/alignDB/util/batch_get_seq.pl yeast_id_seq.csv  2>&1 | tee yeast_id_seq.log
+perl ~/Scripts/withncbi/util/batch_get_seq.pl yeast_id_seq.csv  2>&1 | tee yeast_id_seq.log
 
 #----------------------------#
 # taxon info
 #----------------------------#
-cd /home/wangq/data/self_alignment/genome
-perl ~/Scripts/alignDB/taxon/strain_info.pl \
+cd ~/data/self_alignment/genome
+perl ~/Scripts/withncbi/taxon/strain_info.pl \
     --file yeast_ncbi.csv \
     --id 559292 \
     --id 285006 \
@@ -153,44 +153,45 @@ perl ~/Scripts/alignDB/taxon/strain_info.pl \
 #----------------------------#
 # self align
 #----------------------------#
-cd /home/wangq/data/self_alignment
+cd ~/data/self_alignment
 
 # Saccharomyces cerevisiae
 # copy sequences (raw)
-perl /home/wangq/Scripts/alignDB/taxon/strain_bz_self.pl \
-    --file /home/wangq/data/self_alignment/genome/yeast_ncbi.csv \
-    -w /home/wangq/data/self_alignment \
-    --seq_dir /home/wangq/data/self_alignment/genome \
+perl ~/Scripts/withncbi/taxon/strain_bz_self.pl \
+    --file ~/data/self_alignment/genome/yeast_ncbi.csv \
+    -w ~/data/self_alignment \
+    --seq_dir ~/data/self_alignment/genome \
     --name Scer \
     --length 1000 \
     -q 285006 \
     -q 658763 \
     -t 559292
 
-sh Scer/file-rm.sh
+sh Scer/2_file_rm.sh
 
 # don't copy sequences (RepeatMasker done)
-perl /home/wangq/Scripts/alignDB/taxon/strain_bz_self.pl \
-    --file /home/wangq/data/self_alignment/genome/yeast_ncbi.csv \
-    -w /home/wangq/data/self_alignment \
+perl ~/Scripts/withncbi/taxon/strain_bz_self.pl \
+    --file ~/data/self_alignment/genome/yeast_ncbi.csv \
+    -w ~/data/self_alignment \
     --name Scer \
     --length 1000 \
     -q 285006 \
     -q 658763 \
     -t 559292
 
-sh Scer/self_cmd.sh
-sh Scer/proc_cmd.sh
-sh Scer/circos_cmd.sh
-sh Scer/feature_cmd.sh
-sh Scer/pair_stat.sh
+sh Scer/1_real_chr.sh 
+sh Scer/3_self_cmd.sh
+sh Scer/4_proc_cmd.sh
+sh Scer/5_circos_cmd.sh
+sh Scer/6_feature_cmd.sh
+sh Scer/7_pair_stat.sh
     
 # Lachancea
 # copy sequences (raw)
-perl /home/wangq/Scripts/alignDB/taxon/strain_bz_self.pl \
-    --file /home/wangq/data/self_alignment/genome/yeast_ncbi.csv \
-    -w /home/wangq/data/self_alignment \
-    --seq_dir /home/wangq/data/self_alignment/genome \
+perl ~/Scripts/withncbi/taxon/strain_bz_self.pl \
+    --file ~/data/self_alignment/genome/yeast_ncbi.csv \
+    -w ~/data/self_alignment \
+    --seq_dir ~/data/self_alignment/genome \
     --name Lachancea \
     --length 1000 \
     -q 226302 \
@@ -208,13 +209,13 @@ perl -nl -e "BEGIN { $i = 1}; if (/>/) {print qq{>$i}; $i++;} else {print}" 5592
 mkdir -p ~/data/self_alignment/yeast2/559292
 cd ~/data/self_alignment/yeast2/559292
 
-find /home/wangq/data/ensemblgenomes12_65/fungi/fasta/saccharomyces_cerevisiae/dna/ -name "*dna.toplevel*" | xargs gzip -d -c > toplevel.fa
+find ~/data/ensemblgenomes12_65/fungi/fasta/saccharomyces_cerevisiae/dna/ -name "*dna.toplevel*" | xargs gzip -d -c > toplevel.fa
 ~/bin/x86_64/faCount toplevel.fa | perl -aln -e 'next if $F[0] eq 'total'; print $F[0] if $F[1] > 100000; print $F[0] if $F[1] > 10000  and $F[6]/$F[1] < 0.05' | uniq > listFile
 ~/bin/x86_64/faSomeRecords toplevel.fa listFile toplevel.filtered.fa
 ~/bin/x86_64/faSplit byname toplevel.filtered.fa .
 rm toplevel.fa toplevel.filtered.fa listFile
 
-find /home/wangq/data/ensemblgenomes12_65/fungi/gtf/saccharomyces_cerevisiae/ -name "*gtf.gz"  | xargs gzip -d -c > toplevel.gtf
+find ~/data/ensemblgenomes12_65/fungi/gtf/saccharomyces_cerevisiae/ -name "*gtf.gz"  | xargs gzip -d -c > toplevel.gtf
 # cufflinks tool
 #     -F  full GFF attribute preservation 
 #     -O  process also non-transcript GFF records 
@@ -229,17 +230,17 @@ rm toplevel.gtf toplevel.gff
 #----------------------------#
 # self align
 #----------------------------#
-cd /home/wangq/data/self_alignment
+cd ~/data/self_alignment
 
-perl /home/wangq/Scripts/alignDB/taxon/strain_bz_self.pl \
-    --file /home/wangq/data/self_alignment/genome/yeast_ncbi.csv \
-    -w /home/wangq/data/self_alignment \
+perl ~/Scripts/withncbi/taxon/strain_bz_self.pl \
+    --file ~/data/self_alignment/genome/yeast_ncbi.csv \
+    -w ~/data/self_alignment \
     --name yeast2 \
     --length 1000 \
     -t 559292
 
 
-find  /home/wangq/data/self_alignment/yeast2/559292 -type f -name "*.gff" \
+find  ~/data/self_alignment/yeast2/559292 -type f -name "*.gff" \
     | xargs perl -anle'/^#/ and next; print $F[2]' \
     | sort | uniq -c \
-    > bacteria.feature.count
+    > yeast2.feature.count
