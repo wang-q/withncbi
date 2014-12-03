@@ -12,6 +12,7 @@ use DBI;
 use Text::CSV_XS;
 use DateTime::Format::Natural;
 use List::MoreUtils qw(any all uniq);
+use Template;
 
 use File::Copy::Recursive qw(fcopy);
 use File::Spec;
@@ -19,11 +20,11 @@ use File::Find::Rule;
 use File::Basename;
 use Cwd qw(realpath);
 
-use Template;
+use AlignDB::Stopwatch;
 
 use FindBin;
-
-use AlignDB::Stopwatch;
+use lib "$FindBin::Bin/../lib";
+use MyUtil qw(replace_home);
 
 #----------------------------------------------------------#
 # GetOpt section
@@ -974,19 +975,6 @@ sub prep_fa {
     return $basename;
 }
 
-sub replace_home {
-    my $path = shift;
-
-    require File::Spec;
-    require File::HomeDir;
-
-    if ( $path =~ /^\~\// ) {
-        $path =~ s/^\~\///;
-        $path = File::Spec->catdir( File::HomeDir->my_home, $path );
-    }
-
-    return $path;
-}
 __END__
 
-perl bac_strains.pl
+perl strain_bz_self.pl 
