@@ -815,6 +815,8 @@ perl [% aligndb %]/extra/two_way_batch.pl \
     -da [% working_dir %]/[% item.taxon %]vsselfalign \
     --gff_files [% FOREACH acc IN acc_of.${item.taxon} %][% working_dir %]/[% item.taxon %]/[% acc %].gff,[% END %] \
     --rm_gff_files [% FOREACH acc IN acc_of.${item.taxon} %][% working_dir %]/[% item.taxon %]/[% acc %].rm.gff,[% END %] \
+    -taxon [% working_dir %]/taxon.csv \
+    -chr [% working_dir %]/chr_length.csv \
     -lt 1000 --parallel [% parallel %] --run 1-5,21,40
 
 [% END -%]
@@ -825,6 +827,8 @@ perl [% aligndb %]/extra/two_way_batch.pl \
 # init db
 perl [% aligndb %]/extra/two_way_batch.pl \
     -d [% name_str %]_paralog \
+    -taxon [% working_dir %]/taxon.csv \
+    -chr [% working_dir %]/chr_length.csv \
     -r 1
 
 #----------------------------#
