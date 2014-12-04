@@ -13,7 +13,7 @@ ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/Eukaryotes/fungi/
 
 # genus
 # Saccharomyces 4930
-# 
+#
 # Candida   5475
 # Ashbya
 
@@ -177,13 +177,13 @@ perl         ~/Scripts/withncbi/taxon/strain_bz_self.pl  \
     -q       658763                                      \
     -t       559292
 
-sh Scer/1_real_chr.sh 
+sh Scer/1_real_chr.sh
 sh Scer/3_self_cmd.sh
 sh Scer/4_proc_cmd.sh
 sh Scer/5_circos_cmd.sh
 sh Scer/6_feature_cmd.sh
 sh Scer/7_pair_stat.sh
-    
+
 # Lachancea
 # copy sequences (raw)
 perl          ~/Scripts/withncbi/taxon/strain_bz_self.pl  \
@@ -215,8 +215,8 @@ rm toplevel.fa toplevel.filtered.fa listFile
 
 find ~/data/ensemblgenomes12_65/fungi/gtf/saccharomyces_cerevisiae/ -name "*gtf.gz"  | xargs gzip -d -c > toplevel.gtf
 # cufflinks tool
-#     -F  full GFF attribute preservation 
-#     -O  process also non-transcript GFF records 
+#     -F  full GFF attribute preservation
+#     -O  process also non-transcript GFF records
 gffread toplevel.gtf -F -O -o- > toplevel.gff
 
 for f in `find $PWD -type f -name "*.fa" | sort | parallel basename {} .fa `;do \
@@ -239,7 +239,7 @@ perl         ~/Scripts/withncbi/taxon/strain_bz_self.pl  \
 
 find  ~/data/self_alignment/yeast2/559292 -type f -name "*.gff" \
     | xargs perl -anle'/^#/ and next; print $F[2]' \
-    | sort | uniq -c 
+    | sort | uniq -c
 
 sh yeast2/1_real_chr.sh
 sh yeast2/2_file_rm.sh
@@ -248,4 +248,4 @@ sh yeast2/4_proc_cmd.sh
 sh yeast2/5_circos_cmd.sh
 sh yeast2/6_feature_cmd.sh
 sh yeast2/7_pair_stat.sh
-  
+
