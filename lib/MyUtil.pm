@@ -13,7 +13,7 @@ use vars qw(@ISA @EXPORT_OK %EXPORT_TAGS);
 %EXPORT_TAGS = (
     all => [
         qw{
-            replace_home
+            replace_home find_ancestor
             },
     ],
 );
@@ -29,6 +29,21 @@ sub replace_home {
     }
 
     return $path;
+}
+
+sub find_ancestor {
+    my $taxon = shift;
+    my $rank = shift || 'species';
+
+    return $taxon if $taxon->rank eq $rank;
+
+RANK: while (1) {
+        $taxon = $taxon->ancestor;
+        last RANK unless defined $taxon;
+        return $taxon if $taxon->rank eq $rank;
+    }
+
+    return;
 }
 
 1;

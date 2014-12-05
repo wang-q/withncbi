@@ -238,18 +238,18 @@ __END__
 
 =head1 NAME
 
-gr_db.pl
+    gr_db.pl
 
 =head1 SYNOPSIS
 
-# linux, mac
-perl gr_db.pl --file prok_strains.csv
-
-perl gr_db.pl --append --file euk_strains.csv
-
-# windows
-perl gr_db.pl --file prok_strains.csv --gr d:/data/NCBI/genomes/GENOME_REPORTS
-
-perl gr_db.pl --append --file euk_strains.csv --gr d:/data/NCBI/genomes/GENOME_REPORTS
+    # linux, mac
+    perl gr_db.pl --db gr --file prok_strains.csv
+    
+    perl gr_db.pl --db gr --append --file euk_strains.csv
+    
+    # windows
+    perl gr_db.pl --db gr --file prok_strains.csv --gr d:/data/NCBI/genomes/GENOME_REPORTS
+    
+    perl gr_db.pl --db gr --append --file euk_strains.csv --gr d:/data/NCBI/genomes/GENOME_REPORTS
 
 =cut

@@ -19,7 +19,7 @@ use AlignDB::Stopwatch;
 
 use FindBin;
 use lib "$FindBin::Bin/../lib";
-use MyUtil qw(replace_home);
+use MyUtil qw(replace_home find_ancestor);
 
 #----------------------------------------------------------#
 # GetOpt section
@@ -240,35 +240,17 @@ if ( $^O ne "Win32" ) {
 $stopwatch->end_message;
 exit;
 
-#----------------------------------------------------------#
-# Subroutines
-#----------------------------------------------------------#
-sub find_ancestor {
-    my $taxon = shift;
-    my $rank = shift || 'species';
-
-    return $taxon if $taxon->rank eq $rank;
-
-RANK: while (1) {
-        $taxon = $taxon->ancestor;
-        last RANK unless defined $taxon;
-        return $taxon if $taxon->rank eq $rank;
-    }
-
-    return;
-}
-
 __END__
 
 =head1 NAME
 
-gr_strains.pl
+    gr_strains.pl
 
 =head1 SYNOPSIS
 
-perl gr_strains.pl
+    perl gr_strains.pl
 
-perl gr_strains.pl --euk -o euk_strains.csv
+    perl gr_strains.pl --euk -o euk_strains.csv
 
 =cut
 
