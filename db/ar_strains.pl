@@ -19,7 +19,7 @@ use AlignDB::Stopwatch;
 
 use FindBin;
 use lib "$FindBin::Bin/../lib";
-use MyUtil qw(replace_home find_ancestor);
+use MyUtil qw(replace_home find_ancestor find_group);
 
 #----------------------------------------------------------#
 # GetOpt section
@@ -35,20 +35,20 @@ my $stopwatch = AlignDB::Stopwatch->new(
 );
 
 # running options
-my $gr_dir = replace_home( $Config->{path}{gr} );    # genome report
+my $ar_dir = replace_home( $Config->{path}{ar} );    # assembly report
 my $bp_dir = replace_home( $Config->{path}{bp} );    # bioproject
 my $td_dir = replace_home( $Config->{path}{td} );    # taxdmp
 
-# eukaryotes instead of prokaryotes
-my $euk;
+# genbank instead of refseq
+my $genbank;
 
-my $strain_file = "prok_strains.csv";
+my $strain_file = "ar_strains.csv";
 
 my $man  = 0;
 my $help = 0;
 
 GetOptions(
-    'euk'        => \$euk,
+    'genbank'    => \$genbank,
     'o|output=s' => \$strain_file,
     'help|?'     => \$help,
     'man'        => \$man,
@@ -76,37 +76,23 @@ my $taxon_db = Bio::DB::Taxonomy->new(
 $stopwatch->block_message("Load ncbi genome report and bioproject summary.");
 my $dbh = DBI->connect("DBI:CSV:");
 
-if ( !$euk ) {
-
-    # Chromosomes_RefSeq ==> Chromosomes
-    $dbh->{csv_tables}->{t0} = {
-        eol            => "\n",
-        sep_char       => "\t",
-        file           => "$gr_dir/prokaryotes.txt",
-        skip_first_row => 1,
-        quote_char     => '',
-        col_names      => [
-            qw{ Organism_Name TaxID BioProject_Accession BioProject_ID Group
-                SubGroup Size GC Chromosomes Chromosomes_INSDC Plasmids_RefSeq
-                Plasmids_INSDC WGS Scaffolds Genes Proteins Release_Date Modify_Date
-                Status Center }
-        ],
-    };
-}
-else {
-    $dbh->{csv_tables}->{t0} = {
-        eol            => "\n",
-        sep_char       => "\t",
-        file           => "$gr_dir/eukaryotes.txt",
-        skip_first_row => 1,
-        quote_char     => '',
-        col_names      => [
-            qw{ Organism_Name TaxID BioProject_Accession BioProject_ID Group
-                SubGroup Size GC Assembly Chromosomes Organelles Plasmids WGS
-                Scaffolds Genes Proteins Release_Date Modify_Date Status Center }
-        ],
-    };
-}
+# Chromosomes_RefSeq ==> Chromosomes
+$dbh->{csv_tables}->{t0} = {
+    eol      => "\n",
+    sep_char => "\t",
+    file     => $genbank
+    ? "$ar_dir/assembly_summary_genbank.txt"
+    : "$ar_dir/assembly_summary_refseq.txt",
+    skip_first_row => 1,
+    quote_char     => '',
+    col_names      => [
+        qw{ assembly_accession bioproject biosample wgs_master
+            refseq_category taxid species_taxid organism_name
+            infraspecific_name isolate version_status assembly_level
+            release_type genome_rep seq_rel_date asm_name submitter
+            gbrs_paired_asm paired_asm_comp }
+    ],
+};
 
 $dbh->{csv_tables}->{t1} = {
     eol            => "\n",
@@ -129,23 +115,22 @@ $dbh->{csv_tables}->{t1} = {
     my $query = qq{
         SELECT 
             t1.TaxID,
-            t0.Organism_Name,
-            t0.BioProject_Accession,
-            t0.Group,
-            t0.SubGroup,
-            t0.Size,
-            t0.GC,
-            t0.Chromosomes,
-            t0.WGS,
-            t0.Scaffolds,
-            t0.Release_Date,
-            t0.Status
+            t0.organism_name,
+            t0.bioproject,
+            t0.assembly_accession,
+            t0.wgs_master,
+            t0.refseq_category,
+            t0.assembly_level,
+            t0.genome_rep,
+            t0.seq_rel_date,
+            t0.asm_name
         FROM   t0, t1
         WHERE 1 = 1
-        AND t0.BioProject_Accession = t1.Project_Accession
+        AND t0.bioproject = t1.Project_Accession
+        AND t0.version_status = 'latest'
+        AND t0.genome_rep = 'Full'
     };
 
-    #AND t0.Organism_Name = t1.Organism_Name
     my $header_sth = $dbh->prepare($query);
     $header_sth->execute;
     $header_sth->finish;
@@ -157,24 +142,16 @@ $dbh->{csv_tables}->{t1} = {
     $csv->print(
         $csv_fh,
         [   @cols_name,
-            qw{ species species_id genus genus_id species_member
+            qw{ superkingdom group subgroup species species_id genus genus_id species_member
                 genus_species_member genus_strain_member }
         ]
     );
 
     my @strs = (
-        q{ AND t0.Status = 'Complete'
-            AND t0.Chromosomes <> '-'
-            AND t0.Chromosomes <> ''
-            ORDER BY t0.Release_Date },    # prok
-        q{ AND t0.Status = 'Chromosomes'
-            AND t0.Chromosomes <> '-'
-            AND t0.Chromosomes <> ''
-            ORDER BY t0.Release_Date },    # euk
-        q{ AND t0.Status = 'Scaffolds or contigs'
-            AND t0.WGS <> '-'
-            AND t0.WGS <> ''
-            ORDER BY t0.Release_Date },
+        q{ AND t0.assembly_level like '%Chromosome%'
+            ORDER BY t0.seq_rel_date },
+        q{ AND t0.assembly_level not like '%Chromosome%'
+            ORDER BY t0.seq_rel_date },
     );
     my @taxon_ids;
     for my $str (@strs) {
@@ -183,6 +160,7 @@ $dbh->{csv_tables}->{t1} = {
         while ( my @row = $join_sth->fetchrow_array ) {
             for my $item (@row) {
                 $item = undef if ( $item eq '-' );
+                $item = undef if ( $item eq 'na' );
             }
 
             # find each strains' species and genus
@@ -197,6 +175,9 @@ $dbh->{csv_tables}->{t1} = {
                 warn "Can't find taxon for $name\n";
                 next;
             }
+            
+            # superkingdom, group, subgroup
+            push @row, (find_group($node));
 
             my $species = find_ancestor( $node, 'species' );
             if ($species) {
@@ -230,7 +211,8 @@ $dbh->{csv_tables}->{t1} = {
 if ( $^O ne "Win32" ) {
     print "\n";
     system "wc -l $_"
-        for "$gr_dir/prokaryotes.txt", "$gr_dir/eukaryotes.txt",
+        for "$ar_dir/assembly_summary_refseq.txt",
+        "$ar_dir/assembly_summary_genbank.txt",
         "$bp_dir/summary.txt", $strain_file;
 }
 
@@ -244,13 +226,13 @@ __END__
 
 =head1 NAME
 
-    gr_strains.pl
+    ar_strains.pl
 
 =head1 SYNOPSIS
 
-    perl gr_strains.pl
+    perl ar_strains.pl
 
-    perl gr_strains.pl --euk -o euk_strains.csv
+    perl ar_strains.pl --genbank -o ar_strains_genbank.csv
 
 =cut
 

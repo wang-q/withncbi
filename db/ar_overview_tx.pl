@@ -33,7 +33,7 @@ my $password = $Config->{database}{password};
 my $db_name  = $Config->{database}{db};
 
 # running options
-my $outfile = "gr_overview_tx.xlsx";
+my $outfile = "ar_overview_tx.xlsx";
 
 my $man  = 0;
 my $help = 0;
@@ -75,7 +75,7 @@ my $strains = sub {
     {    # write header
         my $sql_query = q{
             SELECT  *
-            FROM gr
+            FROM ar
             WHERE 1 = 1
         };
         ( $sheet_row, $sheet_col ) = ( 0, 0 );
@@ -92,7 +92,7 @@ my $strains = sub {
             # species' member, chr_number and genus_member
         my $sql_query = q{
             SELECT  *
-            FROM gr
+            FROM ar
             WHERE 1 = 1
         };
         my %option = (
@@ -115,9 +115,8 @@ my $species = sub {
     my ( $sheet_row, $sheet_col );
 
     {    # write header
-        my @headers = qw{ genus_id genus species_id species
-            avg_genome_size avg_gc species_member genus_species_member
-            genus_strain_member code };
+        my @headers = qw{ genus_id genus species_id species species_member
+            genus_species_member genus_strain_member code };
         ( $sheet_row, $sheet_col ) = ( 0, 0 );
         my %option = (
             sheet_row => $sheet_row,
@@ -135,12 +134,10 @@ my $species = sub {
                     genus,
                     species_id,
                     species,
-                    AVG(genome_size),
-                    AVG(gc_content),
                     species_member,
                     genus_species_member,
                     genus_strain_member
-            FROM    gr
+            FROM    ar
             WHERE   1 = 1
             GROUP BY species
         };
@@ -156,19 +153,17 @@ my $species = sub {
 };
 
 #----------------------------------------------------------#
-# worksheet -- gc_checklist
+# worksheet -- group
 #----------------------------------------------------------#
-my $gc_checklist = sub {
-    my $sheet_name = 'gc_checklist';
+my $group = sub {
+    my $sheet_name = 'group';
     my $sheet;
     my ( $sheet_row, $sheet_col );
 
     {    # write header
-        my @headers = qw{
-            genus_id genus species_id species avg_genome_size avg_gc count code
-            table tree align xlsx
-        };
-        ( $sheet_row, $sheet_col ) = ( 0, 0 );
+        my @headers
+            = qw{ group_name genus_member species_member strain_member };
+        ( $sheet_row, $sheet_col ) = ( 0, 1 );
         my %option = (
             sheet_row => $sheet_row,
             sheet_col => $sheet_col,
@@ -179,25 +174,67 @@ my $gc_checklist = sub {
     }
 
     {    # write contents
+        my $query_name = 'superkingdom';
+        $sheet_row++;
         my $sql_query = q{
-            SELECT  genus_id,
-                    genus,
-                    species_id,
-                    species,
-                    AVG(genome_size),
-                    AVG(gc_content),
-                    COUNT(*) count,
-                    MAX(CHAR_LENGTH(code))
-            FROM gr
-            WHERE   1 = 1 
-            AND species_member > 2
-            GROUP BY species_id
-            ORDER BY species
+            SELECT 
+                superkingdom group_name,
+                COUNT(DISTINCT genus_id) genus_member,
+                COUNT(DISTINCT species_id) species_member,
+                COUNT(DISTINCT taxonomy_id) strain_member
+            FROM
+                ar
+            GROUP BY group_name
         };
         my %option = (
-            sql_query => $sql_query,
-            sheet_row => $sheet_row,
-            sheet_col => $sheet_col,
+            query_name => $query_name,
+            sql_query  => $sql_query,
+            sheet_row  => $sheet_row,
+            sheet_col  => $sheet_col,
+        );
+        ($sheet_row) = $to_xlsx->write_content_direct( $sheet, \%option );
+    }
+
+    {    # write contents
+        my $query_name = 'Euk subgroup';
+        $sheet_row++;
+        my $sql_query = q{
+            SELECT 
+                (CONCAT(`group`, ', ', subgroup)) group_name,
+                COUNT(DISTINCT genus_id) genus_member,
+                COUNT(DISTINCT species_id) species_member,
+                COUNT(DISTINCT taxonomy_id) strain_member
+            FROM ar
+            WHERE superkingdom = 'Eukaryota'
+            GROUP BY group_name
+        };
+        my %option = (
+            query_name => $query_name,
+            sql_query  => $sql_query,
+            sheet_row  => $sheet_row,
+            sheet_col  => $sheet_col,
+        );
+        ($sheet_row) = $to_xlsx->write_content_direct( $sheet, \%option );
+    }
+
+    {    # write contents
+        my $query_name = 'Prok group';
+        $sheet_row++;
+        my $sql_query = q{
+            SELECT 
+                `group` group_name,
+                COUNT(DISTINCT genus_id) genus_member,
+                COUNT(DISTINCT species_id) species_member,
+                COUNT(DISTINCT taxonomy_id) strain_member
+            FROM ar
+            WHERE superkingdom != 'Eukaryota'
+            GROUP BY group_name
+        };
+        my %option = (
+            query_name => $query_name,
+            sql_query  => $sql_query,
+            sheet_row  => $sheet_row,
+            sheet_col  => $sheet_col,
         );
         ($sheet_row) = $to_xlsx->write_content_direct( $sheet, \%option );
     }
@@ -206,18 +243,16 @@ my $gc_checklist = sub {
 };
 
 #----------------------------------------------------------#
-# worksheet -- gr_gc_checklist
+# worksheet -- euk_group
 #----------------------------------------------------------#
-my $gr_gc_checklist = sub {
-    my $sheet_name = 'gr_gc_checklist';
+my $euk_group = sub {
+    my $sheet_name = 'euk_group';
     my $sheet;
     my ( $sheet_row, $sheet_col );
 
     {    # write header
-        my @headers = qw{
-            genus_id genus species_id species avg_genome_size avg_gc count code
-            table tree align xlsx
-        };
+        my @headers = qw{ group_name genus_member species_member strain_member
+            chromosome scaffold contig };
         ( $sheet_row, $sheet_col ) = ( 0, 0 );
         my %option = (
             sheet_row => $sheet_row,
@@ -230,20 +265,47 @@ my $gr_gc_checklist = sub {
 
     {    # write contents
         my $sql_query = q{
-            SELECT  genus_id,
-                    genus,
-                    species_id,
-                    species,
-                    AVG(genome_size),
-                    AVG(gc_content),
-                    COUNT(*) count,
-                    MAX(CHAR_LENGTH(code))
-            FROM gr
-            WHERE   1 = 1 
-            AND species_member > 2
-            AND status = 'Complete'
-            GROUP BY species_id HAVING count > 2
-            ORDER BY species
+            SELECT 
+                t0.group_name,
+                t0.genus_member,
+                t0.species_member,
+                t0.strain_member,
+                t1.strain_member,
+                t2.strain_member,
+                t3.strain_member
+            FROM
+                (SELECT 
+                    (CONCAT(`group`, ', ', subgroup)) group_name,
+                        COUNT(DISTINCT genus_id) genus_member,
+                        COUNT(DISTINCT species_id) species_member,
+                        COUNT(taxonomy_id) strain_member
+                FROM ar
+                WHERE superkingdom = 'Eukaryota'
+                GROUP BY group_name) t0
+                    LEFT JOIN
+                (SELECT 
+                    (CONCAT(`group`, ', ', subgroup)) group_name,
+                        COUNT(DISTINCT taxonomy_id) strain_member
+                FROM ar
+                WHERE superkingdom = 'Eukaryota'
+                        AND assembly_level LIKE '%Chromosome%'
+                GROUP BY group_name) t1 ON t0.group_name = t1.group_name
+                    LEFT JOIN
+                (SELECT 
+                    (CONCAT(`group`, ', ', subgroup)) group_name,
+                        COUNT(DISTINCT taxonomy_id) strain_member
+                FROM ar
+                WHERE superkingdom = 'Eukaryota'
+                        AND assembly_level = 'Scaffold'
+                GROUP BY group_name) t2 ON t0.group_name = t2.group_name
+                    LEFT JOIN
+                (SELECT 
+                    (CONCAT(`group`, ', ', subgroup)) group_name,
+                        COUNT(DISTINCT taxonomy_id) strain_member
+                FROM ar
+                WHERE superkingdom = 'Eukaryota'
+                        AND assembly_level = 'Contig'
+                GROUP BY group_name) t3 ON t0.group_name = t3.group_name
         };
         my %option = (
             sql_query => $sql_query,
@@ -252,15 +314,17 @@ my $gr_gc_checklist = sub {
         );
         ($sheet_row) = $to_xlsx->write_content_direct( $sheet, \%option );
     }
-
     print "Sheet \"$sheet_name\" has been generated.\n";
 };
 
 {
     &$strains;
     &$species;
-    &$gc_checklist;
-    &$gr_gc_checklist;
+    &$group;
+    &$euk_group;
+
+    #&$gc_checklist;
+    #&$ar_gc_checklist;
 }
 
 $stopwatch->end_message;
@@ -270,11 +334,10 @@ __END__
 
 =head1 NAME
 
-    gr_overview_tx.pl - Overviews for NCBI GENOME_REPORTS
+    ar_overview_tx.pl - Overviews for NCBI ASSEMBLY_REPORTS
 
 =head1 SYNOPSIS
 
-    perl rr_overview_tx.pl --db gr
+    perl ar_overview_tx.pl --db ar_genbank
 
 =cut
-
