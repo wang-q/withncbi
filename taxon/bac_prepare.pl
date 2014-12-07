@@ -43,7 +43,7 @@ my $stopwatch = AlignDB::Stopwatch->new(
 );
 
 # running options
-my $seq_dir     = "/home/wangq/data/bacteria/bac_seq_dir";
+my $seq_dir     = "~/data/bacteria/bac_seq_dir";
 my $working_dir = ".";
 
 my $parent_id = "562,585054";    # E.coli and E. fergusonii
@@ -108,6 +108,8 @@ GetOptions(
 pod2usage(1) if $help;
 pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
 
+$seq_dir = replace_home($seq_dir);
+
 #----------------------------------------------------------#
 # init
 #----------------------------------------------------------#
@@ -141,7 +143,7 @@ my $id_str;
         my $query
             = $scaffold
             ? q{ SELECT taxonomy_id FROM gr WHERE 1 = 1 }
-            : q{ SELECT taxonomy_id FROM gr WHERE status = 'Complete' };
+            : q{ SELECT taxonomy_id FROM gr WHERE status like '%Complete%' };
         my $sth = $dbh->prepare($query);
         $sth->execute;
         while ( my ($id) = $sth->fetchrow_array ) {
@@ -257,6 +259,8 @@ my @query_ids;
     close $fh;
 }
 
+my %id_missing_file;
+my @ids_missing;
 {    # build fasta files
 
     # read all filenames, then grep
@@ -272,7 +276,7 @@ my @query_ids;
     }
 
     print "Rewrite seqs for every strains\n";
-    for my $taxon_id ( $target_id, @query_ids ) {
+ID: for my $taxon_id ( $target_id, @query_ids ) {
         print "taxon_id $taxon_id\n";
         my $id_dir = File::Spec->catdir( $seq_dir, $taxon_id );
         mkdir $id_dir unless -e $id_dir;
@@ -290,6 +294,12 @@ my @query_ids;
         # AND is $scaffold, prep_scaff() will find the scaffolds
         for my $acc ( grep {defined} @accs ) {
             my ($fna_file) = grep {/$acc/} @fna_files;
+            if ( !defined $fna_file ) {
+                warn ".fna file for [$acc] of [$taxon_id] doesn't exist.\n";
+                $id_missing_file{$taxon_id}++;
+                push @ids_missing, $taxon_id;
+                next ID;
+            }
             copy( $fna_file, $id_dir );
 
             my ($gff_file) = grep {/$acc/} @gff_files;
@@ -311,6 +321,15 @@ my @query_ids;
             }
         }
     }
+}
+
+{ # report missing
+    @query_ids = grep {!$id_missing_file{$_}} @query_ids;
+    
+    my $table_file = File::Spec->catfile( $working_dir, "table.txt" );
+    open my $fh, '>>', $table_file;
+    print {$fh} "Can't find files for the following ID:\n@ids_missing\n";
+    close $fh;
 }
 
 {

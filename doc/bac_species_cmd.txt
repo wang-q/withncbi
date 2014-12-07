@@ -113,7 +113,7 @@ perl ~/Scripts/withncbi/taxon/bac_prepare.pl -p 747
 perl ~/Scripts/withncbi/taxon/bac_prepare.pl -p 837   
 perl ~/Scripts/withncbi/taxon/bac_prepare.pl -p 1219  -t 146891 -e 167539,167555,59920,59922,74547,93059 -n Prochlorococcus_marinus ###
 perl ~/Scripts/withncbi/taxon/bac_prepare.pl -p 1747  
-perl ~/Scripts/withncbi/taxon/bac_prepare.pl -p 287    -t 208964 Pseudomonas_aeruginosa
+perl ~/Scripts/withncbi/taxon/bac_prepare.pl -p 287    -t 208964 -n Pseudomonas_aeruginosa
 perl ~/Scripts/withncbi/taxon/bac_prepare.pl -p 294   
 perl ~/Scripts/withncbi/taxon/bac_prepare.pl -p 303    -t 160488 -e 1196325 -n Pseudomonas_putida
 perl ~/Scripts/withncbi/taxon/bac_prepare.pl -p 316   

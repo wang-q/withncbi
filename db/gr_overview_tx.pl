@@ -241,8 +241,7 @@ my $gr_gc_checklist = sub {
             FROM gr
             WHERE   1 = 1 
             AND species_member > 2
-            AND status != 'Scaffold'
-            AND status != 'Contig'
+            AND status like '%Complete%'
             AND species not like '%Candidatus%'
             GROUP BY species_id
             HAVING count > 2 AND species_code > 0
