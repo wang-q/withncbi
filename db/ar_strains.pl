@@ -36,7 +36,6 @@ my $stopwatch = AlignDB::Stopwatch->new(
 
 # running options
 my $ar_dir = replace_home( $Config->{path}{ar} );    # assembly report
-my $bp_dir = replace_home( $Config->{path}{bp} );    # bioproject
 my $td_dir = replace_home( $Config->{path}{td} );    # taxdmp
 
 # genbank instead of refseq
@@ -94,27 +93,15 @@ $dbh->{csv_tables}->{t0} = {
     ],
 };
 
-$dbh->{csv_tables}->{t1} = {
-    eol            => "\n",
-    sep_char       => "\t",
-    file           => "$bp_dir/summary.txt",
-    skip_first_row => 1,
-    quote_char     => '',
-    col_names      => [
-        qw{ Organism_Name TaxID Project_Accession Project_ID Project_Type
-            Project_Data_Type Date }
-    ],
-};
-
 #----------------------------#
-# join t0 and t1
+# select columns only needed
 #----------------------------#
 {
     $stopwatch->block_message("Write summary");
 
     my $query = qq{
         SELECT 
-            t1.TaxID,
+            t0.TaxID,
             t0.organism_name,
             t0.bioproject,
             t0.assembly_accession,
@@ -124,9 +111,8 @@ $dbh->{csv_tables}->{t1} = {
             t0.genome_rep,
             t0.seq_rel_date,
             t0.asm_name
-        FROM   t0, t1
+        FROM   t0
         WHERE 1 = 1
-        AND t0.bioproject = t1.Project_Accession
         AND t0.version_status = 'latest'
         AND t0.genome_rep = 'Full'
     };
@@ -175,9 +161,9 @@ $dbh->{csv_tables}->{t1} = {
                 warn "Can't find taxon for $name\n";
                 next;
             }
-            
+
             # superkingdom, group, subgroup
-            push @row, (find_group($node));
+            push @row, ( find_group($node) );
 
             my $species = find_ancestor( $node, 'species' );
             if ($species) {
@@ -213,7 +199,7 @@ if ( $^O ne "Win32" ) {
     system "wc -l $_"
         for "$ar_dir/assembly_summary_refseq.txt",
         "$ar_dir/assembly_summary_genbank.txt",
-        "$bp_dir/summary.txt", $strain_file;
+        $strain_file;
 }
 
 #----------------------------#

@@ -36,7 +36,6 @@ my $stopwatch = AlignDB::Stopwatch->new(
 
 # running options
 my $gr_dir = replace_home( $Config->{path}{gr} );    # genome report
-my $bp_dir = replace_home( $Config->{path}{bp} );    # bioproject
 my $td_dir = replace_home( $Config->{path}{td} );    # taxdmp
 
 # eukaryotes instead of prokaryotes
@@ -108,27 +107,15 @@ else {
     };
 }
 
-$dbh->{csv_tables}->{t1} = {
-    eol            => "\n",
-    sep_char       => "\t",
-    file           => "$bp_dir/summary.txt",
-    skip_first_row => 1,
-    quote_char     => '',
-    col_names      => [
-        qw{ Organism_Name TaxID Project_Accession Project_ID Project_Type
-            Project_Data_Type Date }
-    ],
-};
-
 #----------------------------#
-# join t0 and t1
+# select columns only needed
 #----------------------------#
 {
     $stopwatch->block_message("Write summary");
 
     my $query = qq{
         SELECT 
-            t1.TaxID,
+            t0.TaxID,
             t0.Organism_Name,
             t0.BioProject_Accession,
             t0.Group,
@@ -140,12 +127,10 @@ $dbh->{csv_tables}->{t1} = {
             t0.Scaffolds,
             t0.Release_Date,
             t0.Status
-        FROM   t0, t1
+        FROM t0
         WHERE 1 = 1
-        AND t0.BioProject_Accession = t1.Project_Accession
     };
 
-    #AND t0.Organism_Name = t1.Organism_Name
     my $header_sth = $dbh->prepare($query);
     $header_sth->execute;
     $header_sth->finish;
@@ -163,15 +148,15 @@ $dbh->{csv_tables}->{t1} = {
     );
 
     my @strs = (
-        q{ AND t0.Status = 'Complete'
-            AND t0.Chromosomes <> '-'
+
+        q{ AND t0.Chromosomes <> '-'
             AND t0.Chromosomes <> ''
-            ORDER BY t0.Release_Date },    # prok
-        q{ AND t0.Status = 'Chromosomes'
-            AND t0.Chromosomes <> '-'
-            AND t0.Chromosomes <> ''
-            ORDER BY t0.Release_Date },    # euk
-        q{ AND t0.Status = 'Scaffolds or contigs'
+            ORDER BY t0.Release_Date },
+        q{ AND t0.Status = 'Scaffold'
+            AND t0.WGS <> '-'
+            AND t0.WGS <> ''
+            ORDER BY t0.Release_Date },
+        q{ AND t0.Status = 'Contig'
             AND t0.WGS <> '-'
             AND t0.WGS <> ''
             ORDER BY t0.Release_Date },
@@ -231,7 +216,7 @@ if ( $^O ne "Win32" ) {
     print "\n";
     system "wc -l $_"
         for "$gr_dir/prokaryotes.txt", "$gr_dir/eukaryotes.txt",
-        "$bp_dir/summary.txt", $strain_file;
+        $strain_file;
 }
 
 #----------------------------#
