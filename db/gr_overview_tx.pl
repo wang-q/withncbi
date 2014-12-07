@@ -215,7 +215,7 @@ my $gr_gc_checklist = sub {
 
     {    # write header
         my @headers = qw{
-            genus_id genus species_id species avg_genome_size avg_gc count code
+            group genus_id species_id species avg_genome_size avg_gc count code
             table tree align xlsx
         };
         ( $sheet_row, $sheet_col ) = ( 0, 0 );
@@ -230,20 +230,23 @@ my $gr_gc_checklist = sub {
 
     {    # write contents
         my $sql_query = q{
-            SELECT  genus_id,
-                    genus,
+            SELECT  `group` group_name,
+                    genus_id,
                     species_id,
                     species,
                     AVG(genome_size),
                     AVG(gc_content),
                     COUNT(*) count,
-                    MAX(CHAR_LENGTH(code))
+                    MAX(CHAR_LENGTH(code)) species_code 
             FROM gr
             WHERE   1 = 1 
             AND species_member > 2
-            AND status = 'Complete'
-            GROUP BY species_id HAVING count > 2
-            ORDER BY species
+            AND status != 'Scaffold'
+            AND status != 'Contig'
+            AND species not like '%Candidatus%'
+            GROUP BY species_id
+            HAVING count > 2 AND species_code > 0
+            ORDER BY group_name, species
         };
         my %option = (
             sql_query => $sql_query,
@@ -274,7 +277,7 @@ __END__
 
 =head1 SYNOPSIS
 
-    perl rr_overview_tx.pl --db gr
+    perl gr_overview_tx.pl --db gr
 
 =cut
 
