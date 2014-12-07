@@ -26,6 +26,8 @@ use AlignDB::IntSpan;
 use AlignDB::Stopwatch;
 
 use FindBin;
+use lib "$FindBin::Bin/../lib";
+use MyUtil qw(replace_home find_ancestor);
 
 #----------------------------------------------------------#
 # GetOpt section
@@ -67,11 +69,15 @@ my $username = $Config->{database}{username};
 my $password = $Config->{database}{password};
 my $db_name  = $Config->{database}{db};
 
+# including scaffolds and contigs
 my $scaffold;
-my $td_dir   = $Config->{path}{td};      # taxdmp
-my $nb_dir   = $Config->{path}{nb};      # NCBI genomes bac
-my $nbd_dir  = $Config->{path}{nbd};     # NCBI genomes bac draft
-my $ngbd_dir = $Config->{path}{ngbd};    # NCBI genbank genomes bac draft
+
+# paths
+my $td_dir  = replace_home( $Config->{path}{td} );     # taxdmp
+my $nb_dir  = replace_home( $Config->{path}{nb} );     # NCBI genomes bac
+my $nbd_dir = replace_home( $Config->{path}{nbd} );    # NCBI genomes bac draft
+my $ngbd_dir
+    = replace_home( $Config->{path}{ngbd} );    # NCBI genbank genomes bac draft
 
 # run in parallel mode
 my $parallel = $Config->{run}{parallel};
