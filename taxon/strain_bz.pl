@@ -42,6 +42,7 @@ my $stopwatch = AlignDB::Stopwatch->new(
 my $working_dir = ".";
 my $seq_dir;    #  will prep_fa from this dir ~/Scripts/alignDB/taxon
                 #  or use seqs store in $working_dir
+my @keep;       # don't touch anything inside fasta files
 
 my $target_id;
 my @query_ids;
@@ -51,13 +52,22 @@ my $clustalw;
 
 my $name_str = "working";
 
-# all taxons in this project (may also contain unused taxons)
+# All taxons in this project (may also contain unused taxons)
 my $filename = "strains_taxon_info.csv";
 
 my $aligndb  = replace_home( $Config->{run}{aligndb} );     # alignDB path
 my $egaz     = replace_home( $Config->{run}{egaz} );        # egaz path
 my $kent_bin = replace_home( $Config->{run}{kent_bin} );    # exes of Jim Kent
 my $bat_dir  = $Config->{run}{bat};                         # Windows scripts
+
+# Use name instead of taxon_id as identifier. These names should only contain
+# alphanumeric value and match with sequence directory names.
+# For strains not recorded in NCBI taxonomy, you should assign them fake ids.
+# If this option set to be true, all $target_id, @query_ids is actually names.
+my $use_name;
+
+# Use Ensembl database as annotation source
+my $ensembl;
 
 # run in parallel mode
 my $parallel = $Config->{run}{parallel};
@@ -71,11 +81,14 @@ GetOptions(
     'file=s'          => \$filename,
     'w|working_dir=s' => \$working_dir,
     's|seq_dir=s'     => \$seq_dir,
-    't|target_id=i'   => \$target_id,
-    'q|query_ids=i'   => \@query_ids,
-    'o|r|outgroup=i'  => \$outgroup_id,
+    'keep=s'          => \@keep,
+    't|target_id=s'   => \$target_id,
+    'q|query_ids=s'   => \@query_ids,
+    'o|r|outgroup=s'  => \$outgroup_id,
     'n|name_str=s'    => \$name_str,
+    'un|use_name'     => \$use_name,
     'clustalw'        => \$clustalw,
+    'e|ensembl=s'     => \$ensembl,
     'parallel=i'      => \$parallel,
 ) or pod2usage(2);
 
@@ -110,13 +123,30 @@ if ($outgroup_id) {
     push @query_ids, $outgroup_id;
 }
 
+my @data;
+{
+    if ( !$use_name ) {
+        @data
+            = map { taxon_info( $_, $working_dir ) } ( $target_id, @query_ids );
+    }
+    else {
+        @data
+            = map { taxon_info_name( $_, $working_dir ) }
+            ( $target_id, @query_ids );
+    }
+}
+
 # if seqs is not in working dir, copy them from seq_dir
-my @target_accs;
+my @target_seqs;    # for gff and rm-gff files
 if ($seq_dir) {
     print "Get seqs from [$seq_dir]\n";
 
     for my $id ( $target_id, @query_ids ) {
-        print " " x 4, "Copy seq of $id\n";
+        my ($keep) = grep { $_ eq $id } @keep;
+        print " " x 4 . "Copy seq of [$id]\n";
+        if ( defined $keep ) {
+            print " " x 8 . "Don't change fasta header for [$id]\n";
+        }
 
         my $original_dir = File::Spec->catdir( $seq_dir,     $id );
         my $cur_dir      = File::Spec->catdir( $working_dir, $id );
@@ -126,14 +156,31 @@ if ($seq_dir) {
             = File::Find::Rule->file->name( '*.fna', '*.fa', '*.fas',
             '*.fasta' )->in($original_dir);
 
+        printf " " x 8 . "Total %d fasta file(s)\n", scalar @fa_files;
+
         for my $fa_file (@fa_files) {
-            my $basename = prep_fa( $fa_file, $cur_dir );
-            if ( $id eq $target_id ) {
-                push @target_accs, $basename;
+            my $basename;
+            if ( defined $keep ) {
+                $basename = prep_fa( $fa_file, $cur_dir, 1 );
             }
-            my $gff_file = File::Spec->catdir( $original_dir, "$basename.gff" );
-            if ( -e $gff_file ) {
-                fcopy( $gff_file, $cur_dir );
+            else {
+                $basename = prep_fa( $fa_file, $cur_dir );
+            }
+            if ( $id eq $target_id ) {
+                push @target_seqs, $basename;
+            }
+            if ( !$ensembl ) {
+                my $gff_file
+                    = File::Spec->catdir( $original_dir, "$basename.gff" );
+                if ( -e $gff_file ) {
+                    fcopy( $gff_file, $cur_dir );
+                }
+
+                my $rm_gff_file
+                    = File::Spec->catdir( $original_dir, "$basename.rm.gff" );
+                if ( -e $rm_gff_file ) {
+                    fcopy( $rm_gff_file, $cur_dir );
+                }
             }
         }
     }
@@ -151,12 +198,23 @@ if ($seq_dir) {
     close $fh;
 }
 
-{    # use id as species name
+{
     print "Create id2name.csv\n";
     my $id2name_file = File::Spec->catfile( $working_dir, "id2name.csv" );
     open my $fh, '>', $id2name_file;
-    for my $id ( $target_id, @query_ids ) {
-        print {$fh} "$id,$id\n";
+    if ( !$use_name ) {
+
+        # if not set --use_name, use id as strain name
+        for my $id ( $target_id, @query_ids ) {
+            print {$fh} "$id,$id\n";
+        }
+    }
+    else {
+        for my $name ( $target_id, @query_ids ) {
+            my ($id)
+                = map { $_->{taxon} } grep { $_->{name} eq $name } @data;
+            print {$fh} "$id,$name\n";
+        }
     }
     close $fh;
 }
@@ -177,15 +235,13 @@ if ($seq_dir) {
     my $tt = Template->new;
     my $text;
     my $sh_name;
-    my @data
-        = map { taxon_info( $_, $working_dir ) } ( $target_id, @query_ids );
 
     # taxon.csv
     print "Create taxon.csv\n";
     $text = <<'EOF';
-taxon_id,genus,species,sub_species,common_name,classification
+taxon_id,genus,species,sub_species,common_name
 [% FOREACH item IN data -%]
-[% item.taxon %],[% item.genus %],[% item.species %],[% item.subname %],[% item.name %],
+[% item.taxon %],[% item.genus %],[% item.species %],[% item.subname %],[% item.name %]
 [% END -%]
 EOF
     $tt->process(
@@ -304,7 +360,11 @@ cd [% working_dir %]
 #----------------------------#
 perl [% aligndb %]/extra/seq_pair_batch.pl \
     --bin [% kent_bin %] \
+[% IF use_name -%]
+    --id [% working_dir %]/id2name.csv \
+[% ELSE -%]
     --dir_as_taxon \
+[% END -%]
     --parallel [% parallel %] \
     -f [% working_dir %]/seq_pair.csv \
     -taxon [% working_dir %]/taxon.csv \
@@ -313,7 +373,11 @@ perl [% aligndb %]/extra/seq_pair_batch.pl \
 
 perl [% aligndb %]/extra/seq_pair_batch.pl \
     --bin [% kent_bin %] \
+[% IF use_name -%]
+    --id [% working_dir %]/id2name.csv \
+[% ELSE -%]
     --dir_as_taxon \
+[% END -%]
     --parallel [% parallel %] \
     -f [% working_dir %]/seq_pair.csv \
     -taxon [% working_dir %]/taxon.csv \
@@ -329,6 +393,7 @@ EOF
             aligndb     => $aligndb,
             kent_bin    => $kent_bin,
             name_str    => $name_str,
+            use_name    => $use_name,
             target_id   => $target_id,
             outgroup_id => $outgroup_id,
             query_ids   => \@query_ids,
@@ -542,7 +607,7 @@ EOF
             target_id   => $target_id,
             outgroup_id => $outgroup_id,
             query_ids   => \@query_ids,
-            target_accs => \@target_accs,
+            target_seqs => \@target_seqs,
             clustalw    => $clustalw,
         },
         File::Spec->catfile( $working_dir, $sh_name )
@@ -567,12 +632,15 @@ perl [% aligndb %]/extra/multi_way_batch.pl \
 [% ELSE -%]
     -da [% working_dir %]/[% name_str %]_mft \
 [% END -%]
-    --gff_file [% FOREACH acc IN target_accs %][% working_dir %]/[% target_id %]/[% acc %].gff,[% END %] \
-    --rm_gff_file [% FOREACH acc IN target_accs %][% working_dir %]/[% target_id %]/[% acc %].rm.gff,[% END %] \
-    --block --id [% working_dir %]/id2name.csv \
+    --gff_file [% FOREACH seq IN target_seqs %][% working_dir %]/[% target_id %]/[% seq %].gff,[% END %] \
+    --rm_gff_file [% FOREACH seq IN target_seqs %][% working_dir %]/[% target_id %]/[% seq %].rm.gff,[% END %] \
+    --block \
+    --id [% working_dir %]/id2name.csv \
 [% IF outgroup_id -%]
     --outgroup \
 [% END -%]
+    -taxon [% working_dir %]/taxon.csv \
+    -chr [% working_dir %]/chr_length.csv \
     -lt 1000 --parallel [% parallel %] --batch 5 \
     --run 1,2,5,10,21,30-32,40-42,44
 
@@ -587,7 +655,7 @@ EOF
             target_id   => $target_id,
             outgroup_id => $outgroup_id,
             query_ids   => \@query_ids,
-            target_accs => \@target_accs,
+            target_seqs => \@target_seqs,
             clustalw    => $clustalw,
         },
         File::Spec->catfile( $working_dir, $sh_name )
@@ -625,7 +693,6 @@ EOF
 
     # message
     $stopwatch->block_message("Execute *.sh files in order.");
-
 }
 
 #----------------------------#
@@ -637,7 +704,6 @@ exit;
 #----------------------------------------------------------#
 # Subroutines
 #----------------------------------------------------------#
-
 sub taxon_info {
     my $taxon_id = shift;
     my $dir      = shift;
@@ -676,9 +742,46 @@ sub taxon_info {
     };
 }
 
+sub taxon_info_name {
+    my $name = shift;
+    my $dir  = shift;
+
+    my $dbh = DBI->connect("DBI:CSV:");
+
+    $dbh->{csv_tables}->{t0} = {
+        eol       => "\n",
+        sep_char  => ",",
+        file      => $filename,
+        col_names => [
+            map { ( $_, $_ . "_id" ) } qw{strain species genus family order}
+        ],
+    };
+
+    my $query
+        = qq{ SELECT strain_id, strain, genus, species FROM t0 WHERE strain = ? };
+    my $sth = $dbh->prepare($query);
+    $sth->execute($name);
+    my ( $taxonomy_id, $organism_name, $genus, $species )
+        = $sth->fetchrow_array;
+    $species =~ s/^$genus\s+//;
+    my $sub_name = $organism_name;
+    $sub_name =~ s/^$genus[\s_]+//;
+    $sub_name =~ s/^$species[\s_]*//;
+
+    return {
+        taxon   => $taxonomy_id,
+        name    => $name,
+        genus   => $genus,
+        species => $species,
+        subname => $sub_name,
+        dir     => File::Spec->catdir( $working_dir, $name ),
+    };
+}
+
 sub prep_fa {
     my $infile = shift;
     my $dir    = shift;
+    my $keep   = shift;
 
     my $basename = basename( $infile, '.fna', '.fa', '.fas', '.fasta' );
 
@@ -686,11 +789,16 @@ sub prep_fa {
     open my $in_fh,  '<', $infile;
     open my $out_fh, '>', $outfile;
     while (<$in_fh>) {
-        if (/>/) {
-            print {$out_fh} ">$basename\n";
+        if ($keep) {
+            print {$out_fh} $_;
         }
         else {
-            print {$out_fh} $_;
+            if (/>/) {
+                print {$out_fh} ">$basename\n";
+            }
+            else {
+                print {$out_fh} $_;
+            }
         }
     }
     close $out_fh;
@@ -700,5 +808,4 @@ sub prep_fa {
 }
 
 __END__
-
 perl strain_bz.pl 
