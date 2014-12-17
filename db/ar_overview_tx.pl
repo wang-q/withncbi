@@ -392,12 +392,86 @@ my $Ascomycetes_genus = sub {
 };
 
 
+#----------------------------------------------------------#
+# worksheet -- genus_Saccharomyces
+#----------------------------------------------------------#
+my $genus_Saccharomyces = sub {
+    my $sheet_name = 'genus_Saccharomyces';
+    my $sheet;
+    my ( $sheet_row, $sheet_col );
+
+    {    # write header
+        my @headers = qw{ species strain_member
+            chromosome scaffold contig };
+        ( $sheet_row, $sheet_col ) = ( 0, 0 );
+        my %option = (
+            sheet_row => $sheet_row,
+            sheet_col => $sheet_col,
+            header    => \@headers,
+        );
+        ( $sheet, $sheet_row )
+            = $to_xlsx->write_header_direct( $sheet_name, \%option );
+    }
+
+    {    # write contents
+        my $sql_query = q{
+            SELECT 
+                t0.species,
+                t0.strain_member,
+                t1.strain_member,
+                t2.strain_member,
+                t3.strain_member
+            FROM
+                (SELECT 
+                    species,
+                    COUNT(DISTINCT taxonomy_id) strain_member
+                FROM ar
+                WHERE genus = 'Saccharomyces'
+                GROUP BY species) t0
+                    LEFT JOIN
+                (SELECT 
+                    species,
+                    COUNT(DISTINCT taxonomy_id) strain_member
+                FROM ar
+                WHERE genus = 'Saccharomyces'
+                        AND assembly_level LIKE '%Chromosome%'
+                GROUP BY species) t1 ON t0.species = t1.species
+                    LEFT JOIN
+                (SELECT 
+                    species,
+                    COUNT(DISTINCT taxonomy_id) strain_member
+                FROM ar
+                WHERE genus = 'Saccharomyces'
+                        AND assembly_level = 'Scaffold'
+                GROUP BY species) t2 ON t0.species = t2.species
+                    LEFT JOIN
+                (SELECT 
+                    species,
+                    COUNT(DISTINCT taxonomy_id) strain_member
+                FROM ar
+                WHERE genus = 'Saccharomyces'
+                        AND assembly_level = 'Contig'
+                GROUP BY species) t3 ON t0.species = t3.species
+            ORDER BY t0.strain_member DESC
+        };
+        my %option = (
+            sql_query => $sql_query,
+            sheet_row => $sheet_row,
+            sheet_col => $sheet_col,
+        );
+        ($sheet_row) = $to_xlsx->write_content_direct( $sheet, \%option );
+    }
+    print "Sheet \"$sheet_name\" has been generated.\n";
+};
+
+
 {
     &$strains;
     &$species;
     &$group;
     &$euk_group;
     &$Ascomycetes_genus;
+    &$genus_Saccharomyces;
 }
 
 $stopwatch->end_message;
