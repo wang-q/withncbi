@@ -78,8 +78,9 @@ my $parallel = 12;
 
     # taxon.csv
     my $text = <<'EOF';
+taxon_id,genus,species,sub_species,common_name
 [% FOREACH item IN data -%]
-[% item.taxon %],Saccharomyces,cerevisiae,[% item.name %],[% item.name %],
+[% item.taxon %],Saccharomyces,cerevisiae,[% item.name %],[% item.name %]
 [% END -%]
 EOF
     $tt->process(
@@ -90,6 +91,7 @@ EOF
 
     # chr_length_chrUn.csv
     $text = <<'EOF';
+taxon_id,chr,length,name,assembly
 [% FOREACH item IN data -%]
 [% item.taxon %],chrUn,999999999,[% item.name %]/WGS/sgrp2
 [% END -%]

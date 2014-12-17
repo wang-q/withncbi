@@ -323,7 +323,8 @@ ID: for my $taxon_id ( $target_id, @query_ids ) {
     }
 }
 
-{ # report missing
+# report missing
+if (@ids_missing) {
     @query_ids = grep {!$id_missing_file{$_}} @query_ids;
     
     my $table_file = File::Spec->catfile( $working_dir, "table.txt" );
