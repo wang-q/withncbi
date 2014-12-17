@@ -41,14 +41,18 @@ my $td_dir = replace_home( $Config->{path}{td} );    # taxdmp
 
 my $filename = "strains_taxon_info.csv";
 
+# simplify strain name
+my $simple;
+
 my $man  = 0;
 my $help = 0;
 
 GetOptions(
-    'help|?'   => \$help,
-    'man'      => \$man,
-    'id=i'     => \@ids,
-    'file=s'   => \$filename,
+    'help|?' => \$help,
+    'man'    => \$man,
+    'id=i'   => \@ids,
+    'file=s' => \$filename,
+    'simple' => \$simple,
 ) or pod2usage(2);
 
 pod2usage(1) if $help;
@@ -90,6 +94,14 @@ ID: for my $taxon_id (@ids) {
             next ID;
         }
         push @row, ( $taxon_obj->scientific_name, $taxon_obj->id, );
+    }
+
+    if ($simple) {
+        my $sub_name = $row[0];
+        $sub_name =~ s/^$row[2]\s*//;
+        $sub_name =~ s/\W/_/g;
+        $sub_name =~ s/_+/_/g;
+        $row[0] = $sub_name;
     }
 
     for my $level (qw{genus family order}) {
