@@ -15,9 +15,11 @@ use Bio::DB::Taxonomy;
 use DateTime::Format::Natural;
 use List::MoreUtils qw(any all uniq);
 
-use FindBin;
-
 use AlignDB::Stopwatch;
+
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+use MyUtil qw(replace_home);
 
 #----------------------------------------------------------#
 # GetOpt section
@@ -43,10 +45,10 @@ my $man  = 0;
 my $help = 0;
 
 GetOptions(
-    'help|?' => \$help,
-    'man'    => \$man,
-    'id=i'   => \@ids,
-    'file=s' => \$filename,
+    'help|?'   => \$help,
+    'man'      => \$man,
+    'id=i'     => \@ids,
+    'file=s'   => \$filename,
 ) or pod2usage(2);
 
 pod2usage(1) if $help;
@@ -127,20 +129,6 @@ RANK: while (1) {
     }
 
     return;
-}
-
-sub replace_home {
-    my $path = shift;
-
-    require File::Spec;
-    require File::HomeDir;
-
-    if ( $path =~ /^\~\// ) {
-        $path =~ s/^\~\///;
-        $path = File::Spec->catdir( File::HomeDir->my_home, $path );
-    }
-
-    return $path;
 }
 
 __END__
