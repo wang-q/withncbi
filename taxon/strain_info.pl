@@ -35,6 +35,7 @@ my $stopwatch = AlignDB::Stopwatch->new(
 );
 
 my @ids;
+my %name_of;
 
 # running options
 my $td_dir = replace_home( $Config->{path}{td} );    # taxdmp
@@ -51,6 +52,7 @@ GetOptions(
     'help|?' => \$help,
     'man'    => \$man,
     'id=i'   => \@ids,
+    'name=s' => \%name_of,
     'file=s' => \$filename,
     'simple' => \$simple,
 ) or pod2usage(2);
@@ -96,7 +98,10 @@ ID: for my $taxon_id (@ids) {
         push @row, ( $taxon_obj->scientific_name, $taxon_obj->id, );
     }
 
-    if ($simple) {
+    if ( exists $name_of{$taxon_id} ) {
+        $row[0] = $name_of{$taxon_id};
+    }
+    elsif ($simple) {
         my $sub_name = $row[0];
         $sub_name =~ s/^$row[2]\s*//;
         $sub_name =~ s/\W/_/g;
