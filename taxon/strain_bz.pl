@@ -48,12 +48,19 @@ my $target_id;
 my @query_ids;
 my $outgroup_id;
 
-my $clustalw;
-
 my $name_str = "working";
 
 # All taxons in this project (may also contain unused taxons)
-my $filename = "strains_taxon_info.csv";
+my $taxon_file = "strains_taxon_info.csv";
+
+# predefined phylogenetic tree
+my $phylo_tree;
+
+# Naming multiply alignment, the default value is $name_str
+# This option is for more than one align combination.
+my $multi_name;
+
+my $clustalw;
 
 my $aligndb  = replace_home( $Config->{run}{aligndb} );     # alignDB path
 my $egaz     = replace_home( $Config->{run}{egaz} );        # egaz path
@@ -78,7 +85,7 @@ my $help = 0;
 GetOptions(
     'help|?'          => \$help,
     'man'             => \$man,
-    'file=s'          => \$filename,
+    'file=s'          => \$taxon_file,
     'w|working_dir=s' => \$working_dir,
     's|seq_dir=s'     => \$seq_dir,
     'keep=s'          => \@keep,
@@ -87,6 +94,8 @@ GetOptions(
     'o|r|outgroup=s'  => \$outgroup_id,
     'n|name_str=s'    => \$name_str,
     'un|use_name'     => \$use_name,
+    'p|phylo_tree=s'  => \$phylo_tree,
+    'm|multi_name=s'  => \$multi_name,
     'clustalw'        => \$clustalw,
     'e|ensembl=s'     => \$ensembl,
     'parallel=i'      => \$parallel,
@@ -95,12 +104,23 @@ GetOptions(
 pod2usage(1) if $help;
 pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
 
+if ( defined $phylo_tree ) {
+    if ( !-e $phylo_tree ) {
+        warn "$phylo_tree does not exists. Unset it.\n";
+        undef $phylo_tree;
+    }
+}
+
+if ( !defined $multi_name ) {
+    $multi_name = $name_str;
+}
+
 #----------------------------------------------------------#
 # init
 #----------------------------------------------------------#
 $stopwatch->start_message("Writing strains summary...");
 
-die "$filename doesn't exist\n" unless -e $filename;
+die "$taxon_file doesn't exist\n" unless -e $taxon_file;
 
 # prepare working dir
 {
@@ -219,7 +239,8 @@ if ($seq_dir) {
     close $fh;
 }
 
-{
+# If there's no phylo tree, generate a fake one.
+if ( !defined $phylo_tree ) {
     print "Create fake_tree.nwk\n";
     my $fake_tree_file = File::Spec->catfile( $working_dir, "fake_tree.nwk" );
     open my $fh, '>', $fake_tree_file;
@@ -273,8 +294,10 @@ if [ -f real_chr.csv ]; then
 fi;
 
 [% FOREACH item IN data -%]
-[% kent_bin %]/faSize -detailed [% item.dir%]/*.fa > [% item.dir%]/chr.sizes
-perl -aln -F"\t" -e 'print qq{[% item.taxon %],$F[0],$F[1],[% item.name %]}' [% item.dir %]/chr.sizes >> real_chr.csv
+if [ ! -f [% item.dir%]/chr.sizes ]; then 
+    [% kent_bin %]/faSize -detailed [% item.dir%]/*.fa > [% item.dir%]/chr.sizes;
+fi;
+perl -aln -F"\t" -e 'print qq{[% item.taxon %],$F[0],$F[1],[% item.name %]}' [% item.dir %]/chr.sizes >> real_chr.csv;
 [% END -%]
 
 cat chrUn.csv real_chr.csv > chr_length.csv
@@ -392,7 +415,6 @@ EOF
             working_dir => $working_dir,
             aligndb     => $aligndb,
             kent_bin    => $kent_bin,
-            name_str    => $name_str,
             use_name    => $use_name,
             target_id   => $target_id,
             outgroup_id => $outgroup_id,
@@ -402,9 +424,10 @@ EOF
     ) or die Template->error;
 
     # rawphylo.sh
-    $sh_name = "4_rawphylo.sh";
-    print "Create $sh_name\n";
-    $text = <<'EOF';
+    if ( !defined $phylo_tree ) {
+        $sh_name = "4_rawphylo.sh";
+        print "Create $sh_name\n";
+        $text = <<'EOF';
 #!/bin/bash
 # perl [% stopwatch.cmd_line %]
 
@@ -413,7 +436,7 @@ cd [% working_dir %]
 # join_dbs.pl
 perl [% aligndb %]/extra/join_dbs.pl \
     --no_insert --block --trimmed_fasta --length 1000 \
-    --goal_db [% name_str %]_raw --target 0target \
+    --goal_db [% multi_name %]_raw --target 0target \
 [% IF outgroup_id -%]
     --outgroup [% query_ids.max %]query \
     --queries [% maxq = query_ids.max - 1 %][% FOREACH i IN [ 0 .. maxq ] %][% i %]query,[% END %] \
@@ -437,42 +460,43 @@ rm [% working_dir %]/rawphylo/RAxML*
 
 [% IF query_ids.size > 2 -%]
 perl [% egaz%]/concat_fasta.pl \
-    -i [% working_dir %]/[% name_str %]_raw \
-    -o [% working_dir %]/rawphylo/[% name_str %].phy \
+    -i [% working_dir %]/[% multi_name %]_raw \
+    -o [% working_dir %]/rawphylo/[% multi_name %].phy \
     -p
 
 raxml -T 5 -f a -m GTRGAMMA -p $RANDOM -N 100 -x $RANDOM \
 [% IF outgroup_id -%]
     -o [% outgroup_id %] \
 [% END -%]
-    -n [% name_str %] -s [% working_dir %]/rawphylo/[% name_str %].phy
+    -n [% multi_name %] -s [% working_dir %]/rawphylo/[% multi_name %].phy
 
-cp [% working_dir %]/rawphylo/RAxML_best* [% working_dir %]/rawphylo/[% name_str %].nwk
+cp [% working_dir %]/rawphylo/RAxML_best* [% working_dir %]/rawphylo/[% multi_name %].nwk
 
 [% ELSIF query_ids.size == 2 -%]
-echo "(([% target_id %],[% query_ids.0 %]),[% query_ids.1 %]);" > [% working_dir %]/rawphylo/[% name_str %].nwk
+echo "(([% target_id %],[% query_ids.0 %]),[% query_ids.1 %]);" > [% working_dir %]/rawphylo/[% multi_name %].nwk
 
 [% ELSE -%]
 
-echo "([% target_id %],[% query_ids.0 %]);" > [% working_dir %]/rawphylo/[% name_str %].nwk
+echo "([% target_id %],[% query_ids.0 %]);" > [% working_dir %]/rawphylo/[% multi_name %].nwk
 
 [% END -%]
 
 EOF
-    $tt->process(
-        \$text,
-        {   stopwatch   => $stopwatch,
-            parallel    => $parallel,
-            working_dir => $working_dir,
-            aligndb     => $aligndb,
-            egaz        => $egaz,
-            name_str    => $name_str,
-            target_id   => $target_id,
-            outgroup_id => $outgroup_id,
-            query_ids   => \@query_ids,
-        },
-        File::Spec->catfile( $working_dir, $sh_name )
-    ) or die Template->error;
+        $tt->process(
+            \$text,
+            {   stopwatch   => $stopwatch,
+                parallel    => $parallel,
+                working_dir => $working_dir,
+                aligndb     => $aligndb,
+                egaz        => $egaz,
+                target_id   => $target_id,
+                outgroup_id => $outgroup_id,
+                query_ids   => \@query_ids,
+                multi_name  => $multi_name,
+            },
+            File::Spec->catfile( $working_dir, $sh_name )
+        ) or die Template->error;
+    }
 
     # multi_cmd.sh
     $sh_name = "5_multi_cmd.sh";
@@ -482,21 +506,21 @@ EOF
 # perl [% stopwatch.cmd_line %]
 
 cd [% working_dir %]
-mkdir [% working_dir %]/[% name_str %]
+mkdir [% working_dir %]/[% multi_name %]
 
-if [ -d [% working_dir %]/[% name_str %]_fasta ]
+if [ -d [% working_dir %]/[% multi_name %]_fasta ]
 then
-    rm -fr [% working_dir %]/[% name_str %]_fasta
+    rm -fr [% working_dir %]/[% multi_name %]_fasta
 fi
 
-if [ -d [% working_dir %]/[% name_str %]_mft ]
+if [ -d [% working_dir %]/[% multi_name %]_mft ]
 then
-    rm -fr [% working_dir %]/[% name_str %]_mft
+    rm -fr [% working_dir %]/[% multi_name %]_mft
 fi
 
-if [ -d [% working_dir %]/[% name_str %]_clw ]
+if [ -d [% working_dir %]/[% multi_name %]_clw ]
 then
-    rm -fr [% working_dir %]/[% name_str %]_clw
+    rm -fr [% working_dir %]/[% multi_name %]_clw
 fi
 
 if [ -d [% working_dir %]/phylo ]
@@ -509,15 +533,25 @@ mkdir [% working_dir %]/phylo
 #----------------------------#
 # mz
 #----------------------------#
-if [ -f [% working_dir %]/rawphylo/[% name_str %].nwk ]
+[% IF phylo_tree -%]
+perl [% egaz %]/mz.pl \
+    [% FOREACH id IN query_ids -%]
+    -d [% working_dir %]/[% target_id %]vs[% id %] \
+    [% END -%]
+    -bin [% kent_bin %] \
+    --tree [% phylo_tree %] \
+    --out [% working_dir %]/[% multi_name %] \
+    -syn -p [% parallel %]
+[% ELSE %]
+if [ -f [% working_dir %]/rawphylo/[% multi_name %].nwk ]
 then
     perl [% egaz %]/mz.pl \
         [% FOREACH id IN query_ids -%]
         -d [% working_dir %]/[% target_id %]vs[% id %] \
         [% END -%]
         -bin [% kent_bin %] \
-        --tree [% working_dir %]/rawphylo/[% name_str %].nwk \
-        --out [% working_dir %]/[% name_str %] \
+        --tree [% working_dir %]/rawphylo/[% multi_name %].nwk \
+        --out [% working_dir %]/[% multi_name %] \
         -syn -p [% parallel %]
 else
     perl [% egaz %]/mz.pl \
@@ -526,19 +560,20 @@ else
         [% END -%]
         -bin [% kent_bin %] \
         --tree [% working_dir %]/fake_tree.nwk \
-        --out [% working_dir %]/[% name_str %] \
+        --out [% working_dir %]/[% multi_name %] \
         -syn -p [% parallel %]
 fi
+[% END -%]
 
-find [% working_dir %]/[% name_str %] -type f -name "*.maf" | parallel -j [% parallel %] gzip
+find [% working_dir %]/[% multi_name %] -type f -name "*.maf" | parallel -j [% parallel %] gzip
 
 #----------------------------#
 # maf2fasta
 #----------------------------#
 perl [% egaz %]/maf2fasta.pl \
     -p [% parallel %] --block \
-    -i [% working_dir %]/[% name_str %] \
-    -o [% working_dir %]/[% name_str %]_fasta
+    -i [% working_dir %]/[% multi_name %] \
+    -o [% working_dir %]/[% multi_name %]_fasta
 
 #----------------------------#
 # mafft
@@ -548,10 +583,10 @@ perl [% egaz %]/refine_fasta.pl \
 [% IF outgroup_id -%]
     --outgroup \
 [% END -%]
-    -i [% working_dir %]/[% name_str %]_fasta \
-    -o [% working_dir %]/[% name_str %]_mft
+    -i [% working_dir %]/[% multi_name %]_fasta \
+    -o [% working_dir %]/[% multi_name %]_mft
 
-find [% working_dir %]/[% name_str %]_mft -type f -name "*.fas" | parallel -j [% parallel %] gzip
+find [% working_dir %]/[% multi_name %]_mft -type f -name "*.fas" | parallel -j [% parallel %] gzip
 
 [% IF clustalw -%]
 #----------------------------#
@@ -562,10 +597,10 @@ perl [% egaz %]/refine_fasta.pl \
 [% IF outgroup_id -%]
     --outgroup \
 [% END -%]
-    -i [% working_dir %]/[% name_str %]_fasta \
-    -o [% working_dir %]/[% name_str %]_clw
+    -i [% working_dir %]/[% multi_name %]_fasta \
+    -o [% working_dir %]/[% multi_name %]_clw
 
-find [% working_dir %]/[% name_str %]_clw -type f -name "*.fas" | parallel -j [% parallel %] gzip
+find [% working_dir %]/[% multi_name %]_clw -type f -name "*.fas" | parallel -j [% parallel %] gzip
 [% END -%]
 
 #----------------------------#
@@ -576,11 +611,11 @@ cd [% working_dir %]/phylo
 
 perl [% egaz %]/concat_fasta.pl \
 [% IF clustalw -%]
-    -i [% working_dir %]/[% name_str %]_clw \
+    -i [% working_dir %]/[% multi_name %]_clw \
 [% ELSE -%]
-    -i [% working_dir %]/[% name_str %]_mft  \
+    -i [% working_dir %]/[% multi_name %]_mft  \
 [% END -%] 
-    -o [% working_dir %]/phylo/[% name_str %].phy \
+    -o [% working_dir %]/phylo/[% multi_name %].phy \
     -p
 
 rm [% working_dir %]/phylo/RAxML*
@@ -589,9 +624,9 @@ raxml -T 5 -f a -m GTRGAMMA -p $RANDOM -N 100 -x $RANDOM \
 [% IF outgroup_id -%]
     -o [% outgroup_id %] \
 [% END -%]
-    -n [% name_str %] -s [% working_dir %]/phylo/[% name_str %].phy
+    -n [% multi_name %] -s [% working_dir %]/phylo/[% multi_name %].phy
 
-cp [% working_dir %]/phylo/RAxML_best* [% working_dir %]/phylo/[% name_str %].nwk
+cp [% working_dir %]/phylo/RAxML_best* [% working_dir %]/phylo/[% multi_name %].nwk
 [% END -%]
 
 EOF
@@ -603,11 +638,12 @@ EOF
             aligndb     => $aligndb,
             egaz        => $egaz,
             kent_bin    => $kent_bin,
-            name_str    => $name_str,
             target_id   => $target_id,
             outgroup_id => $outgroup_id,
             query_ids   => \@query_ids,
             target_seqs => \@target_seqs,
+            phylo_tree  => $phylo_tree,
+            multi_name  => $multi_name,
             clustalw    => $clustalw,
         },
         File::Spec->catfile( $working_dir, $sh_name )
@@ -626,11 +662,11 @@ cd [% working_dir %]
 # multi_way_batch
 #----------------------------#
 perl [% aligndb %]/extra/multi_way_batch.pl \
-    -d [% name_str %] \
+    -d [% multi_name %] \
 [% IF clustalw -%]
-    -da [% working_dir %]/[% name_str %]_clw \
+    -da [% working_dir %]/[% multi_name %]_clw \
 [% ELSE -%]
-    -da [% working_dir %]/[% name_str %]_mft \
+    -da [% working_dir %]/[% multi_name %]_mft \
 [% END -%]
     --gff_file [% FOREACH seq IN target_seqs %][% working_dir %]/[% target_id %]/[% seq %].gff,[% END %] \
     --rm_gff_file [% FOREACH seq IN target_seqs %][% working_dir %]/[% target_id %]/[% seq %].rm.gff,[% END %] \
@@ -651,11 +687,11 @@ EOF
             parallel    => $parallel,
             working_dir => $working_dir,
             aligndb     => $aligndb,
-            name_str    => $name_str,
             target_id   => $target_id,
             outgroup_id => $outgroup_id,
             query_ids   => \@query_ids,
             target_seqs => \@target_seqs,
+            multi_name  => $multi_name,
             clustalw    => $clustalw,
         },
         File::Spec->catfile( $working_dir, $sh_name )
@@ -671,13 +707,13 @@ REM basicstat
 perl [% bat_dir %]/fig_table/collect_common_basic.pl -d .
 
 REM common chart
-if exist [% name_str %].common.xlsx perl [% bat_dir %]/alignDB/stat/common_chart_factory.pl -i [% name_str %].common.xlsx
+if exist [% multi_name %].common.xlsx perl [% bat_dir %]/alignDB/stat/common_chart_factory.pl -i [% multi_name %].common.xlsx
 
 REM multi chart
-if exist [% name_str %].multi.xlsx  perl [% bat_dir %]/alignDB/stat/multi_chart_factory.pl -i [% name_str %].multi.xlsx
+if exist [% multi_name %].multi.xlsx  perl [% bat_dir %]/alignDB/stat/multi_chart_factory.pl -i [% multi_name %].multi.xlsx
 
 REM gc chart
-if exist [% name_str %].gc.xlsx     perl [% bat_dir %]/alignDB/stat/gc_chart_factory.pl --add_trend 1 -i [% name_str %].gc.xlsx
+if exist [% multi_name %].gc.xlsx     perl [% bat_dir %]/alignDB/stat/gc_chart_factory.pl --add_trend 1 -i [% multi_name %].gc.xlsx
 
 EOF
     $tt->process(
@@ -686,7 +722,7 @@ EOF
             parallel    => $parallel,
             working_dir => $working_dir,
             bat_dir     => $bat_dir,
-            name_str    => $name_str,
+            multi_name  => $multi_name,
         },
         File::Spec->catfile( $working_dir, "chart.bat" )
     ) or die Template->error;
@@ -713,7 +749,7 @@ sub taxon_info {
     $dbh->{csv_tables}->{t0} = {
         eol       => "\n",
         sep_char  => ",",
-        file      => $filename,
+        file      => $taxon_file,
         col_names => [
             map { ( $_, $_ . "_id" ) } qw{strain species genus family order}
         ],
@@ -751,7 +787,7 @@ sub taxon_info_name {
     $dbh->{csv_tables}->{t0} = {
         eol       => "\n",
         sep_char  => ",",
-        file      => $filename,
+        file      => $taxon_file,
         col_names => [
             map { ( $_, $_ . "_id" ) } qw{strain species genus family order}
         ],
