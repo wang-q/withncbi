@@ -564,3 +564,268 @@ EOF
     ) or die Template->error;
 
 }
+
+__END__
+
+### sgrp2
+# sgrp2 SGA assembly
+my $seq_dir = File::Spec->catdir( $ENV{HOME}, "data/SGRP2/assembly/" );
+
+my @data = (
+    { taxon => 901501, name => "YPS128",    coverage => "56x illumina", },
+    { taxon => 901502, name => "DBVPG1106", coverage => "34x illumina", },
+    { taxon => 901503, name => "SK1",       coverage => "40x illumina", },
+    { taxon => 901504, name => "L1528",     coverage => "34x illumina", },
+    { taxon => 901505, name => "Y12",       coverage => "29x illumina", },
+    { taxon => 901506, name => "UWOPS83",   coverage => "638x illumina", },
+    { taxon => 901507, name => "UWOPS87",   coverage => "834x illumina", },
+    { taxon => 901508, name => "UWOPS03",   coverage => "24x illumina", },
+    { taxon => 901509, name => "W303",      coverage => "33x illumina", },
+    { taxon => 901510, name => "YJM975",    coverage => "22x illumina", },
+    { taxon => 901511, name => "DBVPG6765", coverage => "37x illumina", },
+    { taxon => 901512, name => "DBVPG6044", coverage => "32x illumina", },
+    { taxon => 901513, name => "DBVPG1373", coverage => "26x illumina", },
+    { taxon => 901514, name => "Y55",       coverage => "28x illumina", },
+);
+    
+my $strains_of = {
+
+    # sum-align > 10M
+    S288CvsXIS2 => [
+        qw{ Spar DBVPG1373 DBVPG6044 DBVPG6765 L1528 SK1 UWOPS83 UWOPS87
+            W303 Y55 YPS128 }
+    ],
+
+    ## sum-align > 9M
+    #S288CvsXIIIS2 => [
+    #    qw{ Spar DBVPG1373 DBVPG6044 DBVPG6765 L1528 SK1 UWOPS83 UWOPS87
+    #    W303 Y55 YPS128 DBVPG1106 Y12 }
+    #],
+
+    # sum-align > 3M
+    S288CvsXVS2 => [
+        qw{ Spar DBVPG1373 DBVPG6044 DBVPG6765 L1528 SK1 UWOPS83 UWOPS87
+            W303 Y55 YPS128 DBVPG1106 Y12 UWOPS03 YJM975}
+    ],
+};
+
+### yeast_old
+
+my @data = (
+    { taxon => 226125, name => 'Spar',   coverage => '7x', },
+    { taxon => 285006, name => 'RM11',   coverage => '10x', },
+    { taxon => 307796, name => 'YJM789', coverage => '10x', },
+
+    {   taxon    => 574961,
+        name     => 'JAY291',
+        coverage => '12x 454; 58x solexa s; 95x solexa p',
+    },
+    {   taxon    => 538975,
+        name     => 'Sigma1278b',
+        coverage => '45x sanger/solexa',
+    },
+    { taxon => 643680, name => 'EC1118', coverage => '24x unknown', },
+
+    # wustl 11 yeast strains
+    {   taxon    => 929587,
+        name     => 'CBS_7960',
+        coverage => '7.3x 454; 9.69x sanger',
+    },
+    {   taxon    => 464025,
+        name     => 'CLIB215',
+        coverage => '6.8x 454; 10.09 sanger',
+    },
+    {   taxon    => 929629,
+        name     => 'CLIB324',
+        coverage => '3.2x 454; 3.94x sanger',
+    },
+    { taxon => 947035, name => 'CLIB382', coverage => '5.96x 454', },
+    {   taxon    => 947036,
+        name     => 'FL100',
+        coverage => '3.2x 454; 3.2x sanger',
+    },
+    { taxon => 947039, name => 'PW5', coverage => '16.10x 454', },
+    { taxon => 929585, name => 'T7',  coverage => '25.4x 454/sanger', },
+    { taxon => 471859, name => 'T73', coverage => '13.9x 454', },
+    { taxon => 947040, name => 'UC5', coverage => '15.7x 454', },
+    {   taxon    => 462210,
+        name     => 'Y10',
+        coverage => '2.8x 454; 3.81x sanger',
+    },
+    {   taxon    => 929586,
+        name     => 'YJM269',
+        coverage => '7.1x 454; 9.59x sanger',
+    },
+
+    # wine
+    { taxon => 764097, name => 'AWRI796',     coverage => '20x 454', },
+    { taxon => 764101, name => 'FostersO',    coverage => '20x 454', },
+    { taxon => 764102, name => 'FostersB',    coverage => '20x 454', },
+    { taxon => 764098, name => 'Lalvin_QA23', coverage => '20x 454', },
+    { taxon => 764099, name => 'Vin13',       coverage => '20x 454', },
+    { taxon => 764100, name => 'VL3',         coverage => '20x 454', },
+
+    { taxon => 1095001, name => 'EC9_8', coverage => '30x 454', },
+    {   taxon    => 721032,
+        name     => 'Kyokai_no__7',
+        coverage => '9.1x sanger',
+    },
+
+    { taxon => 545124, name => 'AWRI1631', coverage => '7x 454', },
+    { taxon => 538975, name => 'M22',      coverage => '2.6x sanger', },
+    { taxon => 538976, name => 'YPS163',   coverage => '2.8x sanger', },
+);
+
+my $strains_of = {
+    S288CvsYJM789refSpar => [qw{ Spar YJM789 }],
+    S288CvsThree         => [qw{ Spar RM11 YJM789 }],
+    S288CvsSix           => [qw{ Spar RM11 YJM789 DBVPG6765 SK1 Y55 }],
+    S288CvsGE10M18       => [
+        qw{ Spar RM11 YJM789 JAY291 Sigma1278b EC1118 T7 AWRI796
+            Lalvin_QA23 Vin13 VL3 FostersO FostersB Kyokai_no__7 DBVPG6765
+            SK1 Y55 W303
+            }
+    ],
+    S288CvsALL32 => [
+        qw{ Spar RM11 YJM789 JAY291 Sigma1278b EC1118 CBS_7960 CLIB215
+            CLIB324 FL100 Y10 YJM269 CLIB382 PW5 T7 T73 UC5 AWRI796
+            Lalvin_QA23 Vin13 VL3 FostersO FostersB EC9_8 Kyokai_no__7
+            AWRI1631 M22 YPS163 DBVPG6765 SK1 Y55 W303
+            }
+    ],
+};
+
+### yeast65
+my $data_dir = File::Spec->catdir( $ENV{HOME}, "data/alignment/yeast65" );
+
+my @data = (
+    { taxon => 226125, name => 'Spar',   coverage => '7x', },
+    { taxon => 285006, name => 'RM11',   coverage => '10x', },
+    { taxon => 307796, name => 'YJM789', coverage => '10x', },
+
+    # high coverage
+    {   taxon    => 574961,
+        name     => 'JAY291',
+        coverage => '12x 454; 58x solexa se; 95x solexa pe',
+    },
+    {   taxon    => 538975,
+        name     => 'Sigma1278b',
+        coverage => '45x sanger/solexa',
+    },
+    {   taxon    => 643680,
+        name     => 'EC1118',
+        coverage => '17.6x 454; 4.1+1.9x sanger',
+    },
+    {   taxon    => 721032,
+        name     => 'Kyokai_no__7',
+        coverage => '9.1x sanger',
+    },
+
+
+    # wustl 11 yeast strains
+    {   taxon    => 929587,
+        name     => 'CBS_7960',
+        coverage => '7.3x 454; 9.69x sanger',
+    },
+    {   taxon    => 464025,
+        name     => 'CLIB215',
+        coverage => '6.8x 454; 10.09 sanger',
+    },
+    {   taxon    => 929629,
+        name     => 'CLIB324',
+        coverage => '3.2x 454; 3.94x sanger',
+    },
+    { taxon => 947035, name => 'CLIB382', coverage => '5.96x 454', },
+    {   taxon    => 947036,
+        name     => 'FL100',
+        coverage => '3.2x 454; 3.2x sanger',
+    },
+    { taxon => 947039, name => 'PW5', coverage => '16.10x 454', },
+    { taxon => 929585, name => 'T7',  coverage => '25.4x 454/sanger', },
+    { taxon => 471859, name => 'T73', coverage => '13.9x 454', },
+    { taxon => 947040, name => 'UC5', coverage => '15.7x 454', },
+    {   taxon    => 462210,
+        name     => 'Y10',
+        coverage => '2.8x 454; 3.81x sanger',
+    },
+    {   taxon    => 929586,
+        name     => 'YJM269',
+        coverage => '7.1x 454; 9.59x sanger',
+    },
+
+    # wine
+    { taxon => 764097, name => 'AWRI796',     coverage => '20x 454', },
+    { taxon => 764101, name => 'FostersO',    coverage => '20x 454', },
+    { taxon => 764102, name => 'FostersB',    coverage => '20x 454', },
+    { taxon => 764098, name => 'Lalvin_QA23', coverage => '20x 454', },
+    { taxon => 764099, name => 'Vin13',       coverage => '20x 454', },
+    { taxon => 764100, name => 'VL3',         coverage => '20x 454', },
+
+    { taxon => 1095001, name => 'EC9_8', coverage => '30x 454', },
+    { taxon => 545124, name => 'AWRI1631', coverage => '7x 454', },
+    { taxon => 538975, name => 'M22',      coverage => '2.6x sanger', },
+    { taxon => 538976, name => 'YPS163',   coverage => '2.8x sanger', },
+
+    # sgrp data
+    { taxon => 900003, name => 'DBVPG6765', coverage => '3x sanger', },
+    {   taxon    => 580239,
+        name     => 'SK1',
+        coverage => '3.27x sanger; 15.61x solexa',
+    },
+    {   taxon    => 580240,
+        name     => 'W303',
+        coverage => '2.33x sanger; 3.01x solexa',
+    },
+    {   taxon    => 900001,
+        name     => 'Y55',
+        coverage => '3.42x sanger; 8.94x solexa',
+    },
+);
+
+my $strains_of = {
+     #S288CvsYJM789Spar => [qw{ Spar YJM789 }],
+     #S288CvsIII       => [qw{ Spar RM11 YJM789 }],
+     #
+     ## 10k target length > Spar
+     #S288CvsXVIIIGE10m => [
+     #    qw{ Spar RM11 YJM789 JAY291 Sigma1278b EC1118 T7 AWRI796 FostersO
+     #        FostersB Lalvin_QA23 Vin13 VL3 Kyokai_no__7 DBVPG6765 SK1 W303
+     #        Y55 }
+     #],
+
+     # 10k target length > Spar,
+     # exclude abnormal ins/del ones ( all from wine 454)
+     # VL3 Vin13 Lalvin_QA23 AWRI796 FostersO FostersB
+     #S288CvsXIIGE10m => [
+     #    qw{ Spar AWRI1631 AWRI796 CBS_7960 DBVPG6765 EC1118 EC9_8 FostersB
+     #    FostersO JAY291 Kyokai_no__7 Lalvin_QA23 PW5 RM11 SK1 Sigma1278b T7
+     #    UC5 VL3 Vin13 W303 Y55 YJM269 YJM789 }
+     #],
+     #S288CvsXIIGE10m => [
+     #    qw{ Spar AWRI1631 CBS_7960 DBVPG6765 EC1118 EC9_8 JAY291
+     #    Kyokai_no__7 PW5 RM11 SK1 Sigma1278b T7 UC5 W303 Y55 YJM269 YJM789 }
+     #],
+     S288CvsVIII => [
+         qw{ Spar EC1118 JAY291 Kyokai_no__7 RM11 Sigma1278b T7 YJM789 }
+     ],
+
+     ## 1k avg-align > Spar
+     #S288CvsXVIIIGE8k => [
+     #    qw{ Spar RM11 YJM789 JAY291 Sigma1278b EC1118 PW5 T7 UC5 YJM269
+     #        AWRI796 FostersO FostersB Lalvin_QA23 Vin13 VL3 EC9_8
+     #        Kyokai_no__7 }
+     #],
+     #S288CvsXXIIGE8k => [
+     #    qw{ Spar RM11 YJM789 JAY291 Sigma1278b EC1118 PW5 T7 UC5 YJM269
+     #        AWRI796 FostersO FostersB Lalvin_QA23 Vin13 VL3 EC9_8
+     #        Kyokai_no__7 DBVPG6765 SK1 W303 Y55 }
+     #],
+     #
+     ## CLIB382 lacks 4 chr
+     #S288CvsXXXI => [
+     #    qw{ Spar RM11 YJM789 JAY291 Sigma1278b EC1118 CBS_7960 CLIB215
+     #        CLIB324 FL100 PW5 T7 T73 UC5 Y10 YJM269 AWRI796 FostersO
+     #        FostersB Lalvin_QA23 Vin13 VL3 EC9_8 Kyokai_no__7 AWRI1631 M22
+     #        YPS163 DBVPG6765 SK1 W303 Y55 }
+     #],
+ };
