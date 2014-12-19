@@ -6,7 +6,12 @@ use autodie;
 use File::Spec;
 use File::HomeDir;
 
-use List::MoreUtils qw(firstidx);
+use List::MoreUtils qw(firstidx uniq zip);
+use List::Util qw(first max maxstr min minstr reduce shuffle sum);
+
+use WWW::Mechanize;
+use HTML::TableExtract;
+use Regexp::Common qw(balanced);
 
 use Bio::DB::Taxonomy;
 use Bio::TreeIO;
@@ -18,7 +23,7 @@ use vars qw(@ISA @EXPORT_OK %EXPORT_TAGS);
 %EXPORT_TAGS = (
     all => [
         qw{
-            replace_home find_ancestor find_group
+            replace_home wgs_worker find_ancestor find_group
             },
     ],
 );
@@ -34,6 +39,83 @@ sub replace_home {
     }
 
     return $path;
+}
+
+sub wgs_worker {
+    my $term = shift;
+
+    my $mech = WWW::Mechanize->new;
+    $mech->stack_depth(0);    # no history to save memory
+
+    my $url_part = "http://www.ncbi.nlm.nih.gov/Traces/wgs/";
+    my $url      = $url_part . '?val=' . $term;
+    print $url, "\n";
+
+    my $info = { prefix => $term, };
+    $mech->get($url);
+
+    {                         # extract from tables
+        my $page    = $mech->content;
+        my @tables  = qw{ meta-table structured-comments };
+        my @columns = (
+            '#_of_Contigs',    'Total_length',
+            'Update_date',     'BioProject',
+            'Keywords',        'Organism',
+            'Assembly_Method', 'Assembly_Name',
+            'Genome_Coverage', 'Sequencing_Technology',
+        );
+
+        for my $table (@tables) {
+            print "Extract from table ", $table, "\n";
+            my $te
+                = HTML::TableExtract->new( attribs => { class => $table, }, );
+            $te->parse($page);
+
+            my %srr_info;
+            for my $ts ( $te->table_states ) {
+                for my $row ( $ts->rows ) {
+                    for my $cell (@$row) {
+                        if ($cell) {
+                            $cell =~ s/[,:]//g;
+                            $cell =~ s/^\s+//g;
+                            $cell =~ s/\s+$//g;
+                            $cell =~ s/\s+/ /g;
+                        }
+                    }
+                    next unless $row->[0];
+                    $row->[0] =~ s/\s+/_/g;
+                    next unless grep { $row->[0] eq $_ } @columns;
+
+                    $row->[1] =~ s/\s+.\s+show.+lineage.+$//g;
+                    $info->{ $row->[0] } = $row->[1];
+                }
+            }
+        }
+    }
+
+    {    # taxon id
+        my @links = $mech->find_all_links( url_regex => => qr{wwwtax}, );
+        if ( @links and $links[0]->url =~ /\?id=(\d+)/ ) {
+            $info->{taxon_id} = $1;
+        }
+    }
+
+    {    # pubmed id
+        my @links = $mech->find_all_links( url_regex => => qr{\/pubmed\/}, );
+        if ( @links and $links[0]->url =~ /\/pubmed\/(\d+)/ ) {
+            $info->{pubmed} = $1;
+        }
+    }
+
+    {    # downloads
+        my @links = $mech->find_all_links(
+            text_regex => qr{$term},
+            url_regex  => => qr{download=},
+        );
+        $info->{download} = [ map { $url_part . $_->url } @links ];
+    }
+
+    return $info;
 }
 
 sub find_ancestor {
