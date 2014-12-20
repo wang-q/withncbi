@@ -105,9 +105,6 @@ for my $item (@data) {
     $item->{dir} = $dir;
 }
 
-#my $basecount = File::Spec->catfile( $data_dir, "basecount.txt" );
-#remove( \1, $basecount ) if -e $basecount;
-
 my $text;
 
 $text = <<'EOF';
@@ -291,5 +288,11 @@ perl ~/Scripts/withncbi/pop/primates.pl
 sh 01_file.sh
 sh 02_ensemblrm.sh
 
-# execute 03_prepare.sh by copy & paste  
+# execute 03_prepare.sh by copy & paste
+
+# for each multi_name, execute the following bash file
+sh 1_real_chr.sh
+sh 3_pair_cmd.sh
+sh 5_multi_cmd.sh
+sh 6_multi_db_only.sh
 
