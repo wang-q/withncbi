@@ -73,6 +73,9 @@ my $bat_dir  = $Config->{run}{bat};                         # Windows scripts
 # If this option set to be true, all $target_id, @query_ids is actually names.
 my $use_name;
 
+# Don't do stat stuffs
+my $nostat;
+
 # Use Ensembl database as annotation source
 my $ensembl;
 
@@ -97,6 +100,7 @@ GetOptions(
     'p|phylo_tree=s'  => \$phylo_tree,
     'm|multi_name=s'  => \$multi_name,
     'clustalw'        => \$clustalw,
+    'nostat'          => \$nostat,
     'e|ensembl=s'     => \$ensembl,
     'parallel=i'      => \$parallel,
 ) or pod2usage(2);
@@ -405,7 +409,12 @@ perl [% aligndb %]/extra/seq_pair_batch.pl \
     -f [% working_dir %]/seq_pair.csv \
     -taxon [% working_dir %]/taxon.csv \
     -chr [% working_dir %]/chr_length.csv \
-    -lt 1000 -r 1,2,5,21,40
+    -lt 1000 \
+[% IF nostat -%]
+    -r 1,2
+[% ELSE -%]
+    -r 1,2,5,21,40
+[% END -%]
 
 EOF
     $tt->process(
@@ -416,6 +425,7 @@ EOF
             aligndb     => $aligndb,
             kent_bin    => $kent_bin,
             use_name    => $use_name,
+            nostat      => $nostat,
             target_id   => $target_id,
             outgroup_id => $outgroup_id,
             query_ids   => \@query_ids,
@@ -650,9 +660,10 @@ EOF
     ) or die Template->error;
 
     # multi_db_only.sh
-    $sh_name = "6_multi_db_only.sh";
-    print "Create $sh_name\n";
-    $text = <<'EOF';
+    if ( !$nostat ) {
+        $sh_name = "6_multi_db_only.sh";
+        print "Create $sh_name\n";
+        $text = <<'EOF';
 #!/bin/bash
 # perl [% stopwatch.cmd_line %]
 
@@ -681,25 +692,25 @@ perl [% aligndb %]/extra/multi_way_batch.pl \
     --run 1,2,5,10,21,30-32,40-42,44
 
 EOF
-    $tt->process(
-        \$text,
-        {   stopwatch   => $stopwatch,
-            parallel    => $parallel,
-            working_dir => $working_dir,
-            aligndb     => $aligndb,
-            target_id   => $target_id,
-            outgroup_id => $outgroup_id,
-            query_ids   => \@query_ids,
-            target_seqs => \@target_seqs,
-            multi_name  => $multi_name,
-            clustalw    => $clustalw,
-        },
-        File::Spec->catfile( $working_dir, $sh_name )
-    ) or die Template->error;
+        $tt->process(
+            \$text,
+            {   stopwatch   => $stopwatch,
+                parallel    => $parallel,
+                working_dir => $working_dir,
+                aligndb     => $aligndb,
+                target_id   => $target_id,
+                outgroup_id => $outgroup_id,
+                query_ids   => \@query_ids,
+                target_seqs => \@target_seqs,
+                multi_name  => $multi_name,
+                clustalw    => $clustalw,
+            },
+            File::Spec->catfile( $working_dir, $sh_name )
+        ) or die Template->error;
 
-    # chart.bat
-    print "Create chart.bat\n";
-    $text = <<'EOF';
+        # chart.bat
+        print "Create chart.bat\n";
+        $text = <<'EOF';
 REM strain_bz.pl
 REM perl [% stopwatch.cmd_line %]
 
@@ -716,16 +727,17 @@ REM gc chart
 if exist [% multi_name %].gc.xlsx     perl [% bat_dir %]/alignDB/stat/gc_chart_factory.pl --add_trend 1 -i [% multi_name %].gc.xlsx
 
 EOF
-    $tt->process(
-        \$text,
-        {   stopwatch   => $stopwatch,
-            parallel    => $parallel,
-            working_dir => $working_dir,
-            bat_dir     => $bat_dir,
-            multi_name  => $multi_name,
-        },
-        File::Spec->catfile( $working_dir, "chart.bat" )
-    ) or die Template->error;
+        $tt->process(
+            \$text,
+            {   stopwatch   => $stopwatch,
+                parallel    => $parallel,
+                working_dir => $working_dir,
+                bat_dir     => $bat_dir,
+                multi_name  => $multi_name,
+            },
+            File::Spec->catfile( $working_dir, "chart.bat" )
+        ) or die Template->error;
+    }
 
     # message
     $stopwatch->block_message("Execute *.sh files in order.");
