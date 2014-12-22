@@ -73,6 +73,9 @@ my $bat_dir  = $Config->{run}{bat};                         # Windows scripts
 # If this option set to be true, all $target_id, @query_ids is actually names.
 my $use_name;
 
+# RepeatMasker has been done.
+my $norm;
+
 # Don't do stat stuffs
 my $nostat;
 
@@ -100,6 +103,7 @@ GetOptions(
     'p|phylo_tree=s'  => \$phylo_tree,
     'm|multi_name=s'  => \$multi_name,
     'clustalw'        => \$clustalw,
+    'norm'            => \$norm,
     'nostat'          => \$nostat,
     'e|ensembl=s'     => \$ensembl,
     'parallel=i'      => \$parallel,
@@ -329,9 +333,10 @@ EOF
     ) or die Template->error;
 
     # file-rm.sh
-    $sh_name = "2_file_rm.sh";
-    print "Create $sh_name\n";
-    $text = <<'EOF';
+    if ( !$norm ) {
+        $sh_name = "2_file_rm.sh";
+        print "Create $sh_name\n";
+        $text = <<'EOF';
 #!/bin/bash
 
 cd [% working_dir %]
@@ -361,16 +366,17 @@ done;
 
 EOF
 
-    $tt->process(
-        \$text,
-        {   stopwatch   => $stopwatch,
-            parallel    => $parallel,
-            working_dir => $working_dir,
-            target_id   => $target_id,
-            query_ids   => \@query_ids,
-        },
-        File::Spec->catfile( $working_dir, $sh_name )
-    ) or die Template->error;
+        $tt->process(
+            \$text,
+            {   stopwatch   => $stopwatch,
+                parallel    => $parallel,
+                working_dir => $working_dir,
+                target_id   => $target_id,
+                query_ids   => \@query_ids,
+            },
+            File::Spec->catfile( $working_dir, $sh_name )
+        ) or die Template->error;
+    }
 
     # pair_cmd.sh
     $sh_name = "3_pair_cmd.sh";
