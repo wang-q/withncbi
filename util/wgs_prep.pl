@@ -147,22 +147,28 @@ $stopwatch->block_message(
     $csv->print( $csv_fh, \@columns );
 
     for my $key ( sort keys %{$wgsid_of} ) {
+
         # Don't use hashref here, because I want use hash slices.
         my %info = %{ $master->{$key} };
 
         if ($fix_strain) {
-            print "Fix strain taxon info for $info{name}\n";
-            $info{Organism} = $info{Organism} . " " . $info{Biosource};
-            my $node = $taxon_db->get_taxon( -name => $info{Organism} );
-            if ( !$node ) {
-                print " " x 4, "Can't find taxon for $info{name}\n";
-                $arbitrary++;
-                print " " x 4, "Give it arbitrary id as $arbitrary\n";
-                $info{original_id} = $info{taxon_id};
-                $info{taxon_id} = $arbitrary;
+            if ( $info{Organism} =~ /$info{Biosource}/ ) {
+                print "Don't need fixing for $info{name}\n";
             }
             else {
-                $info{taxon_id} = $node->id;
+                print "Fix strain taxon info for $info{name}\n";
+                $info{Organism} = $info{Organism} . " " . $info{Biosource};
+                my $node = $taxon_db->get_taxon( -name => $info{Organism} );
+                if ( !$node ) {
+                    print " " x 4, "Can't find taxon for $info{name}\n";
+                    $arbitrary++;
+                    print " " x 4, "Give it arbitrary id as $arbitrary\n";
+                    $info{original_id} = $info{taxon_id};
+                    $info{taxon_id}    = $arbitrary;
+                }
+                else {
+                    $info{taxon_id} = $node->id;
+                }
             }
         }
         $csv->print( $csv_fh, [ @info{@columns} ] );
