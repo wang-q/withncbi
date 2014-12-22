@@ -63,6 +63,7 @@ sub wgs_worker {
             'Keywords',        'Organism',
             'Assembly_Method', 'Assembly_Name',
             'Genome_Coverage', 'Sequencing_Technology',
+            'Biosource',
         );
 
         for my $table (@tables) {
@@ -87,7 +88,20 @@ sub wgs_worker {
                     next unless grep { $row->[0] eq $_ } @columns;
 
                     $row->[1] =~ s/\s+.\s+show.+lineage.+$//g;
-                    $info->{ $row->[0] } = $row->[1];
+                    if ( $row->[0] eq 'Biosource' ) {
+                        my ($biosource_strain)
+                            = grep {/strain = /} grep {defined} split /\//,
+                            $row->[1];
+
+                        #print $row->[1], "\n";
+                        $biosource_strain =~ s/strain = //;
+
+                        #print $biosource_strain, "\n";
+                        $info->{ $row->[0] } = $biosource_strain;
+                    }
+                    else {
+                        $info->{ $row->[0] } = $row->[1];
+                    }
                 }
             }
         }
