@@ -524,27 +524,25 @@ EOF
 cd [% working_dir %]
 mkdir [% working_dir %]/[% multi_name %]
 
-if [ -d [% working_dir %]/[% multi_name %]_fasta ]
-then
-    rm -fr [% working_dir %]/[% multi_name %]_fasta
-fi
+if [ -d [% working_dir %]/[% multi_name %]_fasta ]; then
+    rm -fr [% working_dir %]/[% multi_name %]_fasta;
+fi;
 
-if [ -d [% working_dir %]/[% multi_name %]_mft ]
-then
-    rm -fr [% working_dir %]/[% multi_name %]_mft
-fi
+if [ -d [% working_dir %]/[% multi_name %]_mft ]; then
+    rm -fr [% working_dir %]/[% multi_name %]_mft;
+fi;
 
-if [ -d [% working_dir %]/[% multi_name %]_clw ]
-then
-    rm -fr [% working_dir %]/[% multi_name %]_clw
-fi
+if [ -d [% working_dir %]/[% multi_name %]_clw ]; then
+    rm -fr [% working_dir %]/[% multi_name %]_clw;
+fi;
 
-if [ -d [% working_dir %]/phylo ]
-then
-    rm -fr [% working_dir %]/phylo
-fi
-
-mkdir [% working_dir %]/phylo
+if [ -d [% working_dir %]/phylo ]; then
+    rm [% working_dir %]/RAxML*;
+    rm [% working_dir %]/*.phy;
+    rm [% working_dir %]/*.phy.reduced;
+else
+    mkdir [% working_dir %]/phylo;
+fi;
 
 #----------------------------#
 # mz
@@ -633,8 +631,6 @@ perl [% egaz %]/concat_fasta.pl \
 [% END -%] 
     -o [% working_dir %]/phylo/[% multi_name %].phy \
     -p
-
-rm [% working_dir %]/phylo/RAxML*
 
 raxml -T 5 -f a -m GTRGAMMA -p $RANDOM -N 100 -x $RANDOM \
 [% IF outgroup_id -%]
