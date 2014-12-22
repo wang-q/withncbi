@@ -10,10 +10,10 @@ use YAML qw(Dump Load DumpFile LoadFile);
 
 use DBI;
 use Text::CSV_XS;
-use Bio::Taxon;
-use Bio::DB::Taxonomy;
 use DateTime::Format::Natural;
 use List::MoreUtils qw(any all uniq);
+
+use Bio::DB::Taxonomy;
 
 use AlignDB::Stopwatch;
 
@@ -37,6 +37,12 @@ my $stopwatch = AlignDB::Stopwatch->new(
 my @ids;
 my %name_of;
 
+# for arbitrary ids
+my %species_of;
+
+# for unrecorded strains, give them arbitrary ids
+my $arbitrary = 10_000_000;
+
 # running options
 my $td_dir = replace_home( $Config->{path}{td} );    # taxdmp
 
@@ -49,12 +55,13 @@ my $man  = 0;
 my $help = 0;
 
 GetOptions(
-    'help|?' => \$help,
-    'man'    => \$man,
-    'id=i'   => \@ids,
-    'name=s' => \%name_of,
-    'file=s' => \$filename,
-    'simple' => \$simple,
+    'help|?'    => \$help,
+    'man'       => \$man,
+    'id=i'      => \@ids,
+    'name=s'    => \%name_of,
+    'species=s' => \%species_of,
+    'file=s'    => \$filename,
+    'simple'    => \$simple,
 ) or pod2usage(2);
 
 pod2usage(1) if $help;
@@ -82,12 +89,30 @@ $csv->print( $csv_fh,
 ID: for my $taxon_id (@ids) {
     my @row;
 
-    my $strain = $taxon_db->get_taxon( -taxonid => $taxon_id );
-    if ( !$strain ) {
-        warn "Can't find taxon for $taxon_id\n";
-        next;
+    my $strain;
+    if ( exists $species_of{$taxon_id} ) {
+
+        $strain = $taxon_db->get_taxon( -taxonid => $species_of{$taxon_id} );
+        if ( !$strain ) {
+            warn
+                "Can't find taxon for $species_of{$taxon_id}. Fake id is $taxon_id\n";
+            next;
+        }
+
+        if ( !exists $name_of{$taxon_id} ) {
+            warn "Fake id should has its own name.\n";
+            next;
+        }
+        push @row, ( "SHOULD BE REPLACED", $taxon_id, );
     }
-    push @row, ( $strain->scientific_name, $strain->id, );
+    else {
+        $strain = $taxon_db->get_taxon( -taxonid => $taxon_id );
+        if ( !$strain ) {
+            warn "Can't find taxon for $taxon_id\n";
+            next;
+        }
+        push @row, ( $strain->scientific_name, $strain->id, );
+    }
 
     for my $level (qw{species}) {
         my $taxon_obj = find_ancestor( $strain, $level );
