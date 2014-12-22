@@ -19,7 +19,7 @@ while ( my $row = $csv->getline($csv_fh) ) {
     my $id  = $row->[0];
     my $seq = $row->[1];
 
-    print "id\t$id\tseq\t$seq\n";
+    print "id: [$id]\tseq: [$seq]\n";
     if (-e "$id/$seq.gb") {
         print "Sequence [$id/$seq.gb] exists, next\n";
         next;
