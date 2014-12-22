@@ -16,8 +16,9 @@ my $parallel = 8;
 my $group_name = 'trichoderma';
 my $base_dir   = File::Spec->catdir( $ENV{HOME}, "data/alignment" );
 my $data_dir   = File::Spec->catdir( $base_dir, $group_name );
+
 #my $phylo_tree = File::Spec->catfile( $data_dir, "primates_13way.nwk" );
-my $pl_dir     = File::Spec->catdir( $ENV{HOME}, "Scripts" );
+my $pl_dir = File::Spec->catdir( $ENV{HOME}, "Scripts" );
 
 # NCBI WGS
 my $fasta_dir
@@ -68,7 +69,7 @@ my @data = (
         prefix   => "ABDF02",
         coverage => "8.05x Sanger",
     },
-    
+
     # contigs are too short
     #{   taxon    => 1247866,
     #    name     => "Tham",
@@ -110,7 +111,7 @@ echo [% item.name %]
 cd [% item.dir %]
 gzip -d -c [% item.fasta %] > toplevel.fa
 perl -p -i -e '/>/ and s/\>gi\|(\d+).*/\>gi_$1/' toplevel.fa
-faops count toplevel.fa | perl -aln -e 'next if $F[0] eq 'total'; print $F[0] if $F[1] > 100000; print $F[0] if $F[1] > 10000  and $F[6]/$F[1] < 0.05' | uniq > listFile
+faops count toplevel.fa | perl -aln -e 'next if $F[0] eq 'total'; print $F[0] if $F[1] > 100000; print $F[0] if $F[1] > 5000  and $F[6]/$F[1] < 0.05' | uniq > listFile
 faops some toplevel.fa listFile toplevel.filtered.fa
 [% IF item.name == 'Tatr' or item.name == 'Tvir_Gv29_8' or item.name == 'Tree_QM6a' -%]
 faops split-name toplevel.filtered.fa .
@@ -141,6 +142,7 @@ $text = <<'EOF';
 # RepeatMasker
 #----------------------------------------------------------#
 cd [% data_dir %]
+echo Doing RepeatMasker
 
 [% FOREACH item IN data -%]
 #----------------------------#
@@ -157,6 +159,7 @@ RepeatMasker [% item.dir %]/*.fasta -species Fungi -xsmall --parallel [% paralle
 # Clean RepeatMasker
 #----------------------------------------------------------#
 cd [% data_dir %]
+echo Cleaning RepeatMasker
 
 [% FOREACH item IN data -%]
 #----------------------------#
@@ -180,10 +183,10 @@ EOF
 
 $tt->process(
     \$text,
-    {   data        => \@data,
-        data_dir    => $data_dir,
-        pl_dir      => $pl_dir,
-        parallel    => $parallel,
+    {   data     => \@data,
+        data_dir => $data_dir,
+        pl_dir   => $pl_dir,
+        parallel => $parallel,
     },
     File::Spec->catfile( $data_dir, "02_rm.sh" )
 ) or die Template->error;
@@ -217,6 +220,7 @@ perl [% pl_dir %]/withncbi/taxon/strain_bz.pl \
     --multi_name Trichoderma_7way \
     --use_name \
     --parallel [% parallel %]\
+    --norm \
     -t Tatr \
     -q Thar \
     -q Tpse \
@@ -234,7 +238,6 @@ $tt->process(
         data_dir   => $data_dir,
         base_dir   => $base_dir,
         pl_dir     => $pl_dir,
-        #phylo_tree => $phylo_tree,
         parallel   => $parallel,
     },
     File::Spec->catfile( $data_dir, "03_prepare.sh" )
