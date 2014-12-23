@@ -419,7 +419,7 @@ perl [% aligndb %]/extra/seq_pair_batch.pl \
 [% IF nostat -%]
     -r 1,2
 [% ELSE -%]
-    -r 1,2,5,21,40
+    -r 1,2,40
 [% END -%]
 
 EOF
