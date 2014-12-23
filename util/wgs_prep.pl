@@ -214,11 +214,11 @@ $stopwatch->block_message("Generate .data.txt");
     my $text = <<'EOF';
 my @data = (
 [% FOREACH name IN names -%]
-    {   taxon    => [% master.$name.taxon_id %],
-        name     => "[% master.$name.name %]",
-        sciname  => "[% master.$name.Organism %]",
-        prefix   => "[% master.$name.prefix %]",
-        coverage => "[% master.$name.Genome_Coverage %] [% master.$name.Sequencing_Technology %]",
+    {   taxon       => [% master.$name.taxon_id %],
+        name        => "[% master.$name.name %]",
+        sciname     => "[% master.$name.Organism %]",
+        prefix      => "[% master.$name.prefix %]",
+        coverage    => "[% master.$name.Genome_Coverage %] [% master.$name.Sequencing_Technology %]",
 [% IF master.$name.original_id -%]
         original_id => [% master.$name.original_id %],
 [% END -%]
