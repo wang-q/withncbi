@@ -146,7 +146,8 @@ perl       ~/Scripts/withncbi/taxon/strain_info.pl \
     --id   285006                                  \
     --id   658763                                  \
     --id   559295                                  \
-    --id   226302
+    --id   226302                                  \
+    --id   307796
 
 #----------------------------#
 # self align

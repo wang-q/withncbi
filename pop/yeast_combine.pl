@@ -783,49 +783,49 @@ my @data = (
 );
 
 my $strains_of = {
-     #S288CvsYJM789Spar => [qw{ Spar YJM789 }],
-     #S288CvsIII       => [qw{ Spar RM11 YJM789 }],
-     #
-     ## 10k target length > Spar
-     #S288CvsXVIIIGE10m => [
-     #    qw{ Spar RM11 YJM789 JAY291 Sigma1278b EC1118 T7 AWRI796 FostersO
-     #        FostersB Lalvin_QA23 Vin13 VL3 Kyokai_no__7 DBVPG6765 SK1 W303
-     #        Y55 }
-     #],
+    S288CvsYJM789Spar => [qw{ Spar YJM789 }],
+    S288CvsIII       => [qw{ Spar RM11 YJM789 }],
+    
+    # 10k target length > Spar
+    S288CvsXVIIIGE10m => [
+        qw{ Spar RM11 YJM789 JAY291 Sigma1278b EC1118 T7 AWRI796 FostersO
+            FostersB Lalvin_QA23 Vin13 VL3 Kyokai_no__7 DBVPG6765 SK1 W303
+            Y55 }
+    ],
 
-     # 10k target length > Spar,
-     # exclude abnormal ins/del ones ( all from wine 454)
-     # VL3 Vin13 Lalvin_QA23 AWRI796 FostersO FostersB
-     #S288CvsXIIGE10m => [
-     #    qw{ Spar AWRI1631 AWRI796 CBS_7960 DBVPG6765 EC1118 EC9_8 FostersB
-     #    FostersO JAY291 Kyokai_no__7 Lalvin_QA23 PW5 RM11 SK1 Sigma1278b T7
-     #    UC5 VL3 Vin13 W303 Y55 YJM269 YJM789 }
-     #],
-     #S288CvsXIIGE10m => [
-     #    qw{ Spar AWRI1631 CBS_7960 DBVPG6765 EC1118 EC9_8 JAY291
-     #    Kyokai_no__7 PW5 RM11 SK1 Sigma1278b T7 UC5 W303 Y55 YJM269 YJM789 }
-     #],
-     S288CvsVIII => [
-         qw{ Spar EC1118 JAY291 Kyokai_no__7 RM11 Sigma1278b T7 YJM789 }
-     ],
+    #10k target length > Spar,
+    #exclude abnormal ins/del ones ( all from wine 454)
+    #VL3 Vin13 Lalvin_QA23 AWRI796 FostersO FostersB
+    S288CvsXIIGE10m => [
+        qw{ Spar AWRI1631 AWRI796 CBS_7960 DBVPG6765 EC1118 EC9_8 FostersB
+        FostersO JAY291 Kyokai_no__7 Lalvin_QA23 PW5 RM11 SK1 Sigma1278b T7
+        UC5 VL3 Vin13 W303 Y55 YJM269 YJM789 }
+    ],
+    S288CvsXIIGE10m => [
+        qw{ Spar AWRI1631 CBS_7960 DBVPG6765 EC1118 EC9_8 JAY291
+        Kyokai_no__7 PW5 RM11 SK1 Sigma1278b T7 UC5 W303 Y55 YJM269 YJM789 }
+    ],
+    288CvsVIII => [
+       qw{ Spar EC1118 JAY291 Kyokai_no__7 RM11 Sigma1278b T7 YJM789 }
+    ,
 
-     ## 1k avg-align > Spar
-     #S288CvsXVIIIGE8k => [
-     #    qw{ Spar RM11 YJM789 JAY291 Sigma1278b EC1118 PW5 T7 UC5 YJM269
-     #        AWRI796 FostersO FostersB Lalvin_QA23 Vin13 VL3 EC9_8
-     #        Kyokai_no__7 }
-     #],
-     #S288CvsXXIIGE8k => [
-     #    qw{ Spar RM11 YJM789 JAY291 Sigma1278b EC1118 PW5 T7 UC5 YJM269
-     #        AWRI796 FostersO FostersB Lalvin_QA23 Vin13 VL3 EC9_8
-     #        Kyokai_no__7 DBVPG6765 SK1 W303 Y55 }
-     #],
-     #
-     ## CLIB382 lacks 4 chr
-     #S288CvsXXXI => [
-     #    qw{ Spar RM11 YJM789 JAY291 Sigma1278b EC1118 CBS_7960 CLIB215
-     #        CLIB324 FL100 PW5 T7 T73 UC5 Y10 YJM269 AWRI796 FostersO
-     #        FostersB Lalvin_QA23 Vin13 VL3 EC9_8 Kyokai_no__7 AWRI1631 M22
-     #        YPS163 DBVPG6765 SK1 W303 Y55 }
-     #],
+    # 1k avg-align > Spar
+    S288CvsXVIIIGE8k => [
+        qw{ Spar RM11 YJM789 JAY291 Sigma1278b EC1118 PW5 T7 UC5 YJM269
+            AWRI796 FostersO FostersB Lalvin_QA23 Vin13 VL3 EC9_8
+            Kyokai_no__7 }
+    ],
+    S288CvsXXIIGE8k => [
+        qw{ Spar RM11 YJM789 JAY291 Sigma1278b EC1118 PW5 T7 UC5 YJM269
+            AWRI796 FostersO FostersB Lalvin_QA23 Vin13 VL3 EC9_8
+            Kyokai_no__7 DBVPG6765 SK1 W303 Y55 }
+    ],
+    
+    # CLIB382 lacks 4 chr
+    S288CvsXXXI => [
+        qw{ Spar RM11 YJM789 JAY291 Sigma1278b EC1118 CBS_7960 CLIB215
+            CLIB324 FL100 PW5 T7 T73 UC5 Y10 YJM269 AWRI796 FostersO
+            FostersB Lalvin_QA23 Vin13 VL3 EC9_8 Kyokai_no__7 AWRI1631 M22
+            YPS163 DBVPG6765 SK1 W303 Y55 }
+    ],
  };

@@ -164,9 +164,9 @@ my $acc_of = {};
     # taxon.csv
     print "Create taxon.csv\n";
     $text = <<'EOF';
-taxon_id,genus,species,sub_species,common_name,classification
+taxon_id,genus,species,sub_species,common_name
 [% FOREACH item IN data -%]
-[% item.taxon %],[% item.genus %],[% item.species %],[% item.subname %],[% item.name %],
+[% item.taxon %],[% item.genus %],[% item.species %],[% item.subname %],[% item.name %]
 [% END -%]
 EOF
     $tt->process(

@@ -632,7 +632,9 @@ perl [% egaz %]/concat_fasta.pl \
     -o [% working_dir %]/phylo/[% multi_name %].phy \
     -p
 
-raxml -T 5 -f a -m GTRGAMMA -p $RANDOM -N 100 -x $RANDOM \
+rm [% working_dir %]/phylo/RAxML*
+
+raxml -T 4 -f a -m GTRGAMMA -p $RANDOM -N 100 -x $RANDOM \
 [% IF outgroup_id -%]
     -o [% outgroup_id %] \
 [% END -%]
