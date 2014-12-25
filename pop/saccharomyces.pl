@@ -563,10 +563,12 @@ mv Scer_S288c/chrMito.fa Scer_S288c/chrMito.fa.skip
 
 ### execute 03_prepare.sh by copy & paste
 # perl /home/wangq/Scripts/withncbi/taxon/strain_info.pl \
-
-# perl /home/wangq/Scripts/withncbi/taxon/strain_bz.pl \
+    ...
 
 # for Saccharomyces_18way, execute the following bash file
+# perl /home/wangq/Scripts/withncbi/taxon/strain_bz.pl \
+    ...
+
 sh 1_real_chr.sh
 sh 3_pair_cmd.sh
 sh 4_rawphylo.sh
@@ -574,5 +576,8 @@ sh 5_multi_cmd.sh
 sh 6_multi_db_only.sh
 
 # for other multi names, execute the following bash file
+# perl /home/wangq/Scripts/withncbi/taxon/strain_bz.pl \
+    ...
+
 sh 5_multi_cmd.sh
 sh 6_multi_db_only.sh

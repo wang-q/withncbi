@@ -537,9 +537,9 @@ if [ -d [% working_dir %]/[% multi_name %]_clw ]; then
 fi;
 
 if [ -d [% working_dir %]/phylo ]; then
-    rm [% working_dir %]/RAxML*;
-    rm [% working_dir %]/*.phy;
-    rm [% working_dir %]/*.phy.reduced;
+    rm [% working_dir %]/phylo/RAxML*;
+    rm [% working_dir %]/phylo/*.phy;
+    rm [% working_dir %]/phylo/*.phy.reduced;
 else
     mkdir [% working_dir %]/phylo;
 fi;
