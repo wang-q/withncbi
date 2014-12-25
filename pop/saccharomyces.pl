@@ -550,8 +550,9 @@ aria2c -x 6 -s 3 -c -i WGS/saccharomyces.url.txt
 
 find WGS -name "*.gz" | xargs gzip -t 
 
-# edit ~/Scripts/withncbi/pop/saccharomyces.pl, add contents from saccharomyces.data.txt
+# edit ~/Scripts/withncbi/pop/saccharomyces.pl, add contents to @data from saccharomyces.data.txt
 
+# Run the perl script again if you changed it.
 perl ~/Scripts/withncbi/pop/saccharomyces.pl
 sh 01_file.sh
 sh 02_rm.sh
