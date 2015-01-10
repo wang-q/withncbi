@@ -705,12 +705,11 @@ perl [% pl_dir %]/withncbi/taxon/strain_bz.pl \
     -q=M3839       -q=N85           -q=NAM34_4C  -q=NY1308       -q=P283        \
     -q=P301                         -q=R008      -q=R103         -q=RM11_1a     \
     -q=RedStar     -q=SEY6210       -q=SK1                                      \
-    -q=Sigma1278b  -q=Spar                       -q=T7           -q=UC5         \
+    -q=Sigma1278b                                -q=T7           -q=UC5         \
     -q=UFMG_A_905                   -q=VL3       -q=Vin13        -q=W303        \
     -q=X2180_1A    -q=Y55           -q=YJM269    -q=YJM339       -q=YJM789      \
     -q=YJSH1       -q=YPH499        -q=YPS128    -q=YPS163       -q=YS9         \
-    -q=ZTW1        -q=EC1118        -q=YJM993                                   \
-    -o Spar
+    -q=ZTW1        -q=EC1118        -q=YJM993
 
 # Scer_61way_Spar
 cd [% data_dir %]
@@ -733,39 +732,97 @@ perl [% pl_dir %]/withncbi/taxon/strain_bz.pl \
     -q=M3839       -q=N85           -q=NAM34_4C  -q=NY1308       -q=P283        \
     -q=P301                         -q=R008      -q=R103         -q=RM11_1a     \
     -q=RedStar     -q=SEY6210       -q=SK1                                      \
-    -q=Sigma1278b                                -q=T7           -q=UC5         \
+    -q=Sigma1278b  -q=Spar                       -q=T7           -q=UC5         \
     -q=UFMG_A_905                   -q=VL3       -q=Vin13        -q=W303        \
     -q=X2180_1A    -q=Y55           -q=YJM269    -q=YJM339       -q=YJM789      \
     -q=YJSH1       -q=YPH499        -q=YPS128    -q=YPS163       -q=YS9         \
-    -q=ZTW1        -q=EC1118        -q=YJM993
+    -q=ZTW1        -q=EC1118        -q=YJM993                                   \
+    -o Spar
 
-# Scer_66way_refSbou
+# Scer_61way_Spas
 cd [% data_dir %]
 perl [% pl_dir %]/withncbi/taxon/strain_bz.pl \
     --file [% data_dir %]/[% group_name %].csv \
     -w     [% base_dir %] \
     --name [% group_name %] \
-    --multi_name Scer_70way_GT10M \
+    --multi_name Scer_61way_Spas \
     --use_name \
     --parallel [% parallel %] \
     --norm \
     --phylo_tree [% data_dir %]/phylo/Scer_69way.nwk \
     -t S288c \
-    -q=10560_6B    -q=9464          -q=AWRI1631  -q=AWRI796      -q=BC187       \
-    -q=BY4741      -q=BY4742        -q=CBS_7960  -q=CEN_PK113_7D -q=CEN_PK2_1Ca \
-    -q=CLIB215     -q=D273_10B      -q=DBVPG6044 -q=EBY_VW4000   -q=EC9_8       \
+    -q=10560_6B    -q=9464                       -q=AWRI796      -q=BC187       \
+    -q=BY4741      -q=BY4742                     -q=CEN_PK113_7D -q=CEN_PK2_1Ca \
+                   -q=D273_10B      -q=DBVPG6044 -q=EBY_VW4000   -q=EC9_8       \
     -q=FL100       -q=FY1679        -q=FostersB  -q=FostersO     -q=IR_2        \
     -q=JAY291      -q=JK9_3d        -q=K11       -q=Kyokai_no_7  -q=L1528       \
     -q=Lalvin_QA23 -q=M3707         -q=M3836     -q=M3837        -q=M3838       \
     -q=M3839       -q=N85           -q=NAM34_4C  -q=NY1308       -q=P283        \
-    -q=P301        -q=PW5           -q=R008      -q=R103         -q=RM11_1a     \
-    -q=RedStar     -q=SEY6210       -q=SK1       -q=Sbou                        \
-    -q=Sigma1278b                                -q=T7           -q=UC5         \
-    -q=UFMG_A_905  -q=UWOPS05_217_3 -q=VL3       -q=Vin13        -q=W303        \
+    -q=P301                         -q=R008      -q=R103         -q=RM11_1a     \
+    -q=RedStar     -q=SEY6210       -q=SK1                                      \
+    -q=Sigma1278b                   -q=Spas      -q=T7           -q=UC5         \
+    -q=UFMG_A_905                   -q=VL3       -q=Vin13        -q=W303        \
     -q=X2180_1A    -q=Y55           -q=YJM269    -q=YJM339       -q=YJM789      \
     -q=YJSH1       -q=YPH499        -q=YPS128    -q=YPS163       -q=YS9         \
     -q=ZTW1        -q=EC1118        -q=YJM993                                   \
-    -o Sbou
+    -o Spas
+
+
+# Scer_61way_Scar
+cd [% data_dir %]
+perl [% pl_dir %]/withncbi/taxon/strain_bz.pl \
+    --file [% data_dir %]/[% group_name %].csv \
+    -w     [% base_dir %] \
+    --name [% group_name %] \
+    --multi_name Scer_61way_Scar \
+    --use_name \
+    --parallel [% parallel %] \
+    --norm \
+    --phylo_tree [% data_dir %]/phylo/Scer_69way.nwk \
+    -t S288c \
+    -q=10560_6B    -q=9464                       -q=AWRI796      -q=BC187       \
+    -q=BY4741      -q=BY4742                     -q=CEN_PK113_7D -q=CEN_PK2_1Ca \
+                   -q=D273_10B      -q=DBVPG6044 -q=EBY_VW4000   -q=EC9_8       \
+    -q=FL100       -q=FY1679        -q=FostersB  -q=FostersO     -q=IR_2        \
+    -q=JAY291      -q=JK9_3d        -q=K11       -q=Kyokai_no_7  -q=L1528       \
+    -q=Lalvin_QA23 -q=M3707         -q=M3836     -q=M3837        -q=M3838       \
+    -q=M3839       -q=N85           -q=NAM34_4C  -q=NY1308       -q=P283        \
+    -q=P301                         -q=R008      -q=R103         -q=RM11_1a     \
+    -q=RedStar     -q=SEY6210       -q=SK1                       -q=Scar        \
+    -q=Sigma1278b                                -q=T7           -q=UC5         \
+    -q=UFMG_A_905                   -q=VL3       -q=Vin13        -q=W303        \
+    -q=X2180_1A    -q=Y55           -q=YJM269    -q=YJM339       -q=YJM789      \
+    -q=YJSH1       -q=YPH499        -q=YPS128    -q=YPS163       -q=YS9         \
+    -q=ZTW1        -q=EC1118        -q=YJM993                                   \
+    -o Scar
+
+# Scer_55way_Spas
+cd [% data_dir %]
+perl [% pl_dir %]/withncbi/taxon/strain_bz.pl \
+    --file [% data_dir %]/[% group_name %].csv \
+    -w     [% base_dir %] \
+    --name [% group_name %] \
+    --multi_name Scer_55way_Spas \
+    --use_name \
+    --parallel [% parallel %] \
+    --norm \
+    --phylo_tree [% data_dir %]/phylo/Scer_69way.nwk \
+    -t S288c \
+    -q=10560_6B    -q=9464                       -q=AWRI796      -q=BC187       \
+    -q=BY4741      -q=BY4742                     -q=CEN_PK113_7D -q=CEN_PK2_1Ca \
+                   -q=D273_10B      -q=DBVPG6044 -q=EBY_VW4000   -q=EC9_8       \
+    -q=FL100       -q=FY1679        -q=FostersB  -q=FostersO                    \
+                   -q=JK9_3d        -q=K11       -q=Kyokai_no_7  -q=L1528       \
+    -q=Lalvin_QA23 -q=M3707         -q=M3836     -q=M3837        -q=M3838       \
+    -q=M3839       -q=N85                        -q=NY1308                      \
+    -q=P301                                                      -q=RM11_1a     \
+    -q=RedStar     -q=SEY6210       -q=SK1                                      \
+    -q=Sigma1278b                   -q=Spas      -q=T7           -q=UC5         \
+    -q=UFMG_A_905                   -q=VL3       -q=Vin13        -q=W303        \
+    -q=X2180_1A    -q=Y55           -q=YJM269    -q=YJM339       -q=YJM789      \
+    -q=YJSH1       -q=YPH499        -q=YPS128    -q=YPS163       -q=YS9         \
+    -q=ZTW1        -q=EC1118        -q=YJM993                                   \
+    -o Spas
 
 EOF
 
