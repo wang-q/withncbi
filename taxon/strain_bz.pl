@@ -397,21 +397,21 @@ cd [% working_dir %]
 sleep 1;
 
 #----------------------------#
-# seq_pair
+# z_batch
 #----------------------------#
-perl [% aligndb %]/extra/seq_pair_batch.pl \
+[% FOREACH q IN query_ids -%]
+perl [% egaz %]/z_batch.pl \
     --bin [% kent_bin %] \
-[% IF use_name -%]
-    --id [% working_dir %]/id2name.csv \
-[% ELSE -%]
-    --dir_as_taxon \
+    -dt [% working_dir %]/[% target_id %] \
+    -dq [% working_dir %]/[% q %] \
+    -dw [% working_dir %] \
+    -r 2-4 \
+    --parallel [% parallel %]
 [% END -%]
-    --parallel [% parallel %] \
-    -f [% working_dir %]/seq_pair.csv \
-    -taxon [% working_dir %]/taxon.csv \
-    -chr [% working_dir %]/chr_length.csv \
-    -lt 1000 -r 100-102
 
+#----------------------------#
+# seq_pair_batch
+#----------------------------#
 perl [% aligndb %]/extra/seq_pair_batch.pl \
     --bin [% kent_bin %] \
 [% IF use_name -%]
@@ -436,6 +436,7 @@ EOF
         {   stopwatch   => $stopwatch,
             parallel    => $parallel,
             working_dir => $working_dir,
+            egaz        => $egaz,
             aligndb     => $aligndb,
             kent_bin    => $kent_bin,
             use_name    => $use_name,
