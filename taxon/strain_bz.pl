@@ -290,6 +290,8 @@ EOF
 #!/bin/bash
 cd [% working_dir %]
 
+sleep 1;
+
 cat << DELIMITER > chrUn.csv
 taxon_id,chr,length,name,assembly
 [% FOREACH item IN data -%]
@@ -314,12 +316,14 @@ echo "chr_length.csv generated."
 rm chrUn.csv
 rm real_chr.csv
 
+[% IF !nostat -%]
 echo '# If you want, run the following cmds to merge csv files'
 echo
 echo perl [% aligndb %]/util/merge_csv.pl -t [% aligndb %]/data/taxon.csv -m [% working_dir %]/taxon.csv -f 0 -f 1
 echo
 echo perl [% aligndb %]/util/merge_csv.pl -t [% aligndb %]/data/chr_length.csv -m [% working_dir %]/chr_length.csv -f 0 -f 1
 echo
+[% END -%]
 
 EOF
     $tt->process(
@@ -328,6 +332,7 @@ EOF
             working_dir => $working_dir,
             aligndb     => $aligndb,
             kent_bin    => $kent_bin,
+            nostat      => $nostat,
         },
         File::Spec->catfile( $working_dir, $sh_name )
     ) or die Template->error;
@@ -338,8 +343,9 @@ EOF
         print "Create $sh_name\n";
         $text = <<'EOF';
 #!/bin/bash
-
 cd [% working_dir %]
+
+sleep 1;
 
 #----------------------------#
 # repeatmasker on all fasta
@@ -387,6 +393,8 @@ EOF
 # perl [% stopwatch.cmd_line %]
 
 cd [% working_dir %]
+
+sleep 1;
 
 #----------------------------#
 # seq_pair
@@ -448,6 +456,8 @@ EOF
 # perl [% stopwatch.cmd_line %]
 
 cd [% working_dir %]
+
+sleep 1;
 
 # join_dbs.pl
 perl [% aligndb %]/extra/join_dbs.pl \
@@ -522,6 +532,9 @@ EOF
 # perl [% stopwatch.cmd_line %]
 
 cd [% working_dir %]
+
+sleep 1;
+
 mkdir [% working_dir %]/[% multi_name %]
 
 if [ -d [% working_dir %]/[% multi_name %]_fasta ]; then
@@ -672,6 +685,8 @@ EOF
 # perl [% stopwatch.cmd_line %]
 
 cd [% working_dir %]
+
+sleep 1;
 
 #----------------------------#
 # multi_way_batch
