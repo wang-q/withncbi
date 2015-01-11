@@ -11,77 +11,32 @@ use File::Spec;
 use String::Compare;
 use YAML qw(Dump Load DumpFile LoadFile);
 
-my $parallel = 8;
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+use MyUtil qw(replace_home find_ancestor);
 
-my $group_name = 'trichoderma';
-my $base_dir   = File::Spec->catdir( $ENV{HOME}, "data/alignment" );
-my $data_dir   = File::Spec->catdir( $base_dir, $group_name );
+my $conf_file = "$FindBin::Bin/trichoderma_data.yml";
+my $yml = LoadFile($conf_file);
 
-#my $phylo_tree = File::Spec->catfile( $data_dir, "primates_13way.nwk" );
-my $pl_dir = File::Spec->catdir( $ENV{HOME}, "Scripts" );
+my $group_name = $yml->{group_name};
+my $base_dir   = replace_home( $yml->{base_dir} );
+my $data_dir   = replace_home( $yml->{data_dir} );
+my $pl_dir     = replace_home( $yml->{pl_dir} );
+my $parallel = $yml->{parallel} || 8;
 
 # NCBI WGS
-my $fasta_dir
-    = File::Spec->catdir( $ENV{HOME}, "data/alignment/trichoderma/WGS" );
+my $fasta_dir = replace_home( $yml->{fasta_dir} );
 
 my $tt = Template->new;
 
-my @data = (
-    {   taxon    => 452589,
-        name     => "Tatr",
-        sciname  => "Trichoderma atroviride IMI 206040",
-        prefix   => "ABDG02",
-        coverage => "8.26x Sanger",
-    },
-    {   taxon    => 5544,
-        name     => "Thar",
-        sciname  => "Trichoderma harzianum",
-        prefix   => "JNNP01",
-        coverage => "20.0x Illumina HiSeq",
-    },
-    {   taxon    => 1234776,
-        name     => "Tpse",
-        sciname  => "Trichoderma longibrachiatum SMF2",
-        prefix   => "ANBJ01",
-        coverage => "69x 454; Illumina HiSeq",
-    },
-    {   taxon    => 431241,
-        name     => "Tree_QM6a",
-        sciname  => "Trichoderma reesei QM6a",
-        prefix   => "AAIL02",
-        coverage => "9x Sanger",
-    },
-    {   taxon    => 1344414,
-        name     => "Tree_RUT_C_30",
-        sciname  => "Trichoderma reesei RUT C-30",
-        prefix   => "JABP01",
-        coverage => "47.6x Illumina",
-    },
-    {   taxon    => 1331945,
-        name     => "Tvir_FT_333",
-        sciname  => "Trichoderma virens FT-333",
-        prefix   => "JTGJ01",
-        coverage => "51.0x SOLiD",
-    },
-    {   taxon    => 413071,
-        name     => "Tvir_Gv29_8",
-        sciname  => "Trichoderma virens Gv29-8",
-        prefix   => "ABDF02",
-        coverage => "8.05x Sanger",
-    },
-
-    # contigs are too short
-    #{   taxon    => 1247866,
-    #    name     => "Tham",
-    #    sciname  => "Trichoderma hamatum GD12",
-    #    prefix   => "ANCB01",
-    #    coverage => "40.0x Illumina HiSeq",
-    #},
-);
+my @data = @{ $yml->{data} };
 
 my @subdirs_fasta = File::Find::Rule->file->name('*.fsa_nt.gz')->in($fasta_dir);
-
 for my $item (@data) {
+    printf "Matching [%s]\n", $item->{name};
+    if ( exists $item->{skip} ) {
+        printf " " x 4 . "Skip: %s\n", $item->{skip};
+    }
 
     # match the most similar name
     my ($fasta) = map { $_->[0] }

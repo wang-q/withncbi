@@ -205,26 +205,26 @@ $stopwatch->block_message(
 }
 
 #----------------------------#
-# @data template
+# @data yaml
 #----------------------------#
-$stopwatch->block_message("Generate .data.txt");
+$stopwatch->block_message("Generate .data.yml");
 {
-    my $file_data = File::Spec->catfile( $dir_output, "$basename.data.txt" );
+    my $file_data = File::Spec->catfile( $dir_output, "$basename.data.yml" );
 
     my $text = <<'EOF';
-my @data = (
+---
+data:
 [% FOREACH name IN names -%]
-    {   taxon       => [% master.$name.taxon_id %],
-        name        => "[% master.$name.name %]",
-        sciname     => "[% master.$name.Organism %]",
-        prefix      => "[% master.$name.prefix %]",
-        coverage    => "[% master.$name.Genome_Coverage %] [% master.$name.Sequencing_Technology %]",
+    - taxon: [% master.$name.taxon_id %]
+      name: '[% master.$name.name %]'
+      sciname: '[% master.$name.Organism %]'
+      prefix: '[% master.$name.prefix %]'
+      coverage: '[% master.$name.Genome_Coverage %] [% master.$name.Sequencing_Technology %]'
 [% IF master.$name.original_id -%]
-        original_id => [% master.$name.original_id %],
+      original_id: [% master.$name.original_id %]
 [% END -%]
-    },
 [% END -%]
-);
+
 EOF
     my $tt = Template->new;
     $tt->process( \$text,
