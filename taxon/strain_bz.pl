@@ -350,31 +350,39 @@ sleep 1;
 #----------------------------#
 # repeatmasker on all fasta
 #----------------------------#
-for f in `find . -name "*.fa"` ; do
+[% FOREACH item IN data -%]
+
+for f in `find [% item.dir%] -name "*.fa"` ; do
     rename 's/fa$/fasta/' $f ;
 done
 
-for f in `find . -name "*.fasta"` ; do
+for f in `find [% item.dir%] -name "*.fasta"` ; do
     RepeatMasker $f -xsmall --parallel [% parallel %] ;
 done
 
-for f in `find . -name "*.fasta.out"` ; do
+for f in `find [% item.dir%] -name "*.fasta.out"` ; do
     rmOutToGFF3.pl $f > `dirname $f`/`basename $f .fasta.out`.rm.gff;
 done
 
-for f in `find . -name "*.fasta"` ; do
+for f in `find [% item.dir%] -name "*.fasta"` ; do
     if [ -f $f.masked ];
     then
         rename 's/fasta.masked$/fa/' $f.masked;
-        find . -type f -name "`basename $f`*" | xargs rm;
+        find [% item.dir%] -type f -name "`basename $f`*" | xargs rm;
+    else
+        rename 's/fasta$/fa/' $f;
+        echo "RepeatMasker on $f failed.\n" >> RepeatMasker.log
+        find [% item.dir%] -type f -name "`basename $f`*" | xargs rm;
     fi;
 done;
+
+[% END %]
 
 EOF
 
         $tt->process(
             \$text,
-            {   stopwatch   => $stopwatch,
+            {   data        => \@data,
                 parallel    => $parallel,
                 working_dir => $working_dir,
                 target_id   => $target_id,
@@ -407,6 +415,7 @@ perl [% egaz %]/z_batch.pl \
     -dw [% working_dir %] \
     -r 2-4 \
     --parallel [% parallel %]
+
 [% END -%]
 
 #----------------------------#
