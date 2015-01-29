@@ -479,8 +479,8 @@ echo "* blast [% id %]vsselfalign.axt.fasta"
 #----------------------------#
 # paralog sequences
 #----------------------------#
-# Omit genome locations in .axt
-# There are errors, especially for queries
+# XXX Omit genome locations in .axt
+# XXX There are errors, especially for queries
 perl [% aligndb %]/slice/blastn_genome_location.pl -f [% id %]vsselfalign.axt.blast -m 0 -i 90 -c 0.95
 
 #----------------------------#
@@ -503,11 +503,14 @@ perl [% aligndb %]/slice/cc.pl               -f [% id %]vsselfalign.merge.graph.
 perl [% aligndb %]/slice/proc_cc_chop.pl     -f [% id %]vsselfalign.cc.yml --size [% working_dir %]/[% id %]/chr.sizes --msa [% msa %]
 perl [% aligndb %]/slice/proc_cc_stat.pl     -f [% id %]vsselfalign.cc.yml --size [% working_dir %]/[% id %]/chr.sizes
 
+perl [% aligndb %]/slice/stat_runlist.pl --size [% working_dir %]/[% id %]/chr.sizes -f [% id %]vsselfalign.cc.chr.runlist.yml;
+
 #----------------------------#
 # result
 #----------------------------#
 cp [% id %]vsselfalign.cc.yml [% working_dir %]/[% id %]_result
 mv [% id %]vsselfalign.cc.csv [% working_dir %]/[% id %]_result
+cp [% id %]vsselfalign.cc.chr.runlist.yml.csv [% working_dir %]/[% id %]_result/[% id %]vsselfalign.chr.csv
 
 #----------------------------#
 # clean
