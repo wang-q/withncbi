@@ -24,9 +24,16 @@ for my $type (@types) {
     my $file = File::Spec->catfile( $dir, "$id.$type" );
     $file = File::Spec->rel2abs($file);
     print "Saving file to [$file]\n";
+    
+    # local shadowsocks proxy
+    if ($ENV{EUPROXY}) {
+        $factory->proxy(['http','https'], 'socks://127.0.0.1:1080' )
+    }
 
     # dump HTTP::Response content to a file (not retained in memory)
     $factory->get_Response( -file => $file );
     print "Done.\n";
 }
+
+__END__
 
