@@ -42,25 +42,37 @@ my $stopwatch = AlignDB::Stopwatch->new(
 my $working_dir = ".";
 my $seq_dir;    #  will prep_fa from this dir ~/Scripts/alignDB/taxon
                 #  or use seqs store in $working_dir
+my @keep;       # don't touch anything inside fasta files
 
 my $target_id;
 my @query_ids;
 
-my $clustalw;
-
-my $length = 1000;
-
 my $name_str = "working";
 
-# all taxons in this project (may also contain unused taxons)
-my $filename = "strains_taxon_info.csv";
+# All taxons in this project (may also contain unused taxons)
+my $taxon_file = "strains_taxon_info.csv";
 
-my $aligndb  = replace_home( $Config->{run}{aligndb} );   # current alignDB path
+my $msa    = 'mafft';    # Default alignment program
+my $length = 1000;
+
+my $aligndb  = replace_home( $Config->{run}{aligndb} );   # alignDB path
 my $egaz     = replace_home( $Config->{run}{egaz} );      # egaz path
 my $kent_bin = replace_home( $Config->{run}{kent_bin} );  # exes of Jim Kent
-my $bat_dir  = $Config->{run}{bat};                       # Windows alignDB path
 my $blast    = replace_home( $Config->{run}{blast} );     # blast path
 my $circos   = replace_home( $Config->{run}{circos} );    # circos path
+my $bat_dir  = $Config->{run}{bat};                       # Windows alignDB path
+
+# Use name instead of taxon_id as identifier. These names should only contain
+# alphanumeric value and match with sequence directory names.
+# For strains not recorded in NCBI taxonomy, you should assign them fake ids.
+# If this option set to be true, all $target_id, @query_ids is actually names.
+my $use_name;
+
+# RepeatMasker has been done.
+my $norm;
+
+# Don't do stat stuffs
+my $nostat;
 
 # run in parallel mode
 my $parallel = $Config->{run}{parallel};
@@ -71,14 +83,18 @@ my $help = 0;
 GetOptions(
     'help|?'          => \$help,
     'man'             => \$man,
-    'file=s'          => \$filename,
+    'file=s'          => \$taxon_file,
     'w|working_dir=s' => \$working_dir,
     's|seq_dir=s'     => \$seq_dir,
-    't|target_id=i'   => \$target_id,
-    'q|query_ids=i'   => \@query_ids,
+    'keep=s'          => \@keep,
+    't|target_id=s'   => \$target_id,
+    'q|query_ids=s'   => \@query_ids,
     'length=i'        => \$length,
     'n|name_str=s'    => \$name_str,
-    'clustalw'        => \$clustalw,
+    'un|use_name'     => \$use_name,
+    'msa=s'           => \$msa,
+    'norm'            => \$norm,
+    'nostat'          => \$nostat,
     'parallel=i'      => \$parallel,
 ) or pod2usage(2);
 
@@ -90,7 +106,7 @@ pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
 #----------------------------------------------------------#
 $stopwatch->start_message("Writing strains summary...");
 
-die "$filename doesn't exist\n" unless -e $filename;
+die "$taxon_file doesn't exist\n" unless -e $taxon_file;
 
 # prepare working dir
 {
@@ -102,12 +118,30 @@ die "$filename doesn't exist\n" unless -e $filename;
     print " " x 4, "Working dir is $working_dir\n";
 }
 
+my @data;
+{
+    if ( !$use_name ) {
+        @data
+            = map { taxon_info( $_, $working_dir ) } ( $target_id, @query_ids );
+    }
+    else {
+        @data
+            = map { taxon_info_name( $_, $working_dir ) }
+            ( $target_id, @query_ids );
+    }
+}
+
 # if seqs is not in working dir, copy them from seq_dir
+my @target_seqs;    # for gff and rm-gff files
 if ($seq_dir) {
     print "Get seqs from [$seq_dir]\n";
 
     for my $id ( $target_id, @query_ids ) {
-        print " " x 4, "Copy seq of $id\n";
+        my ($keep) = grep { $_ eq $id } @keep;
+        print " " x 4 . "Copy seq of [$id]\n";
+        if ( defined $keep ) {
+            print " " x 8 . "Don't change fasta header for [$id]\n";
+        }
 
         my $original_dir = File::Spec->catdir( $seq_dir,     $id );
         my $cur_dir      = File::Spec->catdir( $working_dir, $id );
@@ -117,11 +151,28 @@ if ($seq_dir) {
             = File::Find::Rule->file->name( '*.fna', '*.fa', '*.fas',
             '*.fasta' )->in($original_dir);
 
+        printf " " x 8 . "Total %d fasta file(s)\n", scalar @fa_files;
+
         for my $fa_file (@fa_files) {
-            my $basename = prep_fa( $fa_file, $cur_dir );
+            my $basename;
+            if ( defined $keep ) {
+                $basename = prep_fa( $fa_file, $cur_dir, 1 );
+            }
+            else {
+                $basename = prep_fa( $fa_file, $cur_dir );
+            }
+            if ( $id eq $target_id ) {
+                push @target_seqs, $basename;
+            }
             my $gff_file = File::Spec->catdir( $original_dir, "$basename.gff" );
             if ( -e $gff_file ) {
                 fcopy( $gff_file, $cur_dir );
+            }
+
+            my $rm_gff_file
+                = File::Spec->catdir( $original_dir, "$basename.rm.gff" );
+            if ( -e $rm_gff_file ) {
+                fcopy( $rm_gff_file, $cur_dir );
             }
         }
     }
@@ -144,12 +195,23 @@ my $acc_of = {};
     }
 }
 
-{    # use id as species name
+{
     print "Create id2name.csv\n";
     my $id2name_file = File::Spec->catfile( $working_dir, "id2name.csv" );
     open my $fh, '>', $id2name_file;
-    for my $id ( $target_id, @query_ids ) {
-        print {$fh} "$id,$id\n";
+    if ( !$use_name ) {
+
+        # if not set --use_name, use id as strain name
+        for my $id ( $target_id, @query_ids ) {
+            print {$fh} "$id,$id\n";
+        }
+    }
+    else {
+        for my $name ( $target_id, @query_ids ) {
+            my ($id)
+                = map { $_->{taxon} } grep { $_->{name} eq $name } @data;
+            print {$fh} "$id,$name\n";
+        }
     }
     close $fh;
 }
@@ -158,8 +220,6 @@ my $acc_of = {};
     my $tt = Template->new;
     my $text;
     my $sh_name;
-    my @data
-        = map { taxon_info( $_, $working_dir ) } ( $target_id, @query_ids );
 
     # taxon.csv
     print "Create taxon.csv\n";
@@ -186,6 +246,8 @@ EOF
 #!/bin/bash
 cd [% working_dir %]
 
+sleep 1;
+
 cat << DELIMITER > chrUn.csv
 taxon_id,chr,length,name,assembly
 [% FOREACH item IN data -%]
@@ -198,8 +260,10 @@ if [ -f real_chr.csv ]; then
 fi;
 
 [% FOREACH item IN data -%]
-[% kent_bin %]/faSize -detailed [% item.dir%]/*.fa > [% item.dir%]/chr.sizes
-perl -aln -F"\t" -e 'print qq{[% item.taxon %],$F[0],$F[1],[% item.name %]}' [% item.dir %]/chr.sizes >> real_chr.csv
+if [ ! -f [% item.dir%]/chr.sizes ]; then 
+    [% kent_bin %]/faSize -detailed [% item.dir%]/*.fa > [% item.dir%]/chr.sizes;
+fi;
+perl -aln -F"\t" -e 'print qq{[% item.taxon %],$F[0],$F[1],[% item.name %]}' [% item.dir %]/chr.sizes >> real_chr.csv;
 [% END -%]
 
 cat chrUn.csv real_chr.csv > chr_length.csv
@@ -208,12 +272,14 @@ echo "chr_length.csv generated."
 rm chrUn.csv
 rm real_chr.csv
 
+[% IF !nostat -%]
 echo '# If you want, run the following cmds to merge csv files'
 echo
 echo perl [% aligndb %]/util/merge_csv.pl -t [% aligndb %]/data/taxon.csv -m [% working_dir %]/taxon.csv -f 0 -f 1
 echo
 echo perl [% aligndb %]/util/merge_csv.pl -t [% aligndb %]/data/chr_length.csv -m [% working_dir %]/chr_length.csv -f 0 -f 1
 echo
+[% END -%]
 
 EOF
     $tt->process(
@@ -222,53 +288,65 @@ EOF
             working_dir => $working_dir,
             aligndb     => $aligndb,
             kent_bin    => $kent_bin,
+            nostat      => $nostat,
         },
         File::Spec->catfile( $working_dir, $sh_name )
     ) or die Template->error;
 
     # file-rm.sh
-    $sh_name = "2_file_rm.sh";
-    print "Create $sh_name\n";
-    $text = <<'EOF';
+    if ( !$norm ) {
+        $sh_name = "2_file_rm.sh";
+        print "Create $sh_name\n";
+        $text = <<'EOF';
 #!/bin/bash
-
 cd [% working_dir %]
+
+sleep 1;
 
 #----------------------------#
 # repeatmasker on all fasta
 #----------------------------#
-for f in `find . -name "*.fa"` ; do
+[% FOREACH item IN data -%]
+
+for f in `find [% item.dir%] -name "*.fa"` ; do
     rename 's/fa$/fasta/' $f ;
 done
 
-for f in `find . -name "*.fasta"` ; do
+for f in `find [% item.dir%] -name "*.fasta"` ; do
     RepeatMasker $f -xsmall --parallel [% parallel %] ;
 done
 
-for f in `find . -name "*.fasta.out"` ; do
+for f in `find [% item.dir%] -name "*.fasta.out"` ; do
     rmOutToGFF3.pl $f > `dirname $f`/`basename $f .fasta.out`.rm.gff;
 done
 
-for f in `find . -name "*.fasta"` ; do
+for f in `find [% item.dir%] -name "*.fasta"` ; do
     if [ -f $f.masked ];
     then
         rename 's/fasta.masked$/fa/' $f.masked;
-        find . -type f -name "`basename $f`*" | xargs rm;
+        find [% item.dir%] -type f -name "`basename $f`*" | xargs rm;
+    else
+        rename 's/fasta$/fa/' $f;
+        echo "RepeatMasker on $f failed.\n" >> RepeatMasker.log
+        find [% item.dir%] -type f -name "`basename $f`*" | xargs rm;
     fi;
 done;
 
+[% END %]
+
 EOF
 
-    $tt->process(
-        \$text,
-        {   stopwatch   => $stopwatch,
-            parallel    => $parallel,
-            working_dir => $working_dir,
-            target_id   => $target_id,
-            query_ids   => \@query_ids,
-        },
-        File::Spec->catfile( $working_dir, $sh_name )
-    ) or die Template->error;
+        $tt->process(
+            \$text,
+            {   data        => \@data,
+                parallel    => $parallel,
+                working_dir => $working_dir,
+                target_id   => $target_id,
+                query_ids   => \@query_ids,
+            },
+            File::Spec->catfile( $working_dir, $sh_name )
+        ) or die Template->error;
+    }
 
     # self_cmd.sh
     $sh_name = "3_self_cmd.sh";
@@ -280,13 +358,15 @@ EOF
 
 cd [% working_dir %]
 
-[% FOREACH item IN data -%]
+sleep 1;
+
+[% FOREACH id IN all_ids -%]
 #----------------------------------------------------------#
-# [% item.taxon %] [% item.name %]
+# [% id %]
 #----------------------------------------------------------#
-if [ -d [% working_dir %]/[% item.taxon %]vsselfalign ]
+if [ -d [% working_dir %]/[% id %]vsselfalign ]
 then
-    rm -fr [% working_dir %]/[% item.taxon %]vsselfalign
+    rm -fr [% working_dir %]/[% id %]vsselfalign
 fi
 
 #----------------------------#
@@ -295,9 +375,9 @@ fi
 perl [% egaz %]/bz.pl \
     --is_self \
     -s set01 -C 0 --noaxt -pb lastz --lastz \
-    -dt [% working_dir %]/[% item.taxon %] \
-    -dq [% working_dir %]/[% item.taxon %] \
-    -dl [% working_dir %]/[% item.taxon %]vsselfalign \
+    -dt [% working_dir %]/[% id %] \
+    -dq [% working_dir %]/[% id %] \
+    -dl [% working_dir %]/[% id %]vsselfalign \
     --parallel [% parallel %]
 
 #----------------------------#
@@ -305,9 +385,9 @@ perl [% egaz %]/bz.pl \
 #----------------------------#
 perl [% egaz %]/lpcna.pl \
     -bin [% kent_bin %] \
-    -dt [% working_dir %]/[% item.taxon %] \
-    -dq [% working_dir %]/[% item.taxon %] \
-    -dl [% working_dir %]/[% item.taxon %]vsselfalign \
+    -dt [% working_dir %]/[% id %] \
+    -dq [% working_dir %]/[% id %] \
+    -dl [% working_dir %]/[% id %]vsselfalign \
     --parallel [% parallel %]
 
 [% END -%]
@@ -318,13 +398,10 @@ EOF
         {   stopwatch   => $stopwatch,
             parallel    => $parallel,
             working_dir => $working_dir,
-            aligndb     => $aligndb,
             egaz        => $egaz,
             kent_bin    => $kent_bin,
             name_str    => $name_str,
-            target_id   => $target_id,
-            query_ids   => \@query_ids,
-            data        => \@data,
+            all_ids     => [ $target_id, @query_ids ],
         },
         File::Spec->catfile( $working_dir, $sh_name )
     ) or die Template->error;
@@ -338,104 +415,106 @@ EOF
 
 cd [% working_dir %]
 
-[% FOREACH item IN data -%]
+sleep 1;
+
+[% FOREACH id IN all_ids -%]
 #----------------------------------------------------------#
-# [% item.taxon %] [% item.name %]
+# [% id %]
 #----------------------------------------------------------#
-if [ -d [% working_dir %]/[% item.taxon %]_proc ]
+if [ -d [% working_dir %]/[% id %]_proc ]
 then
-    find [% working_dir %]/[% item.taxon %]_proc -type f -not -name "circos.conf" | xargs rm
+    find [% working_dir %]/[% id %]_proc -type f -not -name "circos.conf" | xargs rm
 else
-    mkdir [% working_dir %]/[% item.taxon %]_proc
+    mkdir [% working_dir %]/[% id %]_proc
 fi
 
-if [ ! -d [% working_dir %]/[% item.taxon %]_result ]
+if [ ! -d [% working_dir %]/[% id %]_result ]
 then
-    mkdir [% working_dir %]/[% item.taxon %]_result
+    mkdir [% working_dir %]/[% id %]_result
 fi
 
-cd [% working_dir %]/[% item.taxon %]_proc
+cd [% working_dir %]/[% id %]_proc
 
 #----------------------------#
 # quick and dirty coverage
 #----------------------------#
-perl [% aligndb %]/slice/gather_info_axt.pl -l [% length %] -d [% working_dir %]/[% item.taxon %]vsselfalign --nomatch
-perl [% aligndb %]/slice/compare_runlist.pl -op intersect -f1 [% item.taxon %]vsselfalign.runlist.0.yml -f2 [% item.taxon %]vsselfalign.runlist.1.yml -o [% item.taxon %]vsselfalign.runlist.i.yml
-perl [% aligndb %]/slice/compare_runlist.pl -op xor -f1 [% item.taxon %]vsselfalign.runlist.0.yml -f2 [% item.taxon %]vsselfalign.runlist.1.yml -o [% item.taxon %]vsselfalign.runlist.x.yml
-perl [% aligndb %]/slice/compare_runlist.pl -op union -f1 [% item.taxon %]vsselfalign.runlist.0.yml -f2 [% item.taxon %]vsselfalign.runlist.1.yml -o [% item.taxon %]vsselfalign.runlist.u.yml
+perl [% aligndb %]/slice/gather_info_axt.pl -l [% length %] -d [% working_dir %]/[% id %]vsselfalign --nomatch
+perl [% aligndb %]/slice/compare_runlist.pl -op intersect -f1 [% id %]vsselfalign.runlist.0.yml -f2 [% id %]vsselfalign.runlist.1.yml -o [% id %]vsselfalign.runlist.i.yml
+perl [% aligndb %]/slice/compare_runlist.pl -op xor -f1 [% id %]vsselfalign.runlist.0.yml -f2 [% id %]vsselfalign.runlist.1.yml -o [% id %]vsselfalign.runlist.x.yml
+perl [% aligndb %]/slice/compare_runlist.pl -op union -f1 [% id %]vsselfalign.runlist.0.yml -f2 [% id %]vsselfalign.runlist.1.yml -o [% id %]vsselfalign.runlist.u.yml
 
 for op in 0 1 i x u
 do
-    perl [% aligndb %]/slice/stat_runlist.pl --size [% working_dir %]/[% item.taxon %]/chr.sizes -f [% item.taxon %]vsselfalign.runlist.$op.yml;
+    perl [% aligndb %]/slice/stat_runlist.pl --size [% working_dir %]/[% id %]/chr.sizes -f [% id %]vsselfalign.runlist.$op.yml;
 done
 
-echo "group,name,length,size,coverage" > [% working_dir %]/[% item.taxon %]_result/[% item.taxon %].[% length %].csv
+echo "group,name,length,size,coverage" > [% working_dir %]/[% id %]_result/[% id %].[% length %].csv
 for op in 0 1 i x u
 do
-    OP=$op perl -nl -e '/^name/ and next; print qq{$ENV{OP},$_};' [% item.taxon %]vsselfalign.runlist.$op.yml.csv;
-done >> [% working_dir %]/[% item.taxon %]_result/[% item.taxon %].[% length %].csv
+    OP=$op perl -nl -e '/^name/ and next; print qq{$ENV{OP},$_};' [% id %]vsselfalign.runlist.$op.yml.csv;
+done >> [% working_dir %]/[% id %]_result/[% id %].[% length %].csv
 
 for op in 0 1 i x u
 do
-    rm [% item.taxon %]vsselfalign.runlist.$op.yml;
-    rm [% item.taxon %]vsselfalign.runlist.$op.yml.csv;
+    rm [% id %]vsselfalign.runlist.$op.yml;
+    rm [% id %]vsselfalign.runlist.$op.yml.csv;
 done
 
 #----------------------------#
 # genome blast
 #----------------------------#
-find [% working_dir %]/[% item.taxon %] -type f -name "*.fa" \
+find [% working_dir %]/[% id %] -type f -name "*.fa" \
     | sort | xargs cat \
     | perl -nl -e '/^>/ or uc; print' \
-    > [% item.taxon %].genome.fasta
+    > [% id %].genome.fasta
 
-echo "* build genome blast db [% item.taxon %].genome.fasta"
-[% blast %]/bin/formatdb -p F -o T -i [% item.taxon %].genome.fasta
+echo "* build genome blast db [% id %].genome.fasta"
+[% blast %]/bin/formatdb -p F -o T -i [% id %].genome.fasta
 
-perl [% aligndb %]/slice/gather_seq_axt.pl -l [% length %] -d [% working_dir %]/[% item.taxon %]vsselfalign
+perl [% aligndb %]/slice/gather_seq_axt.pl -l [% length %] -d [% working_dir %]/[% id %]vsselfalign
 
-echo "* blast [% item.taxon %]vsselfalign.axt.fasta"
-[% blast %]/bin/blastall -p blastn -F "m D" -m 0 -b 10 -v 10 -e 1e-3 -a 8 -i [% item.taxon %]vsselfalign.axt.fasta -d [% item.taxon %].genome.fasta -o [% item.taxon %]vsselfalign.axt.blast
+echo "* blast [% id %]vsselfalign.axt.fasta"
+[% blast %]/bin/blastall -p blastn -F "m D" -m 0 -b 10 -v 10 -e 1e-3 -a 8 -i [% id %]vsselfalign.axt.fasta -d [% id %].genome.fasta -o [% id %]vsselfalign.axt.blast
 
 #----------------------------#
 # paralog sequences
 #----------------------------#
 # Omit genome locations in .axt
 # There are errors, especially for queries
-perl [% aligndb %]/slice/blastn_genome_location.pl -f [% item.taxon %]vsselfalign.axt.blast -m 0 -i 90 -c 0.95
+perl [% aligndb %]/slice/blastn_genome_location.pl -f [% id %]vsselfalign.axt.blast -m 0 -i 90 -c 0.95
 
 #----------------------------#
 # paralog blast
 #----------------------------#
-echo "* build paralog blast db [% item.taxon %]vsselfalign.gl.fasta"
-[% blast %]/bin/formatdb -p F -o T -i [% item.taxon %]vsselfalign.gl.fasta
+echo "* build paralog blast db [% id %]vsselfalign.gl.fasta"
+[% blast %]/bin/formatdb -p F -o T -i [% id %]vsselfalign.gl.fasta
 
-echo "* blast [% item.taxon %]vsselfalign.gl.fasta"
-[% blast %]/bin/blastall -p blastn -F "m D" -m 0 -b 10 -v 10 -e 1e-3 -a 8 -i [% item.taxon %]vsselfalign.gl.fasta -d [% item.taxon %]vsselfalign.gl.fasta -o [% item.taxon %]vsselfalign.gl.blast
+echo "* blast [% id %]vsselfalign.gl.fasta"
+[% blast %]/bin/blastall -p blastn -F "m D" -m 0 -b 10 -v 10 -e 1e-3 -a 8 -i [% id %]vsselfalign.gl.fasta -d [% id %]vsselfalign.gl.fasta -o [% id %]vsselfalign.gl.blast
 
 #----------------------------#
 # merge
 #----------------------------#
-perl [% aligndb %]/slice/blastn_paralog.pl -f [% item.taxon %]vsselfalign.gl.blast -m 0 -i 90 -c 0.9
+perl [% aligndb %]/slice/blastn_paralog.pl -f [% id %]vsselfalign.gl.blast -m 0 -i 90 -c 0.9
 
-perl [% aligndb %]/slice/merge_node.pl    -v -f [% item.taxon %]vsselfalign.blast.tsv -o [% item.taxon %]vsselfalign.merge.yml -c 0.9
-perl [% aligndb %]/slice/paralog_graph.pl -v -f [% item.taxon %]vsselfalign.blast.tsv -m [% item.taxon %]vsselfalign.merge.yml --nonself -o [% item.taxon %]vsselfalign.merge.graph.yml
-perl [% aligndb %]/slice/cc.pl               -f [% item.taxon %]vsselfalign.merge.graph.yml
-perl [% aligndb %]/slice/proc_cc_chop.pl     -f [% item.taxon %]vsselfalign.cc.yml --size [% working_dir %]/[% item.taxon %]/chr.sizes
-perl [% aligndb %]/slice/proc_cc_stat.pl     -f [% item.taxon %]vsselfalign.cc.yml --size [% working_dir %]/[% item.taxon %]/chr.sizes
+perl [% aligndb %]/slice/merge_node.pl    -v -f [% id %]vsselfalign.blast.tsv -o [% id %]vsselfalign.merge.yml -c 0.9
+perl [% aligndb %]/slice/paralog_graph.pl -v -f [% id %]vsselfalign.blast.tsv -m [% id %]vsselfalign.merge.yml --nonself -o [% id %]vsselfalign.merge.graph.yml
+perl [% aligndb %]/slice/cc.pl               -f [% id %]vsselfalign.merge.graph.yml
+perl [% aligndb %]/slice/proc_cc_chop.pl     -f [% id %]vsselfalign.cc.yml --size [% working_dir %]/[% id %]/chr.sizes --msa [% msa %]
+perl [% aligndb %]/slice/proc_cc_stat.pl     -f [% id %]vsselfalign.cc.yml --size [% working_dir %]/[% id %]/chr.sizes
 
 #----------------------------#
 # result
 #----------------------------#
-cp [% item.taxon %]vsselfalign.cc.yml [% working_dir %]/[% item.taxon %]_result
-mv [% item.taxon %]vsselfalign.cc.csv [% working_dir %]/[% item.taxon %]_result
+cp [% id %]vsselfalign.cc.yml [% working_dir %]/[% id %]_result
+mv [% id %]vsselfalign.cc.csv [% working_dir %]/[% id %]_result
 
 #----------------------------#
 # clean
 #----------------------------#
-find [% working_dir %]/[% item.taxon %]_proc -type f -name "*genome.fasta*" | xargs rm
-find [% working_dir %]/[% item.taxon %]_proc -type f -name "*gl.fasta*" | xargs rm
-find [% working_dir %]/[% item.taxon %]_proc -type f -name "*.blast" | xargs rm
+find [% working_dir %]/[% id %]_proc -type f -name "*genome.fasta*" | xargs rm
+find [% working_dir %]/[% id %]_proc -type f -name "*gl.fasta*" | xargs rm
+find [% working_dir %]/[% id %]_proc -type f -name "*.blast" | xargs rm
 
 [% END -%]
 EOF
@@ -447,9 +526,9 @@ EOF
             aligndb     => $aligndb,
             egaz        => $egaz,
             blast       => $blast,
+            msa         => $msa,
             name_str    => $name_str,
-            target_id   => $target_id,
-            query_ids   => \@query_ids,
+            all_ids     => [ $target_id, @query_ids ],
             data        => \@data,
             length      => $length,
         },
@@ -654,27 +733,27 @@ EOF
 
 cd [% working_dir %]
 
-[% FOREACH item IN data -%]
+[% FOREACH id IN all_ids -%]
 #----------------------------------------------------------#
-# [% item.taxon %] [% item.name %]
+# [% id %]
 #----------------------------------------------------------#
 
 #----------------------------#
 # karyotype
 #----------------------------#
-cd [% working_dir %]/[% item.taxon %]_proc
+cd [% working_dir %]/[% id %]_proc
 
 # generate karyotype file
-perl -anl -e '$i++; print qq{chr - $F[0] $F[0] 0 $F[1] chr$i}' [% working_dir %]/[% item.taxon %]/chr.sizes > karyotype.[% item.taxon %].txt
+perl -anl -e '$i++; print qq{chr - $F[0] $F[0] 0 $F[1] chr$i}' [% working_dir %]/[% id %]/chr.sizes > karyotype.[% id %].txt
 
 #----------------------------#
 # gff to highlight
 #----------------------------#
 # coding and other features
-perl -anl -e '/^#/ and next; $F[0] =~ s/\.\d+//; $color = q{}; $F[2] eq q{CDS} and $color = q{chr9}; $F[2] eq q{ncRNA} and $color = q{dark2-8-qual-1}; $F[2] eq q{rRNA} and $color = q{dark2-8-qual-2}; $F[2] eq q{tRNA} and $color = q{dark2-8-qual-3}; $F[2] eq q{tmRNA} and $color = q{dark2-8-qual-4}; $color and ($F[4] - $F[3] > 49) and print qq{$F[0] $F[3] $F[4] fill_color=$color};' [% working_dir %]/[% item.taxon %]/*.gff > highlight.features.[% item.taxon %].txt
+perl -anl -e '/^#/ and next; $F[0] =~ s/\.\d+//; $color = q{}; $F[2] eq q{CDS} and $color = q{chr9}; $F[2] eq q{ncRNA} and $color = q{dark2-8-qual-1}; $F[2] eq q{rRNA} and $color = q{dark2-8-qual-2}; $F[2] eq q{tRNA} and $color = q{dark2-8-qual-3}; $F[2] eq q{tmRNA} and $color = q{dark2-8-qual-4}; $color and ($F[4] - $F[3] > 49) and print qq{$F[0] $F[3] $F[4] fill_color=$color};' [% working_dir %]/[% id %]/*.gff > highlight.features.[% id %].txt
 
 # repeats
-perl -anl -e '/^#/ and next; $F[0] =~ s/\.\d+//; $color = q{}; $F[2] eq q{region} and $F[8] =~ /mobile_element|Transposon/i and $color = q{chr15}; $F[2] =~ /repeat/ and $F[8] !~ /RNA/ and $color = q{chr15}; $color and ($F[4] - $F[3] > 49) and print qq{$F[0] $F[3] $F[4] fill_color=$color};' [% working_dir %]/[% item.taxon %]/*.gff > highlight.repeats.[% item.taxon %].txt
+perl -anl -e '/^#/ and next; $F[0] =~ s/\.\d+//; $color = q{}; $F[2] eq q{region} and $F[8] =~ /mobile_element|Transposon/i and $color = q{chr15}; $F[2] =~ /repeat/ and $F[8] !~ /RNA/ and $color = q{chr15}; $color and ($F[4] - $F[3] > 49) and print qq{$F[0] $F[3] $F[4] fill_color=$color};' [% working_dir %]/[% id %]/*.gff > highlight.repeats.[% id %].txt
 
 #----------------------------#
 # run circos
@@ -691,8 +770,7 @@ EOF
             working_dir => $working_dir,
             circos      => $circos,
             name_str    => $name_str,
-            target_id   => $target_id,
-            query_ids   => \@query_ids,
+            all_ids     => [ $target_id, @query_ids ],
             data        => \@data,
         },
         File::Spec->catfile( $working_dir, $sh_name )
@@ -707,74 +785,74 @@ EOF
 
 cd [% working_dir %]
 
-[% FOREACH item IN data -%]
+[% FOREACH id IN all_ids -%]
 #----------------------------------------------------------#
-# [% item.taxon %] [% item.name %]
+# [% id %]
 #----------------------------------------------------------#
 
 #----------------------------#
 # gff to feature
 #----------------------------#
-cd [% working_dir %]/[% item.taxon %]_proc
+cd [% working_dir %]/[% id %]_proc
 
 # coding
-perl -anl -e '/^#/ and next; $F[0] =~ s/\.\d+//; $F[2] eq q{CDS} and print qq{$F[0]\t$F[3]\t$F[4]};' [% working_dir %]/[% item.taxon %]/*.gff > feature.coding.[% item.taxon %].bed
+perl -anl -e '/^#/ and next; $F[0] =~ s/\.\d+//; $F[2] eq q{CDS} and print qq{$F[0]\t$F[3]\t$F[4]};' [% working_dir %]/[% id %]/*.gff > feature.coding.[% id %].bed
 
 # repeats
-perl -anl -e '/^#/ and next; $F[0] =~ s/\.\d+//; $F[2] eq q{region} and $F[8] =~ /mobile_element|Transposon/i and print qq{$F[0]\t$F[3]\t$F[4]};' [% working_dir %]/[% item.taxon %]/*.gff > feature.repeats.[% item.taxon %].bed
-perl -anl -e '/^#/ and next; $F[0] =~ s/\.\d+//; $F[2] =~ /repeat/ and $F[8] !~ /RNA/ and print qq{$F[0]\t$F[3]\t$F[4]};' [% working_dir %]/[% item.taxon %]/*.gff >> feature.repeats.[% item.taxon %].bed
+perl -anl -e '/^#/ and next; $F[0] =~ s/\.\d+//; $F[2] eq q{region} and $F[8] =~ /mobile_element|Transposon/i and print qq{$F[0]\t$F[3]\t$F[4]};' [% working_dir %]/[% id %]/*.gff > feature.repeats.[% id %].bed
+perl -anl -e '/^#/ and next; $F[0] =~ s/\.\d+//; $F[2] =~ /repeat/ and $F[8] !~ /RNA/ and print qq{$F[0]\t$F[3]\t$F[4]};' [% working_dir %]/[% id %]/*.gff >> feature.repeats.[% id %].bed
 
 # others
-perl -anl -e '/^#/ and next; $F[0] =~ s/\.\d+//; $F[2] eq q{ncRNA} and print qq{$F[0]\t$F[3]\t$F[4]};' [% working_dir %]/[% item.taxon %]/*.gff > feature.ncRNA.[% item.taxon %].bed
-perl -anl -e '/^#/ and next; $F[0] =~ s/\.\d+//; $F[2] eq q{rRNA} and print qq{$F[0]\t$F[3]\t$F[4]};' [% working_dir %]/[% item.taxon %]/*.gff > feature.rRNA.[% item.taxon %].bed
-perl -anl -e '/^#/ and next; $F[0] =~ s/\.\d+//; $F[2] eq q{tRNA} and print qq{$F[0]\t$F[3]\t$F[4]};' [% working_dir %]/[% item.taxon %]/*.gff > feature.tRNA.[% item.taxon %].bed
+perl -anl -e '/^#/ and next; $F[0] =~ s/\.\d+//; $F[2] eq q{ncRNA} and print qq{$F[0]\t$F[3]\t$F[4]};' [% working_dir %]/[% id %]/*.gff > feature.ncRNA.[% id %].bed
+perl -anl -e '/^#/ and next; $F[0] =~ s/\.\d+//; $F[2] eq q{rRNA} and print qq{$F[0]\t$F[3]\t$F[4]};' [% working_dir %]/[% id %]/*.gff > feature.rRNA.[% id %].bed
+perl -anl -e '/^#/ and next; $F[0] =~ s/\.\d+//; $F[2] eq q{tRNA} and print qq{$F[0]\t$F[3]\t$F[4]};' [% working_dir %]/[% id %]/*.gff > feature.tRNA.[% id %].bed
 
 #----------------------------#
 # merge bed and stat
 #----------------------------#
 for ftr in coding repeats ncRNA rRNA tRNA
 do
-    if [ -s feature.$ftr.[% item.taxon %].bed ]
+    if [ -s feature.$ftr.[% id %].bed ]
     then
         # there are some data in .bed file
-        perl [% aligndb %]/ofg/bed_op.pl --op merge_to_runlist --file feature.$ftr.[% item.taxon %].bed --name feature.$ftr.[% item.taxon %].yml;
+        perl [% aligndb %]/ofg/bed_op.pl --op merge_to_runlist --file feature.$ftr.[% id %].bed --name feature.$ftr.[% id %].yml;
     else
         # .bed file is empty
         # create empty runlists from chr.sizes
-        perl -ane'BEGIN { print qq{---\n} }; print qq{$F[0]: "-"\n}; END {print qq{\n}};' [% working_dir %]/[% item.taxon %]/chr.sizes > feature.$ftr.[% item.taxon %].yml;
+        perl -ane'BEGIN { print qq{---\n} }; print qq{$F[0]: "-"\n}; END {print qq{\n}};' [% working_dir %]/[% id %]/chr.sizes > feature.$ftr.[% id %].yml;
     fi;
-    perl [% aligndb %]/slice/stat_runlist.pl --size [% working_dir %]/[% item.taxon %]/chr.sizes -f feature.$ftr.[% item.taxon %].yml;
+    perl [% aligndb %]/slice/stat_runlist.pl --size [% working_dir %]/[% id %]/chr.sizes -f feature.$ftr.[% id %].yml;
 done
 
-echo "feature,name,length,size,coverage" > [% working_dir %]/[% item.taxon %]_result/[% item.taxon %].feature.csv
+echo "feature,name,length,size,coverage" > [% working_dir %]/[% id %]_result/[% id %].feature.csv
 for ftr in coding repeats ncRNA rRNA tRNA
 do
-    FTR=$ftr perl -nl -e '/^name/ and next; print qq{$ENV{FTR},$_};' feature.$ftr.[% item.taxon %].yml.csv;
-done >> [% working_dir %]/[% item.taxon %]_result/[% item.taxon %].feature.csv
+    FTR=$ftr perl -nl -e '/^name/ and next; print qq{$ENV{FTR},$_};' feature.$ftr.[% id %].yml.csv;
+done >> [% working_dir %]/[% id %]_result/[% id %].feature.csv
 
 for ftr in coding repeats ncRNA rRNA tRNA
 do
-    perl [% aligndb %]/slice/compare_runlist.pl -op intersect --mk -f1 [% item.taxon %]vsselfalign.cc.runlist.yml -f2 feature.$ftr.[% item.taxon %].yml -o [% item.taxon %]vsselfalign.cc.runlist.$ftr.yml
+    perl [% aligndb %]/slice/compare_runlist.pl -op intersect --mk -f1 [% id %]vsselfalign.cc.runlist.yml -f2 feature.$ftr.[% id %].yml -o [% id %]vsselfalign.cc.runlist.$ftr.yml
 done
 
 for ftr in coding repeats ncRNA rRNA tRNA
 do
-    perl [% aligndb %]/slice/stat_runlist.pl --mk --size [% working_dir %]/[% item.taxon %]/chr.sizes -f [% item.taxon %]vsselfalign.cc.runlist.$ftr.yml;
+    perl [% aligndb %]/slice/stat_runlist.pl --mk --size [% working_dir %]/[% id %]/chr.sizes -f [% id %]vsselfalign.cc.runlist.$ftr.yml;
 done
 
-echo "feature,copy,name,length,size,coverage" > [% working_dir %]/[% item.taxon %]_result/[% item.taxon %]vsselfalign.feature.copies.csv
+echo "feature,copy,name,length,size,coverage" > [% working_dir %]/[% id %]_result/[% id %]vsselfalign.feature.copies.csv
 for ftr in coding repeats ncRNA rRNA tRNA
 do
-    FTR=$ftr perl -nl -e '/^key/ and next; /\,all\,/ or next; print qq{$ENV{FTR},$_};' [% item.taxon %]vsselfalign.cc.runlist.$ftr.yml.csv;
-done >> [% working_dir %]/[% item.taxon %]_result/[% item.taxon %]vsselfalign.feature.copies.csv
+    FTR=$ftr perl -nl -e '/^key/ and next; /\,all\,/ or next; print qq{$ENV{FTR},$_};' [% id %]vsselfalign.cc.runlist.$ftr.yml.csv;
+done >> [% working_dir %]/[% id %]_result/[% id %]vsselfalign.feature.copies.csv
 
 for ftr in coding repeats ncRNA rRNA tRNA
 do
-    rm feature.$ftr.[% item.taxon %].bed;
-    rm feature.$ftr.[% item.taxon %].yml;
-    rm feature.$ftr.[% item.taxon %].yml.csv;
-    rm [% item.taxon %]vsselfalign.cc.runlist.$ftr.yml;
-    rm [% item.taxon %]vsselfalign.cc.runlist.$ftr.yml.csv;
+    rm feature.$ftr.[% id %].bed;
+    rm feature.$ftr.[% id %].yml;
+    rm feature.$ftr.[% id %].yml.csv;
+    rm [% id %]vsselfalign.cc.runlist.$ftr.yml;
+    rm [% id %]vsselfalign.cc.runlist.$ftr.yml.csv;
 done
 
 [% END -%]
@@ -787,8 +865,7 @@ EOF
             working_dir => $working_dir,
             aligndb     => $aligndb,
             name_str    => $name_str,
-            target_id   => $target_id,
-            query_ids   => \@query_ids,
+            all_ids     => [ $target_id, @query_ids ],
             data        => \@data,
         },
         File::Spec->catfile( $working_dir, $sh_name )
@@ -905,7 +982,6 @@ EOF
 
     # message
     $stopwatch->block_message("Execute *.sh files in order.");
-
 }
 
 #----------------------------#
@@ -917,7 +993,6 @@ exit;
 #----------------------------------------------------------#
 # Subroutines
 #----------------------------------------------------------#
-
 sub taxon_info {
     my $taxon_id = shift;
     my $dir      = shift;
@@ -927,7 +1002,7 @@ sub taxon_info {
     $dbh->{csv_tables}->{t0} = {
         eol       => "\n",
         sep_char  => ",",
-        file      => $filename,
+        file      => $taxon_file,
         col_names => [
             map { ( $_, $_ . "_id" ) } qw{strain species genus family order}
         ],
@@ -956,9 +1031,46 @@ sub taxon_info {
     };
 }
 
+sub taxon_info_name {
+    my $name = shift;
+    my $dir  = shift;
+
+    my $dbh = DBI->connect("DBI:CSV:");
+
+    $dbh->{csv_tables}->{t0} = {
+        eol       => "\n",
+        sep_char  => ",",
+        file      => $taxon_file,
+        col_names => [
+            map { ( $_, $_ . "_id" ) } qw{strain species genus family order}
+        ],
+    };
+
+    my $query
+        = qq{ SELECT strain_id, strain, genus, species FROM t0 WHERE strain = ? };
+    my $sth = $dbh->prepare($query);
+    $sth->execute($name);
+    my ( $taxonomy_id, $organism_name, $genus, $species )
+        = $sth->fetchrow_array;
+    $species =~ s/^$genus\s+//;
+    my $sub_name = $organism_name;
+    $sub_name =~ s/^$genus[\s_]+//;
+    $sub_name =~ s/^$species[\s_]*//;
+
+    return {
+        taxon   => $taxonomy_id,
+        name    => $name,
+        genus   => $genus,
+        species => $species,
+        subname => $sub_name,
+        dir     => File::Spec->catdir( $working_dir, $name ),
+    };
+}
+
 sub prep_fa {
     my $infile = shift;
     my $dir    = shift;
+    my $keep   = shift;
 
     my $basename = basename( $infile, '.fna', '.fa', '.fas', '.fasta' );
 
@@ -966,11 +1078,16 @@ sub prep_fa {
     open my $in_fh,  '<', $infile;
     open my $out_fh, '>', $outfile;
     while (<$in_fh>) {
-        if (/>/) {
-            print {$out_fh} ">$basename\n";
+        if ($keep) {
+            print {$out_fh} $_;
         }
         else {
-            print {$out_fh} $_;
+            if (/>/) {
+                print {$out_fh} ">$basename\n";
+            }
+            else {
+                print {$out_fh} $_;
+            }
         }
     }
     close $out_fh;
