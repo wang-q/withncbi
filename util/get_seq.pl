@@ -11,6 +11,8 @@ my $dir = shift || ".";
 
 mkdir $dir if !-d $dir;
 
+# Some .gb files only contain assembling infomation, so we need download both
+# types.
 my @types = qw(gb fasta);
 
 for my $type (@types) {
