@@ -13,6 +13,7 @@ mkdir $dir if !-d $dir;
 
 # Some .gb files only contain assembling infomation, so we need download both
 # types.
+# When network connection is aweful, downloads may be incomplete.
 my @types = qw(gb fasta);
 
 for my $type (@types) {

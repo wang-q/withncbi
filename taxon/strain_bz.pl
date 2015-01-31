@@ -608,7 +608,7 @@ find [% working_dir %]/[% multi_name %] -type f -name "*.maf" | parallel -j [% p
 # maf2fasta
 #----------------------------#
 perl [% egaz %]/maf2fasta.pl \
-    -p [% parallel %] --block \
+    -p [% parallel %] \
     -i [% working_dir %]/[% multi_name %] \
     -o [% working_dir %]/[% multi_name %]_fasta
 

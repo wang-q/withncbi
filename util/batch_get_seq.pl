@@ -92,5 +92,5 @@ close $csv_fh;
 
 __END__
 
-cd /Users/wangq/data/alignment/yeast_genome
-perl ~/Scripts/withncbi/util/batch_get_seq.pl -r -p -f yeast_name_test.csv 2>&1 | tee yeast_name_test.log
+cd ~/data/alignment/yeast_genome
+perl ~/Scripts/withncbi/util/batch_get_seq.pl -r -p -f yeast_name_seq.csv 2>&1 | tee yeast_name_seq.log
