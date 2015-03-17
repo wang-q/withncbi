@@ -57,6 +57,7 @@ my $length = 1000;
 
 my $aligndb  = replace_home( $Config->{run}{aligndb} );   # alignDB path
 my $egaz     = replace_home( $Config->{run}{egaz} );      # egaz path
+my $egas     = replace_home( $Config->{run}{egas} );      # egas path
 my $kent_bin = replace_home( $Config->{run}{kent_bin} );  # exes of Jim Kent
 my $blast    = replace_home( $Config->{run}{blast} );     # blast path
 my $circos   = replace_home( $Config->{run}{circos} );    # circos path
@@ -438,14 +439,14 @@ cd [% working_dir %]/[% id %]_proc
 #----------------------------#
 # quick and dirty coverage
 #----------------------------#
-perl [% aligndb %]/slice/gather_info_axt.pl -l [% length %] -d [% working_dir %]/[% id %]vsselfalign --nomatch
-perl [% aligndb %]/slice/compare_runlist.pl -op intersect -f1 [% id %]vsselfalign.runlist.0.yml -f2 [% id %]vsselfalign.runlist.1.yml -o [% id %]vsselfalign.runlist.i.yml
-perl [% aligndb %]/slice/compare_runlist.pl -op xor -f1 [% id %]vsselfalign.runlist.0.yml -f2 [% id %]vsselfalign.runlist.1.yml -o [% id %]vsselfalign.runlist.x.yml
-perl [% aligndb %]/slice/compare_runlist.pl -op union -f1 [% id %]vsselfalign.runlist.0.yml -f2 [% id %]vsselfalign.runlist.1.yml -o [% id %]vsselfalign.runlist.u.yml
+perl [% egas %]/gather_info_axt.pl -l [% length %] -d [% working_dir %]/[% id %]vsselfalign --nomatch
+perl [% egas %]/compare_runlist.pl -op intersect -f1 [% id %]vsselfalign.runlist.0.yml -f2 [% id %]vsselfalign.runlist.1.yml -o [% id %]vsselfalign.runlist.i.yml
+perl [% egas %]/compare_runlist.pl -op xor -f1 [% id %]vsselfalign.runlist.0.yml -f2 [% id %]vsselfalign.runlist.1.yml -o [% id %]vsselfalign.runlist.x.yml
+perl [% egas %]/compare_runlist.pl -op union -f1 [% id %]vsselfalign.runlist.0.yml -f2 [% id %]vsselfalign.runlist.1.yml -o [% id %]vsselfalign.runlist.u.yml
 
 for op in 0 1 i x u
 do
-    perl [% aligndb %]/slice/stat_runlist.pl --size [% working_dir %]/[% id %]/chr.sizes -f [% id %]vsselfalign.runlist.$op.yml;
+    perl [% egas %]/stat_runlist.pl --size [% working_dir %]/[% id %]/chr.sizes -f [% id %]vsselfalign.runlist.$op.yml;
 done
 
 echo "group,name,length,size,coverage" > [% working_dir %]/[% id %]_result/[% id %].[% length %].csv
@@ -471,7 +472,7 @@ find [% working_dir %]/[% id %] -type f -name "*.fa" \
 echo "* build genome blast db [% id %].genome.fasta"
 [% blast %]/bin/formatdb -p F -o T -i [% id %].genome.fasta
 
-perl [% aligndb %]/slice/gather_seq_axt.pl -l [% length %] -d [% working_dir %]/[% id %]vsselfalign
+perl [% egas %]/gather_seq_axt.pl -l [% length %] -d [% working_dir %]/[% id %]vsselfalign
 
 echo "* blast [% id %]vsselfalign.axt.fasta"
 [% blast %]/bin/blastall -p blastn -F "m D" -m 0 -b 10 -v 10 -e 1e-3 -a 8 -i [% id %]vsselfalign.axt.fasta -d [% id %].genome.fasta -o [% id %]vsselfalign.axt.blast
@@ -481,7 +482,7 @@ echo "* blast [% id %]vsselfalign.axt.fasta"
 #----------------------------#
 # XXX Omit genome locations in .axt
 # XXX There are errors, especially for queries
-perl [% aligndb %]/slice/blastn_genome_location.pl -f [% id %]vsselfalign.axt.blast -m 0 -i 90 -c 0.95
+perl [% egas %]/blastn_genome_location.pl -f [% id %]vsselfalign.axt.blast -m 0 -i 90 -c 0.95
 
 #----------------------------#
 # paralog blast
@@ -495,15 +496,15 @@ echo "* blast [% id %]vsselfalign.gl.fasta"
 #----------------------------#
 # merge
 #----------------------------#
-perl [% aligndb %]/slice/blastn_paralog.pl -f [% id %]vsselfalign.gl.blast -m 0 -i 90 -c 0.9
+perl [% egas %]/blastn_paralog.pl -f [% id %]vsselfalign.gl.blast -m 0 -i 90 -c 0.9
 
-perl [% aligndb %]/slice/merge_node.pl    -v -f [% id %]vsselfalign.blast.tsv -o [% id %]vsselfalign.merge.yml -c 0.9
-perl [% aligndb %]/slice/paralog_graph.pl -v -f [% id %]vsselfalign.blast.tsv -m [% id %]vsselfalign.merge.yml --nonself -o [% id %]vsselfalign.merge.graph.yml
-perl [% aligndb %]/slice/cc.pl               -f [% id %]vsselfalign.merge.graph.yml
-perl [% aligndb %]/slice/proc_cc_chop.pl     -f [% id %]vsselfalign.cc.yml --size [% working_dir %]/[% id %]/chr.sizes --msa [% msa %]
-perl [% aligndb %]/slice/proc_cc_stat.pl     -f [% id %]vsselfalign.cc.yml --size [% working_dir %]/[% id %]/chr.sizes
+perl [% egas %]/merge_node.pl    -v -f [% id %]vsselfalign.blast.tsv -o [% id %]vsselfalign.merge.yml -c 0.9
+perl [% egas %]/paralog_graph.pl -v -f [% id %]vsselfalign.blast.tsv -m [% id %]vsselfalign.merge.yml --nonself -o [% id %]vsselfalign.merge.graph.yml
+perl [% egas %]/cc.pl               -f [% id %]vsselfalign.merge.graph.yml
+perl [% egas %]/proc_cc_chop.pl     -f [% id %]vsselfalign.cc.yml --size [% working_dir %]/[% id %]/chr.sizes --msa [% msa %]
+perl [% egas %]/proc_cc_stat.pl     -f [% id %]vsselfalign.cc.yml --size [% working_dir %]/[% id %]/chr.sizes
 
-perl [% aligndb %]/slice/stat_runlist.pl --size [% working_dir %]/[% id %]/chr.sizes -f [% id %]vsselfalign.cc.chr.runlist.yml;
+perl [% egas %]/stat_runlist.pl --size [% working_dir %]/[% id %]/chr.sizes -f [% id %]vsselfalign.cc.chr.runlist.yml;
 
 #----------------------------#
 # result
@@ -511,6 +512,8 @@ perl [% aligndb %]/slice/stat_runlist.pl --size [% working_dir %]/[% id %]/chr.s
 cp [% id %]vsselfalign.cc.yml [% working_dir %]/[% id %]_result
 mv [% id %]vsselfalign.cc.csv [% working_dir %]/[% id %]_result
 cp [% id %]vsselfalign.cc.chr.runlist.yml.csv [% working_dir %]/[% id %]_result/[% id %]vsselfalign.chr.csv
+
+cp [% id %]vsselfalign.cc.pairwise.fas [% working_dir %]/[% id %]_result
 
 #----------------------------#
 # clean
@@ -528,6 +531,7 @@ EOF
             working_dir => $working_dir,
             aligndb     => $aligndb,
             egaz        => $egaz,
+            egas        => $egas,
             blast       => $blast,
             msa         => $msa,
             name_str    => $name_str,
@@ -824,7 +828,7 @@ do
         # create empty runlists from chr.sizes
         perl -ane'BEGIN { print qq{---\n} }; print qq{$F[0]: "-"\n}; END {print qq{\n}};' [% working_dir %]/[% id %]/chr.sizes > feature.$ftr.[% id %].yml;
     fi;
-    perl [% aligndb %]/slice/stat_runlist.pl --size [% working_dir %]/[% id %]/chr.sizes -f feature.$ftr.[% id %].yml;
+    perl [% egas %]/stat_runlist.pl --size [% working_dir %]/[% id %]/chr.sizes -f feature.$ftr.[% id %].yml;
 done
 
 echo "feature,name,length,size,coverage" > [% working_dir %]/[% id %]_result/[% id %].feature.csv
@@ -835,12 +839,12 @@ done >> [% working_dir %]/[% id %]_result/[% id %].feature.csv
 
 for ftr in coding repeats ncRNA rRNA tRNA
 do
-    perl [% aligndb %]/slice/compare_runlist.pl -op intersect --mk -f1 [% id %]vsselfalign.cc.runlist.yml -f2 feature.$ftr.[% id %].yml -o [% id %]vsselfalign.cc.runlist.$ftr.yml
+    perl [% egas %]/compare_runlist.pl -op intersect --mk -f1 [% id %]vsselfalign.cc.runlist.yml -f2 feature.$ftr.[% id %].yml -o [% id %]vsselfalign.cc.runlist.$ftr.yml
 done
 
 for ftr in coding repeats ncRNA rRNA tRNA
 do
-    perl [% aligndb %]/slice/stat_runlist.pl --mk --size [% working_dir %]/[% id %]/chr.sizes -f [% id %]vsselfalign.cc.runlist.$ftr.yml;
+    perl [% egas %]/stat_runlist.pl --mk --size [% working_dir %]/[% id %]/chr.sizes -f [% id %]vsselfalign.cc.runlist.$ftr.yml;
 done
 
 echo "feature,copy,name,length,size,coverage" > [% working_dir %]/[% id %]_result/[% id %]vsselfalign.feature.copies.csv
@@ -867,6 +871,7 @@ EOF
             parallel    => $parallel,
             working_dir => $working_dir,
             aligndb     => $aligndb,
+            egas        => $egas,
             name_str    => $name_str,
             all_ids     => [ $target_id, @query_ids ],
             data        => \@data,
@@ -883,18 +888,17 @@ EOF
 
 cd [% working_dir %]
 
-[% FOREACH item IN data -%]
+[% FOREACH id IN all_ids -%]
 #----------------------------------------------------------#
-# [% item.taxon %] [% item.name %]
+# [% id %]
 #----------------------------------------------------------#
 # gen_alignDB
-perl [% aligndb %]/extra/two_way_batch.pl \
-    -d [% item.taxon %]vs[% item.taxon %] \
-    -t [% item.taxon %],[% item.taxon %] \
-    -q [% item.taxon %],[% item.taxon %] \
-    -da [% working_dir %]/[% item.taxon %]vsselfalign \
-    --gff_files [% FOREACH acc IN acc_of.${item.taxon} %][% working_dir %]/[% item.taxon %]/[% acc %].gff,[% END %] \
-    --rm_gff_files [% FOREACH acc IN acc_of.${item.taxon} %][% working_dir %]/[% item.taxon %]/[% acc %].rm.gff,[% END %] \
+perl [% aligndb %]/extra/multi_way_batch.pl \
+    -d [% id %]vs[% id %] \
+    -da [% working_dir %]/[% id %]_result \
+    --gff_files [% FOREACH acc IN acc_of.${id} %][% working_dir %]/[% item.taxon %]/[% acc %].gff,[% END %] \
+    --rm_gff_files [% FOREACH acc IN acc_of.${id} %][% working_dir %]/[% item.taxon %]/[% acc %].rm.gff,[% END %] \
+    --id [% working_dir %]/id2name.csv \
     -taxon [% working_dir %]/taxon.csv \
     -chr [% working_dir %]/chr_length.csv \
     -lt 1000 --parallel [% parallel %] --run 1-5,21,40
@@ -905,8 +909,9 @@ perl [% aligndb %]/extra/two_way_batch.pl \
 # [% name_str %]
 #----------------------------------------------------------#
 # init db
-perl [% aligndb %]/extra/two_way_batch.pl \
+perl [% aligndb %]/extra/multi_way_batch.pl \
     -d [% name_str %]_paralog \
+    --id [% working_dir %]/id2name.csv \
     -taxon [% working_dir %]/taxon.csv \
     -chr [% working_dir %]/chr_length.csv \
     -r 1
@@ -915,14 +920,13 @@ perl [% aligndb %]/extra/two_way_batch.pl \
 # gen_alignDB.pl
 #----------------------------#
 
-[% FOREACH item IN data -%]
-# [% item.taxon %]
+[% FOREACH id IN all_ids -%]
+# [% id %]
 # gen_alignDB to existing database
-perl [% aligndb %]/extra/two_way_batch.pl \
+perl [% aligndb %]/extra/multi_way_batch.pl \
     -d [% name_str %]_paralog \
-    -t [% item.taxon %],[% item.name %] \
-    -q [% item.taxon %],[% item.name %] \
-    -da [% working_dir %]/[% item.taxon %]vsselfalign \
+    --id [% working_dir %]/id2name.csv \
+    -da [% working_dir %]/[% id %]_result \
     -lt 1000 --parallel [% parallel %] --run 2
 
 [% END -%]
@@ -932,9 +936,9 @@ perl [% aligndb %]/extra/two_way_batch.pl \
 #----------------------------#
 perl [% aligndb %]/extra/two_way_batch.pl \
     -d [% name_str %]_paralog \
-[% FOREACH item IN data -%]
-    --gff_files [% FOREACH acc IN acc_of.${item.taxon} %][% working_dir %]/[% item.taxon %]/[% acc %].gff,[% END %] \
-    --rm_gff_files [% FOREACH acc IN acc_of.${item.taxon} %][% working_dir %]/[% item.taxon %]/[% acc %].rm.gff,[% END %] \
+[% FOREACH id IN all_ids -%]
+    --gff_files [% FOREACH acc IN acc_of.${id} %][% working_dir %]/[% item.taxon %]/[% acc %].gff,[% END %] \
+    --rm_gff_files [% FOREACH acc IN acc_of.${id} %][% working_dir %]/[% item.taxon %]/[% acc %].rm.gff,[% END %] \
 [% END -%]
     -lt 1000 --parallel [% parallel %] --batch 5 \
     --run 5,10,21,30-32,40-42,44
@@ -947,6 +951,7 @@ EOF
             working_dir => $working_dir,
             aligndb     => $aligndb,
             name_str    => $name_str,
+            all_ids     => [ $target_id, @query_ids ],
             data        => \@data,
             acc_of      => $acc_of,
         },

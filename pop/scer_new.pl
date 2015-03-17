@@ -824,6 +824,30 @@ perl [% pl_dir %]/withncbi/taxon/strain_bz.pl \
     -q=ZTW1        -q=EC1118        -q=YJM993                                   \
     -o Spas
 
+# Scer_9way_Spar
+# S288c Spar EC1118 JAY291 Kyokai_no_7 RM11 Sigma1278b T7 YJM789 }
+cd [% data_dir %]
+perl [% pl_dir %]/withncbi/taxon/strain_bz.pl \
+    --file [% data_dir %]/[% group_name %].csv \
+    -w     [% base_dir %] \
+    --name [% group_name %] \
+    --multi_name Scer_9way_Spar \
+    --use_name \
+    --parallel [% parallel %] \
+    --norm \
+    --phylo_tree [% data_dir %]/phylo/Scer_69way.nwk \
+    -t S288c \
+    -q EC1118 \
+    -q JAY291 \
+    -q Kyokai_no_7 \
+    -q RM11_1a \
+    -q SK1 \
+    -q Sigma1278b \
+    -q Spar \
+    -q T7 \
+    -q YJM789 \
+    -o Spar
+
 EOF
 
 $tt->process(
