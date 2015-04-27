@@ -16,8 +16,8 @@ use FindBin;
 #----------------------------------------------------------#
 my $in_file;
 
-my $rename;    # rename source to seq name
-my $pure_gff; # remove fasta sequences from generated gff files
+my $rename;      
+my $pure_gff;
 
 my $man  = 0;
 my $help = 0;
@@ -27,7 +27,7 @@ GetOptions(
     'man'      => \$man,
     'f|file=s' => \$in_file,
     'r|rename' => \$rename,
-    'p|pure' => \$pure_gff,
+    'p|pure'   => \$pure_gff,
 ) or pod2usage(2);
 
 pod2usage(1) if $help;
@@ -92,5 +92,41 @@ close $csv_fh;
 
 __END__
 
-cd ~/data/alignment/yeast_genome
-perl ~/Scripts/withncbi/util/batch_get_seq.pl -r -p -f yeast_name_seq.csv 2>&1 | tee yeast_name_seq.log
+=head1 NAME
+
+batch_get_seq.pl - retrieve all sequences listed in a file
+
+=head1 SYNOPSIS
+
+    perl wgs_prep.pl <-f seq.csv>
+
+    wgs_prep.pl [options]
+      Options:
+        --help              brief help message
+        --man               full documentation
+        -f                  
+        -r                  rename file to seq name
+        -p                  remove fasta sequences from generated gff files
+
+=head1 CSV file format
+
+Example:
+
+    strain_name,accession,strain_taxon_id,seq_name # This line is needed
+    S288c,NC_001133,559292,I
+    S288c,NC_001134,559292,II
+    S288c,NC_001135,559292,III
+    
+Columns:
+
+    strain_name     =>  files will be stored in a directory named after this
+    accession       =>  NCBI sequence accession
+    strain_taxon_id =>  optional, not needed
+    seq_name        =>  optional, with -r, rename filename and sequence header
+
+=head1 EXAMPLE
+
+    cd ~/data/alignment/yeast_genome
+    perl ~/Scripts/withncbi/util/batch_get_seq.pl -r -p -f yeast_name_seq.csv 2>&1 | tee yeast_name_seq.log
+
+=cut

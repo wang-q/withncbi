@@ -40,3 +40,14 @@ for my $type (@types) {
 
 __END__
 
+=head1 NAME
+
+    get_seq.pl - retrieve nucleotide sequences from NCBI via Bio::DB::EUtilities
+
+=head1 SYNOPSIS
+
+    perl get_seq.pl <Accession> [Output directory]
+    
+    perl get_seq.pl NC_001284 .
+
+=cut
