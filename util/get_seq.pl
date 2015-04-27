@@ -42,7 +42,7 @@ __END__
 
 =head1 NAME
 
-    get_seq.pl - retrieve nucleotide sequences from NCBI via Bio::DB::EUtilities
+get_seq.pl - retrieve nucleotide sequences from NCBI via Bio::DB::EUtilities
 
 =head1 SYNOPSIS
 

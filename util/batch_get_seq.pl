@@ -98,9 +98,9 @@ batch_get_seq.pl - retrieve all sequences listed in a file
 
 =head1 SYNOPSIS
 
-    perl wgs_prep.pl <-f seq.csv>
+    perl batch_get_seq.pl <-f seq.csv>
 
-    wgs_prep.pl [options]
+    batch_get_seq.pl [options]
       Options:
         --help              brief help message
         --man               full documentation
