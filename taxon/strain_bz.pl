@@ -60,7 +60,8 @@ my $phylo_tree;
 # This option is for more than one align combination.
 my $multi_name;
 
-my $clustalw;
+# multi-seq aligner
+my $msa = 'mafft';
 
 my $aligndb  = replace_home( $Config->{run}{aligndb} );     # alignDB path
 my $egaz     = replace_home( $Config->{run}{egaz} );        # egaz path
@@ -102,7 +103,7 @@ GetOptions(
     'un|use_name'     => \$use_name,
     'p|phylo_tree=s'  => \$phylo_tree,
     'm|multi_name=s'  => \$multi_name,
-    'clustalw'        => \$clustalw,
+    'msa=s'           => \$msa,
     'norm'            => \$norm,
     'nostat'          => \$nostat,
     'e|ensembl=s'     => \$ensembl,
@@ -551,12 +552,8 @@ if [ -d [% working_dir %]/[% multi_name %]_fasta ]; then
     rm -fr [% working_dir %]/[% multi_name %]_fasta;
 fi;
 
-if [ -d [% working_dir %]/[% multi_name %]_mft ]; then
+if [ -d [% working_dir %]/[% multi_name %]_refined ]; then
     rm -fr [% working_dir %]/[% multi_name %]_mft;
-fi;
-
-if [ -d [% working_dir %]/[% multi_name %]_clw ]; then
-    rm -fr [% working_dir %]/[% multi_name %]_clw;
 fi;
 
 if [ -d [% working_dir %]/phylo ]; then
@@ -613,32 +610,17 @@ perl [% egaz %]/maf2fasta.pl \
     -o [% working_dir %]/[% multi_name %]_fasta
 
 #----------------------------#
-# mafft
+# refine fasta
 #----------------------------#
 perl [% egaz %]/refine_fasta.pl \
-    --msa mafft --block -p [% parallel %] \
+    --msa [% msa %] --block -p [% parallel %] \
 [% IF outgroup_id -%]
     --outgroup \
 [% END -%]
     -i [% working_dir %]/[% multi_name %]_fasta \
-    -o [% working_dir %]/[% multi_name %]_mft
+    -o [% working_dir %]/[% multi_name %]_refined
 
-find [% working_dir %]/[% multi_name %]_mft -type f -name "*.fas" | parallel -j [% parallel %] gzip
-
-[% IF clustalw -%]
-#----------------------------#
-# clustalw
-#----------------------------#
-perl [% egaz %]/refine_fasta.pl \
-    --msa clustalw --block -p [% parallel %] \
-[% IF outgroup_id -%]
-    --outgroup \
-[% END -%]
-    -i [% working_dir %]/[% multi_name %]_fasta \
-    -o [% working_dir %]/[% multi_name %]_clw
-
-find [% working_dir %]/[% multi_name %]_clw -type f -name "*.fas" | parallel -j [% parallel %] gzip
-[% END -%]
+#find [% working_dir %]/[% multi_name %]_refined -type f -name "*.fas" | parallel -j [% parallel %] gzip
 
 #----------------------------#
 # RAxML
@@ -647,11 +629,7 @@ find [% working_dir %]/[% multi_name %]_clw -type f -name "*.fas" | parallel -j 
 cd [% working_dir %]/phylo
 
 perl [% egaz %]/concat_fasta.pl \
-[% IF clustalw -%]
-    -i [% working_dir %]/[% multi_name %]_clw \
-[% ELSE -%]
-    -i [% working_dir %]/[% multi_name %]_mft  \
-[% END -%] 
+    -i [% working_dir %]/[% multi_name %]_refined \
     -o [% working_dir %]/phylo/[% multi_name %].phy \
     -p
 
@@ -681,14 +659,55 @@ EOF
             target_seqs => \@target_seqs,
             phylo_tree  => $phylo_tree,
             multi_name  => $multi_name,
-            clustalw    => $clustalw,
+            msa         => $msa,
+        },
+        File::Spec->catfile( $working_dir, $sh_name )
+    ) or die Template->error;
+
+    # var_list.sh
+    $sh_name = "6_var_list.sh";
+    print "Create $sh_name\n";
+    $text = <<'EOF';
+#!/bin/bash
+# perl [% stopwatch.cmd_line %]
+
+cd [% working_dir %]
+
+sleep 1;
+
+if [ -d [% working_dir %]/[% multi_name %]_vcf ]; then
+    rm -fr [% working_dir %]/[% multi_name %]_vcf;
+fi;
+
+mkdir -p [% working_dir %]/[% multi_name %]_vcf
+
+#----------------------------#
+# var_list
+#----------------------------#
+find [% working_dir %]/[% multi_name %]_refined -type f -name "*.fas" \
+    | parallel basename {} \
+    | parallel -j 1 \
+        perl [% egaz %]/fas2vcf.pl \
+            -s [% working_dir %]/[% target_id %]/chr.sizes \
+            -i [% working_dir %]/[% multi_name %]_refined/{} \
+            -o [% working_dir %]/[% multi_name %]_vcf/{}.vcf
+
+EOF
+    $tt->process(
+        \$text,
+        {   stopwatch   => $stopwatch,
+            parallel    => $parallel,
+            working_dir => $working_dir,
+            egaz        => $egaz,
+            target_id   => $target_id,
+            multi_name  => $multi_name,
         },
         File::Spec->catfile( $working_dir, $sh_name )
     ) or die Template->error;
 
     # multi_db_only.sh
     if ( !$nostat ) {
-        $sh_name = "6_multi_db_only.sh";
+        $sh_name = "7_multi_db_only.sh";
         print "Create $sh_name\n";
         $text = <<'EOF';
 #!/bin/bash
@@ -703,11 +722,7 @@ sleep 1;
 #----------------------------#
 perl [% aligndb %]/extra/multi_way_batch.pl \
     -d [% multi_name %] \
-[% IF clustalw -%]
-    -da [% working_dir %]/[% multi_name %]_clw \
-[% ELSE -%]
-    -da [% working_dir %]/[% multi_name %]_mft \
-[% END -%]
+    -da [% working_dir %]/[% multi_name %]_refined \
     --gff_file [% FOREACH seq IN target_seqs %][% working_dir %]/[% target_id %]/[% seq %].gff,[% END %] \
     --rm_gff_file [% FOREACH seq IN target_seqs %][% working_dir %]/[% target_id %]/[% seq %].rm.gff,[% END %] \
     --block \
@@ -732,7 +747,6 @@ EOF
                 query_ids   => \@query_ids,
                 target_seqs => \@target_seqs,
                 multi_name  => $multi_name,
-                clustalw    => $clustalw,
             },
             File::Spec->catfile( $working_dir, $sh_name )
         ) or die Template->error;
