@@ -701,6 +701,40 @@ EOF
         File::Spec->catfile( $working_dir, $sh_name )
     ) or die Template->error;
 
+    # pack_it_up.sh
+    $sh_name = "9_pack_it_up.sh";
+    print "Create $sh_name\n";
+    $text = <<'EOF';
+#!/bin/bash
+# perl [% stopwatch.cmd_line %]
+
+cd [% working_dir %]
+
+sleep 1;
+
+find . -type f \
+    | grep -v -E "\.(sh|2bit|bat)$" \
+    | grep -v -E "(chr_length|id2name|taxon|seq_pair|fake_taxon)\.csv$" \
+    | grep -v -F "fake_tree.nwk" \
+    > file_list.temp.txt
+
+tar -czvf [% multi_name %].tar.gz -T file_list.temp.txt
+
+rm file_list.temp.txt
+
+EOF
+    $tt->process(
+        \$text,
+        {   stopwatch   => $stopwatch,
+            parallel    => $parallel,
+            working_dir => $working_dir,
+            egaz        => $egaz,
+            target_id   => $target_id,
+            multi_name  => $multi_name,
+        },
+        File::Spec->catfile( $working_dir, $sh_name )
+    ) or die Template->error;
+
     # multi_db_only.sh
     if ( !$nostat ) {
         $sh_name = "7_multi_db_only.sh";
