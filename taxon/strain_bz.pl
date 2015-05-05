@@ -80,9 +80,6 @@ my $norm;
 # Don't do stat stuffs
 my $nostat;
 
-# Use Ensembl database as annotation source
-my $ensembl;
-
 # run in parallel mode
 my $parallel = $Config->{run}{parallel};
 
@@ -106,7 +103,6 @@ GetOptions(
     'msa=s'           => \$msa,
     'norm'            => \$norm,
     'nostat'          => \$nostat,
-    'e|ensembl=s'     => \$ensembl,
     'parallel=i'      => \$parallel,
 ) or pod2usage(2);
 
@@ -198,18 +194,16 @@ if ($seq_dir) {
             if ( $id eq $target_id ) {
                 push @target_seqs, $basename;
             }
-            if ( !$ensembl ) {
-                my $gff_file
-                    = File::Spec->catdir( $original_dir, "$basename.gff" );
-                if ( -e $gff_file ) {
-                    fcopy( $gff_file, $cur_dir );
-                }
 
-                my $rm_gff_file
-                    = File::Spec->catdir( $original_dir, "$basename.rm.gff" );
-                if ( -e $rm_gff_file ) {
-                    fcopy( $rm_gff_file, $cur_dir );
-                }
+            my $gff_file = File::Spec->catdir( $original_dir, "$basename.gff" );
+            if ( -e $gff_file ) {
+                fcopy( $gff_file, $cur_dir );
+            }
+
+            my $rm_gff_file
+                = File::Spec->catdir( $original_dir, "$basename.rm.gff" );
+            if ( -e $rm_gff_file ) {
+                fcopy( $rm_gff_file, $cur_dir );
             }
         }
     }
@@ -372,7 +366,7 @@ for f in `find [% item.dir%] -name "*.fasta"` ; do
         find [% item.dir%] -type f -name "`basename $f`*" | xargs rm;
     else
         rename 's/fasta$/fa/' $f;
-        echo "RepeatMasker on $f failed." >> RepeatMasker.log
+        echo "RepeatMasker on $f failed.\n" >> RepeatMasker.log
         find [% item.dir%] -type f -name "`basename $f`*" | xargs rm;
     fi;
 done;
@@ -500,8 +494,9 @@ perl [% egaz%]/concat_fasta.pl \
     -i [% working_dir %]/[% multi_name %]_raw \
     -o [% working_dir %]/rawphylo/[% multi_name %].phy \
     -p
-
-raxml -T 5 -f a -m GTRGAMMA -p $RANDOM -N 100 -x $RANDOM \
+    
+raxml -T [% IF parallel > 3 %] [% parallel - 1 %] [% ELSE %] 2 [% END %] \
+    -f a -m GTRGAMMA -p $RANDOM -N 100 -x $RANDOM \
 [% IF outgroup_id -%]
     -o [% outgroup_id %] \
 [% END -%]
@@ -635,7 +630,8 @@ perl [% egaz %]/concat_fasta.pl \
 
 rm [% working_dir %]/phylo/RAxML*
 
-raxml -T 4 -f a -m GTRGAMMA -p $RANDOM -N 100 -x $RANDOM \
+raxml -T [% IF parallel > 3 %] [% parallel - 1 %] [% ELSE %] 2 [% END %] \
+    -f a -m GTRGAMMA -p $RANDOM -N 100 -x $RANDOM \
 [% IF outgroup_id -%]
     -o [% outgroup_id %] \
 [% END -%]

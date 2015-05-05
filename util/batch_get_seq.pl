@@ -49,6 +49,9 @@ while ( my $row = $csv->getline($csv_fh) ) {
     my $id  = $row->[0];
     my $seq = $row->[1];
 
+    # replace non-alphanumeric chars
+    $id =~ s/[\W]+/_/g;
+
     print "id: [$id]\tseq: [$seq]\n";
     if ( -e "$id/$seq.gb" ) {
         print "Sequence [$id/$seq.gb] exists, next\n";
@@ -104,7 +107,7 @@ batch_get_seq.pl - retrieve all sequences listed in a file
       Options:
         --help              brief help message
         --man               full documentation
-        -f                  
+        -f                  input csv file
         -r                  rename file to seq name
         -p                  remove fasta sequences from generated gff files
 
