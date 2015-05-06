@@ -299,7 +299,7 @@ if [ -f real_chr.csv ]; then
 fi;
 
 [% FOREACH item IN data -%]
-if [ ! -f [% item.dir%]/chr.sizes ]; then 
+if [ ! -f [% item.dir%]/chr.sizes ]; then
     [% kent_bin %]/faSize -detailed [% item.dir%]/*.fa > [% item.dir%]/chr.sizes;
 fi;
 perl -aln -F"\t" -e 'print qq{[% item.taxon %],$F[0],$F[1],[% item.name %]}' [% item.dir %]/chr.sizes >> real_chr.csv;
@@ -487,14 +487,14 @@ fi
 
 cd [% working_dir %]/rawphylo
 
-rm [% working_dir %]/rawphylo/RAxML*
+find [% working_dir %]/rawphylo -type f -name "RAxML*" | xargs rm
 
 [% IF query_ids.size > 2 -%]
 perl [% egaz%]/concat_fasta.pl \
     -i [% working_dir %]/[% multi_name %]_raw \
     -o [% working_dir %]/rawphylo/[% multi_name %].phy \
     -p
-    
+
 raxml -T [% IF parallel > 3 %] [% parallel - 1 %] [% ELSE %] 2 [% END %] \
     -f a -m GTRGAMMA -p $RANDOM -N 100 -x $RANDOM \
 [% IF outgroup_id -%]
@@ -548,7 +548,7 @@ if [ -d [% working_dir %]/[% multi_name %]_fasta ]; then
 fi;
 
 if [ -d [% working_dir %]/[% multi_name %]_refined ]; then
-    rm -fr [% working_dir %]/[% multi_name %]_mft;
+    rm -fr [% working_dir %]/[% multi_name %]_refined;
 fi;
 
 if [ -d [% working_dir %]/phylo ]; then
@@ -628,7 +628,7 @@ perl [% egaz %]/concat_fasta.pl \
     -o [% working_dir %]/phylo/[% multi_name %].phy \
     -p
 
-rm [% working_dir %]/phylo/RAxML*
+find [% working_dir %]/phylo -type f -name "RAxML*" | xargs rm
 
 raxml -T [% IF parallel > 3 %] [% parallel - 1 %] [% ELSE %] 2 [% END %] \
     -f a -m GTRGAMMA -p $RANDOM -N 100 -x $RANDOM \
@@ -637,7 +637,10 @@ raxml -T [% IF parallel > 3 %] [% parallel - 1 %] [% ELSE %] 2 [% END %] \
 [% END -%]
     -n [% multi_name %] -s [% working_dir %]/phylo/[% multi_name %].phy
 
-cp [% working_dir %]/phylo/RAxML_best* [% working_dir %]/phylo/[% multi_name %].nwk
+cp [% working_dir %]/phylo/RAxML_bipartitions.* [% working_dir %]/phylo/[% multi_name %].nwk
+
+nw_display -s -b 'visibility:hidden' [% working_dir %]/phylo/[% multi_name %].nwk > [% working_dir %]/phylo/[% multi_name %].svg
+
 [% END -%]
 
 EOF
@@ -929,4 +932,4 @@ sub prep_fa {
 }
 
 __END__
-perl strain_bz.pl 
+perl strain_bz.pl
