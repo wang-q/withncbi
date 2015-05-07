@@ -300,7 +300,7 @@ fi;
 
 [% FOREACH item IN data -%]
 if [ ! -f [% item.dir%]/chr.sizes ]; then
-    [% kent_bin %]/faSize -detailed [% item.dir%]/*.fa > [% item.dir%]/chr.sizes;
+    faops size [% item.dir%]/*.fa > [% item.dir%]/chr.sizes;
 fi;
 perl -aln -F"\t" -e 'print qq{[% item.taxon %],$F[0],$F[1],[% item.name %]}' [% item.dir %]/chr.sizes >> real_chr.csv;
 [% END -%]
@@ -326,7 +326,6 @@ EOF
         {   data        => \@data,
             working_dir => $working_dir,
             aligndb     => $aligndb,
-            kent_bin    => $kent_bin,
             nostat      => $nostat,
         },
         File::Spec->catfile( $working_dir, $sh_name )
