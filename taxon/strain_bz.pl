@@ -60,8 +60,8 @@ my $phylo_tree;
 # This option is for more than one align combination.
 my $multi_name;
 
-# multi-seq aligner
-my $msa = 'mafft';
+my $msa    = 'mafft';    # Default alignment program
+my $length = 1000;
 
 my $aligndb  = replace_home( $Config->{run}{aligndb} );     # alignDB path
 my $egaz     = replace_home( $Config->{run}{egaz} );        # egaz path
@@ -737,7 +737,6 @@ EOF
         File::Spec->catfile( $working_dir, $sh_name )
     ) or die Template->error;
 
-    # multi_db_only.sh
     if ( !$nostat ) {
         $sh_name = "7_multi_db_only.sh";
         print "Create $sh_name\n";

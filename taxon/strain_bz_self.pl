@@ -165,6 +165,7 @@ if ($seq_dir) {
             if ( $id eq $target_id ) {
                 push @target_seqs, $basename;
             }
+
             my $gff_file = File::Spec->catdir( $original_dir, "$basename.gff" );
             if ( -e $gff_file ) {
                 fcopy( $gff_file, $cur_dir );
@@ -261,8 +262,8 @@ if [ -f real_chr.csv ]; then
 fi;
 
 [% FOREACH item IN data -%]
-if [ ! -f [% item.dir%]/chr.sizes ]; then 
-    [% kent_bin %]/faSize -detailed [% item.dir%]/*.fa > [% item.dir%]/chr.sizes;
+if [ ! -f [% item.dir%]/chr.sizes ]; then
+    faops size [% item.dir%]/*.fa > [% item.dir%]/chr.sizes;
 fi;
 perl -aln -F"\t" -e 'print qq{[% item.taxon %],$F[0],$F[1],[% item.name %]}' [% item.dir %]/chr.sizes >> real_chr.csv;
 [% END -%]
@@ -288,7 +289,6 @@ EOF
         {   data        => \@data,
             working_dir => $working_dir,
             aligndb     => $aligndb,
-            kent_bin    => $kent_bin,
             nostat      => $nostat,
         },
         File::Spec->catfile( $working_dir, $sh_name )
@@ -328,7 +328,7 @@ for f in `find [% item.dir%] -name "*.fasta"` ; do
         find [% item.dir%] -type f -name "`basename $f`*" | xargs rm;
     else
         rename 's/fasta$/fa/' $f;
-        echo "RepeatMasker on $f failed." >> RepeatMasker.log
+        echo "RepeatMasker on $f failed.\n" >> RepeatMasker.log
         find [% item.dir%] -type f -name "`basename $f`*" | xargs rm;
     fi;
 done;
@@ -879,10 +879,44 @@ EOF
         File::Spec->catfile( $working_dir, $sh_name )
     ) or die Template->error;
 
-    # pair_stat.sh
-    $sh_name = "7_pair_stat.sh";
+    # pack_it_up.sh
+    $sh_name = "9_pack_it_up.sh";
     print "Create $sh_name\n";
     $text = <<'EOF';
+#!/bin/bash
+# perl [% stopwatch.cmd_line %]
+
+cd [% working_dir %]
+
+sleep 1;
+
+find . -type f \
+    | grep -v -E "\.(sh|2bit|bat)$" \
+    | grep -v -E "(chr_length|id2name|taxon|seq_pair|fake_taxon)\.csv$" \
+    | grep -v -F "fake_tree.nwk" \
+    > file_list.temp.txt
+
+tar -czvf [% name_str %].tar.gz -T file_list.temp.txt
+
+rm file_list.temp.txt
+
+EOF
+    $tt->process(
+        \$text,
+        {   stopwatch   => $stopwatch,
+            parallel    => $parallel,
+            working_dir => $working_dir,
+            egaz        => $egaz,
+            target_id   => $target_id,
+            name_str    => $name_str,
+        },
+        File::Spec->catfile( $working_dir, $sh_name )
+    ) or die Template->error;
+
+    if ( !$nostat ) {
+        $sh_name = "7_pair_stat.sh";
+        print "Create $sh_name\n";
+        $text = <<'EOF';
 #!/bin/bash
 # perl [% stopwatch.cmd_line %]
 
@@ -944,23 +978,23 @@ perl [% aligndb %]/extra/two_way_batch.pl \
     --run 5,10,21,30-32,40-42,44
 
 EOF
-    $tt->process(
-        \$text,
-        {   stopwatch   => $stopwatch,
-            parallel    => $parallel,
-            working_dir => $working_dir,
-            aligndb     => $aligndb,
-            name_str    => $name_str,
-            all_ids     => [ $target_id, @query_ids ],
-            data        => \@data,
-            acc_of      => $acc_of,
-        },
-        File::Spec->catfile( $working_dir, $sh_name )
-    ) or die Template->error;
+        $tt->process(
+            \$text,
+            {   stopwatch   => $stopwatch,
+                parallel    => $parallel,
+                working_dir => $working_dir,
+                aligndb     => $aligndb,
+                name_str    => $name_str,
+                all_ids     => [ $target_id, @query_ids ],
+                data        => \@data,
+                acc_of      => $acc_of,
+            },
+            File::Spec->catfile( $working_dir, $sh_name )
+        ) or die Template->error;
 
-    # chart.bat
-    print "Create chart.bat\n";
-    $text = <<'EOF';
+        # chart.bat
+        print "Create chart.bat\n";
+        $text = <<'EOF';
 REM strain_bz_self.pl
 REM perl [% stopwatch.cmd_line %]
 
@@ -977,16 +1011,17 @@ REM gc chart
 if exist [% name_str %]_paralog.gc.xlsx     perl [% bat_dir %]/alignDB/stat/gc_chart_factory.pl --add_trend 1 -i [% name_str %]_paralog.gc.xlsx
 
 EOF
-    $tt->process(
-        \$text,
-        {   stopwatch   => $stopwatch,
-            parallel    => $parallel,
-            working_dir => $working_dir,
-            bat_dir     => $bat_dir,
-            name_str    => $name_str,
-        },
-        File::Spec->catfile( $working_dir, "chart.bat" )
-    ) or die Template->error;
+        $tt->process(
+            \$text,
+            {   stopwatch   => $stopwatch,
+                parallel    => $parallel,
+                working_dir => $working_dir,
+                bat_dir     => $bat_dir,
+                name_str    => $name_str,
+            },
+            File::Spec->catfile( $working_dir, "chart.bat" )
+        ) or die Template->error;
+    }
 
     # message
     $stopwatch->block_message("Execute *.sh files in order.");
