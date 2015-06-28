@@ -75,6 +75,9 @@ my $norm;
 # Don't do stat stuffs
 my $nostat;
 
+# Useless here, just keep compatibility with strain_bz.pl
+my $norawphylo;
+
 # run in parallel mode
 my $parallel = $Config->{run}{parallel};
 
@@ -96,6 +99,7 @@ GetOptions(
     'msa=s'           => \$msa,
     'norm'            => \$norm,
     'nostat'          => \$nostat,
+    'norawphylo'      => \$norawphylo,
     'parallel=i'      => \$parallel,
 ) or pod2usage(2);
 

@@ -80,6 +80,9 @@ my $norm;
 # Don't do stat stuffs
 my $nostat;
 
+# Skip rawphylo
+my $norawphylo;
+
 # run in parallel mode
 my $parallel = $Config->{run}{parallel};
 
@@ -103,6 +106,7 @@ GetOptions(
     'msa=s'           => \$msa,
     'norm'            => \$norm,
     'nostat'          => \$nostat,
+    'norawphylo'      => \$norawphylo,
     'parallel=i'      => \$parallel,
 ) or pod2usage(2);
 
@@ -452,7 +456,7 @@ EOF
     ) or die Template->error;
 
     # rawphylo.sh
-    if ( !defined $phylo_tree ) {
+    if ( !$norawphylo and !defined $phylo_tree ) {
         $sh_name = "4_rawphylo.sh";
         print "Create $sh_name\n";
         $text = <<'EOF';
