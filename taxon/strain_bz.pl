@@ -416,27 +416,6 @@ perl [% egaz %]/z_batch.pl \
 
 [% END -%]
 
-#----------------------------#
-# seq_pair_batch
-#----------------------------#
-perl [% aligndb %]/extra/seq_pair_batch.pl \
-    --bin [% kent_bin %] \
-[% IF use_name -%]
-    --id [% working_dir %]/id2name.csv \
-[% ELSE -%]
-    --dir_as_taxon \
-[% END -%]
-    --parallel [% parallel %] \
-    -f [% working_dir %]/seq_pair.csv \
-    -taxon [% working_dir %]/taxon.csv \
-    -chr [% working_dir %]/chr_length.csv \
-    -lt 1000 \
-[% IF nostat -%]
-    -r 1,2
-[% ELSE -%]
-    -r 1,2,40
-[% END -%]
-
 EOF
     $tt->process(
         \$text,
@@ -467,7 +446,30 @@ cd [% working_dir %]
 
 sleep 1;
 
+#----------------------------#
+# seq_pair_batch
+#----------------------------#
+perl [% aligndb %]/extra/seq_pair_batch.pl \
+    --bin [% kent_bin %] \
+[% IF use_name -%]
+    --id [% working_dir %]/id2name.csv \
+[% ELSE -%]
+    --dir_as_taxon \
+[% END -%]
+    --parallel [% parallel %] \
+    -f [% working_dir %]/seq_pair.csv \
+    -taxon [% working_dir %]/taxon.csv \
+    -chr [% working_dir %]/chr_length.csv \
+    -lt 1000 \
+[% IF nostat -%]
+    -r 1,2
+[% ELSE -%]
+    -r 1,2,40
+[% END -%]
+
+#----------------------------#
 # join_dbs.pl
+#----------------------------#
 perl [% aligndb %]/extra/join_dbs.pl \
     --no_insert --block --trimmed_fasta --length 1000 \
     --goal_db [% multi_name %]_raw --target 0target \
@@ -528,11 +530,14 @@ EOF
                 outgroup_id => $outgroup_id,
                 query_ids   => \@query_ids,
                 multi_name  => $multi_name,
+                kent_bin    => $kent_bin,
+            use_name    => $use_name,
+            nostat      => $nostat,
             },
             File::Spec->catfile( $working_dir, $sh_name )
         ) or die Template->error;
     }
-
+            
     # multi_cmd.sh
     $sh_name = "5_multi_cmd.sh";
     print "Create $sh_name\n";
