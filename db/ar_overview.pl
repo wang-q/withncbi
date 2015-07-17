@@ -33,7 +33,7 @@ my $password = $Config->{database}{password};
 my $db_name  = $Config->{database}{db};
 
 # running options
-my $outfile = "ar_overview_tx.xlsx";
+my $outfile = "ar_overview.xlsx";
 
 my $man  = 0;
 my $help = 0;
@@ -481,7 +481,7 @@ __END__
 
 =head1 NAME
 
-    ar_overview_tx.pl - Overviews for NCBI ASSEMBLY_REPORTS
+ar_overview_tx.pl - Overviews for NCBI ASSEMBLY_REPORTS
 
 =head1 SYNOPSIS
 
