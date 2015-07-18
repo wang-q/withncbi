@@ -13,16 +13,16 @@ use YAML qw(Dump Load DumpFile LoadFile);
 
 use FindBin;
 use lib "$FindBin::Bin/../lib";
-use MyUtil qw(replace_home find_ancestor);
+use MyUtil qw(replace_home);
 
 my $conf_file = "$FindBin::Bin/trichoderma_data.yml";
-my $yml = LoadFile($conf_file);
+my $yml       = LoadFile($conf_file);
 
 my $group_name = $yml->{group_name};
 my $base_dir   = replace_home( $yml->{base_dir} );
 my $data_dir   = replace_home( $yml->{data_dir} );
 my $pl_dir     = replace_home( $yml->{pl_dir} );
-my $parallel = $yml->{parallel} || 8;
+my $parallel   = $yml->{parallel} || 8;
 
 # NCBI WGS
 my $fasta_dir = replace_home( $yml->{fasta_dir} );
@@ -200,13 +200,13 @@ $tt->process(
 
 __END__
 
-# create withncbi/doc/trichoderma.tsv manually
+# create withncbi/pop/trichoderma.tsv manually
 
 mkdir -p ~/data/alignment/trichoderma
 cd ~/data/alignment/trichoderma
 
 perl ~/Scripts/withncbi/util/wgs_prep.pl \
-    -f ~/Scripts/withncbi/doc/trichoderma.tsv \
+    -f ~/Scripts/withncbi/pop/trichoderma.tsv \
     -o WGS \
     -a 
 
