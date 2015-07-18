@@ -36,6 +36,8 @@ for my $item (@data) {
     printf "Matching [%s]\n", $item->{name};
     if ( exists $item->{skip} ) {
         printf " " x 4 . "Skip: %s\n", $item->{skip};
+        $item = undef;
+        next;
     }
 
     # match the most similar name
@@ -49,6 +51,7 @@ for my $item (@data) {
     mkdir $dir if !-e $dir;
     $item->{dir} = $dir;
 }
+@data = grep {defined} @data;
 
 my $text;
 
@@ -214,7 +217,7 @@ aria2c -x 6 -s 3 -c -i WGS/trichoderma.url.txt
 
 find WGS -name "*.gz" | xargs gzip -t 
 
-# edit ~/Scripts/withncbi/pop/trichoderma.pl, add contents from trichoderma.data.txt
+# Add some contents to WGS/trichoderma.data.yml, get pop/trichoderma_data.yml
 
 perl ~/Scripts/withncbi/pop/trichoderma.pl
 sh 01_file.sh

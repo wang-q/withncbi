@@ -541,7 +541,7 @@ mkdir -p ~/data/alignment/saccharomyces
 cd ~/data/alignment/saccharomyces
 
 perl ~/Scripts/withncbi/util/wgs_prep.pl \
-    -f ~/Scripts/withncbi/doc/saccharomyces.tsv \
+    -f ~/Scripts/withncbi/pop/saccharomyces.tsv \
     --fix \
     -o WGS \
     -a 
