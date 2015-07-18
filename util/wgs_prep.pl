@@ -72,12 +72,19 @@ $dir_output = "." unless $dir_output;
 $stopwatch->start_message("Prepare NCBI WGS");
 
 $stopwatch->block_message("Load ncbi taxdmp.");
-my $taxon_db = Bio::DB::Taxonomy->new(
-    -source    => 'flatfile',
-    -directory => $td_dir,
-    -nodesfile => "$td_dir/nodes.dmp",
-    -namesfile => "$td_dir/names.dmp",
-);
+my $taxon_db;
+
+if ( -e "$td_dir/nodes.dmp" ) {
+    $taxon_db = Bio::DB::Taxonomy->new(
+        -source    => 'flatfile',
+        -directory => $td_dir,
+        -nodesfile => "$td_dir/nodes.dmp",
+        -namesfile => "$td_dir/names.dmp",
+    );
+}
+else {
+    $taxon_db = Bio::DB::Taxonomy->new( -source => 'entrez', );
+}
 
 #----------------------------#
 # Read
