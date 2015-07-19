@@ -535,7 +535,7 @@ $tt->process(
 
 __END__
 
-# create withncbi/doc/saccharomyces.tsv manually
+# create withncbi/pop/saccharomyces.tsv manually
 
 mkdir -p ~/data/alignment/saccharomyces
 cd ~/data/alignment/saccharomyces

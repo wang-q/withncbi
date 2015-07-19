@@ -244,6 +244,8 @@ EOF
 
 exit;
 
+__END__
+
 =head1 NAME
 
 wgs_prep.pl - prepare WGS materials

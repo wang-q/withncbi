@@ -3,7 +3,6 @@
 #Scer	Saccharomyces cerevisiae S288c
 Sarb_H_6	ALIE01	Saccharomyces arboricola H-6
 Sbay_623_6C	AACG02	Saccharomyces bayanus 623-6C
-Scar_CBS_1513	AZCJ01	Saccharomyces carlsbergensis CBS 1513
 ScerSkud_VIN7	AGVY01	Saccharomyces cerevisiae x Saccharomyces kudriavzevii VIN7
 Skud_FM1056	AJHP01	Saccharomyces kudriavzevii FM1056
 Skud_FM1057	AJHQ01	Saccharomyces kudriavzevii FM1057
@@ -29,6 +28,7 @@ Smik_IFO_1815_1	AABZ01	Saccharomyces mikatae IFO 1815
 Smik_IFO_1815_2	AACH01	Saccharomyces mikatae IFO 1815
 Spar_NRRL_Y_17217	AABY01	Saccharomyces paradoxus NRRL Y-17217
 Spas_CBS_1483	JTFI01	Saccharomyces pastorianus CBS 1483
+Spas_CBS_1513	AZCJ01	Saccharomyces pastorianus CBS 1513
 Spas_CCY48_91	ALJS01	Saccharomyces pastorianus CCY48 - 91
 Spas_Weihenstephan_34_70_1	ABPO01	Saccharomyces pastorianus Weihenstephan 34/70
 Spas_Weihenstephan_34_70_2	AZAA01	Saccharomyces pastorianus Weihenstephan 34/70 (New sequenced version)
