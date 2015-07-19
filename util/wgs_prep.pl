@@ -71,10 +71,9 @@ $dir_output = "." unless $dir_output;
 #----------------------------------------------------------#
 $stopwatch->start_message("Prepare NCBI WGS");
 
-$stopwatch->block_message("Load ncbi taxdmp.");
 my $taxon_db;
-
 if ( -e "$td_dir/nodes.dmp" ) {
+    $stopwatch->block_message("Load ncbi taxdmp.");
     $taxon_db = Bio::DB::Taxonomy->new(
         -source    => 'flatfile',
         -directory => $td_dir,
@@ -247,11 +246,9 @@ exit;
 
 =head1 NAME
 
-    wgs_prep.pl - prepare for wgs
+wgs_prep.pl - prepare WGS materials
 
 =head1 SYNOPSIS
-
-    perl wgs_prep.pl -a -f trichoderma.tsv -o WGS
 
     wgs_prep.pl [options]
       Options:
@@ -259,7 +256,10 @@ exit;
         --man               full documentation
         -i, -f, --file      tab seperated file containing wgs prefix and name
         -o, -d, --dir       output dir
+        -a, --aria2         url file is for aria2
+        --fix               sometimes WGS records miss assigning strain id
 
+    perl wgs_prep.pl -a -f trichoderma.tsv -o WGS
     Three files will be generated.
     trichoderma.csv
     trichoderma.url.txt

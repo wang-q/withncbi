@@ -72,12 +72,19 @@ pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
 #----------------------------------------------------------#
 $stopwatch->start_message("Writing strains summary...");
 
-my $taxon_db = Bio::DB::Taxonomy->new(
-    -source    => 'flatfile',
-    -directory => $td_dir,
-    -nodesfile => "$td_dir/nodes.dmp",
-    -namesfile => "$td_dir/names.dmp",
-);
+my $taxon_db;
+if ( -e "$td_dir/nodes.dmp" ) {
+    $stopwatch->block_message("Load ncbi taxdmp.");
+    $taxon_db = Bio::DB::Taxonomy->new(
+        -source    => 'flatfile',
+        -directory => $td_dir,
+        -nodesfile => "$td_dir/nodes.dmp",
+        -namesfile => "$td_dir/names.dmp",
+    );
+}
+else {
+    $taxon_db = Bio::DB::Taxonomy->new( -source => 'entrez', );
+}
 
 my $csv = Text::CSV_XS->new( { binary => 1, eol => "\n" } );
 open my $csv_fh, ">", $filename;
