@@ -1,7 +1,7 @@
 ---
 data:
     - taxon: 452589
-      name: 'Tart_IMI_2206040'
+      name: 'Tatr_IMI_2206040'
       sciname: 'Trichoderma atroviride IMI 206040'
       prefix: 'ABDG02'
       coverage: '8.26x Sanger'

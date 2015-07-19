@@ -195,7 +195,7 @@ strain_info.pl - generate a csv file for taxonomy info
         -o, --file          output filename
         --id                @ids
         --name              %name_of
-        --species           %species_of
+        --species           %species_of, fake id need this
         --simple            means use subspecies strain name as name
         -a, --aria2         url file is for aria2
         --fix               sometimes WGS records miss assigning strain id

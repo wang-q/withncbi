@@ -96,5 +96,7 @@
     sh 3_pair_cmd.sh
     sh 4_rawphylo.sh
     sh 5_multi_cmd.sh
-    sh 6_multi_db_only.sh
+    sh 6_var_list.sh
+    sh 7_multi_db_only.sh
+    sh 9_pack_it_up.sh
     ```
