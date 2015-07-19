@@ -60,7 +60,7 @@ GetOptions(
     'id=i'      => \@ids,
     'name=s'    => \%name_of,
     'species=s' => \%species_of,
-    'file=s'    => \$filename,
+    'o|file=s'    => \$filename,
     'simple'    => \$simple,
 ) or pod2usage(2);
 
@@ -182,4 +182,31 @@ RANK: while (1) {
 
 __END__
 
-perl bac_strains.pl 
+=head1 NAME
+
+strain_info.pl - generate a csv file for taxonomy info
+
+=head1 SYNOPSIS
+
+    perl strain_info.pl [options]
+      Options:
+        --help              brief help message
+        --man               full documentation
+        -o, --file          output filename
+        --id                @ids
+        --name              %name_of
+        --species           %species_of
+        --simple            means use subspecies strain name as name
+        -a, --aria2         url file is for aria2
+        --fix               sometimes WGS records miss assigning strain id
+
+    perl strain_info.pl \
+        --file   yeast_ncbi.csv \
+        --simple \
+        --id     559292         \
+        --id     285006         \
+        --id     307796         \
+        --id     226125         \
+        --name   226125=Spar
+
+=cut
