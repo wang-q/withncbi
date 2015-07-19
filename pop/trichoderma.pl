@@ -6,7 +6,6 @@ use autodie;
 use Template;
 use File::Basename;
 use File::Find::Rule;
-use File::Remove qw(remove);
 use File::Spec;
 use String::Compare;
 use YAML qw(Dump Load DumpFile LoadFile);
@@ -22,7 +21,7 @@ my $group_name = $yml->{group_name};
 my $base_dir   = replace_home( $yml->{base_dir} );
 my $data_dir   = replace_home( $yml->{data_dir} );
 my $pl_dir     = replace_home( $yml->{pl_dir} );
-my $parallel   = $yml->{parallel} || 8;
+my $parallel   = $yml->{parallel} || 4;
 
 # NCBI WGS
 my $fasta_dir = replace_home( $yml->{fasta_dir} );
@@ -35,8 +34,7 @@ my @subdirs_fasta = File::Find::Rule->file->name('*.fsa_nt.gz')->in($fasta_dir);
 for my $item (@data) {
     printf "Matching [%s]\n", $item->{name};
     if ( exists $item->{skip} ) {
-        printf " " x 4 . "Skip: %s\n", $item->{skip};
-        $item = undef;
+        printf " " x 4 . "SKIP! %s\n", $item->{skip};
         next;
     }
 
@@ -51,7 +49,6 @@ for my $item (@data) {
     mkdir $dir if !-e $dir;
     $item->{dir} = $dir;
 }
-@data = grep {defined} @data;
 
 my $text;
 
@@ -66,12 +63,15 @@ cd [% data_dir %]
 # [% item.name %] [% item.coverage %] 
 echo [% item.name %]
 
+[% IF item.skip %]
+echo '    SKIP! [% item.skip %]'
+[% ELSE -%]
 cd [% item.dir %]
 gzip -d -c [% item.fasta %] > toplevel.fa
 perl -p -i -e '/>/ and s/\>gi\|(\d+).*/\>gi_$1/' toplevel.fa
 faops count toplevel.fa | perl -aln -e 'next if $F[0] eq 'total'; print $F[0] if $F[1] > 100000; print $F[0] if $F[1] > 5000  and $F[6]/$F[1] < 0.05' | uniq > listFile
 faops some toplevel.fa listFile toplevel.filtered.fa
-[% IF item.name == 'Tart_IMI_2206040' -%]
+[% IF item.per_seq -%]
 faops split-name toplevel.filtered.fa .
 [% ELSE -%]
 faops split-about toplevel.filtered.fa 10000000 .
@@ -79,7 +79,8 @@ faops split-about toplevel.filtered.fa 10000000 .
 rm toplevel.fa toplevel.filtered.fa listFile
 
 rename 's/fa$/fasta/' *.fa;
-    
+[% END -%]
+
 [% END -%]
 
 EOF
@@ -108,9 +109,12 @@ echo Doing RepeatMasker
 #----------------------------#
 echo [% item.name %]
 
+[% IF item.skip %]
+echo 'SKIP! [% item.skip %]"
+[% ELSE -%]
 cd [% item.dir %]
 RepeatMasker [% item.dir %]/*.fasta -species Fungi -xsmall --parallel [% parallel %]
-
+[% END -%]
 [% END -%]
 
 #----------------------------------------------------------#
@@ -125,6 +129,9 @@ echo Cleaning RepeatMasker
 #----------------------------#
 echo [% item.name %]
 
+[% IF item.skip %]
+echo 'SKIP! [% item.skip %]"
+[% ELSE -%]
 cd [% item.dir %]
 for i in *.fasta;
 do
@@ -134,6 +141,7 @@ do
         find [% item.dir %] -type f -name "`basename $i`*" | xargs rm 
     fi;
 done;
+[% END -%]
 
 [% END -%]
 
@@ -203,8 +211,9 @@ $tt->process(
 
 __END__
 
-# create withncbi/pop/trichoderma.tsv manually, be careful with tabs and spaces.
+# create pop/trichoderma.tsv manually, be careful with tabs and spaces.
 # http://www.ncbi.nlm.nih.gov/Traces/wgs/?page=1&term=trichoderma
+
 mkdir -p ~/data/alignment/trichoderma
 cd ~/data/alignment/trichoderma
 

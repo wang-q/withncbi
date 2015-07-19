@@ -5,6 +5,7 @@ data:
       sciname: 'Trichoderma atroviride IMI 206040'
       prefix: 'ABDG02'
       coverage: '8.26x Sanger'
+      per_seq: 1
     - taxon: 100000001
       name: 'Tatr_XS215'
       sciname: 'Trichoderma atroviride XS2015'
