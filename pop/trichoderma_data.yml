@@ -1,26 +1,44 @@
 ---
 data:
     - taxon: 452589
-      name: 'Tatr'
+      name: 'Tart_IMI_2206040'
       sciname: 'Trichoderma atroviride IMI 206040'
       prefix: 'ABDG02'
       coverage: '8.26x Sanger'
+    - taxon: 100000001
+      name: 'Tatr_XS215'
+      sciname: 'Trichoderma atroviride XS2015'
+      prefix: 'JZUQ01'
+      coverage: '72.0x Illumina MiSeq'
+      original_id: 63577
     - taxon: 1247866
-      name: 'Tham'
+      name: 'Tham_GD12'
       sciname: 'Trichoderma hamatum GD12'
       prefix: 'ANCB01'
       coverage: '40.0x Illumina HiSeq'
       skip: 'contigs are too short'
-    - taxon: 5544
-      name: 'Thar'
-      sciname: 'Trichoderma harzianum'
+    - taxon: 100000002
+      name: 'Thar_B05'
+      sciname: 'Trichoderma harzianum B05'
       prefix: 'JNNP01'
       coverage: '20.0x Illumina HiSeq'
+      original_id: 5544
+    - taxon: 100000003
+      name: 'Thar_T6776'
+      sciname: 'Trichoderma harzianum T6776'
+      prefix: 'JOKZ01'
+      coverage: '100.0x Illumina MiSeq'
+      original_id: 5544
     - taxon: 1234776
-      name: 'Tpse'
+      name: 'Tlon_SMF2'
       sciname: 'Trichoderma longibrachiatum SMF2'
       prefix: 'ANBJ01'
       coverage: '69x 454; Illumina HiSeq'
+    - taxon: 858221
+      name: 'Tpar'
+      sciname: 'Trichoderma parareesei'
+      prefix: 'LFMI01'
+      coverage: '28.0x Illumina'
     - taxon: 431241
       name: 'Tree_QM6a'
       sciname: 'Trichoderma reesei QM6a'
@@ -46,4 +64,4 @@ base_dir: '~/data/alignment'
 data_dir: '~/data/alignment/trichoderma'
 fasta_dir: '~/data/alignment/trichoderma/WGS'
 pl_dir: '~/Scripts'
-parallel: 8
+parallel: 4

@@ -71,7 +71,7 @@ gzip -d -c [% item.fasta %] > toplevel.fa
 perl -p -i -e '/>/ and s/\>gi\|(\d+).*/\>gi_$1/' toplevel.fa
 faops count toplevel.fa | perl -aln -e 'next if $F[0] eq 'total'; print $F[0] if $F[1] > 100000; print $F[0] if $F[1] > 5000  and $F[6]/$F[1] < 0.05' | uniq > listFile
 faops some toplevel.fa listFile toplevel.filtered.fa
-[% IF item.name == 'Tatr' or item.name == 'Tvir_Gv29_8' or item.name == 'Tree_QM6a' -%]
+[% IF item.name == 'Tart_IMI_2206040' -%]
 faops split-name toplevel.filtered.fa .
 [% ELSE -%]
 faops split-about toplevel.filtered.fa 10000000 .
@@ -203,8 +203,8 @@ $tt->process(
 
 __END__
 
-# create withncbi/pop/trichoderma.tsv manually
-
+# create withncbi/pop/trichoderma.tsv manually, be careful with tabs and spaces.
+# http://www.ncbi.nlm.nih.gov/Traces/wgs/?page=1&term=trichoderma
 mkdir -p ~/data/alignment/trichoderma
 cd ~/data/alignment/trichoderma
 
