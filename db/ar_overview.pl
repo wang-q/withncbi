@@ -251,7 +251,7 @@ my $euk_group = sub {
 
     {    # write header
         my @headers = qw{ group_name genus_member species_member strain_member
-            chromosome scaffold contig };
+            genome chromosome scaffold contig };
         ( $sheet_row, $sheet_col ) = ( 0, 0 );
         my %option = (
             sheet_row => $sheet_row,
@@ -271,7 +271,8 @@ my $euk_group = sub {
                 t0.strain_member,
                 t1.strain_member,
                 t2.strain_member,
-                t3.strain_member
+                t3.strain_member,
+                t4.strain_member
             FROM
                 (SELECT 
                     (CONCAT(`group`, ', ', subgroup)) group_name,
@@ -287,7 +288,7 @@ my $euk_group = sub {
                         COUNT(DISTINCT taxonomy_id) strain_member
                 FROM ar
                 WHERE superkingdom = 'Eukaryota'
-                        AND assembly_level LIKE '%Chromosome%'
+                        AND assembly_level LIKE '%Genome%'
                 GROUP BY group_name) t1 ON t0.group_name = t1.group_name
                     LEFT JOIN
                 (SELECT 
@@ -295,7 +296,7 @@ my $euk_group = sub {
                         COUNT(DISTINCT taxonomy_id) strain_member
                 FROM ar
                 WHERE superkingdom = 'Eukaryota'
-                        AND assembly_level = 'Scaffold'
+                        AND assembly_level LIKE '%Chromosome%'
                 GROUP BY group_name) t2 ON t0.group_name = t2.group_name
                     LEFT JOIN
                 (SELECT 
@@ -303,8 +304,16 @@ my $euk_group = sub {
                         COUNT(DISTINCT taxonomy_id) strain_member
                 FROM ar
                 WHERE superkingdom = 'Eukaryota'
-                        AND assembly_level = 'Contig'
+                        AND assembly_level = 'Scaffold'
                 GROUP BY group_name) t3 ON t0.group_name = t3.group_name
+                    LEFT JOIN
+                (SELECT 
+                    (CONCAT(`group`, ', ', subgroup)) group_name,
+                        COUNT(DISTINCT taxonomy_id) strain_member
+                FROM ar
+                WHERE superkingdom = 'Eukaryota'
+                        AND assembly_level = 'Contig'
+                GROUP BY group_name) t4 ON t0.group_name = t4.group_name
         };
         my %option = (
             sql_query => $sql_query,
@@ -317,16 +326,17 @@ my $euk_group = sub {
 };
 
 #----------------------------------------------------------#
-# worksheet -- Ascomycetes_genus
+# worksheets -- subgroup_XXX
 #----------------------------------------------------------#
-my $Ascomycetes_genus = sub {
-    my $sheet_name = 'Ascomycetes_genus';
+my $subgroup_query = sub {
+    my $subgroup   = shift;
+    my $sheet_name = "subgroup_$subgroup";
     my $sheet;
     my ( $sheet_row, $sheet_col );
 
     {    # write header
         my @headers = qw{ genus species_member strain_member
-            chromosome scaffold contig };
+            genome chromosome scaffold contig };
         ( $sheet_row, $sheet_col ) = ( 0, 0 );
         my %option = (
             sheet_row => $sheet_row,
@@ -338,46 +348,55 @@ my $Ascomycetes_genus = sub {
     }
 
     {    # write contents
-        my $sql_query = q{
+        my $sql_query = qq{
             SELECT 
                 t0.genus,
                 t0.species_member,
                 t0.strain_member,
                 t1.strain_member,
                 t2.strain_member,
-                t3.strain_member
+                t3.strain_member,
+                t4.strain_member
             FROM
                 (SELECT 
                     genus,
                     COUNT(DISTINCT species_id) species_member,
                     COUNT(DISTINCT taxonomy_id) strain_member
                 FROM ar
-                WHERE subgroup = 'Ascomycetes'
+                WHERE subgroup = '$subgroup'
                 GROUP BY genus) t0
                     LEFT JOIN
                 (SELECT 
                     genus,
                     COUNT(DISTINCT taxonomy_id) strain_member
                 FROM ar
-                WHERE subgroup = 'Ascomycetes'
-                        AND assembly_level LIKE '%Chromosome%'
+                WHERE subgroup = '$subgroup'
+                        AND assembly_level LIKE '%Genome%'
                 GROUP BY genus) t1 ON t0.genus = t1.genus
                     LEFT JOIN
                 (SELECT 
                     genus,
                     COUNT(DISTINCT taxonomy_id) strain_member
                 FROM ar
-                WHERE subgroup = 'Ascomycetes'
-                        AND assembly_level = 'Scaffold'
+                WHERE subgroup = '$subgroup'
+                        AND assembly_level LIKE '%Chromosome%'
                 GROUP BY genus) t2 ON t0.genus = t2.genus
                     LEFT JOIN
                 (SELECT 
                     genus,
                     COUNT(DISTINCT taxonomy_id) strain_member
                 FROM ar
-                WHERE subgroup = 'Ascomycetes'
-                        AND assembly_level = 'Contig'
+                WHERE subgroup = '$subgroup'
+                        AND assembly_level = 'Scaffold'
                 GROUP BY genus) t3 ON t0.genus = t3.genus
+                    LEFT JOIN
+                (SELECT 
+                    genus,
+                    COUNT(DISTINCT taxonomy_id) strain_member
+                FROM ar
+                WHERE subgroup = '$subgroup'
+                        AND assembly_level = 'Contig'
+                GROUP BY genus) t4 ON t0.genus = t4.genus
             ORDER BY t0.strain_member DESC
         };
         my %option = (
@@ -390,19 +409,18 @@ my $Ascomycetes_genus = sub {
     print "Sheet \"$sheet_name\" has been generated.\n";
 };
 
-
 #----------------------------------------------------------#
-# worksheet -- genus_Saccharomyces
+# worksheets -- genus_XXX
 #----------------------------------------------------------#
 my $genus_query = sub {
-    my $genus = shift;
+    my $genus      = shift;
     my $sheet_name = "genus_$genus";
     my $sheet;
     my ( $sheet_row, $sheet_col );
 
     {    # write header
         my @headers = qw{ species strain_member
-            chromosome scaffold contig };
+            genome chromosome scaffold contig };
         ( $sheet_row, $sheet_col ) = ( 0, 0 );
         my %option = (
             sheet_row => $sheet_row,
@@ -420,7 +438,8 @@ my $genus_query = sub {
                 t0.strain_member,
                 t1.strain_member,
                 t2.strain_member,
-                t3.strain_member
+                t3.strain_member,
+                t4.strain_member
             FROM
                 (SELECT 
                     species,
@@ -434,7 +453,7 @@ my $genus_query = sub {
                     COUNT(DISTINCT taxonomy_id) strain_member
                 FROM ar
                 WHERE genus = '$genus'
-                        AND assembly_level LIKE '%Chromosome%'
+                        AND assembly_level LIKE '%Genome%'
                 GROUP BY species) t1 ON t0.species = t1.species
                     LEFT JOIN
                 (SELECT 
@@ -442,7 +461,7 @@ my $genus_query = sub {
                     COUNT(DISTINCT taxonomy_id) strain_member
                 FROM ar
                 WHERE genus = '$genus'
-                        AND assembly_level = 'Scaffold'
+                        AND assembly_level LIKE '%Chromosome%'
                 GROUP BY species) t2 ON t0.species = t2.species
                     LEFT JOIN
                 (SELECT 
@@ -450,8 +469,16 @@ my $genus_query = sub {
                     COUNT(DISTINCT taxonomy_id) strain_member
                 FROM ar
                 WHERE genus = '$genus'
-                        AND assembly_level = 'Contig'
+                        AND assembly_level = 'Scaffold'
                 GROUP BY species) t3 ON t0.species = t3.species
+                    LEFT JOIN
+                (SELECT 
+                    species,
+                    COUNT(DISTINCT taxonomy_id) strain_member
+                FROM ar
+                WHERE genus = '$genus'
+                        AND assembly_level = 'Contig'
+                GROUP BY species) t4 ON t0.species = t4.species
             ORDER BY t0.strain_member DESC
         };
         my %option = (
@@ -464,13 +491,12 @@ my $genus_query = sub {
     print "Sheet \"$sheet_name\" has been generated.\n";
 };
 
-
 {
     &$strains;
     &$species;
     &$group;
     &$euk_group;
-    &$Ascomycetes_genus;
+    $subgroup_query->("Ascomycetes");
     $genus_query->("Saccharomyces");
     $genus_query->("Dictyostelium");
     $genus_query->("Aspergillus");
