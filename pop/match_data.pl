@@ -94,7 +94,11 @@ for my $item (@data) {
 # Move skipped entries to tail
 my @data_sort = grep { !exists $_->{skip} } @data;
 push @data_sort, grep { exists $_->{skip} } @data;
-$yml->{data} = \@data_sort;
+
+# Move per_seq entries to head
+my @data_sort2 = grep { exists $_->{per_seq} } @data_sort;
+push @data_sort2, grep { !exists $_->{per_seq} } @data_sort;
+$yml->{data} = \@data_sort2;
 
 $stopwatch->block_message("Other options");
 for my $key ( sort keys %other_opts ) {
@@ -137,7 +141,6 @@ match_data.pl - find matched files for each @data entry in YAML and store extra 
         --opt group_name=trichoderma \
         --opt base_dir='~/data/alignment' \
         --opt data_dir='~/data/alignment/trichoderma' \
-        --opt pl_dir='~/Scripts' \
-        --opt parallel=4
+        --opt rm_species=Fungi
 
 =cut
