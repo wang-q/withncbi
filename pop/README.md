@@ -51,35 +51,24 @@
     find WGS -name "*.gz" | xargs gzip -t 
     ```
 
-5. Add some fields to WGS/trichoderma.data.yml, get pop/trichoderma_data.yml.
+5. Use 'match_data.pl` find matched files for each @data entry in YAML and store extra options.
 
     * `per_seq` mean split fasta by names, target or good assembles should set it.
-    * `skip` mean skip this strains.
-
-    ```yaml
-    ---
-    data:
-        - taxon: 452589
-          name: 'Tart_IMI_2206040'
-          per_seq: 1
-        - taxon: 1247866
-          name: 'Tham_GD12'
-          skip: 'contigs are too short'
-    ```
-
-6. Use 'match_data.pl` find matched files for each @data entry in YAML and store extra options.
+    * `skip` mean skip this strain.
 
     ```bash
-    perl match_data.pl \
+    perl ~/Scripts/withncbi/pop/match_data.pl \
         -i ~/data/alignment/trichoderma/WGS/trichoderma.data.yml \
-        -o trichoderma_test.yml \
+        -o ~/Scripts/withncbi/pop/trichoderma_test.yml \
         -d ~/data/alignment/trichoderma/WGS \
         -m prefix \
         -r '*.fsa_nt.gz' \
         --opt group_name=trichoderma \
         --opt base_dir='~/data/alignment' \
         --opt data_dir='~/data/alignment/trichoderma' \
-        --opt rm_species=Fungi    
+        --opt rm_species=Fungi \
+        --skip Tham_GD12='contigs are too short' \
+        --per_seq Tart_IMI_2206040
     ```
 
 7. Add multiply alignment plans to pop/trichoderma_test.yml.

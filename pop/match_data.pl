@@ -40,6 +40,9 @@ my $match_field = 'name';
 my @name_rules = ( "*.fa", "*.fa.gz" );
 my $pattern;
 
+my %skip;
+my @per_seq;
+
 my %other_opts;
 
 my $man  = 0;
@@ -55,6 +58,8 @@ GetOptions(
     'r|rule=s'    => \@name_rules,
     'p|pattern=s' => \$pattern,
     'opt=s'       => \%other_opts,
+    'skip=s'      => \%skip,
+    'per_seq=s'   => \@per_seq,
 ) or pod2usage(2);
 
 pod2usage(1) if $help;
@@ -63,6 +68,8 @@ pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
 unless ($file_output) {
     $file_output = $file_input;
 }
+
+my %per_seq = map { $_ => 1 } @per_seq;
 
 #----------------------------------------------------------#
 # Start
@@ -89,6 +96,15 @@ for my $item (@data) {
         map { [ $_, compare( basename($_), $item->{$match_field} ) ] } @files;
     $item->{fasta} = $fasta;
     printf " " x 4 . "%s => %s\n", $item->{$match_field}, $item->{fasta};
+
+    if ( $skip{ $item->{name} } ) {
+        printf "[%s] Mark flag 'skip'\n", $item->{name};
+        $item->{skip} = $skip{ $item->{name} };
+    }
+    if ( $per_seq{ $item->{name} } ) {
+        printf "[%s] Mark flag 'per_seq'\n", $item->{name};
+        $item->{per_seq} = 1;
+    }
 }
 
 # Move skipped entries to tail
@@ -131,5 +147,7 @@ match_data.pl - find matched files for each @data entry in YAML and store extra 
         -r, --rule          @, File::Find::Rule, '*.fsa_nt.gz' for NCBI WGS
         -p, --pattern       For ensembl, 'dna.toplevel'
         --opt               %, Other options for running pop
+        --skip              %, skip this strain
+        --per_seq           @, split fasta by names, target or good assembles
 
 =cut
