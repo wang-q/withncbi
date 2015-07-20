@@ -24,8 +24,7 @@ use MyUtil qw(replace_home find_ancestor);
 #----------------------------------------------------------#
 # GetOpt section
 #----------------------------------------------------------#
-my $Config = Config::Tiny->new;
-$Config = Config::Tiny->read("$FindBin::Bin/../config.ini");
+my $Config = Config::Tiny->read("$FindBin::Bin/../config.ini");
 
 # record ARGV and Config
 my $stopwatch = AlignDB::Stopwatch->new(
@@ -233,7 +232,7 @@ __END__
 
 =head1 SYNOPSIS
 
-    perl gr_strains.pl
+    perl gr_strains.pl -o prok_strains.csv
 
     perl gr_strains.pl --euk -o euk_strains.csv
 

@@ -15,8 +15,7 @@ use FindBin;
 #----------------------------------------------------------#
 # GetOpt section
 #----------------------------------------------------------#
-my $Config = Config::Tiny->new;
-$Config = Config::Tiny->read("$FindBin::Bin/../config.ini");
+my $Config = Config::Tiny->read("$FindBin::Bin/../config.ini");
 
 # record ARGV and Config
 my $stopwatch = AlignDB::Stopwatch->new(
@@ -272,11 +271,11 @@ __END__
 
 =head1 NAME
 
-gr_overview_tx.pl - Overviews for NCBI GENOME_REPORTS
+gr_overview.pl - Overviews for NCBI GENOME_REPORTS
 
 =head1 SYNOPSIS
 
-    perl gr_overview_tx.pl --db gr
+    perl gr_overview.pl --db gr
 
 =cut
 
