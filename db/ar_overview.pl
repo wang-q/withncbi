@@ -394,8 +394,9 @@ my $Ascomycetes_genus = sub {
 #----------------------------------------------------------#
 # worksheet -- genus_Saccharomyces
 #----------------------------------------------------------#
-my $genus_Saccharomyces = sub {
-    my $sheet_name = 'genus_Saccharomyces';
+my $genus_query = sub {
+    my $genus = shift;
+    my $sheet_name = "genus_$genus";
     my $sheet;
     my ( $sheet_row, $sheet_col );
 
@@ -413,7 +414,7 @@ my $genus_Saccharomyces = sub {
     }
 
     {    # write contents
-        my $sql_query = q{
+        my $sql_query = qq{
             SELECT 
                 t0.species,
                 t0.strain_member,
@@ -425,14 +426,14 @@ my $genus_Saccharomyces = sub {
                     species,
                     COUNT(DISTINCT taxonomy_id) strain_member
                 FROM ar
-                WHERE genus = 'Saccharomyces'
+                WHERE genus = '$genus'
                 GROUP BY species) t0
                     LEFT JOIN
                 (SELECT 
                     species,
                     COUNT(DISTINCT taxonomy_id) strain_member
                 FROM ar
-                WHERE genus = 'Saccharomyces'
+                WHERE genus = '$genus'
                         AND assembly_level LIKE '%Chromosome%'
                 GROUP BY species) t1 ON t0.species = t1.species
                     LEFT JOIN
@@ -440,7 +441,7 @@ my $genus_Saccharomyces = sub {
                     species,
                     COUNT(DISTINCT taxonomy_id) strain_member
                 FROM ar
-                WHERE genus = 'Saccharomyces'
+                WHERE genus = '$genus'
                         AND assembly_level = 'Scaffold'
                 GROUP BY species) t2 ON t0.species = t2.species
                     LEFT JOIN
@@ -448,7 +449,7 @@ my $genus_Saccharomyces = sub {
                     species,
                     COUNT(DISTINCT taxonomy_id) strain_member
                 FROM ar
-                WHERE genus = 'Saccharomyces'
+                WHERE genus = '$genus'
                         AND assembly_level = 'Contig'
                 GROUP BY species) t3 ON t0.species = t3.species
             ORDER BY t0.strain_member DESC
@@ -470,7 +471,11 @@ my $genus_Saccharomyces = sub {
     &$group;
     &$euk_group;
     &$Ascomycetes_genus;
-    &$genus_Saccharomyces;
+    $genus_query->("Saccharomyces");
+    $genus_query->("Dictyostelium");
+    $genus_query->("Aspergillus");
+    $genus_query->("Candida");
+    $genus_query->("Oryza");
 }
 
 $stopwatch->end_message;
@@ -484,6 +489,7 @@ ar_overview_tx.pl - Overviews for NCBI ASSEMBLY_REPORTS
 
 =head1 SYNOPSIS
 
-    perl ar_overview_tx.pl --db ar_genbank
+    perl ar_overview.pl --db ar_refseq
+    perl ar_overview.pl --db ar_genbank -o ar_genebank_overview.xlsx
 
 =cut
