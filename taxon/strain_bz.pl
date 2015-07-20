@@ -607,10 +607,9 @@ find [% working_dir %]/[% multi_name %] -type f -name "*.maf" | parallel -j [% p
 #----------------------------#
 # maf2fasta
 #----------------------------#
-perl [% egaz %]/maf2fasta.pl \
-    -p [% parallel %] \
-    -i [% working_dir %]/[% multi_name %] \
-    -o [% working_dir %]/[% multi_name %]_fasta
+mkdir -p [% working_dir %]/[% multi_name %]_fasta
+find [% working_dir %]/[% multi_name %] -name "*.maf" -or -name "*.maf.gz" \
+    | parallel -j [% parallel %] fasops maf2fas {} -o [% working_dir %]/[% multi_name %]_fasta/{/}.gz
 
 #----------------------------#
 # refine fasta
