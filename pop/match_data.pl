@@ -45,6 +45,8 @@ my @per_seq;
 
 my %other_opts;
 
+my $yes;
+
 my $man  = 0;
 my $help = 0;
 
@@ -60,6 +62,7 @@ GetOptions(
     'opt=s'       => \%other_opts,
     'skip=s'      => \%skip,
     'per_seq=s'   => \@per_seq,
+    'y|yes'       => \$yes,
 ) or pod2usage(2);
 
 pod2usage(1) if $help;
@@ -74,29 +77,35 @@ my %per_seq = map { $_ => 1 } @per_seq;
 #----------------------------------------------------------#
 # Start
 #----------------------------------------------------------#
-$stopwatch->start_message("Load YAML");
+$stopwatch->start_message;
 
 my $yml  = LoadFile($file_input);
 my @data = @{ $yml->{data} };
 
-$stopwatch->block_message("Scan $dir_scan");
-my @files = File::Find::Rule->file->name(@name_rules)->in($dir_scan);
-if ($pattern) {
-    my $rx = quotemeta $pattern;
-    @files = grep {m{$rx}} @files;
+if ( defined $dir_scan and -d $dir_scan ) {
+    $stopwatch->block_message("Scan $dir_scan");
+    my @files = File::Find::Rule->file->name(@name_rules)->in($dir_scan);
+    if ($pattern) {
+        my $rx = quotemeta $pattern;
+        @files = grep {m{$rx}} @files;
+    }
+
+    $stopwatch->block_message("Match field");
+    for my $item (@data) {
+        printf "Matching [%s]\n", $item->{name};
+
+        # match the most similar name
+        my ($fasta) = map { $_->[0] }
+            sort { $b->[1] <=> $a->[1] }
+            map { [ $_, compare( basename($_), $item->{$match_field} ) ] }
+            @files;
+        $item->{fasta} = $fasta;
+        printf " " x 4 . "%s => %s\n", $item->{$match_field}, $item->{fasta};
+    }
 }
 
-$stopwatch->block_message("Match field");
+$stopwatch->block_message("Mark flags");
 for my $item (@data) {
-    printf "Matching [%s]\n", $item->{name};
-
-    # match the most similar name
-    my ($fasta) = map { $_->[0] }
-        sort { $b->[1] <=> $a->[1] }
-        map { [ $_, compare( basename($_), $item->{$match_field} ) ] } @files;
-    $item->{fasta} = $fasta;
-    printf " " x 4 . "%s => %s\n", $item->{$match_field}, $item->{fasta};
-
     if ( $skip{ $item->{name} } ) {
         printf "[%s] Mark flag 'skip'\n", $item->{name};
         $item->{skip} = $skip{ $item->{name} };
@@ -121,8 +130,22 @@ for my $key ( sort keys %other_opts ) {
     $yml->{$key} = $other_opts{$key};
 }
 
-$stopwatch->block_message("Write YAML [$file_output]");
-DumpFile( $file_output, $yml );
+if ( -e $file_output ) {
+    if ( $file_input ne $file_output ) {
+        if ($yes) {
+            $stopwatch->block_message("Write YAML [$file_output]");
+            DumpFile( $file_output, $yml );
+        }
+        else {
+            print
+                "[$file_output] exists and may contain manual added infomaton. Don't overwrite it.\n";
+        }
+    }
+    else {
+        $stopwatch->block_message("Update YAML [$file_output]");
+        DumpFile( $file_output, $yml );
+    }
+}
 
 $stopwatch->end_message;
 
@@ -149,5 +172,6 @@ match_data.pl - find matched files for each @data entry in YAML and store extra 
         --opt               %, Other options for running pop
         --skip              %, skip this strain
         --per_seq           @, split fasta by names, target or good assembles
+        -y, --yes           Overwrite existing YAML file
 
 =cut

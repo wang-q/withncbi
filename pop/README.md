@@ -71,20 +71,27 @@
         --per_seq Tart_IMI_2206040
     ```
 
-7. Add multiply alignment plans to pop/trichoderma_test.yml.
+6. Add multiply alignment plans to pop/trichoderma_test.yml.
 
     ```yaml
     ---
     plans:
-        - name: 'four_way'
-          t: 'Tart_IMI_2206040'
-          qs:
-            - 'Tvir_Gv29_8'
-
+      - name: four_way
+        qs:
+          - Tvir_Gv29_8
+          - Tatr_XS215
+          - Tree_QM6a
+        t: Tart_IMI_2206040
     ```
 
+    The following cmd update existing YAML file.
 
-8. `pop_prep.pl` will generate three or more bash scripts:
+    ```bash
+    perl ~/Scripts/withncbi/pop/match_data.pl \
+        -i ~/Scripts/withncbi/pop/trichoderma_test.yml
+    ```
+
+7. `pop_prep.pl` will generate three or more bash scripts:
 
     `perl ~/Scripts/withncbi/pop/pop_prep.pl -i trichoderma_test.yml`
     
@@ -93,7 +100,7 @@
     3. `03_strain_info.sh`: strain_info and alignment plan of all genomes
     4. `plan_four_way.sh`: alignment plan of `four_way`
 
-9. For each aligning plans (multi_name), execute the following bash file.
+8. For each aligning plans (multi_name), execute the following bash file.
 
     ```bash
     sh 1_real_chr.sh
