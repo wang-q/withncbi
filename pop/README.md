@@ -55,7 +55,6 @@
 
     * `per_seq` mean split fasta by names, target or good assembles should set it.
     * `skip` mean skip this strains.
-    * The rest are running parameters.
 
     ```yaml
     ---
@@ -66,30 +65,46 @@
         - taxon: 1247866
           name: 'Tham_GD12'
           skip: 'contigs are too short'
-    group_name: 'trichoderma'
-    base_dir: '~/data/alignment'
-    data_dir: '~/data/alignment/trichoderma'
-    fasta_dir: '~/data/alignment/trichoderma/WGS'
-    pl_dir: '~/Scripts'
-    parallel: 4
     ```
 
-6. Edit trichoderma.pl
+6. Use 'match_data.pl` find matched files for each @data entry in YAML and store extra options.
 
-    * Section `01_file`: length thresholds
-    * Section `02_rm`: -species Fungi
-    * Section `03_prepare`: multi genome alignment plan
+    ```bash
+    perl match_data.pl \
+        -i ~/data/alignment/trichoderma/WGS/trichoderma.data.yml \
+        -o trichoderma_test.yml \
+        -d ~/data/alignment/trichoderma/WGS \
+        -m prefix \
+        -r '*.fsa_nt.gz' \
+        --opt group_name=trichoderma \
+        --opt base_dir='~/data/alignment' \
+        --opt data_dir='~/data/alignment/trichoderma' \
+        --opt rm_species=Fungi    
+    ```
 
-7. `trichoderma.pl` will match entries in yaml file and downloaded files, then generate three bash scripts:
+7. Add multiply alignment plans to pop/trichoderma_test.yml.
 
-    `perl ~/Scripts/withncbi/pop/trichoderma.pl`
+    ```yaml
+    ---
+    plans:
+        - name: 'four_way'
+          t: 'Tart_IMI_2206040'
+          qs:
+            - 'Tvir_Gv29_8'
+
+    ```
+
+
+8. `pop_prep.pl` will generate three or more bash scripts:
+
+    `perl ~/Scripts/withncbi/pop/pop_prep.pl -i trichoderma_test.yml`
     
     1. `01_file.sh`: unzip, filter and split
     2. `02_rm.sh`: RepeatMasker
-    3. `03_prepare.sh`: aligning plans
-        * copy & paste lines of `03_prepare.sh` section by section into terminal.
+    3. `03_strain_info.sh`: strain_info and alignment plan of all genomes
+    4. `plan_four_way.sh`: alignment plan of `four_way`
 
-8. For each aligning plans (multi_name), execute the following bash file.
+9. For each aligning plans (multi_name), execute the following bash file.
 
     ```bash
     sh 1_real_chr.sh

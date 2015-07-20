@@ -132,15 +132,4 @@ match_data.pl - find matched files for each @data entry in YAML and store extra 
         -p, --pattern       For ensembl, 'dna.toplevel'
         --opt               %, Other options for running pop
 
-    perl match_data.pl \
-        -i ~/data/alignment/trichoderma/WGS/trichoderma.data.yml \
-        -o trichoderma_test.yml \
-        -d ~/data/alignment/trichoderma/WGS \
-        -m prefix \
-        -r '*.fsa_nt.gz' \
-        --opt group_name=trichoderma \
-        --opt base_dir='~/data/alignment' \
-        --opt data_dir='~/data/alignment/trichoderma' \
-        --opt rm_species=Fungi
-
 =cut
