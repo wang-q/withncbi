@@ -88,6 +88,7 @@ for my $item (@data) {
         sort { $b->[1] <=> $a->[1] }
         map { [ $_, compare( basename($_), $item->{$match_field} ) ] } @files;
     $item->{fasta} = $fasta;
+    printf " " x 4 . "%s => %s\n", $item->{$match_field}, $item->{fasta};
 }
 
 # Move skipped entries to tail
@@ -97,7 +98,7 @@ $yml->{data} = \@data_sort;
 
 $stopwatch->block_message("Other options");
 for my $key ( sort keys %other_opts ) {
-    $yml->$key( $other_opts{$key} );
+    $yml->{$key} = $other_opts{$key};
 }
 
 $stopwatch->block_message("Write YAML [$file_output]");
