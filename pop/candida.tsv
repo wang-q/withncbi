@@ -1,0 +1,35 @@
+#Name	WGS	Organism
+# http://www.ncbi.nlm.nih.gov/assembly?term=Candida
+#
+#SELECT 
+#    CONCAT(LEFT(genus, 1),
+#            LEFT(TRIM(REPLACE(species, genus, '')),
+#                3),
+#            REPLACE((REPLACE(organism_name, species, '')),
+#                ' ',
+#                '_')),
+#    SUBSTRING(wgs_master, 1, 4),
+#    organism_name,
+#    assembly_level
+#FROM
+#    ar_genbank.ar
+#WHERE
+#    genus = 'Candida'
+#        AND assembly_level != 'Contig'
+#        AND wgs_master LIKE '%000%'
+#ORDER BY organism_name
+#
+Calb_3153A	AVAY	Candida albicans 3153A	Scaffold
+Calb_A123	AVAR	Candida albicans A123	Scaffold
+Calb_A155	AVAZ	Candida albicans A155	Scaffold
+Calb_A20	AVAX	Candida albicans A20	Scaffold
+Calb_A203	AVAT	Candida albicans A203	Scaffold
+Calb_A48	AVAV	Candida albicans A48	Scaffold
+Calb_A67	AVAU	Candida albicans A67	Scaffold
+Calb_A84	AVBA	Candida albicans A84	Scaffold
+Calb_A92	AVAS	Candida albicans A92	Scaffold
+Calb_Ca529L	ASHC	Candida albicans Ca529L	Scaffold
+Calb_CHN1	AVAW	Candida albicans CHN1	Scaffold
+Calb_WO-1	AAFO	Candida albicans WO-1	Chromosome
+Ctro	JGYC	Candida tropicalis	Scaffold
+Ctro_MYA-3404	AAFN	Candida tropicalis MYA-3404	Scaffold
