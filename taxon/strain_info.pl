@@ -54,12 +54,12 @@ my $man  = 0;
 my $help = 0;
 
 GetOptions(
-    'help|?'    => \$help,
+    'help'      => \$help,
     'man'       => \$man,
     'id=i'      => \@ids,
     'name=s'    => \%name_of,
     'species=s' => \%species_of,
-    'o|file=s'    => \$filename,
+    'o|file=s'  => \$filename,
     'simple'    => \$simple,
 ) or pod2usage(2);
 

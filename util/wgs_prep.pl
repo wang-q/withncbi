@@ -51,7 +51,7 @@ my $man  = 0;
 my $help = 0;
 
 GetOptions(
-    'help|?'     => \$help,
+    'help'       => \$help,
     'man'        => \$man,
     'i|f|file=s' => \$file_input,
     'o|d|dir=s'  => \$dir_output,

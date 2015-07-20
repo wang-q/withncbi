@@ -89,7 +89,7 @@ my $man  = 0;
 my $help = 0;
 
 GetOptions(
-    'help|?'          => \$help,
+    'help'            => \$help,
     'man'             => \$man,
     'file=s'          => \$taxon_file,
     'w|working_dir=s' => \$working_dir,
@@ -530,13 +530,13 @@ EOF
                 query_ids   => \@query_ids,
                 multi_name  => $multi_name,
                 kent_bin    => $kent_bin,
-            use_name    => $use_name,
-            nostat      => $nostat,
+                use_name    => $use_name,
+                nostat      => $nostat,
             },
             File::Spec->catfile( $working_dir, $sh_name )
         ) or die Template->error;
     }
-            
+
     # multi_cmd.sh
     $sh_name = "5_multi_cmd.sh";
     print "Create $sh_name\n";

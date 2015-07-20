@@ -48,7 +48,7 @@ my $man  = 0;
 my $help = 0;
 
 GetOptions(
-    'help|?'       => \$help,
+    'help'         => \$help,
     'man'          => \$man,
     's|server=s'   => \$server,
     'P|port=i'     => \$port,

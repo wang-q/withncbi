@@ -16,14 +16,14 @@ use FindBin;
 #----------------------------------------------------------#
 my $in_file;
 
-my $rename;      
+my $rename;
 my $pure_gff;
 
 my $man  = 0;
 my $help = 0;
 
 GetOptions(
-    'help|?'   => \$help,
+    'help'     => \$help,
     'man'      => \$man,
     'f|file=s' => \$in_file,
     'r|rename' => \$rename,

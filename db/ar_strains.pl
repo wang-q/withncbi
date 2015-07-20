@@ -46,10 +46,10 @@ my $man  = 0;
 my $help = 0;
 
 GetOptions(
+    'help'       => \$help,
+    'man'        => \$man,
     'genbank'    => \$genbank,
     'o|output=s' => \$strain_file,
-    'help|?'     => \$help,
-    'man'        => \$man,
 ) or pod2usage(2);
 
 pod2usage(1) if $help;

@@ -85,7 +85,7 @@ my $man  = 0;
 my $help = 0;
 
 GetOptions(
-    'help|?'          => \$help,
+    'help'            => \$help,
     'man'             => \$man,
     's|server=s'      => \$server,
     'P|port=i'        => \$port,
@@ -324,8 +324,8 @@ ID: for my $taxon_id ( $target_id, @query_ids ) {
 
 # report missing
 if (@ids_missing) {
-    @query_ids = grep {!$id_missing_file{$_}} @query_ids;
-    
+    @query_ids = grep { !$id_missing_file{$_} } @query_ids;
+
     my $table_file = File::Spec->catfile( $working_dir, "table.txt" );
     open my $fh, '>>', $table_file;
     print {$fh} "Can't find files for the following ID:\n@ids_missing\n";

@@ -84,7 +84,7 @@ my $man  = 0;
 my $help = 0;
 
 GetOptions(
-    'help|?'          => \$help,
+    'help'            => \$help,
     'man'             => \$man,
     'file=s'          => \$taxon_file,
     'w|working_dir=s' => \$working_dir,
