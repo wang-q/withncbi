@@ -91,16 +91,28 @@
         -i ~/Scripts/withncbi/pop/trichoderma_test.yml
     ```
 
-7. `pop_prep.pl` will generate three or more bash scripts:
+7. `pop_prep.pl` will generate four or more bash scripts:
 
-    `perl ~/Scripts/withncbi/pop/pop_prep.pl -i trichoderma_test.yml`
+    ```bash
+    perl ~/Scripts/withncbi/pop/pop_prep.pl -i ~/Scripts/withncbi/pop/trichoderma_test.yml
+    ```
     
     1. `01_file.sh`: unzip, filter and split
     2. `02_rm.sh`: RepeatMasker
-    3. `03_strain_info.sh`: strain_info and alignment plan of all genomes
-    4. `plan_four_way.sh`: alignment plan of `four_way`
+    3. `03_strain_info.sh`: strain_info
+    4. `04_plan_ALL.sh`: alignment plan of all genomes
+    5. `plan_four_way.sh`: alignment plan of `four_way`
 
-8. For each aligning plans (multi_name), execute the following bash file.
+8. Run scripts.
+
+    ```bash
+    sh 01_file.sh
+    sh 02_rm.sh
+    sh 03_strain_info.sh
+    sh 04_plan_ALL.sh
+    ```
+
+8. `04_plan_ALL.sh` generated the following bash files, execute them.
 
     ```bash
     sh 1_real_chr.sh
@@ -109,5 +121,15 @@
     sh 5_multi_cmd.sh
     sh 6_var_list.sh
     sh 7_multi_db_only.sh
-    sh 9_pack_it_up.sh
     ```
+
+9. `plan_four_way.sh` will overwrite some bash files, execute the following:
+
+    ```bash
+    sh 5_multi_cmd.sh
+    sh 6_var_list.sh
+    sh 7_multi_db_only.sh
+    ```
+
+10. When you are satisfied and don't see any wrong, rename pop/trichoderma_test.yml to
+    pop/trichoderma_data.yml and git commit it.

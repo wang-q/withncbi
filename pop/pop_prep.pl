@@ -15,6 +15,8 @@ use File::Spec;
 use String::Compare;
 use YAML qw(Dump Load DumpFile LoadFile);
 
+use AlignDB::Stopwatch;
+
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 use MyUtil qw(replace_home);
@@ -43,7 +45,7 @@ my $help = 0;
 GetOptions(
     'help'       => \$help,
     'man'        => \$man,
-    'i|file=i'   => \$file_yaml,
+    'i|file=s'   => \$file_yaml,
     'parallel=i' => \$parallel,
 ) or pod2usage(2);
 
@@ -89,11 +91,15 @@ if ( exists $yml->{rm_species} ) {
 print "Create dir\n";
 my @data = @{ $yml->{data} };
 for my $item (@data) {
-
-    # prepare working dir
-    my $dir = File::Spec->catdir( $data_dir, $item->{name} );
-    mkdir $dir if !-e $dir;
-    $item->{dir} = $dir;
+    if ( exists $item->{skip} ) {
+        printf " " x 4 . $item->{name} . " SKIP! %s\n", $item->{skip};
+    }
+    else {
+        printf " " x 4 . $item->{name} . "\n";
+        my $dir = File::Spec->catdir( $data_dir, $item->{name} );
+        mkdir $dir if !-e $dir;
+        $item->{dir} = $dir;
+    }
 }
 
 {
@@ -166,7 +172,7 @@ echo Doing RepeatMasker
 echo [% item.name %]
 
 [% IF item.skip -%]
-echo 'SKIP! [% item.skip %]'
+echo '    SKIP! [% item.skip %]'
 [% ELSE -%]
 cd [% item.dir %]
 RepeatMasker [% item.dir %]/*.fasta [% IF rm_species %]-species [% rm_species %][% END %] -xsmall --parallel [% parallel %]
@@ -187,7 +193,7 @@ echo Cleaning RepeatMasker
 echo [% item.name %]
 
 [% IF item.skip -%]
-echo 'SKIP! [% item.skip %]'
+echo '    SKIP! [% item.skip %]'
 [% ELSE -%]
 cd [% item.dir %]
 for i in *.fasta;
@@ -234,6 +240,27 @@ perl [% withncbi %]/taxon/strain_info.pl \
 [% END -%]
     --file [% data_dir %]/[% group_name %].csv
 
+EOF
+
+    $tt->process(
+        \$text,
+        {   data       => \@data,
+            group_name => $group_name,
+            data_dir   => $data_dir,
+            base_dir   => $base_dir,
+            withncbi   => $withncbi,
+            parallel   => $parallel,
+        },
+        File::Spec->catfile( $data_dir, $sh_name )
+    ) or die Template->error;
+
+    # 04_plan_ALL.sh
+    $sh_name = "04_plan_ALL.sh";
+    print "Create $sh_name\n";
+    $text = <<'EOF';
+#!/bin/bash
+cd [% data_dir %]
+
 #----------------------------#
 # alignment plan of all genomes 
 #----------------------------#
@@ -253,7 +280,9 @@ perl [% withncbi %]/taxon/strain_bz.pl \
     --norm \
 [% FOREACH item IN data -%]
 [% IF loop.index != 0 -%]
+[% IF ! item.skip -%]
     -q [% item.name %] \
+[% END -%]
 [% END -%]
 [% END -%]
     -t [% data.0.name %]
@@ -271,7 +300,7 @@ EOF
         },
         File::Spec->catfile( $data_dir, $sh_name )
     ) or die Template->error;
-
+    
     if ( exists $yml->{plans} ) {
         print "Create .sh for each plans\n";
         my @plans = @{ $yml->{plans} };
@@ -279,7 +308,7 @@ EOF
             my $plan_name = $plan->{name};
 
             $sh_name = "plan_$plan_name.sh";
-            print " " x 4, "Create $sh_name\n";
+            print " " x 4, "$sh_name\n";
             $text = <<'EOF';
 #!/bin/bash
 cd [% data_dir %]
@@ -296,13 +325,13 @@ perl [% withncbi %]/taxon/strain_bz.pl \
     --parallel [% parallel %] \
     --norm \
     --phylo_tree [% data_dir %]/[% group_name %]_ALL.nwk \
-[% IF o -%]
-    -o [% o %] \
+[% IF plan.o -%]
+    -o [% plan.o %] \
 [% END -%]
-[% FOREACH q IN qs -%]
+[% FOREACH q IN plan.qs -%]
     -q [% q %] \
 [% END -%]
-    -t [% t %]
+    -t [% plan.t %]
 
 EOF
 
@@ -314,9 +343,7 @@ EOF
                     withncbi   => $withncbi,
                     parallel   => $parallel,
                     plan_name  => $plan_name,
-                    t          => $plan->{t},
-                    qw         => $plan->{qs},
-                    o          => $plan->{o},
+                    plan       => $plan,
                 },
                 File::Spec->catfile( $data_dir, $sh_name )
             ) or die Template->error;
@@ -330,37 +357,17 @@ exit;
 
 __END__
 
-# create pop/trichoderma.tsv manually, be careful with tabs and spaces.
-# http://www.ncbi.nlm.nih.gov/Traces/wgs/?page=1&term=trichoderma
+=head1 NAME
 
-mkdir -p ~/data/alignment/trichoderma
-cd ~/data/alignment/trichoderma
+pop_prep.pl - prepare pop
 
-perl ~/Scripts/withncbi/util/wgs_prep.pl \
-    -f ~/Scripts/withncbi/pop/trichoderma.tsv \
-    --fix \
-    -o WGS \
-    -a 
+=head1 SYNOPSIS
 
-aria2c -x 6 -s 3 -c -i WGS/trichoderma.url.txt
+    perl pop_prep.pl [options]
+      Options:
+        --help              brief help message
+        --man               full documentation
+        -i, --file          input yaml
+        --parallel          number of child processes
 
-find WGS -name "*.gz" | xargs gzip -t 
-
-# rsync --progress -av wangq@139.162.23.84:/home/wangq/data/alignment/trichoderma/ ~/data/alignment/trichoderma
-
-# Add some contents to WGS/trichoderma.data.yml, get pop/trichoderma_data.yml
-
-perl ~/Scripts/withncbi/pop/trichoderma.pl
-sh 01_file.sh
-sh 02_rm.sh
-
-# execute 03_prepare.sh by copy & paste  
-
-# for each multi_name, execute the following bash file
-sh 1_real_chr.sh
-sh 3_pair_cmd.sh
-sh 4_rawphylo.sh
-sh 5_multi_cmd.sh
-sh 6_var_list.sh
-sh 7_multi_db_only.sh
-sh 9_pack_it_up.sh
+=cut
