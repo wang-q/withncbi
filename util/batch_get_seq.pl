@@ -33,7 +33,7 @@ GetOptions(
 pod2usage(1) if $help;
 pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
 
-die "Provide a csv file\n" unless defined $in_file and -e $in_file;
+die "Provide a .csv file\n" unless defined $in_file and -e $in_file;
 
 #----------------------------------------------------------#
 # Init
@@ -101,9 +101,7 @@ batch_get_seq.pl - retrieve all sequences listed in a file
 
 =head1 SYNOPSIS
 
-    perl batch_get_seq.pl <-f seq.csv>
-
-    batch_get_seq.pl [options]
+    perl batch_get_seq.pl <-f seq.csv> [options]
       Options:
         --help              brief help message
         --man               full documentation
