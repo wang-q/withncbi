@@ -44,6 +44,7 @@ my $pattern;
 my %skip;
 my @per_seq;
 my @downloaded;
+my @plan;
 
 my %other_opts;
 
@@ -65,6 +66,7 @@ GetOptions(
     'skip=s'       => \%skip,
     'per_seq=s'    => \@per_seq,
     'downloaded=s' => \@downloaded,
+    'plan=s' => \@plan,
     'y|yes'        => \$yes,
 ) or pod2usage(2);
 
@@ -150,7 +152,7 @@ push @data_sort2, grep { !exists $_->{per_seq} } @data_sort;
 # 'name=Scer_S288c,taxon=559292,sciname=Saccharomyces cerevisiae S288c'
 if ( scalar @downloaded ) {
     for my $entry (@downloaded) {
-        my %hash = map { split /=/ } ( split /,/, $entry );
+        my %hash = map { split /=/ } ( split /;/, $entry );
         $hash{downloaded} = 1;
 
         printf "Inject downloaded %s\n", $hash{name};
@@ -158,6 +160,18 @@ if ( scalar @downloaded ) {
     }
 }
 $yml->{data} = \@data_sort2;
+
+if ( scalar @plan ) {
+    $stopwatch->block_message("Alignment plans");
+    my @ary;
+    for my $entry (@plan) {
+        my %hash = map { split /=/ } ( split /;/, $entry );
+        $hash{qs} = [split /,/, $hash{qs}];
+        printf "Inject plan %s\n", $hash{name};
+        push @ary, \%hash;
+    }
+    $yml->{plans} = \@ary;
+}
 
 $stopwatch->block_message("Other options");
 for my $key ( sort keys %other_opts ) {
@@ -193,25 +207,27 @@ __END__
 
 =head1 NAME
 
-match_data.pl - find matched files for each @data entry in YAML and store extra options.
+gen_pop_conf.pl - find matched files for each @data entry in YAML and store other options.
 
 =head1 SYNOPSIS
 
-    perl match_data.pl [options]
+    perl gen_pop_conf.pl [options]
       Options:
         --help              brief help message
         --man               full documentation
-        -i, --input         input yaml
+        -i, --input         s, input yaml
         -o, --output        output yaml
-        -d, --dir           where sequence files live
-        -m, --match         key name of each @data entry. or prefix, sciname...
+        -d, --dir           s, where sequence files live
+        -m, --match         s, key of each @data entry. name, prefix or sciname...
         -r, --rule          @, File::Find::Rule, '*.fsa_nt.gz' for NCBI WGS
-        -p, --pattern       For ensembl, 'dna.toplevel'
+        -p, --pattern       s, For ensembl, 'dna.toplevel'
         --opt               %, Other options for running pop
         --skip              %, skip this strain
         --per_seq           @, split fasta by names, target or good assembles
-        --downloaded        Add an entry to @data which were download previously
-                            'name=Scer_S288c,taxon=559292,sciname=Saccharomyces cerevisiae S288c'
-        -y, --yes           Overwrite existing YAML file
+        --downloaded        @, Add entries to @data which were download previously
+                            'name=Scer_S288c;taxon=559292;sciname=Saccharomyces cerevisiae S288c'
+        --plan              @, Add alignment plans
+                            'name=four_way;t=Scer_S288c;qs=Sbou_ATCC_MYA_796,Spar_NRRL_Y_17217,Spas_CBS_1483'
+        -y, --yes           !, Overwrite existing YAML file
 
 =cut
