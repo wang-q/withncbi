@@ -145,6 +145,7 @@
         --opt rm_species=Fungi \
         --downloaded 'name=Scer_S288c;taxon=559292;sciname=Saccharomyces cerevisiae S288c' \
         --plan 'name=four_way;t=Scer_S288c;qs=Sbou_ATCC_MYA_796,Spar_NRRL_Y_17217,Spas_CBS_1483' \
+        --plan 'name=17_way;t=Scer_S288c;qs=Sarb_H_6,Sbay_623_6C,Sbou_17,Sbou_ATCC_MYA_796,Sbou_EDRL,ScerSkud_VIN7,Skud_IFO_1802,Skud_ZP591,Smik_IFO_1815_1,Spar_NRRL_Y_17217,Spas_CBS_1483,Spas_CBS_1513,Spas_CCY48_91,Spas_Weihenstephan_34_70_2,Sunv_A9,Suva_MCYC_623' \
         --skip Smik_IFO_1815_2='same strain and same taxon_id, keep one based on filtered sequence length' \
         --skip Spas_Weihenstephan_34_70_1='same strain and same taxon_id, keep one based on filtered sequence length' \
         --skip Skud_FM1057='short contigs' \
@@ -185,7 +186,6 @@
     sh 3_pair_cmd.sh
     sh 4_rawphylo.sh
     sh 5_multi_cmd.sh
-    sh 6_var_list.sh
     sh 7_multi_db_only.sh
     ```
 
@@ -195,7 +195,7 @@
     sh plan_XXX.sh
 
     sh 5_multi_cmd.sh
-    sh 6_multi_db_only.sh
+    sh 7_multi_db_only.sh
     ```
 
 7. Restore everything to the beginning
