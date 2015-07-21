@@ -73,6 +73,8 @@ GetOptions(
 pod2usage(1) if $help;
 pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
 
+die "Need a YAML file" unless $file_input;
+
 unless ($file_output) {
     $file_output = $file_input;
 }
@@ -211,23 +213,23 @@ gen_pop_conf.pl - find matched files for each @data entry in YAML and store othe
 
 =head1 SYNOPSIS
 
-    perl gen_pop_conf.pl [options]
+    perl gen_pop_conf.pl <-i data.yml> [options]
       Options:
         --help              brief help message
         --man               full documentation
-        -i, --input         s, input yaml
-        -o, --output        output yaml
-        -d, --dir           s, where sequence files live
-        -m, --match         s, key of each @data entry. name, prefix or sciname...
-        -r, --rule          @, File::Find::Rule, '*.fsa_nt.gz' for NCBI WGS
-        -p, --pattern       s, For ensembl, 'dna.toplevel'
-        --opt               %, Other options for running pop
-        --skip              %, skip this strain
-        --per_seq           @, split fasta by names, target or good assembles
-        --downloaded        @, Add entries to @data which were download previously
+        -i, --input STR     input yaml
+        -o, --output STR    output yaml
+        -d, --dir STR       where sequence files live
+        -m, --match STR     key of each @data entry. name, prefix or sciname...
+        -r, --rule @STR     File::Find::Rule, '*.fsa_nt.gz' for NCBI WGS
+        -p, --pattern STR   For ensembl, 'dna.toplevel'
+        --opt STR=STR       Other options for running pop
+        --skip STR=STR      skip this strain
+        --per_seq @STR      split fasta by names, target or good assembles
+        --downloaded @STR   Add entries to @data which were download previously
                             'name=Scer_S288c;taxon=559292;sciname=Saccharomyces cerevisiae S288c'
-        --plan              @, Add alignment plans
+        --plan @STR         Add alignment plans
                             'name=four_way;t=Scer_S288c;qs=Sbou_ATCC_MYA_796,Spar_NRRL_Y_17217,Spas_CBS_1483'
-        -y, --yes           !, Overwrite existing YAML file
+        -y, --yes           Overwrite existing YAML file
 
 =cut
