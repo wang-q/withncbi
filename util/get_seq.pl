@@ -29,7 +29,7 @@ for my $type (@types) {
     print "Saving file to [$file]\n";
     
     # local shadowsocks proxy
-    if ($ENV{EUPROXY}) {
+    if ($ENV{SSPROXY}) {
         $factory->proxy(['http','https'], 'socks://127.0.0.1:1080' )
     }
 
