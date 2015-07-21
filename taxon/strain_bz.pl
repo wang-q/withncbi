@@ -473,19 +473,21 @@ perl [% aligndb %]/extra/join_dbs.pl \
 # RAxML
 #----------------------------#
 # raw phylo guiding tree
-if [ ! -d [% working_dir %]/rawphylo ]
-then
-    mkdir [% working_dir %]/rawphylo
-fi
+if [ -d [% working_dir %]/[% multi_name %]_rawphylo ]; then
+    rm -fr [% working_dir %]/[% multi_name %]_rawphylo;
+    mkdir -p [% working_dir %]/[% multi_name %]_rawphylo;
+else
+    mkdir -p [% working_dir %]/[% multi_name %]_rawphylo;
+fi;
 
-cd [% working_dir %]/rawphylo
+cd [% working_dir %]/[% multi_name %]_rawphylo
 
-find [% working_dir %]/rawphylo -type f -name "RAxML*" | xargs rm
+find [% working_dir %]/[% multi_name %]_rawphylo -type f -name "RAxML*" | xargs rm
 
 [% IF query_ids.size > 2 -%]
 perl [% egaz%]/concat_fasta.pl \
     -i [% working_dir %]/[% multi_name %]_raw \
-    -o [% working_dir %]/rawphylo/[% multi_name %].phy \
+    -o [% working_dir %]/[% multi_name %]_rawphylo/[% multi_name %].phy \
     -p
 
 raxml -T [% IF parallel > 3 %] [% parallel - 1 %] [% ELSE %] 2 [% END %] \
@@ -493,16 +495,16 @@ raxml -T [% IF parallel > 3 %] [% parallel - 1 %] [% ELSE %] 2 [% END %] \
 [% IF outgroup_id -%]
     -o [% outgroup_id %] \
 [% END -%]
-    -n [% multi_name %] -s [% working_dir %]/rawphylo/[% multi_name %].phy
+    -n [% multi_name %] -s [% working_dir %]/[% multi_name %]_rawphylo/[% multi_name %].phy
 
-cp [% working_dir %]/rawphylo/RAxML_best* [% working_dir %]/rawphylo/[% multi_name %].nwk
+cp [% working_dir %]/[% multi_name %]_rawphylo/RAxML_best* [% working_dir %]/[% multi_name %]_rawphylo/[% multi_name %].nwk
 
 [% ELSIF query_ids.size == 2 -%]
-echo "(([% target_id %],[% query_ids.0 %]),[% query_ids.1 %]);" > [% working_dir %]/rawphylo/[% multi_name %].nwk
+echo "(([% target_id %],[% query_ids.0 %]),[% query_ids.1 %]);" > [% working_dir %]/[% multi_name %]_rawphylo/[% multi_name %].nwk
 
 [% ELSE -%]
 
-echo "([% target_id %],[% query_ids.0 %]);" > [% working_dir %]/rawphylo/[% multi_name %].nwk
+echo "([% target_id %],[% query_ids.0 %]);" > [% working_dir %]/[% multi_name %]_rawphylo/[% multi_name %].nwk
 
 [% END -%]
 
@@ -537,7 +539,12 @@ cd [% working_dir %]
 
 sleep 1;
 
-mkdir [% working_dir %]/[% multi_name %]
+if [ -d [% working_dir %]/[% multi_name %] ]; then
+    rm -fr [% working_dir %]/[% multi_name %];
+    mkdir -p [% working_dir %]/[% multi_name %];
+else
+    mkdir -p [% working_dir %]/[% multi_name %];
+fi;
 
 if [ -d [% working_dir %]/[% multi_name %]_fasta ]; then
     rm -fr [% working_dir %]/[% multi_name %]_fasta;
@@ -547,12 +554,11 @@ if [ -d [% working_dir %]/[% multi_name %]_refined ]; then
     rm -fr [% working_dir %]/[% multi_name %]_refined;
 fi;
 
-if [ -d [% working_dir %]/phylo ]; then
-    rm [% working_dir %]/phylo/RAxML*;
-    rm [% working_dir %]/phylo/*.phy;
-    rm [% working_dir %]/phylo/*.phy.reduced;
+if [ -d [% working_dir %]/[% multi_name %]_phylo ]; then
+    rm -fr [% working_dir %]/[% multi_name %]_phylo;
+    mkdir -p [% working_dir %]/[% multi_name %]_phylo;
 else
-    mkdir [% working_dir %]/phylo;
+    mkdir -p [% working_dir %]/[% multi_name %]_phylo;
 fi;
 
 #----------------------------#
@@ -568,7 +574,7 @@ perl [% egaz %]/mz.pl \
     --out [% working_dir %]/[% multi_name %] \
     -syn -p [% parallel %]
 [% ELSE %]
-if [ -f [% working_dir %]/rawphylo/[% multi_name %].nwk ]
+if [ -f [% working_dir %]/[% multi_name %]_rawphylo/[% multi_name %].nwk ]
 then
     perl [% egaz %]/mz.pl \
         [% FOREACH id IN query_ids -%]
@@ -597,7 +603,7 @@ find [% working_dir %]/[% multi_name %] -type f -name "*.maf" | parallel -j [% p
 #----------------------------#
 mkdir -p [% working_dir %]/[% multi_name %]_fasta
 find [% working_dir %]/[% multi_name %] -name "*.maf" -or -name "*.maf.gz" \
-    | parallel -j [% parallel %] fasops maf2fas {} -o [% working_dir %]/[% multi_name %]_fasta/{/}.gz
+    | parallel -j [% parallel %] fasops maf2fas {} -o [% working_dir %]/[% multi_name %]_fasta/{/}.fas
 
 #----------------------------#
 # refine fasta
@@ -616,25 +622,25 @@ perl [% egaz %]/refine_fasta.pl \
 # RAxML
 #----------------------------#
 [% IF query_ids.size > 2 -%]
-cd [% working_dir %]/phylo
+cd [% working_dir %]/[% multi_name %]_phylo
 
 perl [% egaz %]/concat_fasta.pl \
     -i [% working_dir %]/[% multi_name %]_refined \
-    -o [% working_dir %]/phylo/[% multi_name %].phy \
+    -o [% working_dir %]/[% multi_name %]_phylo/[% multi_name %].phy \
     -p
 
-find [% working_dir %]/phylo -type f -name "RAxML*" | xargs rm
+find [% working_dir %]/[% multi_name %]_phylo -type f -name "RAxML*" | xargs rm
 
 raxml -T [% IF parallel > 3 %] [% parallel - 1 %] [% ELSE %] 2 [% END %] \
     -f a -m GTRGAMMA -p $RANDOM -N 100 -x $RANDOM \
 [% IF outgroup_id -%]
     -o [% outgroup_id %] \
 [% END -%]
-    -n [% multi_name %] -s [% working_dir %]/phylo/[% multi_name %].phy
+    -n [% multi_name %] -s [% working_dir %]/[% multi_name %]_phylo/[% multi_name %].phy
 
-cp [% working_dir %]/phylo/RAxML_bipartitions.* [% working_dir %]/phylo/[% multi_name %].nwk
+cp [% working_dir %]/[% multi_name %]_phylo/RAxML_bipartitions.* [% working_dir %]/[% multi_name %]_phylo/[% multi_name %].nwk
 
-nw_display -s -b 'visibility:hidden' [% working_dir %]/phylo/[% multi_name %].nwk > [% working_dir %]/phylo/[% multi_name %].svg
+nw_display -s -b 'visibility:hidden' [% working_dir %]/[% multi_name %]_phylo/[% multi_name %].nwk > [% working_dir %]/[% multi_name %]_phylo/[% multi_name %].svg
 
 [% END -%]
 
