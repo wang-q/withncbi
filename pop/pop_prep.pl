@@ -272,13 +272,13 @@ cd [% data_dir %]
 # This plan includes all genomes, use the generated phylogenetic tree as guide
 #   tree for other plans
 
-# [% group_name %]_ALL
+# plan_ALL
 cd [% data_dir %]
 perl [% withncbi %]/taxon/strain_bz.pl \
     --file [% data_dir %]/[% group_name %].csv \
     -w     [% base_dir %] \
     --name [% group_name %] \
-    --multi_name [% group_name %]_ALL \
+    --multi_name plan_ALL \
     --use_name \
     --parallel [% parallel %] \
     --norm \
@@ -328,7 +328,7 @@ perl [% withncbi %]/taxon/strain_bz.pl \
     --use_name \
     --parallel [% parallel %] \
     --norm \
-    --phylo_tree [% data_dir %]/[% group_name %]_ALL.nwk \
+    --phylo_tree [% data_dir %]/plan_ALL_phylo/plan_ALL.nwk \
 [% IF plan.o -%]
     -o [% plan.o %] \
 [% END -%]
