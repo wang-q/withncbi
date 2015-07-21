@@ -123,6 +123,8 @@ echo [% item.name %]
 
 [% IF item.skip -%]
 echo '    SKIP! [% item.skip %]'
+[% ELSIF item.downloaded -%]
+echo '    Downloaded files. [% item.skip %]'
 [% ELSE -%]
 cd [% item.dir %]
 gzip -d -c [% item.fasta %] > toplevel.fa
@@ -232,10 +234,12 @@ cd [% data_dir %]
 #----------------------------#
 perl [% withncbi %]/taxon/strain_info.pl \
 [% FOREACH item IN data -%]
+[% IF ! item.skip -%]
     --id   [% item.taxon %] \
     --name [% item.taxon %]=[% item.name %] \
 [% IF item.original_id -%]
     --species [% item.taxon %]=[% item.original_id %] \
+[% END -%]
 [% END -%]
 [% END -%]
     --file [% data_dir %]/[% group_name %].csv
