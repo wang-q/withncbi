@@ -30,11 +30,11 @@
         ```yaml
         ---
         data:
-            - taxon: 452589
-              name: 'Tart_IMI_2206040'
-              sciname: 'Trichoderma atroviride IMI 206040'
-              prefix: 'ABDG02'
-              coverage: '8.26x Sanger'
+          - taxon: 452589
+            name: 'Tart_IMI_2206040'
+            sciname: 'Trichoderma atroviride IMI 206040'
+            prefix: 'ABDG02'
+            coverage: '8.26x Sanger'
         ```
         
     3. `trichoderma.url.txt`
@@ -67,6 +67,7 @@
         --opt base_dir='~/data/alignment' \
         --opt data_dir='~/data/alignment/trichoderma' \
         --opt rm_species=Fungi \
+        --opt min_contig=10000 \
         --skip Tham_GD12='contigs are too short' \
         --per_seq Tatr_IMI_2206040
     ```
@@ -94,7 +95,7 @@
 7. `pop_prep.pl` will generate four or more bash scripts:
 
     ```bash
-    perl ~/Scripts/withncbi/pop/pop_prep.pl -i ~/Scripts/withncbi/pop/trichoderma_test.yml
+    perl ~/Scripts/withncbi/pop/pop_prep.pl -p 12 -i ~/Scripts/withncbi/pop/trichoderma_test.yml
     ```
     
     1. `01_file.sh`: unzip, filter and split
@@ -133,3 +134,7 @@
 
 10. When you are satisfied and don't see any wrong, rename pop/trichoderma_test.yml to
     pop/trichoderma_data.yml and git commit it.
+    
+    ```bash
+    mv ~/Scripts/withncbi/pop/trichoderma_test.yml ~/Scripts/withncbi/pop/trichoderma_data.yml
+    ```
