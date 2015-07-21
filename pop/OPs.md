@@ -92,7 +92,7 @@
 
     http://www.ncbi.nlm.nih.gov/assembly?term=Saccharomyces%20kudriavzevii
 
-2. Create working direcotry and download sequences.
+2. Create working direcotry and download WGS sequences.
 
     ```bash
     mkdir -p ~/data/alignment/saccharomyces
@@ -115,7 +115,7 @@
 3. Download Saccharomyces cerevisiae S288c
 
     ```bash
-    cd ~/data/alignment/saccharomyces
+    cd ~/data/alignment/saccharomyces/WGS
 
     # Omit chrMt
     perl ~/Scripts/withncbi/util/assemble_csv.pl \
@@ -189,36 +189,19 @@
     sh 7_multi_db_only.sh
     ```
 
-6. Add multiply alignment plans to pop/saccharomyces_test.yml.
-
-    ```yaml
-    ---
-    plans:
-      - name: Saccharomyces_17way
-        qs:
-          - Sarb_H_6
-          - Sbay_623_6C
-          - Sbou_17
-          - Sbou_ATCC_MYA_796
-          - Sbou_EDRL
-          - ScerSkud_VIN7
-          - Skud_IFO_1802
-          - Skud_ZP591
-          - Smik_IFO_1815_1
-          - Spar_NRRL_Y_17217
-          - Spas_CBS_1483
-          - Spas_CBS_1513
-          - Spas_CCY48_91
-          - Spas_Weihenstephan_34_70_2
-          - Sunv_A9
-          - Suva_MCYC_623
-        t: Scer_S288c
-    ```
-
-    The following cmd update existing YAML file.
+6. For other plans
 
     ```bash
-    perl ~/Scripts/withncbi/pop/gen_pop_conf.pl \
-        -i ~/Scripts/withncbi/pop/saccharomyces_test.yml
+    sh plan_XXX.sh
+
+    sh 5_multi_cmd.sh
+    sh 6_multi_db_only.sh
     ```
 
+7. Restore everything to the beginning
+
+    ```bash
+    cd ~/data/alignment/saccharomyces
+    find . -maxdepth 1 -type d -not -path "*WGS" | grep -v "\." | xargs rm -fr
+    rm *.xlsx *.csv *.sh *.bat *.nwk
+    ```

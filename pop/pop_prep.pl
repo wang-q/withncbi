@@ -125,8 +125,13 @@ echo [% item.name %]
 [% IF item.skip -%]
 echo '    SKIP! [% item.skip %]'
 [% ELSIF item.downloaded -%]
-echo '    Downloaded files. [% item.skip %]'
+echo '    Downloaded files.'
+[% IF item.pre_dir -%]
+cp -R [% item.pre_dir %] .
+[% END -%]
 [% ELSE -%]
+echo '    Unzip, filter and split.'
+
 cd [% item.dir %]
 gzip -d -c [% item.fasta %] > toplevel.fa
 perl -p -i -e '/>/ and s/\>gi\|(\d+).*/\>gi_$1/' toplevel.fa
@@ -243,7 +248,7 @@ perl [% withncbi %]/taxon/strain_info.pl \
 [% END -%]
 [% END -%]
 [% END -%]
-    --file [% data_dir %]/[% group_name %].csv
+    --file [% data_dir %]/[% group_name %].taxon.csv
 
 EOF
 
@@ -270,13 +275,13 @@ cd [% data_dir %]
 # alignment plan of all genomes 
 #----------------------------#
 # Don't copy sequences (RepeatMasker done)
-# This plan includes all genomes, use the generated phylogenetic tree as guide
-#   tree for other plans
+# This plan includes all genomes.
+# Use the generated phylogenetic tree in this step as guide tree for other plans.
 
 # plan_ALL
 cd [% data_dir %]
 perl [% withncbi %]/taxon/strain_bz.pl \
-    --file [% data_dir %]/[% group_name %].csv \
+    --file [% data_dir %]/[% group_name %].taxon.csv \
     -w     [% base_dir %] \
     --name [% group_name %] \
     --multi_name plan_ALL \
@@ -305,7 +310,7 @@ EOF
         },
         File::Spec->catfile( $data_dir, $sh_name )
     ) or die Template->error;
-    
+
     if ( exists $yml->{plans} ) {
         print "Create .sh for each plans\n";
         my @plans = @{ $yml->{plans} };
@@ -322,7 +327,7 @@ cd [% data_dir %]
 # alignment plan for [% plan_name %]
 #----------------------------#
 perl [% withncbi %]/taxon/strain_bz.pl \
-    --file [% data_dir %]/[% group_name %].csv \
+    --file [% data_dir %]/[% group_name %].taxon.csv \
     -w     [% base_dir %] \
     --name [% group_name %] \
     --multi_name [% plan_name %] \

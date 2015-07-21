@@ -66,7 +66,7 @@ GetOptions(
     'skip=s'       => \%skip,
     'per_seq=s'    => \@per_seq,
     'downloaded=s' => \@downloaded,
-    'plan=s' => \@plan,
+    'plan=s'       => \@plan,
     'y|yes'        => \$yes,
 ) or pod2usage(2);
 
@@ -153,11 +153,24 @@ push @data_sort2, grep { !exists $_->{per_seq} } @data_sort;
 
 # 'name=Scer_S288c,taxon=559292,sciname=Saccharomyces cerevisiae S288c'
 if ( scalar @downloaded ) {
+    $stopwatch->block_message('Pre downloaded');
+
     for my $entry (@downloaded) {
         my %hash = map { split /=/ } ( split /;/, $entry );
-        $hash{downloaded} = 1;
-
         printf "Inject downloaded %s\n", $hash{name};
+
+        $hash{downloaded} = 1;
+        my $dir = File::Spec->catdir( $dir_scan, $hash{name} );
+        if ( -d $dir ) {
+            $hash{pre_dir} = $dir;
+            printf "%s => %s\n", $hash{name}, $hash{pre_dir};
+        }
+        else {
+            printf
+                "%s doesn't exist, make sure %s/ exists in working directory.\n",
+                $dir, $hash{name};
+        }
+
         unshift @data_sort2, \%hash;
     }
 }
@@ -168,7 +181,7 @@ if ( scalar @plan ) {
     my @ary;
     for my $entry (@plan) {
         my %hash = map { split /=/ } ( split /;/, $entry );
-        $hash{qs} = [split /,/, $hash{qs}];
+        $hash{qs} = [ split /,/, $hash{qs} ];
         printf "Inject plan %s\n", $hash{name};
         push @ary, \%hash;
     }
