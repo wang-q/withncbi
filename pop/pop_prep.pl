@@ -52,11 +52,12 @@ GetOptions(
 pod2usage(1) if $help;
 pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
 
+die "Need a YAML file" unless $file_yaml;
+
 #----------------------------------------------------------#
 # Init
 #----------------------------------------------------------#
 $stopwatch->start_message("Prepare pop");
-die "Need a YAML file" unless $file_yaml;
 
 my $yml = LoadFile($file_yaml);
 
