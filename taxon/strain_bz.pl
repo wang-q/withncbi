@@ -314,22 +314,11 @@ echo "chr_length.csv generated."
 rm chrUn.csv
 rm real_chr.csv
 
-[% IF !nostat -%]
-echo '# If you want, run the following cmds to merge csv files'
-echo
-echo perl [% aligndb %]/util/merge_csv.pl -t [% aligndb %]/data/taxon.csv -m [% working_dir %]/taxon.csv -f 0 -f 1
-echo
-echo perl [% aligndb %]/util/merge_csv.pl -t [% aligndb %]/data/chr_length.csv -m [% working_dir %]/chr_length.csv -f 0 -f 1
-echo
-[% END -%]
-
 EOF
     $tt->process(
         \$text,
         {   data        => \@data,
             working_dir => $working_dir,
-            aligndb     => $aligndb,
-            nostat      => $nostat,
         },
         File::Spec->catfile( $working_dir, $sh_name )
     ) or die Template->error;
@@ -604,7 +593,7 @@ fi
 find [% working_dir %]/[% multi_name %] -type f -name "*.maf" | parallel -j [% parallel %] gzip
 
 #----------------------------#
-# maf2fasta
+# maf2fas
 #----------------------------#
 mkdir -p [% working_dir %]/[% multi_name %]_fasta
 find [% working_dir %]/[% multi_name %] -name "*.maf" -or -name "*.maf.gz" \
