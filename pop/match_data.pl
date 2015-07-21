@@ -42,6 +42,7 @@ my $pattern;
 
 my %skip;
 my @per_seq;
+my @downloaded;
 
 my %other_opts;
 
@@ -62,6 +63,7 @@ GetOptions(
     'opt=s'       => \%other_opts,
     'skip=s'      => \%skip,
     'per_seq=s'   => \@per_seq,
+    'downloaded'  => \@downloaded,
     'y|yes'       => \$yes,
 ) or pod2usage(2);
 
@@ -79,6 +81,7 @@ my %per_seq = map { $_ => 1 } @per_seq;
 #----------------------------------------------------------#
 $stopwatch->start_message;
 
+$stopwatch->block_message("Load YAML");
 my $yml  = LoadFile($file_input);
 my @data = @{ $yml->{data} };
 
@@ -101,6 +104,12 @@ if ( defined $dir_scan and -d $dir_scan ) {
             @files;
         $item->{fasta} = $fasta;
         printf " " x 4 . "%s => %s\n", $item->{$match_field}, $item->{fasta};
+
+        if ( index( $item->{fasta}, $item->{name} ) == -1 ) {
+            printf " " x 4 . "[%s] with [%s] matches to [%s]\n", $item->{name},
+                $item->{prefix}, $item->{fasta};
+            die "Match errors. Please check.\n";
+        }
     }
 }
 
@@ -123,6 +132,15 @@ push @data_sort, grep { exists $_->{skip} } @data;
 # Move per_seq entries to head
 my @data_sort2 = grep { exists $_->{per_seq} } @data_sort;
 push @data_sort2, grep { !exists $_->{per_seq} } @data_sort;
+
+# 'name=Scer_S288c,taxon=559292,sciname=Saccharomyces cerevisiae S288c'
+if (scalar @downloaded) {
+    for my $entry (@downloaded) {
+        my %hash = map {split /=/} (split /,/, $entry);
+        $hash{downloaded} = 1;
+        unshift @data_sort2, \%hash;
+    }
+}
 $yml->{data} = \@data_sort2;
 
 $stopwatch->block_message("Other options");
@@ -176,6 +194,8 @@ match_data.pl - find matched files for each @data entry in YAML and store extra 
         --opt               %, Other options for running pop
         --skip              %, skip this strain
         --per_seq           @, split fasta by names, target or good assembles
+        --downloaded        Add an entry to @data which were download previously
+                            'name=Scer_S288c,taxon=559292,sciname=Saccharomyces cerevisiae S288c'
         -y, --yes           Overwrite existing YAML file
 
 =cut
