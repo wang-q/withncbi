@@ -137,6 +137,8 @@ for my $item (@data) {
     }
 }
 
+$stopwatch->block_message('Sort @data');
+
 # Move skipped entries to tail
 my @data_sort = grep { !exists $_->{skip} } @data;
 push @data_sort, grep { exists $_->{skip} } @data;
@@ -150,6 +152,8 @@ if ( scalar @downloaded ) {
     for my $entry (@downloaded) {
         my %hash = map { split /=/ } ( split /,/, $entry );
         $hash{downloaded} = 1;
+
+        printf "Inject downloaded %s\n", $hash{name};
         unshift @data_sort2, \%hash;
     }
 }
