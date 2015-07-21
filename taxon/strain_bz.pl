@@ -581,7 +581,7 @@ then
         -d [% working_dir %]/[% target_id %]vs[% id %] \
         [% END -%]
         -bin [% kent_bin %] \
-        --tree [% working_dir %]/rawphylo/[% multi_name %].nwk \
+        --tree [% working_dir %]/[% multi_name %]_rawphylo/[% multi_name %].nwk \
         --out [% working_dir %]/[% multi_name %] \
         -syn -p [% parallel %]
 else
@@ -616,7 +616,7 @@ perl [% egaz %]/refine_fasta.pl \
     -i [% working_dir %]/[% multi_name %]_fasta \
     -o [% working_dir %]/[% multi_name %]_refined
 
-#find [% working_dir %]/[% multi_name %]_refined -type f -name "*.fas" | parallel -j [% parallel %] gzip
+find [% working_dir %]/[% multi_name %]_refined -type f -name "*.fas" | parallel -j [% parallel %] gzip
 
 #----------------------------#
 # RAxML

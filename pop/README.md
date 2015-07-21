@@ -68,24 +68,14 @@
         --opt data_dir='~/data/alignment/trichoderma' \
         --opt rm_species=Fungi \
         --opt min_contig=10000 \
+        --plan 'name=four_way;t=Tart_IMI_2206040;qs=Tatr_XS215,Tree_QM6a,Tvir_Gv29_8' \
         --skip Tham_GD12='contigs are too short' \
         --per_seq Tatr_IMI_2206040
     ```
 
-6. Add multiply alignment plans to pop/trichoderma_test.yml.
+6. Edit pop/trichoderma_test.yml on necessary.
 
-    ```yaml
-    ---
-    plans:
-      - name: four_way
-        qs:
-          - Tvir_Gv29_8
-          - Tatr_XS215
-          - Tree_QM6a
-        t: Tart_IMI_2206040
-    ```
-
-    The following cmd update existing YAML file.
+    The following cmd refresh existing YAML file.
 
     ```bash
     perl ~/Scripts/withncbi/pop/gen_pop_conf.pl \
@@ -101,8 +91,8 @@
     1. `01_file.sh`: unzip, filter and split
     2. `02_rm.sh`: RepeatMasker
     3. `03_strain_info.sh`: strain_info
-    4. `04_plan_ALL.sh`: alignment plan of all genomes
-    5. `plan_four_way.sh`: alignment plan of `four_way`
+    4. `04_plan_ALL.sh`: alignment plan for all genomes
+    5. `plan_four_way.sh`: alignment plan for `four_way`
 
 8. Run scripts.
 
@@ -120,15 +110,15 @@
     sh 3_pair_cmd.sh
     sh 4_rawphylo.sh
     sh 5_multi_cmd.sh
-    sh 6_var_list.sh
     sh 7_multi_db_only.sh
     ```
 
 9. `plan_four_way.sh` will overwrite some bash files, execute the following:
 
     ```bash
+    sh plan_four_way.sh
+
     sh 5_multi_cmd.sh
-    sh 6_var_list.sh
     sh 7_multi_db_only.sh
     ```
 
