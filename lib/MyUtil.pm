@@ -317,7 +317,6 @@ sub find_group {
     }
 
     return ( $superkingdom, $group, $subgroup );
-
 }
 
 1;

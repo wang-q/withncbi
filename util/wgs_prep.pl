@@ -109,7 +109,7 @@ $stopwatch->block_message("Scrapping NCBI WGS...");
 my $master = {};
 {
     for my $key ( sort keys %{$wgsid_of} ) {
-        print " " x 4 . "$key\n";
+        print "$key\n";
         my $prefix = $wgsid_of->{$key};
         my $info   = wgs_worker($prefix);
         $info->{name} = $key;
