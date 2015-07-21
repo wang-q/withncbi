@@ -47,9 +47,14 @@ sub wgs_worker {
     my $mech = WWW::Mechanize->new;
     $mech->stack_depth(0);    # no history to save memory
 
+    # local shadowsocks proxy
+    if ($ENV{SSPROXY}) {
+        $mech->proxy(['http','https'], 'socks://127.0.0.1:1080' )
+    }
+
     my $url_part = "http://www.ncbi.nlm.nih.gov/Traces/wgs/";
     my $url      = $url_part . '?val=' . $term;
-    print $url, "\n";
+    print " " x 4 . $url . "\n";
 
     my $info = { prefix => $term, };
     $mech->get($url);
@@ -67,7 +72,7 @@ sub wgs_worker {
         );
 
         for my $table (@tables) {
-            print "Extract from table ", $table, "\n";
+            print " " x 4 . "Extract from table ", $table, "\n";
             my $te
                 = HTML::TableExtract->new( attribs => { class => $table, }, );
             $te->parse($page);
