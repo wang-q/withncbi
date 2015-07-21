@@ -12,6 +12,7 @@ use File::Basename;
 use File::Find::Rule;
 use File::Spec;
 use String::Compare;
+use List::MoreUtils qw(zip);
 
 use AlignDB::Stopwatch;
 
@@ -37,7 +38,7 @@ my $dir_scan;
 
 my $match_field = 'name';
 
-my @name_rules = ( "*.fa", "*.fa.gz" );
+my @name_rules;
 my $pattern;
 
 my %skip;
@@ -52,19 +53,19 @@ my $man  = 0;
 my $help = 0;
 
 GetOptions(
-    'help'        => \$help,
-    'man'         => \$man,
-    'i|input=s'   => \$file_input,
-    'o|output=s'  => \$file_output,
-    'd|dir=s'     => \$dir_scan,
-    'm|match=s'   => \$match_field,
-    'r|rule=s'    => \@name_rules,
-    'p|pattern=s' => \$pattern,
-    'opt=s'       => \%other_opts,
-    'skip=s'      => \%skip,
-    'per_seq=s'   => \@per_seq,
-    'downloaded'  => \@downloaded,
-    'y|yes'       => \$yes,
+    'help'         => \$help,
+    'man'          => \$man,
+    'i|input=s'    => \$file_input,
+    'o|output=s'   => \$file_output,
+    'd|dir=s'      => \$dir_scan,
+    'm|match=s'    => \$match_field,
+    'r|rule=s'     => \@name_rules,
+    'p|pattern=s'  => \$pattern,
+    'opt=s'        => \%other_opts,
+    'skip=s'       => \%skip,
+    'per_seq=s'    => \@per_seq,
+    'downloaded=s' => \@downloaded,
+    'y|yes'        => \$yes,
 ) or pod2usage(2);
 
 pod2usage(1) if $help;
@@ -75,6 +76,10 @@ unless ($file_output) {
 }
 
 my %per_seq = map { $_ => 1 } @per_seq;
+
+unless ( scalar @name_rules ) {
+    @name_rules = ( "*.fa", "*.fa.gz" );
+}
 
 #----------------------------------------------------------#
 # Start
@@ -94,20 +99,27 @@ if ( defined $dir_scan and -d $dir_scan ) {
     }
 
     $stopwatch->block_message("Match field");
+
+    my @name_rules_copy = map { s/\*//; $_ } @name_rules;
+    my @strips = map { basename( $_, @name_rules_copy ) } @files;
+    my $file_of = { zip( @strips, @files ) };
+
     for my $item (@data) {
         printf "Matching [%s]\n", $item->{name};
 
         # match the most similar name
         my ($fasta) = map { $_->[0] }
             sort { $b->[1] <=> $a->[1] }
-            map { [ $_, compare( basename($_), $item->{$match_field} ) ] }
-            @files;
-        $item->{fasta} = $fasta;
-        printf " " x 4 . "%s => %s\n", $item->{$match_field}, $item->{fasta};
+            map { [ $_, compare( $_, $item->{$match_field} ) ] }
+            keys %{$file_of};
+        $item->{fasta} = $file_of->{$fasta};
+        printf " " x 4 . "%s => %s => %s\n", $item->{$match_field}, $fasta,
+            $item->{fasta};
 
         if ( index( $item->{fasta}, $item->{name} ) == -1 ) {
             printf " " x 4 . "[%s] with [%s] matches to [%s]\n", $item->{name},
                 $item->{prefix}, $item->{fasta};
+            print " " x 4 . "Filtering with prefix and try again.\n";
             die "Match errors. Please check.\n";
         }
     }
@@ -134,9 +146,9 @@ my @data_sort2 = grep { exists $_->{per_seq} } @data_sort;
 push @data_sort2, grep { !exists $_->{per_seq} } @data_sort;
 
 # 'name=Scer_S288c,taxon=559292,sciname=Saccharomyces cerevisiae S288c'
-if (scalar @downloaded) {
+if ( scalar @downloaded ) {
     for my $entry (@downloaded) {
-        my %hash = map {split /=/} (split /,/, $entry);
+        my %hash = map { split /=/ } ( split /,/, $entry );
         $hash{downloaded} = 1;
         unshift @data_sort2, \%hash;
     }
@@ -156,7 +168,7 @@ if ( -e $file_output ) {
         }
         else {
             print
-                "[$file_output] exists and may contain manual added infomaton. Don't overwrite it.\n";
+                "[$file_output] exists and may contain manually added infomaton. Don't overwrite it.\n";
         }
     }
     else {
