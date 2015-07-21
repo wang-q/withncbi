@@ -51,13 +51,13 @@
     find WGS -name "*.gz" | xargs gzip -t 
     ```
 
-5. Use 'match_data.pl` find matched files for each @data entry in YAML and store extra options.
+5. Use 'gen_pop_conf.pl` find matched files for each @data entry in YAML and store extra options.
 
     * `per_seq` mean split fasta by names, target or good assembles should set it.
     * `skip` mean skip this strain.
 
     ```bash
-    perl ~/Scripts/withncbi/pop/match_data.pl \
+    perl ~/Scripts/withncbi/pop/gen_pop_conf.pl \
         -i ~/data/alignment/trichoderma/WGS/trichoderma.data.yml \
         -o ~/Scripts/withncbi/pop/trichoderma_test.yml \
         -d ~/data/alignment/trichoderma/WGS \
@@ -88,7 +88,7 @@
     The following cmd update existing YAML file.
 
     ```bash
-    perl ~/Scripts/withncbi/pop/match_data.pl \
+    perl ~/Scripts/withncbi/pop/gen_pop_conf.pl \
         -i ~/Scripts/withncbi/pop/trichoderma_test.yml
     ```
 
