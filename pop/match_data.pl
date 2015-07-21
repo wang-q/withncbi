@@ -146,6 +146,10 @@ if ( -e $file_output ) {
         DumpFile( $file_output, $yml );
     }
 }
+else {
+    $stopwatch->block_message("Write YAML [$file_output]");
+    DumpFile( $file_output, $yml );
+}
 
 $stopwatch->end_message;
 

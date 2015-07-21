@@ -68,7 +68,7 @@
         --opt data_dir='~/data/alignment/trichoderma' \
         --opt rm_species=Fungi \
         --skip Tham_GD12='contigs are too short' \
-        --per_seq Tart_IMI_2206040
+        --per_seq Tatr_IMI_2206040
     ```
 
 6. Add multiply alignment plans to pop/trichoderma_test.yml.
