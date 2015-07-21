@@ -109,7 +109,7 @@ $stopwatch->block_message("Scrapping NCBI WGS...");
 my $master = {};
 {
     for my $key ( sort keys %{$wgsid_of} ) {
-        print "$key\n";
+        print " " x 4 . "$key\n";
         my $prefix = $wgsid_of->{$key};
         my $info   = wgs_worker($prefix);
         $info->{name} = $key;
@@ -220,13 +220,13 @@ $stopwatch->block_message("Generate .data.yml");
 ---
 data:
 [% FOREACH name IN names -%]
-    - taxon: [% master.$name.taxon_id %]
-      name: '[% master.$name.name %]'
-      sciname: '[% master.$name.Organism %]'
-      prefix: '[% master.$name.prefix %]'
-      coverage: '[% master.$name.Genome_Coverage %] [% master.$name.Sequencing_Technology %]'
+  - taxon: [% master.$name.taxon_id %]
+    name: [% master.$name.name %]
+    sciname: [% master.$name.Organism %]
+    prefix: [% master.$name.prefix %]
+    coverage: [% master.$name.Genome_Coverage %] [% master.$name.Sequencing_Technology %]
 [% IF master.$name.original_id -%]
-      original_id: [% master.$name.original_id %]
+    original_id: [% master.$name.original_id %]
 [% END -%]
 [% END -%]
 
