@@ -1,4 +1,5 @@
-#Name	WGS	Organism
+#Name	WGS	Organism	Level
+Calb_WO_1	AAFO	Candida albicans WO-1	Chromosome
 Calb_3153A	AVAY	Candida albicans 3153A	Scaffold
 Calb_A123	AVAR	Candida albicans A123	Scaffold
 Calb_A155	AVAZ	Candida albicans A155	Scaffold
@@ -10,6 +11,32 @@ Calb_A84	AVBA	Candida albicans A84	Scaffold
 Calb_A92	AVAS	Candida albicans A92	Scaffold
 Calb_Ca529L	ASHC	Candida albicans Ca529L	Scaffold
 Calb_CHN1	AVAW	Candida albicans CHN1	Scaffold
-Calb_WO_1	AAFO	Candida albicans WO-1	Chromosome
 Ctro	JGYC	Candida tropicalis	Scaffold
 Ctro_MYA_3404	AAFN	Candida tropicalis MYA-3404	Scaffold
+Calb_12C	AJIQ	Candida albicans 12C	Contig
+Calb_19F	AJIV	Candida albicans 19F	Contig
+Calb_Ca6	AJJG	Candida albicans Ca6	Contig
+Calb_GC75	AJIW	Candida albicans GC75	Contig
+Calb_L26	AJIR	Candida albicans L26	Contig
+Calb_P34048	AJIZ	Candida albicans P34048	Contig
+Calb_P37005	AJIU	Candida albicans P37005	Contig
+Calb_P37037	AJJA	Candida albicans P37037	Contig
+Calb_P37039	JSXQ	Candida albicans P37039	Contig
+Calb_P57055	AJJB	Candida albicans P57055	Contig
+Calb_P57072	AJIY	Candida albicans P57072	Contig
+Calb_P60002	JSXP	Candida albicans P60002	Contig
+Calb_P75010	JSXR	Candida albicans P75010	Contig
+Calb_P75016	JPEV	Candida albicans P75016	Contig
+Calb_P75063	AJJC	Candida albicans P75063	Contig
+Calb_P76055	AJJD	Candida albicans P76055	Contig
+Calb_P76067	AJJE	Candida albicans P76067	Contig
+Calb_P78042	JPEW	Candida albicans P78042	Contig
+Calb_P78048	AJIX	Candida albicans P78048	Contig
+Calb_P87	AJIT	Candida albicans P87	Contig
+Calb_P94015	AJIS	Candida albicans P94015	Contig
+Calb_SC5314	AACQ	Candida albicans SC5314	Contig
+Cdub	JFFX	Candida dubliniensis	Contig
+Cmal_Xu316	AOGT	Candida maltosa Xu316	Contig
+Cort_AY2	AMDC	Candida orthopsilosis AY2	Contig
+Cpar	CBZQ	Candida parapsilosis	Contig
+Cpar_CDC317	CABE	Candida parapsilosis CDC317	Contig

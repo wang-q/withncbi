@@ -1,91 +1,5 @@
 # Operating steps for each group.
 
-## Candida WGS
-
-1. Create pop/candida.tsv manually.
-
-    http://www.ncbi.nlm.nih.gov/assembly?term=Candida
-
-    Query a local ar_genbank DB.
-    
-    ```sql
-    SELECT 
-        CONCAT(LEFT(genus, 1),
-                LEFT(TRIM(REPLACE(species, genus, '')),
-                    3),
-                REPLACE((REPLACE(organism_name, species, '')),
-                    ' ',
-                    '_')),
-        SUBSTRING(wgs_master, 1, 4),
-        organism_name,
-        assembly_level
-    FROM
-        ar_genbank.ar
-    WHERE
-        genus = 'Candida'
-            AND assembly_level != 'Contig'
-            AND wgs_master LIKE '%000%'
-    ORDER BY organism_name
-    ```
-
-2. Create working direcotry and download sequences.
-
-    ```bash
-    mkdir -p ~/data/alignment/candida
-    cd ~/data/alignment/candida
-    
-    perl ~/Scripts/withncbi/util/wgs_prep.pl \
-        -f ~/Scripts/withncbi/pop/candida.tsv \
-        --fix \
-        -o WGS \
-        -a 
-    
-    aria2c -x 6 -s 3 -c -i WGS/candida.url.txt
-    
-    find WGS -name "*.gz" | xargs gzip -t
-    
-    # rsync remote files
-    # rsync --progress -av wangq@139.162.23.84:/home/wangq/data/alignment/candida/ ~/data/alignment/candida
-    ```
-
-3. 'gen_pop_conf.pl`
-
-    ```bash
-    perl ~/Scripts/withncbi/pop/gen_pop_conf.pl \
-        -i ~/data/alignment/candida/WGS/candida.data.yml \
-        -o ~/Scripts/withncbi/pop/candida_test.yml \
-        -d ~/data/alignment/candida/WGS \
-        -m prefix \
-        -r '*.fsa_nt.gz' \
-        --opt group_name=candida \
-        --opt base_dir='~/data/alignment' \
-        --opt data_dir='~/data/alignment/candida' \
-        --opt rm_species=Fungi \
-        --per_seq Calb_WO_1
-    ```
-
-4. `pop_prep.pl`
-
-    ```bash
-    perl ~/Scripts/withncbi/pop/pop_prep.pl -p 12 -i ~/Scripts/withncbi/pop/candida_test.yml
-    
-    sh 01_file.sh
-    sh 02_rm.sh
-    sh 03_strain_info.sh
-    sh 04_plan_ALL.sh
-    ```
-
-5. `04_plan_ALL.sh`
-
-    ```bash
-    sh 1_real_chr.sh
-    sh 3_pair_cmd.sh
-    sh 4_rawphylo.sh
-    sh 5_multi_cmd.sh
-    sh 6_var_list.sh
-    sh 7_multi_db_only.sh
-    ```
-
 ## Saccharomyces WGS
 
 1. Create pop/saccharomyces.tsv manually.
@@ -198,10 +112,152 @@
     sh 7_multi_db_only.sh
     ```
 
-7. Restore everything to the beginning
+7. Cleaning.
+    
+    * Remove useless files
+    
+        ```bash
+        cd ~/data/alignment/saccharomyces
+        
+        # clean raw fasta
+        find . -maxdepth 1 -type d -name "*_raw" | xargs rm -fr
+        
+        # clean maf-fasta
+        find . -maxdepth 1 -type d -name "*_fasta" | xargs rm -fr
+        
+        # compress files
+        find . -name "*.maf" | parallel gzip
+        find . -name "*.fas" | parallel gzip
+        ```
+
+    * Restore everything to the beginning
+
+        ```bash
+        cd ~/data/alignment/saccharomyces
+
+        find . -maxdepth 1 -type d -not -path "*WGS" | grep "\.\/" | xargs rm -fr
+        rm *.xlsx *.csv *.sh *.bat *.nwk
+        ```
+
+## Candida WGS
+
+1. Create pop/candida.tsv manually.
+
+    http://www.ncbi.nlm.nih.gov/assembly?term=Candida
+
+    Query a local ar_genbank DB.
+    
+    ```sql
+    SELECT 
+        CONCAT(LEFT(genus, 1),
+                LEFT(TRIM(REPLACE(species, genus, '')),
+                    3),
+                REPLACE((REPLACE(organism_name, species, '')),
+                    ' ',
+                    '_')),
+        SUBSTRING(wgs_master, 1, 4),
+        organism_name,
+        assembly_level
+    FROM
+        ar_genbank.ar
+    WHERE
+        genus = 'Candida'
+            AND wgs_master LIKE '%000%'
+    ORDER BY assembly_level , organism_name
+    ```
+
+2. Create working direcotry and download WGS sequences.
 
     ```bash
-    cd ~/data/alignment/saccharomyces
-    find . -maxdepth 1 -type d -not -path "*WGS" | grep -v "\." | xargs rm -fr
-    rm *.xlsx *.csv *.sh *.bat *.nwk
+    mkdir -p ~/data/alignment/candida
+    cd ~/data/alignment/candida
+    
+    perl ~/Scripts/withncbi/util/wgs_prep.pl \
+        -f ~/Scripts/withncbi/pop/candida.tsv \
+        --fix \
+        -o WGS \
+        -a 
+    
+    aria2c -x 6 -s 3 -c -i WGS/candida.url.txt
+    
+    find WGS -name "*.gz" | xargs gzip -t
+    
+    # rsync remote files
+    # rsync --progress -av wangq@139.162.23.84:/home/wangq/data/alignment/candida/ ~/data/alignment/candida
     ```
+
+3. Download Candida dubliniensis CD36 and Candida orthopsilosis Co 90-125
+
+    ```bash
+    cd ~/data/alignment/candida/WGS
+
+    perl ~/Scripts/withncbi/util/assemble_csv.pl \
+        -f ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/All/GCF_000026945.1.assembly.txt \
+        -name Cdub_CD36 \
+        > Cdub_CD36.seq.csv
+
+    perl ~/Scripts/withncbi/util/assemble_csv.pl \
+        -f ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/All/GCF_000315875.1.assembly.txt \
+        -name Corh_Co_90_125 \
+        > Corh_Co_90_125.seq.csv
+    
+    # Download, rename files and change fasta headers
+    perl ~/Scripts/withncbi/util/batch_get_seq.pl \
+        -f Cdub_CD36.seq.csv  \
+        -r -p
+
+    perl ~/Scripts/withncbi/util/batch_get_seq.pl \
+        -f Corh_Co_90_125.seq.csv  \
+        -r -p 
+    ```
+
+3. 'gen_pop_conf.pl`
+
+    ```bash
+    perl ~/Scripts/withncbi/pop/gen_pop_conf.pl \
+        -i ~/data/alignment/candida/WGS/candida.data.yml \
+        -o ~/Scripts/withncbi/pop/candida_test.yml \
+        -d ~/data/alignment/candida/WGS \
+        -m prefix \
+        -r '*.fsa_nt.gz' \
+        --opt group_name=candida \
+        --opt base_dir='~/data/alignment' \
+        --opt data_dir='~/data/alignment/candida' \
+        --opt rm_species=Fungi \
+        --downloaded 'name=Cdub_CD36;taxon=573826;sciname=Candida dubliniensis CD36' \
+        --downloaded 'name=Corh_Co_90_125;taxon=1136231;sciname=Candida orthopsilosis Co 90-125' \
+        --plan 'name=four_way;t=Cdub_CD36;qs=Corh_Co_90_125,Calb_WO_1,Ctro_MYA_3404' \
+        --plan 'name=four_way_2;t=Corh_Co_90_125;qs=Cdub_CD36,Calb_WO_1,Ctro_MYA_3404'
+    ```
+
+4. `pop_prep.pl`
+
+    ```bash
+    perl ~/Scripts/withncbi/pop/pop_prep.pl -p 12 -i ~/Scripts/withncbi/pop/candida_test.yml
+    
+    sh 01_file.sh
+    sh 02_rm.sh
+    sh 03_strain_info.sh
+    sh 04_plan_ALL.sh
+    ```
+
+5. `04_plan_ALL.sh`
+
+    ```bash
+    sh 1_real_chr.sh
+    sh 3_pair_cmd.sh
+    sh 4_rawphylo.sh
+    sh 5_multi_cmd.sh
+    sh 6_var_list.sh
+    sh 7_multi_db_only.sh
+    ```
+
+6. For other plans
+
+    ```bash
+    sh plan_XXX.sh
+
+    sh 5_multi_cmd.sh
+    sh 7_multi_db_only.sh
+    ```
+
