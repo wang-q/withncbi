@@ -133,10 +133,10 @@ if ( defined $dir_scan and -d $dir_scan ) {
 $stopwatch->block_message("Mark flags");
 my $name_set = Set::Scalar->new;
 $name_set->insert( $_->{name} ) for @data;
-for my $key ( keys %per_seq, keys %skip ) {
-    if ( $name_set->has($key) ) {
+for my $name ( keys %per_seq, keys %skip ) {
+    if ( !$name_set->has($name) ) {
         die
-            "Check you --skip or --per_seq for [$key], which isn't present in YAML-data-names.\n";
+            "Check you --skip or --per_seq for [$name], which isn't present in YAML-data-names.\n";
     }
 }
 
@@ -193,6 +193,15 @@ if ( scalar @plan ) {
     for my $entry (@plan) {
         my %hash = map { split /=/ } ( split /;/, $entry );
         $hash{qs} = [ split /,/, $hash{qs} ];
+
+        for my $name ( $hash{t}, $hash{o}, @{ $hash{qs} } ) {
+
+            if ( !$name_set->has($name) ) {
+                die
+                    "Check you --plan for [$name], which isn't present in YAML-data-names.\n";
+            }
+        }
+
         printf "Inject plan %s\n", $hash{name};
         push @ary, \%hash;
     }
