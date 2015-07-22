@@ -263,6 +263,7 @@
     ```bash
     sh plan_XXX.sh
 
+    # sh 3_pair_cmd.sh # Only do this when target switched, e.g. four_way_2
     sh 5_multi_cmd.sh
     sh 7_multi_db_only.sh
     ```
