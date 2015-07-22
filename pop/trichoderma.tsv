@@ -1,13 +1,12 @@
-#Name	WGS	Organism
-# http://www.ncbi.nlm.nih.gov/assembly?term=Trichoderma
-Tatr_IMI_2206040	ABDG02	Trichoderma atroviride IMI 206040
-Tatr_XS215	JZUQ01	Trichoderma atroviride XS2015
-Tham_GD12	ANCB01	Trichoderma hamatum GD12
-Thar_B05	JNNP01	Trichoderma harzianum B05
-Thar_T6776	JOKZ01	Trichoderma harzianum T6776
-Tlon_SMF2	ANBJ01	Trichoderma longibrachiatum SMF2
-Tpar	LFMI01	Trichoderma parareesei
-Tree_QM6a	AAIL02	Trichoderma reesei QM6a
-Tree_RUT_C_30	JABP01	Trichoderma reesei RUT C-30
-Tvir_FT_333	JTGJ01	Trichoderma virens FT-333
-Tvir_Gv29_8	ABDF02	Trichoderma virens Gv29-8
+#Name	WGS	Organism Assemble_level
+Tham_GD12	ANCB	Trichoderma hamatum GD12	Scaffold
+Tlon_SMF2	ANBJ	Trichoderma longibrachiatum SMF2	Scaffold
+Tree_QM6a	AAIL	Trichoderma reesei QM6a	Scaffold
+Tree_RUT_C-30	JABP	Trichoderma reesei RUT C-30	Scaffold
+Tatr_XS215	JZUQ	Trichoderma atroviride XS2015	Contig
+Thar_B05	JNNP	Trichoderma harzianum B05	Contig
+Thar_T6776	JOKZ	Trichoderma harzianum T6776	Contig
+Tatr_IMI_206040	ABDG	Trichoderma atroviride IMI 206040	Contig
+Tpar	LFMI	Trichoderma parareesei	Contig
+Tvir_FT_333	JTGJ	Trichoderma virens FT-333	Contig
+Tvir_Gv29_8	ABDF	Trichoderma virens Gv29-8	Contig
