@@ -13,6 +13,7 @@ use File::Find::Rule;
 use File::Spec;
 use String::Compare;
 use List::MoreUtils qw(zip);
+use Set::Scalar;
 
 use AlignDB::Stopwatch;
 
@@ -130,6 +131,15 @@ if ( defined $dir_scan and -d $dir_scan ) {
 }
 
 $stopwatch->block_message("Mark flags");
+my $name_set = Set::Scalar->new;
+$name_set->insert( $_->{name} ) for @data;
+for my $key ( keys %per_seq, keys %skip ) {
+    if ( $name_set->has($key) ) {
+        die
+            "Check you --skip or --per_seq for [$key], which isn't present in YAML-data-names.\n";
+    }
+}
+
 for my $item (@data) {
     if ( $skip{ $item->{name} } ) {
         printf "[%s] Mark flag 'skip'\n", $item->{name};
@@ -223,7 +233,7 @@ __END__
 
 =head1 NAME
 
-gen_pop_conf.pl - find matched files for each @data entry in YAML and store other options.
+gen_pop_conf.pl - for each @data entries in YAML, find matched files, check parameters and store other options.
 
 =head1 SYNOPSIS
 
