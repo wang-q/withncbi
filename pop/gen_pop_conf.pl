@@ -155,7 +155,7 @@ push @data_sort2, grep { !exists $_->{per_seq} } @data_sort;
 if ( scalar @downloaded ) {
     $stopwatch->block_message('Pre downloaded');
 
-    for my $entry (@downloaded) {
+    for my $entry ( reverse @downloaded ) {
         my %hash = map { split /=/ } ( split /;/, $entry );
         printf "Inject downloaded %s\n", $hash{name};
 
@@ -171,6 +171,7 @@ if ( scalar @downloaded ) {
                 $dir, $hash{name};
         }
 
+        # to the head
         unshift @data_sort2, \%hash;
     }
 }

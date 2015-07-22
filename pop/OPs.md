@@ -143,7 +143,11 @@
 
 1. Create pop/candida.tsv manually.
 
-    http://www.ncbi.nlm.nih.gov/assembly?term=Candida
+    Check NCBI pages
+    
+    * http://www.ncbi.nlm.nih.gov/Traces/wgs/?page=1&term=Candida*&order=organism
+    * http://www.ncbi.nlm.nih.gov/assembly?term=txid1535326[Organism:exp]
+    * http://www.ncbi.nlm.nih.gov/genome/?term=txid1535326[Organism:exp]
 
     Query a local ar_genbank DB.
     
@@ -212,6 +216,8 @@
     ```
 
 3. 'gen_pop_conf.pl`
+
+    Pay attentions to --downloaded orders. The first one will be the default target.
 
     ```bash
     perl ~/Scripts/withncbi/pop/gen_pop_conf.pl \
