@@ -6,7 +6,7 @@
 
     http://www.ncbi.nlm.nih.gov/assembly?term=Saccharomyces%20kudriavzevii
 
-2. Create working direcotry and download WGS sequences.
+2. Create working directory and download WGS sequences.
 
     ```bash
     mkdir -p ~/data/alignment/saccharomyces
