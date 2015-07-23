@@ -90,6 +90,8 @@
 
     Edit the crude .tsv, put in it `~/Scripts/withncbi/pop/` and run `wgs_prep.pl` again.
 
+    For detailed WGS info, click Prefix column lead to WGS project, where we could download gzipped fasta and project description manually.
+
 2. `wgs_prep.pl` will create a directory named `WGS` and three files containing meta information:
 
     ```bash
