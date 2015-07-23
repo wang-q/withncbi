@@ -45,27 +45,27 @@
     # stage1
     # Results from sql query.
     mysql -ualignDB -palignDB ar_refseq -e \
-    	"SELECT bioproject, SUBSTRING(wgs_master,1,4) as prefix, organism_name, assembly_level FROM ar WHERE genus_id = $GENUS_ID" \
+    	"SELECT SUBSTRING(wgs_master,1,6) as prefix0, SUBSTRING(wgs_master,1,4) as prefix, organism_name, assembly_level FROM ar WHERE wgs_master LIKE '%000%' AND genus_id = $GENUS_ID" \
     	> raw.tsv
 
     mysql -ualignDB -palignDB ar_genbank -e \
-        "SELECT bioproject, SUBSTRING(wgs_master,1,4) as prefix, organism_name, assembly_level FROM ar WHERE genus_id = $GENUS_ID" \
+        "SELECT SUBSTRING(wgs_master,1,6) as prefix0, SUBSTRING(wgs_master,1,4) as prefix, organism_name, assembly_level FROM ar WHERE wgs_master LIKE '%000%' AND genus_id = $GENUS_ID" \
         >> raw.tsv
 
     mysql -ualignDB -palignDB gr -e \
-        "SELECT bioproject, SUBSTRING(wgs,1,4) as prefix, organism_name, status FROM gr WHERE genus_id = $GENUS_ID" \
+        "SELECT SUBSTRING(wgs_master,1,6) as prefix0, SUBSTRING(wgs,1,4) as prefix, organism_name, status FROM gr WHERE wgs LIKE '%000%' AND genus_id = $GENUS_ID" \
         >> raw.tsv
 
     # stage2
     # Combined with NCBI WGS page.
     curl "http://www.ncbi.nlm.nih.gov/Traces/wgs/?&size=100&term=$GENUS&retmode=text&size=all" \
         | perl -nl -a -F"\t" -e \
-        '$F[0] = substr($F[0],0,4); print qq{$F[2]\t$F[0]\t$F[4]\t$F[5]}' \
+        '$p = substr($F[0],0,4); print qq{$F[0]\t$p\t$F[4]\t$F[5]}' \
         >> raw.tsv
 
     cat raw.tsv \
         | perl -nl -a -F"\t" -e \
-        'BEGIN{my %seen}; /^bioproject/i and next; $seen{$F[1]}++; $seen{$F[1]} > 1 and next; print' \
+        'BEGIN{my %seen}; /^prefix/i and next; $seen{$F[1]}++; $seen{$F[1]} > 1 and next; print' \
         > raw2.tsv
 
     # stage3
