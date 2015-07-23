@@ -75,6 +75,10 @@ my $min_contig
     = exists $yml->{min_contig}
     ? $yml->{min_contig}
     : $Config->{pop}{min_contig};
+my $per_seq_min_contig
+    = exists $yml->{per_seq_min_contig}
+    ? $yml->{per_seq_min_contig}
+    : $Config->{pop}{per_seq_min_contig};
 
 if ( !$parallel ) {
     $parallel
@@ -115,11 +119,14 @@ for my $item (@data) {
 #!/bin/bash
 cd [% data_dir %]
 
-#----------------------------#
+#----------------------------------------------------------#
 # unzip, filter and split
-#----------------------------#
+#----------------------------------------------------------#
+
 [% FOREACH item IN data -%]
-# [% item.name %] [% item.coverage %] 
+#----------------------------#
+# [% item.name %]
+#----------------------------#
 echo [% item.name %]
 
 [% IF item.skip -%]
@@ -131,20 +138,19 @@ cp -R [% item.pre_dir %] .
 [% END -%]
 [% ELSE -%]
 echo '    Unzip, filter and split.'
-
 cd [% item.dir %]
 gzip -d -c [% item.fasta %] > toplevel.fa
 perl -p -i -e '/>/ and s/\>gi\|(\d+).*/\>gi_$1/' toplevel.fa
-faops count toplevel.fa | perl -aln -e 'next if $F[0] eq 'total'; print $F[0] if $F[1] > [% min_contig * 10 %]; print $F[0] if $F[1] > [% min_contig %]  and $F[6]/$F[1] < 0.05' | uniq > listFile
-faops some toplevel.fa listFile toplevel.filtered.fa
 [% IF item.per_seq -%]
+faops count toplevel.fa | perl -aln -e 'next if $F[0] eq 'total'; print $F[0] if $F[1] > [% per_seq_min_contig * 10 %]; print $F[0] if $F[1] > [% per_seq_min_contig %]  and $F[6]/$F[1] < 0.05' | uniq > listFile
+faops some toplevel.fa listFile toplevel.filtered.fa
 faops split-name toplevel.filtered.fa .
 [% ELSE -%]
+faops count toplevel.fa | perl -aln -e 'next if $F[0] eq 'total'; print $F[0] if $F[1] > [% min_contig * 10 %]; print $F[0] if $F[1] > [% min_contig %]  and $F[6]/$F[1] < 0.05' | uniq > listFile
+faops some toplevel.fa listFile toplevel.filtered.fa
 faops split-about toplevel.filtered.fa [% split_about %] .
 [% END -%]
 rm toplevel.fa toplevel.filtered.fa listFile
-
-rename 's/fa$/fasta/' *.fa;
 [% END -%]
 
 [% END -%]
@@ -153,10 +159,11 @@ EOF
 
     $tt->process(
         \$text,
-        {   data        => \@data,
-            data_dir    => $data_dir,
-            split_about => $split_about,
-            min_contig  => $min_contig,
+        {   data               => \@data,
+            data_dir           => $data_dir,
+            split_about        => $split_about,
+            min_contig         => $min_contig,
+            per_seq_min_contig => $per_seq_min_contig,
         },
         File::Spec->catfile( $data_dir, $sh_name )
     ) or die Template->error;
@@ -175,7 +182,7 @@ echo Doing RepeatMasker
 
 [% FOREACH item IN data -%]
 #----------------------------#
-# [% item.name %] [% item.coverage %]
+# [% item.name %]
 #----------------------------#
 echo [% item.name %]
 
@@ -183,7 +190,18 @@ echo [% item.name %]
 echo '    SKIP! [% item.skip %]'
 [% ELSE -%]
 cd [% item.dir %]
-RepeatMasker [% item.dir %]/*.fasta [% IF rm_species %]-species [% rm_species %][% END %] -xsmall --parallel [% parallel %]
+
+for f in `find [% item.dir%] -name "*.fa"` ; do
+    rename 's/fa$/fasta/' $f ;
+done
+
+for f in `find [% item.dir%] -name "*.fasta"` ; do
+    RepeatMasker $f [% IF rm_species %]-species [% rm_species %][% END %] -xsmall --parallel [% parallel %] ;
+done
+
+for f in `find [% item.dir%] -name "*.fasta.out"` ; do
+    rmOutToGFF3.pl $f > `dirname $f`/`basename $f .fasta.out`.rm.gff;
+done
 [% END -%]
 
 [% END -%]
@@ -196,7 +214,7 @@ echo Cleaning RepeatMasker
 
 [% FOREACH item IN data -%]
 #----------------------------#
-# [% item.name %] [% item.coverage %]
+# [% item.name %]
 #----------------------------#
 echo [% item.name %]
 
@@ -204,12 +222,15 @@ echo [% item.name %]
 echo '    SKIP! [% item.skip %]'
 [% ELSE -%]
 cd [% item.dir %]
-for i in *.fasta;
-do
-    if [ -f $i.masked ];
+for f in `find [% item.dir%] -name "*.fasta"` ; do
+    if [ -f $f.masked ];
     then
-        rename 's/fasta.masked$/fa/' $i.masked;
-        find [% item.dir %] -type f -name "`basename $i`*" | xargs rm 
+        rename 's/fasta.masked$/fa/' $f.masked;
+        find [% item.dir%] -type f -name "`basename $f`*" | xargs rm;
+    else
+        rename 's/fasta$/fa/' $f;
+        echo `date` "RepeatMasker on $f failed.\n" >> RepeatMasker.log
+        find [% item.dir%] -type f -name "`basename $f`*" | xargs rm;
     fi;
 done;
 [% END -%]
@@ -235,9 +256,9 @@ EOF
 #!/bin/bash
 cd [% data_dir %]
 
-#----------------------------#
+#----------------------------------------------------------#
 # generate taxon file
-#----------------------------#
+#----------------------------------------------------------#
 perl [% withncbi %]/taxon/strain_info.pl \
 [% FOREACH item IN data -%]
 [% IF ! item.skip -%]
@@ -264,16 +285,16 @@ EOF
         File::Spec->catfile( $data_dir, $sh_name )
     ) or die Template->error;
 
-    # 04_plan_ALL.sh
-    $sh_name = "04_plan_ALL.sh";
+    # plan_ALL.sh
+    $sh_name = "plan_ALL.sh";
     print "Create $sh_name\n";
     $text = <<'EOF';
 #!/bin/bash
 cd [% data_dir %]
 
-#----------------------------#
+#----------------------------------------------------------#
 # alignment plan of all genomes 
-#----------------------------#
+#----------------------------------------------------------#
 # Don't copy sequences (RepeatMasker done)
 # This plan includes all genomes.
 # Use the generated phylogenetic tree in this step as guide tree for other plans.
@@ -323,9 +344,9 @@ EOF
 #!/bin/bash
 cd [% data_dir %]
 
-#----------------------------#
+#----------------------------------------------------------#
 # alignment plan for [% plan_name %]
-#----------------------------#
+#----------------------------------------------------------#
 perl [% withncbi %]/taxon/strain_bz.pl \
     --file [% data_dir %]/[% group_name %].taxon.csv \
     -w     [% base_dir %] \
