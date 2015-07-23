@@ -77,6 +77,7 @@
         | perl -nl -a -F"," -e \
         '/^prefix/i and next; s/"//g for @F; @O =split(/ /, $F[3]); $F[4] =~ s/\W+/_/g; $name = substr($O[0],0,1) . substr($O[1],0,3) . q{_} . $F[4]; print qq{$name\t$F[0]\t$F[3]\t$F[9]}' \
         | sort -t$'\t' -k4 -n \
+        | uniq \
         >> raw3.tsv
 
     mv raw3.tsv $GENUS.tsv

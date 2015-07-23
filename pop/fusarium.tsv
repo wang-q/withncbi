@@ -1,17 +1,14 @@
-#name	prefix	Organism	Contigs
+#name	prefix	organism	contigs
 Fpse_CS3270	JTGB	Fusarium pseudograminearum	44
 Fsp_JS626	JWIV	Fusarium sp. JS626	63
-Fave_FaLH03	JQGD	Fusarium avenaceum	105
-Fave_FaLH03	JQGD	Fusarium avenaceum	105
 Fave_FaLH03	JQGD	Fusarium avenaceum	105
 Fsp_JS1030	JWIW	Fusarium sp. JS1030	107
 Fver_7600	AAIM	Fusarium verticillioides 7600	213
 Nhae_mpVI_77_13_4	ACJF	Nectria haematococca mpVI 77-13-4	233
 Foxy_Fo47	AFMM	Fusarium oxysporum Fo47	419
 Fgra_CS3005	JATU	Fusarium graminearum	424
-Fgra_PH_1_NRRL_31084	AACM	Fusarium graminearum PH-1	435
+Fgra_PH_1	AACM	Fusarium graminearum PH-1	435
 Ffuj_B14	ANFV	Fusarium fujikuroi B14	455
-Fgra_241165	LAKA	Fusarium graminearum	486
 Fgra_241165	LAKA	Fusarium graminearum	486
 Foxy_FOSC_3_a	AFML	Fusarium oxysporum FOSC 3-a	545
 Foxy_54006	AGND	Fusarium oxysporum f. sp. cubense tropical race 4 54006	716
