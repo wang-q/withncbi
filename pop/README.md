@@ -31,17 +31,63 @@
     ORDER BY assembly_level , organism_name
     ```
 
-    When the two approach get very different number of strains, you can use the [downloaded list](http://www.ncbi.nlm.nih.gov/Traces/wgs/?&size=100&term=Trichoderma&state=live&retmode=text),
-    create a quick .tsv file containing BioProject,Prefix,Organism,# of Contigs.
+    When the two approach get very different number of strains, you run the following
+    steps.
+
+    Check intermediate results.
 
     ```bash
-    curl 'http://www.ncbi.nlm.nih.gov/Traces/wgs/?&size=100&term=Trichoderma&retmode=text&size=all' \
-        | perl -nl -a -F"\t" -e 'print qq{$F[2]\t$F[0]\t$F[4]\t$F[5]}' \
-        > raw.tsv
+    export GENUS_ID=5543
+    export GENUS=trichoderma
+    mkdir -p ~/data/alignment/$GENUS
+    cd ~/data/alignment/$GENUS
+
+    # stage1
+    # Results from sql query.
+    mysql -ualignDB -palignDB ar_refseq -e \
+    	"SELECT bioproject, SUBSTRING(wgs_master,1,4) as prefix, organism_name, assembly_level FROM ar WHERE genus_id = $GENUS_ID" \
+    	> raw.tsv
+
+    mysql -ualignDB -palignDB ar_genbank -e \
+        "SELECT bioproject, SUBSTRING(wgs_master,1,4) as prefix, organism_name, assembly_level FROM ar WHERE genus_id = $GENUS_ID" \
+        >> raw.tsv
+
+    mysql -ualignDB -palignDB gr -e \
+        "SELECT bioproject, SUBSTRING(wgs,1,4) as prefix, organism_name, status FROM gr WHERE genus_id = $GENUS_ID" \
+        >> raw.tsv
+
+    # stage2
+    # Combined with NCBI WGS page.
+    curl "http://www.ncbi.nlm.nih.gov/Traces/wgs/?&size=100&term=$GENUS&retmode=text&size=all" \
+        | perl -nl -a -F"\t" -e \
+        '$F[0] = substr($F[0],0,4); print qq{$F[2]\t$F[0]\t$F[4]\t$F[5]}' \
+        >> raw.tsv
+
+    cat raw.tsv \
+        | perl -nl -a -F"\t" -e \
+        'BEGIN{my %seen}; /^bioproject/i and next; $seen{$F[1]}++; $seen{$F[1]} > 1 and next; print' \
+        > raw2.tsv
+
+    # stage3
+    # Run `wgs_prep.pl` to get a crude `raw2.csv`
+    perl ~/Scripts/withncbi/util/wgs_prep.pl -f raw2.tsv --csvonly
+
+    echo -e '#name\tprefix\tOrganism\tContigs' > raw3.tsv
+    cat raw2.csv \
+        | perl -nl -a -F"," -e \
+        '/^prefix/i and next; s/"//g for @F; @O =split(/ /, $F[3]); $F[4] =~ s/\W+/_/g; $name = substr($O[0],0,1) . substr($O[1],0,3) . q{_} . $F[4]; print qq{$name\t$F[0]\t$F[3]\t$F[9]}' \
+        | sort -t$'\t' -k4 -n \
+        >> raw3.tsv
+
+    mv raw3.tsv $GENUS.tsv
+
+    # Cleaning
+    rm raw*.*sv
+    unset GENUS_ID
+    unset GENUS
     ```
 
-    Then combined with the result from sql query. Run `wgs_prep.pl` to get `WGS/trichoderma.csv`,
-    filter out duplicated items based on WGS prefix and run `wgs_prep.pl` again.
+    Edit the crude .tsv, put in it `~/Scripts/withncbi/pop/` and run `wgs_prep.pl` again.
 
 2. `wgs_prep.pl` will create a directory named `WGS` and three files containing meta information:
 
@@ -219,3 +265,9 @@
 
     The whole `pop/` and much of `util/` scripts are for Eukaryotes. For small genomes
     of bacteria and archea, check `taxon/bac_prepare.pl`.
+
+* Your command lines executed and the results are wired.
+
+    Be sure you aren't in Windows.
+
+    Or send what you want to me and let me do the job.
