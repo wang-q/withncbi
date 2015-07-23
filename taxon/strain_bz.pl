@@ -357,7 +357,7 @@ for f in `find [% item.dir%] -name "*.fasta"` ; do
         find [% item.dir%] -type f -name "`basename $f`*" | xargs rm;
     else
         rename 's/fasta$/fa/' $f;
-        echo "RepeatMasker on $f failed.\n" >> RepeatMasker.log
+        echo `date` "RepeatMasker on $f failed.\n" >> RepeatMasker.log
         find [% item.dir%] -type f -name "`basename $f`*" | xargs rm;
     fi;
 done;

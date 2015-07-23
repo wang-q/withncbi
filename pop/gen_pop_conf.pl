@@ -195,7 +195,7 @@ if ( scalar @plan ) {
         $hash{qs} = [ split /,/, $hash{qs} ];
 
         for my $name ( $hash{t}, $hash{o}, @{ $hash{qs} } ) {
-
+            next unless defined $name;
             if ( !$name_set->has($name) ) {
                 die
                     "Check you --plan for [$name], which isn't present in YAML-data-names.\n";
@@ -220,6 +220,7 @@ if ( -e $file_output ) {
             DumpFile( $file_output, $yml );
         }
         else {
+            $stopwatch->block_message("NOTICE");
             print
                 "[$file_output] exists and may contain manually added infomaton. Don't overwrite it.\n";
         }
