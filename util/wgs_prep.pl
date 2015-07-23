@@ -41,6 +41,8 @@ my $file_input;
 my $dir_output;
 my $aria2;    # generate a aria2 input file
 
+my $csvonly;
+
 # sometimes WGS records miss assigning strain id
 my $fix_strain;
 
@@ -57,7 +59,7 @@ GetOptions(
     'o|d|dir=s'  => \$dir_output,
     'a|aria2'    => \$aria2,
     'fix'        => \$fix_strain,
-
+    'csvonly'    => \$csvonly,
 ) or pod2usage(2);
 
 pod2usage(1) if $help;
@@ -135,10 +137,8 @@ $stopwatch->block_message(
     $csv->eol("\n");
 
     my $file_csv = File::Spec->catfile( $dir_output, "$basename.csv" );
-    my $file_url = File::Spec->catfile( $dir_output, "$basename.url.txt" );
 
     open my $csv_fh, ">", $file_csv;
-    open my $url_fh, ">", $file_url;
 
     my @columns = (
         'prefix',                'taxon_id',
@@ -158,7 +158,7 @@ $stopwatch->block_message(
         # Don't use hashref here, because I want use hash slices.
         my %info = %{ $master->{$key} };
 
-        if ($fix_strain) {
+        if ( !$csvonly and $fix_strain ) {
             if ( $info{Organism} =~ /$info{Biosource}/ ) {
                 print "Don't need fixing for $info{name}\n";
             }
@@ -181,41 +181,51 @@ $stopwatch->block_message(
         $csv->print( $csv_fh, [ @info{@columns} ] );
         $master->{$key} = \%info;
 
-        my @downloads = @{ $info{download} };
-        if ($aria2) {
-            for (@downloads) {
-                print {$url_fh} $_, "\n";
-                print {$url_fh} "  dir=", "$dir_output/$key", "\n";
-            }
-        }
-        else {
-            print {$url_fh} $_, "\n" for @downloads;
-        }
     }
-
     close $csv_fh;
-    close $url_fh;
 
     print "\n", "=" x 20, "\n";
     print ".csv generated.\n";
 
-    print "\n", "=" x 20, "\n";
-    if ($aria2) {
-        print "# Run the follow cmd to download with aria2c\n";
-        print "aria2c -x 6 -s 3 -c -i $file_url\n";
+    if ( !$csvonly ) {
+        my $file_url = File::Spec->catfile( $dir_output, "$basename.url.txt" );
+        open my $url_fh, ">", $file_url;
+        for my $key (@orig_orders) {
+
+            my %info = %{ $master->{$key} };
+
+            my @downloads = @{ $info{download} };
+            if ($aria2) {
+                for (@downloads) {
+                    print {$url_fh} $_, "\n";
+                    print {$url_fh} "  dir=", "$dir_output/$key", "\n";
+                }
+            }
+            else {
+                print {$url_fh} $_, "\n" for @downloads;
+            }
+
+        }
+        close $url_fh;
+        if ($aria2) {
+            print "# Run the follow cmd to download with aria2c\n";
+            print "aria2c -x 6 -s 3 -c -i $file_url\n";
+            print "\n";
+            print "# Use the following cmd to check .gz files\n";
+            print "find $dir_output -name \"*.gz\" | xargs gzip -t \n";
+        }
+        else {
+            print "Download urls in file $file_url\n";
+        }
     }
-    else {
-        print "Download files in $file_url\n";
-    }
-    print "# Use the following cmd to check .gz files\n";
-    print "find $dir_output -name \"*.gz\" | xargs gzip -t \n";
 }
 
 #----------------------------#
 # @data yaml
 #----------------------------#
-$stopwatch->block_message("Generate .data.yml");
-{
+if ( !$csvonly ) {
+    $stopwatch->block_message("Generate .data.yml");
+
     my $file_data = File::Spec->catfile( $dir_output, "$basename.data.yml" );
 
     my $text = <<'EOF';
@@ -238,9 +248,10 @@ EOF
         $file_data )
         or die Template->error;
 
-    print "\n", "=" x 20, "\n";
     print ".data.txt generated.\n";
 }
+
+$stopwatch->end_message;
 
 exit;
 
@@ -260,6 +271,7 @@ wgs_prep.pl - prepare WGS materials
         -o, -d, --dir       output dir
         -a, --aria2         url file is for aria2
         --fix               sometimes WGS records miss assigning strain id
+        --csvonly           only generate the csv file
 
     perl wgs_prep.pl -a -f trichoderma.tsv -o WGS
     Three files will be generated.
