@@ -72,7 +72,7 @@
     # Run `wgs_prep.pl` to get a crude `raw2.csv`
     perl ~/Scripts/withncbi/util/wgs_prep.pl -f raw2.tsv --csvonly
 
-    echo -e '#name\tprefix\tOrganism\tContigs' > raw3.tsv
+    echo -e '#name\tprefix\torganism\tcontigs' > raw3.tsv
     cat raw2.csv \
         | perl -nl -a -F"," -e \
         '/^prefix/i and next; s/"//g for @F; @O =split(/ /, $F[3]); $F[4] =~ s/\W+/_/g; $name = substr($O[0],0,1) . substr($O[1],0,3) . q{_} . $F[4]; print qq{$name\t$F[0]\t$F[3]\t$F[9]}' \

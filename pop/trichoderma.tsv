@@ -1,12 +1,12 @@
-#Name	WGS	Organism	Assembly_level
-Tham_GD12	ANCB	Trichoderma hamatum GD12	Scaffold
-Tlon_SMF2	ANBJ	Trichoderma longibrachiatum SMF2	Scaffold
-Tree_QM6a	AAIL	Trichoderma reesei QM6a	Scaffold
-Tree_RUT_C_30	JABP	Trichoderma reesei RUT C-30	Scaffold
-Tatr_XS215	JZUQ	Trichoderma atroviride XS2015	Contig
-Thar_B05	JNNP	Trichoderma harzianum B05	Contig
-Thar_T6776	JOKZ	Trichoderma harzianum T6776	Contig
-Tatr_IMI_206040	ABDG	Trichoderma atroviride IMI 206040	Contig
-Tpar	LFMI	Trichoderma parareesei	Contig
-Tvir_FT_333	JTGJ	Trichoderma virens FT-333	Contig
-Tvir_Gv29_8	ABDF	Trichoderma virens Gv29-8	Contig
+#name	prefix	organism	contigs
+Tatr_IMI_206040	ABDG	Trichoderma atroviride IMI 206040	29
+Tvir_Gv29_8	ABDF	Trichoderma virens Gv29-8	93
+Tree_QM6a	AAIL	Trichoderma reesei QM6a	121
+Tatr_XS2015	JZUQ	Trichoderma atroviride	131
+Tlon_SMF2	ANBJ	Trichoderma longibrachiatum SMF2	316
+Tvir_FT_333	JTGJ	Trichoderma virens FT-333	586
+Tree_RUT_C_30	JABP	Trichoderma reesei RUT C-30	680
+Tpar_	LFMI	Trichoderma parareesei	885
+Thar_B05	JNNP	Trichoderma harzianum	1439
+Thar_T6776	JOKZ	Trichoderma harzianum	1572
+Tham_GD12	ANCB	Trichoderma hamatum GD12	14797
