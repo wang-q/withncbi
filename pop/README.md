@@ -1,6 +1,7 @@
 ## STEPS
 
-1. Create `pop/trichoderma.tsv` manually, be careful with tabs and spaces.
+1. Create `pop/trichoderma.tsv` manually. Names should only contain alphanumeric characters and underscores.
+  Be careful with tabs and spaces, because .tsv stands for Tab-separated values, white spaces matters.
 
     Check NCBI pages
 
@@ -30,7 +31,17 @@
     ORDER BY assembly_level , organism_name
     ```
 
-    Sometimes you should finish step 2, adjust names according `WGS/trichoderma.csv` and run `wgs_prep.pl` again.
+    When the two approach get very different number of strains, you can use the [downloaded list](http://www.ncbi.nlm.nih.gov/Traces/wgs/?&size=100&term=Trichoderma&state=live&retmode=text),
+    create a quick .tsv file containing BioProject,Prefix,Organism,# of Contigs.
+
+    ```bash
+    curl 'http://www.ncbi.nlm.nih.gov/Traces/wgs/?&size=100&term=Trichoderma&retmode=text&size=all' \
+        | perl -nl -a -F"\t" -e 'print qq{$F[2]\t$F[0]\t$F[4]\t$F[5]}' \
+        > raw.tsv
+    ```
+
+    Then combined with the result from sql query. Run `wgs_prep.pl` to get `WGS/trichoderma.csv`,
+    filter out duplicated items based on WGS prefix and run `wgs_prep.pl` again.
 
 2. `wgs_prep.pl` will create a directory named `WGS` and three files containing meta information:
 
@@ -197,3 +208,14 @@
     find . -maxdepth 1 -type d -not -path "*WGS" | grep "\.\/" | xargs rm -fr
     rm *.xlsx *.csv *.sh *.bat *.nwk *.yml
     ```
+
+## FAQ
+
+* Why .tsv? All of your other programs use .csv.
+
+    There are strains of which sub-species parts of names contain commas, can you believe it?
+
+* I've 500 genomes of *E. coli*, the manually editing step 1 kills me.
+
+    The whole `pop/` and much of `util/` scripts are for Eukaryotes. For small genomes
+    of bacteria and archea, check `taxon/bac_prepare.pl`.
