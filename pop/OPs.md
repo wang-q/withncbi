@@ -8,7 +8,28 @@ for genomes out of WGS, which usually in better assembling levels.
 1. Create `pop/saccharomyces.tsv` manually.
 
     * http://www.ncbi.nlm.nih.gov/Traces/wgs/?page=1&term=Saccharomyces&order=organism
-    * http://www.ncbi.nlm.nih.gov/assembly?term=Saccharomyces
+    * http://www.ncbi.nlm.nih.gov/assembly?term=txid4930[Organism:exp]
+
+    ```bash
+    export GENUS_ID=4930
+    export GENUS=saccharomyces
+    mkdir -p ~/data/alignment/$GENUS
+    cd ~/data/alignment/$GENUS
+
+    ...
+
+    unset GENUS_ID
+    unset GENUS
+    ```
+
+    Remove all strains of Saccharomyces cerevisiae.
+
+    ```bash
+    cat saccharomyces.tsv | grep Scer_ > scer_.tsv
+    cat saccharomyces.tsv | grep -v Scer_ > sacc_.tsv
+    ```
+
+    Edit them to fix names and comment out bad strains.
 
 2. Create working directory and download WGS sequences.
 
@@ -48,7 +69,7 @@ for genomes out of WGS, which usually in better assembling levels.
         -r -p
     ```
 
-3. `gen_pop_conf.pl`
+4. `gen_pop_conf.pl`
 
     ```bash
     perl ~/Scripts/withncbi/pop/gen_pop_conf.pl \
@@ -62,31 +83,10 @@ for genomes out of WGS, which usually in better assembling levels.
         --opt data_dir='~/data/alignment/saccharomyces' \
         --opt rm_species=Fungi \
         --downloaded 'name=Scer_S288c;taxon=559292;sciname=Saccharomyces cerevisiae S288c' \
-        --plan 'name=four_way;t=Scer_S288c;qs=Sbou_ATCC_MYA_796,Spar_NRRL_Y_17217,Spas_CBS_1483' \
-        --plan 'name=17_way;t=Scer_S288c;qs=Sarb_H_6,Sbay_623_6C,Sbou_17,Sbou_ATCC_MYA_796,Sbou_EDRL,ScerSkud_VIN7,Skud_IFO_1802,Skud_ZP591,Smik_IFO_1815_1,Spar_NRRL_Y_17217,Spas_CBS_1483,Spas_CBS_1513,Spas_CCY48_91,Spas_Weihenstephan_34_70_2,Sunv_A9,Suva_MCYC_623' \
-        --skip Smik_IFO_1815_2='same strain and taxon_id, keep one based on filtered sequence length' \
-        --skip Spas_Weihenstephan_34_70_1='same strain and taxon_id, keep one based on filtered sequence length' \
-        --skip Skud_FM1057='short contigs' \
-        --skip Skud_FM1062='short contigs' \
-        --skip Skud_FM1066='short contigs' \
-        --skip Skud_FM1069='short contigs' \
-        --skip Skud_FM1071='short contigs' \
-        --skip Skud_FM1072='short contigs' \
-        --skip Skud_FM1073='short contigs' \
-        --skip Skud_FM1074='short contigs' \
-        --skip Skud_FM1075='short contigs' \
-        --skip Skud_FM1076='short contigs' \
-        --skip Skud_FM1076='short contigs' \
-        --skip Skud_FM1077='short contigs' \
-        --skip Skud_FM1078='short contigs' \
-        --skip Skud_FM1079='short contigs' \
-        --skip Skud_FM1094='short contigs' \
-        --skip Skud_IFO10990='short contigs' \
-        --skip Skud_IFO10991='short contigs' \
-        --skip Skud_IFO1803='short contigs'
+        --plan 'name=four_way;t=Scer_S288c;qs=Sbou_ATCC_MYA_796,Spar_NRRL_Y_17217,Spas_CBS_1483'
     ```
 
-4. Rest routing things.
+5. Rest routing things.
 
     ```bash
     # pop_prep.pl
@@ -106,7 +106,7 @@ for genomes out of WGS, which usually in better assembling levels.
     sh 7_multi_db_only.sh
 
     # other plans
-    sh plan_XXX.sh
+    sh plan_four_way.sh
 
     sh 5_multi_cmd.sh
     sh 7_multi_db_only.sh
@@ -123,6 +123,9 @@ for genomes out of WGS, which usually in better assembling levels.
     * http://www.ncbi.nlm.nih.gov/genome/?term=txid1535326[Organism:exp]
 
     And query a local ar_genbank DB.
+
+    The wgs page contains a lot of strains from other genus. So we just manually
+    create .tsv.
 
 2. Create working directory and download WGS sequences.
 
@@ -169,7 +172,7 @@ for genomes out of WGS, which usually in better assembling levels.
         -r -p
     ```
 
-3. `gen_pop_conf.pl`
+4. `gen_pop_conf.pl`
 
     Pay attentions to --downloaded orders. The first one will be the default target.
 
@@ -190,11 +193,149 @@ for genomes out of WGS, which usually in better assembling levels.
         --plan 'name=four_way_2;t=Corh_Co_90_125;qs=Cdub_CD36,Calb_WO_1,Ctro_MYA_3404'
     ```
 
-4. Rest routing things.
+5. Rest routing things.
 
     ```bash
     # pop_prep.pl
     perl ~/Scripts/withncbi/pop/pop_prep.pl -p 12 -i ~/Scripts/withncbi/pop/candida_test.yml
+
+    sh 01_file.sh
+    sh 02_rm.sh
+    sh 03_strain_info.sh
+
+    # plan_ALL.sh
+    sh plan_ALL.sh
+
+    sh 1_real_chr.sh
+    sh 3_pair_cmd.sh
+    sh 4_rawphylo.sh
+    sh 5_multi_cmd.sh
+    sh 7_multi_db_only.sh
+
+    # other plans
+    sh plan_four_way.sh
+
+    sh 5_multi_cmd.sh
+    sh 7_multi_db_only.sh
+
+    sh plan_four_way_2.sh
+
+    sh 3_pair_cmd.sh # Only do this when target switched
+    sh 5_multi_cmd.sh
+    sh 7_multi_db_only.sh
+    ```
+
+## *Fusarium* WGS
+
+1. Create `pop/fusarium.tsv` manually.
+
+    Check NCBI pages
+
+    * http://www.ncbi.nlm.nih.gov/Traces/wgs/?page=1&term=fusarium*&order=organism
+    * http://www.ncbi.nlm.nih.gov/assembly?term=txid5506[Organism:exp]
+    * http://www.ncbi.nlm.nih.gov/genome/?term=txid5506[Organism:exp]
+
+    This genus contains about 40 strains, use command lines listed in README.md.
+
+    ```bash
+    export GENUS_ID=5506
+    export GENUS=fusarium
+    mkdir -p ~/data/alignment/$GENUS
+    cd ~/data/alignment/$GENUS
+
+    ...
+
+    unset GENUS_ID
+    unset GENUS
+    ```
+
+2. Create working directory and download WGS sequences.
+
+    ```bash
+    mkdir -p ~/data/alignment/fusarium
+    cd ~/data/alignment/fusarium
+
+    perl ~/Scripts/withncbi/util/wgs_prep.pl \
+        -f ~/Scripts/withncbi/pop/fusarium.tsv \
+        --fix \
+        -o WGS \
+        -a
+
+    aria2c -x 6 -s 3 -c -i WGS/fusarium.url.txt
+
+    find WGS -name "*.gz" | xargs gzip -t
+
+    # rsync remote files
+    # rsync --progress -av wangq@139.162.23.84:/home/wangq/data/alignment/fusarium/ ~/data/alignment/fusarium
+    ```
+
+3. Download Fusarium graminearum* PH-1, *Fusarium pseudograminearum* CS3270
+  and *Fusarium verticillioides* 7600.
+
+    ```bash
+    cd ~/data/alignment/candida/WGS
+
+    perl ~/Scripts/withncbi/util/assemble_csv.pl \
+        -f ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/All/GCA_000240135.3.assembly.txt \
+        -name Fgra_PH_1 \
+        --genbank \
+        --nuclear \
+        > Fgra_PH_1.seq.csv
+
+    perl ~/Scripts/withncbi/util/assemble_csv.pl \
+        -f ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/All/GCA_000974265.1.assembly.txt \
+        -name Fpse_CS3270 \
+        --genbank \
+        --nuclear \
+        > Fpse_CS3270.seq.csv
+
+    perl ~/Scripts/withncbi/util/assemble_csv.pl \
+        -f ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/All/GCA_000149555.1.assembly.txt \
+        -name Fver_7600 \
+        --genbank \
+        --nuclear \
+        > Fver_7600.seq.csv
+
+    # Download, rename files and change fasta headers
+    perl ~/Scripts/withncbi/util/batch_get_seq.pl \
+        -f Fgra_PH_1.seq.csv  \
+        -r -p
+
+    perl ~/Scripts/withncbi/util/batch_get_seq.pl \
+        -f Fpse_CS3270.seq.csv  \
+        -r -p
+
+    perl ~/Scripts/withncbi/util/batch_get_seq.pl \
+        -f Fver_7600.seq.csv  \
+        -r -p
+    ```
+
+3. `gen_pop_conf.pl`
+
+    Pay attentions to --downloaded orders. The first one will be the default target.
+
+    ```bash
+    perl ~/Scripts/withncbi/pop/gen_pop_conf.pl \
+        -i ~/data/alignment/fusarium/WGS/fusarium.data.yml \
+        -o ~/Scripts/withncbi/pop/fusarium_test.yml \
+        -d ~/data/alignment/fusarium/WGS \
+        -m prefix \
+        -r '*.fsa_nt.gz' \
+        --opt group_name=fusarium \
+        --opt base_dir='~/data/alignment' \
+        --opt data_dir='~/data/alignment/fusarium' \
+        --opt rm_species=Fungi \
+        --downloaded 'name=Cdub_CD36;taxon=573826;sciname=Candida dubliniensis CD36' \
+        --downloaded 'name=Corh_Co_90_125;taxon=1136231;sciname=Candida orthopsilosis Co 90-125' \
+        --plan 'name=four_way;t=Cdub_CD36;qs=Corh_Co_90_125,Calb_WO_1,Ctro_MYA_3404' \
+        --plan 'name=four_way_2;t=Corh_Co_90_125;qs=Cdub_CD36,Calb_WO_1,Ctro_MYA_3404'
+    ```
+
+4. Rest routing things.
+
+    ```bash
+    # pop_prep.pl
+    perl ~/Scripts/withncbi/pop/pop_prep.pl -p 12 -i ~/Scripts/withncbi/pop/fusarium_test.yml
 
     sh 01_file.sh
     sh 02_rm.sh

@@ -1,38 +1,36 @@
-#Name	WGS	Organism
-# http://www.ncbi.nlm.nih.gov/assembly?term=Saccharomyces%20kudriavzevii
-Sarb_H_6	ALIE01	Saccharomyces arboricola H-6
-Sbay_623_6C	AACG02	Saccharomyces bayanus 623-6C
-ScerSkud_VIN7	AGVY01	Saccharomyces cerevisiae x Saccharomyces kudriavzevii VIN7
-Skud_FM1056	AJHP01	Saccharomyces kudriavzevii FM1056
-Skud_FM1057	AJHQ01	Saccharomyces kudriavzevii FM1057
-Skud_FM1062	AJHR01	Saccharomyces kudriavzevii FM1062
-Skud_FM1066	AJHS01	Saccharomyces kudriavzevii FM1066
-Skud_FM1069	AJHT01	Saccharomyces kudriavzevii FM1069
-Skud_FM1071	AJHU01	Saccharomyces kudriavzevii FM1071
-Skud_FM1072	AJHV01	Saccharomyces kudriavzevii FM1072
-Skud_FM1073	AJHW01	Saccharomyces kudriavzevii FM1073
-Skud_FM1074	AJHX01	Saccharomyces kudriavzevii FM1074
-Skud_FM1075	AJHY01	Saccharomyces kudriavzevii FM1075
-Skud_FM1076	AJHZ01	Saccharomyces kudriavzevii FM1076
-Skud_FM1077	AJIA01	Saccharomyces kudriavzevii FM1077
-Skud_FM1078	AJIB01	Saccharomyces kudriavzevii FM1078
-Skud_FM1079	AJIC01	Saccharomyces kudriavzevii FM1079
-Skud_FM1094	AJID01	Saccharomyces kudriavzevii FM1094
-Skud_IFO_1802	AACI03	Saccharomyces kudriavzevii IFO 1802
-Skud_IFO10990	AJIE01	Saccharomyces kudriavzevii IFO10990
-Skud_IFO10991	AJIF01	Saccharomyces kudriavzevii IFO10991
-Skud_IFO1803	AJIG01	Saccharomyces kudriavzevii IFO1803
-Skud_ZP591	AJIH01	Saccharomyces kudriavzevii ZP591
-Smik_IFO_1815_1	AABZ01	Saccharomyces mikatae IFO 1815
-Smik_IFO_1815_2	AACH01	Saccharomyces mikatae IFO 1815
-Spar_NRRL_Y_17217	AABY01	Saccharomyces paradoxus NRRL Y-17217
-Spas_CBS_1483	JTFI01	Saccharomyces pastorianus CBS 1483
-Spas_CBS_1513	AZCJ01	Saccharomyces pastorianus CBS 1513
-Spas_CCY48_91	ALJS01	Saccharomyces pastorianus CCY48 - 91
-Spas_Weihenstephan_34_70_1	ABPO01	Saccharomyces pastorianus Weihenstephan 34/70
-Spas_Weihenstephan_34_70_2	AZAA01	Saccharomyces pastorianus Weihenstephan 34/70 (New sequenced version)
-Sbou_17	JPJH02	Saccharomyces sp. 'boulardii' 17
-Sbou_ATCC_MYA_796	JRHY01	Saccharomyces sp. 'boulardii' ATCC MYA-796
-Sbou_EDRL	ATCS01	Saccharomyces sp. EDRL
-Suva_MCYC_623	AACA01	Saccharomyces uvarum MCYC 623
-Sunv_A9	JNVO01	Saccharomyces uvarum
+#name	prefix	organism	contigs
+Spas_CBS_1513	AZCJ	Saccharomyces pastorianus CBS 1513	77
+Ssp_ATCC_MYA_796	JRHY	Saccharomyces sp. 'boulardii'	193
+Ssp_EDRL	ATCS	Saccharomyces sp. EDRL	194
+Sarb_H_6	ALIE	Saccharomyces arboricola H-6	219
+Ssp_17	JPJH	Saccharomyces sp. 'boulardii'	442
+Sbay_623_6C	AACG	Saccharomyces bayanus 623-6C	586
+Spar_NRRL_Y_17217	AABY	Saccharomyces paradoxus NRRL Y-17217	832
+Spas_CBS_1483	JTFI	Saccharomyces pastorianus	878
+Suva_MCYC_623	AACA	Saccharomyces uvarum MCYC 623	1098
+Spas_Weihenstephan_34_70	AZAA	Saccharomyces pastorianus Weihenstephan 34/70	1358
+Smik_IFO_1815	AABZ	Saccharomyces mikatae IFO 1815	1648
+Skud_IFO_1802	AACI	Saccharomyces kudriavzevii IFO 1802	2055
+Spas_CCY48_91	ALJS	Saccharomyces pastorianus CCY48 - 91	2425
+#Smik_IFO_1815	AACH	Saccharomyces mikatae IFO 1815	2808 #same strain and taxon_id
+Skud_ZP591	AJIH	Saccharomyces kudriavzevii ZP591	3127
+#Spas_Weihenstephan_34_70	ABPO	Saccharomyces pastorianus Weihenstephan 34/70	3566 #same strain and taxon_id
+Suva_A9	JNVO	Saccharomyces uvarum	3985
+#Skud_IFO1803	AJIG	Saccharomyces kudriavzevii IFO1803	10183
+#Skud_FM1094	AJID	Saccharomyces kudriavzevii FM1094	10490
+#Skud_FM1066	AJHS	Saccharomyces kudriavzevii FM1066	10836
+#Skud_FM1056	AJHP	Saccharomyces kudriavzevii FM1056	11180
+#Skud_IFO10990	AJIE	Saccharomyces kudriavzevii IFO10990	12218
+#Skud_FM1062	AJHR	Saccharomyces kudriavzevii FM1062	12499
+#Skud_IFO10991	AJIF	Saccharomyces kudriavzevii IFO10991	13292
+#Skud_FM1057	AJHQ	Saccharomyces kudriavzevii FM1057	13804
+#Skud_FM1073	AJHW	Saccharomyces kudriavzevii FM1073	14162
+#Skud_FM1075	AJHY	Saccharomyces kudriavzevii FM1075	14397
+#Skud_FM1072	AJHV	Saccharomyces kudriavzevii FM1072	14409
+#Skud_FM1076	AJHZ	Saccharomyces kudriavzevii FM1076	15032
+#Skud_FM1069	AJHT	Saccharomyces kudriavzevii FM1069	15145
+#Skud_FM1074	AJHX	Saccharomyces kudriavzevii FM1074	15433
+#Skud_FM1077	AJIA	Saccharomyces kudriavzevii FM1077	15752
+#Skud_FM1078	AJIB	Saccharomyces kudriavzevii FM1078	16131
+#Skud_FM1079	AJIC	Saccharomyces kudriavzevii FM1079	16253
+#Skud_FM1071	AJHU	Saccharomyces kudriavzevii FM1071	16822
