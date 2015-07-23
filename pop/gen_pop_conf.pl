@@ -183,6 +183,9 @@ if ( scalar @downloaded ) {
 
         # to the head
         unshift @data_sort2, \%hash;
+
+        # and to $name_set
+        $name_set->insert( $hash{name} );
     }
 }
 $yml->{data} = \@data_sort2;
@@ -197,8 +200,9 @@ if ( scalar @plan ) {
         for my $name ( $hash{t}, $hash{o}, @{ $hash{qs} } ) {
             next unless defined $name;
             if ( !$name_set->has($name) ) {
+                printf "In plan []\n", $hash{name};
                 die
-                    "Check you --plan for [$name], which isn't present in YAML-data-names.\n";
+                    "Please check you for [$name], which isn't present in YAML-data-names.\n";
             }
         }
 
