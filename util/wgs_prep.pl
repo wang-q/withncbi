@@ -91,6 +91,7 @@ $stopwatch->block_message("Load $file_input.");
 my $basename = basename( $file_input, ".txt", ".tab", ".tsv" );
 
 my $wgsid_of = {};
+my @orig_orders;
 {
     my @lines = read_file($file_input);
     for my $line (@lines) {
@@ -99,6 +100,7 @@ my $wgsid_of = {};
         my ( $name, $prefix ) = split /\t/, $line;
         $prefix or next;
         $wgsid_of->{$name} = $prefix;
+        push @orig_orders, $name;
     }
 }
 
@@ -151,7 +153,7 @@ $stopwatch->block_message(
 
     $csv->print( $csv_fh, \@columns );
 
-    for my $key ( sort keys %{$wgsid_of} ) {
+    for my $key (@orig_orders) {
 
         # Don't use hashref here, because I want use hash slices.
         my %info = %{ $master->{$key} };
@@ -232,8 +234,7 @@ data:
 
 EOF
     my $tt = Template->new;
-    $tt->process( \$text,
-        { names => [ sort keys %{$wgsid_of} ], master => $master, },
+    $tt->process( \$text, { names => [@orig_orders], master => $master, },
         $file_data )
         or die Template->error;
 
