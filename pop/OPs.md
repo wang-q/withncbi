@@ -1,9 +1,9 @@
-# Operating steps for each group.
+# Operating steps for each groups
 
 Less detailed than Trichoderma in [README.md](README.md), but include examples
 for genomes out of WGS, which usually in better assembling levels.
 
-## Download.
+## Download
 
 ### *Saccharomyces* WGS
 
@@ -106,6 +106,8 @@ for genomes out of WGS, which usually in better assembling levels.
     mv tmp.tsv raw2.tsv
     ...
 
+    # Cleaning
+    rm raw*.*sv
     unset GENUS_ID
     unset GENUS
     ```
@@ -194,6 +196,8 @@ for genomes out of WGS, which usually in better assembling levels.
 
     ...
 
+    # Cleaning
+    rm raw*.*sv
     unset GENUS_ID
     unset GENUS
     ```
@@ -281,7 +285,101 @@ for genomes out of WGS, which usually in better assembling levels.
         -r -p
     ```
 
-## Align.
+### *Aspergillus* WGS
+
+1. Create `pop/aspergillus.tsv` manually.
+
+    Check NCBI pages
+
+    * http://www.ncbi.nlm.nih.gov/Traces/wgs/?page=1&term=aspergillus&order=organism
+    * http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?mode=Info&id=5052
+    * http://www.ncbi.nlm.nih.gov/assembly?term=txid5052[Organism:exp]
+    * http://www.ncbi.nlm.nih.gov/genome/?term=txid5052[Organism:exp]
+
+    This genus contains about 40 strains, use command lines listed in README.md.
+
+    ```bash
+    export GENUS_ID=5052
+    export GENUS=aspergillus
+    mkdir -p ~/data/alignment/Fungi/$GENUS          # operation directory
+    mkdir -p ~/data/alignment/Fungi/GENOMES/$GENUS  # sequence directory
+
+    cd ~/data/alignment/Fungi/GENOMES/$GENUS
+
+    ...
+
+    # Cleaning
+    rm raw*.*sv
+    unset GENUS_ID
+    unset GENUS
+    ```
+
+2. Create working directory and download WGS sequences.
+
+    ```bash
+    mkdir -p ~/data/alignment/Fungi/GENOMES/aspergillus
+    cd ~/data/alignment/Fungi/GENOMES/aspergillus
+
+    perl ~/Scripts/withncbi/util/wgs_prep.pl \
+        -f ~/Scripts/withncbi/pop/aspergillus.tsv \
+        --fix \
+        -o WGS \
+        -a
+
+    aria2c -x 6 -s 3 -c -i WGS/aspergillus.url.txt
+
+    find WGS -name "*.gz" | xargs gzip -t
+    ```
+
+3. Download *Aspergillus fumigatus* Af293
+
+    ```sql
+    SELECT *
+    FROM gr_euk.gr
+    WHERE genus_id = 5052
+
+    SELECT
+        *
+    FROM
+        ar_genbank.ar
+    WHERE
+        genus_id = 5052
+    ORDER BY organism_name
+    ```
+
+    | assigned name | organism_name                  | assembly_accession |
+    | :------------ | :------------                  | :------------      |
+    | Afum_Af293    | *Aspergillus fumigatus* Af293  | GCA_000002655.1    |
+    | Anid_FGSC_A4  | *Aspergillus nidulans* FGSC A4 | GCA_000011425.1    |
+
+    ```bash
+    mkdir -p ~/data/alignment/Fungi/GENOMES/aspergillus/DOWNLOAD
+    cd ~/data/alignment/Fungi/GENOMES/aspergillus/DOWNLOAD
+
+    perl ~/Scripts/withncbi/util/assemble_csv.pl \
+        -f ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/All/GCA_000002655.1.assembly.txt \
+        -name Afum_Af293 \
+        --nuclear \
+        > Afum_Af293.seq.csv
+
+    perl ~/Scripts/withncbi/util/assemble_csv.pl \
+        -f ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/All/GCA_000011425.1.assembly.txt \
+        -name Anid_FGSC_A4 \
+        --genbank \
+        --nuclear \
+        > Anid_FGSC_A4.seq.csv
+
+    # Download, rename files and change fasta headers
+    perl ~/Scripts/withncbi/util/batch_get_seq.pl \
+        -f Afum_Af293.seq.csv  \
+        -r -p
+
+    perl ~/Scripts/withncbi/util/batch_get_seq.pl \
+        -f Anid_FGSC_A4.seq.csv  \
+        -r -p
+    ```
+
+## Align
 
 ### *Saccharomyces* WGS
 
