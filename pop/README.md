@@ -37,6 +37,18 @@ Genus Trichoderma as example.
     ORDER BY assembly_level , organism_name
     ```
 
+    For genus comtains many species, you should be careful that "Gspe" (G_enus spe_cies) style
+    abbreviation may mix up two or more species.
+
+    ```sql
+    SELECT DISTINCT
+        species
+    FROM
+        ar_genbank.ar
+    WHERE
+        genus = 'Trichoderma'
+    ```
+
     When the two approach get very different number of strains, you run the following steps.
 
     Check intermediate results on necessary.
@@ -292,4 +304,4 @@ Genus Trichoderma as example.
 * I've a very good assembly on chromosome level, but I can't find it in WGS.
 
     Best genomes on the world went to NCBI RefSeq. Use tools in `util/` to
-    download them. Examples can be find in `pop/OPs.md`.
+    download them. Examples can be found in `pop/OPs.md`.
