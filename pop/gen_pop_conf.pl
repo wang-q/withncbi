@@ -211,9 +211,9 @@ if ( scalar @plan ) {
         for my $name ( $hash{t}, $hash{o}, @{ $hash{qs} } ) {
             next unless defined $name;
             if ( !$name_set->has($name) ) {
-                printf "In plan []\n", $hash{name};
+                printf "In plan [%s]\n", $hash{name};
                 die
-                    "Please check you for [$name], which isn't present in YAML-data-names.\n";
+                    "Please check for [$name], which isn't present in YAML-data-names.\n";
             }
         }
 
