@@ -189,7 +189,7 @@ __END__
 
 =head1 NAME
 
-    ar_db.pl
+ar_db.pl
 
 =head1 SYNOPSIS
 

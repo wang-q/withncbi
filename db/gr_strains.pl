@@ -147,7 +147,6 @@ else {
     );
 
     my @strs = (
-
         q{ AND t0.Chromosomes <> '-'
             AND t0.Chromosomes <> ''
             ORDER BY t0.Release_Date },
@@ -228,7 +227,7 @@ __END__
 
 =head1 NAME
 
-    gr_strains.pl
+gr_strains.pl
 
 =head1 SYNOPSIS
 
@@ -237,4 +236,3 @@ __END__
     perl gr_strains.pl --euk -o euk_strains.csv
 
 =cut
-

@@ -237,7 +237,7 @@ __END__
 
 =head1 NAME
 
-    gr_db.pl
+gr_db.pl
 
 =head1 SYNOPSIS
 

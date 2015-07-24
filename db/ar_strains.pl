@@ -211,7 +211,7 @@ __END__
 
 =head1 NAME
 
-    ar_strains.pl
+ar_strains.pl
 
 =head1 SYNOPSIS
 
@@ -220,4 +220,3 @@ __END__
     perl ar_strains.pl --genbank -o ar_strains_genbank.csv
 
 =cut
-
