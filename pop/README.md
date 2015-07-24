@@ -53,12 +53,20 @@ Genus Trichoderma as example.
 
     Check intermediate results on necessary.
 
+    Working directory should be `~/data/alignment/Fungi/GENOMES/trichoderma` in this section.
+
     ```bash
     export GENUS_ID=5543
     export GENUS=trichoderma
-    mkdir -p ~/data/alignment/Fungi/$GENUS
-    cd ~/data/alignment/Fungi/$GENUS
+    mkdir -p ~/data/alignment/Fungi/$GENUS          # operation directory
+    mkdir -p ~/data/alignment/Fungi/GENOMES/$GENUS  # sequence directory
 
+    cd ~/data/alignment/Fungi/GENOMES/$GENUS
+    ```
+
+    You can copy & paste the following block of codes as a whole unit.
+
+    ```bash
     # stage1
     # Results from sql query.
     mysql -ualignDB -palignDB ar_refseq -e \
@@ -69,7 +77,7 @@ Genus Trichoderma as example.
         "SELECT SUBSTRING(wgs_master,1,6) as prefix0, SUBSTRING(wgs_master,1,4) as prefix, organism_name, assembly_level FROM ar WHERE wgs_master LIKE '%000%' AND genus_id = $GENUS_ID" \
         >> raw.tsv
 
-    mysql -ualignDB -palignDB gr -e \
+    mysql -ualignDB -palignDB gr_euk -e \
         "SELECT SUBSTRING(wgs_master,1,6) as prefix0, SUBSTRING(wgs,1,4) as prefix, organism_name, status FROM gr WHERE wgs LIKE '%000%' AND genus_id = $GENUS_ID" \
         >> raw.tsv
 
@@ -104,6 +112,9 @@ Genus Trichoderma as example.
         | perl -nl -a -F"\t" -e 'print $F[0]' \
         | uniq -c
 
+    ```
+
+    ```bash
     # Edit .tsv, remove duplicated strains, check strain names and comment out poor assemblies.
     # vim $GENUS.tsv
 
@@ -121,8 +132,8 @@ Genus Trichoderma as example.
 2. `wgs_prep.pl` will create a directory named `WGS` and three files containing meta information:
 
     ```bash
-    mkdir -p ~/data/alignment/Fungi/trichoderma
-    cd ~/data/alignment/Fungi/trichoderma
+    mkdir -p ~/data/alignment/Fungi/GENOMES/trichoderma
+    cd ~/data/alignment/Fungi/GENOMES/trichoderma
 
     perl ~/Scripts/withncbi/util/wgs_prep.pl \
         -f ~/Scripts/withncbi/pop/trichoderma.tsv \
@@ -130,8 +141,6 @@ Genus Trichoderma as example.
         -o WGS \
         -a
     ```
-
-    Working directory should be `~/data/alignment/Fungi/trichoderma` throughout this procedure.
 
     1. `trichoderma.csv`
 
@@ -165,10 +174,12 @@ Genus Trichoderma as example.
     # rsync remote files
     # My connection to NCBI isn't stable, so download sequences in a linode VPS.
     # PLEASE don't hack it.
-    # rsync --progress -av wangq@139.162.23.84:/home/wangq/data/alignment/Fungi/ ~/data/alignment/Fungi
+    # rsync --progress -av wangq@139.162.23.84:/home/wangq/data/alignment/Fungi/ ~/data/alignment/Fungi/
     ```
 
 ## Section 2: create configuration file and generate alignments.
+
+Working directory should be `~/data/alignment/Fungi/trichoderma` in this section.
 
 1. Use `gen_pop_conf.pl` find matched files for each data entries in YAML and store extra options.
 
@@ -180,19 +191,22 @@ Genus Trichoderma as example.
     * The script will not overwrite existing .yml file by default, use `-y` to force it.
 
     ```bash
+    mkdir -p ~/data/alignment/Fungi/trichoderma
+    cd ~/data/alignment/Fungi/trichoderma
+
     perl ~/Scripts/withncbi/pop/gen_pop_conf.pl \
-        -i ~/data/alignment/Fungi/trichoderma/WGS/trichoderma.data.yml \
+        -i ~/data/alignment/Fungi/GENOMES/trichoderma/WGS/trichoderma.data.yml \
         -o ~/Scripts/withncbi/pop/trichoderma_test.yml \
-        -d ~/data/alignment/Fungi/trichoderma/WGS \
+        -d ~/data/alignment/Fungi/GENOMES/trichoderma/WGS \
         -m prefix \
         -r '*.fsa_nt.gz' \
         --opt group_name=trichoderma \
-        --opt base_dir='~/data/alignmentFungi/' \
+        --opt base_dir='~/data/alignment/Fungi/' \
         --opt data_dir='~/data/alignment/Fungi/trichoderma' \
         --opt rm_species=Fungi \
         --opt min_contig=5000 \
         --opt per_seq_min_contig=30000 \
-        --plan 'name=four_way;t=Tatr_IMI_206040;qs=Tatr_XS215,Tree_QM6a,Tvir_Gv29_8' \
+        --plan 'name=four_way;t=Tatr_IMI_206040;qs=Tatr_XS2015,Tree_QM6a,Tvir_Gv29_8' \
         --skip Tham_GD12='contigs are too short' \
         --per_seq Tatr_IMI_206040
     ```
