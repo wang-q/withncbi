@@ -122,10 +122,24 @@ for genomes out of WGS, which usually in better assembling levels.
     * http://www.ncbi.nlm.nih.gov/assembly?term=txid1535326[Organism:exp]
     * http://www.ncbi.nlm.nih.gov/genome/?term=txid1535326[Organism:exp]
 
-    And query a local ar_genbank DB.
+    The wgs page contains a lot of strains from other genus.
 
-    The wgs page contains a lot of strains from other genus. So we just manually
-    create .tsv.
+    ```bash
+    export GENUS_ID=1535326
+    export GENUS=candida
+    mkdir -p ~/data/alignment/$GENUS
+    cd ~/data/alignment/$GENUS
+
+    ...
+    # Edit raw2.tsv, remove lines containing CANDIDATUS or CANDIDATE DIVISION
+    cat raw2.tsv | grep -v 'CANDIDATUS' | grep -v 'CANDIDATE DIVISION' > tmp.tsv
+    mv tmp.tsv raw2.tsv
+    ...
+
+    unset GENUS_ID
+    unset GENUS
+    ```
+
 
 2. Create working directory and download WGS sequences.
 
