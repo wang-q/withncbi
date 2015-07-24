@@ -4,7 +4,7 @@ Or order, family, species.
 
 Genus Trichoderma as example.
 
-## STEPS
+## Section 1: select strains and download sequences.
 
 1. Create `pop/trichoderma.tsv` manually. Names should only contain alphanumeric characters and underscores.
   Be careful with tabs and spaces, because .tsv stands for Tab-separated values, white spaces matters.
@@ -168,7 +168,9 @@ Genus Trichoderma as example.
     # rsync --progress -av wangq@139.162.23.84:/home/wangq/data/alignment/Fungi/ ~/data/alignment/Fungi
     ```
 
-4. Use `gen_pop_conf.pl` find matched files for each data entries in YAML and store extra options.
+## Section 2: create configuration file and generate alignments.
+
+1. Use `gen_pop_conf.pl` find matched files for each data entries in YAML and store extra options.
 
     * `per_seq` mean split fasta by names, target or good assembles should set it.
     * `skip` mean skip this strain.
@@ -195,7 +197,7 @@ Genus Trichoderma as example.
         --per_seq Tatr_IMI_206040
     ```
 
-5. Edit `pop/trichoderma_test.yml` on necessary.
+2. Edit `pop/trichoderma_test.yml` on necessary.
 
     The following cmd refresh existing YAML file.
 
@@ -204,7 +206,7 @@ Genus Trichoderma as example.
         -i ~/Scripts/withncbi/pop/trichoderma_test.yml
     ```
 
-6. `pop_prep.pl` will generate four or more bash scripts:
+3. `pop_prep.pl` will generate four or more bash scripts:
 
     ```bash
     perl ~/Scripts/withncbi/pop/pop_prep.pl -p 12 -i ~/Scripts/withncbi/pop/trichoderma_test.yml
@@ -216,7 +218,7 @@ Genus Trichoderma as example.
     4. `plan_ALL.sh`: alignment plan for all genomes
     5. `plan_four_way.sh`: alignment plan for `four_way`, specified by `--plan` of `gen_pop_conf.pl`
 
-7. Run generated scripts.
+4. Run generated scripts.
 
     Scripts starting with a "0" means they are doing preparing works.
 
@@ -226,7 +228,7 @@ Genus Trichoderma as example.
     sh 03_strain_info.sh
     ```
 
-8. `plan_ALL.sh` generates some bash files, execute them in order.
+5. `plan_ALL.sh` generates some bash files, execute them in order.
 
     ```bash
     sh plan_ALL.sh
@@ -238,7 +240,7 @@ Genus Trichoderma as example.
     sh 7_multi_db_only.sh
     ```
 
-9. `plan_four_way.sh` will overwrite some bash files, execute the following:
+6. `plan_four_way.sh` will overwrite some bash files, execute the following:
 
     ```bash
     sh plan_four_way.sh
@@ -247,16 +249,18 @@ Genus Trichoderma as example.
     sh 7_multi_db_only.sh
     ```
 
-10. When you are satisfied and don't see any wrong, rename `pop/trichoderma_test.yml` to
+7. When you are satisfied and don't see any wrong, rename `pop/trichoderma_test.yml` to
     `pop/trichoderma_data.yml` and commit it.
 
     ```bash
     mv ~/Scripts/withncbi/pop/trichoderma_test.yml ~/Scripts/withncbi/pop/trichoderma_data.yml
     ```
 
-99. Cleaning. This is the ultimate final step. No more.
+## Section 3: cleaning.
 
-    * Remove useless files
+This is the ultimate final step. No more. Actually you may choose not to do this. It's depended on your disk capacity.
+
+* Remove useless files
 
     ```bash
     cd ~/data/alignment/Fungi/trichoderma
@@ -275,7 +279,7 @@ Genus Trichoderma as example.
     find . -type f -name "*.fas" | parallel gzip
     ```
 
-    * Restore everything to the beginning
+* Restore everything to the beginning
 
     ```bash
     cd ~/data/alignment/Fungi/trichoderma
