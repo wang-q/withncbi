@@ -112,7 +112,7 @@ my @orig_orders;
 $stopwatch->block_message("Scrapping NCBI WGS...");
 my $master = {};
 {
-    for my $key ( sort keys %{$wgsid_of} ) {
+    for my $key (@orig_orders) {
         print "$key\n";
         my $prefix = $wgsid_of->{$key};
         my $info   = wgs_worker($prefix);
