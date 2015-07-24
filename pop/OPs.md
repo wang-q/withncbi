@@ -13,8 +13,8 @@ for genomes out of WGS, which usually in better assembling levels.
     ```bash
     export GENUS_ID=4930
     export GENUS=saccharomyces
-    mkdir -p ~/data/alignment/$GENUS
-    cd ~/data/alignment/$GENUS
+    mkdir -p ~/data/alignment/Fungi/$GENUS
+    cd ~/data/alignment/Fungi/$GENUS
 
     ...
 
@@ -34,8 +34,8 @@ for genomes out of WGS, which usually in better assembling levels.
 2. Create working directory and download WGS sequences.
 
     ```bash
-    mkdir -p ~/data/alignment/saccharomyces
-    cd ~/data/alignment/saccharomyces
+    mkdir -p ~/data/alignment/Fungi/saccharomyces
+    cd ~/data/alignment/Fungi/saccharomyces
 
     perl ~/Scripts/withncbi/util/wgs_prep.pl \
         -f ~/Scripts/withncbi/pop/saccharomyces.tsv \
@@ -46,15 +46,18 @@ for genomes out of WGS, which usually in better assembling levels.
     aria2c -x 6 -s 3 -c -i WGS/saccharomyces.url.txt
 
     find WGS -name "*.gz" | xargs gzip -t
-
-    # rsync remote files
-    # rsync --progress -av wangq@139.162.23.84:/home/wangq/data/alignment/saccharomyces/ ~/data/alignment/saccharomyces
     ```
 
-3. Download *Saccharomyces cerevisiae* S288c
+3. Download *Saccharomyces cerevisiae* S288c.
+  This step is totally manual operation. **Be careful.**
+
+    | assigned name | organism_name                    | assembly_accession |
+    | :---          | :---                             | :---               |
+    | Scer_S288c    | *Saccharomyces cerevisiae* S288c | GCF_000146045.2    |
 
     ```bash
-    cd ~/data/alignment/saccharomyces/WGS
+    mkdir -p ~/data/alignment/Fungi/saccharomyces/DOWNLOAD
+    cd ~/data/alignment/Fungi/saccharomyces/DOWNLOAD
 
     # Omit chrMt
     perl ~/Scripts/withncbi/util/assemble_csv.pl \
@@ -73,15 +76,16 @@ for genomes out of WGS, which usually in better assembling levels.
 
     ```bash
     perl ~/Scripts/withncbi/pop/gen_pop_conf.pl \
-        -i ~/data/alignment/saccharomyces/WGS/saccharomyces.data.yml \
+        -i ~/data/alignment/Fungi/saccharomyces/WGS/saccharomyces.data.yml \
         -o ~/Scripts/withncbi/pop/saccharomyces_test.yml \
-        -d ~/data/alignment/saccharomyces/WGS \
+        -d ~/data/alignment/Fungi/saccharomyces/WGS \
         -m prefix \
         -r '*.fsa_nt.gz' \
         --opt group_name=saccharomyces \
-        --opt base_dir='~/data/alignment' \
-        --opt data_dir='~/data/alignment/saccharomyces' \
+        --opt base_dir='~/data/alignmentFungi/' \
+        --opt data_dir='~/data/alignment/Fungi/saccharomyces' \
         --opt rm_species=Fungi \
+        --dd ~/data/alignment/Fungi/saccharomyces/DOWNLOAD \
         --downloaded 'name=Scer_S288c;taxon=559292;sciname=Saccharomyces cerevisiae S288c' \
         --plan 'name=four_way;t=Scer_S288c;qs=Sbou_ATCC_MYA_796,Spar_NRRL_Y_17217,Spas_CBS_1483'
     ```
@@ -127,8 +131,8 @@ for genomes out of WGS, which usually in better assembling levels.
     ```bash
     export GENUS_ID=1535326
     export GENUS=candida
-    mkdir -p ~/data/alignment/$GENUS
-    cd ~/data/alignment/$GENUS
+    mkdir -p ~/data/alignment/Fungi/$GENUS
+    cd ~/data/alignment/Fungi/$GENUS
 
     ...
     # Edit raw2.tsv, remove lines containing CANDIDATUS or CANDIDATE DIVISION
@@ -140,12 +144,11 @@ for genomes out of WGS, which usually in better assembling levels.
     unset GENUS
     ```
 
-
 2. Create working directory and download WGS sequences.
 
     ```bash
-    mkdir -p ~/data/alignment/candida
-    cd ~/data/alignment/candida
+    mkdir -p ~/data/alignment/Fungi/candida
+    cd ~/data/alignment/Fungi/candida
 
     perl ~/Scripts/withncbi/util/wgs_prep.pl \
         -f ~/Scripts/withncbi/pop/candida.tsv \
@@ -156,15 +159,32 @@ for genomes out of WGS, which usually in better assembling levels.
     aria2c -x 6 -s 3 -c -i WGS/candida.url.txt
 
     find WGS -name "*.gz" | xargs gzip -t
-
-    # rsync remote files
-    # rsync --progress -av wangq@139.162.23.84:/home/wangq/data/alignment/candida/ ~/data/alignment/candida
     ```
 
 3. Download *Candida dubliniensis* CD36 and *Candida orthopsilosis* Co 90-125
 
+    ```sql
+    SELECT *
+    FROM gr.gr
+    WHERE genus_id = 1535326
+
+    SELECT
+        organism_name, assembly_accession
+    FROM
+        ar_refseq.ar
+    WHERE
+        genus_id = 1535326
+    ORDER BY organism_name
+    ```
+
+    | assigned name  | organism_name                     | assembly_accession |
+    | :---           | :---                              | :---               |
+    | Cdub_CD36      | *Candida dubliniensis* CD36       | GCF_000026945.1    |
+    | Corh_Co_90_125 | *Candida orthopsilosis* Co 90-125 | GCF_000315875.1    |
+
     ```bash
-    cd ~/data/alignment/candida/WGS
+    mkdir -p ~/data/alignment/Fungi/candida/DOWNLOAD
+    cd ~/data/alignment/Fungi/candida/DOWNLOAD
 
     perl ~/Scripts/withncbi/util/assemble_csv.pl \
         -f ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/All/GCF_000026945.1.assembly.txt \
@@ -192,15 +212,16 @@ for genomes out of WGS, which usually in better assembling levels.
 
     ```bash
     perl ~/Scripts/withncbi/pop/gen_pop_conf.pl \
-        -i ~/data/alignment/candida/WGS/candida.data.yml \
+        -i ~/data/alignment/Fungi/candida/WGS/candida.data.yml \
         -o ~/Scripts/withncbi/pop/candida_test.yml \
-        -d ~/data/alignment/candida/WGS \
+        -d ~/data/alignment/Fungi/candida/WGS \
         -m prefix \
         -r '*.fsa_nt.gz' \
         --opt group_name=candida \
-        --opt base_dir='~/data/alignment' \
-        --opt data_dir='~/data/alignment/candida' \
+        --opt base_dir='~/data/alignment/Fungi' \
+        --opt data_dir='~/data/alignment/Fungi/candida' \
         --opt rm_species=Fungi \
+        --dd ~/data/alignment/Fungi/candida/DOWNLOAD \
         --downloaded 'name=Cdub_CD36;taxon=573826;sciname=Candida dubliniensis CD36' \
         --downloaded 'name=Corh_Co_90_125;taxon=1136231;sciname=Candida orthopsilosis Co 90-125' \
         --plan 'name=four_way;t=Cdub_CD36;qs=Corh_Co_90_125,Calb_WO_1,Ctro_MYA_3404' \
@@ -254,8 +275,8 @@ for genomes out of WGS, which usually in better assembling levels.
     ```bash
     export GENUS_ID=5506
     export GENUS=fusarium
-    mkdir -p ~/data/alignment/$GENUS
-    cd ~/data/alignment/$GENUS
+    mkdir -p ~/data/alignment/Fungi/$GENUS
+    cd ~/data/alignment/Fungi/$GENUS
 
     ...
 
@@ -266,8 +287,8 @@ for genomes out of WGS, which usually in better assembling levels.
 2. Create working directory and download WGS sequences.
 
     ```bash
-    mkdir -p ~/data/alignment/fusarium
-    cd ~/data/alignment/fusarium
+    mkdir -p ~/data/alignment/Fungi/fusarium
+    cd ~/data/alignment/Fungi/fusarium
 
     perl ~/Scripts/withncbi/util/wgs_prep.pl \
         -f ~/Scripts/withncbi/pop/fusarium.tsv \
@@ -280,14 +301,28 @@ for genomes out of WGS, which usually in better assembling levels.
     find WGS -name "*.gz" | xargs gzip -t
 
     # rsync remote files
-    # rsync --progress -av wangq@139.162.23.84:/home/wangq/data/alignment/fusarium/ ~/data/alignment/fusarium
+    # rsync --progress -av wangq@139.162.23.84:/home/wangq/data/alignment/Fungi/fusarium/ ~/data/alignment/Fungi/fusarium
     ```
 
-3. Download Fusarium graminearum* PH-1, *Fusarium pseudograminearum* CS3270
-  and *Fusarium verticillioides* 7600.
+3. Download *Fusarium graminearum* PH-1, *Fusarium oxysporum* f. sp. lycopersici 4287,
+   *Fusarium pseudograminearum* CS3270 and *Fusarium verticillioides* 7600.
+
+    ```sql
+    SELECT *
+    FROM gr.gr
+    WHERE genus_id = 5506
+    ```
+
+    | assigned name | organism_name                                | assembly_accession |
+    | :---          | :---                                         | :---               |
+    | Fgra_PH_1     | *Fusarium graminearum* PH-1                  | GCA_000240135.3    |
+    | Foxy_4287     | *Fusarium oxysporum* f. sp. lycopersici 4287 | GCA_000149955.1    |
+    | Fpse_CS3270   | *Fusarium pseudograminearum* CS3270          | GCA_000974265.1    |
+    | Fver_7600     | *Fusarium verticillioides* 7600              | GCA_000149555.1    |
 
     ```bash
-    cd ~/data/alignment/candida/WGS
+    mkdir -p ~/data/alignment/Fungi/fusarium/DOWNLOAD
+    cd ~/data/alignment/Fungi/fusarium/DOWNLOAD
 
     perl ~/Scripts/withncbi/util/assemble_csv.pl \
         -f ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/All/GCA_000240135.3.assembly.txt \
@@ -295,6 +330,13 @@ for genomes out of WGS, which usually in better assembling levels.
         --genbank \
         --nuclear \
         > Fgra_PH_1.seq.csv
+
+    perl ~/Scripts/withncbi/util/assemble_csv.pl \
+        -f ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/All/GCA_000149955.1.assembly.txt \
+        -name Foxy_4287 \
+        --genbank \
+        --nuclear \
+        > Foxy_4287.seq.csv
 
     perl ~/Scripts/withncbi/util/assemble_csv.pl \
         -f ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/All/GCA_000974265.1.assembly.txt \
@@ -316,6 +358,10 @@ for genomes out of WGS, which usually in better assembling levels.
         -r -p
 
     perl ~/Scripts/withncbi/util/batch_get_seq.pl \
+        -f Foxy_4287.seq.csv  \
+        -r -p
+
+    perl ~/Scripts/withncbi/util/batch_get_seq.pl \
         -f Fpse_CS3270.seq.csv  \
         -r -p
 
@@ -330,15 +376,16 @@ for genomes out of WGS, which usually in better assembling levels.
 
     ```bash
     perl ~/Scripts/withncbi/pop/gen_pop_conf.pl \
-        -i ~/data/alignment/fusarium/WGS/fusarium.data.yml \
+        -i ~/data/alignment/Fungi/fusarium/WGS/fusarium.data.yml \
         -o ~/Scripts/withncbi/pop/fusarium_test.yml \
-        -d ~/data/alignment/fusarium/WGS \
+        -d ~/data/alignment/Fungi/fusarium/WGS \
         -m prefix \
         -r '*.fsa_nt.gz' \
         --opt group_name=fusarium \
-        --opt base_dir='~/data/alignment' \
-        --opt data_dir='~/data/alignment/fusarium' \
+        --opt base_dir='~/data/alignment/Fungi' \
+        --opt data_dir='~/data/alignment/Fungi/fusarium' \
         --opt rm_species=Fungi \
+        --dd ~/data/alignment/Fungi/fusarium/DOWNLOAD \
         --downloaded 'name=Cdub_CD36;taxon=573826;sciname=Candida dubliniensis CD36' \
         --downloaded 'name=Corh_Co_90_125;taxon=1136231;sciname=Candida orthopsilosis Co 90-125' \
         --plan 'name=four_way;t=Cdub_CD36;qs=Corh_Co_90_125,Calb_WO_1,Ctro_MYA_3404' \

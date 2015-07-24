@@ -56,8 +56,8 @@ Genus Trichoderma as example.
     ```bash
     export GENUS_ID=5543
     export GENUS=trichoderma
-    mkdir -p ~/data/alignment/$GENUS
-    cd ~/data/alignment/$GENUS
+    mkdir -p ~/data/alignment/Fungi/$GENUS
+    cd ~/data/alignment/Fungi/$GENUS
 
     # stage1
     # Results from sql query.
@@ -121,8 +121,8 @@ Genus Trichoderma as example.
 2. `wgs_prep.pl` will create a directory named `WGS` and three files containing meta information:
 
     ```bash
-    mkdir -p ~/data/alignment/trichoderma
-    cd ~/data/alignment/trichoderma
+    mkdir -p ~/data/alignment/Fungi/trichoderma
+    cd ~/data/alignment/Fungi/trichoderma
 
     perl ~/Scripts/withncbi/util/wgs_prep.pl \
         -f ~/Scripts/withncbi/pop/trichoderma.tsv \
@@ -131,7 +131,7 @@ Genus Trichoderma as example.
         -a
     ```
 
-    Working directory should be `~/data/alignment/trichoderma` throughout this procedure.
+    Working directory should be `~/data/alignment/Fungi/trichoderma` throughout this procedure.
 
     1. `trichoderma.csv`
 
@@ -165,7 +165,7 @@ Genus Trichoderma as example.
     # rsync remote files
     # My connection to NCBI isn't stable, so download sequences in a linode VPS.
     # PLEASE don't hack it.
-    # rsync --progress -av wangq@139.162.23.84:/home/wangq/data/alignment/trichoderma/ ~/data/alignment/trichoderma
+    # rsync --progress -av wangq@139.162.23.84:/home/wangq/data/alignment/Fungi/ ~/data/alignment/Fungi
     ```
 
 4. Use `gen_pop_conf.pl` find matched files for each data entries in YAML and store extra options.
@@ -179,14 +179,14 @@ Genus Trichoderma as example.
 
     ```bash
     perl ~/Scripts/withncbi/pop/gen_pop_conf.pl \
-        -i ~/data/alignment/trichoderma/WGS/trichoderma.data.yml \
+        -i ~/data/alignment/Fungi/trichoderma/WGS/trichoderma.data.yml \
         -o ~/Scripts/withncbi/pop/trichoderma_test.yml \
-        -d ~/data/alignment/trichoderma/WGS \
+        -d ~/data/alignment/Fungi/trichoderma/WGS \
         -m prefix \
         -r '*.fsa_nt.gz' \
         --opt group_name=trichoderma \
-        --opt base_dir='~/data/alignment' \
-        --opt data_dir='~/data/alignment/trichoderma' \
+        --opt base_dir='~/data/alignmentFungi/' \
+        --opt data_dir='~/data/alignment/Fungi/trichoderma' \
         --opt rm_species=Fungi \
         --opt min_contig=5000 \
         --opt per_seq_min_contig=30000 \
@@ -259,7 +259,7 @@ Genus Trichoderma as example.
     * Remove useless files
 
     ```bash
-    cd ~/data/alignment/trichoderma
+    cd ~/data/alignment/Fungi/trichoderma
 
     # clean raw fasta
     find . -maxdepth 1 -type d -name "*_raw" | xargs rm -fr
@@ -278,7 +278,7 @@ Genus Trichoderma as example.
     * Restore everything to the beginning
 
     ```bash
-    cd ~/data/alignment/trichoderma
+    cd ~/data/alignment/Fungi/trichoderma
 
     find . -maxdepth 1 -type d -not -path "*WGS" | grep "\.\/" | xargs rm -fr
     rm *.xlsx *.csv *.sh *.bat *.nwk *.yml
