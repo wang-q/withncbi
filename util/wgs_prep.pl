@@ -163,6 +163,9 @@ $stopwatch->block_message(
                 print "Don't need fixing for $info{name}\n";
             }
             else {
+                # Sometimes the uploader didn't create a new strain, assign
+                # its own id and marked species name as strain name.
+                # So try looking up this strain in taxonomy dumps
                 print "Fix strain taxon info for $info{name}\n";
                 $info{Organism} = $info{Organism} . " " . $info{Biosource};
                 my $node = $taxon_db->get_taxon( -name => $info{Organism} );

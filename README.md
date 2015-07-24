@@ -1,4 +1,4 @@
 withncbi
 ========
 
-Batch operation according to NCBI taxonomy database.
+Fetch sequences, generate reports and build alignments according to various NCBI databases.

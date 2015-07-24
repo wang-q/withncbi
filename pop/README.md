@@ -1,3 +1,9 @@
+# Build alignments on an whole Eukaryotes genus
+
+Or order, family, species.
+
+Genus Trichoderma as example.
+
 ## STEPS
 
 1. Create `pop/trichoderma.tsv` manually. Names should only contain alphanumeric characters and underscores.
@@ -31,10 +37,9 @@
     ORDER BY assembly_level , organism_name
     ```
 
-    When the two approach get very different number of strains, you run the following
-    steps.
+    When the two approach get very different number of strains, you run the following steps.
 
-    Check intermediate results.
+    Check intermediate results on necessary.
 
     ```bash
     export GENUS_ID=5543
@@ -82,13 +87,22 @@
 
     mv raw3.tsv $GENUS.tsv
 
+    # find potential duplicated strains or assemblies
+    cat $GENUS.tsv \
+        | perl -nl -a -F"\t" -e 'print $F[0]' \
+        | uniq -c
+
+    # Edit .tsv, remove duplicated strains, check strain names and comment out poor assemblies.
+    # vim $GENUS.tsv
+
     # Cleaning
     rm raw*.*sv
     unset GENUS_ID
     unset GENUS
     ```
 
-    Edit the crude .tsv, put in it `~/Scripts/withncbi/pop/` and run `wgs_prep.pl` again.
+    Put the .tsv file to `~/Scripts/withncbi/pop/` and run `wgs_prep.pl` again.
+    When everything is fine, commit the .tsv file.
 
     For detailed WGS info, click Prefix column lead to WGS project, where we could download gzipped fasta and project description manually.
 
@@ -262,15 +276,20 @@
 
 * Why .tsv? All of your other programs use .csv.
 
-    There are strains of which sub-species parts of names contain commas, can you believe it?
+    There are strains of which sub-species parts contain commas, can you believe it?
 
 * I've 500 genomes of *E. coli*, the manually editing step 1 kills me.
 
     The whole `pop/` and much of `util/` scripts are for Eukaryotes. For small genomes
-    of bacteria and archea, check `taxon/bac_prepare.pl`.
+    of bacteria, archea and organelles, check `taxon/bac_prepare.pl`.
 
 * Your command lines executed and the results are wired.
 
-    Be sure you aren't in Windows.
+    Be sure you aren't in Windows. Be sure you are familiar to bash command lines.
 
     Or send what you want to me and let me do the job.
+
+* I've a very good assembly on chromosome level, but I can't find it in WGS.
+
+    Best genomes on the world went to NCBI RefSeq. Use tools in `util/` to
+    download them. Examples can be find in `pop/OPs.md`.
