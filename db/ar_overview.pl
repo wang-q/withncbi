@@ -32,7 +32,7 @@ my $password = $Config->{database}{password};
 my $db_name  = $Config->{database}{db};
 
 # running options
-my $outfile = "ar_overview.xlsx";
+my $outfile;
 
 my $man  = 0;
 my $help = 0;
@@ -50,6 +50,10 @@ GetOptions(
 
 pod2usage(1) if $help;
 pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
+
+unless ($outfile) {
+    $outfile = $db_name . "_overview.xlsx";
+}
 
 #----------------------------------------------------------#
 # Init section

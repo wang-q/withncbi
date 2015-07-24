@@ -32,7 +32,7 @@ my $password = $Config->{database}{password};
 my $db_name  = $Config->{database}{db};
 
 # running options
-my $outfile = "gr_overview.xlsx";
+my $outfile;
 
 my $man  = 0;
 my $help = 0;
@@ -50,6 +50,10 @@ GetOptions(
 
 pod2usage(1) if $help;
 pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
+
+unless ($outfile) {
+    $outfile = $db_name . "_overview.xlsx";
+}
 
 #----------------------------------------------------------#
 # Init section
@@ -188,7 +192,7 @@ my $gc_checklist = sub {
                     COUNT(*) count,
                     MAX(CHAR_LENGTH(code))
             FROM gr
-            WHERE   1 = 1 
+            WHERE   1 = 1
             AND species_member > 2
             GROUP BY species_id
             ORDER BY species
@@ -236,9 +240,9 @@ my $gr_gc_checklist = sub {
                     AVG(genome_size),
                     AVG(gc_content),
                     COUNT(*) count,
-                    MAX(CHAR_LENGTH(code)) species_code 
+                    MAX(CHAR_LENGTH(code)) species_code
             FROM gr
-            WHERE   1 = 1 
+            WHERE   1 = 1
             AND species_member > 2
             AND status like '%Complete%'
             AND species not like '%Candidatus%'
@@ -278,4 +282,3 @@ gr_overview.pl - Overviews for NCBI GENOME_REPORTS
     perl gr_overview.pl --db gr
 
 =cut
-
