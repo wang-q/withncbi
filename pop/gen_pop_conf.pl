@@ -44,7 +44,10 @@ my $pattern;
 
 my %skip;
 my @per_seq;
+
+my $dir_download = ".";
 my @downloaded;
+
 my @plan;
 
 my %other_opts;
@@ -55,20 +58,21 @@ my $man  = 0;
 my $help = 0;
 
 GetOptions(
-    'help'         => \$help,
-    'man'          => \$man,
-    'i|input=s'    => \$file_input,
-    'o|output=s'   => \$file_output,
-    'd|dir=s'      => \$dir_scan,
-    'm|match=s'    => \$match_field,
-    'r|rule=s'     => \@name_rules,
-    'p|pattern=s'  => \$pattern,
-    'opt=s'        => \%other_opts,
-    'skip=s'       => \%skip,
-    'per_seq=s'    => \@per_seq,
-    'downloaded=s' => \@downloaded,
-    'plan=s'       => \@plan,
-    'y|yes'        => \$yes,
+    'help'        => \$help,
+    'man'         => \$man,
+    'i|input=s'   => \$file_input,
+    'o|output=s'  => \$file_output,
+    'd|dir=s'     => \$dir_scan,
+    'm|match=s'   => \$match_field,
+    'r|rule=s'    => \@name_rules,
+    'p|pattern=s' => \$pattern,
+    'opt=s'       => \%other_opts,
+    'skip=s'      => \%skip,
+    'per_seq=s'   => \@per_seq,
+    'dd=s'        => \$dir_download,
+    'download=s'  => \@downloaded,
+    'plan=s'      => \@plan,
+    'y|yes'       => \$yes,
 ) or pod2usage(2);
 
 pod2usage(1) if $help;
@@ -170,7 +174,7 @@ if ( scalar @downloaded ) {
         printf "Inject downloaded %s\n", $hash{name};
 
         $hash{downloaded} = 1;
-        my $dir = File::Spec->catdir( $dir_scan, $hash{name} );
+        my $dir = File::Spec->catdir( $dir_download, $hash{name} );
         if ( -d $dir ) {
             $hash{pre_dir} = $dir;
             printf "%s => %s\n", $hash{name}, $hash{pre_dir};
@@ -181,11 +185,18 @@ if ( scalar @downloaded ) {
                 $dir, $hash{name};
         }
 
+        if ( $name_set->has( $hash{name} ) ) {
+
+            # replace existing one
+            @data_sort2 = grep { $_->{name} ne $hash{name} } @data_sort2;
+        }
+        else {
+            # add to $name_set
+            $name_set->insert( $hash{name} );
+        }
+
         # to the head
         unshift @data_sort2, \%hash;
-
-        # and to $name_set
-        $name_set->insert( $hash{name} );
     }
 }
 $yml->{data} = \@data_sort2;
@@ -257,14 +268,16 @@ gen_pop_conf.pl - for each @data entries in YAML, find matched files, check para
         --man               full documentation
         -i, --input STR     input yaml
         -o, --output STR    output yaml
-        -d, --dir STR       where sequence files live
-        -m, --match STR     key of each @data entry. name, prefix or sciname...
+        -d, --dir STR       Where sequence files live
+        -m, --match STR     Key of each @data entry. name, prefix or sciname...
         -r, --rule @STR     File::Find::Rule, '*.fsa_nt.gz' for NCBI WGS
         -p, --pattern STR   For ensembl, 'dna.toplevel'
         --opt STR=STR       Other options for running pop
-        --skip STR=STR      skip this strain
-        --per_seq @STR      split fasta by names, target or good assembles
-        --downloaded @STR   Add entries to @data which were download previously
+        --skip STR=STR      Skip this strain
+        --per_seq @STR      Split fasta by names, target or good assembles
+        --dd STR            Where downloaded files live
+                            Default is ".".
+        --download @STR     Add entries to @data which were download previously
                             'name=Scer_S288c;taxon=559292;sciname=Saccharomyces cerevisiae S288c'
         --plan @STR         Add alignment plans
                             'name=four_way;t=Scer_S288c;qs=Sbou_ATCC_MYA_796,Spar_NRRL_Y_17217,Spas_CBS_1483'
