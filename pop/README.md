@@ -6,8 +6,9 @@ Genus Trichoderma as example.
 
 ## Section 1: select strains and download sequences.
 
-1. Create `pop/trichoderma.tsv` manually. Names should only contain alphanumeric characters and underscores.
-  Be careful with tabs and spaces, because .tsv stands for Tab-separated values, white spaces matters.
+1. Create `pop/trichoderma.tsv` manually. Names should only contain alphanumeric characters and
+underscores. Be careful with tabs and spaces, because .tsv stands for Tab-separated values, white
+spaces matters.
 
     Check NCBI pages
 
@@ -16,7 +17,8 @@ Genus Trichoderma as example.
     * http://www.ncbi.nlm.nih.gov/genome/?term=txid5543[Organism:exp]
     * http://www.ncbi.nlm.nih.gov/assembly?term=txid5543[Organism:exp]
 
-    And query a local ar_genbank DB. This is just a convenient but not accurate approach, especially for sub-species parts.
+    And query a local ar_genbank DB. This is just a convenient but not accurate approach, especially
+    for sub-species parts.
 
     ```sql
     SELECT
@@ -49,9 +51,8 @@ Genus Trichoderma as example.
         genus = 'Trichoderma'
     ```
 
-    When the two approach get very different number of strains, you run the following steps.
-
-    Check intermediate results on necessary.
+    When the two approach get very different number of strains, you run the following steps. Check
+    intermediate results on necessary.
 
     Working directory should be `~/data/alignment/Fungi/GENOMES/trichoderma` in this section.
 
@@ -112,22 +113,22 @@ Genus Trichoderma as example.
         | perl -nl -a -F"\t" -e 'print $F[0]' \
         | uniq -c
 
+    # Edit .tsv, remove duplicated strains, check strain names and comment out poor assemblies.
+    # vim $GENUS.tsv
     ```
 
     ```bash
-    # Edit .tsv, remove duplicated strains, check strain names and comment out poor assemblies.
-    # vim $GENUS.tsv
-
     # Cleaning
     rm raw*.*sv
     unset GENUS_ID
     unset GENUS
     ```
 
-    Put the .tsv file to `~/Scripts/withncbi/pop/` and run `wgs_prep.pl` again.
-    When everything is fine, commit the .tsv file.
+    Put the .tsv file to `~/Scripts/withncbi/pop/` and run `wgs_prep.pl` again. When everything is
+    fine, commit the .tsv file.
 
-    For detailed WGS info, click Prefix column lead to WGS project, where we could download gzipped fasta and project description manually.
+    For detailed WGS info, click Prefix column lead to WGS project, where we could download gzipped
+    fasta and project description manually.
 
 2. `wgs_prep.pl` will create a directory named `WGS` and three files containing meta information:
 
@@ -264,7 +265,7 @@ Working directory should be `~/data/alignment/Fungi/trichoderma` in this section
     ```
 
 7. When you are satisfied and don't see any wrong, rename `pop/trichoderma_test.yml` to
-    `pop/trichoderma_data.yml` and commit it.
+`pop/trichoderma_data.yml` and commit it.
 
     ```bash
     mv ~/Scripts/withncbi/pop/trichoderma_test.yml ~/Scripts/withncbi/pop/trichoderma_data.yml
@@ -272,9 +273,8 @@ Working directory should be `~/data/alignment/Fungi/trichoderma` in this section
 
 ## Section 3: cleaning.
 
-This is the ultimate final step. No more. Actually you may choose not to do this. It's depended on your disk capacity.
-
-* Remove useless files
+This is the ultimate final step. No more. Actually you may choose not to do this. It's depended on
+your disk capacity.
 
     ```bash
     cd ~/data/alignment/Fungi/trichoderma
@@ -293,15 +293,6 @@ This is the ultimate final step. No more. Actually you may choose not to do this
     find . -type f -name "*.fas" | parallel gzip
     ```
 
-* Restore everything to the beginning
-
-    ```bash
-    cd ~/data/alignment/Fungi/trichoderma
-
-    find . -maxdepth 1 -type d -not -path "*WGS" | grep "\.\/" | xargs rm -fr
-    rm *.xlsx *.csv *.sh *.bat *.nwk *.yml
-    ```
-
 ## FAQ
 
 * Why .tsv? All of your other programs use .csv.
@@ -310,8 +301,8 @@ This is the ultimate final step. No more. Actually you may choose not to do this
 
 * I've 500 genomes of *E. coli*, the manually editing step 1 kills me.
 
-    The whole `pop/` and much of `util/` scripts are for Eukaryotes. For small genomes
-    of bacteria, archea and organelles, check `taxon/bac_prepare.pl`.
+    The whole `pop/` and much of `util/` scripts are for Eukaryotes. For small genomes of bacteria,
+    archea and organelles, check `taxon/bac_prepare.pl`.
 
 * Your command lines executed and the results are wired.
 
