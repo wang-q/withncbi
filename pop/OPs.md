@@ -129,7 +129,7 @@ for genomes out of WGS, which usually in better assembling levels.
     find WGS -name "*.gz" | xargs gzip -t
     ```
 
-3. Download *Candida dubliniensis* CD36 and *Candida orthopsilosis* Co 90-125
+3. Pick targets.
 
     ```sql
     SELECT *
@@ -219,8 +219,7 @@ for genomes out of WGS, which usually in better assembling levels.
     find WGS -name "*.gz" | xargs gzip -t
     ```
 
-3. Download *Fusarium graminearum* PH-1, *Fusarium oxysporum* f. sp. lycopersici 4287,
-   *Fusarium pseudograminearum* CS3270 and *Fusarium verticillioides* 7600.
+3. Pick targets.
 
     ```sql
     SELECT *
@@ -331,7 +330,7 @@ for genomes out of WGS, which usually in better assembling levels.
     find WGS -name "*.gz" | xargs gzip -t
     ```
 
-3. Download *Aspergillus fumigatus* Af293
+3. Pick targets.
 
     ```sql
     SELECT *
@@ -378,6 +377,71 @@ for genomes out of WGS, which usually in better assembling levels.
         -f Anid_FGSC_A4.seq.csv  \
         -r -p
     ```
+
+### *Penicillium* WGS
+
+1. Create `pop/penicillium.tsv` manually.
+
+    * http://www.ncbi.nlm.nih.gov/Traces/wgs/?page=1&term=penicillium&order=organism
+    * http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?mode=Info&id=5073
+    * http://www.ncbi.nlm.nih.gov/assembly?term=txid5073[Organism:exp]
+    * http://www.ncbi.nlm.nih.gov/genome/?term=txid5073[Organism:exp]
+
+    ```bash
+    export GENUS_ID=5073
+    export GENUS=penicillium
+    mkdir -p ~/data/alignment/Fungi/$GENUS          # operation directory
+    mkdir -p ~/data/alignment/Fungi/GENOMES/$GENUS  # sequence directory
+
+    cd ~/data/alignment/Fungi/GENOMES/$GENUS
+
+    ...
+
+    # Cleaning
+    rm raw*.*sv
+    unset GENUS_ID
+    unset GENUS
+    ```
+
+2. Create working directory and download WGS sequences.
+
+    ```bash
+    mkdir -p ~/data/alignment/Fungi/GENOMES/penicillium
+    cd ~/data/alignment/Fungi/GENOMES/penicillium
+
+    perl ~/Scripts/withncbi/util/wgs_prep.pl \
+        -f ~/Scripts/withncbi/pop/penicillium.tsv \
+        --fix \
+        -o WGS \
+        -a
+
+    aria2c -x 6 -s 3 -c -i WGS/penicillium.url.txt
+
+    find WGS -name "*.gz" | xargs gzip -t
+    ```
+
+3. Pick targets.
+
+    ```sql
+    SELECT *
+    FROM gr_euk.gr
+    WHERE genus_id = 5073
+
+    SELECT
+        *
+    FROM
+        ar_genbank.ar
+    WHERE
+        genus_id = 5073
+    ORDER BY organism_name
+    ```
+
+    There're no good target. Pchr_P2niaD18 is the only one on chromosome level, but is not de novo
+    assembled and hasn't annotations.
+
+    | assigned name | organism_name                      | assembly_accession |
+    | :------------ | :------------                      | :------------      |
+    | Pchr_P2niaD18 | *Penicillium chrysogenum* P2niaD18 | GCA_000710275.1    |
 
 ## Align
 
@@ -539,6 +603,109 @@ for genomes out of WGS, which usually in better assembling levels.
     sh plan_XXX.sh
 
     # sh 3_pair_cmd.sh # Only do this when target switched, e.g. four_way_2
+    sh 5_multi_cmd.sh
+    sh 7_multi_db_only.sh
+    ```
+
+### *Aspergillus* WGS
+
+1. `gen_pop_conf.pl`
+
+    Pay attentions to --downloaded orders. The first one will be the default target.
+
+    ```bash
+    mkdir -p ~/data/alignment/Fungi/aspergillus
+    cd ~/data/alignment/Fungi/aspergillus
+
+    perl ~/Scripts/withncbi/pop/gen_pop_conf.pl \
+        -i ~/data/alignment/Fungi/aspergillus/WGS/aspergillus.data.yml \
+        -o ~/Scripts/withncbi/pop/aspergillus_test.yml \
+        -d ~/data/alignment/Fungi/aspergillus/WGS \
+        -m prefix \
+        -r '*.fsa_nt.gz' \
+        --opt group_name=aspergillus \
+        --opt base_dir='~/data/alignment/Fungi' \
+        --opt data_dir='~/data/alignment/Fungi/aspergillus' \
+        --opt rm_species=Fungi \
+        --dd ~/data/alignment/Fungi/aspergillus/DOWNLOAD \
+        --downloaded 'name=Afum_Af293;taxon=330879;sciname=Aspergillus fumigatus Af293' \
+        --downloaded 'name=Anid_FGSC_A4;taxon=227321;sciname=Aspergillus nidulans FGSC A4' \
+        --plan 'name=Afum_7way;t=Afum_Af293;qs=Afum_A1163,Afum_AF10,Afum_AF210,Afum_Af293,Afum_niveus,Afum_Z5' \
+        --plan 'name=four_way_2;t=Anid_FGSC_A4;qs=Afum_Af293,Anig_ATCC_1015,Aory_RIB40'
+    ```
+
+2. Rest routing things.
+
+    ```bash
+    # pop_prep.pl
+    perl ~/Scripts/withncbi/pop/pop_prep.pl -p 12 -i ~/Scripts/withncbi/pop/aspergillus_test.yml
+
+    sh 01_file.sh
+    sh 02_rm.sh
+    sh 03_strain_info.sh
+
+    # plan_ALL.sh
+    sh plan_ALL.sh
+
+    sh 1_real_chr.sh
+    sh 3_pair_cmd.sh
+    sh 4_rawphylo.sh
+    sh 5_multi_cmd.sh
+    sh 7_multi_db_only.sh
+
+    # other plans
+    sh plan_Afum_7way.sh
+
+    sh 5_multi_cmd.sh
+    sh 7_multi_db_only.sh
+
+    sh plan_four_way_2.sh
+
+    sh 3_pair_cmd.sh # Only do this when target switched
+    sh 5_multi_cmd.sh
+    sh 7_multi_db_only.sh
+    ```
+
+### *Penicillium* WGS
+
+1. `gen_pop_conf.pl`
+
+    Pay attentions to --downloaded orders. The first one will be the default target.
+
+    ```bash
+    mkdir -p ~/data/alignment/Fungi/penicillium
+    cd ~/data/alignment/Fungi/penicillium
+
+    perl ~/Scripts/withncbi/pop/gen_pop_conf.pl \
+        -i ~/data/alignment/Fungi/penicillium/WGS/penicillium.data.yml \
+        -o ~/Scripts/withncbi/pop/penicillium_test.yml \
+        -d ~/data/alignment/Fungi/penicillium/WGS \
+        -m prefix \
+        -r '*.fsa_nt.gz' \
+        --opt group_name=penicillium \
+        --opt base_dir='~/data/alignment/Fungi' \
+        --opt data_dir='~/data/alignment/Fungi/penicillium' \
+        --opt rm_species=Fungi \
+        --opt per_seq_min_contig=30000 \
+        --per_seq Pchr_P2niaD18
+    ```
+
+2. Rest routing things.
+
+    ```bash
+    # pop_prep.pl
+    perl ~/Scripts/withncbi/pop/pop_prep.pl -p 12 -i ~/Scripts/withncbi/pop/penicillium_test.yml
+
+    sh 01_file.sh
+    sh 02_rm.sh
+    sh 03_strain_info.sh
+
+    # plan_ALL.sh
+    sh plan_ALL.sh
+
+    sh 1_real_chr.sh
+    sh 3_pair_cmd.sh
+    sh 4_rawphylo.sh
     sh 5_multi_cmd.sh
     sh 7_multi_db_only.sh
     ```
