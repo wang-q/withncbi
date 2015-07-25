@@ -68,7 +68,7 @@ for genomes out of WGS, which usually in better assembling levels.
     cd ~/data/alignment/Fungi/GENOMES/saccharomyces/DOWNLOAD
 
     # Omit chrMt
-    perl ~/Scripts/withncbi/util/assemble_csv.pl \
+    perl ~/Scripts/withncbi/taxon/assembly_csv.pl \
         -f ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/All/GCF_000146045.2.assembly.txt \
         -name Scer_S288c \
         --nuclear \
@@ -154,12 +154,12 @@ for genomes out of WGS, which usually in better assembling levels.
     mkdir -p ~/data/alignment/Fungi/GENOMES/candida/DOWNLOAD
     cd ~/data/alignment/Fungi/GENOMES/candida/DOWNLOAD
 
-    perl ~/Scripts/withncbi/util/assemble_csv.pl \
+    perl ~/Scripts/withncbi/taxon/assembly_csv.pl \
         -f ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/All/GCF_000026945.1.assembly.txt \
         -name Cdub_CD36 \
         > Cdub_CD36.seq.csv
 
-    perl ~/Scripts/withncbi/util/assemble_csv.pl \
+    perl ~/Scripts/withncbi/taxon/assembly_csv.pl \
         -f ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/All/GCF_000315875.1.assembly.txt \
         -name Corh_Co_90_125 \
         > Corh_Co_90_125.seq.csv
@@ -238,28 +238,28 @@ for genomes out of WGS, which usually in better assembling levels.
     mkdir -p ~/data/alignment/Fungi/GENOMES/fusarium/DOWNLOAD
     cd ~/data/alignment/Fungi/GENOMES/fusarium/DOWNLOAD
 
-    perl ~/Scripts/withncbi/util/assemble_csv.pl \
+    perl ~/Scripts/withncbi/taxon/assembly_csv.pl \
         -f ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/All/GCA_000240135.3.assembly.txt \
         -name Fgra_PH_1 \
         --genbank \
         --nuclear \
         > Fgra_PH_1.seq.csv
 
-    perl ~/Scripts/withncbi/util/assemble_csv.pl \
+    perl ~/Scripts/withncbi/taxon/assembly_csv.pl \
         -f ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/All/GCA_000149955.1.assembly.txt \
         -name Foxy_4287 \
         --genbank \
         --nuclear \
         > Foxy_4287.seq.csv
 
-    perl ~/Scripts/withncbi/util/assemble_csv.pl \
+    perl ~/Scripts/withncbi/taxon/assembly_csv.pl \
         -f ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/All/GCA_000974265.1.assembly.txt \
         -name Fpse_CS3270 \
         --genbank \
         --nuclear \
         > Fpse_CS3270.seq.csv
 
-    perl ~/Scripts/withncbi/util/assemble_csv.pl \
+    perl ~/Scripts/withncbi/taxon/assembly_csv.pl \
         -f ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/All/GCA_000149555.1.assembly.txt \
         -name Fver_7600 \
         --genbank \
@@ -355,13 +355,13 @@ for genomes out of WGS, which usually in better assembling levels.
     mkdir -p ~/data/alignment/Fungi/GENOMES/aspergillus/DOWNLOAD
     cd ~/data/alignment/Fungi/GENOMES/aspergillus/DOWNLOAD
 
-    perl ~/Scripts/withncbi/util/assemble_csv.pl \
+    perl ~/Scripts/withncbi/taxon/assembly_csv.pl \
         -f ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/All/GCA_000002655.1.assembly.txt \
         -name Afum_Af293 \
         --nuclear \
         > Afum_Af293.seq.csv
 
-    perl ~/Scripts/withncbi/util/assemble_csv.pl \
+    perl ~/Scripts/withncbi/taxon/assembly_csv.pl \
         -f ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/All/GCA_000011425.1.assembly.txt \
         -name Anid_FGSC_A4 \
         --genbank \

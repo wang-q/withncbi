@@ -130,6 +130,6 @@ assemble_csv.pl - convert NCBI assemble report to a .csv file for batch_get_seq.
 
 =head1 EXAMPLE
 
-    perl ~/Scripts/withncbi/util/assemble_csv.pl -f ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/All/GCF_000146045.2.assembly.txt
+    perl ~/Scripts/withncbi/taxon/assembly_csv.pl -f ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/All/GCF_000146045.2.assembly.txt
 
 =cut
