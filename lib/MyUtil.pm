@@ -23,7 +23,7 @@ use vars qw(@ISA @EXPORT_OK %EXPORT_TAGS);
 %EXPORT_TAGS = (
     all => [
         qw{
-            replace_home wgs_worker find_ancestor find_group
+            replace_home wgs_worker find_ancestor find_group abbr abbr_most
             },
     ],
 );
@@ -317,6 +317,67 @@ sub find_group {
     }
 
     return ( $superkingdom, $group, $subgroup );
+}
+
+# from core module Text::Abbrev
+sub abbr {
+    my $list = shift;
+    my $min  = shift;
+    return {} unless @{$list};
+
+    $min = 1 unless $min;
+    my $hashref = {};
+    my %table;
+
+WORD: for my $word ( @{$list} ) {
+        for ( my $len = ( length $word ) - 1; $len >= $min; --$len ) {
+            my $abbrev = substr( $word, 0, $len );
+            my $seen = ++$table{$abbrev};
+            if ( $seen == 1 ) {    # We're the first word so far to have
+                                   # this abbreviation.
+                $hashref->{$abbrev} = $word;
+            }
+            elsif ( $seen == 2 ) {    # We're the second word to have this
+                                      # abbreviation, so we can't use it.
+                delete $hashref->{$abbrev};
+            }
+            else {                    # We're the third word to have this
+                                      # abbreviation, so skip to the next word.
+                next WORD;
+            }
+        }
+    }
+
+    # Non-abbreviations always get entered, even if they aren't unique
+    for my $word ( @{$list} ) {
+        $hashref->{$word} = $word;
+    }
+    return $hashref;
+}
+
+sub abbr_most {
+    my $list = shift;
+    my $min  = shift;
+    my $creat = shift; # don't abbreviate 1 letter. "I'd spell creat with an e." 
+    return {} unless @{$list};
+
+    my $hashref = abbr( $list, $min ? $min : () );
+    my @ks   = sort keys %{$hashref};
+    my %abbr_of;
+    for my $i ( reverse( 0 .. $#ks ) ) {
+        if ( index( $ks[$i], $ks[ $i - 1 ] ) != 0 ) {
+            $abbr_of{ $hashref->{ $ks[$i] } } = $ks[$i];
+        }
+    }
+
+    if ($creat) {
+        for my $key (keys %abbr_of) {
+            if (length $key - length $abbr_of{$key} == 1 ) {
+                $abbr_of{$key} = $key;
+            }
+        }
+    }
+    return \%abbr_of;
 }
 
 1;
