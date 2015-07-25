@@ -94,6 +94,8 @@ for my $i ( 0 .. $count - 1 ) {
     print $organism, "\n";
 }
 
+# TODO: append abbr to existing columns, just like id_project_to.pl
+
 exit;
 
 __END__
