@@ -48,8 +48,8 @@ sub wgs_worker {
     $mech->stack_depth(0);    # no history to save memory
 
     # local shadowsocks proxy
-    if ($ENV{SSPROXY}) {
-        $mech->proxy(['http','https'], 'socks://127.0.0.1:1080' )
+    if ( $ENV{SSPROXY} ) {
+        $mech->proxy( [ 'http', 'https' ], 'socks://127.0.0.1:1080' );
     }
 
     my $url_part = "http://www.ncbi.nlm.nih.gov/Traces/wgs/";
@@ -59,7 +59,7 @@ sub wgs_worker {
     my $info = { prefix => $term, };
     $mech->get($url);
 
-    {                         # extract from tables
+    {    # extract from tables
         my $page    = $mech->content;
         my @tables  = qw{ meta-table structured-comments };
         my @columns = (
@@ -330,7 +330,7 @@ sub abbr {
     my %table;
 
 WORD: for my $word ( @{$list} ) {
-        for ( my $len = ( length $word ) - 1; $len >= $min; --$len ) {
+        for ( my $len = length($word) - 1; $len >= $min; --$len ) {
             my $abbrev = substr( $word, 0, $len );
             my $seen = ++$table{$abbrev};
             if ( $seen == 1 ) {    # We're the first word so far to have
@@ -356,28 +356,41 @@ WORD: for my $word ( @{$list} ) {
 }
 
 sub abbr_most {
-    my $list = shift;
-    my $min  = shift;
-    my $creat = shift; # don't abbreviate 1 letter. "I'd spell creat with an e." 
+    my $list  = shift;
+    my $min   = shift;
+    my $creat = shift; # don't abbreviate 1 letter. "I'd spell creat with an e."
     return {} unless @{$list};
 
-    my $hashref = abbr( $list, $min ? $min : () );
-    my @ks   = sort keys %{$hashref};
-    my %abbr_of;
-    for my $i ( reverse( 0 .. $#ks ) ) {
-        if ( index( $ks[$i], $ks[ $i - 1 ] ) != 0 ) {
-            $abbr_of{ $hashref->{ $ks[$i] } } = $ks[$i];
+    # don't abbreviate
+    if ( defined $min and $min == 0 ) {
+        my %abbr_of;
+        for my $word ( @{$list} ) {
+            $abbr_of{$word} = $word;
         }
+        return \%abbr_of;
     }
 
-    if ($creat) {
-        for my $key (keys %abbr_of) {
-            if (length $key - length $abbr_of{$key} == 1 ) {
-                $abbr_of{$key} = $key;
+    # do abbreviate
+    else {
+        my $hashref = $min ? abbr( $list, $min ) : abbr($list);
+        my @ks = sort keys %{$hashref};
+        my %abbr_of;
+        for my $i ( reverse( 0 .. $#ks ) ) {
+            if ( index( $ks[$i], $ks[ $i - 1 ] ) != 0 ) {
+                $abbr_of{ $hashref->{ $ks[$i] } } = $ks[$i];
+            }
+
+            if ($creat) {
+                for my $key ( keys %abbr_of ) {
+                    if ( length($key) - length( $abbr_of{$key} ) == 1 ) {
+                        $abbr_of{$key} = $key;
+                    }
+                }
             }
         }
+
+        return \%abbr_of;
     }
-    return \%abbr_of;
 }
 
 1;
