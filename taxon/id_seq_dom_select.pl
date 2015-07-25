@@ -7,8 +7,8 @@ use File::Slurp;
 use Mojo::DOM;
 use YAML qw(Dump Load DumpFile LoadFile);
 
-# 'http://www.ncbi.nlm.nih.gov/genomes/GenomesGroup.cgi?taxid=2759&opt=plastid';
-# 'http://www.ncbi.nlm.nih.gov/genomes/GenomesGroup.cgi?taxid=33090&opt=organelle';
+# http://www.ncbi.nlm.nih.gov/genomes/GenomesGroup.cgi?taxid=2759&opt=plastid
+# http://www.ncbi.nlm.nih.gov/genomes/GenomesGroup.cgi?taxid=33090&opt=organelle
 
 my $file = shift;
 die "Provide a valid html file!\n" unless $file;
@@ -17,20 +17,20 @@ my $html = read_file($file);
 
 my $dom = Mojo::DOM->new($html);
 
-my $string = $dom->find('#Tbl1 tr[bgcolor=#F0F0F0] > td > a')->map(
+my $ref = $dom->find('#Tbl1 tr[bgcolor=#F0F0F0] > td > a')->map(
     sub {
         my $el = shift;
         if ( $el->text =~ /NC_\d+/ ) {
             return $el->text;
         }
         elsif ( $el->{href} =~ /id\=(\d+)/ ) {
-            return $1;
-        }
-        else {
-            return $el;
+            if ( $el->text !~ /not exist/ ) {
+                return $1;
+            }
         }
     }
 );
+
 
 #348535
 #NC_014345
@@ -47,9 +47,9 @@ my $string = $dom->find('#Tbl1 tr[bgcolor=#F0F0F0] > td > a')->map(
 #137071
 #NC_017928
 
+my @els = grep {$_} @{$ref};
 my $acc_of = {};
 {
-    my @els = split /\n/, $string;
     my $cur_id;
     while (@els) {
         my $el = shift @els;
