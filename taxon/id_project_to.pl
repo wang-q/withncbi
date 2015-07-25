@@ -47,6 +47,8 @@ pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
 #----------------------------------------------------------#
 # init
 #----------------------------------------------------------#
+$|++;
+
 # check $rank
 my @ranks = qw{species genus family order class phylum superkingdom};
 my %valid = map { $_ => 1 } @ranks;
@@ -80,17 +82,17 @@ while ( my $line = <> ) {
     if ( isint($taxon_id) ) {
         my $strain = $taxon_db->get_taxon( -taxonid => $taxon_id );
         if ( !$strain ) {
-            warn "Can't find taxon for [$taxon_id], \n";
-            push @row, '';
-            push @row, '' if $rankid;
+            warn "Can't find taxon for [$taxon_id]\n";
+            push @row, 'NA';
+            push @row, '0' if $rankid;
         }
         else {
             if ($rank) {
                 my $taxon_obj = find_ancestor( $strain, $rank );
                 if ( !$taxon_obj ) {
                     warn "Can't find [$rank] for [$taxon_id]\n";
-                    push @row, '';
-                    push @row, '' if $rankid;
+                    push @row, 'NA';
+                    push @row, '0' if $rankid;
                 }
                 else {
                     push @row, $taxon_obj->scientific_name;
@@ -105,9 +107,8 @@ while ( my $line = <> ) {
     }
     else {
         warn "[$taxon_id] doesn't look like a taxonmy id.\n";
-
-        push @row, '';
-        push @row, '' if $rankid;
+        push @row, 'NA';
+        push @row, '0' if $rankid;
     }
 
     print join( ",", @row ), "\n";
