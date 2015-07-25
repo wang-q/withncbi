@@ -50,7 +50,7 @@ pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
 $|++;
 
 # check $rank
-my @ranks = qw{species genus family order class phylum superkingdom};
+my @ranks = qw{species genus family order class phylum kingdom};
 my %valid = map { $_ => 1 } @ranks;
 
 if ( $rank and !$valid{$rank} ) {

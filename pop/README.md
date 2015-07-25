@@ -98,6 +98,7 @@ spaces matters.
     # Run `wgs_prep.pl` to get a crude `raw2.csv`
     perl ~/Scripts/withncbi/taxon/wgs_prep.pl -f raw2.tsv --csvonly
 
+    # FIXME:  @O =split(/ /, $F[3]) just take the first part of sub-species.
     echo -e '#name\tprefix\torganism\tcontigs' > raw3.tsv
     cat raw2.csv \
         | perl -nl -a -F"," -e \
