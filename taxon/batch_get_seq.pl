@@ -59,7 +59,7 @@ while ( my $row = $csv->getline($csv_fh) ) {
     }
 
     # download
-    system "perl $FindBin::Bin/../util/get_seq.pl $seq $id";
+    system "perl $FindBin::Bin/get_seq.pl $seq $id";
 
     # replace contents from .gb and .fasta
     if ( $rename and defined $row->[3] ) {
