@@ -66,7 +66,7 @@ my $acc_of = {};
     }
 }
 
-print "strain_taxon_id,accession\n";
+print "#strain_taxon_id,accession\n";
 for my $key ( sort keys %{$acc_of} ) {
     print join ",", ( $key, @{ $acc_of->{$key} } );
     print "\n";
