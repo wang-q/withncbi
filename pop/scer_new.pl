@@ -913,7 +913,7 @@ __END__
 mkdir -p ~/data/alignment/scer_new
 cd ~/data/alignment/scer_new
 
-perl ~/Scripts/withncbi/util/wgs_prep.pl \
+perl ~/Scripts/withncbi/taxon/wgs_prep.pl \
     -f ~/Scripts/withncbi/doc/scer_new.tsv \
     --fix \
     -o WGS \

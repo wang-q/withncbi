@@ -45,7 +45,7 @@ for genomes out of WGS, which usually in better assembling levels.
     mkdir -p ~/data/alignment/Fungi/GENOMES/saccharomyces
     cd ~/data/alignment/Fungi/GENOMES/saccharomyces
 
-    perl ~/Scripts/withncbi/util/wgs_prep.pl \
+    perl ~/Scripts/withncbi/taxon/wgs_prep.pl \
         -f ~/Scripts/withncbi/pop/saccharomyces.tsv \
         --fix \
         -o WGS \
@@ -118,7 +118,7 @@ for genomes out of WGS, which usually in better assembling levels.
     mkdir -p ~/data/alignment/Fungi/GENOMES/candida
     cd ~/data/alignment/Fungi/GENOMES/candida
 
-    perl ~/Scripts/withncbi/util/wgs_prep.pl \
+    perl ~/Scripts/withncbi/taxon/wgs_prep.pl \
         -f ~/Scripts/withncbi/pop/candida.tsv \
         --fix \
         -o WGS \
@@ -208,7 +208,7 @@ for genomes out of WGS, which usually in better assembling levels.
     mkdir -p ~/data/alignment/Fungi/GENOMES/fusarium
     cd ~/data/alignment/Fungi/GENOMES/fusarium
 
-    perl ~/Scripts/withncbi/util/wgs_prep.pl \
+    perl ~/Scripts/withncbi/taxon/wgs_prep.pl \
         -f ~/Scripts/withncbi/pop/fusarium.tsv \
         --fix \
         -o WGS \
@@ -319,7 +319,7 @@ for genomes out of WGS, which usually in better assembling levels.
     mkdir -p ~/data/alignment/Fungi/GENOMES/aspergillus
     cd ~/data/alignment/Fungi/GENOMES/aspergillus
 
-    perl ~/Scripts/withncbi/util/wgs_prep.pl \
+    perl ~/Scripts/withncbi/taxon/wgs_prep.pl \
         -f ~/Scripts/withncbi/pop/aspergillus.tsv \
         --fix \
         -o WGS \
@@ -409,7 +409,7 @@ for genomes out of WGS, which usually in better assembling levels.
     mkdir -p ~/data/alignment/Fungi/GENOMES/penicillium
     cd ~/data/alignment/Fungi/GENOMES/penicillium
 
-    perl ~/Scripts/withncbi/util/wgs_prep.pl \
+    perl ~/Scripts/withncbi/taxon/wgs_prep.pl \
         -f ~/Scripts/withncbi/pop/penicillium.tsv \
         --fix \
         -o WGS \

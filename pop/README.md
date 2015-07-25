@@ -96,7 +96,7 @@ spaces matters.
 
     # stage3
     # Run `wgs_prep.pl` to get a crude `raw2.csv`
-    perl ~/Scripts/withncbi/util/wgs_prep.pl -f raw2.tsv --csvonly
+    perl ~/Scripts/withncbi/taxon/wgs_prep.pl -f raw2.tsv --csvonly
 
     echo -e '#name\tprefix\torganism\tcontigs' > raw3.tsv
     cat raw2.csv \
@@ -136,7 +136,7 @@ spaces matters.
     mkdir -p ~/data/alignment/Fungi/GENOMES/trichoderma
     cd ~/data/alignment/Fungi/GENOMES/trichoderma
 
-    perl ~/Scripts/withncbi/util/wgs_prep.pl \
+    perl ~/Scripts/withncbi/taxon/wgs_prep.pl \
         -f ~/Scripts/withncbi/pop/trichoderma.tsv \
         --fix \
         -o WGS \
