@@ -930,7 +930,7 @@ find WGS -name "*.gz" | xargs gzip -t
 # YJM993 http://www.ncbi.nlm.nih.gov/assembly/GCA_000662435.1/
 # Then create "yeast_name_seq.csv" manually and put it in "~/data/alignment/yeast_genome"
 cd ~/data/alignment/yeast_genome
-perl ~/Scripts/withncbi/util/batch_get_seq.pl yeast_name_seq.csv  2>&1 | tee yeast_name_seq.log
+perl ~/Scripts/withncbi/taxon/batch_get_seq.pl yeast_name_seq.csv  2>&1 | tee yeast_name_seq.log
 
 # pretend to be WGS
 mkdir ~/data/alignment/scer_new/WGS/EC1118

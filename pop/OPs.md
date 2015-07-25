@@ -75,7 +75,7 @@ for genomes out of WGS, which usually in better assembling levels.
         > Scer_S288c.seq.csv
 
     # Download, rename files and change fasta headers
-    perl ~/Scripts/withncbi/util/batch_get_seq.pl \
+    perl ~/Scripts/withncbi/taxon/batch_get_seq.pl \
         -f Scer_S288c.seq.csv  \
         -r -p
     ```
@@ -165,11 +165,11 @@ for genomes out of WGS, which usually in better assembling levels.
         > Corh_Co_90_125.seq.csv
 
     # Download, rename files and change fasta headers
-    perl ~/Scripts/withncbi/util/batch_get_seq.pl \
+    perl ~/Scripts/withncbi/taxon/batch_get_seq.pl \
         -f Cdub_CD36.seq.csv  \
         -r -p
 
-    perl ~/Scripts/withncbi/util/batch_get_seq.pl \
+    perl ~/Scripts/withncbi/taxon/batch_get_seq.pl \
         -f Corh_Co_90_125.seq.csv  \
         -r -p
     ```
@@ -267,19 +267,19 @@ for genomes out of WGS, which usually in better assembling levels.
         > Fver_7600.seq.csv
 
     # Download, rename files and change fasta headers
-    perl ~/Scripts/withncbi/util/batch_get_seq.pl \
+    perl ~/Scripts/withncbi/taxon/batch_get_seq.pl \
         -f Fgra_PH_1.seq.csv  \
         -r -p
 
-    perl ~/Scripts/withncbi/util/batch_get_seq.pl \
+    perl ~/Scripts/withncbi/taxon/batch_get_seq.pl \
         -f Foxy_4287.seq.csv  \
         -r -p
 
-    perl ~/Scripts/withncbi/util/batch_get_seq.pl \
+    perl ~/Scripts/withncbi/taxon/batch_get_seq.pl \
         -f Fpse_CS3270.seq.csv  \
         -r -p
 
-    perl ~/Scripts/withncbi/util/batch_get_seq.pl \
+    perl ~/Scripts/withncbi/taxon/batch_get_seq.pl \
         -f Fver_7600.seq.csv  \
         -r -p
     ```
@@ -369,11 +369,11 @@ for genomes out of WGS, which usually in better assembling levels.
         > Anid_FGSC_A4.seq.csv
 
     # Download, rename files and change fasta headers
-    perl ~/Scripts/withncbi/util/batch_get_seq.pl \
+    perl ~/Scripts/withncbi/taxon/batch_get_seq.pl \
         -f Afum_Af293.seq.csv  \
         -r -p
 
-    perl ~/Scripts/withncbi/util/batch_get_seq.pl \
+    perl ~/Scripts/withncbi/taxon/batch_get_seq.pl \
         -f Anid_FGSC_A4.seq.csv  \
         -r -p
     ```

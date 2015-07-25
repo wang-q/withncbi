@@ -105,7 +105,7 @@ batch_get_seq.pl - retrieve all sequences listed in a file
       Options:
         --help              brief help message
         --man               full documentation
-        -f                  input csv file
+        -f STR              input csv file
         -r                  rename file to seq name
         -p                  remove fasta sequences from generated gff files
 
@@ -117,7 +117,7 @@ Example:
     S288c,NC_001133,559292,I
     S288c,NC_001134,559292,II
     S288c,NC_001135,559292,III
-    
+
 Columns:
 
     strain_name     =>  files will be stored in a directory named after this
@@ -128,6 +128,6 @@ Columns:
 =head1 EXAMPLE
 
     cd ~/data/alignment/yeast_genome
-    perl ~/Scripts/withncbi/util/batch_get_seq.pl -r -p -f yeast_name_seq.csv 2>&1 | tee yeast_name_seq.log
+    perl ~/Scripts/withncbi/taxon/batch_get_seq.pl -r -p -f yeast_name_seq.csv 2>&1 | tee yeast_name_seq.log
 
 =cut
