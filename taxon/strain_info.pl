@@ -36,6 +36,8 @@ my $stopwatch = AlignDB::Stopwatch->new(
 my @ids;
 my %name_of;
 
+my $stdin;
+
 # for arbitrary ids
 my %species_of;
 
@@ -57,6 +59,7 @@ GetOptions(
     'help'      => \$help,
     'man'       => \$man,
     'id=i'      => \@ids,
+    'stdin'     => \$stdin,
     'name=s'    => \%name_of,
     'species=s' => \%species_of,
     'o|file=s'  => \$filename,
@@ -83,6 +86,13 @@ if ( -e "$td_dir/nodes.dmp" ) {
 }
 else {
     $taxon_db = Bio::DB::Taxonomy->new( -source => 'entrez', );
+}
+
+if ($stdin) {
+    while (<>) {
+        chomp;
+        push @ids, $_;
+    }
 }
 
 my $csv = Text::CSV_XS->new( { binary => 1, eol => "\n" } );
@@ -191,13 +201,14 @@ strain_info.pl - generate a csv file for taxonomy info
       Options:
         --help              brief help message
         --man               full documentation
-        -o, --file          output filename
-        --id                @ids
-        --name              %name_of
-        --species           %species_of, fake id need this
+        -o, --file STR      output filename
+        --id @INT           ids
+        --stdin             Read ids from stdin, --id is still working
+        --name INT=STR      Assign name to id
+        --species INT=STR   fake id need this
         --simple            means use subspecies strain name as name
-        -a, --aria2         url file is for aria2
-        --fix               sometimes WGS records miss assigning strain id
+
+=head1 EXAMPLE
 
     perl strain_info.pl \
         --file   yeast_ncbi.csv \
