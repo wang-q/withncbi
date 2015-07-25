@@ -74,7 +74,7 @@ while ( my $row = $csv->getline($csv_fh) ) {
         print " " x 4 . "Keep original names.\n";
     }
 
-    system "perl $FindBin::Bin/../util/bp_genbank2gff3.pl $id/$seq.gb";
+    system "perl $FindBin::Bin/bp_genbank2gff3.pl $id/$seq.gb";
 
     move( "$seq.gb.gff", "$id/$seq.gff" );
     if ($pure_gff) {
