@@ -110,17 +110,18 @@ sed -i ".bak" "s/\'//g" plastid.CHECKME.csv
 sed -i ".bak" "s/Chlorella,NA,NA/Chlorella,Chlorellaceae,Chlorellales/" plastid.CHECKME.csv
 
 # Koliella corcontica (a green algae) was grouped to Streptophyta.
-# Don't fix it here.
+sed -i ".bak" "s/Klebsormidiophyceae,Streptophyta/Klebsormidiophyceae,Chlorophyta/" plastid.CHECKME.csv
+
 sed -i ".bak" "s/Koliella,NA/Koliella,Klebsormidiaceae/" plastid.CHECKME.csv
 
 sed -i ".bak" "s/Nephroselmis,NA,NA/Nephroselmis,Nephroselmidaceae,Nephroselmidales/" plastid.CHECKME.csv
+
+# Chrysanthemum x morifolium and Pelargonium x hortorum are also weird, but they can be googled.
 ```
 
 ### Filtering based on valid families and genera
 
 Species and genus should not be "NA" and genus has 2 or more members.
-
-We got 82 genera,  345 species and **352** accessions.
 
 ```text
 678 ---------> 675 ---------> 352 ---------> 526
@@ -166,22 +167,12 @@ grep -F -f family.tmp plastid.tmp > plastid.family.tmp
 # 526
 wc -l plastid.family.tmp
 
-# #   82 genus.txt
-# #   42 family.txt
-# cut -d',' -f 5 plastid.genus.tmp | sort | uniq > genus.txt
-# cut -d',' -f 6 plastid.genus.tmp | sort | uniq > family.txt
-# wc -l genus.txt family.txt
-#
-# # results produced in this step
-# head -n 1 plastid.CHECKME.csv > plastid.ALIGN.csv
-# cat plastid.genus.tmp >> plastid.ALIGN.csv
-
 # results produced in this step
 head -n 1 plastid.CHECKME.csv > plastid.DOWNLOAD.csv
 cat plastid.family.tmp >> plastid.DOWNLOAD.csv
 
 # clean
-rm *.tmp
+rm *.tmp *.bak
 ```
 
 ### Find a way to name these.
@@ -270,7 +261,7 @@ perl ~/Scripts/withncbi/taxon/batch_get_seq.pl -f plastid_name_acc_id.csv -p 2>&
 find . -name "*.fasta" | wc -l
 ```
 
-Regenerate `plastid_ncbi.csv` with abbr names.
+Create `plastid_ncbi.csv` with abbr names.
 
 ```bash
 # local, Runtime 10 seconds.
@@ -280,4 +271,61 @@ cat plastid.ABBR.csv \
     | grep -v '^#' \
     | perl -nl -a -F"," -e 'print qq{$F[0],$F[9]}' \
     | perl ~/Scripts/withncbi/taxon/strain_info.pl --stdin --withname --file plastid_ncbi.csv
+```
+
+### Create alignment plans
+
+We got 43 families, 82 genera, 345 species and **352** accessions.
+
+```bash
+# valid genera
+cat plastid.ABBR.csv \
+    | grep -v "^#" \
+    | perl -nl -a -F"," -e \
+    '$seen{$F[4]}++; END {for $k (sort keys %seen) {printf qq{,%s,\n}, $k if $seen{$k} > 1}}' \
+    > genus.tmp
+
+# intersect between two files
+grep -F -f genus.tmp plastid.ABBR.csv > plastid.GENUS.csv
+
+# 352
+wc -l plastid.GENUS.csv
+
+#   count every rank
+#   42 family.txt
+#   82 genus.txt
+#  345 species.txt
+cut -d',' -f 4 plastid.GENUS.csv | sort | uniq > species.txt
+cut -d',' -f 5 plastid.GENUS.csv | sort | uniq > genus.txt
+cut -d',' -f 6 plastid.GENUS.csv | sort | uniq > family.txt
+wc -l family.txt genus.txt species.txt
+
+# create again with headers
+grep -F -f genus.tmp plastid.ABBR.csv > plastid.GENUS.tmp
+
+# sort by multiply columns, phylum, order, family, abbr
+head -n 1 plastid.ABBR.csv > plastid.GENUS.csv
+cat plastid.GENUS.tmp \
+    | sort -t',' -k9,9 -k7,7 -k6,6 -k10,10 \
+    >> plastid.GENUS.csv
+```
+
+Create alignments without outgroups.
+
+```bash
+cd ~/data/organelle/
+
+echo -e "mkdir -p ~/data/organelle/plastid.working\n cd ~/data/organelle/plastid.working\n" > plastid.new.cmd.txt
+
+# sed is bad for handling new lines
+cat plastid.new/plastid.GENUS.csv \
+    | grep -v "^#" \
+    | perl -nl -a -F"," -e \
+    'BEGIN{($g, @s) = ('');}; if ($F[4] ne $g) {if ($g) {print qq{\n# $g}; print qq{GENUS $g \\}; print qq{-q $_ \\} for @s;} $g = $F[4]; @s = ();} push @s, $F[9]; END {print qq{\n# $g}; print qq{GENUS $g \\}; print qq{-q $_ \\} for @s; print;}' \
+    | perl -e '@ls = <>; $l = join q{}, @ls; $l =~ s/GENUS (\w+) \\\n\-q/GENUS \1 \\\n\    -t/gs; $l =~ s/\-q /    \-q /gs; $l =~ s/\\\n\n/\n\n/gs; print $l;' \
+    | perl -e '@ls = <>; $l = join q{}, @ls; $l =~ s/GENUS /perl \~\/Scripts\/withncbi\/taxon\/strain_bz\.pl \\\nOPTIONS\\\n    --use_name \\\n    \-\-name /gs; print $l;' \
+    | perl -e '@ls = <>; $l = join q{}, @ls; $l =~ s/OPTIONS/    \-\-file ~\/data\/organelle\/plastid\.new\/plastid_ncbi.csv \\\nOPTIONS /gs; print $l;' \
+    | perl -e '@ls = <>; $l = join q{}, @ls; $l =~ s/OPTIONS/    \-\-seq_dir ~\/data\/organelle\/plastid\.new/gs; print $l;' \
+    >> plastid.new.cmd.txt
+
 ```
