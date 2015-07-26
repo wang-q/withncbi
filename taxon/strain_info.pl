@@ -37,6 +37,7 @@ my @ids;
 my %name_of;
 
 my $stdin;
+my $stdin_with_name;
 
 # for arbitrary ids
 my %species_of;
@@ -60,6 +61,7 @@ GetOptions(
     'man'       => \$man,
     'id=i'      => \@ids,
     'stdin'     => \$stdin,
+    'withname'  => \$stdin_with_name,
     'name=s'    => \%name_of,
     'species=s' => \%species_of,
     'o|file=s'  => \$filename,
@@ -91,7 +93,14 @@ else {
 if ($stdin) {
     while (<>) {
         chomp;
-        push @ids, $_;
+        if ($stdin_with_name) {
+            my ( $in_id, $in_name ) = split /,/, $_;
+            push @ids, $in_id;
+            $name_of{$in_id} = $in_name;
+        }
+        else {
+            push @ids, $_;
+        }
     }
 }
 
@@ -204,6 +213,7 @@ strain_info.pl - generate a csv file for taxonomy info
         -o, --file STR      output filename
         --id @INT           ids
         --stdin             Read ids from stdin, --id is still working
+        --withname          stdin is id,name, 9606,Human
         --name INT=STR      Assign name to id
         --species INT=STR   fake id need this
         --simple            means use subspecies strain name as name
