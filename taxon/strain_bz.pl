@@ -39,8 +39,7 @@ my $stopwatch = AlignDB::Stopwatch->new(
 );
 
 my $working_dir = ".";
-my $seq_dir;    #  will prep_fa from this dir ~/Scripts/alignDB/taxon
-                #  or use seqs store in $working_dir
+my $seq_dir;    #  will do prep_fa() from this dir or use seqs store in $working_dir
 my @keep;       # don't touch anything inside fasta files
 
 my $target_id;
