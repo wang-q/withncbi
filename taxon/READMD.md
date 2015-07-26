@@ -54,6 +54,7 @@ id ---> lineage ---> filtering ---> naming ---> strain_info.pl   ---> strain_bz.
                                       |                                 ^
                                       |-------> batch_get_seq.pl -------|
 ```
+I'm sure there are no commas in names. So for convenient, don't use Text::CSV_XS.
 
 ### Scrap id and acc from NCBI
 
@@ -92,7 +93,7 @@ If you sure, you can add or delete lines and contents in `plastid.CHECKME.csv`.
 # generate a .csv file for manually checking
 echo '#strain_taxon_id,accession,strain,species,genus,family,order,class,phylum' > plastid.CHECKME.csv
 cat plastid_id_seq.csv \
-    | grep -v strain_taxon_id \
+    | grep -v "^#" \
     | perl ~/Scripts/withncbi/taxon/id_project_to.pl -s "," \
     | perl ~/Scripts/withncbi/taxon/id_project_to.pl -s "," --rank species \
     | perl ~/Scripts/withncbi/taxon/id_project_to.pl -s "," --rank genus \
@@ -104,21 +105,26 @@ cat plastid_id_seq.csv \
 
 # correct 'Chlorella' mirabilis  
 # darwin (bsd) need "" for -i
-sed -i "" "s/\'//g" plastid.CHECKME.csv
+sed -i ".bak" "s/\'//g" plastid.CHECKME.csv
+
+sed -i ".bak" "s/Chlorella,NA,NA/Chlorella,Chlorellaceae,Chlorellales/" plastid.CHECKME.csv
 
 # Koliella corcontica (a green algae) was grouped to Streptophyta.
 # Don't fix it here.
+sed -i ".bak" "s/Koliella,NA/Koliella,Klebsormidiaceae/" plastid.CHECKME.csv
+
+sed -i ".bak" "s/Nephroselmis,NA,NA/Nephroselmis,Nephroselmidaceae,Nephroselmidales/" plastid.CHECKME.csv
 ```
 
 ### Filtering based on valid families and genera
 
 Species and genus should not be "NA" and genus has 2 or more members.
 
-We got 71 genera,  322 species and **352** accessions.
+We got 82 genera,  345 species and **352** accessions.
 
 ```text
-678 ---------> 675 ---------> 352
-        NA           genus
+678 ---------> 675 ---------> 352 ---------> 526
+        NA           genus          family
 ```
 
 ```bash
@@ -128,8 +134,12 @@ cat plastid.CHECKME.csv \
     '/^#/ and next; ($F[3] eq q{NA} or $F[4] eq q{NA} ) and next; print' \
     > plastid.tmp
 
+# 675
 wc -l plastid.tmp
 
+#----------------------------#
+# Genus
+#----------------------------#
 # valid genera
 cat plastid.tmp \
     | perl -nl -a -F"," -e \
@@ -138,18 +148,37 @@ cat plastid.tmp \
 
 # intersect between two files
 grep -F -f genus.tmp plastid.tmp > plastid.genus.tmp
+
+# 352
 wc -l plastid.genus.tmp
 
-# count every ranks
-#   82 genus.txt
-#  345 species.txt
-cut -d',' -f 5 plastid.genus.tmp | sort | uniq > genus.txt
-cut -d',' -f 4 plastid.genus.tmp | sort | uniq > species.txt
-wc -l genus.txt species.txt
+#----------------------------#
+# Family
+#----------------------------#
+# get some genera back as candidates for outgroup
+cat plastid.genus.tmp \
+    | perl -nl -a -F"," -e 'printf qq{,$F[5],\n}' \
+    > family.tmp
+
+# intersect between two files
+grep -F -f family.tmp plastid.tmp > plastid.family.tmp
+
+# 526
+wc -l plastid.family.tmp
+
+# #   82 genus.txt
+# #   42 family.txt
+# cut -d',' -f 5 plastid.genus.tmp | sort | uniq > genus.txt
+# cut -d',' -f 6 plastid.genus.tmp | sort | uniq > family.txt
+# wc -l genus.txt family.txt
+#
+# # results produced in this step
+# head -n 1 plastid.CHECKME.csv > plastid.ALIGN.csv
+# cat plastid.genus.tmp >> plastid.ALIGN.csv
 
 # results produced in this step
-head -n 1 plastid.CHECKME.csv > plastid.FILTERED.csv
-cat plastid.genus.tmp >> plastid.FILTERED.csv
+head -n 1 plastid.CHECKME.csv > plastid.DOWNLOAD.csv
+cat plastid.family.tmp >> plastid.DOWNLOAD.csv
 
 # clean
 rm *.tmp
@@ -161,7 +190,7 @@ Seems it's OK to use species as names.
 
 ```bash
 # sub-species
-cat plastid.FILTERED.csv \
+cat plastid.DOWNLOAD.csv \
     | perl -nl -a -F"," -e \
     '/^#/i and next; $seen{$F[3]}++; END {for $k (keys %seen){printf qq{%s,%d\n}, $k, $seen{$k} if $seen{$k} > 1}};' \
     | sort
@@ -173,7 +202,7 @@ cat plastid.FILTERED.csv \
 # Saccharum hybrid cultivar,2
 
 # strain name not equal to species
-cat plastid.FILTERED.csv \
+cat plastid.DOWNLOAD.csv \
     | grep -v '^#' \
     | perl -nl -a -F"," -e '$F[2] ne $F[3] and print $F[2]' \
     | sort
@@ -211,7 +240,7 @@ Create abbreviations.
 
 
 echo '#strain_taxon_id,accession,strain,species,genus,family,order,class,phylum,abbr' > plastid.ABBR.csv
-cat plastid.FILTERED.csv \
+cat plastid.DOWNLOAD.csv \
     | grep -v '^#' \
     | perl ~/Scripts/withncbi/taxon/abbr_name.pl -c "3,4,5" -s "," -m 0 \
     >> plastid.ABBR.csv
@@ -244,6 +273,9 @@ find . -name "*.fasta" | wc -l
 Regenerate `plastid_ncbi.csv` with abbr names.
 
 ```bash
+# local, Runtime 10 seconds.
+# with --entrez, Runtime 7 minutes and 23 seconds.
+# And can't find is still can't find.
 cat plastid.ABBR.csv \
     | grep -v '^#' \
     | perl -nl -a -F"," -e 'print qq{$F[0],$F[9]}' \
