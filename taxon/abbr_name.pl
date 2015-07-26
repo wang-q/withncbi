@@ -48,6 +48,7 @@ $|++;
 # start
 #----------------------------------------------------------#
 my @columns = map { $_ - 1 } split( /,/, $column );
+my @fields;
 my @rows;
 while ( my $line = <> ) {
     chomp $line;
@@ -73,14 +74,16 @@ while ( my $line = <> ) {
     }
 
     s/\W+/_/g for ( $strain, $species, $genus );
-    push @rows, [ $strain, $species, $genus ];
+    push @fields, [ $strain, $species, $genus ];
+    
+    push @rows, \@row;
 }
 
-my $count = scalar @rows;
+my $count = scalar @fields;
 
-my @ge = map { $_->[2] } @rows;
-my @sp = map { $_->[1] } @rows;
-my @st = map { $_->[0] } @rows;
+my @ge = map { $_->[2] } @fields;
+my @sp = map { $_->[1] } @fields;
+my @st = map { $_->[0] } @fields;
 
 my $ge_of = abbr_most( [ uniq(@ge) ], 1,            "Yes" );
 my $sp_of = abbr_most( [ uniq(@sp) ], $min_species, "Yes" );
@@ -91,10 +94,8 @@ for my $i ( 0 .. $count - 1 ) {
         $sp_of->{ $sp[$i] };
     my $organism = join "_", grep { defined and length } $ge_sp, $st[$i];
 
-    print $organism, "\n";
+    print join(",", @{$rows[$i]}, $organism), "\n";
 }
-
-# TODO: append abbr to existing columns, just like id_project_to.pl
 
 exit;
 
