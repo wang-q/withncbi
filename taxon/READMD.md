@@ -45,18 +45,29 @@ rsync --progress -av ftp.ncbi.nlm.nih.gov::genbank/genomes/Bacteria_DRAFT/ \
     ~/data/NCBI/genbank/genomes/Bacteria_DRAFT/
 ```
 
-## Download plastid genomes
+## Process plastid genomes
+
+```text
+id ---> lineage ---> filtering ---> naming ---> batch_get_seq.pl ---> strain_bz.pl
+                                      |                                     ^
+                                      |-------> strain_info.pl   -----------|
+```
 
 ### Scrap id and acc from NCBI
 
 Open browser and visit [NCBI plastid page](http://www.ncbi.nlm.nih.gov/genomes/GenomesGroup.cgi?taxid=33090&opt=plastid).
 Save page to a local file, html only. In this case, it's `doc/green_plants_plastid_150725.html`.
 
+From now on, our cwd is `~/data/organelle/plastid.new`.
+
+Use `taxon/id_seq_dom_select.pl` to extract Taxonomy ids and genbank accessions.
+
+Got **678** accessions.
+
 ```bash
 mkdir -p ~/data/organelle/plastid.new
 cd ~/data/organelle/plastid.new
 
-# extract Taxonomy ids and genbank accessions.
 # id,acc
 # 996148,NC_017006
 perl ~/Scripts/withncbi/taxon/id_seq_dom_select.pl ~/Scripts/withncbi/doc/green_plants_plastid_150725.html > plastid_id_seq.csv
@@ -67,7 +78,9 @@ cat plastid_id_seq.csv | grep -v "^#" | wc -l
 
 ### Add linage information
 
-Got **678** accessions, give them better shapes for manually checking and automatic filtering.
+Give ids better shapes for manually checking and automatic filtering.
+
+If you sure, you can add or delete lines and contents in `plastid.CHECKME.csv`.
 
 ```bash
 # generate a .csv file for manually checking
@@ -94,9 +107,9 @@ Family has 3 or more strains and Genus has 2 or more.
 
 We got 31 families, 71 genera,  322 species and **329** accessions.
 
-```
-        NA           family         genus
+```text
 678 ---------> 649 ---------> 543 ---------> 329
+        NA           family         genus
 ```
 
 ```bash
@@ -148,7 +161,7 @@ rm *.tmp
 
 ### Find a way to name these.
 
- Seems it's OK to use species as names.
+Seems it's OK to use species as names.
 
 ```bash
 # sub-species
@@ -183,9 +196,11 @@ cat plastid.FILTERED.csv \
 # Phalaenopsis aphrodite subsp. formosana
 # Saccharum hybrid cultivar NCo 310
 # Saccharum hybrid cultivar SP80-3280
+```
 
-# create abbreviations
+Create abbreviations.
 
+```bash
 # # use Text::Abbrev
 # cat genus.txt \
 #     | perl -MText::Abbrev -nl -e \
@@ -198,15 +213,43 @@ cat plastid.FILTERED.csv \
 #     | perl -I ~/Scripts/withncbi/lib -MMyUtil -MYAML -nl -e \
 #     'push @list, $_; END{$hashref = MyUtil::abbr_most( \@list); print Dump $hashref }'
 
+
+echo '#strain_taxon_id,accession,strain,species,genus,family,order,class,phylum,abbr' > plastid.ABBR.csv
 cat plastid.FILTERED.csv \
     | grep -v '^#' \
-    | perl ~/Scripts/withncbi/taxon/auto_name.pl -c "3,4,5" -s ","
+    | perl ~/Scripts/withncbi/taxon/abbr_name.pl -c "3,4,5" -s "," -m 0 \
+    >> plastid.ABBR.csv
 ```
 
+### Download sequences and regenerate lineage information.
+
+We don't rename sequences here, so the file has three columns
+
 ```bash
-perl ~/Scripts/withncbi/taxon/batch_get_seq.pl plastid_id_seq.csv  2>&1 | tee plastid_seq.log
+mkdir -p ~/data/organelle/plastid.new
+cd ~/data/organelle/plastid.new
+
+echo "#strain_name,accession,strain_taxon_id" > plastid_name_acc_id.csv
+cat plastid.ABBR.csv \
+    | grep -v '^#' \
+    | perl -nl -a -F"," -e 'print qq{$F[9],$F[1],$F[0]}' \
+    | sort \
+    >> plastid_name_acc_id.csv
+
+# some warnings fro bioperl, normally just ignore them
+perl ~/Scripts/withncbi/taxon/batch_get_seq.pl -f plastid_name_acc_id.csv -p 2>&1 | tee plastid_seq.log
+
+# rsync --progress -av wangq@139.162.23.84:/home/wangq/data/organelle/ ~/data/organelle/
 
 # count downloaded sequences
 find . -name "*.fasta" | wc -l
+```
 
+Regenerate `plastid_ncbi.csv` with abbr names.
+
+```bash
+cat plastid.ABBR.csv \
+    | grep -v '^#' \
+    | perl -nl -a -F"," -e 'print qq{$F[0],$F[9]}' \
+    | perl ~/Scripts/withncbi/taxon/strain_info.pl --stdin --withname --file plastid_ncbi.csv
 ```
