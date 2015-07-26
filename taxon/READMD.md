@@ -47,16 +47,22 @@ rsync --progress -av ftp.ncbi.nlm.nih.gov::genbank/genomes/Bacteria_DRAFT/ \
 
 ## Process plastid genomes
 
+Work flow.
+
 ```text
-id ---> lineage ---> filtering ---> naming ---> batch_get_seq.pl ---> strain_bz.pl
-                                      |                                     ^
-                                      |-------> strain_info.pl   -----------|
+id ---> lineage ---> filtering ---> naming ---> strain_info.pl   ---> strain_bz.pl
+                                      |                                 ^
+                                      |-------> batch_get_seq.pl -------|
 ```
 
 ### Scrap id and acc from NCBI
 
 Open browser and visit [NCBI plastid page](http://www.ncbi.nlm.nih.gov/genomes/GenomesGroup.cgi?taxid=33090&opt=plastid).
 Save page to a local file, html only. In this case, it's `doc/green_plants_plastid_150725.html`.
+
+Viridiplantae (33090) plastid genomes - 680 records
+    Chlorophyta (3041)  [46]
+    Streptophyta (35493)  [634]
 
 From now on, our cwd is `~/data/organelle/plastid.new`.
 
@@ -99,61 +105,51 @@ cat plastid_id_seq.csv \
 # correct 'Chlorella' mirabilis  
 # darwin (bsd) need "" for -i
 sed -i "" "s/\'//g" plastid.CHECKME.csv
+
+# Koliella corcontica (a green algae) was grouped to Streptophyta.
+# Don't fix it here.
 ```
 
 ### Filtering based on valid families and genera
 
-Family has 3 or more strains and Genus has 2 or more.
+Species and genus should not be "NA" and genus has 2 or more members.
 
-We got 31 families, 71 genera,  322 species and **329** accessions.
+We got 71 genera,  322 species and **352** accessions.
 
 ```text
-678 ---------> 649 ---------> 543 ---------> 329
-        NA           family         genus
+678 ---------> 675 ---------> 352
+        NA           genus
 ```
 
 ```bash
 # filter out accessions without linage information
 cat plastid.CHECKME.csv \
     | perl -nl -a -F"," -e \
-    '/^#/ and next; $F[5] eq q{NA} and next; $F[4] eq q{NA} and next; $F[3] eq q{NA} and next; print' \
+    '/^#/ and next; ($F[3] eq q{NA} or $F[4] eq q{NA} ) and next; print' \
     > plastid.tmp
 
-# 649
 wc -l plastid.tmp
 
-# valid families
-cat plastid.tmp \
-    | perl -nl -a -F"," -e \
-    '$seen{$F[5]}++; END {for $k (sort keys %seen) {printf qq{,%s,\n}, $k if $seen{$k} > 2}}' \
-    > family.tmp
-
-# 543
-grep -F -f family.tmp plastid.tmp > plastid.family.tmp
-wc -l plastid.family.tmp
-
 # valid genera
-cat plastid.family.tmp \
+cat plastid.tmp \
     | perl -nl -a -F"," -e \
     '$seen{$F[4]}++; END {for $k (sort keys %seen) {printf qq{,%s,\n}, $k if $seen{$k} > 1}}' \
     > genus.tmp
 
-# 329
-grep -F -f genus.tmp plastid.family.tmp > plastid.familiy.genus.tmp
-wc -l plastid.familiy.genus.tmp
+# intersect between two files
+grep -F -f genus.tmp plastid.tmp > plastid.genus.tmp
+wc -l plastid.genus.tmp
 
 # count every ranks
-#   31 family.txt
-#   71 genus.txt
-#  322 species.txt
-cut -d',' -f 6 plastid.familiy.genus.tmp | sort | uniq > family.txt
-cut -d',' -f 5 plastid.familiy.genus.tmp | sort | uniq > genus.txt
-cut -d',' -f 4 plastid.familiy.genus.tmp | sort | uniq > species.txt
-wc -l family.txt genus.txt species.txt
+#   82 genus.txt
+#  345 species.txt
+cut -d',' -f 5 plastid.genus.tmp | sort | uniq > genus.txt
+cut -d',' -f 4 plastid.genus.tmp | sort | uniq > species.txt
+wc -l genus.txt species.txt
 
 # results produced in this step
 head -n 1 plastid.CHECKME.csv > plastid.FILTERED.csv
-cat plastid.familiy.genus.tmp >> plastid.FILTERED.csv
+cat plastid.genus.tmp >> plastid.FILTERED.csv
 
 # clean
 rm *.tmp
@@ -184,6 +180,7 @@ cat plastid.FILTERED.csv \
 
 # Brassica rapa subsp. pekinensis
 # Cucumis melo subsp. melo
+# Fagopyrum esculentum subsp. ancestrale
 # Fragaria vesca subsp. bracteata
 # Fragaria vesca subsp. vesca
 # Hordeum vulgare subsp. vulgare
@@ -205,8 +202,7 @@ Create abbreviations.
 # cat genus.txt \
 #     | perl -MText::Abbrev -nl -e \
 #     'push @list, $_; END{%hash = abbrev @list; @ks = sort keys %hash; for $i (reverse(0 .. $#ks)) {if (index($ks[$i], $ks[$i - 1]) != 0) { print $ks[$i], q{,}, $hash{$ks[$i]}; } } }' \
-#     | perl -e 'print reverse <>' \
-#     > genus.abbr.txt
+#     | perl -e 'print reverse <>'
 #
 # # use MyUtil::abbr_most
 # cat genus.txt \
