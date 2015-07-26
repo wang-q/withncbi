@@ -1,79 +1,38 @@
-## Bulk downloading bacteria genomes from NCBI
+# Process plastid genomes
 
-On a linux box.
+The following command lines are about how I processed the plastid genomes of green plants.
+Many tools of `taxon/` are used here, which makes a good example for users.
 
-```bash
-# genome Bacteria
-rsync --progress -av ftp.ncbi.nlm.nih.gov::genomes/Bacteria/ \
-    ~/data/NCBI/genomes/Bacteria/ --exclude="all.*"
-
-# genomes Bacteria_DRAFT
-~/.aspera/connect/bin/ascp \
-    -TQ -k1 -p -v \
-    -i ~/.aspera/connect/etc/asperaweb_id_dsa.openssh \
-    anonftp@ftp-private.ncbi.nlm.nih.gov:/genomes/Bacteria_DRAFT \
-   ~/data/NCBI/genomes/
-
-rsync --progress -av ftp.ncbi.nlm.nih.gov::genomes/Bacteria_DRAFT/ \
-    ~/data/NCBI/genomes/Bacteria_DRAFT/
-```
-
-NCBI will abandon genbank Bacteria and genbank Bacteria_DRAFT soon. And updates have stopped in late
-2014,
-
-ftp://ftp.ncbi.nlm.nih.gov/genbank/genomes/NOTICE_OF_CHANGE.txt
-
-```bash
-# genbank Bacteria
-~/.aspera/connect/bin/ascp \
-    -TQ -k1 -p -v \
-    -i ~/.aspera/connect/etc/asperaweb_id_dsa.openssh \
-    anonftp@ftp-private.ncbi.nlm.nih.gov:/genbank/genomes/Bacteria \
-   ~/data/NCBI/genbank/genomes/
-
-rsync --progress -av ftp.ncbi.nlm.nih.gov::genbank/genomes/Bacteria/ \
-    ~/data/NCBI/genbank/genomes/Bacteria/
-
-# genbank Bacteria_DRAFT
-~/.aspera/connect/bin/ascp \
-    -TQ -k1 -p -v \
-    -i ~/.aspera/connect/etc/asperaweb_id_dsa.openssh \
-    anonftp@ftp-private.ncbi.nlm.nih.gov:/genbank/genomes/Bacteria_DRAFT \
-   ~/data/NCBI/genbank/genomes/
-
-rsync --progress -av ftp.ncbi.nlm.nih.gov::genbank/genomes/Bacteria_DRAFT/ \
-    ~/data/NCBI/genbank/genomes/Bacteria_DRAFT/
-```
-
-## Process plastid genomes
-
-Work flow.
+## Work flow.
 
 ```text
 id ---> lineage ---> filtering ---> naming ---> strain_info.pl   ---> strain_bz.pl
                                       |                                 ^
                                       |-------> batch_get_seq.pl -------|
 ```
+
 I'm sure there are no commas in names. So for convenient, don't use Text::CSV_XS.
 
-### Scrap id and acc from NCBI
+## Scrap id and acc from NCBI
 
 Open browser and visit [NCBI plastid page](http://www.ncbi.nlm.nih.gov/genomes/GenomesGroup.cgi?taxid=33090&opt=plastid).
 Save page to a local file, html only. In this case, it's `doc/green_plants_plastid_150725.html`.
 
+```text
 Viridiplantae (33090) plastid genomes - 680 records
     Chlorophyta (3041)  [46]
     Streptophyta (35493)  [634]
+```
 
-From now on, our cwd is `~/data/organelle/plastid.new`.
+From now on, our cwd is `~/data/organelle/plastid_genomes`.
 
 Use `taxon/id_seq_dom_select.pl` to extract Taxonomy ids and genbank accessions.
 
 Got **678** accessions.
 
 ```bash
-mkdir -p ~/data/organelle/plastid.new
-cd ~/data/organelle/plastid.new
+mkdir -p ~/data/organelle/plastid_genomes
+cd ~/data/organelle/plastid_genomes
 
 # id,acc
 # 996148,NC_017006
@@ -83,7 +42,7 @@ perl ~/Scripts/withncbi/taxon/id_seq_dom_select.pl ~/Scripts/withncbi/doc/green_
 cat plastid_id_seq.csv | grep -v "^#" | wc -l
 ```
 
-### Add linage information
+## Add linage information
 
 Give ids better shapes for manually checking and automatic filtering.
 
@@ -119,7 +78,7 @@ sed -i ".bak" "s/Nephroselmis,NA,NA/Nephroselmis,Nephroselmidaceae,Nephroselmida
 # Chrysanthemum x morifolium and Pelargonium x hortorum are also weird, but they can be googled.
 ```
 
-### Filtering based on valid families and genera
+## Filtering based on valid families and genera
 
 Species and genus should not be "NA" and genus has 2 or more members.
 
@@ -175,7 +134,7 @@ cat plastid.family.tmp >> plastid.DOWNLOAD.csv
 rm *.tmp *.bak
 ```
 
-### Find a way to name these.
+## Find a way to name these.
 
 Seems it's OK to use species as names.
 
@@ -237,13 +196,13 @@ cat plastid.DOWNLOAD.csv \
     >> plastid.ABBR.csv
 ```
 
-### Download sequences and regenerate lineage information.
+## Download sequences and regenerate lineage information.
 
 We don't rename sequences here, so the file has three columns
 
 ```bash
-mkdir -p ~/data/organelle/plastid.new
-cd ~/data/organelle/plastid.new
+mkdir -p ~/data/organelle/plastid_genomes
+cd ~/data/organelle/plastid_genomes
 
 echo "#strain_name,accession,strain_taxon_id" > plastid_name_acc_id.csv
 cat plastid.ABBR.csv \
@@ -273,7 +232,7 @@ cat plastid.ABBR.csv \
     | perl ~/Scripts/withncbi/taxon/strain_info.pl --stdin --withname --file plastid_ncbi.csv
 ```
 
-### Create alignment plans
+## Create alignment plans
 
 We got 43 families, 82 genera, 345 species and **352** accessions.
 
@@ -315,17 +274,52 @@ Create alignments without outgroups.
 ```bash
 cd ~/data/organelle/
 
-echo -e "mkdir -p ~/data/organelle/plastid.working\n cd ~/data/organelle/plastid.working\n" > plastid.new.cmd.txt
+echo -e "mkdir -p ~/data/organelle/plastid.working\ncd ~/data/organelle/plastid.working\n" > plastid.cmd.txt
 
 # sed is bad for handling new lines
-cat plastid.new/plastid.GENUS.csv \
+cat plastid_genomes/plastid.GENUS.csv \
     | grep -v "^#" \
     | perl -nl -a -F"," -e \
     'BEGIN{($g, @s) = ('');}; if ($F[4] ne $g) {if ($g) {print qq{\n# $g}; print qq{GENUS $g \\}; print qq{-q $_ \\} for @s;} $g = $F[4]; @s = ();} push @s, $F[9]; END {print qq{\n# $g}; print qq{GENUS $g \\}; print qq{-q $_ \\} for @s; print;}' \
     | perl -e '@ls = <>; $l = join q{}, @ls; $l =~ s/GENUS (\w+) \\\n\-q/GENUS \1 \\\n\    -t/gs; $l =~ s/\-q /    \-q /gs; $l =~ s/\\\n\n/\n\n/gs; print $l;' \
     | perl -e '@ls = <>; $l = join q{}, @ls; $l =~ s/GENUS /perl \~\/Scripts\/withncbi\/taxon\/strain_bz\.pl \\\nOPTIONS\\\n    --use_name \\\n    \-\-name /gs; print $l;' \
-    | perl -e '@ls = <>; $l = join q{}, @ls; $l =~ s/OPTIONS/    \-\-file ~\/data\/organelle\/plastid\.new\/plastid_ncbi.csv \\\nOPTIONS /gs; print $l;' \
-    | perl -e '@ls = <>; $l = join q{}, @ls; $l =~ s/OPTIONS/    \-\-seq_dir ~\/data\/organelle\/plastid\.new/gs; print $l;' \
-    >> plastid.new.cmd.txt
+    | perl -e '@ls = <>; $l = join q{}, @ls; $l =~ s/OPTIONS/    \-\-file ~\/data\/organelle\/plastid_genomes\/plastid_ncbi.csv \\\nOPTIONS /gs; print $l;' \
+    | perl -e '@ls = <>; $l = join q{}, @ls; $l =~ s/OPTIONS/    \-\-seq_dir ~\/data\/organelle\/plastid_genomes/gs; print $l;' \
+    >> plastid.cmd.txt
 
+```
+
+## Batch running
+
+The old prepare_run.sh
+
+```bash
+cd ~/data/organelle/
+
+sh plastid.cmd.txt
+cd plastid.working
+
+# sh plastid.OG.cmd.txt
+## cd plastid.OG
+
+for d in `find $PWD -mindepth 1 -maxdepth 1 -type d | sort `;do \
+    echo sh $d/1_real_chr.sh ; \
+    echo sh $d/2_file-rm.sh ; \
+    echo sh $d/3_pair_cmd.sh ; \
+    echo sh $d/4_rawphylo.sh ; \
+    echo sh $d/5_multi_cmd.sh ; \
+    echo sh $d/6_multi_db_only.sh ; \
+    echo ; \
+done  > runall.sh
+
+sh runall.sh 2>&1 | tee plastid.final.log
+# sh runall.sh 2>&1 | tee plastid.OG.final.log
+
+# clean
+find $PWD -mindepth 1 -maxdepth 2 -type d -name "*_raw" | xargs rm -fr
+find $PWD -mindepth 1 -maxdepth 2 -type d -name "*_fasta" | xargs rm -fr
+find $PWD -mindepth 1 -maxdepth 2 -type d -name "rawphylo" | xargs rm -fr
+
+find $PWD -mindepth 1 -maxdepth 3 -type f -name "*.phy" | xargs rm
+find $PWD -mindepth 1 -maxdepth 3 -type f -name "*.phy.reduced" | xargs rm
 ```
