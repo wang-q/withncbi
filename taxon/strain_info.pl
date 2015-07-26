@@ -50,8 +50,8 @@ my $td_dir = replace_home( $Config->{path}{td} );    # taxdmp
 
 my $filename = "strains_taxon_info.csv";
 
-# simplify strain name
 my $simple;
+my $entrez;
 
 my $man  = 0;
 my $help = 0;
@@ -66,6 +66,7 @@ GetOptions(
     'species=s' => \%species_of,
     'o|file=s'  => \$filename,
     'simple'    => \$simple,
+    'entrez'    => \$entrez,
 ) or pod2usage(2);
 
 pod2usage(1) if $help;
@@ -77,7 +78,7 @@ pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
 $stopwatch->start_message("Writing strains summary...");
 
 my $taxon_db;
-if ( -e "$td_dir/nodes.dmp" ) {
+if ( !$entrez and -e "$td_dir/nodes.dmp" ) {
     $stopwatch->block_message("Load ncbi taxdmp.");
     $taxon_db = Bio::DB::Taxonomy->new(
         -source    => 'flatfile',
@@ -87,6 +88,7 @@ if ( -e "$td_dir/nodes.dmp" ) {
     );
 }
 else {
+    $stopwatch->block_message("Use online ncbi entrez.");
     $taxon_db = Bio::DB::Taxonomy->new( -source => 'entrez', );
 }
 
@@ -103,6 +105,8 @@ if ($stdin) {
         }
     }
 }
+
+$stopwatch->block_message("Processing...");
 
 my $csv = Text::CSV_XS->new( { binary => 1, eol => "\n" } );
 open my $csv_fh, ">", $filename;
@@ -217,6 +221,7 @@ strain_info.pl - generate a csv file for taxonomy info
         --name INT=STR      Assign name to id
         --species INT=STR   fake id need this
         --simple            means use subspecies strain name as name
+        --entrez            don't use local taxdmp
 
 =head1 EXAMPLE
 
