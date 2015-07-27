@@ -299,30 +299,78 @@ cd ~/data/organelle/plastid.working
 
 time sh ../plastid.cmd.txt 2>&1 | tee log_cmd.txt
 
-for d in `find $PWD -mindepth 1 -maxdepth 1 -type d | sort `;do \
-    echo "echo \"====> Processing $d <====\""
-    echo "echo \"===> 1_real_chr <===\""
-    echo sh $d/1_real_chr.sh ; \
-    echo "echo \"===> 2_file_rm <===\""
-    echo sh $d/2_file_rm.sh ; \
-    echo "echo \"===> 3_pair_cmd <===\""
-    echo sh $d/3_pair_cmd.sh ; \
-    echo "echo \"===> 4_rawphylo <===\""
-    echo sh $d/4_rawphylo.sh ; \
-    echo "echo \"===> 5_multi_cmd <===\""
-    echo sh $d/5_multi_cmd.sh ; \
-    echo "echo \"===> 7_multi_db_only <===\""
-    echo sh $d/7_multi_db_only.sh ; \
-    echo ; \
-done  > runall.sh
+#----------------------------#
+# Approach 1: one by one
+#----------------------------#
+# for d in `find . -mindepth 1 -maxdepth 1 -type d | sort `;do \
+#     echo "echo \"====> Processing $d <====\""
+#     echo "echo \"===> 1_real_chr <===\""
+#     echo sh $d/1_real_chr.sh ; \
+#     echo "echo \"===> 2_file_rm <===\""
+#     echo sh $d/2_file_rm.sh ; \
+#     echo "echo \"===> 3_pair_cmd <===\""
+#     echo sh $d/3_pair_cmd.sh ; \
+#     echo "echo \"===> 4_rawphylo <===\""
+#     echo sh $d/4_rawphylo.sh ; \
+#     echo "echo \"===> 5_multi_cmd <===\""
+#     echo sh $d/5_multi_cmd.sh ; \
+#     echo "echo \"===> 7_multi_db_only <===\""
+#     echo sh $d/7_multi_db_only.sh ; \
+#     echo ; \
+# done  > runall.sh
+#
+# sh runall.sh 2>&1 | tee log_runall.txt
 
-sh runall.sh 2>&1 | tee log_runall.txt
+#----------------------------#
+# Approach 2: step by step
+#----------------------------#
+# real_chr
+for f in `find . -mindepth 1 -maxdepth 2 -type f -name 1_real_chr.sh | sort `;do \
+    echo sh $f ; \
+    echo ; \
+done  > run_1.sh
+cat run_1.sh | grep . | parallel -j 4 2>&1 | tee log_1.txt
+
+# RepeatMasker
+for f in `find . -mindepth 1 -maxdepth 2 -type f -name 2_file_rm.sh | sort `;do \
+    echo sh $f ; \
+    echo ; \
+done  > run_2.sh
+cat run_2.sh | grep . | parallel -j 2 2>&1 | tee log_2.txt
+
+# pair
+for f in `find . -mindepth 1 -maxdepth 2 -type f -name 3_pair_cmd.sh | sort `;do \
+    echo sh $f ; \
+    echo ; \
+done  > run_3.sh
+cat run_3.sh | grep . | parallel -j 1 2>&1 | tee log_3.txt
+
+# rawphylo
+for f in `find . -mindepth 1 -maxdepth 2 -type f -name 4_rawphylo.sh | sort `;do \
+    echo sh $f ; \
+    echo ; \
+done  > run_4.sh
+cat run_4.sh | grep . | parallel -j 1 2>&1 | tee log_4.txt
+
+# multi cmd
+for f in `find . -mindepth 1 -maxdepth 2 -type f -name 5_multi_cmd.sh | sort `;do \
+    echo sh $f ; \
+    echo ; \
+done  > run_5.sh
+cat run_5.sh | grep . | parallel -j 1 2>&1 | tee log_5.txt
+
+# multi db
+for f in `find . -mindepth 1 -maxdepth 2 -type f -name 7_multi_db_only.sh | sort `;do \
+    echo sh $f ; \
+    echo ; \
+done  > run_7.sh
+cat run_7.sh | grep . | parallel -j 1 2>&1 | tee log_7.txt
 
 # clean
-find $PWD -mindepth 1 -maxdepth 2 -type d -name "*_raw" | xargs rm -fr
-find $PWD -mindepth 1 -maxdepth 2 -type d -name "*_fasta" | xargs rm -fr
-find $PWD -mindepth 1 -maxdepth 2 -type d -name "rawphylo" | xargs rm -fr
+find . -mindepth 1 -maxdepth 2 -type d -name "*_raw" | xargs rm -fr
+find . -mindepth 1 -maxdepth 2 -type d -name "*_fasta" | xargs rm -fr
+find . -mindepth 1 -maxdepth 2 -type d -name "rawphylo" | xargs rm -fr
 
-find $PWD -mindepth 1 -maxdepth 3 -type f -name "*.phy" | xargs rm
-find $PWD -mindepth 1 -maxdepth 3 -type f -name "*.phy.reduced" | xargs rm
+find . -mindepth 1 -maxdepth 3 -type f -name "*.phy" | xargs rm
+find . -mindepth 1 -maxdepth 3 -type f -name "*.phy.reduced" | xargs rm
 ```
