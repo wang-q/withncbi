@@ -284,7 +284,7 @@ cat plastid_genomes/plastid.GENUS.csv \
     | perl -e '@ls = <>; $l = join q{}, @ls; $l =~ s/GENUS (\w+) \\\n\-q/GENUS \1 \\\n\    -t/gs; $l =~ s/\-q /    \-q /gs; $l =~ s/\\\n\n/\n\n/gs; print $l;' \
     | perl -e '@ls = <>; $l = join q{}, @ls; $l =~ s/GENUS /perl \~\/Scripts\/withncbi\/taxon\/strain_bz\.pl \\\nOPTIONS\\\n    --use_name \\\n    \-\-name /gs; print $l;' \
     | perl -e '@ls = <>; $l = join q{}, @ls; $l =~ s/OPTIONS/    \-\-file ~\/data\/organelle\/plastid_genomes\/plastid_ncbi.csv \\\nOPTIONS /gs; print $l;' \
-    | perl -e '@ls = <>; $l = join q{}, @ls; $l =~ s/OPTIONS/    \-\-seq_dir ~\/data\/organelle\/plastid_genomes/gs; print $l;' \
+    | perl -e '@ls = <>; $l = join q{}, @ls; $l =~ s/OPTIONS/    \-\-parallel 4 \\\n    \-\-seq_dir ~\/data\/organelle\/plastid_genomes/gs; print $l;' \
     >> plastid.cmd.txt
 
 ```
@@ -294,26 +294,22 @@ cat plastid_genomes/plastid.GENUS.csv \
 The old prepare_run.sh
 
 ```bash
-cd ~/data/organelle/
+mkdir -p ~/data/organelle/plastid.working
+cd ~/data/organelle/plastid.working
 
-sh plastid.cmd.txt
-cd plastid.working
-
-# sh plastid.OG.cmd.txt
-## cd plastid.OG
+time sh ../plastid.cmd.txt 2>&1 | tee log_cmd.txt
 
 for d in `find $PWD -mindepth 1 -maxdepth 1 -type d | sort `;do \
     echo sh $d/1_real_chr.sh ; \
-    echo sh $d/2_file-rm.sh ; \
+    echo sh $d/2_file_rm.sh ; \
     echo sh $d/3_pair_cmd.sh ; \
     echo sh $d/4_rawphylo.sh ; \
     echo sh $d/5_multi_cmd.sh ; \
-    echo sh $d/6_multi_db_only.sh ; \
+    echo sh $d/7_multi_db_only.sh ; \
     echo ; \
 done  > runall.sh
 
-sh runall.sh 2>&1 | tee plastid.final.log
-# sh runall.sh 2>&1 | tee plastid.OG.final.log
+sh runall.sh 2>&1 | tee log_runall.txt
 
 # clean
 find $PWD -mindepth 1 -maxdepth 2 -type d -name "*_raw" | xargs rm -fr
