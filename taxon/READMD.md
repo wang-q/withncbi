@@ -300,11 +300,18 @@ cd ~/data/organelle/plastid.working
 time sh ../plastid.cmd.txt 2>&1 | tee log_cmd.txt
 
 for d in `find $PWD -mindepth 1 -maxdepth 1 -type d | sort `;do \
+    echo "echo \"====> Processing $d <====\""
+    echo "echo \"===> 1_real_chr <===\""
     echo sh $d/1_real_chr.sh ; \
+    echo "echo \"===> 2_file_rm <===\""
     echo sh $d/2_file_rm.sh ; \
+    echo "echo \"===> 3_pair_cmd <===\""
     echo sh $d/3_pair_cmd.sh ; \
+    echo "echo \"===> 4_rawphylo <===\""
     echo sh $d/4_rawphylo.sh ; \
+    echo "echo \"===> 5_multi_cmd <===\""
     echo sh $d/5_multi_cmd.sh ; \
+    echo "echo \"===> 7_multi_db_only <===\""
     echo sh $d/7_multi_db_only.sh ; \
     echo ; \
 done  > runall.sh
