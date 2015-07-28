@@ -424,4 +424,20 @@ done  > runall.sh
 
 sh runall.sh 2>&1 | tee log_runall.txt
 
+#----------------------------#
+# Charting on Windows
+#----------------------------#
+for d in `find . -mindepth 1 -maxdepth 1 -type d | sort `;do \
+    export d_base=`basename $d` ; \
+    echo "perl d:/Scripts/fig_table/collect_common_basic.pl    -d $d_base" ; \
+    echo "perl d:/Scripts/alignDB/stat/common_chart_factory.pl -i $d_base/${d_base}_paralog.common.xlsx" ; \
+    echo "perl d:/Scripts/alignDB/stat/gc_chart_factory.pl     -i $d_base/${d_base}_paralog.gc.xlsx" ; \
+    echo ; \
+done  > run_chart.bat
+perl -pi -e 's/\n/\r\n/g' run_chart.bat
+
+# clean
+find . -mindepth 1 -maxdepth 2 -type d -name "*_raw" | xargs rm -fr
+find . -mindepth 1 -maxdepth 2 -type d -name "*_fasta" | xargs rm -fr
+
 ```
