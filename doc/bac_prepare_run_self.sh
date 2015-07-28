@@ -72,7 +72,6 @@ cat run_pair_stat.sh | grep . | parallel -j 4 2>&1 | tee log_pair_stat.txt
 # clean
 find $PWD -mindepth 1 -maxdepth 2 -type d -name "*_raw" | xargs rm -fr 
 find $PWD -mindepth 1 -maxdepth 2 -type d -name "*_fasta" | xargs rm -fr 
-find $PWD -mindepth 1 -maxdepth 2 -type d -name "rawphylo" | xargs rm -fr 
 
 find $PWD -mindepth 1 -maxdepth 3 -type f -name "*.phy" | xargs rm 
 find $PWD -mindepth 1 -maxdepth 3 -type f -name "*.phy.reduced" | xargs rm 
