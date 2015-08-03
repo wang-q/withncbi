@@ -304,7 +304,7 @@ cat plastid_genomes/plastid.ABBR.csv \
 
 ```
 
-## Batch running
+## Batch running for genus
 
 The old prepare_run.sh
 
@@ -413,7 +413,7 @@ perl ~/Scripts/alignDB/util/merge_csv.pl \
 
 ```
 
-Self alignments.
+## Self alignments.
 
 ```bash
 cd ~/data/organelle/
@@ -455,4 +455,27 @@ perl -pi -e 's/\n/\r\n/g' run_chart.bat
 find . -mindepth 1 -maxdepth 2 -type d -name "*_raw" | xargs rm -fr
 find . -mindepth 1 -maxdepth 2 -type d -name "*_fasta" | xargs rm -fr
 
+```
+
+## Batch running for family
+
+The old prepare_run.sh
+
+```bash
+mkdir -p ~/data/organelle/plastid_families
+cd ~/data/organelle/plastid_families
+
+time sh ../plastid_families.cmd.txt 2>&1 | tee log_cmd.txt
+
+for d in `find . -mindepth 1 -maxdepth 1 -type d | sort `;do \
+    echo "echo \"====> Processing $d <====\""
+    echo sh $d/1_real_chr.sh ; \
+    echo sh $d/2_file_rm.sh ; \
+    echo sh $d/3_pair_cmd.sh ; \
+    echo sh $d/4_rawphylo.sh ; \
+    echo sh $d/5_multi_cmd.sh ; \
+    echo ; \
+done  > runall.sh
+
+sh runall.sh 2>&1 | tee log_runall.txt
 ```
