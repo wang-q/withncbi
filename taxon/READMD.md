@@ -193,7 +193,9 @@ echo '#strain_taxon_id,accession,strain,species,genus,family,order,class,phylum,
 cat plastid.DOWNLOAD.csv \
     | grep -v '^#' \
     | perl ~/Scripts/withncbi/taxon/abbr_name.pl -c "3,4,5" -s "," -m 0 \
+    | sort -t',' -k9,9 -k7,7 -k6,6 -k10,10 \
     >> plastid.ABBR.csv
+
 ```
 
 ## Download sequences and regenerate lineage information.
@@ -286,6 +288,19 @@ cat plastid_genomes/plastid.GENUS.csv \
     | perl -e '@ls = <>; $l = join q{}, @ls; $l =~ s/OPTIONS/    \-\-file ~\/data\/organelle\/plastid_genomes\/plastid_ncbi.csv \\\nOPTIONS /gs; print $l;' \
     | perl -e '@ls = <>; $l = join q{}, @ls; $l =~ s/OPTIONS/    \-\-parallel 4 \\\n    \-\-seq_dir ~\/data\/organelle\/plastid_genomes/gs; print $l;' \
     >> plastid.cmd.txt
+
+# this is for finding outgroups
+echo -e "mkdir -p ~/data/organelle/plastid_families\ncd ~/data/organelle/plastid_families\n" > plastid_families.cmd.txt
+
+cat plastid_genomes/plastid.ABBR.csv \
+    | grep -v "^#" \
+    | perl -nl -a -F"," -e \
+    'BEGIN{($g, @s) = ('');}; if ($F[5] ne $g) {if ($g) {print qq{\n# $g}; print qq{FAMILY $g \\}; print qq{-q $_ \\} for @s;} $g = $F[5]; @s = ();} push @s, $F[9]; END {print qq{\n# $g}; print qq{FAMILY $g \\}; print qq{-q $_ \\} for @s; print;}' \
+    | perl -e '@ls = <>; $l = join q{}, @ls; $l =~ s/FAMILY (\w+) \\\n\-q/FAMILY \1 \\\n\    -t/gs; $l =~ s/\-q /    \-q /gs; $l =~ s/\\\n\n/\n\n/gs; print $l;' \
+    | perl -e '@ls = <>; $l = join q{}, @ls; $l =~ s/FAMILY /perl \~\/Scripts\/withncbi\/taxon\/strain_bz\.pl \\\nOPTIONS\\\n    --use_name \\\n    \-\-name /gs; print $l;' \
+    | perl -e '@ls = <>; $l = join q{}, @ls; $l =~ s/OPTIONS/    \-\-file ~\/data\/organelle\/plastid_genomes\/plastid_ncbi.csv \\\nOPTIONS /gs; print $l;' \
+    | perl -e '@ls = <>; $l = join q{}, @ls; $l =~ s/OPTIONS/    \-\-parallel 4 \\\n    \-\-seq_dir ~\/data\/organelle\/plastid_genomes/gs; print $l;' \
+    >> plastid_families.cmd.txt
 
 ```
 
