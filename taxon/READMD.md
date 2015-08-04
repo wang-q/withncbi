@@ -457,7 +457,7 @@ find . -mindepth 1 -maxdepth 2 -type d -name "*_fasta" | xargs rm -fr
 
 ```
 
-## Batch running for family
+## Alignments of families for outgroups.
 
 The old prepare_run.sh
 
