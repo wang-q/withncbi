@@ -1,0 +1,207 @@
+cd ~/data/bacteria
+
+mkdir process
+cd process
+
+
+#===================OK===================================
+
+#=========
+# Acinetobacter baumannii
+perl ~/Scripts/alignDB/bac/bac_prepare.pl -p 470 -t 400667 -n Acinetobacter_baumannii
+
+#=========
+# 715 Actinobacillus pleuropneumoniae
+perl ~/Scripts/alignDB/bac/bac_prepare.pl -p 715 -t 416269 -n Actinobacillus_pleuropneumoniae
+
+#=========
+# Bacillus cereus
+perl ~/Scripts/alignDB/bac/bac_prepare.pl -p 1396 -t 222523 -n Bacillus_cereus
+
+#=========
+# 216816 Bifidobacterium longum
+perl ~/Scripts/alignDB/bac/bac_prepare.pl -p 216816 -t 206672 -n Bifidobacterium_longum
+
+#=========
+# 95486 Burkholderia cenocepacia
+perl ~/Scripts/alignDB/bac/bac_prepare.pl -p 95486 -t 331271 -n Burkholderia_cenocepacia
+
+#=========
+# 13373 Burkholderia mallei
+perl ~/Scripts/alignDB/bac/bac_prepare.pl -p 13373 -t 243160 -n Burkholderia_mallei
+
+#=========
+# 28450 Burkholderia pseudomallei
+perl ~/Scripts/alignDB/bac/bac_prepare.pl -p 28450 -t 272560 -n Burkholderia_pseudomallei
+# perl ~/Scripts/alignDB/bac/bac_prepare.pl -p 28450 -t 272560 --gr -n Burkholderia_pseudomallei_gr
+
+#=========
+# Campylobacter_jejuni
+perl ~/Scripts/alignDB/bac/bac_prepare.pl -p 197 -t 192222 -n Campylobacter_jejuni
+
+#=========
+# Chlamydia trachomatis
+perl ~/Scripts/alignDB/bac/bac_prepare.pl -p 813 -t 272561 -n Chlamydia_trachomatis
+
+#=========
+# Clostridium botulinum
+# 508767,508765 in a subtree, D is 0.19 and 0.20
+# 929506 in a subtree, D is 0.22
+perl ~/Scripts/alignDB/bac/bac_prepare.pl -p 1491 -t 413999  -e 508765,508767,929506 -n Clostridium_botulinum
+
+#=========
+# 777 Coxiella burnetii
+perl ~/Scripts/alignDB/bac/bac_prepare.pl -p 777 -t 227377 -n Coxiella_burnetii
+
+#=========
+# Escherichia coli
+perl ~/Scripts/alignDB/bac/bac_prepare.pl -p 562 -t 511145 -n Escherichia_coli
+
+#=========
+# Francisella tularensis
+# exclude 393115 Francisella tularensis subsp. tularensis FSC198, no difference with target
+perl ~/Scripts/alignDB/bac/bac_prepare.pl -p 263 -t 177416 -e 393115 -n Francisella_tularensis
+
+#=========
+# Haemophilus influenzae
+perl ~/Scripts/alignDB/bac/bac_prepare.pl -p 727 -t 71421  -e 374930 -n Haemophilus_influenzae
+
+#=========
+# Helicobacter pylori
+perl ~/Scripts/alignDB/bac/bac_prepare.pl -p 210 -t 85962 -n Helicobacter_pylori
+
+#=========
+# Lactococcus lactis
+perl ~/Scripts/alignDB/bac/bac_prepare.pl -p 1358 -t 272623 -n Lactococcus_lactis
+
+#=========
+#  446 Legionella pneumophila
+perl ~/Scripts/alignDB/bac/bac_prepare.pl -p 446 -t 272624 -n Legionella_pneumophila
+
+#=========
+# Listeria_monocytogenes
+perl ~/Scripts/alignDB/bac/bac_prepare.pl -p 1639 -t 169963 -n Listeria_monocytogenes
+
+#=========
+# 1773 Mycobacterium tuberculosis
+perl ~/Scripts/alignDB/bac/bac_prepare.pl -p 1773 -t 83332 -e 419947 -n Mycobacterium_tuberculosis
+
+#=========
+# 487 Neisseria meningitidis
+perl ~/Scripts/alignDB/bac/bac_prepare.pl -p 487 -t 122586 -n Neisseria_meningitidis
+
+#=========
+# 1219 Prochlorococcus marinus
+perl ~/Scripts/alignDB/bac/bac_prepare.pl -p 93060,74546,146891,167546,59919,167542 -t 146891 -n Prochlorococcus_marinus
+
+#=========
+# 287 Pseudomonas aeruginosa
+perl ~/Scripts/alignDB/bac/bac_prepare.pl -p 287 -t 208964 Pseudomonas_aeruginosa
+
+#=========
+# 303 Pseudomonas putida
+perl ~/Scripts/alignDB/bac/bac_prepare.pl -p 303 -t 160488 -n Pseudomonas_putida
+
+#=========
+# 1076 Rhodopseudomonas palustris
+perl ~/Scripts/alignDB/bac/bac_prepare.pl -p 1076 -t 258594  -e 316055,316056 -n Rhodopseudomonas_palustris
+
+#=========
+# Salmonella_enterica
+perl ~/Scripts/alignDB/bac/bac_prepare.pl -p 28901 -t 220341 -n Salmonella_enterica
+
+#=========
+# 62322 Shewanella baltica
+perl ~/Scripts/alignDB/bac/bac_prepare.pl -p 62322 -t 325240 -n Shewanella_baltica
+
+#=========
+# Staphylococcus_aureus
+perl ~/Scripts/alignDB/bac/bac_prepare.pl -p 1280 -t 93062 -n Staphylococcus_aureus
+
+#=========
+# 1311 Streptococcus agalactiae
+perl ~/Scripts/alignDB/bac/bac_prepare.pl -p 1311 -t 208435 -n Streptococcus_agalactiae
+
+
+#=========
+# 1336 Streptococcus equi
+perl ~/Scripts/alignDB/bac/bac_prepare.pl -p 1336 -t 552526 -n Streptococcus_equi
+
+#=========
+# Streptococcus pneumoniae
+perl ~/Scripts/alignDB/bac/bac_prepare.pl -p 1313 -t 170187 -n Streptococcus_pneumoniae
+
+#=========
+# 1314 Streptococcus pyogenes
+perl ~/Scripts/alignDB/bac/bac_prepare.pl -p 1314 -t 160490 -n Streptococcus_pyogenes
+
+#=========
+# 1307 Streptococcus suis
+perl ~/Scripts/alignDB/bac/bac_prepare.pl -p 1307 -t 391295 -n Streptococcus_suis
+
+#=========
+# 1308 Streptococcus thermophilus
+perl ~/Scripts/alignDB/bac/bac_prepare.pl -p 1308 -t 264199 -n Streptococcus_thermophilus
+
+#=========
+# 666 Vibrio cholerae
+perl ~/Scripts/alignDB/bac/bac_prepare.pl -p 666 -t 243277 -n Vibrio_cholerae
+
+#=========
+# 339 Xanthomonas campestris
+perl ~/Scripts/alignDB/bac/bac_prepare.pl -p 339 -t 190485 -n Xanthomonas_campestris
+
+#=========
+# 347 Xanthomonas oryzae
+perl ~/Scripts/alignDB/bac/bac_prepare.pl -p 347 -t 291331 -n Xanthomonas_oryzae
+
+#=========
+# 2371 Xylella fastidiosa
+perl ~/Scripts/alignDB/bac/bac_prepare.pl -p 2371 -t 183190 -n Xylella_fastidiosa
+
+#=========
+# Yersinia pestis
+perl ~/Scripts/alignDB/bac/bac_prepare.pl -p 632 -t 214092 -n Yersinia_pestis
+
+#=========
+# Yersinia pseudotuberculosis
+perl ~/Scripts/alignDB/bac/bac_prepare.pl -p 633 -t 273123 -n Yersinia_pseudotuberculosis
+
+#===================NOK==================================
+
+
+#===================DOUBT================================
+
+#=========
+# Acetobacter pasteurianus
+#perl ~/Scripts/alignDB/bac/bac_prepare.pl -p 438 -t 634452 -o 634458 -n Acetobacter_pasteurianus --gr --sca
+#real    84m8.607s
+#user    114m4.978s
+#sys     5m30.376s
+
+# genus Acetobacter
+# perl ~/Scripts/alignDB/bac/bac_prepare.pl -p 434 -t 634452 -n Acetobacter --gr --sca
+
+#=========
+# Bacillus anthracis
+perl ~/Scripts/alignDB/bac/bac_prepare.pl -p 1392 -t 198094 -n Bacillus_anthracis
+
+
+#===================ABANDON================================
+#=========
+# 28025 Bifidobacterium animalis
+# perl ~/Scripts/alignDB/bac/bac_prepare.pl -p 1678 -t 442563 -e 205913,206672,565040,391904,890402,565042,759350 -n Bifidobacterium_animalis
+
+#=========
+# 9 Buchnera aphidicola
+# perl ~/Scripts/alignDB/bac/bac_prepare.pl -p 9
+
+#===================Archaea================================
+#=========
+# 39152	Methanococcus maripaludis
+perl ~/Scripts/alignDB/bac/bac_prepare.pl -p 39152 -t 267377 -n Methanococcus_maripaludis
+
+#=========
+# 43080	Sulfolobus islandicus
+perl ~/Scripts/alignDB/bac/bac_prepare.pl -p 43080 -t 427317 -n Sulfolobus_islandicus
+
