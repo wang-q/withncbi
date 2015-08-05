@@ -400,7 +400,9 @@ for d in `find . -mindepth 1 -maxdepth 1 -type d | sort `;do \
 done  > run_chart.bat
 perl -pi -e 's/\n/\r\n/g' run_chart.bat
 
-# clean
+#----------------------------#
+# Clean
+#----------------------------#
 find . -mindepth 1 -maxdepth 2 -type d -name "*_raw" | xargs rm -fr
 find . -mindepth 1 -maxdepth 2 -type d -name "*_fasta" | xargs rm -fr
 
