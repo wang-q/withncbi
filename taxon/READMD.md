@@ -16,12 +16,14 @@ I'm sure there are no commas in names. So for convenient, don't use Text::CSV_XS
 ## Scrap id and acc from NCBI
 
 Open browser and visit [NCBI plastid page](http://www.ncbi.nlm.nih.gov/genomes/GenomesGroup.cgi?taxid=33090&opt=plastid).
-Save page to a local file, html only. In this case, it's `doc/green_plants_plastid_150725.html`.
+Save page to a local file, html only. In this case, it's `doc/green_plants_plastid_150805.html`.
+
+Or [this link](http://www.ncbi.nlm.nih.gov/genome/browse/?report=5).
 
 ```text
-Viridiplantae (33090) plastid genomes - 680 records
-    Chlorophyta (3041)  [46]
-    Streptophyta (35493)  [634]
+Viridiplantae (33090) plastid genomes - 820 records
+    Chlorophyta (3041)  [58]
+    Streptophyta (35493)  [762]
 ```
 
 From now on, our cwd is `~/data/organelle/plastid_genomes`.
@@ -36,9 +38,9 @@ cd ~/data/organelle/plastid_genomes
 
 # id,acc
 # 996148,NC_017006
-perl ~/Scripts/withncbi/taxon/id_seq_dom_select.pl ~/Scripts/withncbi/doc/green_plants_plastid_150725.html > plastid_id_seq.csv
+perl ~/Scripts/withncbi/taxon/id_seq_dom_select.pl ~/Scripts/withncbi/doc/green_plants_plastid_150805.html > plastid_id_seq.csv
 
-# 678
+# 818
 cat plastid_id_seq.csv | grep -v "^#" | wc -l
 ```
 
@@ -83,7 +85,7 @@ sed -i ".bak" "s/Nephroselmis,NA,NA/Nephroselmis,Nephroselmidaceae,Nephroselmida
 Species and genus should not be "NA" and genus has 2 or more members.
 
 ```text
-678 ---------> 675 ---------> 352 ---------> 526
+818 ---------> 815 ---------> 439 ---------> 634
         NA           genus          family
 ```
 
@@ -94,7 +96,7 @@ cat plastid.CHECKME.csv \
     '/^#/ and next; ($F[3] eq q{NA} or $F[4] eq q{NA} ) and next; print' \
     > plastid.tmp
 
-# 675
+# 815
 wc -l plastid.tmp
 
 #----------------------------#
@@ -109,7 +111,7 @@ cat plastid.tmp \
 # intersect between two files
 grep -F -f genus.tmp plastid.tmp > plastid.genus.tmp
 
-# 352
+# 439
 wc -l plastid.genus.tmp
 
 #----------------------------#
@@ -123,7 +125,7 @@ cat plastid.genus.tmp \
 # intersect between two files
 grep -F -f family.tmp plastid.tmp > plastid.family.tmp
 
-# 526
+# 634
 wc -l plastid.family.tmp
 
 # results produced in this step
@@ -146,9 +148,10 @@ cat plastid.DOWNLOAD.csv \
     | sort
 
 # Fragaria vesca,2
+# Gossypium herbaceum,2
 # Magnolia officinalis,2
 # Olea europaea,4
-# Oryza sativa,2
+# Oryza sativa,3
 # Saccharum hybrid cultivar,2
 
 # strain name not equal to species
@@ -159,17 +162,23 @@ cat plastid.DOWNLOAD.csv \
 
 # Brassica rapa subsp. pekinensis
 # Cucumis melo subsp. melo
+# Eucalyptus globulus subsp. globulus
 # Fagopyrum esculentum subsp. ancestrale
 # Fragaria vesca subsp. bracteata
 # Fragaria vesca subsp. vesca
+# Gossypium herbaceum subsp. africanum
 # Hordeum vulgare subsp. vulgare
 # Magnolia officinalis subsp. biloba
+# Oenothera elata subsp. hookeri
 # Olea europaea subsp. cuspidata
 # Olea europaea subsp. europaea
 # Olea europaea subsp. maroccana
+# Olea woodiana subsp. woodiana
 # Oryza sativa Indica Group
 # Oryza sativa Japonica Group
 # Phalaenopsis aphrodite subsp. formosana
+# Phyllostachys nigra var. henonis
+# Pseudotsuga sinensis var. wilsoniana
 # Saccharum hybrid cultivar NCo 310
 # Saccharum hybrid cultivar SP80-3280
 ```
@@ -216,7 +225,7 @@ cat plastid.ABBR.csv \
 # some warnings fro bioperl, normally just ignore them
 perl ~/Scripts/withncbi/taxon/batch_get_seq.pl -f plastid_name_acc_id.csv -p 2>&1 | tee plastid_seq.log
 
-# rsync --progress -av wangq@139.162.23.84:/home/wangq/data/organelle/ ~/data/organelle/
+# rsync --progress -av wangq@45.79.80.100:/home/wangq/data/organelle/ ~/data/organelle/
 
 # count downloaded sequences
 find . -name "*.fasta" | wc -l
@@ -236,7 +245,7 @@ cat plastid.ABBR.csv \
 
 ## Create alignment plans
 
-We got 43 families, 82 genera, 345 species and **352** accessions.
+We got 52 families, 106 genera, 430 species and **439** accessions.
 
 ```bash
 # valid genera
@@ -249,13 +258,13 @@ cat plastid.ABBR.csv \
 # intersect between two files
 grep -F -f genus.tmp plastid.ABBR.csv > plastid.GENUS.csv
 
-# 352
+# 439
 wc -l plastid.GENUS.csv
 
 #   count every rank
-#   42 family.txt
-#   82 genus.txt
-#  345 species.txt
+#   52 family.txt
+#  106 genus.txt
+#  430 species.txt
 cut -d',' -f 4 plastid.GENUS.csv | sort | uniq > species.txt
 cut -d',' -f 5 plastid.GENUS.csv | sort | uniq > genus.txt
 cut -d',' -f 6 plastid.GENUS.csv | sort | uniq > family.txt
@@ -282,7 +291,7 @@ echo -e "mkdir -p ~/data/organelle/plastid.working\ncd ~/data/organelle/plastid.
 cat plastid_genomes/plastid.GENUS.csv \
     | grep -v "^#" \
     | perl -nl -a -F"," -e \
-    'BEGIN{($g, @s) = ('');}; if ($F[4] ne $g) {if ($g) {print qq{\n# $g}; print qq{GENUS $g \\}; print qq{-q $_ \\} for @s;} $g = $F[4]; @s = ();} push @s, $F[9]; END {print qq{\n# $g}; print qq{GENUS $g \\}; print qq{-q $_ \\} for @s; print;}' \
+    'BEGIN{($g, @s, %h) = ('');}; if ($F[4] ne $g) {if ($g) {print qq{\n# $g}; print qq{GENUS $g \\}; print qq{-q $_ \\} for sort {$h{$a} <=> $h{$b}} @s;} $g = $F[4]; @s = ();} push @s, $F[9]; $h{$F[9]} = $F[0]; END {print qq{\n# $g}; print qq{GENUS $g \\}; print qq{-q $_ \\} for sort {$h{$a} <=> $h{$b}} @s; print;}' \
     | perl -e '@ls = <>; $l = join q{}, @ls; $l =~ s/GENUS (\w+) \\\n\-q/GENUS \1 \\\n\    -t/gs; $l =~ s/\-q /    \-q /gs; $l =~ s/\\\n\n/\n\n/gs; print $l;' \
     | perl -e '@ls = <>; $l = join q{}, @ls; $l =~ s/GENUS /perl \~\/Scripts\/withncbi\/taxon\/strain_bz\.pl \\\nOPTIONS\\\n    --use_name \\\n    \-\-name /gs; print $l;' \
     | perl -e '@ls = <>; $l = join q{}, @ls; $l =~ s/OPTIONS/    \-\-file ~\/data\/organelle\/plastid_genomes\/plastid_ncbi.csv \\\nOPTIONS /gs; print $l;' \
@@ -295,7 +304,7 @@ echo -e "mkdir -p ~/data/organelle/plastid_families\ncd ~/data/organelle/plastid
 cat plastid_genomes/plastid.ABBR.csv \
     | grep -v "^#" \
     | perl -nl -a -F"," -e \
-    'BEGIN{($g, @s) = ('');}; if ($F[5] ne $g) {if ($g) {print qq{\n# $g}; print qq{FAMILY $g \\}; print qq{-q $_ \\} for @s;} $g = $F[5]; @s = ();} push @s, $F[9]; END {print qq{\n# $g}; print qq{FAMILY $g \\}; print qq{-q $_ \\} for @s; print;}' \
+    'BEGIN{($g, @s, %h) = ('');}; if ($F[5] ne $g) {if ($g) {print qq{\n# $g}; print qq{FAMILY $g \\}; print qq{-q $_ \\} for sort {$h{$a} <=> $h{$b}} @s;} $g = $F[5]; @s = ();} push @s, $F[9]; $h{$F[9]} = $F[0]; END {print qq{\n# $g}; print qq{FAMILY $g \\}; print qq{-q $_ \\} for sort {$h{$a} <=> $h{$b}} @s; print;}' \
     | perl -e '@ls = <>; $l = join q{}, @ls; $l =~ s/FAMILY (\w+) \\\n\-q/FAMILY \1 \\\n\    -t/gs; $l =~ s/\-q /    \-q /gs; $l =~ s/\\\n\n/\n\n/gs; print $l;' \
     | perl -e '@ls = <>; $l = join q{}, @ls; $l =~ s/FAMILY /perl \~\/Scripts\/withncbi\/taxon\/strain_bz\.pl \\\nOPTIONS\\\n    --use_name \\\n    \-\-name /gs; print $l;' \
     | perl -e '@ls = <>; $l = join q{}, @ls; $l =~ s/OPTIONS/    \-\-file ~\/data\/organelle\/plastid_genomes\/plastid_ncbi.csv \\\nOPTIONS /gs; print $l;' \
@@ -304,7 +313,9 @@ cat plastid_genomes/plastid.ABBR.csv \
 
 ```
 
-## Batch running for genus
+## Aligning
+
+### Batch running for genus
 
 The old prepare_run.sh
 
@@ -397,23 +408,7 @@ find . -mindepth 1 -maxdepth 3 -type f -name "*.phy" | xargs rm
 find . -mindepth 1 -maxdepth 3 -type f -name "*.phy.reduced" | xargs rm
 ```
 
-Create `plastid.list.csv` from `plastid.GENUS.csv` with sequence lengths.
-
-```bash
-mkdir -p ~/data/organelle/plastid_summary
-cd ~/data/organelle/plastid_summary
-
-find ~/data/organelle/plastid.working -type f -name "chr.sizes" | sort \
-    | xargs perl -nl -e 'BEGIN{print q{genus,strain_abbr,accession,length}}; $_ =~ s/\t/\,/; $ARGV =~ /working\/(\w+)\/(\w+)\//; print qq{$1,$2,$_}' > length.tmp
-
-perl ~/Scripts/alignDB/util/merge_csv.pl \
-    -t ~/data/organelle/plastid_genomes/plastid.GENUS.csv -m length.tmp -f 1 -f2 2 --concat --stdout \
-    | perl -nl -a -F"," -e 'print qq{$F[5],$F[4],$F[2],$F[0],$F[1],$F[13]}' \
-    >  plastid.list.csv
-
-```
-
-## Self alignments.
+### Self alignments.
 
 ```bash
 cd ~/data/organelle/
@@ -457,7 +452,7 @@ find . -mindepth 1 -maxdepth 2 -type d -name "*_fasta" | xargs rm -fr
 
 ```
 
-## Alignments of families for outgroups.
+### Alignments of families for outgroups.
 
 The old prepare_run.sh
 
@@ -495,5 +490,25 @@ for d in `find . -mindepth 1 -maxdepth 1 -type d | sort `;do
         nw_display -s -b 'visibility:hidden' $f_base.nwk > $f_base.svg ;
     fi
 done
+
+find . -type f -path "*_phylo*" -name "*.nwk"
+
+```
+
+### summary
+
+Create `plastid.list.csv` from `plastid.GENUS.csv` with sequence lengths.
+
+```bash
+mkdir -p ~/data/organelle/plastid_summary
+cd ~/data/organelle/plastid_summary
+
+find ~/data/organelle/plastid.working -type f -name "chr.sizes" | sort \
+    | xargs perl -nl -e 'BEGIN{print q{genus,strain_abbr,accession,length}}; $_ =~ s/\t/\,/; $ARGV =~ /working\/(\w+)\/(\w+)\//; print qq{$1,$2,$_}' > length.tmp
+
+perl ~/Scripts/alignDB/util/merge_csv.pl \
+    -t ~/data/organelle/plastid_genomes/plastid.GENUS.csv -m length.tmp -f 1 -f2 2 --concat --stdout \
+    | perl -nl -a -F"," -e 'print qq{$F[5],$F[4],$F[2],$F[0],$F[1],$F[13]}' \
+    >  plastid.list.csv
 
 ```
