@@ -353,19 +353,19 @@ cat genus.tsv \
 # every genera
 echo -e "mkdir -p ~/data/organelle/plastid.working\ncd ~/data/organelle/plastid.working\n" > ../plastid.cmd.txt
 cat genus.tsv \
-    | perl ~/Scripts/withncbi/taxon/cmd_template.pl --seq_dir ~/data/organelle/plastid_genomes --taxon_file ~/data/organelle/plastid_genomes/plastid_ncbi.csv \
+    | perl ~/Scripts/withncbi/taxon/cmd_template.pl --seq_dir ~/data/organelle/plastid_genomes --taxon_file ~/data/organelle/plastid_genomes/plastid_ncbi.csv --parallel 8 \
     >> ../plastid.cmd.txt
 
 # this is for finding outgroups
 echo -e "mkdir -p ~/data/organelle/plastid_families\ncd ~/data/organelle/plastid_families\n" > ../plastid_families.cmd.txt
 cat family.tsv \
-    | perl ~/Scripts/withncbi/taxon/cmd_template.pl --seq_dir ~/data/organelle/plastid_genomes --taxon_file ~/data/organelle/plastid_genomes/plastid_ncbi.csv \
+    | perl ~/Scripts/withncbi/taxon/cmd_template.pl --seq_dir ~/data/organelle/plastid_genomes --taxon_file ~/data/organelle/plastid_genomes/plastid_ncbi.csv --parallel 8 \
     >> ../plastid_families.cmd.txt
 
 # genera with outgroups
 echo -e "mkdir -p ~/data/organelle/plastid_OG\ncd ~/data/organelle/plastid_OG\n" > ../plastid_OG.cmd.txt
 cat genus_OG.tsv \
-    | perl ~/Scripts/withncbi/taxon/cmd_template.pl --seq_dir ~/data/organelle/plastid_genomes --taxon_file ~/data/organelle/plastid_genomes/plastid_ncbi.csv \
+    | perl ~/Scripts/withncbi/taxon/cmd_template.pl --seq_dir ~/data/organelle/plastid_genomes --taxon_file ~/data/organelle/plastid_genomes/plastid_ncbi.csv --parallel 8 \
     >> ../plastid_OG.cmd.txt
 
 ```

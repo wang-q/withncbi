@@ -81,7 +81,7 @@ while (<>) {
             name       => $fields[0],
             t          => $fields[1],
             qs         => [ split /,/, $fields[2] ],
-            o          => $fields[4],
+            o          => $fields[3],
         },
         \*STDOUT
     ) or die Template->error;
