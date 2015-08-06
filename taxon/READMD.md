@@ -509,6 +509,9 @@ perl -pi -e 's/\n/\r\n/g' run_chart.bat
 find . -mindepth 1 -maxdepth 2 -type d -name "*_raw" | xargs rm -fr
 find . -mindepth 1 -maxdepth 2 -type d -name "*_fasta" | xargs rm -fr
 
+# clean mysql
+find  /usr/local/var/mysql -type d -name "[A-Z]*" | xargs rm -fr
+
 ```
 
 ### Alignments of families for outgroups.
@@ -554,15 +557,15 @@ find . -type f -path "*_phylo*" -name "*.nwk"
 
 ```
 
-After manually editing.
+Manually editing `~/Scripts/withncbi/doc/plastid_OG.md` and generate `genus_OG.tsv`.
 
-*D* of outgroups are around 0.05.
+*D* of outgroups should be around 0.05.
 
 ```bash
 mkdir -p ~/data/organelle/plastid_OG
 cd ~/data/organelle/plastid_OG
 
-time sh ../plastid_OG.cmd.sh 2>&1 | tee log_cmd.txt
+time sh ../plastid_OG.cmd.txt 2>&1 | tee log_cmd.txt
 
 for d in `find . -mindepth 1 -maxdepth 1 -type d | sort `; do
     echo "echo \"====> Processing $d <====\""
@@ -584,7 +587,6 @@ sh runall.sh 2>&1 | tee log_runall.txt
 Create `plastid.list.csv` from `plastid.GENUS.csv` with sequence lengths.
 
 ```bash
-mkdir -p ~/data/organelle/plastid_summary
 cd ~/data/organelle/plastid_summary
 
 find ~/data/organelle/plastid.working -type f -name "chr.sizes" | sort \
