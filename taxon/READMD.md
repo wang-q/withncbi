@@ -81,14 +81,14 @@ sed -i ".bak" "s/Aureococcus,NA/Aureococcus,Pelagomonadaceae/" plastid.CHECKME.c
 sed -i ".bak" "s/Aureoumbra,NA/Aureoumbra,Sarcinochrysidaceae/" plastid.CHECKME.csv
 sed -i ".bak" "s/Bigelowiella,NA/Bigelowiella,Chlorarachniaceae/" plastid.CHECKME.csv
 sed -i ".bak" "s/Choricystis,NA/Choricystis,Coccomyxaceae/" plastid.CHECKME.csv
-sed -i ".bak" "s/Cryptoglena,NA/Cryptoglena,Euglenaceae/" plastid.CHECKME.csv
-sed -i ".bak" "s/Dicloster,NA/Dicloster,Chlorellaceae/" plastid.CHECKME.csv
+sed -i ".bak" "s/Cryptoglena,NA,NA/Cryptoglena,Euglenaceae,Euglenales/" plastid.CHECKME.csv
+sed -i ".bak" "s/Dicloster,NA,NA/Dicloster,Chlorellaceae,Chlorellales/" plastid.CHECKME.csv
 sed -i ".bak" "s/Dictyochloropsis,NA/Dictyochloropsis,Trebouxiaceae/" plastid.CHECKME.csv
 sed -i ".bak" "s/Euglenaformis,NA/Euglenaformis,Euglenaceae/" plastid.CHECKME.csv
 sed -i ".bak" "s/Euglenaria,NA/Euglenaria,Euglenaceae/" plastid.CHECKME.csv
 sed -i ".bak" "s/Eutreptiella,NA/Eutreptiella,Eutreptiaceae/" plastid.CHECKME.csv
 sed -i ".bak" "s/Fusochloris,NA/Fusochloris,Microthamniaceae/" plastid.CHECKME.csv
-sed -i ".bak" "s/Geminella,NA/Geminella,Chlorellaceae/" plastid.CHECKME.csv
+sed -i ".bak" "s/Geminella,NA,NA/Geminella,Chlorellaceae,Chlorellales/" plastid.CHECKME.csv
 sed -i ".bak" "s/Gloeotilopsis,NA/Gloeotilopsis,Ulotrichaceae/" plastid.CHECKME.csv
 sed -i ".bak" "s/Helicosporidium,NA/Helicosporidium,Chlorellaceae/" plastid.CHECKME.csv
 sed -i ".bak" "s/Koliella,NA/Koliella,Klebsormidiaceae/" plastid.CHECKME.csv
@@ -105,7 +105,7 @@ sed -i ".bak" "s/Paradoxia,NA/Paradoxia,Coccomyxaceae/" plastid.CHECKME.csv
 sed -i ".bak" "s/Planctonema,NA/Planctonema,Oocystaceae/" plastid.CHECKME.csv
 sed -i ".bak" "s/Prasinoderma,NA/Prasinoderma,Prasinococcaceae/" plastid.CHECKME.csv
 sed -i ".bak" "s/Pseudendoclonium,NA/Pseudendoclonium,Kornmanniaceae/" plastid.CHECKME.csv
-sed -i ".bak" "s/Pseudochloris,NA/Pseudochloris,Chlorellaceae/" plastid.CHECKME.csv
+sed -i ".bak" "s/Pseudochloris,NA,NA/Pseudochloris,Chlorellaceae,Chlorellales/" plastid.CHECKME.csv
 sed -i ".bak" "s/Pyramimonas,NA/Pyramimonas,Pyramimonadaceae/" plastid.CHECKME.csv
 sed -i ".bak" "s/Stichococcus,NA/Stichococcus,Prasiolaceae/" plastid.CHECKME.csv
 sed -i ".bak" "s/Stigeoclonium,NA/Stigeoclonium,Chaetophoraceae/" plastid.CHECKME.csv
@@ -120,7 +120,7 @@ sed -i ".bak" "s/Watanabea,NA/Watanabea,Trebouxiaceae/" plastid.CHECKME.csv
 Species and genus should not be "NA" and genus has 2 or more members.
 
 ```text
-818 ---------> 815 ---------> 439 ---------> 634
+898 ---------> 894 ---------> 460 ---------> 666
         NA           genus          family
 ```
 
@@ -131,7 +131,7 @@ cat plastid.CHECKME.csv \
     '/^#/ and next; ($F[3] eq q{NA} or $F[4] eq q{NA} ) and next; print' \
     > plastid.tmp
 
-# 815
+# 894
 wc -l plastid.tmp
 
 #----------------------------#
@@ -146,7 +146,7 @@ cat plastid.tmp \
 # intersect between two files
 grep -F -f genus.tmp plastid.tmp > plastid.genus.tmp
 
-# 439
+# 460
 wc -l plastid.genus.tmp
 
 #----------------------------#
@@ -160,7 +160,7 @@ cat plastid.genus.tmp \
 # intersect between two files
 grep -F -f family.tmp plastid.tmp > plastid.family.tmp
 
-# 634
+# 666
 wc -l plastid.family.tmp
 
 # results produced in this step
@@ -280,7 +280,7 @@ cat plastid.ABBR.csv \
 
 ## Create alignment plans
 
-We got 52 families, 106 genera, 430 species and **439** accessions.
+We got 47 orders, 58 families, 113 genera, 451 species and **460** accessions.
 
 ```bash
 # valid genera
@@ -293,17 +293,19 @@ cat plastid.ABBR.csv \
 # intersect between two files
 grep -F -f genus.tmp plastid.ABBR.csv > plastid.GENUS.csv
 
-# 439
+# 460
 wc -l plastid.GENUS.csv
 
 #   count every rank
-#   52 family.txt
-#  106 genus.txt
-#  430 species.txt
+#   47 order.txt
+#   58 family.txt
+#  113 genus.txt
+#  451 species.txt
 cut -d',' -f 4 plastid.GENUS.csv | sort | uniq > species.txt
 cut -d',' -f 5 plastid.GENUS.csv | sort | uniq > genus.txt
 cut -d',' -f 6 plastid.GENUS.csv | sort | uniq > family.txt
-wc -l family.txt genus.txt species.txt
+cut -d',' -f 7 plastid.GENUS.csv | sort | uniq > order.txt
+wc -l order.txt family.txt genus.txt species.txt
 
 # create again with headers
 grep -F -f genus.tmp plastid.ABBR.csv > plastid.GENUS.tmp
