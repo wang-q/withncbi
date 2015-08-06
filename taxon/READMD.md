@@ -18,19 +18,22 @@ I'm sure there are no commas in names. So for convenient, don't use Text::CSV_XS
 Open browser and visit [NCBI plastid page](http://www.ncbi.nlm.nih.gov/genomes/GenomesGroup.cgi?taxid=33090&opt=plastid).
 Save page to a local file, html only. In this case, it's `doc/green_plants_plastid_150805.html`.
 
+All [Eukaryota](http://www.ncbi.nlm.nih.gov/genomes/GenomesGroup.cgi?opt=plastid&taxid=2759), `doc/eukaryota_plastid_150806.html`.
+
 Or [this link](http://www.ncbi.nlm.nih.gov/genome/browse/?report=5).
 
 ```text
-Viridiplantae (33090) plastid genomes - 820 records
-    Chlorophyta (3041)  [58]
-    Streptophyta (35493)  [762]
+Eukaryota (2759)                901
+    Viridiplantae (33090)       820
+        Chlorophyta (3041)      58
+        Streptophyta (35493)    762
 ```
 
 From now on, our cwd is `~/data/organelle/plastid_genomes`.
 
 Use `taxon/id_seq_dom_select.pl` to extract Taxonomy ids and genbank accessions.
 
-Got **678** accessions.
+Got **898** accessions.
 
 ```bash
 mkdir -p ~/data/organelle/plastid_genomes
@@ -38,9 +41,9 @@ cd ~/data/organelle/plastid_genomes
 
 # id,acc
 # 996148,NC_017006
-perl ~/Scripts/withncbi/taxon/id_seq_dom_select.pl ~/Scripts/withncbi/doc/green_plants_plastid_150805.html > plastid_id_seq.csv
+perl ~/Scripts/withncbi/taxon/id_seq_dom_select.pl ~/Scripts/withncbi/doc/eukaryota_plastid_150806.html > plastid_id_seq.csv
 
-# 818
+# 898
 cat plastid_id_seq.csv | grep -v "^#" | wc -l
 ```
 
@@ -67,15 +70,47 @@ cat plastid_id_seq.csv \
 # correct 'Chlorella' mirabilis  
 # darwin (bsd) need "" for -i
 sed -i ".bak" "s/\'//g" plastid.CHECKME.csv
-
 sed -i ".bak" "s/Chlorella,NA,NA/Chlorella,Chlorellaceae,Chlorellales/" plastid.CHECKME.csv
 
 # Koliella corcontica (a green algae) was grouped to Streptophyta.
 sed -i ".bak" "s/Klebsormidiophyceae,Streptophyta/Klebsormidiophyceae,Chlorophyta/" plastid.CHECKME.csv
 
+# various missing families
+# queried from http://www.algaebase.org/
+sed -i ".bak" "s/Aureococcus,NA/Aureococcus,Pelagomonadaceae/" plastid.CHECKME.csv
+sed -i ".bak" "s/Aureoumbra,NA/Aureoumbra,Sarcinochrysidaceae/" plastid.CHECKME.csv
+sed -i ".bak" "s/Bigelowiella,NA/Bigelowiella,Chlorarachniaceae/" plastid.CHECKME.csv
+sed -i ".bak" "s/Choricystis,NA/Choricystis,Coccomyxaceae/" plastid.CHECKME.csv
+sed -i ".bak" "s/Cryptoglena,NA/Cryptoglena,Euglenaceae/" plastid.CHECKME.csv
+sed -i ".bak" "s/Dicloster,NA/Dicloster,Chlorellaceae/" plastid.CHECKME.csv
+sed -i ".bak" "s/Dictyochloropsis,NA/Dictyochloropsis,Trebouxiaceae/" plastid.CHECKME.csv
+sed -i ".bak" "s/Euglenaformis,NA/Euglenaformis,Euglenaceae/" plastid.CHECKME.csv
+sed -i ".bak" "s/Euglenaria,NA/Euglenaria,Euglenaceae/" plastid.CHECKME.csv
+sed -i ".bak" "s/Eutreptiella,NA/Eutreptiella,Eutreptiaceae/" plastid.CHECKME.csv
+sed -i ".bak" "s/Fusochloris,NA/Fusochloris,Microthamniaceae/" plastid.CHECKME.csv
+sed -i ".bak" "s/Geminella,NA/Geminella,Chlorellaceae/" plastid.CHECKME.csv
+sed -i ".bak" "s/Gloeotilopsis,NA/Gloeotilopsis,Ulotrichaceae/" plastid.CHECKME.csv
+sed -i ".bak" "s/Helicosporidium,NA/Helicosporidium,Chlorellaceae/" plastid.CHECKME.csv
 sed -i ".bak" "s/Koliella,NA/Koliella,Klebsormidiaceae/" plastid.CHECKME.csv
-
+sed -i ".bak" "s/Microthamnion,NA/Microthamnion,Microthamniaceae/" plastid.CHECKME.csv
+sed -i ".bak" "s/Monomorphina,NA/Monomorphina,Euglenaceae/" plastid.CHECKME.csv
+sed -i ".bak" "s/Myrmecia,NA/Myrmecia,Trebouxiaceae/" plastid.CHECKME.csv
+sed -i ".bak" "s/Neocystis,NA/Neocystis,Radiococcaceae/" plastid.CHECKME.csv
 sed -i ".bak" "s/Nephroselmis,NA,NA/Nephroselmis,Nephroselmidaceae,Nephroselmidales/" plastid.CHECKME.csv
+sed -i ".bak" "s/Oedogonium,NA/Oedogonium,Oedogoniaceae/" plastid.CHECKME.csv
+sed -i ".bak" "s/Oltmannsiellopsis,NA/Oltmannsiellopsis,Oltmannsiellopsidaceae/" plastid.CHECKME.csv
+sed -i ".bak" "s/Pabia,NA/Pabia,Trebouxiaceae/" plastid.CHECKME.csv
+sed -i ".bak" "s/Parachlorella,NA/Parachlorella,Chlorellaceae/" plastid.CHECKME.csv
+sed -i ".bak" "s/Paradoxia,NA/Paradoxia,Coccomyxaceae/" plastid.CHECKME.csv
+sed -i ".bak" "s/Planctonema,NA/Planctonema,Oocystaceae/" plastid.CHECKME.csv
+sed -i ".bak" "s/Prasinoderma,NA/Prasinoderma,Prasinococcaceae/" plastid.CHECKME.csv
+sed -i ".bak" "s/Pseudendoclonium,NA/Pseudendoclonium,Kornmanniaceae/" plastid.CHECKME.csv
+sed -i ".bak" "s/Pseudochloris,NA/Pseudochloris,Chlorellaceae/" plastid.CHECKME.csv
+sed -i ".bak" "s/Pyramimonas,NA/Pyramimonas,Pyramimonadaceae/" plastid.CHECKME.csv
+sed -i ".bak" "s/Stichococcus,NA/Stichococcus,Prasiolaceae/" plastid.CHECKME.csv
+sed -i ".bak" "s/Stigeoclonium,NA/Stigeoclonium,Chaetophoraceae/" plastid.CHECKME.csv
+sed -i ".bak" "s/Trachydiscus,NA/Trachydiscus,Pleurochloridaceae/" plastid.CHECKME.csv
+sed -i ".bak" "s/Watanabea,NA/Watanabea,Trebouxiaceae/" plastid.CHECKME.csv
 
 # Chrysanthemum x morifolium and Pelargonium x hortorum are also weird, but they can be googled.
 ```
@@ -403,11 +438,11 @@ perl -pi -e 's/\n/\r\n/g' run_chart.bat
 #----------------------------#
 # Clean
 #----------------------------#
-find . -mindepth 1 -maxdepth 2 -type d -name "*_raw" | xargs rm -fr
-find . -mindepth 1 -maxdepth 2 -type d -name "*_fasta" | xargs rm -fr
+find . -mindepth 1 -maxdepth 3 -type d -name "*_raw" | xargs rm -fr
+find . -mindepth 1 -maxdepth 3 -type d -name "*_fasta" | xargs rm -fr
 
-find . -mindepth 1 -maxdepth 3 -type f -name "*.phy" | xargs rm
-find . -mindepth 1 -maxdepth 3 -type f -name "*.phy.reduced" | xargs rm
+find . -mindepth 1 -maxdepth 4 -type f -name "*.phy" | xargs rm
+find . -mindepth 1 -maxdepth 4 -type f -name "*.phy.reduced" | xargs rm
 ```
 
 ### Self alignments.
@@ -494,6 +529,31 @@ for d in `find . -mindepth 1 -maxdepth 1 -type d | sort `;do
 done
 
 find . -type f -path "*_phylo*" -name "*.nwk"
+
+```
+
+After manually editing.
+
+*D* of outgroups are around 0.05.
+
+```bash
+mkdir -p ~/data/organelle/plastid_OG
+cd ~/data/organelle/plastid_OG
+
+time sh ../plastid_OG.cmd.sh 2>&1 | tee log_cmd.txt
+
+for d in `find . -mindepth 1 -maxdepth 1 -type d | sort `; do
+    echo "echo \"====> Processing $d <====\""
+    echo sh $d/1_real_chr.sh ;
+    echo sh $d/2_file_rm.sh ;
+    echo sh $d/3_pair_cmd.sh ;
+    echo sh $d/4_rawphylo.sh ;
+    echo sh $d/5_multi_cmd.sh ;
+    echo sh $d/7_multi_db_only.sh ;
+    echo ;
+done  > runall.sh
+
+sh runall.sh 2>&1 | tee log_runall.txt
 
 ```
 
