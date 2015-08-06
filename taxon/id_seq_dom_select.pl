@@ -5,6 +5,7 @@ use autodie;
 
 use File::Slurp;
 use Mojo::DOM;
+use Tie::IxHash;
 use YAML qw(Dump Load DumpFile LoadFile);
 
 # http://www.ncbi.nlm.nih.gov/genomes/GenomesGroup.cgi?taxid=2759&opt=plastid
@@ -31,7 +32,6 @@ my $ref = $dom->find('#Tbl1 tr[bgcolor=#F0F0F0] > td > a')->map(
     }
 );
 
-
 #348535
 #NC_014345
 #484906
@@ -48,7 +48,7 @@ my $ref = $dom->find('#Tbl1 tr[bgcolor=#F0F0F0] > td > a')->map(
 #NC_017928
 
 my @els = grep {$_} @{$ref};
-my $acc_of = {};
+tie my %acc_of, "Tie::IxHash";
 {
     my $cur_id;
     while (@els) {
@@ -58,17 +58,16 @@ my $acc_of = {};
             $cur_id = $el;
         }
         elsif ( $el =~ /NC_\d+/ ) {
-            if ( !exists $acc_of->{$cur_id} ) {
-                $acc_of->{$cur_id} = [];
+            if ( !exists $acc_of{$cur_id} ) {
+                $acc_of{$cur_id} = [];
             }
-            push @{ $acc_of->{$cur_id} }, $el;
+            push @{ $acc_of{$cur_id} }, $el;
         }
     }
 }
 
 print "#strain_taxon_id,accession\n";
-for my $key ( sort keys %{$acc_of} ) {
-    print join ",", ( $key, @{ $acc_of->{$key} } );
+for my $key ( keys %acc_of ) {
+    print join ",", ( $key, @{ $acc_of{$key} } );
     print "\n";
 }
-
