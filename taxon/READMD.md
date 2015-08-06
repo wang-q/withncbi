@@ -29,8 +29,6 @@ Eukaryota (2759)                901
         Streptophyta (35493)    762
 ```
 
-From now on, our cwd is `~/data/organelle/plastid_genomes`.
-
 Use `taxon/id_seq_dom_select.pl` to extract Taxonomy ids and genbank accessions.
 
 Got **898** accessions.
@@ -54,9 +52,12 @@ Give ids better shapes for manually checking and automatic filtering.
 If you sure, you can add or delete lines and contents in `plastid.CHECKME.csv`.
 
 ```bash
+mkdir -p ~/data/organelle/plastid_summary
+cd ~/data/organelle/plastid_summary
+
 # generate a .csv file for manually checking
 echo '#strain_taxon_id,accession,strain,species,genus,family,order,class,phylum' > plastid.CHECKME.csv
-cat plastid_id_seq.csv \
+cat ../plastid_genomes/plastid_id_seq.csv \
     | grep -v "^#" \
     | perl ~/Scripts/withncbi/taxon/id_project_to.pl -s "," \
     | perl ~/Scripts/withncbi/taxon/id_project_to.pl -s "," --rank species \
@@ -69,48 +70,48 @@ cat plastid_id_seq.csv \
 
 # correct 'Chlorella' mirabilis  
 # darwin (bsd) need "" for -i
-sed -i ".bak" "s/\'//g" plastid.CHECKME.csv
-sed -i ".bak" "s/Chlorella,NA,NA/Chlorella,Chlorellaceae,Chlorellales/" plastid.CHECKME.csv
+sed -i".bak" "s/\'//g" plastid.CHECKME.csv
+sed -i".bak" "s/Chlorella,NA,NA/Chlorella,Chlorellaceae,Chlorellales/" plastid.CHECKME.csv
 
 # Koliella corcontica (a green algae) was grouped to Streptophyta.
-sed -i ".bak" "s/Klebsormidiophyceae,Streptophyta/Klebsormidiophyceae,Chlorophyta/" plastid.CHECKME.csv
+sed -i".bak" "s/Klebsormidiophyceae,Streptophyta/Klebsormidiophyceae,Chlorophyta/" plastid.CHECKME.csv
 
 # various missing families
 # queried from http://www.algaebase.org/
-sed -i ".bak" "s/Aureococcus,NA/Aureococcus,Pelagomonadaceae/" plastid.CHECKME.csv
-sed -i ".bak" "s/Aureoumbra,NA/Aureoumbra,Sarcinochrysidaceae/" plastid.CHECKME.csv
-sed -i ".bak" "s/Bigelowiella,NA/Bigelowiella,Chlorarachniaceae/" plastid.CHECKME.csv
-sed -i ".bak" "s/Choricystis,NA/Choricystis,Coccomyxaceae/" plastid.CHECKME.csv
-sed -i ".bak" "s/Cryptoglena,NA,NA/Cryptoglena,Euglenaceae,Euglenales/" plastid.CHECKME.csv
-sed -i ".bak" "s/Dicloster,NA,NA/Dicloster,Chlorellaceae,Chlorellales/" plastid.CHECKME.csv
-sed -i ".bak" "s/Dictyochloropsis,NA/Dictyochloropsis,Trebouxiaceae/" plastid.CHECKME.csv
-sed -i ".bak" "s/Euglenaformis,NA/Euglenaformis,Euglenaceae/" plastid.CHECKME.csv
-sed -i ".bak" "s/Euglenaria,NA/Euglenaria,Euglenaceae/" plastid.CHECKME.csv
-sed -i ".bak" "s/Eutreptiella,NA/Eutreptiella,Eutreptiaceae/" plastid.CHECKME.csv
-sed -i ".bak" "s/Fusochloris,NA/Fusochloris,Microthamniaceae/" plastid.CHECKME.csv
-sed -i ".bak" "s/Geminella,NA,NA/Geminella,Chlorellaceae,Chlorellales/" plastid.CHECKME.csv
-sed -i ".bak" "s/Gloeotilopsis,NA/Gloeotilopsis,Ulotrichaceae/" plastid.CHECKME.csv
-sed -i ".bak" "s/Helicosporidium,NA/Helicosporidium,Chlorellaceae/" plastid.CHECKME.csv
-sed -i ".bak" "s/Koliella,NA/Koliella,Klebsormidiaceae/" plastid.CHECKME.csv
-sed -i ".bak" "s/Microthamnion,NA/Microthamnion,Microthamniaceae/" plastid.CHECKME.csv
-sed -i ".bak" "s/Monomorphina,NA/Monomorphina,Euglenaceae/" plastid.CHECKME.csv
-sed -i ".bak" "s/Myrmecia,NA/Myrmecia,Trebouxiaceae/" plastid.CHECKME.csv
-sed -i ".bak" "s/Neocystis,NA/Neocystis,Radiococcaceae/" plastid.CHECKME.csv
-sed -i ".bak" "s/Nephroselmis,NA,NA/Nephroselmis,Nephroselmidaceae,Nephroselmidales/" plastid.CHECKME.csv
-sed -i ".bak" "s/Oedogonium,NA/Oedogonium,Oedogoniaceae/" plastid.CHECKME.csv
-sed -i ".bak" "s/Oltmannsiellopsis,NA/Oltmannsiellopsis,Oltmannsiellopsidaceae/" plastid.CHECKME.csv
-sed -i ".bak" "s/Pabia,NA/Pabia,Trebouxiaceae/" plastid.CHECKME.csv
-sed -i ".bak" "s/Parachlorella,NA/Parachlorella,Chlorellaceae/" plastid.CHECKME.csv
-sed -i ".bak" "s/Paradoxia,NA/Paradoxia,Coccomyxaceae/" plastid.CHECKME.csv
-sed -i ".bak" "s/Planctonema,NA/Planctonema,Oocystaceae/" plastid.CHECKME.csv
-sed -i ".bak" "s/Prasinoderma,NA/Prasinoderma,Prasinococcaceae/" plastid.CHECKME.csv
-sed -i ".bak" "s/Pseudendoclonium,NA/Pseudendoclonium,Kornmanniaceae/" plastid.CHECKME.csv
-sed -i ".bak" "s/Pseudochloris,NA,NA/Pseudochloris,Chlorellaceae,Chlorellales/" plastid.CHECKME.csv
-sed -i ".bak" "s/Pyramimonas,NA/Pyramimonas,Pyramimonadaceae/" plastid.CHECKME.csv
-sed -i ".bak" "s/Stichococcus,NA/Stichococcus,Prasiolaceae/" plastid.CHECKME.csv
-sed -i ".bak" "s/Stigeoclonium,NA/Stigeoclonium,Chaetophoraceae/" plastid.CHECKME.csv
-sed -i ".bak" "s/Trachydiscus,NA/Trachydiscus,Pleurochloridaceae/" plastid.CHECKME.csv
-sed -i ".bak" "s/Watanabea,NA/Watanabea,Trebouxiaceae/" plastid.CHECKME.csv
+sed -i".bak" "s/Aureococcus,NA/Aureococcus,Pelagomonadaceae/" plastid.CHECKME.csv
+sed -i".bak" "s/Aureoumbra,NA/Aureoumbra,Sarcinochrysidaceae/" plastid.CHECKME.csv
+sed -i".bak" "s/Bigelowiella,NA/Bigelowiella,Chlorarachniaceae/" plastid.CHECKME.csv
+sed -i".bak" "s/Choricystis,NA/Choricystis,Coccomyxaceae/" plastid.CHECKME.csv
+sed -i".bak" "s/Cryptoglena,NA,NA/Cryptoglena,Euglenaceae,Euglenales/" plastid.CHECKME.csv
+sed -i".bak" "s/Dicloster,NA,NA/Dicloster,Chlorellaceae,Chlorellales/" plastid.CHECKME.csv
+sed -i".bak" "s/Dictyochloropsis,NA/Dictyochloropsis,Trebouxiaceae/" plastid.CHECKME.csv
+sed -i".bak" "s/Euglenaformis,NA/Euglenaformis,Euglenaceae/" plastid.CHECKME.csv
+sed -i".bak" "s/Euglenaria,NA/Euglenaria,Euglenaceae/" plastid.CHECKME.csv
+sed -i".bak" "s/Eutreptiella,NA/Eutreptiella,Eutreptiaceae/" plastid.CHECKME.csv
+sed -i".bak" "s/Fusochloris,NA/Fusochloris,Microthamniaceae/" plastid.CHECKME.csv
+sed -i".bak" "s/Geminella,NA,NA/Geminella,Chlorellaceae,Chlorellales/" plastid.CHECKME.csv
+sed -i".bak" "s/Gloeotilopsis,NA/Gloeotilopsis,Ulotrichaceae/" plastid.CHECKME.csv
+sed -i".bak" "s/Helicosporidium,NA/Helicosporidium,Chlorellaceae/" plastid.CHECKME.csv
+sed -i".bak" "s/Koliella,NA/Koliella,Klebsormidiaceae/" plastid.CHECKME.csv
+sed -i".bak" "s/Microthamnion,NA/Microthamnion,Microthamniaceae/" plastid.CHECKME.csv
+sed -i".bak" "s/Monomorphina,NA/Monomorphina,Euglenaceae/" plastid.CHECKME.csv
+sed -i".bak" "s/Myrmecia,NA/Myrmecia,Trebouxiaceae/" plastid.CHECKME.csv
+sed -i".bak" "s/Neocystis,NA/Neocystis,Radiococcaceae/" plastid.CHECKME.csv
+sed -i".bak" "s/Nephroselmis,NA,NA/Nephroselmis,Nephroselmidaceae,Nephroselmidales/" plastid.CHECKME.csv
+sed -i".bak" "s/Oedogonium,NA/Oedogonium,Oedogoniaceae/" plastid.CHECKME.csv
+sed -i".bak" "s/Oltmannsiellopsis,NA/Oltmannsiellopsis,Oltmannsiellopsidaceae/" plastid.CHECKME.csv
+sed -i".bak" "s/Pabia,NA/Pabia,Trebouxiaceae/" plastid.CHECKME.csv
+sed -i".bak" "s/Parachlorella,NA/Parachlorella,Chlorellaceae/" plastid.CHECKME.csv
+sed -i".bak" "s/Paradoxia,NA/Paradoxia,Coccomyxaceae/" plastid.CHECKME.csv
+sed -i".bak" "s/Planctonema,NA/Planctonema,Oocystaceae/" plastid.CHECKME.csv
+sed -i".bak" "s/Prasinoderma,NA/Prasinoderma,Prasinococcaceae/" plastid.CHECKME.csv
+sed -i".bak" "s/Pseudendoclonium,NA/Pseudendoclonium,Kornmanniaceae/" plastid.CHECKME.csv
+sed -i".bak" "s/Pseudochloris,NA,NA/Pseudochloris,Chlorellaceae,Chlorellales/" plastid.CHECKME.csv
+sed -i".bak" "s/Pyramimonas,NA/Pyramimonas,Pyramimonadaceae/" plastid.CHECKME.csv
+sed -i".bak" "s/Stichococcus,NA/Stichococcus,Prasiolaceae/" plastid.CHECKME.csv
+sed -i".bak" "s/Stigeoclonium,NA/Stigeoclonium,Chaetophoraceae/" plastid.CHECKME.csv
+sed -i".bak" "s/Trachydiscus,NA/Trachydiscus,Pleurochloridaceae/" plastid.CHECKME.csv
+sed -i".bak" "s/Watanabea,NA/Watanabea,Trebouxiaceae/" plastid.CHECKME.csv
 
 # Chrysanthemum x morifolium and Pelargonium x hortorum are also weird, but they can be googled.
 ```
@@ -125,6 +126,9 @@ Species and genus should not be "NA" and genus has 2 or more members.
 ```
 
 ```bash
+mkdir -p ~/data/organelle/plastid_summary
+cd ~/data/organelle/plastid_summary
+
 # filter out accessions without linage information
 cat plastid.CHECKME.csv \
     | perl -nl -a -F"," -e \
@@ -221,6 +225,15 @@ cat plastid.DOWNLOAD.csv \
 Create abbreviations.
 
 ```bash
+cd ~/data/organelle/plastid_summary
+
+echo '#strain_taxon_id,accession,strain,species,genus,family,order,class,phylum,abbr' > plastid.ABBR.csv
+cat plastid.DOWNLOAD.csv \
+    | grep -v '^#' \
+    | perl ~/Scripts/withncbi/taxon/abbr_name.pl -c "3,4,5" -s "," -m 0 \
+    | sort -t',' -k9,9 -k7,7 -k6,6 -k10,10 \
+    >> plastid.ABBR.csv
+
 # # use Text::Abbrev
 # cat genus.txt \
 #     | perl -MText::Abbrev -nl -e \
@@ -232,26 +245,20 @@ Create abbreviations.
 #     | perl -I ~/Scripts/withncbi/lib -MMyUtil -MYAML -nl -e \
 #     'push @list, $_; END{$hashref = MyUtil::abbr_most( \@list); print Dump $hashref }'
 
-
-echo '#strain_taxon_id,accession,strain,species,genus,family,order,class,phylum,abbr' > plastid.ABBR.csv
-cat plastid.DOWNLOAD.csv \
-    | grep -v '^#' \
-    | perl ~/Scripts/withncbi/taxon/abbr_name.pl -c "3,4,5" -s "," -m 0 \
-    | sort -t',' -k9,9 -k7,7 -k6,6 -k10,10 \
-    >> plastid.ABBR.csv
-
 ```
 
 ## Download sequences and regenerate lineage information.
 
-We don't rename sequences here, so the file has three columns
+We don't rename sequences here, so the file has three columns.
+
+And create `plastid_ncbi.csv` with abbr names as taxon file.
 
 ```bash
 mkdir -p ~/data/organelle/plastid_genomes
 cd ~/data/organelle/plastid_genomes
 
 echo "#strain_name,accession,strain_taxon_id" > plastid_name_acc_id.csv
-cat plastid.ABBR.csv \
+cat ../plastid_summary/plastid.ABBR.csv \
     | grep -v '^#' \
     | perl -nl -a -F"," -e 'print qq{$F[9],$F[1],$F[0]}' \
     | sort \
@@ -264,15 +271,11 @@ perl ~/Scripts/withncbi/taxon/batch_get_seq.pl -f plastid_name_acc_id.csv -p 2>&
 
 # count downloaded sequences
 find . -name "*.fasta" | wc -l
-```
 
-Create `plastid_ncbi.csv` with abbr names.
-
-```bash
 # local, Runtime 10 seconds.
 # with --entrez, Runtime 7 minutes and 23 seconds.
 # And can't find is still can't find.
-cat plastid.ABBR.csv \
+cat ../plastid_summary/plastid.ABBR.csv \
     | grep -v '^#' \
     | perl -nl -a -F"," -e 'print qq{$F[0],$F[9]}' \
     | perl ~/Scripts/withncbi/taxon/strain_info.pl --stdin --withname --file plastid_ncbi.csv
@@ -283,6 +286,8 @@ cat plastid.ABBR.csv \
 We got 47 orders, 58 families, 113 genera, 451 species and **460** accessions.
 
 ```bash
+cd ~/data/organelle/plastid_summary
+
 # valid genera
 cat plastid.ABBR.csv \
     | grep -v "^#" \
@@ -296,16 +301,16 @@ grep -F -f genus.tmp plastid.ABBR.csv > plastid.GENUS.csv
 # 460
 wc -l plastid.GENUS.csv
 
-#   count every rank
-#   47 order.txt
-#   58 family.txt
-#  113 genus.txt
-#  451 species.txt
-cut -d',' -f 4 plastid.GENUS.csv | sort | uniq > species.txt
-cut -d',' -f 5 plastid.GENUS.csv | sort | uniq > genus.txt
-cut -d',' -f 6 plastid.GENUS.csv | sort | uniq > family.txt
-cut -d',' -f 7 plastid.GENUS.csv | sort | uniq > order.txt
-wc -l order.txt family.txt genus.txt species.txt
+#   count every ranks
+#   47 order.list.tmp
+#   58 family.list.tmp
+#  113 genus.list.tmp
+#  451 species.list.tmp
+cut -d',' -f 4 plastid.GENUS.csv | sort | uniq > species.list.tmp
+cut -d',' -f 5 plastid.GENUS.csv | sort | uniq > genus.list.tmp
+cut -d',' -f 6 plastid.GENUS.csv | sort | uniq > family.list.tmp
+cut -d',' -f 7 plastid.GENUS.csv | sort | uniq > order.list.tmp
+wc -l order.list.tmp family.list.tmp genus.list.tmp species.list.tmp
 
 # create again with headers
 grep -F -f genus.tmp plastid.ABBR.csv > plastid.GENUS.tmp
@@ -315,38 +320,53 @@ head -n 1 plastid.ABBR.csv > plastid.GENUS.csv
 cat plastid.GENUS.tmp \
     | sort -t',' -k9,9 -k7,7 -k6,6 -k10,10 \
     >> plastid.GENUS.csv
+
+# clean
+rm *.tmp *.bak
 ```
 
 Create alignments without outgroups.
 
 ```bash
-cd ~/data/organelle/
+cd ~/data/organelle/plastid_summary
 
-echo -e "mkdir -p ~/data/organelle/plastid.working\ncd ~/data/organelle/plastid.working\n" > plastid.cmd.txt
-
-# sed is bad for handling new lines
-cat plastid_genomes/plastid.GENUS.csv \
+# tab-seperated
+# name  t   qs
+cat plastid.GENUS.csv \
     | grep -v "^#" \
-    | perl -nl -a -F"," -e \
-    'BEGIN{($g, @s, %h) = ('');}; if ($F[4] ne $g) {if ($g) {print qq{\n# $g}; print qq{GENUS $g \\}; print qq{-q $_ \\} for sort {$h{$a} <=> $h{$b}} @s;} $g = $F[4]; @s = ();} push @s, $F[9]; $h{$F[9]} = $F[0]; END {print qq{\n# $g}; print qq{GENUS $g \\}; print qq{-q $_ \\} for sort {$h{$a} <=> $h{$b}} @s; print;}' \
-    | perl -e '@ls = <>; $l = join q{}, @ls; $l =~ s/GENUS (\w+) \\\n\-q/GENUS \1 \\\n\    -t/gs; $l =~ s/\-q /    \-q /gs; $l =~ s/\\\n\n/\n\n/gs; print $l;' \
-    | perl -e '@ls = <>; $l = join q{}, @ls; $l =~ s/GENUS /perl \~\/Scripts\/withncbi\/taxon\/strain_bz\.pl \\\nOPTIONS\\\n    --use_name \\\n    \-\-name /gs; print $l;' \
-    | perl -e '@ls = <>; $l = join q{}, @ls; $l =~ s/OPTIONS/    \-\-file ~\/data\/organelle\/plastid_genomes\/plastid_ncbi.csv \\\nOPTIONS /gs; print $l;' \
-    | perl -e '@ls = <>; $l = join q{}, @ls; $l =~ s/OPTIONS/    \-\-parallel 4 \\\n    \-\-seq_dir ~\/data\/organelle\/plastid_genomes/gs; print $l;' \
-    >> plastid.cmd.txt
+    | perl -n -a -F"," -e \
+    'BEGIN{ ($g, @s, %h) = (q{}); } chomp for @F; if ($F[4] ne $g) { if ($g) { @s = sort {$h{$a} <=> $h{$b}} @s; $t = shift @s; $qs = join(q{,}, @s); printf qq{%s\t%s\t%s\n}, $g, $t, $qs; } $g = $F[4]; @s = ();} push @s, $F[9]; $h{$F[9]} = $F[0]; END { @s = sort {$h{$a} <=> $h{$b}} @s; $t = shift @s; $qs = join(q{,}, @s); printf qq{%s\t%s\t%s\n}, $g, $t, $qs; }' \
+    > genus.tsv
+
+cat plastid.ABBR.csv \
+    | grep -v "^#" \
+    | perl -n -a -F"," -e \
+    'BEGIN{ ($g, @s, %h) = (q{}); } chomp for @F; if ($F[5] ne $g) { if ($g) { @s = sort {$h{$a} <=> $h{$b}} @s; $t = shift @s; $qs = join(q{,}, @s); printf qq{%s\t%s\t%s\n}, $g, $t, $qs; } $g = $F[5]; @s = ();} push @s, $F[9]; $h{$F[9]} = $F[0]; END { @s = sort {$h{$a} <=> $h{$b}} @s; $t = shift @s; $qs = join(q{,}, @s); printf qq{%s\t%s\t%s\n}, $g, $t, $qs; }' \
+    > family.tsv
+
+# name  t   qs  o
+cat genus.tsv \
+    | perl -nl -a -F"\t" -MPath::Tiny -e \
+    'BEGIN{ @ls = grep {/\S/} grep {!/^#/} path(q{~/Scripts/withncbi/doc/plastid_OG.md})->lines( { chomp => 1}); for (@ls) {@fs = split(/,/); $h{$fs[0]}= $fs[1];}  } if (exists $h{$F[0]}) { printf qq{%s\t%s\t%s\t%s\n}, $F[0], $F[1], $F[2], $h{$F[0]}; }' \
+    > genus_OG.tsv
+
+# every genera
+echo -e "mkdir -p ~/data/organelle/plastid.working\ncd ~/data/organelle/plastid.working\n" > ../plastid.cmd.txt
+cat genus.tsv \
+    | perl ~/Scripts/withncbi/taxon/cmd_template.pl --seq_dir ~/data/organelle/plastid_genomes --taxon_file ~/data/organelle/plastid_genomes/plastid_ncbi.csv \
+    >> ../plastid.cmd.txt
 
 # this is for finding outgroups
-echo -e "mkdir -p ~/data/organelle/plastid_families\ncd ~/data/organelle/plastid_families\n" > plastid_families.cmd.txt
+echo -e "mkdir -p ~/data/organelle/plastid_families\ncd ~/data/organelle/plastid_families\n" > ../plastid_families.cmd.txt
+cat family.tsv \
+    | perl ~/Scripts/withncbi/taxon/cmd_template.pl --seq_dir ~/data/organelle/plastid_genomes --taxon_file ~/data/organelle/plastid_genomes/plastid_ncbi.csv \
+    >> ../plastid_families.cmd.txt
 
-cat plastid_genomes/plastid.ABBR.csv \
-    | grep -v "^#" \
-    | perl -nl -a -F"," -e \
-    'BEGIN{($g, @s, %h) = ('');}; if ($F[5] ne $g) {if ($g) {print qq{\n# $g}; print qq{FAMILY $g \\}; print qq{-q $_ \\} for sort {$h{$a} <=> $h{$b}} @s;} $g = $F[5]; @s = ();} push @s, $F[9]; $h{$F[9]} = $F[0]; END {print qq{\n# $g}; print qq{FAMILY $g \\}; print qq{-q $_ \\} for sort {$h{$a} <=> $h{$b}} @s; print;}' \
-    | perl -e '@ls = <>; $l = join q{}, @ls; $l =~ s/FAMILY (\w+) \\\n\-q/FAMILY \1 \\\n\    -t/gs; $l =~ s/\-q /    \-q /gs; $l =~ s/\\\n\n/\n\n/gs; print $l;' \
-    | perl -e '@ls = <>; $l = join q{}, @ls; $l =~ s/FAMILY /perl \~\/Scripts\/withncbi\/taxon\/strain_bz\.pl \\\nOPTIONS\\\n    --use_name \\\n    \-\-name /gs; print $l;' \
-    | perl -e '@ls = <>; $l = join q{}, @ls; $l =~ s/OPTIONS/    \-\-file ~\/data\/organelle\/plastid_genomes\/plastid_ncbi.csv \\\nOPTIONS /gs; print $l;' \
-    | perl -e '@ls = <>; $l = join q{}, @ls; $l =~ s/OPTIONS/    \-\-parallel 4 \\\n    \-\-seq_dir ~\/data\/organelle\/plastid_genomes/gs; print $l;' \
-    >> plastid_families.cmd.txt
+# genera with outgroups
+echo -e "mkdir -p ~/data/organelle/plastid_OG\ncd ~/data/organelle/plastid_OG\n" > ../plastid_OG.cmd.txt
+cat genus_OG.tsv \
+    | perl ~/Scripts/withncbi/taxon/cmd_template.pl --seq_dir ~/data/organelle/plastid_genomes --taxon_file ~/data/organelle/plastid_genomes/plastid_ncbi.csv \
+    >> ../plastid_OG.cmd.txt
 
 ```
 
