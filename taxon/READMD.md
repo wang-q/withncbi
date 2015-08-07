@@ -282,14 +282,6 @@ cat ../plastid_summary/plastid.ABBR.csv \
     | sort \
     >> plastid_name_acc_id.csv
 
-# some warnings fro bioperl, normally just ignore them
-perl ~/Scripts/withncbi/taxon/batch_get_seq.pl -f plastid_name_acc_id.csv -p 2>&1 | tee plastid_seq.log
-
-# rsync --progress -av wangq@45.79.80.100:/home/wangq/data/organelle/ ~/data/organelle/
-
-# count downloaded sequences
-find . -name "*.fasta" | wc -l
-
 # local, Runtime 10 seconds.
 # with --entrez, Runtime 7 minutes and 23 seconds.
 # And can't find is still can't find.
@@ -297,6 +289,14 @@ cat ../plastid_summary/plastid.ABBR.csv \
     | grep -v '^#' \
     | perl -nl -a -F"," -e 'print qq{$F[0],$F[9]}' \
     | perl ~/Scripts/withncbi/taxon/strain_info.pl --stdin --withname --file plastid_ncbi.csv
+
+# some warnings fro bioperl, normally just ignore them
+perl ~/Scripts/withncbi/taxon/batch_get_seq.pl -f plastid_name_acc_id.csv -p 2>&1 | tee plastid_seq.log
+
+# rsync --progress -av wangq@45.79.80.100:/home/wangq/data/organelle/ ~/data/organelle/
+
+# count downloaded sequences
+find . -name "*.fasta" | wc -l
 ```
 
 ## Create alignment plans

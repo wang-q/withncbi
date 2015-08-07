@@ -85,23 +85,24 @@ my $man  = 0;
 my $help = 0;
 
 GetOptions(
-    'help'            => \$help,
-    'man'             => \$man,
-    's|server=s'      => \$server,
-    'P|port=i'        => \$port,
-    'u|username=s'    => \$username,
-    'p|password=s'    => \$password,
-    'd|db=s'          => \$db_name,
-    'w|working_dir=s' => \$working_dir,
-    'p|parent_id=s'   => \$parent_id,
-    't|target_id=i'   => \$target_id,
-    'o|r|outgroup=i'  => \$outgroup_id,
-    'e|exclude=s'     => \$exclude_ids,
-    'n|name_str=s'    => \$name_str,
-    'is_self'         => \$is_self,
-    'length=i'        => \$paralog_length,
-    'scaffold'        => \$scaffold,
-    'parallel=i'      => \$parallel,
+    'help'           => \$help,
+    'man'            => \$man,
+    's|server=s'     => \$server,
+    'P|port=i'       => \$port,
+    'u|username=s'   => \$username,
+    'p|password=s'   => \$password,
+    'd|db=s'         => \$db_name,
+    'seq_dir=s'      => \$seq_dir,
+    'working_dir=s'  => \$working_dir,
+    'p|parent_id=s'  => \$parent_id,
+    't|target_id=i'  => \$target_id,
+    'o|r|outgroup=i' => \$outgroup_id,
+    'e|exclude=s'    => \$exclude_ids,
+    'n|name_str=s'   => \$name_str,
+    'is_self'        => \$is_self,
+    'length=i'       => \$paralog_length,
+    'scaffold'       => \$scaffold,
+    'parallel=i'     => \$parallel,
 ) or pod2usage(2);
 
 pod2usage(1) if $help;
@@ -142,7 +143,7 @@ my $id_str;
         my $query
             = $scaffold
             ? q{ SELECT taxonomy_id FROM gr WHERE 1 = 1 }
-            : q{ SELECT taxonomy_id FROM gr WHERE status like '%Complete%' };
+            : q{ SELECT taxonomy_id FROM gr WHERE status NOT IN ('Contig', 'Scaffold') };
         my $sth = $dbh->prepare($query);
         $sth->execute;
         while ( my ($id) = $sth->fetchrow_array ) {
