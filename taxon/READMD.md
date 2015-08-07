@@ -76,6 +76,8 @@ sed -i".bak" "s/Chlorella,NA,NA/Chlorella,Chlorellaceae,Chlorellales/" plastid.C
 # Koliella corcontica (a green algae) was grouped to Streptophyta.
 sed -i".bak" "s/Klebsormidiophyceae,Streptophyta/Klebsormidiophyceae,Chlorophyta/" plastid.CHECKME.csv
 
+# Chrysanthemum x morifolium and Pelargonium x hortorum are also weird, but they can be googled.
+
 # various missing families
 # queried from http://www.algaebase.org/
 sed -i".bak" "s/Aureococcus,NA/Aureococcus,Pelagomonadaceae/" plastid.CHECKME.csv
@@ -113,7 +115,23 @@ sed -i".bak" "s/Stigeoclonium,NA/Stigeoclonium,Chaetophoraceae/" plastid.CHECKME
 sed -i".bak" "s/Trachydiscus,NA/Trachydiscus,Pleurochloridaceae/" plastid.CHECKME.csv
 sed -i".bak" "s/Watanabea,NA/Watanabea,Trebouxiaceae/" plastid.CHECKME.csv
 
-# Chrysanthemum x morifolium and Pelargonium x hortorum are also weird, but they can be googled.
+sed -i".bak" "s/Bangiophyceae,NA/Bangiophyceae,Rhodophyta/" plastid.CHECKME.csv
+sed -i".bak" "s/Florideophyceae,NA/Florideophyceae,Rhodophyta/" plastid.CHECKME.csv
+sed -i".bak" "s/Phaeocystales,NA,NA/Phaeocystales,Coccolithophyceae,Haptophyta/" plastid.CHECKME.csv
+
+sed -i".bak" "s/Glaucocystophyceae,NA/Glaucocystophyceae,Glaucophyta/" plastid.CHECKME.csv
+
+# Can't get clear taxon information
+# Genus
+# Chromera
+# Elliptochloris
+# Ettlia
+# Picocystis
+# Xylochloris
+
+# Species
+# Chromerida sp. RM11
+# Trebouxiophyceae sp. MX-AZ01
 ```
 
 ## Filtering based on valid families and genera
