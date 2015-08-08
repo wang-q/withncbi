@@ -1,79 +1,79 @@
 #name	prefix	organism	contigs
-Scer_YJSH1	AGAW	Saccharomyces cerevisiae YJSH1	31
-Scer_ZTW1	AMDD	Saccharomyces cerevisiae ZTW1	33
-Scer_NY1308	ASJZ	Saccharomyces cerevisiae NY1308	35
-Scer_9464	JSAC	Saccharomyces cerevisiae	38
-Scer_Sigma1278b	ACVY	Saccharomyces cerevisiae Sigma1278b	67
-Scer_M3838	AMQE	Saccharomyces cerevisiae M3838	84
-Scer_M3707	AMQB	Saccharomyces cerevisiae M3707	97
-Scer_AWRI796	ADVS	Saccharomyces cerevisiae AWRI796	105
-Scer_M3837	AMQD	Saccharomyces cerevisiae M3837	113
-Scer_RM11_1a	AAEG	Saccharomyces cerevisiae RM11-1a	115
-Scer_M3836	AMQC	Saccharomyces cerevisiae M3836	119
-Scer_M3839	AMQF	Saccharomyces cerevisiae M3839	120
-Scer_VL3	AEJS	Saccharomyces cerevisiae VL3	125
-Scer_FostersB	AEHH	Saccharomyces cerevisiae FostersB	142
-Scer_NAM34_4C	BAUH	Saccharomyces cerevisiae NAM34-4C	154
-Scer_Vin13	ADXC	Saccharomyces cerevisiae Vin13	158
-Scer_Lalvin_QA23	ADVV	Saccharomyces cerevisiae Lalvin QA23	185
-Scer_4124_S60	LCTD	Saccharomyces cerevisiae	213
-Scer_Ethanol_Red	JWJK	Saccharomyces cerevisiae	218
-Scer_FostersO	AEEZ	Saccharomyces cerevisiae FostersO	222
-Scer_YJM789	AAFW	Saccharomyces cerevisiae YJM789	258
-Scer_R008	APIP	Saccharomyces cerevisiae R008	298
-Scer_IR_2	BAUI	Saccharomyces cerevisiae IR-2	322
-#Scer_RM11_1A	JRIP	Saccharomyces cerevisiae	325 # same strain
-Scer_YPH499	JRIO	Saccharomyces cerevisiae	344
-Scer_EBY_VW4000	JSFO	Saccharomyces cerevisiae	354
-#Scer_W303	ALAV	Saccharomyces cerevisiae W303	358 # same strain, 454
-Scer_T7	AFDE	Saccharomyces cerevisiae T7	360
-Scer_ISO12	LBNP	Saccharomyces cerevisiae	361
-Scer_SEY6210	JRIW	Saccharomyces cerevisiae	366
-Scer_N85	CBYJ	Saccharomyces cerevisiae N85	371
-Scer_FY1679	JRIN	Saccharomyces cerevisiae	388
-Scer_10560_6B	JRIQ	Saccharomyces cerevisiae	389
-Scer_CEN_PK2_1Ca	JRIV	Saccharomyces cerevisiae	389
-Scer_BY4741	JRIS	Saccharomyces cerevisiae	397
-Scer_FL100	JRIT	Saccharomyces cerevisiae	402
-Scer_D273_10B	JRIY	Saccharomyces cerevisiae	403
-Scer_X2180_1A	JRIX	Saccharomyces cerevisiae	409
-Scer_Y55	JRIF	Saccharomyces cerevisiae	413
-Scer_W303	JRIU	Saccharomyces cerevisiae	415
-Scer_BY4742	JRIR	Saccharomyces cerevisiae	418
-#Scer_VIN7	AGVY	Saccharomyces cerevisiae x Saccharomyces kudriavzevii VIN7	419 # hybrid diploid
-Scer_JK9_3d	JRIZ	Saccharomyces cerevisiae	431
-Scer_SK1	JRIH	Saccharomyces cerevisiae	451
-Scer_JAY291	ACFL	Saccharomyces cerevisiae JAY291	453
-Scer_K11	JRIJ	Saccharomyces cerevisiae	480
-Scer_R103	APIR	Saccharomyces cerevisiae R103	516
-Scer_UFMG_A_905	JACO	Saccharomyces cerevisiae UFMG A-905	534
-Scer_L1528	JRIK	Saccharomyces cerevisiae	538
-Scer_YJM339	JRIE	Saccharomyces cerevisiae	554
-Scer_GSY2239	LDOE	Saccharomyces cerevisiae	568
-Scer_RedStar	JRIL	Saccharomyces cerevisiae	577
-Scer_CEN_PK113_7D	AEHG	Saccharomyces cerevisiae CEN.PK113-7D	589
-Scer_YPS163	JRIC	Saccharomyces cerevisiae	607
-Scer_BC187	JRII	Saccharomyces cerevisiae	614
-Scer_DBVPG6044	JRIG	Saccharomyces cerevisiae	624
-Scer_P283	AOJC	Saccharomyces cerevisiae P283	665
-Scer_YPS128	JRID	Saccharomyces cerevisiae	670
-Scer_Kyokai_no_7	BABQ	Saccharomyces cerevisiae Kyokai no. 7	705
-Scer_YS9	JRIB	Saccharomyces cerevisiae	851
-Scer_P301	APIQ	Saccharomyces cerevisiae P301	990
-Scer_EC9_8	AGSJ	Saccharomyces cerevisiae EC9-8	1088
-Scer_YJM269	AEWN	Saccharomyces cerevisiae YJM269	1179
-#Scer_UWOPS05_217_3	JRIM	Saccharomyces cerevisiae	1348
-#Scer_UC5	AFDD	Saccharomyces cerevisiae UC5	1527 #454
-#Scer_CLIB215	AEWP	Saccharomyces cerevisiae CLIB215	1566
-#Scer_PW5	AFDC	Saccharomyces cerevisiae PW5	1608
-#Scer_CBS_7960	AEWL	Saccharomyces cerevisiae CBS 7960	2367
-#Scer_AWRI1631	ABSV	Saccharomyces cerevisiae AWRI1631	2484
-#Scer_FL100	AEWO	Saccharomyces cerevisiae FL100	3518
-#Scer_CLIB324	AEWM	Saccharomyces cerevisiae CLIB324	3538
-#Scer_Y10	AEWK	Saccharomyces cerevisiae Y10	4118
-#Scer_YPS163	ABPD	Saccharomyces cerevisiae YPS163	4725 # same strain
-#Scer_T73	AFDF	Saccharomyces cerevisiae T73	5882
-#Scer_UCD51	JPXB	Saccharomyces cerevisiae	6048
-#Scer_M22	ABPC	Saccharomyces cerevisiae M22	6145
-#Scer_M5	JPXA	Saccharomyces cerevisiae M5	7718
-#Scer_CLIB382	AFDG	Saccharomyces cerevisiae CLIB382	12493
+YJSH1	AGAW	Saccharomyces cerevisiae YJSH1	31
+ZTW1	AMDD	Saccharomyces cerevisiae ZTW1	33
+NY1308	ASJZ	Saccharomyces cerevisiae NY1308	35
+9464	JSAC	Saccharomyces cerevisiae	38
+Sigma1278b	ACVY	Saccharomyces cerevisiae Sigma1278b	67
+M3838	AMQE	Saccharomyces cerevisiae M3838	84
+M3707	AMQB	Saccharomyces cerevisiae M3707	97
+AWRI796	ADVS	Saccharomyces cerevisiae AWRI796	105
+M3837	AMQD	Saccharomyces cerevisiae M3837	113
+RM11_1a	AAEG	Saccharomyces cerevisiae RM11-1a	115
+M3836	AMQC	Saccharomyces cerevisiae M3836	119
+M3839	AMQF	Saccharomyces cerevisiae M3839	120
+VL3	AEJS	Saccharomyces cerevisiae VL3	125
+FostersB	AEHH	Saccharomyces cerevisiae FostersB	142
+NAM34_4C	BAUH	Saccharomyces cerevisiae NAM34-4C	154
+Vin13	ADXC	Saccharomyces cerevisiae Vin13	158
+Lalvin_QA23	ADVV	Saccharomyces cerevisiae Lalvin QA23	185
+4124_S60	LCTD	Saccharomyces cerevisiae	213
+Ethanol_Red	JWJK	Saccharomyces cerevisiae	218
+FostersO	AEEZ	Saccharomyces cerevisiae FostersO	222
+YJM789	AAFW	Saccharomyces cerevisiae YJM789	258
+R008	APIP	Saccharomyces cerevisiae R008	298
+IR_2	BAUI	Saccharomyces cerevisiae IR-2	322
+#RM11_1A	JRIP	Saccharomyces cerevisiae	325 # same strain
+YPH499	JRIO	Saccharomyces cerevisiae	344
+EBY_VW4000	JSFO	Saccharomyces cerevisiae	354
+#W303	ALAV	Saccharomyces cerevisiae W303	358 # same strain, 454
+T7	AFDE	Saccharomyces cerevisiae T7	360
+ISO12	LBNP	Saccharomyces cerevisiae	361
+SEY6210	JRIW	Saccharomyces cerevisiae	366
+N85	CBYJ	Saccharomyces cerevisiae N85	371
+FY1679	JRIN	Saccharomyces cerevisiae	388
+10560_6B	JRIQ	Saccharomyces cerevisiae	389
+CEN_PK2_1Ca	JRIV	Saccharomyces cerevisiae	389
+BY4741	JRIS	Saccharomyces cerevisiae	397
+FL100	JRIT	Saccharomyces cerevisiae	402
+D273_10B	JRIY	Saccharomyces cerevisiae	403
+X2180_1A	JRIX	Saccharomyces cerevisiae	409
+Y55	JRIF	Saccharomyces cerevisiae	413
+W303	JRIU	Saccharomyces cerevisiae	415
+BY4742	JRIR	Saccharomyces cerevisiae	418
+#VIN7	AGVY	Saccharomyces cerevisiae x Saccharomyces kudriavzevii VIN7	419 # hybrid diploid
+JK9_3d	JRIZ	Saccharomyces cerevisiae	431
+SK1	JRIH	Saccharomyces cerevisiae	451
+JAY291	ACFL	Saccharomyces cerevisiae JAY291	453
+K11	JRIJ	Saccharomyces cerevisiae	480
+R103	APIR	Saccharomyces cerevisiae R103	516
+UFMG_A_905	JACO	Saccharomyces cerevisiae UFMG A-905	534
+L1528	JRIK	Saccharomyces cerevisiae	538
+YJM339	JRIE	Saccharomyces cerevisiae	554
+GSY2239	LDOE	Saccharomyces cerevisiae	568
+RedStar	JRIL	Saccharomyces cerevisiae	577
+CEN_PK113_7D	AEHG	Saccharomyces cerevisiae CEN.PK113-7D	589
+YPS163	JRIC	Saccharomyces cerevisiae	607
+BC187	JRII	Saccharomyces cerevisiae	614
+DBVPG6044	JRIG	Saccharomyces cerevisiae	624
+P283	AOJC	Saccharomyces cerevisiae P283	665
+YPS128	JRID	Saccharomyces cerevisiae	670
+Kyokai_no_7	BABQ	Saccharomyces cerevisiae Kyokai no. 7	705
+YS9	JRIB	Saccharomyces cerevisiae	851
+P301	APIQ	Saccharomyces cerevisiae P301	990
+EC9_8	AGSJ	Saccharomyces cerevisiae EC9-8	1088
+YJM269	AEWN	Saccharomyces cerevisiae YJM269	1179
+#UWOPS05_217_3	JRIM	Saccharomyces cerevisiae	1348
+#UC5	AFDD	Saccharomyces cerevisiae UC5	1527 #454
+#CLIB215	AEWP	Saccharomyces cerevisiae CLIB215	1566
+#PW5	AFDC	Saccharomyces cerevisiae PW5	1608
+#CBS_7960	AEWL	Saccharomyces cerevisiae CBS 7960	2367
+#AWRI1631	ABSV	Saccharomyces cerevisiae AWRI1631	2484
+#FL100	AEWO	Saccharomyces cerevisiae FL100	3518
+#CLIB324	AEWM	Saccharomyces cerevisiae CLIB324	3538
+#Y10	AEWK	Saccharomyces cerevisiae Y10	4118
+#YPS163	ABPD	Saccharomyces cerevisiae YPS163	4725 # same strain
+#T73	AFDF	Saccharomyces cerevisiae T73	5882
+#UCD51	JPXB	Saccharomyces cerevisiae	6048
+#M22	ABPC	Saccharomyces cerevisiae M22	6145
+#M5	JPXA	Saccharomyces cerevisiae M5	7718
+#CLIB382	AFDG	Saccharomyces cerevisiae CLIB382	12493
