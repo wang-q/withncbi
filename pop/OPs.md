@@ -49,7 +49,7 @@ for genomes out of WGS, which usually in better assembling levels.
         -o WGS \
         -a
 
-    aria2c -x 6 -s 3 -c -i WGS/saccharomyces.url.txt
+    aria2c -UWget -x 6 -s 3 -c -i WGS/saccharomyces.url.txt
 
     find WGS -name "*.gz" | xargs gzip -t
     ```
@@ -78,7 +78,7 @@ for genomes out of WGS, which usually in better assembling levels.
         -r -p
     ```
 
-### *Scer_new* WGS
+### *Scer_new* WGS and ASSEMBLY
 
 1. Create `pop/scer_new.tsv` manually.
 
@@ -122,7 +122,7 @@ for genomes out of WGS, which usually in better assembling levels.
         -o WGS \
         -a
 
-    aria2c -x 6 -s 3 -c -i WGS/scer_new.url.txt
+    aria2c -UWget -x 6 -s 3 -c -i WGS/scer_new.url.txt
 
     find WGS -name "*.gz" | xargs gzip -t
     ```
@@ -213,7 +213,7 @@ for genomes out of WGS, which usually in better assembling levels.
         -o WGS \
         -a
 
-    aria2c -x 6 -s 3 -c -i WGS/candida.url.txt
+    aria2c -UWget -x 6 -s 3 -c -i WGS/candida.url.txt
 
     find WGS -name "*.gz" | xargs gzip -t
     ```
@@ -303,7 +303,7 @@ for genomes out of WGS, which usually in better assembling levels.
         -o WGS \
         -a
 
-    aria2c -x 6 -s 3 -c -i WGS/fusarium.url.txt
+    aria2c -UWget -x 6 -s 3 -c -i WGS/fusarium.url.txt
 
     find WGS -name "*.gz" | xargs gzip -t
     ```
@@ -414,7 +414,7 @@ for genomes out of WGS, which usually in better assembling levels.
         -o WGS \
         -a
 
-    aria2c -x 6 -s 3 -c -i WGS/aspergillus.url.txt
+    aria2c -UWget -x 6 -s 3 -c -i WGS/aspergillus.url.txt
 
     find WGS -name "*.gz" | xargs gzip -t
     ```
@@ -504,7 +504,7 @@ for genomes out of WGS, which usually in better assembling levels.
         -o WGS \
         -a
 
-    aria2c -x 6 -s 3 -c -i WGS/penicillium.url.txt
+    aria2c -UWget -x 6 -s 3 -c -i WGS/penicillium.url.txt
 
     find WGS -name "*.gz" | xargs gzip -t
     ```

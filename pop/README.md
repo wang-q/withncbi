@@ -173,7 +173,7 @@ spaces matters.
     # rsync remote files
     # My connection to NCBI isn't stable, so download sequences in a linode VPS.
     # PLEASE don't hack it.
-    # rsync --progress -av wangq@139.162.23.84:/home/wangq/data/alignment/Fungi/ ~/data/alignment/Fungi/
+    # rsync --progress -av wangq@45.79.80.100:/home/wangq/data/alignment/Fungi/ ~/data/alignment/Fungi/
     ```
 
 ## Section 2: create configuration file and generate alignments.
