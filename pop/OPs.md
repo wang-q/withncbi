@@ -20,7 +20,7 @@ for genomes out of WGS, which usually in better assembling levels.
 
     cd ~/data/alignment/Fungi/GENOMES/$GENUS
 
-    ...
+    ... # paste codes from README.md
 
     # Cleaning
     rm raw*.*sv
@@ -32,8 +32,6 @@ for genomes out of WGS, which usually in better assembling levels.
 
     ```bash
     mv saccharomyces.tsv all.tsv
-    echo -e '#name\tprefix\torganism\tcontigs' > scer_new.tsv
-    cat all.tsv | grep Scer_ >> scer_new.tsv
     cat all.tsv | grep -v Scer_ > saccharomyces.tsv
     ```
 
@@ -78,6 +76,97 @@ for genomes out of WGS, which usually in better assembling levels.
     perl ~/Scripts/withncbi/taxon/batch_get_seq.pl \
         -f Scer_S288c.seq.csv  \
         -r -p
+    ```
+
+### *Scer_new* WGS
+
+1. Create `pop/scer_new.tsv` manually.
+
+    * http://www.ncbi.nlm.nih.gov/Traces/wgs/?page=1&term=Saccharomyces&order=organism
+    * http://www.ncbi.nlm.nih.gov/assembly?term=txid4930[Organism:exp]
+
+    ```bash
+    export GENUS_ID=4930
+    export GENUS=saccharomyces
+    mkdir -p ~/data/alignment/Fungi/scer_new          # operation directory
+    mkdir -p ~/data/alignment/Fungi/GENOMES/scer_new  # sequence directory
+
+    cd ~/data/alignment/Fungi/GENOMES/scer_new
+
+    ... # paste codes from README.md
+
+    # Cleaning
+    rm raw*.*sv
+    unset GENUS_ID
+    unset GENUS
+    ```
+
+    Remove other species of Saccharomyces. More strains will be injected later.
+
+    ```bash
+    echo -e '#name\tprefix\torganism\tcontigs' > scer_new.tsv
+    cat saccharomyces.tsv | grep Scer_ | sed "s/^Scer_//" >> scer_new.tsv
+    ```
+
+    Edit them to fix names and comment out bad strains.
+
+2. Create working directory and download WGS sequences.
+
+    ```bash
+    mkdir -p ~/data/alignment/Fungi/GENOMES/scer_new
+    cd ~/data/alignment/Fungi/GENOMES/scer_new
+
+    perl ~/Scripts/withncbi/taxon/wgs_prep.pl \
+        -f ~/Scripts/withncbi/pop/scer_new.tsv \
+        --fix \
+        -o WGS \
+        -a
+
+    aria2c -x 6 -s 3 -c -i WGS/scer_new.url.txt
+
+    find WGS -name "*.gz" | xargs gzip -t
+    ```
+
+3. Download strains of *Saccharomyces cerevisiae* at good assembly status.
+
+    Click the `Download table` link on the top-right of [Genome list](http://www.ncbi.nlm.nih.gov/genome/genomes/15),
+    save it as .csv file.
+
+    ```bash
+    mkdir -p ~/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD
+    cd ~/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD
+
+    # Download S288c and EC1118 separately
+    perl ~/Scripts/withncbi/taxon/assembly_csv.pl \
+        -f ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/All/GCF_000146045.2.assembly.txt \
+        -name S288c \
+        --nuclear \
+        > S288c.seq.csv
+
+    perl ~/Scripts/withncbi/taxon/assembly_csv.pl \
+        -f ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/All/GCA_000218975.1.assembly.txt \
+        --nuclear --genbank --scaffold -name EC1118 \
+        > EC1118.seq.csv
+
+    mysql -ualignDB -palignDB ar_genbank -e "SELECT organism_name, species, assembly_accession FROM ar WHERE wgs_master = '' AND organism_name != species AND species_id = 4932" \
+        | perl -nl -a -F"\t" -e '$n = $F[0]; $rx = quotemeta $F[1]; $n =~ s/$rx\s+//; $n =~ s/\W+/_/g; printf qq{%s\t%s\n}, $n, $F[2];' \
+        | grep -v organism_name | grep -v S288c | grep -v EC1118 \
+        | perl -nl -a -F"\t" -e '$str = q{echo } . $F[0] . qq{ \n}; $str .= q{perl ~/Scripts/withncbi/taxon/assembly_csv.pl} . qq{ \\\n}; $str .= q{-f ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/All/} . $F[1] . qq{.assembly.txt \\\n}; $str .= q{--nuclear --genbank --chromosome -name } . $F[0] . qq{ \\\n}; $str .= q{>> non_wgs.seq.csv}; print $str . qq{\n}' \
+        > ass_csv.sh
+
+    echo > non_wgs.seq.csv
+    sh ass_csv.sh
+
+    echo "#strain_name,accession,strain_taxon_id,seq_name" > scer_new.seq.csv
+    cat S288c.seq.csv EC1118.seq.csv non_wgs.seq.csv \
+        | grep -v '^#' | grep "\S" \
+        >> scer_new.seq.csv
+
+    # Download, rename files and change fasta headers
+    perl ~/Scripts/withncbi/taxon/batch_get_seq.pl \
+        -f scer_new.seq.csv  \
+        -r -p
+
     ```
 
 ### *Candida* WGS
