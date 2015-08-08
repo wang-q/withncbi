@@ -21,6 +21,7 @@ my $genbank;
 my $ucsc;
 my $scaffold;
 my $nuclear;
+my $chromosome;
 
 my $man  = 0;
 my $help = 0;
@@ -35,6 +36,7 @@ GetOptions(
     'ucsc'      => \$ucsc,
     'scaffold'  => \$scaffold,
     'nuclear'   => \$nuclear,
+    'chromosome'   => \$chromosome,
 ) or pod2usage(2);
 
 pod2usage(1) if $help;
@@ -62,7 +64,8 @@ my $handle = io($in_file);
 my $csv = Text::CSV_XS->new( { binary => 1, eol => "\n" } );
 
 # Header line
-$csv->print( *STDOUT, [qw{#strain_name accession strain_taxon_id seq_name}] );
+$csv->print( *STDOUT,
+    [ '#strain_name', 'accession', 'strain_taxon_id', 'seq_name' ] );
 
 while ( defined( my $line = $handle->getline ) ) {
     chomp $line;
@@ -93,6 +96,11 @@ while ( defined( my $line = $handle->getline ) ) {
 
     # omit non-nuclear
     if ( $nuclear and $fields[7] eq 'non-nuclear' ) {
+        next;
+    }
+    
+    # keep chromosomes only
+    if ( $chromosome and $fields[3] ne 'Chromosome' ) {
         next;
     }
 
