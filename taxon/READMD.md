@@ -616,3 +616,31 @@ perl ~/Scripts/alignDB/util/merge_csv.pl \
     >  plastid.list.csv
 
 ```
+
+## Cyanobacteria
+
+```sql
+# Genus
+SELECT
+    genus_id, genus, COUNT(*) strain_count
+FROM
+    gr_prok.gr
+WHERE
+    `group` = 'Cyanobacteria'
+        AND status NOT IN ('Contig' , 'Scaffold')
+GROUP BY genus_id
+HAVING strain_count > 1
+ORDER BY genus
+
+# Species
+SELECT
+    species_id, species, COUNT(*) strain_count
+FROM
+    gr_prok.gr
+WHERE
+    `group` = 'Cyanobacteria'
+        AND status NOT IN ('Contig' , 'Scaffold')
+GROUP BY species_id
+HAVING strain_count > 1
+ORDER BY species
+```
