@@ -62,7 +62,7 @@ my $handle = io($in_file);
 my $csv = Text::CSV_XS->new( { binary => 1, eol => "\n" } );
 
 # Header line
-$csv->print( *STDOUT, [qw{strain_name accession strain_taxon_id seq_name}] );
+$csv->print( *STDOUT, [qw{#strain_name accession strain_taxon_id seq_name}] );
 
 while ( defined( my $line = $handle->getline ) ) {
     chomp $line;

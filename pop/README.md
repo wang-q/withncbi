@@ -70,16 +70,13 @@ spaces matters.
     ```bash
     # stage1
     # Results from sql query.
-    mysql -ualignDB -palignDB ar_refseq -e \
-    	"SELECT SUBSTRING(wgs_master,1,6) as prefix0, SUBSTRING(wgs_master,1,4) as prefix, organism_name, assembly_level FROM ar WHERE wgs_master LIKE '%000%' AND genus_id = $GENUS_ID" \
+    mysql -ualignDB -palignDB ar_refseq -e "SELECT SUBSTRING(wgs_master,1,6) as prefix0, SUBSTRING(wgs_master,1,4) as prefix, organism_name, assembly_level FROM ar WHERE wgs_master != '' AND genus_id = $GENUS_ID" \
     	> raw.tsv
 
-    mysql -ualignDB -palignDB ar_genbank -e \
-        "SELECT SUBSTRING(wgs_master,1,6) as prefix0, SUBSTRING(wgs_master,1,4) as prefix, organism_name, assembly_level FROM ar WHERE wgs_master LIKE '%000%' AND genus_id = $GENUS_ID" \
+    mysql -ualignDB -palignDB ar_genbank -e "SELECT SUBSTRING(wgs_master,1,6) as prefix0, SUBSTRING(wgs_master,1,4) as prefix, organism_name, assembly_level FROM ar WHERE wgs_master != '' AND genus_id = $GENUS_ID" \
         >> raw.tsv
 
-    mysql -ualignDB -palignDB gr_euk -e \
-        "SELECT SUBSTRING(wgs_master,1,6) as prefix0, SUBSTRING(wgs,1,4) as prefix, organism_name, status FROM gr WHERE wgs LIKE '%000%' AND genus_id = $GENUS_ID" \
+    mysql -ualignDB -palignDB gr_euk -e "SELECT SUBSTRING(wgs,1,6) as prefix0, SUBSTRING(wgs,1,4) as prefix, organism_name, status FROM gr WHERE wgs != '' AND genus_id = $GENUS_ID" \
         >> raw.tsv
 
     # stage2
