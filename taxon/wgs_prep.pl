@@ -212,7 +212,7 @@ $stopwatch->block_message(
         close $url_fh;
         if ($aria2) {
             print "# Run the follow cmd to download with aria2c\n";
-            print "aria2c -x 6 -s 3 -c -i $file_url\n";
+            print "aria2c -UWget -x 6 -s 3 -c -i $file_url\n";
             print "\n";
             print "# Use the following cmd to check .gz files\n";
             print "find $dir_output -name \"*.gz\" | xargs gzip -t \n";
