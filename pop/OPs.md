@@ -74,8 +74,7 @@ for genomes out of WGS, which usually in better assembling levels.
 
     # Download, rename files and change fasta headers
     perl ~/Scripts/withncbi/taxon/batch_get_seq.pl \
-        -f Scer_S288c.seq.csv  \
-        -r -p
+        -p -f Scer_S288c.seq.csv
     ```
 
 ### *Scer_new* WGS and ASSEMBLY
@@ -143,11 +142,6 @@ for genomes out of WGS, which usually in better assembling levels.
         --nuclear \
         > S288c.seq.csv
 
-    perl ~/Scripts/withncbi/taxon/assembly_csv.pl \
-        -f ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/All/GCA_000218975.1.assembly.txt \
-        --nuclear --genbank --scaffold -name EC1118 \
-        > EC1118.seq.csv
-
     mysql -ualignDB -palignDB ar_genbank -e "SELECT organism_name, species, assembly_accession FROM ar WHERE wgs_master = '' AND organism_name != species AND species_id = 4932" \
         | perl -nl -a -F"\t" -e '$n = $F[0]; $rx = quotemeta $F[1]; $n =~ s/$rx\s+//; $n =~ s/\W+/_/g; printf qq{%s\t%s\n}, $n, $F[2];' \
         | grep -v organism_name | grep -v S288c | grep -v EC1118 \
@@ -158,14 +152,24 @@ for genomes out of WGS, which usually in better assembling levels.
     sh ass_csv.sh
 
     echo "#strain_name,accession,strain_taxon_id,seq_name" > scer_new.seq.csv
-    cat S288c.seq.csv EC1118.seq.csv non_wgs.seq.csv \
+    cat S288c.seq.csv non_wgs.seq.csv \
         | grep -v '^#' | grep "\S" \
         >> scer_new.seq.csv
 
     # Download, rename files and change fasta headers
     perl ~/Scripts/withncbi/taxon/batch_get_seq.pl \
-        -f scer_new.seq.csv  \
-        -r -p
+        -p -f scer_new.seq.csv
+
+    # EC1118
+    perl ~/Scripts/withncbi/taxon/assembly_csv.pl \
+        -f ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/All/GCA_000218975.1.assembly.txt \
+        --nuclear --genbank --scaffold -name EC1118 \
+        | cut -d',' -f1,2,3 \
+        > EC1118.seq.csv
+
+    rm -fr EC1118
+    perl ~/Scripts/withncbi/taxon/batch_get_seq.pl \
+        -p -f EC1118.seq.csv
 
     ```
 
@@ -255,12 +259,10 @@ for genomes out of WGS, which usually in better assembling levels.
 
     # Download, rename files and change fasta headers
     perl ~/Scripts/withncbi/taxon/batch_get_seq.pl \
-        -f Cdub_CD36.seq.csv  \
-        -r -p
+        -p -f Cdub_CD36.seq.csv
 
     perl ~/Scripts/withncbi/taxon/batch_get_seq.pl \
-        -f Corh_Co_90_125.seq.csv  \
-        -r -p
+        -p -f Corh_Co_90_125.seq.csv
     ```
 
 ### *Fusarium* WGS
@@ -357,20 +359,16 @@ for genomes out of WGS, which usually in better assembling levels.
 
     # Download, rename files and change fasta headers
     perl ~/Scripts/withncbi/taxon/batch_get_seq.pl \
-        -f Fgra_PH_1.seq.csv  \
-        -r -p
+        -p -f Fgra_PH_1.seq.csv
 
     perl ~/Scripts/withncbi/taxon/batch_get_seq.pl \
-        -f Foxy_4287.seq.csv  \
-        -r -p
+        -p -f Foxy_4287.seq.csv
 
     perl ~/Scripts/withncbi/taxon/batch_get_seq.pl \
-        -f Fpse_CS3270.seq.csv  \
-        -r -p
+        -p -f Fpse_CS3270.seq.csv
 
     perl ~/Scripts/withncbi/taxon/batch_get_seq.pl \
-        -f Fver_7600.seq.csv  \
-        -r -p
+        -p -f Fver_7600.seq.csv
     ```
 
 ### *Aspergillus* WGS
@@ -459,12 +457,10 @@ for genomes out of WGS, which usually in better assembling levels.
 
     # Download, rename files and change fasta headers
     perl ~/Scripts/withncbi/taxon/batch_get_seq.pl \
-        -f Afum_Af293.seq.csv  \
-        -r -p
+        -p -f Afum_Af293.seq.csv
 
     perl ~/Scripts/withncbi/taxon/batch_get_seq.pl \
-        -f Anid_FGSC_A4.seq.csv  \
-        -r -p
+        -p -f Anid_FGSC_A4.seq.csv
     ```
 
 ### *Penicillium* WGS
