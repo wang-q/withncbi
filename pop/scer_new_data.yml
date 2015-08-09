@@ -1,0 +1,768 @@
+---
+base_dir: '~/data/alignment/Fungi'
+data:
+  - downloaded: 1
+    name: S288c
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/S288c
+    taxon: 559292
+  - downloaded: 1
+    name: EC1118
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/EC1118
+    taxon: 643680
+  - downloaded: 1
+    name: YJM993
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM993
+    taxon: 1294331
+  - downloaded: 1
+    name: YJM1078
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM1078
+    taxon: 1296266
+  - downloaded: 1
+    name: YJM195
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM195
+    taxon: 1294305
+  - downloaded: 1
+    name: YJM270
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM270
+    taxon: 1294308
+  - downloaded: 1
+    name: YJM470
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM470
+    taxon: 1294313
+  - downloaded: 1
+    name: YJM683
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM683
+    taxon: 1294320
+  - downloaded: 1
+    name: YJM689
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM689
+    taxon: 1294321
+  - downloaded: 1
+    name: YJM693
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM693
+    taxon: 1294322
+  - downloaded: 1
+    name: YJM1248
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM1248
+    taxon: 1294340
+  - downloaded: 1
+    name: YJM1252
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM1252
+    taxon: 1294342
+  - downloaded: 1
+    name: YJM1273
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM1273
+    taxon: 1294343
+  - downloaded: 1
+    name: YJM1342
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM1342
+    taxon: 1294352
+  - downloaded: 1
+    name: YJM1385
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM1385
+    taxon: 1294357
+  - downloaded: 1
+    name: YJM1387
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM1387
+    taxon: 1294359
+  - downloaded: 1
+    name: YJM1388
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM1388
+    taxon: 1294360
+  - downloaded: 1
+    name: YJM1389
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM1389
+    taxon: 1294361
+  - downloaded: 1
+    name: YJM1399
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM1399
+    taxon: 1294362
+  - downloaded: 1
+    name: YJM1402
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM1402
+    taxon: 1294365
+  - downloaded: 1
+    name: YJM1418
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM1418
+    taxon: 1294368
+  - downloaded: 1
+    name: YJM1439
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM1439
+    taxon: 1294372
+  - downloaded: 1
+    name: YJM1443
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM1443
+    taxon: 1294373
+  - downloaded: 1
+    name: YJM1444
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM1444
+    taxon: 1294374
+  - downloaded: 1
+    name: YJM1447
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM1447
+    taxon: 1294375
+  - downloaded: 1
+    name: YJM1460
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM1460
+    taxon: 1294377
+  - downloaded: 1
+    name: YJM1549
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM1549
+    taxon: 1294384
+  - downloaded: 1
+    name: YJM1573
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM1573
+    taxon: 1294385
+  - downloaded: 1
+    name: YJM1592
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM1592
+    taxon: 1294387
+  - downloaded: 1
+    name: YJM244
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM244
+    taxon: 1294306
+  - downloaded: 1
+    name: YJM1083
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM1083
+    taxon: 1292971
+  - downloaded: 1
+    name: YJM1129
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM1129
+    taxon: 1293430
+  - downloaded: 1
+    name: YJM189
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM189
+    taxon: 1294303
+  - downloaded: 1
+    name: YJM193
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM193
+    taxon: 1294304
+  - downloaded: 1
+    name: YJM248
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM248
+    taxon: 1294307
+  - downloaded: 1
+    name: YJM271
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM271
+    taxon: 1294309
+  - downloaded: 1
+    name: YJM320
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM320
+    taxon: 947042
+  - downloaded: 1
+    name: YJM326
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM326
+    taxon: 468558
+  - downloaded: 1
+    name: YJM428
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM428
+    taxon: 947044
+  - downloaded: 1
+    name: YJM450
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM450
+    taxon: 1294310
+  - downloaded: 1
+    name: YJM451
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM451
+    taxon: 502869
+  - downloaded: 1
+    name: YJM453
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM453
+    taxon: 1294311
+  - downloaded: 1
+    name: YJM456
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM456
+    taxon: 1294312
+  - downloaded: 1
+    name: YJM541
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM541
+    taxon: 1294314
+  - downloaded: 1
+    name: YJM554
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM554
+    taxon: 1294315
+  - downloaded: 1
+    name: YJM555
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM555
+    taxon: 1294316
+  - downloaded: 1
+    name: YJM627
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM627
+    taxon: 1294317
+  - downloaded: 1
+    name: YJM681
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM681
+    taxon: 1294318
+  - downloaded: 1
+    name: YJM682
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM682
+    taxon: 1294319
+  - downloaded: 1
+    name: YJM969
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM969
+    taxon: 1294323
+  - downloaded: 1
+    name: YJM972
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM972
+    taxon: 1294324
+  - downloaded: 1
+    name: YJM975
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM975
+    taxon: 1294325
+  - downloaded: 1
+    name: YJM978
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM978
+    taxon: 1294326
+  - downloaded: 1
+    name: YJM981
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM981
+    taxon: 1294327
+  - downloaded: 1
+    name: YJM984
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM984
+    taxon: 1294328
+  - downloaded: 1
+    name: YJM987
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM987
+    taxon: 1294329
+  - downloaded: 1
+    name: YJM990
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM990
+    taxon: 1294330
+  - downloaded: 1
+    name: YJM996
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM996
+    taxon: 1294332
+  - downloaded: 1
+    name: YJM1133
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM1133
+    taxon: 1294333
+  - downloaded: 1
+    name: YJM1190
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM1190
+    taxon: 1294334
+  - downloaded: 1
+    name: YJM1199
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM1199
+    taxon: 1294335
+  - downloaded: 1
+    name: YJM1202
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM1202
+    taxon: 1294336
+  - downloaded: 1
+    name: YJM1208
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM1208
+    taxon: 1294337
+  - downloaded: 1
+    name: YJM1242
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM1242
+    taxon: 1294338
+  - downloaded: 1
+    name: YJM1244
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM1244
+    taxon: 1294339
+  - downloaded: 1
+    name: YJM1250
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM1250
+    taxon: 1294341
+  - downloaded: 1
+    name: YJM1307
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM1307
+    taxon: 1294345
+  - downloaded: 1
+    name: YJM1311
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM1311
+    taxon: 1294346
+  - downloaded: 1
+    name: YJM1326
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM1326
+    taxon: 1294347
+  - downloaded: 1
+    name: YJM1332
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM1332
+    taxon: 1294348
+  - downloaded: 1
+    name: YJM1336
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM1336
+    taxon: 1294349
+  - downloaded: 1
+    name: YJM1338
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM1338
+    taxon: 1294350
+  - downloaded: 1
+    name: YJM1341
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM1341
+    taxon: 1294351
+  - downloaded: 1
+    name: YJM1355
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM1355
+    taxon: 1294353
+  - downloaded: 1
+    name: YJM1356
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM1356
+    taxon: 1294354
+  - downloaded: 1
+    name: YJM1381
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM1381
+    taxon: 1294355
+  - downloaded: 1
+    name: YJM1383
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM1383
+    taxon: 1294356
+  - downloaded: 1
+    name: YJM1386
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM1386
+    taxon: 1294358
+  - downloaded: 1
+    name: YJM1400
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM1400
+    taxon: 1294363
+  - downloaded: 1
+    name: YJM1401
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM1401
+    taxon: 1294364
+  - downloaded: 1
+    name: YJM1415
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM1415
+    taxon: 1294366
+  - downloaded: 1
+    name: YJM1417
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM1417
+    taxon: 1294367
+  - downloaded: 1
+    name: YJM1419
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM1419
+    taxon: 1294369
+  - downloaded: 1
+    name: YJM1433
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM1433
+    taxon: 1294370
+  - downloaded: 1
+    name: YJM1450
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM1450
+    taxon: 1294376
+  - downloaded: 1
+    name: YJM1463
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM1463
+    taxon: 1294378
+  - downloaded: 1
+    name: YJM1477
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM1477
+    taxon: 1294379
+  - downloaded: 1
+    name: YJM1478
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM1478
+    taxon: 1294380
+  - downloaded: 1
+    name: YJM1479
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM1479
+    taxon: 1294381
+  - downloaded: 1
+    name: YJM1526
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM1526
+    taxon: 1294382
+  - downloaded: 1
+    name: YJM1527
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM1527
+    taxon: 1294383
+  - downloaded: 1
+    name: YJM1574
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM1574
+    taxon: 1294386
+  - downloaded: 1
+    name: YJM1615
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM1615
+    taxon: 1294388
+  - downloaded: 1
+    name: YJM1304
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM1304
+    taxon: 1294344
+  - downloaded: 1
+    name: YJM1434
+    pre_dir: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/YJM1434
+    taxon: 1294371
+  - coverage: 24x 454 GS FLX Titanium; Sanger
+    fasta: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/WGS/YJSH1/AGAW01.1.fsa_nt.gz
+    name: YJSH1
+    prefix: AGAW
+    sciname: Saccharomyces cerevisiae YJSH1
+    taxon: 1087981
+  - coverage: 20.0x 454; Sanger
+    fasta: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/WGS/ZTW1/AMDD01.1.fsa_nt.gz
+    name: ZTW1
+    prefix: AMDD
+    sciname: Saccharomyces cerevisiae ZTW1
+    taxon: 1227742
+  - coverage: 70.0x 454; Illumina
+    fasta: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/WGS/NY1308/ASJZ01.1.fsa_nt.gz
+    name: NY1308
+    prefix: ASJZ
+    sciname: Saccharomyces cerevisiae NY1308
+    taxon: 1331972
+  - coverage: 117.0x PacBio
+    fasta: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/WGS/9464/JSAC01.1.fsa_nt.gz
+    name: 9464
+    original_id: 4932
+    prefix: JSAC
+    sciname: Saccharomyces cerevisiae 9464
+    taxon: 100000001
+  - coverage: ~
+    fasta: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/WGS/Sigma1278b/ACVY01.1.fsa_nt.gz
+    name: Sigma1278b
+    prefix: ACVY
+    sciname: Saccharomyces cerevisiae Sigma1278b
+    taxon: 658763
+  - coverage: 95.6x Illumina
+    fasta: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/WGS/M3838/AMQE01.1.fsa_nt.gz
+    name: M3838
+    prefix: AMQE
+    sciname: Saccharomyces cerevisiae M3838
+    taxon: 1162673
+  - coverage: 125.6x Illumina
+    fasta: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/WGS/M3707/AMQB01.1.fsa_nt.gz
+    name: M3707
+    prefix: AMQB
+    sciname: Saccharomyces cerevisiae M3707
+    taxon: 1149757
+  - coverage: 20x 454
+    fasta: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/WGS/AWRI796/ADVS01.1.fsa_nt.gz
+    name: AWRI796
+    prefix: ADVS
+    sciname: Saccharomyces cerevisiae AWRI796
+    taxon: 764097
+  - coverage: 185.6x Illumina
+    fasta: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/WGS/M3837/AMQD01.1.fsa_nt.gz
+    name: M3837
+    prefix: AMQD
+    sciname: Saccharomyces cerevisiae M3837
+    taxon: 1162672
+  - coverage: ~
+    fasta: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/WGS/RM11_1a/AAEG01.1.fsa_nt.gz
+    name: RM11_1a
+    prefix: AAEG
+    sciname: Saccharomyces cerevisiae RM11-1a
+    taxon: 285006
+  - coverage: 172.6x Illumina
+    fasta: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/WGS/M3836/AMQC01.1.fsa_nt.gz
+    name: M3836
+    prefix: AMQC
+    sciname: Saccharomyces cerevisiae M3836
+    taxon: 1162671
+  - coverage: 165.5x Illumina
+    fasta: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/WGS/M3839/AMQF01.1.fsa_nt.gz
+    name: M3839
+    prefix: AMQF
+    sciname: Saccharomyces cerevisiae M3839
+    taxon: 1162674
+  - coverage: 20x 454
+    fasta: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/WGS/VL3/AEJS01.1.fsa_nt.gz
+    name: VL3
+    prefix: AEJS
+    sciname: Saccharomyces cerevisiae VL3
+    taxon: 764100
+  - coverage: 20x 454
+    fasta: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/WGS/FostersB/AEHH01.1.fsa_nt.gz
+    name: FostersB
+    prefix: AEHH
+    sciname: Saccharomyces cerevisiae FostersB
+    taxon: 764102
+  - coverage: 31.2x 454 GS FLX; SOLiD 3; ABI 3730xl
+    fasta: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/WGS/NAM34_4C/BAUH01.1.fsa_nt.gz
+    name: NAM34_4C
+    prefix: BAUH
+    sciname: Saccharomyces cerevisiae NAM34-4C
+    taxon: 1352823
+  - coverage: 20x 454
+    fasta: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/WGS/Vin13/ADXC01.1.fsa_nt.gz
+    name: Vin13
+    prefix: ADXC
+    sciname: Saccharomyces cerevisiae Vin13
+    taxon: 764099
+  - coverage: 20x 454
+    fasta: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/WGS/Lalvin_QA23/ADVV01.1.fsa_nt.gz
+    name: Lalvin_QA23
+    prefix: ADVV
+    sciname: Saccharomyces cerevisiae Lalvin QA23
+    taxon: 764098
+  - coverage: 160.0x Illumina HiSeq
+    fasta: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/WGS/4124_S60/LCTD01.1.fsa_nt.gz
+    name: 4124_S60
+    original_id: 4932
+    prefix: LCTD
+    sciname: Saccharomyces cerevisiae 4124-S60
+    taxon: 100000002
+  - coverage: 301.0x Illumina MiSeq
+    fasta: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/WGS/Ethanol_Red/JWJK01.1.fsa_nt.gz
+    name: Ethanol_Red
+    original_id: 4932
+    prefix: JWJK
+    sciname: Saccharomyces cerevisiae Ethanol Red
+    taxon: 100000003
+  - coverage: 20x 454
+    fasta: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/WGS/FostersO/AEEZ01.1.fsa_nt.gz
+    name: FostersO
+    prefix: AEEZ
+    sciname: Saccharomyces cerevisiae FostersO
+    taxon: 764101
+  - coverage: ~
+    fasta: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/WGS/YJM789/AAFW02.1.fsa_nt.gz
+    name: YJM789
+    prefix: AAFW
+    sciname: Saccharomyces cerevisiae YJM789
+    taxon: 307796
+  - coverage: 14.0x 454
+    fasta: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/WGS/R008/APIP01.1.fsa_nt.gz
+    name: R008
+    prefix: APIP
+    sciname: Saccharomyces cerevisiae R008
+    taxon: 1182966
+  - coverage: 26.1x 454 GS FLX; SOLiD 3; ABI 3730xl
+    fasta: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/WGS/IR_2/BAUI01.1.fsa_nt.gz
+    name: IR_2
+    prefix: BAUI
+    sciname: Saccharomyces cerevisiae IR-2
+    taxon: 1352824
+  - coverage: 69.0x Illumina HiSeq
+    fasta: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/WGS/YPH499/JRIO01.1.fsa_nt.gz
+    name: YPH499
+    original_id: 4932
+    prefix: JRIO
+    sciname: Saccharomyces cerevisiae YPH499
+    taxon: 100000004
+  - coverage: 90.0x Illumina HiSeq
+    fasta: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/WGS/EBY_VW4000/JSFO01.1.fsa_nt.gz
+    name: EBY_VW4000
+    original_id: 4932
+    prefix: JSFO
+    sciname: Saccharomyces cerevisiae EBY.VW4000
+    taxon: 100000005
+  - coverage: 25.4x 454; ABI 3730
+    fasta: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/WGS/T7/AFDE01.1.fsa_nt.gz
+    name: T7
+    prefix: AFDE
+    sciname: Saccharomyces cerevisiae T7
+    taxon: 929585
+  - coverage: 196.0x Illumina MiSeq
+    fasta: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/WGS/ISO12/LBNP01.1.fsa_nt.gz
+    name: ISO12
+    original_id: 4932
+    prefix: LBNP
+    sciname: Saccharomyces cerevisiae ISO12
+    taxon: 100000006
+  - coverage: 106.0x Illumina HiSeq
+    fasta: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/WGS/SEY6210/JRIW01.1.fsa_nt.gz
+    name: SEY6210
+    original_id: 4932
+    prefix: JRIW
+    sciname: Saccharomyces cerevisiae SEY6210
+    taxon: 100000007
+  - coverage: ~
+    fasta: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/WGS/N85/CBYJ01.1.fsa_nt.gz
+    name: N85
+    prefix: CBYJ
+    sciname: Saccharomyces cerevisiae N85
+    taxon: 1201112
+  - coverage: 329.0x Illumina HiSeq
+    fasta: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/WGS/FY1679/JRIN01.1.fsa_nt.gz
+    name: FY1679
+    original_id: 4932
+    prefix: JRIN
+    sciname: Saccharomyces cerevisiae FY1679
+    taxon: 100000008
+  - coverage: 191.0x Illumina HiSeq
+    fasta: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/WGS/10560_6B/JRIQ01.1.fsa_nt.gz
+    name: 10560_6B
+    original_id: 4932
+    prefix: JRIQ
+    sciname: Saccharomyces cerevisiae 10560-6B
+    taxon: 100000009
+  - coverage: 89.0x Illumina HiSeq
+    fasta: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/WGS/CEN_PK2_1Ca/JRIV01.1.fsa_nt.gz
+    name: CEN_PK2_1Ca
+    original_id: 4932
+    prefix: JRIV
+    sciname: Saccharomyces cerevisiae CEN.PK2-1Ca
+    taxon: 100000010
+  - coverage: 209.0x Illumina HiSeq
+    fasta: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/WGS/BY4741/JRIS01.1.fsa_nt.gz
+    name: BY4741
+    prefix: JRIS
+    sciname: Saccharomyces cerevisiae BY4741
+    taxon: 1247190
+  - coverage: 184.0x Illumina HiSeq
+    fasta: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/WGS/FL100/JRIT01.1.fsa_nt.gz
+    name: FL100
+    prefix: JRIT
+    sciname: Saccharomyces cerevisiae FL100
+    taxon: 947036
+  - coverage: 112.0x Illumina HiSeq
+    fasta: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/WGS/D273_10B/JRIY01.1.fsa_nt.gz
+    name: D273_10B
+    original_id: 4932
+    prefix: JRIY
+    sciname: Saccharomyces cerevisiae D273-10B
+    taxon: 100000011
+  - coverage: 112.0x Illumina HiSeq
+    fasta: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/WGS/X2180_1A/JRIX01.1.fsa_nt.gz
+    name: X2180_1A
+    original_id: 4932
+    prefix: JRIX
+    sciname: Saccharomyces cerevisiae X2180-1A
+    taxon: 100000012
+  - coverage: 112.0x Illumina HiSeq
+    fasta: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/WGS/Y55/JRIF01.1.fsa_nt.gz
+    name: Y55
+    original_id: 4932
+    prefix: JRIF
+    sciname: Saccharomyces cerevisiae Y55
+    taxon: 100000013
+  - coverage: 301.0x Illumina HiSeq
+    fasta: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/WGS/W303/JRIU01.1.fsa_nt.gz
+    name: W303
+    prefix: JRIU
+    sciname: Saccharomyces cerevisiae W303
+    taxon: 580240
+  - coverage: 103.0x Illumina HiSeq
+    fasta: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/WGS/BY4742/JRIR01.1.fsa_nt.gz
+    name: BY4742
+    original_id: 4932
+    prefix: JRIR
+    sciname: Saccharomyces cerevisiae BY4742
+    taxon: 100000014
+  - coverage: 154.0x Illumina HiSeq
+    fasta: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/WGS/JK9_3d/JRIZ01.1.fsa_nt.gz
+    name: JK9_3d
+    original_id: 4932
+    prefix: JRIZ
+    sciname: Saccharomyces cerevisiae JK9-3d
+    taxon: 100000015
+  - coverage: 261.0x Illumina HiSeq
+    fasta: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/WGS/SK1/JRIH01.1.fsa_nt.gz
+    name: SK1
+    prefix: JRIH
+    sciname: Saccharomyces cerevisiae SK1
+    taxon: 580239
+  - coverage: 12x 454; 58x Solexa single-end reads; 95x Solexa paired-end 454; Solexa
+    fasta: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/WGS/JAY291/ACFL01.1.fsa_nt.gz
+    name: JAY291
+    prefix: ACFL
+    sciname: Saccharomyces cerevisiae JAY291
+    taxon: 574961
+  - coverage: 189.0x Illumina HiSeq
+    fasta: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/WGS/K11/JRIJ01.1.fsa_nt.gz
+    name: K11
+    prefix: JRIJ
+    sciname: Saccharomyces cerevisiae K11
+    taxon: 12381
+  - coverage: 14.0x 454
+    fasta: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/WGS/R103/APIR01.1.fsa_nt.gz
+    name: R103
+    prefix: APIR
+    sciname: Saccharomyces cerevisiae R103
+    taxon: 1182967
+  - coverage: 202x Illumina MiSeq
+    fasta: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/WGS/UFMG_A_905/JACO02.1.fsa_nt.gz
+    name: UFMG_A_905
+    prefix: JACO
+    sciname: Saccharomyces cerevisiae UFMG A-905
+    taxon: 1434269
+  - coverage: 186.0x Illumina HiSeq
+    fasta: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/WGS/L1528/JRIK01.1.fsa_nt.gz
+    name: L1528
+    original_id: 4932
+    prefix: JRIK
+    sciname: Saccharomyces cerevisiae L1528
+    taxon: 100000016
+  - coverage: 102.0x Illumina HiSeq
+    fasta: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/WGS/YJM339/JRIE01.1.fsa_nt.gz
+    name: YJM339
+    prefix: JRIE
+    sciname: Saccharomyces cerevisiae YJM339
+    taxon: 1337529
+  - coverage: 15.0x 454
+    fasta: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/WGS/GSY2239/LDOE01.1.fsa_nt.gz
+    name: GSY2239
+    original_id: 4932
+    prefix: LDOE
+    sciname: Saccharomyces cerevisiae GSY2239
+    taxon: 100000017
+  - coverage: 180.0x Illumina HiSeq
+    fasta: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/WGS/RedStar/JRIL01.1.fsa_nt.gz
+    name: RedStar
+    original_id: 4932
+    prefix: JRIL
+    sciname: Saccharomyces cerevisiae RedStar
+    taxon: 100000018
+  - coverage: 18x 454; llumina
+    fasta: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/WGS/CEN_PK113_7D/AEHG01.1.fsa_nt.gz
+    name: CEN_PK113_7D
+    prefix: AEHG
+    sciname: Saccharomyces cerevisiae CEN.PK113-7D
+    taxon: 889517
+  - coverage: 96.0x Illumina HiSeq
+    fasta: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/WGS/YPS163/JRIC01.1.fsa_nt.gz
+    name: YPS163
+    prefix: JRIC
+    sciname: Saccharomyces cerevisiae YPS163
+    taxon: 538976
+  - coverage: 177.0x Illumina HiSeq
+    fasta: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/WGS/BC187/JRII01.1.fsa_nt.gz
+    name: BC187
+    original_id: 4932
+    prefix: JRII
+    sciname: Saccharomyces cerevisiae BC187
+    taxon: 100000019
+  - coverage: 176.0x Illumina HiSeq
+    fasta: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/WGS/DBVPG6044/JRIG01.1.fsa_nt.gz
+    name: DBVPG6044
+    original_id: 4932
+    prefix: JRIG
+    sciname: Saccharomyces cerevisiae DBVPG6044
+    taxon: 100000020
+  - coverage: 14.0x 454
+    fasta: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/WGS/P283/AOJC01.1.fsa_nt.gz
+    name: P283
+    prefix: AOJC
+    sciname: Saccharomyces cerevisiae P283
+    taxon: 1177187
+  - coverage: 95.0x Illumina HiSeq
+    fasta: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/WGS/YPS128/JRID01.1.fsa_nt.gz
+    name: YPS128
+    original_id: 4932
+    prefix: JRID
+    sciname: Saccharomyces cerevisiae YPS128
+    taxon: 100000021
+  - coverage: 9.1x ABI 3730xl
+    fasta: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/WGS/Kyokai_no_7/BABQ01.1.fsa_nt.gz
+    name: Kyokai_no_7
+    prefix: BABQ
+    sciname: Saccharomyces cerevisiae Kyokai no. 7
+    taxon: 721032
+  - coverage: 100.0x Illumina HiSeq
+    fasta: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/WGS/YS9/JRIB01.1.fsa_nt.gz
+    name: YS9
+    original_id: 4932
+    prefix: JRIB
+    sciname: Saccharomyces cerevisiae YS9
+    taxon: 100000022
+  - coverage: 14.0x 454
+    fasta: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/WGS/P301/APIQ01.1.fsa_nt.gz
+    name: P301
+    prefix: APIQ
+    sciname: Saccharomyces cerevisiae P301
+    taxon: 1182968
+  - coverage: 30x 454 Roche GS Junior
+    fasta: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/WGS/EC9_8/AGSJ01.1.fsa_nt.gz
+    name: EC9_8
+    prefix: AGSJ
+    sciname: Saccharomyces cerevisiae EC9-8
+    taxon: 1095001
+  - coverage: 16.7X 454; ABI 3730
+    fasta: /Users/wangq/data/alignment/Fungi/GENOMES/scer_new/WGS/YJM269/AEWN01.1.fsa_nt.gz
+    name: YJM269
+    prefix: AEWN
+    sciname: Saccharomyces cerevisiae YJM269
+    taxon: 929586
+data_dir: '~/data/alignment/Fungi/scer_new'
+group_name: scer_new
+rm_species: Fungi
