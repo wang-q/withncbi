@@ -70,15 +70,15 @@ for genomes out of WGS, which usually in better assembling levels.
 1. `gen_pop_conf.pl`
 
     ```bash
-    mkdir -p ~/data/alignment/Fungi/scer_new
-    cd ~/data/alignment/Fungi/scer_new
-
 	# create downloaded list
     cat ~/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/scer_new.seq.csv \
         | grep -v "^#" \
         | cut -d',' -f1,3 \
         | uniq \
         | perl -nl -a -F"," -e 'printf qq{    --download "name=%s;taxon=%s" \\\n}, $F[0], $F[1];'
+
+    mkdir -p ~/data/alignment/Fungi/scer_new
+    cd ~/data/alignment/Fungi/scer_new
 
     perl ~/Scripts/withncbi/pop/gen_pop_conf.pl \
         -i ~/data/alignment/Fungi/GENOMES/scer_new/WGS/scer_new.data.yml \

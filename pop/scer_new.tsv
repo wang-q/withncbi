@@ -55,13 +55,13 @@ CEN_PK113_7D	AEHG	Saccharomyces cerevisiae CEN.PK113-7D	589
 YPS163	JRIC	Saccharomyces cerevisiae	607
 BC187	JRII	Saccharomyces cerevisiae	614
 DBVPG6044	JRIG	Saccharomyces cerevisiae	624
-P283	AOJC	Saccharomyces cerevisiae P283	665
-YPS128	JRID	Saccharomyces cerevisiae	670
+#P283	AOJC	Saccharomyces cerevisiae P283	665
+#YPS128	JRID	Saccharomyces cerevisiae	670
 Kyokai_no_7	BABQ	Saccharomyces cerevisiae Kyokai no. 7	705
-YS9	JRIB	Saccharomyces cerevisiae	851
-P301	APIQ	Saccharomyces cerevisiae P301	990
-EC9_8	AGSJ	Saccharomyces cerevisiae EC9-8	1088
-YJM269	AEWN	Saccharomyces cerevisiae YJM269	1179
+#YS9	JRIB	Saccharomyces cerevisiae	851
+#P301	APIQ	Saccharomyces cerevisiae P301	990
+#EC9_8	AGSJ	Saccharomyces cerevisiae EC9-8	1088
+#YJM269	AEWN	Saccharomyces cerevisiae YJM269	1179
 #UWOPS05_217_3	JRIM	Saccharomyces cerevisiae	1348
 #UC5	AFDD	Saccharomyces cerevisiae UC5	1527 #454
 #CLIB215	AEWP	Saccharomyces cerevisiae CLIB215	1566
