@@ -437,7 +437,7 @@ perl [% aligndb %]/extra/two_way_batch.pl \
     -taxon [% working_dir %]/taxon.csv \
     -chr [% working_dir %]/chr_length.csv \
     -lt 1000 \
-    --parallel [% parallel %]
+    --parallel [% parallel %] \
 [% IF nostat -%]
     -r 1,2
 [% ELSE -%]

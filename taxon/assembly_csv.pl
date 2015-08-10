@@ -110,6 +110,9 @@ while ( defined( my $line = $handle->getline ) ) {
     $accession =~ s/\.\d+//;
 
     my $seq_name = $ucsc ? $fields[9] : $fields[0];
+    if ($seq_name =~ /(.+)\./) {
+        $seq_name = $1;
+    }
 
     $csv->print( *STDOUT, [ $strain_name, $accession, $taxon_id, $seq_name ] );
 }

@@ -150,14 +150,12 @@ for genomes out of WGS, which usually in better assembling levels.
     # Download S288c and EC1118 separately
     perl ~/Scripts/withncbi/taxon/assembly_csv.pl \
         -f ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/All/GCF_000146045.2.assembly.txt \
-        -name S288c \
-        --nuclear \
+        --nuclear -name S288c \
         > S288c.seq.csv
 
     perl ~/Scripts/withncbi/taxon/assembly_csv.pl \
         -f ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/All/GCA_000218975.1.assembly.txt \
         --nuclear --genbank --scaffold -name EC1118 \
-        | cut -d',' -f1,2,3 \
         > EC1118.seq.csv
 
     mysql -ualignDB -palignDB ar_genbank -e "SELECT organism_name, species, assembly_accession FROM ar WHERE wgs_master = '' AND organism_name != species AND species_id = 4932" \
@@ -170,8 +168,8 @@ for genomes out of WGS, which usually in better assembling levels.
     sh ass_csv.sh
 
     echo "#strain_name,accession,strain_taxon_id,seq_name" > scer_new.seq.csv
-    cat S288c.seq.csv  EC1118.seq.csv non_wgs.seq.csv \
-        | grep -v '^#' | grep "\S" \
+    cat S288c.seq.csv EC1118.seq.csv non_wgs.seq.csv \
+        | perl -nl -e '/^#/ and next; /^\s*$/ and next; print;' \
         >> scer_new.seq.csv
 
     # Download, rename files and change fasta headers
