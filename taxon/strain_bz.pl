@@ -39,8 +39,9 @@ my $stopwatch = AlignDB::Stopwatch->new(
 );
 
 my $working_dir = ".";
-my $seq_dir;    #  will do prep_fa() from this dir or use seqs store in $working_dir
-my @keep;       # don't touch anything inside fasta files
+my $seq_dir
+    ;    #  will do prep_fa() from this dir or use seqs store in $working_dir
+my @keep;    # don't touch anything inside fasta files
 
 my $target_id;
 my @query_ids;
@@ -211,18 +212,8 @@ if ($seq_dir) {
     }
 }
 
-{
-    # write seq_pair.csv and left seq_pair_batch.pl to handle other things
-    print "Create seq_pair.csv\n";
-    my $seq_pair_file = File::Spec->catfile( $working_dir, "seq_pair.csv" );
-    open my $fh, '>', $seq_pair_file;
-    for my $query_id (@query_ids) {
-        print {$fh} File::Spec->catdir( $working_dir, $target_id ), ",",
-            File::Spec->catdir( $working_dir, $query_id ), "\n";
-    }
-    close $fh;
-}
-
+# names to ids.
+my $id_of = {};
 {
     print "Create id2name.csv\n";
     my $id2name_file = File::Spec->catfile( $working_dir, "id2name.csv" );
@@ -232,6 +223,7 @@ if ($seq_dir) {
         # if not set --use_name, use id as strain name
         for my $id ( $target_id, @query_ids ) {
             print {$fh} "$id,$id\n";
+            $id_of->{$id} = $id;
         }
     }
     else {
@@ -239,6 +231,7 @@ if ($seq_dir) {
             my ($id)
                 = map { $_->{taxon} } grep { $_->{name} eq $name } @data;
             print {$fh} "$id,$name\n";
+            $id_of->{$name} = $id;
         }
     }
     close $fh;
@@ -434,24 +427,23 @@ cd [% working_dir %]
 sleep 1;
 
 #----------------------------#
-# seq_pair_batch
+# pair db
 #----------------------------#
-perl [% aligndb %]/extra/seq_pair_batch.pl \
-    --bin [% kent_bin %] \
-[% IF use_name -%]
-    --id [% working_dir %]/id2name.csv \
-[% ELSE -%]
-    --dir_as_taxon \
-[% END -%]
-    --parallel [% parallel %] \
-    -f [% working_dir %]/seq_pair.csv \
+[% FOREACH q IN query_ids -%]
+perl [% aligndb %]/extra/two_way_batch.pl \
+    -t="[% id_of.$target_id %],[% target_id %]" -q="[% id_of.$q %],[% q %]" \
+    -d [% target_id %]vs[% q %] \
+    -da [% working_dir %]/[% target_id %]vs[% q %] \
     -taxon [% working_dir %]/taxon.csv \
     -chr [% working_dir %]/chr_length.csv \
     -lt 1000 \
+    --parallel [% parallel %]
 [% IF nostat -%]
     -r 1,2
 [% ELSE -%]
     -r 1,2,40
+[% END -%]
+
 [% END -%]
 
 #----------------------------#
@@ -518,6 +510,7 @@ EOF
                 target_id   => $target_id,
                 outgroup_id => $outgroup_id,
                 query_ids   => \@query_ids,
+                id_of       => $id_of,
                 multi_name  => $multi_name,
                 kent_bin    => $kent_bin,
                 use_name    => $use_name,
@@ -717,7 +710,7 @@ sleep 1;
 
 find . -type f \
     | grep -v -E "\.(sh|2bit|bat)$" \
-    | grep -v -E "(chr_length|id2name|taxon|seq_pair|fake_taxon)\.csv$" \
+    | grep -v -E "(chr_length|id2name|taxon|fake_taxon)\.csv$" \
     | grep -v -F "fake_tree.nwk" \
     > file_list.temp.txt
 

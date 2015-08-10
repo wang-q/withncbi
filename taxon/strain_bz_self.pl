@@ -884,7 +884,7 @@ sleep 1;
 
 find . -type f \
     | grep -v -E "\.(sh|2bit|bat)$" \
-    | grep -v -E "(chr_length|id2name|taxon|seq_pair|fake_taxon)\.csv$" \
+    | grep -v -E "(chr_length|id2name|taxon|fake_taxon)\.csv$" \
     | grep -v -F "fake_tree.nwk" \
     > file_list.temp.txt
 
