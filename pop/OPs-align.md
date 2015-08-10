@@ -185,7 +185,8 @@ for genomes out of WGS, which usually in better assembling levels.
 	    --download "name=YJM1574;taxon=1294386" \
 	    --download "name=YJM1615;taxon=1294388" \
 	    --download "name=YJM1304;taxon=1294344" \
-	    --download "name=YJM1434;taxon=1294371"
+	    --download "name=YJM1434;taxon=1294371" \
+        --plan 'name=three_way;t=S288c;qs=RM11_1a,YJM789'
 
     ```
 
@@ -209,7 +210,7 @@ for genomes out of WGS, which usually in better assembling levels.
     sh 7_multi_db_only.sh
 
     # other plans
-    sh plan_four_way.sh
+    sh plan_three_way.sh
 
     sh 5_multi_cmd.sh
     sh 7_multi_db_only.sh
