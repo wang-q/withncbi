@@ -18,7 +18,7 @@ doc/alignment
 *.xls
 *.xlsx
 *.csv
-*.bak
+*.pdf
 *.fa
 *.fas
 *.fasta
