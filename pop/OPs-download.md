@@ -228,7 +228,7 @@ for genomes out of WGS, which usually in better assembling levels.
     echo > non_wgs.seq.csv
     sh ass_csv.sh
 
-    echo "#strain_name,accession,strain_taxon_id,seq_name" > scer_new.seq.csv
+    echo "#strain_name,accession,strain_taxon_id,seq_name" > scer_100.seq.csv
     cat S288c.seq.csv non_wgs.seq.csv \
         | perl -nl -e '/^#/ and next; /^\s*$/ and next; print;' \
         >> scer_100.seq.csv

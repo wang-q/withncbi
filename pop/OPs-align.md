@@ -35,15 +35,16 @@ for genomes out of WGS, which usually in better assembling levels.
         --opt data_dir='~/data/alignment/Fungi/saccharomyces' \
         --opt rm_species=Fungi \
         --dd ~/data/alignment/Fungi/GENOMES/saccharomyces/DOWNLOAD \
-        --downloaded 'name=Scer_S288c;taxon=559292;sciname=Saccharomyces cerevisiae S288c' \
-        --plan 'name=four_way;t=Scer_S288c;qs=Sbou_ATCC_MYA_796,Spar_NRRL_Y_17217,Spas_CBS_1483'
+        --download 'name=Scer_S288c;taxon=559292;sciname=Saccharomyces cerevisiae S288c' \
+        --plan 'name=plan_test;t=Scer_S288c;qs=Spar_NRRL_Y_17217,Spas_CBS_1483,Ssp_ATCC_MYA_796'
+
     ```
 
 2. Rest routing things.
 
     ```bash
     # pop_prep.pl
-    perl ~/Scripts/withncbi/pop/pop_prep.pl -p 12 -i ~/Scripts/withncbi/pop/saccharomyces_test.yml
+    perl ~/Scripts/withncbi/pop/pop_prep.pl -p 8 -i ~/Scripts/withncbi/pop/saccharomyces_test.yml
 
     sh 01_file.sh
     sh 02_rm.sh
@@ -59,40 +60,122 @@ for genomes out of WGS, which usually in better assembling levels.
     sh 7_multi_db_only.sh
 
     # other plans
-    sh plan_four_way.sh
+    sh plan_plan_test.sh
 
     sh 5_multi_cmd.sh
     sh 7_multi_db_only.sh
     ```
 
-### *Scer_new* WGS and ASSEMBLY
+3. Create a summary xlsx.
+
+Run `chart.bat` under Windows.
+
+Manually combine `~/data/alignment/Fungi/GENOMES/saccharomyces/WGS/saccharomyces.csv` and
+`~/data/alignment/Fungi/saccharomyces/basicstat.xlsx`.
+
+### *Scer_wgs* WGS
 
 1. `gen_pop_conf.pl`
 
     ```bash
-	# create downloaded list
-    cat ~/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD/scer_new.seq.csv \
+    export GROUP_NAME=scer_wgs
+
+	# create downloaded genome list
+    cat ~/data/alignment/Fungi/GENOMES/${GROUP_NAME}/DOWNLOAD/${GROUP_NAME}.seq.csv \
         | grep -v "^#" \
         | cut -d',' -f1,3 \
         | uniq \
         | perl -nl -a -F"," -e 'printf qq{    --download "name=%s;taxon=%s" \\\n}, $F[0], $F[1];'
 
-    mkdir -p ~/data/alignment/Fungi/scer_new
-    cd ~/data/alignment/Fungi/scer_new
+    mkdir -p ~/data/alignment/Fungi/${GROUP_NAME}
+    cd ~/data/alignment/Fungi/${GROUP_NAME}
 
     perl ~/Scripts/withncbi/pop/gen_pop_conf.pl \
-        -i ~/data/alignment/Fungi/GENOMES/scer_new/WGS/scer_new.data.yml \
-        -o ~/Scripts/withncbi/pop/scer_new_test.yml \
-        -d ~/data/alignment/Fungi/GENOMES/scer_new/WGS \
+        -i ~/data/alignment/Fungi/GENOMES/${GROUP_NAME}/WGS/${GROUP_NAME}.data.yml \
+        -o ~/Scripts/withncbi/pop/${GROUP_NAME}_test.yml \
+        -d ~/data/alignment/Fungi/GENOMES/${GROUP_NAME}/WGS \
         -m prefix \
         -r '*.fsa_nt.gz' \
-        --opt group_name=scer_new \
+        --opt group_name=${GROUP_NAME} \
         --opt base_dir='~/data/alignment/Fungi' \
-        --opt data_dir='~/data/alignment/Fungi/scer_new' \
+        --opt data_dir="~/data/alignment/Fungi/${GROUP_NAME}" \
         --opt rm_species=Fungi \
-        --dd ~/data/alignment/Fungi/GENOMES/scer_new/DOWNLOAD \
+        --dd ~/data/alignment/Fungi/GENOMES/${GROUP_NAME}/DOWNLOAD \
 	    --download "name=S288c;taxon=559292" \
 	    --download "name=EC1118;taxon=643680" \
+        --plan 'name=five_way;t=S288c;qs=EC1118,RM11_1a,YJM789,BC187'
+
+	unset GROUP_NAME
+    ```
+
+2. Rest routing things.
+
+    ```bash
+    # pop_prep.pl
+    perl ~/Scripts/withncbi/pop/pop_prep.pl -p 8 -i ~/Scripts/withncbi/pop/scer_wgs_test.yml
+
+    sh 01_file.sh
+    sh 02_rm.sh
+    sh 03_strain_info.sh
+
+    # plan_ALL.sh
+    sh plan_ALL.sh
+
+    sh 1_real_chr.sh
+    sh 3_pair_cmd.sh
+    sh 4_rawphylo.sh
+    sh 5_multi_cmd.sh
+    sh 7_multi_db_only.sh
+
+    # other plans
+    sh plan_five_way.sh
+
+    sh 5_multi_cmd.sh
+    sh 7_multi_db_only.sh
+    ```
+
+3. Create a summary xlsx.
+
+Run `chart.bat` under Windows.
+
+Manually combine `~/data/alignment/Fungi/GENOMES/scer_wgs/WGS/scer_wgs.csv` and
+`~/data/alignment/Fungi/scer_wgs/basicstat.xlsx`.
+
+### *Scer_100* ASSEMBLY
+
+1. `gen_pop_conf.pl`
+
+    ```bash
+    export GROUP_NAME=scer_100
+
+	# create downloaded genome list
+    cat ~/data/alignment/Fungi/GENOMES/${GROUP_NAME}/DOWNLOAD/${GROUP_NAME}.seq.csv \
+        | grep -v "^#" \
+        | cut -d',' -f1,3 \
+        | uniq \
+        | perl -nl -a -F"," -e 'printf qq{    --download "name=%s;taxon=%s" \\\n}, $F[0], $F[1];'
+
+    cat ~/data/alignment/Fungi/GENOMES/${GROUP_NAME}/DOWNLOAD/${GROUP_NAME}.seq.csv \
+        | grep -v "^#" \
+        | cut -d',' -f1,3 \
+        | uniq \
+        | perl -nl -a -F"," -e 'printf qq{%s,}, $F[0];'
+
+    mkdir -p ~/data/alignment/Fungi/${GROUP_NAME}
+    cd ~/data/alignment/Fungi/${GROUP_NAME}
+
+    perl ~/Scripts/withncbi/pop/gen_pop_conf.pl \
+        -i ~/data/alignment/Fungi/GENOMES/${GROUP_NAME}/WGS/${GROUP_NAME}.data.yml \
+        -o ~/Scripts/withncbi/pop/${GROUP_NAME}_test.yml \
+        -d ~/data/alignment/Fungi/GENOMES/${GROUP_NAME}/WGS \
+        -m prefix \
+        -r '*.fsa_nt.gz' \
+        --opt group_name=${GROUP_NAME} \
+        --opt base_dir='~/data/alignment/Fungi' \
+        --opt data_dir="~/data/alignment/Fungi/${GROUP_NAME}" \
+        --opt rm_species=Fungi \
+        --dd ~/data/alignment/Fungi/GENOMES/${GROUP_NAME}/DOWNLOAD \
+	    --download "name=S288c;taxon=559292" \
 	    --download "name=YJM993;taxon=1294331" \
 	    --download "name=YJM1078;taxon=1296266" \
 	    --download "name=YJM195;taxon=1294305" \
@@ -186,15 +269,16 @@ for genomes out of WGS, which usually in better assembling levels.
 	    --download "name=YJM1615;taxon=1294388" \
 	    --download "name=YJM1304;taxon=1294344" \
 	    --download "name=YJM1434;taxon=1294371" \
-        --plan 'name=three_way;t=S288c;qs=RM11_1a,YJM789'
+        --plan 'name=plan_og_spar;t=S288c;qs=YJM993,YJM1078,YJM195,YJM270,YJM470,YJM683,YJM689,YJM693,YJM1248,YJM1252,YJM1273,YJM1342,YJM1385,YJM1387,YJM1388,YJM1389,YJM1399,YJM1402,YJM1418,YJM1439,YJM1443,YJM1444,YJM1447,YJM1460,YJM1549,YJM1573,YJM1592,YJM244,YJM1083,YJM1129,YJM189,YJM193,YJM248,YJM271,YJM320,YJM326,YJM428,YJM450,YJM451,YJM453,YJM456,YJM541,YJM554,YJM555,YJM627,YJM681,YJM682,YJM969,YJM972,YJM975,YJM978,YJM981,YJM984,YJM987,YJM990,YJM996,YJM1133,YJM1190,YJM1199,YJM1202,YJM1208,YJM1242,YJM1244,YJM1250,YJM1307,YJM1311,YJM1326,YJM1332,YJM1336,YJM1338,YJM1341,YJM1355,YJM1356,YJM1381,YJM1383,YJM1386,YJM1400,YJM1401,YJM1415,YJM1417,YJM1419,YJM1433,YJM1450,YJM1463,YJM1477,YJM1478,YJM1479,YJM1526,YJM1527,YJM1574,YJM1615;o=Spar'
 
+	unset GROUP_NAME
     ```
 
 2. Rest routing things.
 
     ```bash
     # pop_prep.pl
-    perl ~/Scripts/withncbi/pop/pop_prep.pl -p 8 -i ~/Scripts/withncbi/pop/scer_new_test.yml
+    perl ~/Scripts/withncbi/pop/pop_prep.pl -p 8 -i ~/Scripts/withncbi/pop/scer_100_test.yml
 
     sh 01_file.sh
     sh 02_rm.sh
@@ -210,7 +294,7 @@ for genomes out of WGS, which usually in better assembling levels.
     sh 7_multi_db_only.sh
 
     # other plans
-    sh plan_three_way.sh
+    sh plan_og_spar.sh
 
     sh 5_multi_cmd.sh
     sh 7_multi_db_only.sh
