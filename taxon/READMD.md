@@ -160,7 +160,7 @@ sed -i".bak" "s/Glaucocystophyceae,NA/Glaucocystophyceae,Glaucophyta/" plastid.C
 Species and genus should not be "NA" and genus has 2 or more members.
 
 ```text
-904 ---------> 899 ---------> 465 ---------> 670
+919 ---------> 914 ---------> 473 ---------> 683
         NA           genus          family
 ```
 
@@ -174,7 +174,7 @@ cat plastid.CHECKME.csv \
     '/^#/ and next; ($F[3] eq q{NA} or $F[4] eq q{NA} ) and next; print' \
     > plastid.tmp
 
-# 899
+# 914
 wc -l plastid.tmp
 
 #----------------------------#
@@ -189,7 +189,7 @@ cat plastid.tmp \
 # intersect between two files
 grep -F -f genus.tmp plastid.tmp > plastid.genus.tmp
 
-# 465
+# 473
 wc -l plastid.genus.tmp
 
 #----------------------------#
@@ -203,15 +203,18 @@ cat plastid.genus.tmp \
 # intersect between two files
 grep -F -f family.tmp plastid.tmp > plastid.family.tmp
 
-# 670
+# 683
 wc -l plastid.family.tmp
 
+#----------------------------#
 # results produced in this step
+#----------------------------#
 head -n 1 plastid.CHECKME.csv > plastid.DOWNLOAD.csv
 cat plastid.family.tmp >> plastid.DOWNLOAD.csv
 
 # clean
 rm *.tmp *.bak
+
 ```
 
 ## Find a way to name these.
@@ -253,13 +256,18 @@ cat plastid.DOWNLOAD.csv \
 # Olea europaea subsp. europaea
 # Olea europaea subsp. maroccana
 # Olea woodiana subsp. woodiana
+# Oryza sativa Indica Group
 # Oryza sativa Japonica Group
 # Phalaenopsis aphrodite subsp. formosana
 # Phyllostachys nigra var. henonis
+# Plasmodium chabaudi chabaudi
+# Plasmodium falciparum HB3
 # Pseudotsuga sinensis var. wilsoniana
 # Saccharum hybrid cultivar NCo 310
 # Saccharum hybrid cultivar SP80-3280
 # Thalassiosira oceanica CCMP1005
+# Theileria orientalis strain Shintoku
+# Theileria parva strain Muguga
 ```
 
 Create abbreviations.
@@ -306,13 +314,13 @@ cat ../plastid_summary/plastid.ABBR.csv \
 
 # local, Runtime 10 seconds.
 # with --entrez, Runtime 7 minutes and 23 seconds.
-# And can't find is still can't find.
+# And which-can't-find is still which-can't-find.
 cat ../plastid_summary/plastid.ABBR.csv \
     | grep -v '^#' \
     | perl -nl -a -F"," -e 'print qq{$F[0],$F[9]}' \
     | perl ~/Scripts/withncbi/taxon/strain_info.pl --stdin --withname --file plastid_ncbi.csv
 
-# some warnings fro bioperl, normally just ignore them
+# some warnings from bioperl, normally just ignore them
 perl ~/Scripts/withncbi/taxon/batch_get_seq.pl -f plastid_name_acc_id.csv -p 2>&1 | tee plastid_seq.log
 
 # rsync --progress -av wangq@45.79.80.100:/home/wangq/data/organelle/ ~/data/organelle/
@@ -323,7 +331,9 @@ find . -name "*.fasta" | wc -l
 
 ## Create alignment plans
 
-We got 47 orders, 58 families, 113 genera, 451 species and **460** accessions.
+We got **473** accessions.
+
+Numbers for higher ranks are: 49 orders, 60 families, 118 genera and 465 species.
 
 ```bash
 cd ~/data/organelle/plastid_summary
@@ -338,14 +348,14 @@ cat plastid.ABBR.csv \
 # intersect between two files
 grep -F -f genus.tmp plastid.ABBR.csv > plastid.GENUS.csv
 
-# 460
+# 473
 wc -l plastid.GENUS.csv
 
 #   count every ranks
-#   47 order.list.tmp
-#   58 family.list.tmp
-#  113 genus.list.tmp
-#  451 species.list.tmp
+#   49 order.list.tmp
+#   60 family.list.tmp
+#  118 genus.list.tmp
+#  465 species.list.tmp
 cut -d',' -f 4 plastid.GENUS.csv | sort | uniq > species.list.tmp
 cut -d',' -f 5 plastid.GENUS.csv | sort | uniq > genus.list.tmp
 cut -d',' -f 6 plastid.GENUS.csv | sort | uniq > family.list.tmp
@@ -363,6 +373,7 @@ cat plastid.GENUS.tmp \
 
 # clean
 rm *.tmp *.bak
+
 ```
 
 Create alignments without outgroups.
