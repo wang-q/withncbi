@@ -18,20 +18,20 @@ I'm sure there are no commas in names. So for convenient, don't use Text::CSV_XS
 Open browser and visit [NCBI plastid page](http://www.ncbi.nlm.nih.gov/genomes/GenomesGroup.cgi?taxid=33090&opt=plastid).
 Save page to a local file, html only. In this case, it's `doc/green_plants_plastid_150805.html`.
 
-All [Eukaryota](http://www.ncbi.nlm.nih.gov/genomes/GenomesGroup.cgi?opt=plastid&taxid=2759), `doc/eukaryota_plastid_150806.html`.
+All [Eukaryota](http://www.ncbi.nlm.nih.gov/genomes/GenomesGroup.cgi?opt=plastid&taxid=2759), `doc/eukaryota_plastid_150826.html`.
 
 Or [this link](http://www.ncbi.nlm.nih.gov/genome/browse/?report=5).
 
 ```text
-Eukaryota (2759)                901
-    Viridiplantae (33090)       820
+Eukaryota (2759)                908
+    Viridiplantae (33090)       828
         Chlorophyta (3041)      58
-        Streptophyta (35493)    762
+        Streptophyta (35493)    770
 ```
 
 Use `taxon/id_seq_dom_select.pl` to extract Taxonomy ids and genbank accessions.
 
-Got **898** accessions.
+Got **919** accessions.
 
 ```bash
 mkdir -p ~/data/organelle/plastid_genomes
@@ -39,9 +39,28 @@ cd ~/data/organelle/plastid_genomes
 
 # id,acc
 # 996148,NC_017006
-perl ~/Scripts/withncbi/taxon/id_seq_dom_select.pl ~/Scripts/withncbi/doc/eukaryota_plastid_150806.html > plastid_id_seq.csv
+perl ~/Scripts/withncbi/taxon/id_seq_dom_select.pl ~/Scripts/withncbi/doc/eukaryota_plastid_150826.html > webpage_id_seq.csv
 
-# 898
+# 904
+cat webpage_id_seq.csv | grep -v "^#" | wc -l
+```
+
+Use `taxon/gb_taxon_locus.pl` to extract information from refseq plastid file.
+
+```bash
+wget -N ftp://ftp.ncbi.nlm.nih.gov/genomes/refseq/organelle/plastid/plastid.1.genomic.gbff.gz
+gzip -c -d plastid.1.genomic.gbff.gz > plastid.1.genomic.gbff
+
+perl ~/Scripts/withncbi/taxon/gb_taxon_locus.pl plastid.1.genomic.gbff > refseq_id_seq.csv
+
+# 805
+cat refseq_id_seq.csv | grep -v "^#" | wc -l
+
+# combine
+cat webpage_id_seq.csv refseq_id_seq.csv \
+    | sort -u -t, -k1,1 > plastid_id_seq.csv
+
+# 919
 cat plastid_id_seq.csv | grep -v "^#" | wc -l
 ```
 
@@ -121,25 +140,27 @@ sed -i".bak" "s/Phaeocystales,NA,NA/Phaeocystales,Coccolithophyceae,Haptophyta/"
 
 sed -i".bak" "s/Glaucocystophyceae,NA/Glaucocystophyceae,Glaucophyta/" plastid.CHECKME.csv
 
-# Can't get clear taxon information
-# Genus
-# Chromera
-# Elliptochloris
-# Ettlia
-# Picocystis
-# Xylochloris
-
-# Species
-# Chromerida sp. RM11
-# Trebouxiophyceae sp. MX-AZ01
 ```
+
+### Can't get clear taxon information
+
+* Genus
+    + Chromera
+    + Elliptochloris
+    + Ettlia
+    + Picocystis
+    + Xylochloris
+
+* Species
+    + Chromerida sp. RM11
+    + Trebouxiophyceae sp. MX-AZ01
 
 ## Filtering based on valid families and genera
 
 Species and genus should not be "NA" and genus has 2 or more members.
 
 ```text
-898 ---------> 894 ---------> 460 ---------> 666
+904 ---------> 899 ---------> 465 ---------> 670
         NA           genus          family
 ```
 
@@ -153,7 +174,7 @@ cat plastid.CHECKME.csv \
     '/^#/ and next; ($F[3] eq q{NA} or $F[4] eq q{NA} ) and next; print' \
     > plastid.tmp
 
-# 894
+# 899
 wc -l plastid.tmp
 
 #----------------------------#
@@ -168,7 +189,7 @@ cat plastid.tmp \
 # intersect between two files
 grep -F -f genus.tmp plastid.tmp > plastid.genus.tmp
 
-# 460
+# 465
 wc -l plastid.genus.tmp
 
 #----------------------------#
@@ -182,7 +203,7 @@ cat plastid.genus.tmp \
 # intersect between two files
 grep -F -f family.tmp plastid.tmp > plastid.family.tmp
 
-# 666
+# 670
 wc -l plastid.family.tmp
 
 # results produced in this step
@@ -224,6 +245,7 @@ cat plastid.DOWNLOAD.csv \
 # Fragaria vesca subsp. bracteata
 # Fragaria vesca subsp. vesca
 # Gossypium herbaceum subsp. africanum
+# Gracilaria tenuistipitata var. liui
 # Hordeum vulgare subsp. vulgare
 # Magnolia officinalis subsp. biloba
 # Oenothera elata subsp. hookeri
@@ -231,13 +253,13 @@ cat plastid.DOWNLOAD.csv \
 # Olea europaea subsp. europaea
 # Olea europaea subsp. maroccana
 # Olea woodiana subsp. woodiana
-# Oryza sativa Indica Group
 # Oryza sativa Japonica Group
 # Phalaenopsis aphrodite subsp. formosana
 # Phyllostachys nigra var. henonis
 # Pseudotsuga sinensis var. wilsoniana
 # Saccharum hybrid cultivar NCo 310
 # Saccharum hybrid cultivar SP80-3280
+# Thalassiosira oceanica CCMP1005
 ```
 
 Create abbreviations.
