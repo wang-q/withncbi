@@ -346,11 +346,11 @@ for f in `find [% item.dir%] -name "*.fasta"` ; do
     if [ -f $f.masked ];
     then
         rename 's/fasta.masked$/fa/' $f.masked;
-        find [% item.dir%] -type f -name "`basename $f`*" | xargs rm;
+        find [% item.dir%] -type f -name "`basename $f`*" | parallel --no-run-if-empty rm;
     else
         rename 's/fasta$/fa/' $f;
         echo `date` "RepeatMasker on $f failed.\n" >> RepeatMasker.log
-        find [% item.dir%] -type f -name "`basename $f`*" | xargs rm;
+        find [% item.dir%] -type f -name "`basename $f`*" | parallel --no-run-if-empty rm;
     fi;
 done;
 
@@ -473,7 +473,7 @@ fi;
 
 cd [% working_dir %]/[% multi_name %]_rawphylo
 
-find [% working_dir %]/[% multi_name %]_rawphylo -type f -name "RAxML*" | xargs rm
+find [% working_dir %]/[% multi_name %]_rawphylo -type f -name "RAxML*" | parallel --no-run-if-empty rm
 
 [% IF query_ids.size > 2 -%]
 perl [% egaz%]/concat_fasta.pl \
@@ -621,7 +621,7 @@ perl [% egaz %]/concat_fasta.pl \
     -o [% working_dir %]/[% multi_name %]_phylo/[% multi_name %].phy \
     -p
 
-find [% working_dir %]/[% multi_name %]_phylo -type f -name "RAxML*" | xargs rm
+find [% working_dir %]/[% multi_name %]_phylo -type f -name "RAxML*" | parallel --no-run-if-empty rm
 
 raxmlHPC-PTHREADS -T [% IF parallel > 8 %] 8 [% ELSIF parallel > 3 %] [% parallel - 1 %] [% ELSE %] 2 [% END %] \
     -f a -m GTRGAMMA -p $(openssl rand 4 | od -DAn) -N 100 -x $(openssl rand 4 | od -DAn) \
