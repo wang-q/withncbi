@@ -482,7 +482,7 @@ perl [% egaz%]/concat_fasta.pl \
     -p
 
 raxmlHPC-PTHREADS -T [% IF parallel > 8 %] 8 [% ELSIF parallel > 3 %] [% parallel - 1 %] [% ELSE %] 2 [% END %] \
-    -f a -m GTRGAMMA -p $RANDOM -N 100 -x $RANDOM \
+    -f a -m GTRGAMMA -p $(openssl rand 4 | od -DAn) -N 100 -x $(openssl rand 4 | od -DAn) \
 [% IF outgroup_id -%]
     -o [% outgroup_id %] \
 [% END -%]
@@ -624,7 +624,7 @@ perl [% egaz %]/concat_fasta.pl \
 find [% working_dir %]/[% multi_name %]_phylo -type f -name "RAxML*" | xargs rm
 
 raxmlHPC-PTHREADS -T [% IF parallel > 8 %] 8 [% ELSIF parallel > 3 %] [% parallel - 1 %] [% ELSE %] 2 [% END %] \
-    -f a -m GTRGAMMA -p $RANDOM -N 100 -x $RANDOM \
+    -f a -m GTRGAMMA -p $(openssl rand 4 | od -DAn) -N 100 -x $(openssl rand 4 | od -DAn) \
 [% IF outgroup_id -%]
     -o [% outgroup_id %] \
 [% END -%]
