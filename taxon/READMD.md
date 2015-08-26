@@ -255,6 +255,7 @@ cat plastid.DOWNLOAD.csv \
 # Gracilaria tenuistipitata var. liui
 # Hordeum vulgare subsp. vulgare
 # Magnolia officinalis subsp. biloba
+# Micromonas pusilla CCMP1545
 # Oenothera elata subsp. hookeri
 # Olea europaea subsp. cuspidata
 # Olea europaea subsp. europaea
@@ -335,7 +336,7 @@ find . -name "*.fasta" | wc -l
 
 ## Create alignment plans
 
-We got **473** accessions.
+We got **476** accessions.
 
 Numbers for higher ranks are: 49 orders, 60 families, 118 genera and 465 species.
 
@@ -352,14 +353,14 @@ cat plastid.ABBR.csv \
 # intersect between two files
 grep -F -f genus.tmp plastid.ABBR.csv > plastid.GENUS.csv
 
-# 473
+# 476
 wc -l plastid.GENUS.csv
 
 #   count every ranks
-#   49 order.list.tmp
-#   60 family.list.tmp
-#  118 genus.list.tmp
-#  465 species.list.tmp
+#   50 order.list.tmp
+#   61 family.list.tmp
+#  119 genus.list.tmp
+#  467 species.list.tmp
 cut -d',' -f 4 plastid.GENUS.csv | sort | uniq > species.list.tmp
 cut -d',' -f 5 plastid.GENUS.csv | sort | uniq > genus.list.tmp
 cut -d',' -f 6 plastid.GENUS.csv | sort | uniq > family.list.tmp
@@ -492,12 +493,12 @@ for f in `find . -mindepth 1 -maxdepth 2 -type f -name 7_multi_db_only.sh | sort
     echo ; \
 done  > run_7.sh
 
-cat run_1.sh | grep . | parallel -j 4 2>&1 | tee log_1.txt
-cat run_2.sh | grep . | parallel -j 2 2>&1 | tee log_2.txt
-cat run_3.sh | grep . | parallel -j 1 2>&1 | tee log_3.txt
-cat run_4.sh | grep . | parallel -j 1 2>&1 | tee log_4.txt
-cat run_5.sh | grep . | parallel -j 1 2>&1 | tee log_5.txt
-cat run_7.sh | grep . | parallel -j 2 2>&1 | tee log_7.txt
+cat run_1.sh | grep . | parallel -j 8 2>&1 | tee log_1.txt
+cat run_2.sh | grep . | parallel -j 6 2>&1 | tee log_2.txt
+cat run_3.sh | grep . | parallel -j 6 2>&1 | tee log_3.txt
+cat run_4.sh | grep . | parallel -j 2 2>&1 | tee log_4.txt
+cat run_5.sh | grep . | parallel -j 2 2>&1 | tee log_5.txt
+cat run_7.sh | grep . | parallel -j 4 2>&1 | tee log_7.txt
 
 #----------------------------#
 # Charting on Windows
