@@ -317,11 +317,11 @@ for f in `find [% item.dir%] -name "*.fasta"` ; do
     if [ -f $f.masked ];
     then
         rename 's/fasta.masked$/fa/' $f.masked;
-        find [% item.dir%] -type f -name "`basename $f`*" | xargs rm;
+        find [% item.dir%] -type f -name "`basename $f`*" | parallel --no-run-if-empty rm;
     else
         rename 's/fasta$/fa/' $f;
         echo "RepeatMasker on $f failed.\n" >> RepeatMasker.log
-        find [% item.dir%] -type f -name "`basename $f`*" | xargs rm;
+        find [% item.dir%] -type f -name "`basename $f`*" | parallel --no-run-if-empty rm;
     fi;
 done;
 
@@ -416,7 +416,7 @@ sleep 1;
 #----------------------------------------------------------#
 if [ -d [% working_dir %]/[% id %]_proc ]
 then
-    find [% working_dir %]/[% id %]_proc -type f -not -name "circos.conf" | xargs rm
+    find [% working_dir %]/[% id %]_proc -type f -not -name "circos.conf" | parallel --no-run-if-empty rm
 else
     mkdir [% working_dir %]/[% id %]_proc
 fi
@@ -510,9 +510,9 @@ cp [% id %]vsselfalign.cc.pairwise.fas [% working_dir %]/[% id %]_result
 #----------------------------#
 # clean
 #----------------------------#
-find [% working_dir %]/[% id %]_proc -type f -name "*genome.fasta*" | xargs rm
-find [% working_dir %]/[% id %]_proc -type f -name "*gl.fasta*" | xargs rm
-find [% working_dir %]/[% id %]_proc -type f -name "*.blast" | xargs rm
+find [% working_dir %]/[% id %]_proc -type f -name "*genome.fasta*" | parallel --no-run-if-empty rm
+find [% working_dir %]/[% id %]_proc -type f -name "*gl.fasta*" | parallel --no-run-if-empty rm
+find [% working_dir %]/[% id %]_proc -type f -name "*.blast" | parallel --no-run-if-empty rm
 
 [% END -%]
 EOF
