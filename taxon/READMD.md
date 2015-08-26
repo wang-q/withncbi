@@ -97,6 +97,8 @@ sed -i".bak" "s/\'//g" plastid.CHECKME.csv
 sed -i".bak" "s/Chlorella,NA,NA/Chlorella,Chlorellaceae,Chlorellales/" plastid.CHECKME.csv
 
 # Koliella corcontica (a green algae) was grouped to Streptophyta.
+# Koliella longiseta
+perl -pi -e 's/Koliella,\w+,\w+,\w+,\w+/Koliella,Klebsormidiaceae,Klebsormidiales,Klebsormidiophyceae,Chlorophyta/g' plastid.CHECKME.csv
 sed -i".bak" "s/Klebsormidiophyceae,Streptophyta/Klebsormidiophyceae,Chlorophyta/" plastid.CHECKME.csv
 
 # Chrysanthemum x morifolium and Pelargonium x hortorum are also weird, but they can be googled.
@@ -117,7 +119,6 @@ sed -i".bak" "s/Fusochloris,NA/Fusochloris,Microthamniaceae/" plastid.CHECKME.cs
 sed -i".bak" "s/Geminella,NA,NA/Geminella,Chlorellaceae,Chlorellales/" plastid.CHECKME.csv
 sed -i".bak" "s/Gloeotilopsis,NA/Gloeotilopsis,Ulotrichaceae/" plastid.CHECKME.csv
 sed -i".bak" "s/Helicosporidium,NA/Helicosporidium,Chlorellaceae/" plastid.CHECKME.csv
-sed -i".bak" "s/Koliella,NA/Koliella,Klebsormidiaceae/" plastid.CHECKME.csv
 sed -i".bak" "s/Microthamnion,NA/Microthamnion,Microthamniaceae/" plastid.CHECKME.csv
 sed -i".bak" "s/Monomorphina,NA/Monomorphina,Euglenaceae/" plastid.CHECKME.csv
 sed -i".bak" "s/Myrmecia,NA/Myrmecia,Trebouxiaceae/" plastid.CHECKME.csv
@@ -143,6 +144,8 @@ sed -i".bak" "s/Florideophyceae,NA/Florideophyceae,Rhodophyta/" plastid.CHECKME.
 sed -i".bak" "s/Phaeocystales,NA,NA/Phaeocystales,Coccolithophyceae,Haptophyta/" plastid.CHECKME.csv
 
 sed -i".bak" "s/Glaucocystophyceae,NA/Glaucocystophyceae,Glaucophyta/" plastid.CHECKME.csv
+
+sed -i".bak" "s/Chlorellales,NA/Chlorellales,Trebouxiophyceae/" plastid.CHECKME.csv
 
 ```
 
@@ -338,7 +341,7 @@ find . -name "*.fasta" | wc -l
 
 We got **476** accessions.
 
-Numbers for higher ranks are: 49 orders, 60 families, 118 genera and 465 species.
+Numbers for higher ranks are: 49 orders, 61 families, 119 genera and 467 species.
 
 ```bash
 cd ~/data/organelle/plastid_summary
@@ -357,7 +360,7 @@ grep -F -f genus.tmp plastid.ABBR.csv > plastid.GENUS.csv
 wc -l plastid.GENUS.csv
 
 #   count every ranks
-#   50 order.list.tmp
+#   49 order.list.tmp
 #   61 family.list.tmp
 #  119 genus.list.tmp
 #  467 species.list.tmp
@@ -516,11 +519,11 @@ perl -pi -e 's/\n/\r\n/g' run_chart.bat
 #----------------------------#
 # Clean
 #----------------------------#
-find . -mindepth 1 -maxdepth 3 -type d -name "*_raw" | xargs rm -fr
-find . -mindepth 1 -maxdepth 3 -type d -name "*_fasta" | xargs rm -fr
+find . -mindepth 1 -maxdepth 3 -type d -name "*_raw" | parallel --no-run-if-empty rm -fr
+find . -mindepth 1 -maxdepth 3 -type d -name "*_fasta" | parallel --no-run-if-empty rm -fr
 
-find . -mindepth 1 -maxdepth 4 -type f -name "*.phy" | xargs rm
-find . -mindepth 1 -maxdepth 4 -type f -name "*.phy.reduced" | xargs rm
+find . -mindepth 1 -maxdepth 4 -type f -name "*.phy" | parallel --no-run-if-empty rm
+find . -mindepth 1 -maxdepth 4 -type f -name "*.phy.reduced" | parallel --no-run-if-empty rm
 ```
 
 ### Self alignments.
@@ -562,11 +565,11 @@ done  > run_chart.bat
 perl -pi -e 's/\n/\r\n/g' run_chart.bat
 
 # clean
-find . -mindepth 1 -maxdepth 2 -type d -name "*_raw" | xargs rm -fr
-find . -mindepth 1 -maxdepth 2 -type d -name "*_fasta" | xargs rm -fr
+find . -mindepth 1 -maxdepth 2 -type d -name "*_raw" | parallel --no-run-if-empty rm -fr
+find . -mindepth 1 -maxdepth 2 -type d -name "*_fasta" | parallel --no-run-if-empty rm -fr
 
 # clean mysql
-find  /usr/local/var/mysql -type d -name "[A-Z]*" | xargs rm -fr
+find  /usr/local/var/mysql -type d -name "[A-Z]*" | parallel --no-run-if-empty rm -fr
 
 ```
 
