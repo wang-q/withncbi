@@ -31,18 +31,20 @@ Eukaryota (2759)                908
 
 Use `taxon/id_seq_dom_select.pl` to extract Taxonomy ids and genbank accessions.
 
-Got **919** accessions.
+Got **921** accessions.
 
 ```bash
 mkdir -p ~/data/organelle/plastid_genomes
 cd ~/data/organelle/plastid_genomes
 
+# All history pages
 # id,acc
 # 996148,NC_017006
 perl ~/Scripts/withncbi/taxon/id_seq_dom_select.pl ~/Scripts/withncbi/doc/eukaryota_plastid_150826.html > webpage_id_seq.csv
+perl ~/Scripts/withncbi/taxon/id_seq_dom_select.pl ~/Scripts/withncbi/doc/eukaryota_plastid_150806.html >> webpage_id_seq.csv
+perl ~/Scripts/withncbi/taxon/id_seq_dom_select.pl ~/Scripts/withncbi/doc/green_plants_plastid_150725.html >> webpage_id_seq.csv
+perl ~/Scripts/withncbi/taxon/id_seq_dom_select.pl ~/Scripts/withncbi/doc/plant_plastid_141130.html >> webpage_id_seq.csv
 
-# 904
-cat webpage_id_seq.csv | grep -v "^#" | wc -l
 ```
 
 Use `taxon/gb_taxon_locus.pl` to extract information from refseq plastid file.
@@ -53,6 +55,8 @@ gzip -c -d plastid.1.genomic.gbff.gz > plastid.1.genomic.gbff
 
 perl ~/Scripts/withncbi/taxon/gb_taxon_locus.pl plastid.1.genomic.gbff > refseq_id_seq.csv
 
+rm plastid.1.genomic.gbff
+
 # 805
 cat refseq_id_seq.csv | grep -v "^#" | wc -l
 
@@ -60,7 +64,7 @@ cat refseq_id_seq.csv | grep -v "^#" | wc -l
 cat webpage_id_seq.csv refseq_id_seq.csv \
     | sort -u -t, -k1,1 > plastid_id_seq.csv
 
-# 919
+# 921
 cat plastid_id_seq.csv | grep -v "^#" | wc -l
 ```
 
@@ -160,7 +164,7 @@ sed -i".bak" "s/Glaucocystophyceae,NA/Glaucocystophyceae,Glaucophyta/" plastid.C
 Species and genus should not be "NA" and genus has 2 or more members.
 
 ```text
-919 ---------> 914 ---------> 473 ---------> 683
+921 ---------> 916 ---------> 476 ---------> 686
         NA           genus          family
 ```
 
@@ -174,7 +178,7 @@ cat plastid.CHECKME.csv \
     '/^#/ and next; ($F[3] eq q{NA} or $F[4] eq q{NA} ) and next; print' \
     > plastid.tmp
 
-# 914
+# 916
 wc -l plastid.tmp
 
 #----------------------------#
@@ -189,7 +193,7 @@ cat plastid.tmp \
 # intersect between two files
 grep -F -f genus.tmp plastid.tmp > plastid.genus.tmp
 
-# 473
+# 476
 wc -l plastid.genus.tmp
 
 #----------------------------#
@@ -203,7 +207,7 @@ cat plastid.genus.tmp \
 # intersect between two files
 grep -F -f family.tmp plastid.tmp > plastid.family.tmp
 
-# 683
+# 686
 wc -l plastid.family.tmp
 
 #----------------------------#
