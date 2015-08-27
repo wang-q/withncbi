@@ -757,7 +757,7 @@ perl -anl -e '/^#/ and next; $F[0] =~ s/\.\d+//; $color = q{}; $F[2] eq q{region
 #----------------------------#
 # run circos
 #----------------------------#
-[% circos %]/bin/circos -noparanoid -conf circos.conf
+perl [% circos %]/bin/circos -noparanoid -conf circos.conf
 
 [% END -%]
 
