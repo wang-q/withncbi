@@ -418,6 +418,7 @@ cat genus.tsv \
 # this is for finding outgroups
 echo -e "mkdir -p ~/data/organelle/plastid_families\ncd ~/data/organelle/plastid_families\n" > ../plastid_families.cmd.txt
 cat family.tsv \
+    | perl -n -e '/,\w+,/ and print' \
     | perl ~/Scripts/withncbi/taxon/cmd_template.pl --seq_dir ~/data/organelle/plastid_genomes --taxon_file ~/data/organelle/plastid_genomes/plastid_ncbi.csv --parallel 8 \
     >> ../plastid_families.cmd.txt
 

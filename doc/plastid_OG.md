@@ -75,7 +75,7 @@ Panax,Aral_undulata
 Corallorhiza,Catt_crispata
 Cymbidium,Catt_crispata
 Cypripedium,Catt_crispata
-### Dendrobium
+Dendrobium,Catt_crispata
 Epipogium,Catt_crispata
 Masdevallia,Catt_crispata
 Paphiopedilum,Catt_crispata
@@ -92,7 +92,7 @@ Capsella,Lep_virginicum
 Cardamine,Lep_virginicum
 Pachycladon,Lep_virginicum
 ## Amaranthaceae 苋科
-### Haloxylon
+Haloxylon,Spi_oleracea
 Salicornia,Spi_oleracea
 ## Caryophyllaceae 石竹科
 Silene,Agroste_githago
@@ -133,7 +133,7 @@ Cistanche,Lin_philippensis
 Orobanche,Lin_philippensis
 ## Liliaceae 百合科
 Fritillaria,Lil_superbum
-### Lilium
+Lilium,Fri_hupehensis
 ## Melanthiaceae 黑药花科
 Trillium,Paris_verticillata
 ## Magnoliaceae 木兰科
