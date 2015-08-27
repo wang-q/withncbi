@@ -57,6 +57,7 @@ perl [% withncbi %]/taxon/strain_bz.pl \
     --parallel [% parallel %] \
 [% IF o -%]
     -o [% o %] \
+    -q [% o %] \
 [% END -%]
 [% FOREACH q IN qs -%]
     -q [% q %] \

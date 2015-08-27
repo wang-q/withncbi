@@ -603,15 +603,15 @@ for d in `find . -mindepth 1 -maxdepth 1 -type d | sort `;do \
 done  > run_chart.bat
 perl -pi -e 's/\n/\r\n/g' run_chart.bat
 
-for d in `find . -mindepth 1 -maxdepth 1 -type d | sort `;do
-    export d_base=`basename $d` ;
-    export f_base="${d_base}/${d_base}_phylo/${d_base}" ;
-    if [ -f $f_base.nwk ]
-    then
-        echo $f_base ;  
-        nw_display -s -b 'visibility:hidden' $f_base.nwk > $f_base.svg ;
-    fi
-done
+# for d in `find . -mindepth 1 -maxdepth 1 -type d | sort `;do
+#     export d_base=`basename $d` ;
+#     export f_base="${d_base}/${d_base}_phylo/${d_base}" ;
+#     if [ -f $f_base.nwk ]
+#     then
+#         echo $f_base ;  
+#         nw_display -s -b 'visibility:hidden' $f_base.nwk > $f_base.svg ;
+#     fi
+# done
 
 find . -type f -path "*_phylo*" -name "*.nwk"
 

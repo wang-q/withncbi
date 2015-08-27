@@ -145,7 +145,7 @@ Licania,Chryso_icaco
 Populus,Salix_interior
 Salix,Pop_trichocarpa
 ## Malvaceae 锦葵科
-Gossypium,The_cacao
+Gossypium,Theo_cacao
 ## Myrtaceae 桃金娘科
 Angophora,Al_ternata
 Corymbia,Al_ternata
