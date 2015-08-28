@@ -88,4 +88,7 @@ perl ar_db.pl --db ar_genbank --file ar_strains_genbank.csv
 
 perl ar_overview.pl --db ar_refseq
 perl ar_overview.pl --db ar_genbank
+
+mv *.xlsx ../db
+rm *.csv
 ```

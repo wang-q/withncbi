@@ -673,7 +673,25 @@ WHERE
 GROUP BY genus_id
 HAVING strain_count > 1
 ORDER BY genus
+```
 
+| genus_id | genus               | strain_count |
+| ------:  | :-----              | ------:      |
+| 1163     | Anabaena            | 3            |
+| 35823    | Arthrospira         | 2            |
+| 1186     | Calothrix           | 3            |
+| 102234   | Cyanobacterium      | 2            |
+| 43988    | Cyanothece          | 6            |
+| 33071    | Gloeobacter         | 2            |
+| 1125     | Microcystis         | 2            |
+| 1177     | Nostoc              | 4            |
+| 1158     | Oscillatoria        | 2            |
+| 1218     | Prochlorococcus     | 14           |
+| 1129     | Synechococcus       | 20           |
+| 1142     | Synechocystis       | 5            |
+| 146785   | Thermosynechococcus | 2            |
+
+```sql
 # Species
 SELECT
     species_id, species, COUNT(*) strain_count
@@ -686,3 +704,11 @@ GROUP BY species_id
 HAVING strain_count > 1
 ORDER BY species
 ```
+
+| species_id | species                    | strain_count |
+| ------:    | :-----                     | ------:      |
+| 1148       | Synechocystis sp. PCC 6803 | 4            |
+| 32046      | Synechococcus elongatus    | 2            |
+| 1219       | Prochlorococcus marinus    | 12           |
+| 1126       | Microcystis aeruginosa     | 2            |
+| 118562     | Arthrospira platensis      | 2            |
