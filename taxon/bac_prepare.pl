@@ -12,6 +12,7 @@ use File::Find::Rule;
 use File::Spec;
 use File::Copy;
 use File::Basename;
+use Path::Tiny;
 use Text::Table;
 use List::MoreUtils qw(uniq);
 use Archive::Extract;
@@ -113,7 +114,7 @@ $seq_dir = replace_home($seq_dir);
 #----------------------------------------------------------#
 # init
 #----------------------------------------------------------#
-$stopwatch->start_message("Preparing whole species");
+$stopwatch->start_message("Preparing whole group...");
 
 my $dbh = DBI->connect( "dbi:mysql:$db_name:$server", $username, $password );
 
@@ -279,7 +280,9 @@ my @ids_missing;
 ID: for my $taxon_id ( $target_id, @query_ids ) {
         print "taxon_id $taxon_id\n";
         my $id_dir = File::Spec->catdir( $seq_dir, $taxon_id );
-        mkdir $id_dir unless -e $id_dir;
+        if (! -e $id_dir) {
+            path($id_dir)->mkpath;
+        }
 
         my @accs;    # complete accessions
 
@@ -351,7 +354,7 @@ perl [% findbin %]/strain_info.pl \
 [% END -%]
     --id [% target_id %]
 [% END -%]
-    
+
 [% IF ! is_self -%]
 perl [% findbin %]/strain_bz.pl \
     --file [% working_dir %]/info.csv \
