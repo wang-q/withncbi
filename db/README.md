@@ -46,6 +46,24 @@ rsync --progress -av ftp.ncbi.nlm.nih.gov::pub/taxonomy/ \
     ~/data/NCBI/taxonomy/
 ```
 
+Bacteria genomes.
+
+```bash
+rsync -av -P ftp.ncbi.nlm.nih.gov::genomes/Bacteria/ \
+    ~/data/NCBI/genomes/Bacteria/ \
+    --exclude="all.*"
+
+rsync -av -P ftp.ncbi.nlm.nih.gov::genomes/Bacteria_DRAFT/ \
+    ~/data/NCBI/genomes/Bacteria_DRAFT/
+
+rsync -av -P ftp.ncbi.nlm.nih.gov::genbank/genomes/Bacteria/ \
+    ~/data/NCBI/genbank/genomes/Bacteria/
+
+rsync -av -P ftp.ncbi.nlm.nih.gov::genbank/genomes/Bacteria_DRAFT/ \
+    ~/data/NCBI/genbank/genomes/Bacteria_DRAFT/
+
+```
+
 ## Databases
 
 We create 4 MySQL databases:
@@ -89,6 +107,6 @@ perl ar_db.pl --db ar_genbank --file ar_strains_genbank.csv
 perl ar_overview.pl --db ar_refseq
 perl ar_overview.pl --db ar_genbank
 
-mv *.xlsx ../db
-rm *.csv
+cp -f *.xlsx ../db
+rm *.xlsx *.csv
 ```
