@@ -9,9 +9,6 @@ use Config::Tiny;
 use YAML qw(Dump Load DumpFile LoadFile);
 
 use File::Find::Rule;
-use File::Spec;
-use File::Copy;
-use File::Basename;
 use Path::Tiny;
 use Text::Table;
 use List::MoreUtils qw(uniq);
@@ -69,8 +66,8 @@ my $username = $Config->{database}{username};
 my $password = $Config->{database}{password};
 my $db_name  = $Config->{database}{db};
 
-# download sequences from entrez if not existing
-my $entrez;
+# download sequences via get_seq.pl if not existing
+my $get_seq;
 
 # including scaffolds and contigs
 my $scaffold;
@@ -105,7 +102,7 @@ GetOptions(
     'n|name_str=s'   => \$name_str,
     'is_self'        => \$is_self,
     'length=i'       => \$paralog_length,
-    'entrez'         => \$entrez,
+    'get_seq'        => \$get_seq,
     'scaffold'       => \$scaffold,
     'parallel=i'     => \$parallel,
 ) or pod2usage(2);
@@ -186,9 +183,11 @@ my $id_str;
     }
 
     print "Working on $name_str\n";
-    $working_dir = File::Spec->catdir( $working_dir, $name_str );
-    $working_dir = File::Spec->rel2abs($working_dir);
-    mkdir $working_dir unless -e $working_dir;
+    $working_dir = path( $working_dir, $name_str )->absolute;
+    if ( !-d $working_dir ) {
+        $working_dir->mkpath;
+    }
+    $working_dir = $working_dir->stringify;
     print "Working dir is $working_dir\n";
 }
 
@@ -214,8 +213,7 @@ my @query_ids;
         $table->load( [@row] );
     }
 
-    my $table_file = File::Spec->catfile( $working_dir, "table.txt" );
-    open my $fh, '>', $table_file;
+    my $fh = path( $working_dir, "table.txt" )->openw;
     print {$fh} $table, "\n";
     print $table, "\n";
 
@@ -262,7 +260,7 @@ my @query_ids;
         }
     }
 
-    print "\n";
+    print "\n\n";
     print {$fh} "perl " . $stopwatch->cmd_line, "\n";
 
     close $fh;
@@ -286,9 +284,9 @@ my @ids_missing;
     print "Rewrite seqs for every strains\n";
 ID: for my $taxon_id ( $target_id, @query_ids ) {
         print "taxon_id $taxon_id\n";
-        my $id_dir = File::Spec->catdir( $seq_dir, $taxon_id );
+        my $id_dir = path( $seq_dir, $taxon_id );
         if ( !-e $id_dir ) {
-            path($id_dir)->mkpath;
+            $id_dir->mkpath;
         }
 
         my @accs;    # complete accessions
@@ -304,7 +302,7 @@ ID: for my $taxon_id ( $target_id, @query_ids ) {
         for my $acc ( grep {defined} @accs ) {
             my ($fna_file) = grep {/$acc/} @fna_files;
             if ( !defined $fna_file ) {
-                if ($entrez) {
+                if ($get_seq) {
                     print "Download from entrez. id: [$taxon_id]\tseq: [$acc]\n";
                     if ( -e "$id_dir/$acc.gb" ) {
                         print "Sequence [$id_dir/$acc.gb] exists, next\n";
@@ -322,10 +320,10 @@ ID: for my $taxon_id ( $target_id, @query_ids ) {
                 }
             }
             else {
-                copy( $fna_file, $id_dir );
+                path($fna_file)->copy($id_dir);
 
                 my ($gff_file) = grep {/$acc/} @gff_files;
-                copy( $gff_file, $id_dir );
+                path($gff_file)->copy($id_dir);
             }
         }
 
@@ -350,8 +348,7 @@ ID: for my $taxon_id ( $target_id, @query_ids ) {
 if (@ids_missing) {
     @query_ids = grep { !$id_missing_file{$_} } @query_ids;
 
-    my $table_file = File::Spec->catfile( $working_dir, "table.txt" );
-    open my $fh, '>>', $table_file;
+    my $fh = path( $working_dir, "table.txt" )->opena;
     print {$fh} "Can't find files for the following ID:\n@ids_missing\n";
     close $fh;
 }
@@ -417,9 +414,9 @@ EOF
             is_self     => $is_self,
             length      => $paralog_length,
         },
-        File::Spec->catfile( $working_dir, "prepare.sh" )
+        path( $working_dir, "prepare.sh" )->stringify
     ) or die Template->error;
-    
+
     print "Create redo_prepare.sh\n";
     $tt->process(
         \$text,
@@ -435,9 +432,8 @@ EOF
                                               # don't pass $seq_dir
                                               # don't gather taxon info
         },
-        File::Spec->catfile( $working_dir, "redo_prepare.sh" )
+        path( $working_dir, "redo_prepare.sh" )->stringify
     ) or die Template->error;
-
 }
 
 $stopwatch->end_message;
@@ -453,9 +449,8 @@ sub prep_fa {
         return "Can't find fasta file for $acc\n";
     }
 
-    my $fa_file = File::Spec->catfile( $dir, "$acc.fa" );
-    open my $in_fh,  '<', $fna_file;
-    open my $out_fh, '>', $fa_file;
+    open my $in_fh, '<', $fna_file;
+    open my $out_fh, '>', path( $dir, "$acc.fa" )->openw;
     while (<$in_fh>) {
         if (/>/) {
             print {$out_fh} ">$acc\n";
@@ -499,7 +494,7 @@ sub prep_scaff {
         return $ae->error;
     }
 
-    my (@files) = map { File::Spec->rel2abs( $_, $dir ) } @{ $ae->files };
+    my (@files) = map { path($_)->absolute($dir)->stringify } @{ $ae->files };
 
     for my $file (@files) {
         unless ( -e $file ) {
@@ -511,9 +506,9 @@ sub prep_scaff {
             next;
         }
 
-        my $basename = basename( $file, ".fna" );
-        my $fa_file = File::Spec->catfile( $dir, "$basename.fa" );
-        copy( $file, $fa_file );
+        my $basename = path($file)->basename(".fna");
+        my $fa_file = path( $dir, "$basename.fa" );
+        path($file)->copy($fa_file);
     }
 
     unlink $_ for @files;
