@@ -69,6 +69,9 @@ my $username = $Config->{database}{username};
 my $password = $Config->{database}{password};
 my $db_name  = $Config->{database}{db};
 
+# download sequences from entrez if not existing
+my $entrez;
+
 # including scaffolds and contigs
 my $scaffold;
 
@@ -77,7 +80,7 @@ my $td_dir  = replace_home( $Config->{path}{td} );     # taxdmp
 my $nb_dir  = replace_home( $Config->{path}{nb} );     # NCBI genomes bac
 my $nbd_dir = replace_home( $Config->{path}{nbd} );    # NCBI genomes bac draft
 my $ngbd_dir
-    = replace_home( $Config->{path}{ngbd} );    # NCBI genbank genomes bac draft
+    = replace_home( $Config->{path}{ngbd} );           # NCBI genbank genomes bac draft
 
 # run in parallel mode
 my $parallel = $Config->{run}{parallel};
@@ -102,6 +105,7 @@ GetOptions(
     'n|name_str=s'   => \$name_str,
     'is_self'        => \$is_self,
     'length=i'       => \$paralog_length,
+    'entrez'         => \$entrez,
     'scaffold'       => \$scaffold,
     'parallel=i'     => \$parallel,
 ) or pod2usage(2);
@@ -119,7 +123,9 @@ $stopwatch->start_message("Preparing whole group...");
 my $dbh = DBI->connect( "dbi:mysql:$db_name:$server", $username, $password );
 
 my $id_str;
-{    # expand $parent_id
+{
+    $stopwatch->block_message("Load taxdmp and expand --parent_id");
+
     my $taxon_db = Bio::DB::Taxonomy->new(
         -source    => 'flatfile',
         -directory => $td_dir,
@@ -159,7 +165,9 @@ my $id_str;
     die "Wrong id_str $id_str\n" unless $id_str =~ /\d+/;
 }
 
-{    # making working dir
+{
+    $stopwatch->block_message("making working dir");
+
     if ( !$name_str ) {
         my $query = qq{
             SELECT DISTINCT species
@@ -185,7 +193,8 @@ my $id_str;
 }
 
 my @query_ids;
-{    # find all strains' taxon ids
+{
+    $stopwatch->block_message("find all strains' taxon ids");
 
     # select all strains in this species
     my $query = qq{
@@ -230,8 +239,7 @@ my @query_ids;
     }
     else {
         $target_id = $strains[0]->[0];
-        my $message
-            = "Use [$strains[0]->[1]] as target, the oldest strain on NCBI.\n";
+        my $message = "Use [$strains[0]->[1]] as target, the oldest strain on NCBI.\n";
         print {$fh} $message;
         print $message;
     }
@@ -262,7 +270,8 @@ my @query_ids;
 
 my %id_missing_file;
 my @ids_missing;
-{    # build fasta files
+{
+    $stopwatch->block_message("build fasta files");
 
     # read all filenames, then grep
     print "Reading file list\n";
@@ -270,17 +279,15 @@ my @ids_missing;
     my @gff_files = File::Find::Rule->file->name('*.gff')->in($nb_dir);
     my ( @scaff_files, @contig_files );
     if ($scaffold) {
-        @scaff_files
-            = File::Find::Rule->file->name('*.scaffold.fna.tgz')->in($nbd_dir);
-        @contig_files
-            = File::Find::Rule->file->name('*.contig.fna.tgz')->in($ngbd_dir);
+        @scaff_files  = File::Find::Rule->file->name('*.scaffold.fna.tgz')->in($nbd_dir);
+        @contig_files = File::Find::Rule->file->name('*.contig.fna.tgz')->in($ngbd_dir);
     }
 
     print "Rewrite seqs for every strains\n";
 ID: for my $taxon_id ( $target_id, @query_ids ) {
         print "taxon_id $taxon_id\n";
         my $id_dir = File::Spec->catdir( $seq_dir, $taxon_id );
-        if (! -e $id_dir) {
+        if ( !-e $id_dir ) {
             path($id_dir)->mkpath;
         }
 
@@ -290,23 +297,36 @@ ID: for my $taxon_id ( $target_id, @query_ids ) {
         my $sth   = $dbh->prepare($query);
         $sth->execute($taxon_id);
         my ($acc) = $sth->fetchrow_array;
-        push @accs,
-            ( map { s/\.\d+$//; $_ } grep {defined} ( split /,/, $acc ) );
+        push @accs, ( map { s/\.\d+$//; $_ } grep {defined} ( split /,/, $acc ) );
 
         # for NZ_CM*** accessions, the following prep_fa() will find nothing
         # AND is $scaffold, prep_scaff() will find the scaffolds
         for my $acc ( grep {defined} @accs ) {
             my ($fna_file) = grep {/$acc/} @fna_files;
             if ( !defined $fna_file ) {
-                warn ".fna file for [$acc] of [$taxon_id] doesn't exist.\n";
-                $id_missing_file{$taxon_id}++;
-                push @ids_missing, $taxon_id;
-                next ID;
-            }
-            copy( $fna_file, $id_dir );
+                if ($entrez) {
+                    print "Download from entrez. id: [$taxon_id]\tseq: [$acc]\n";
+                    if ( -e "$id_dir/$acc.gb" ) {
+                        print "Sequence [$id_dir/$acc.gb] exists, next\n";
+                        next;
+                    }
 
-            my ($gff_file) = grep {/$acc/} @gff_files;
-            copy( $gff_file, $id_dir );
+                    # download
+                    system "perl $FindBin::Bin/get_seq.pl $acc $id_dir";
+                }
+                else {
+                    warn ".fna file for [$acc] of [$taxon_id] doesn't exist.\n";
+                    $id_missing_file{$taxon_id}++;
+                    push @ids_missing, $taxon_id;
+                    next ID;
+                }
+            }
+            else {
+                copy( $fna_file, $id_dir );
+
+                my ($gff_file) = grep {/$acc/} @gff_files;
+                copy( $gff_file, $id_dir );
+            }
         }
 
         if ($scaffold) {
@@ -340,7 +360,8 @@ if (@ids_missing) {
     my $tt = Template->new;
     my $text;
 
-    # taxon.csv
+    # prepare.sh
+    print "Create prepare.sh\n";
     $text = <<'EOF';
 #!/bin/bash
 
@@ -398,7 +419,8 @@ EOF
         },
         File::Spec->catfile( $working_dir, "prepare.sh" )
     ) or die Template->error;
-
+    
+    print "Create redo_prepare.sh\n";
     $tt->process(
         \$text,
         {   findbin     => $FindBin::Bin,
@@ -409,9 +431,9 @@ EOF
             query_ids   => \@query_ids,
             is_self     => $is_self,
             length      => $paralog_length,
-            redo        => 1,                # If RepeatMasker has been executed
-                                             # don't pass $seq_dir
-                                             # don't gather taxon info
+            redo        => 1,                 # If RepeatMasker has been executed
+                                              # don't pass $seq_dir
+                                              # don't gather taxon info
         },
         File::Spec->catfile( $working_dir, "redo_prepare.sh" )
     ) or die Template->error;
