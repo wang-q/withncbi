@@ -661,6 +661,8 @@ perl ~/Scripts/alignDB/util/merge_csv.pl \
 
 ## Cyanobacteria
 
+### Genus and Species counts
+
 ```sql
 # Genus
 SELECT
@@ -707,8 +709,74 @@ ORDER BY species
 
 | species_id | species                    | strain_count |
 | ------:    | :-----                     | ------:      |
-| 1148       | Synechocystis sp. PCC 6803 | 4            |
-| 32046      | Synechococcus elongatus    | 2            |
-| 1219       | Prochlorococcus marinus    | 12           |
-| 1126       | Microcystis aeruginosa     | 2            |
 | 118562     | Arthrospira platensis      | 2            |
+| 1126       | Microcystis aeruginosa     | 2            |
+| 1219       | Prochlorococcus marinus    | 12           |
+| 32046      | Synechococcus elongatus    | 2            |
+| 1148       | Synechocystis sp. PCC 6803 | 4            |
+
+### Use `bac_prepare.pl`
+
+```bash
+mkdir -p ~/data/organelle/cyanobacteria
+cd ~/data/organelle/cyanobacteria
+
+perl ~/Scripts/withncbi/taxon/bac_prepare.pl --db gr_prok \
+    --seq_dir ~/data/organelle/cyanobacteria/bac_seq_dir \
+    -p 1218 --get_seq -n Prochlorococcus
+
+perl ~/Scripts/withncbi/taxon/bac_prepare.pl --db gr_prok \
+    --seq_dir ~/data/organelle/cyanobacteria/bac_seq_dir \
+    -p 1219 --get_seq -t 59919 -e 167539,167555,59920,59922,74547,93059 -n Prochlorococcus_marinus
+
+perl ~/Scripts/withncbi/taxon/bac_prepare.pl --db gr_prok \
+    --seq_dir ~/data/organelle/cyanobacteria/bac_seq_dir \
+    -p 1219 --get_seq -t 59919 -o 167539 -e 167555,59920,59922,74547,93059 -n Prochlorococcus_marinus_OG
+
+perl ~/Scripts/withncbi/taxon/bac_prepare.pl --db gr_prok \
+    --seq_dir ~/data/organelle/cyanobacteria/bac_seq_dir \
+    -p 1142 --get_seq -n Synechocystis
+
+perl ~/Scripts/withncbi/taxon/bac_prepare.pl --db gr_prok \
+    --seq_dir ~/data/organelle/cyanobacteria/bac_seq_dir \
+    -p 1148 --get_seq -n Synechocystis_sp_PCC_6803
+
+perl ~/Scripts/withncbi/taxon/bac_prepare.pl --db gr_prok \
+    --seq_dir ~/data/organelle/cyanobacteria/bac_seq_dir \
+    -p 1148,1147 -o 1147 --get_seq -n Synechocystis_sp_PCC_6803_OG
+
+export BAC_DIR=Prochlorococcus
+sh ${BAC_DIR}/prepare.sh
+sh ${BAC_DIR}/1_real_chr.sh
+sh ${BAC_DIR}/2_file_rm.sh
+sh ${BAC_DIR}/3_pair_cmd.sh
+sh ${BAC_DIR}/4_rawphylo.sh
+sh ${BAC_DIR}/5_multi_cmd.sh
+sh ${BAC_DIR}/7_multi_db_only.sh
+unset BAC_DIR
+
+sh Prochlorococcus/prepare.sh
+sh Prochlorococcus_marinus/prepare.sh
+sh Prochlorococcus_marinus_OG/prepare.sh
+sh Synechocystis/prepare.sh
+sh Synechocystis_sp_PCC_6803/prepare.sh
+sh Synechocystis_sp_PCC_6803_OG/prepare.sh
+
+for d in `find $PWD -mindepth 1 -maxdepth 1 -type d -not -path "*bac_seq_dir" | sort `;do \
+    echo sh $d/1_real_chr.sh ; \
+    echo sh $d/2_file_rm.sh ; \
+    echo sh $d/3_pair_cmd.sh ; \
+    echo sh $d/4_rawphylo.sh ; \
+    echo sh $d/5_multi_cmd.sh ; \
+    echo sh $d/7_multi_db_only.sh ; \
+    echo ; \
+done  > runall.sh
+
+
+find . -mindepth 1 -maxdepth 3 -type d -name "*_raw" | parallel --no-run-if-empty rm -fr
+find . -mindepth 1 -maxdepth 3 -type d -name "*_fasta" | parallel --no-run-if-empty rm -fr
+
+find . -mindepth 1 -maxdepth 4 -type f -name "*.phy" | parallel --no-run-if-empty rm
+find . -mindepth 1 -maxdepth 4 -type f -name "*.phy.reduced" | parallel --no-run-if-empty rm
+
+```
