@@ -3,13 +3,15 @@ use strict;
 use warnings;
 use autodie;
 
-use File::Spec;
+use Path::Tiny;
 use Bio::DB::EUtilities;
 
 my $id  = shift || "NC_001284";
 my $dir = shift || ".";
 
-mkdir $dir if !-d $dir;
+if ( !-d $dir ) {
+    path($dir)->mkpath;
+}
 
 # Some .gb files only contain assembling infomation, so we need download both
 # types.
@@ -24,13 +26,12 @@ for my $type (@types) {
         -email   => 'mymail@foo.bar',
         -id      => [$id],
     );
-    my $file = File::Spec->catfile( $dir, "$id.$type" );
-    $file = File::Spec->rel2abs($file);
+    my $file = path( $dir, "$id.$type" )->absolute->stringify;
     print "Saving file to [$file]\n";
-    
+
     # local shadowsocks proxy
-    if ($ENV{SSPROXY}) {
-        $factory->proxy(['http','https'], 'socks://127.0.0.1:1080' )
+    if ( $ENV{SSPROXY} ) {
+        $factory->proxy( [ 'http', 'https' ], 'socks://127.0.0.1:1080' );
     }
 
     # dump HTTP::Response content to a file (not retained in memory)
@@ -48,6 +49,7 @@ get_seq.pl - retrieve nucleotide sequences from NCBI via Bio::DB::EUtilities
 
     perl get_seq.pl <Accession> [Output directory]
     
+    # export SSPROXY
     perl get_seq.pl NC_001284 .
 
 =cut
