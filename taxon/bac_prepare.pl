@@ -226,18 +226,19 @@ my @query_ids;
     if ($target_id) {
         my ($exist) = grep { $_->[0] == $target_id } @strains;
         if ( defined $exist ) {
-            my $message = "Use [$exist->[1]] as target, as you wish.\n";
+            my $message = "Use [$exist->[1] ($exist->[0])] as target, as you wish.\n";
             print {$fh} $message;
             print $message;
         }
         else {
-            print "Taxon $target_id doesn't exist, please check.\n";
+            print "Taxon [$target_id] doesn't exist, please check.\n";
             exit;
         }
     }
     else {
         $target_id = $strains[0]->[0];
-        my $message = "Use [$strains[0]->[1]] as target, the oldest strain on NCBI.\n";
+        my $message
+            = "Use [$strains[0]->[1] ($strains[0]->[0])] as target, the oldest strain on NCBI.\n";
         print {$fh} $message;
         print $message;
     }
@@ -247,16 +248,12 @@ my @query_ids;
     if ($outgroup_id) {
         my ($exist) = grep { $_ == $outgroup_id } @query_ids;
         if ( defined $exist ) {
-            my $message = "Use [$exist] as reference, as you wish.\n";
+            my $message = "Use [$exist] as outgroup, as you wish.\n";
             print {$fh} $message;
             print $message;
-
-            # make $outgroup_id first
-            @query_ids = map { $_ == $outgroup_id ? () : $_ } @query_ids;
-            unshift @query_ids, $outgroup_id;
         }
         else {
-            print "Taxon $outgroup_id doesn't exist, please check.\n";
+            print "Taxon [$outgroup_id] doesn't exist, please check.\n";
         }
     }
 
@@ -381,6 +378,9 @@ perl [% findbin %]/strain_bz.pl \
     --seq_dir [% seq_dir %] \
 [% END -%]
     --name [% name_str %] \
+[% IF outgroup_id -%]
+    -o [% outgroup_id %] \
+[% END -%]
 [% FOREACH id IN query_ids -%]
     -q [% id %] \
 [% END -%]
@@ -411,6 +411,7 @@ EOF
             name_str    => $name_str,
             target_id   => $target_id,
             query_ids   => \@query_ids,
+            outgroup_id => $outgroup_id,
             is_self     => $is_self,
             length      => $paralog_length,
         },
@@ -426,6 +427,7 @@ EOF
             name_str    => $name_str,
             target_id   => $target_id,
             query_ids   => \@query_ids,
+            outgroup_id => $outgroup_id,
             is_self     => $is_self,
             length      => $paralog_length,
             redo        => 1,                 # If RepeatMasker has been executed
