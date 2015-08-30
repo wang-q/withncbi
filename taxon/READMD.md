@@ -783,28 +783,39 @@ find . -mindepth 1 -maxdepth 3 -type d -name "*_fasta" | parallel --no-run-if-em
 
 find . -mindepth 1 -maxdepth 4 -type f -name "*.phy" | parallel --no-run-if-empty rm
 find . -mindepth 1 -maxdepth 4 -type f -name "*.phy.reduced" | parallel --no-run-if-empty rm
-
 ```
 
 ## Summary
+
+### Copy xlsx files
+
+```bash
+mkdir -p ~/data/organelle/plastid_summary/xlsx
+cd ~/data/organelle/plastid_summary/xlsx
+
+find  ~/data/organelle/plastid.working -type f -name "*.common.chart.xlsx" | sort \
+    | parallel cp {} .
+
+
+```
 
 ### Genome list
 
 Create `plastid.list.csv` from `plastid.GENUS.csv` with sequence lengths.
 
 ```bash
-cd ~/data/organelle/plastid_summary
+mkdir -p ~/data/organelle/plastid_summary/table
+cd ~/data/organelle/plastid_summary/table
 
 find ~/data/organelle/plastid.working -type f -name "chr.sizes" | sort \
     | xargs perl -nl -e 'BEGIN{print q{genus,strain_abbr,accession,length}}; $_ =~ s/\t/\,/; $ARGV =~ /working\/(\w+)\/(\w+)\//; print qq{$1,$2,$_}' > length.tmp
 
 perl ~/Scripts/alignDB/util/merge_csv.pl \
-    -t plastid.GENUS.csv -m length.tmp -f 1 -f2 2 --concat --stdout \
+    -t ~/data/organelle/plastid_summary/plastid.GENUS.csv -m length.tmp -f 1 -f2 2 --concat --stdout \
     | perl -nl -a -F"," -e 'print qq{$F[8],$F[6],$F[4],$F[2],$F[0],$F[1],$F[13]}' \
     >  plastid.list.csv
 
 rm length.tmp
-
 ```
 
 ### Phylogenic trees of each genus with outgroup
@@ -819,5 +830,64 @@ cat ~/Scripts/withncbi/doc/plastid_OG.md \
 
 find ~/data/organelle/plastid_OG -type f -path "*_phylo*" -name "*.nwk" \
     | parallel -j 1 cp {} ~/data/organelle/plastid_summary/trees
+```
 
+### Genome alignment statistics
+
+```bash
+cd ~/data/organelle/plastid_summary/xlsx
+
+mkdir -p ~/data/organelle/plastid_summary/table
+
+cat <<EOF > Table_alignment.tt
+---
+autofit: A:F
+texts:
+  - text: "Genus"
+    pos: A2
+  - text: "No. of genomes"
+    pos: B2
+  - text: "Aligned length (Mb)"
+    pos: C2
+  - text: "Indels Per 100 bp"
+    pos: D2
+  - text: "D on average"
+    pos: E2
+  - text: "GC-content"
+    pos: F2
+[% FOREACH item IN data -%]
+  - text: [% item.name %]
+    pos: A[% loop.index + 3 %]
+[% END -%]
+borders:
+  - range: A2:F2
+    top: 1
+  - range: A2:F2
+    bottom: 1
+ranges:
+[% FOREACH item IN data -%]
+  [% item.file %]:
+    basic:
+      - copy: B2
+        paste: B[% loop.index + 3 %]
+      - copy: B4
+        paste: C[% loop.index + 3 %]
+      - copy: B5
+        paste: D[% loop.index + 3 %]
+      - copy: B7
+        paste: E[% loop.index + 3 %]
+      - copy: B8
+        paste: F[% loop.index + 3 %]
+[% END -%]
+EOF
+
+cat ~/data/organelle/plastid_summary/genus.tsv \
+    | cut -f 1 \
+    | perl -MTemplate -nl -e 'BEGIN{$tt = Template->new; } push @data, { name => $_, file => qq{$_.common.chart.xlsx}, }; END{$tt->process(q{Table_alignment.tt}, { data => \@data, }, q{Table_alignment.yml}) or die Template->error}'
+
+# Under Windows
+perl d:/Scripts/fig_table/excel_table.pl -i Table_alignment.yml
+
+# Back to mac
+cp -f Table_alignment.xlsx ~/data/organelle/plastid_summary/table
 ```
