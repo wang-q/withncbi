@@ -641,24 +641,6 @@ done  > runall.sh
 sh runall.sh 2>&1 | tee log_runall.txt
 
 ```
-
-### summary
-
-Create `plastid.list.csv` from `plastid.GENUS.csv` with sequence lengths.
-
-```bash
-cd ~/data/organelle/plastid_summary
-
-find ~/data/organelle/plastid.working -type f -name "chr.sizes" | sort \
-    | xargs perl -nl -e 'BEGIN{print q{genus,strain_abbr,accession,length}}; $_ =~ s/\t/\,/; $ARGV =~ /working\/(\w+)\/(\w+)\//; print qq{$1,$2,$_}' > length.tmp
-
-perl ~/Scripts/alignDB/util/merge_csv.pl \
-    -t ~/data/organelle/plastid_genomes/plastid.GENUS.csv -m length.tmp -f 1 -f2 2 --concat --stdout \
-    | perl -nl -a -F"," -e 'print qq{$F[5],$F[4],$F[2],$F[0],$F[1],$F[13]}' \
-    >  plastid.list.csv
-
-```
-
 ## Cyanobacteria
 
 ### Genus and Species counts
@@ -727,11 +709,11 @@ perl ~/Scripts/withncbi/taxon/bac_prepare.pl --db gr_prok \
 
 perl ~/Scripts/withncbi/taxon/bac_prepare.pl --db gr_prok \
     --seq_dir ~/data/organelle/cyanobacteria/bac_seq_dir \
-    -p 1219 --get_seq -t 59919 -e 167539,167555,59920,59922,74547,93059 -n Prochlorococcus_marinus
+    -p 74546,93060,146891,167546 --get_seq -t 74546 -n Prochlorococcus_marinus
 
 perl ~/Scripts/withncbi/taxon/bac_prepare.pl --db gr_prok \
     --seq_dir ~/data/organelle/cyanobacteria/bac_seq_dir \
-    -p 1219 --get_seq -t 59919 -o 167539 -e 167555,59920,59922,74547,93059 -n Prochlorococcus_marinus_OG
+    -p 74546,93060,146891,167546,59919 --get_seq -t 74546 -o 59919 -n Prochlorococcus_marinus_OG
 
 perl ~/Scripts/withncbi/taxon/bac_prepare.pl --db gr_prok \
     --seq_dir ~/data/organelle/cyanobacteria/bac_seq_dir \
@@ -778,5 +760,22 @@ find . -mindepth 1 -maxdepth 3 -type d -name "*_fasta" | parallel --no-run-if-em
 
 find . -mindepth 1 -maxdepth 4 -type f -name "*.phy" | parallel --no-run-if-empty rm
 find . -mindepth 1 -maxdepth 4 -type f -name "*.phy.reduced" | parallel --no-run-if-empty rm
+
+```
+
+## Summary
+
+Create `plastid.list.csv` from `plastid.GENUS.csv` with sequence lengths.
+
+```bash
+cd ~/data/organelle/plastid_summary
+
+find ~/data/organelle/plastid.working -type f -name "chr.sizes" | sort \
+    | xargs perl -nl -e 'BEGIN{print q{genus,strain_abbr,accession,length}}; $_ =~ s/\t/\,/; $ARGV =~ /working\/(\w+)\/(\w+)\//; print qq{$1,$2,$_}' > length.tmp
+
+perl ~/Scripts/alignDB/util/merge_csv.pl \
+    -t ~/data/organelle/plastid_genomes/plastid.GENUS.csv -m length.tmp -f 1 -f2 2 --concat --stdout \
+    | perl -nl -a -F"," -e 'print qq{$F[5],$F[4],$F[2],$F[0],$F[1],$F[13]}' \
+    >  plastid.list.csv
 
 ```
