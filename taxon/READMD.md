@@ -29,7 +29,12 @@ Eukaryota (2759)                908
         Streptophyta (35493)    770
 ```
 
-Use `taxon/id_seq_dom_select.pl` to extract Taxonomy ids and genbank accessions.
+Use `taxon/id_seq_dom_select.pl` to extract Taxonomy ids and genbank accessions from all history pages.
+
+```csv
+id,acc
+996148,NC_017006
+```
 
 Got **921** accessions.
 
@@ -37,14 +42,10 @@ Got **921** accessions.
 mkdir -p ~/data/organelle/plastid_genomes
 cd ~/data/organelle/plastid_genomes
 
-# All history pages
-# id,acc
-# 996148,NC_017006
 perl ~/Scripts/withncbi/taxon/id_seq_dom_select.pl ~/Scripts/withncbi/doc/eukaryota_plastid_150826.html > webpage_id_seq.csv
 perl ~/Scripts/withncbi/taxon/id_seq_dom_select.pl ~/Scripts/withncbi/doc/eukaryota_plastid_150806.html >> webpage_id_seq.csv
 perl ~/Scripts/withncbi/taxon/id_seq_dom_select.pl ~/Scripts/withncbi/doc/green_plants_plastid_150725.html >> webpage_id_seq.csv
 perl ~/Scripts/withncbi/taxon/id_seq_dom_select.pl ~/Scripts/withncbi/doc/plant_plastid_141130.html >> webpage_id_seq.csv
-
 ```
 
 Use `taxon/gb_taxon_locus.pl` to extract information from refseq plastid file.
@@ -381,7 +382,6 @@ cat plastid.GENUS.tmp \
 
 # clean
 rm *.tmp *.bak
-
 ```
 
 Create alignments without outgroups.
@@ -406,7 +406,7 @@ cat plastid.ABBR.csv \
 # name  t   qs  o
 cat genus.tsv \
     | perl -nl -a -F"\t" -MPath::Tiny -e \
-    'BEGIN{ @ls = grep {/\S/} grep {!/^#/} path(q{~/Scripts/withncbi/doc/plastid_OG.md})->lines( { chomp => 1}); for (@ls) {@fs = split(/,/); $h{$fs[0]}= $fs[1];}  } if (exists $h{$F[0]}) { printf qq{%s\t%s\t%s\t%s\n}, $F[0], $F[1], $F[2], $h{$F[0]}; }' \
+    'BEGIN{ @ls = grep {/\S/} grep {!/^#/} path(q{~/Scripts/withncbi/doc/plastid_OG.md})->lines( { chomp => 1}); for (@ls) {@fs = split(/,/); $h{$fs[0]}= $fs[1];}  } if (exists $h{$F[0]}) { printf qq{%s\t%s\t%s\t%s\n}, $F[0] . q{_OG}, $F[1], $F[2], $h{$F[0]}; }' \
     > genus_OG.tsv
 
 # every genera
@@ -427,7 +427,6 @@ echo -e "mkdir -p ~/data/organelle/plastid_OG\ncd ~/data/organelle/plastid_OG\n"
 cat genus_OG.tsv \
     | perl ~/Scripts/withncbi/taxon/cmd_template.pl --seq_dir ~/data/organelle/plastid_genomes --taxon_file ~/data/organelle/plastid_genomes/plastid_ncbi.csv --parallel 8 \
     >> ../plastid_OG.cmd.txt
-
 ```
 
 ## Aligning
@@ -571,7 +570,6 @@ find . -mindepth 1 -maxdepth 2 -type d -name "*_fasta" | parallel --no-run-if-em
 
 # clean mysql
 find  /usr/local/var/mysql -type d -name "[A-Z]*" | parallel --no-run-if-empty rm -fr
-
 ```
 
 ### Alignments of families for outgroups.
@@ -614,7 +612,6 @@ perl -pi -e 's/\n/\r\n/g' run_chart.bat
 # done
 
 find . -type f -path "*_phylo*" -name "*.nwk"
-
 ```
 
 Manually editing `~/Scripts/withncbi/doc/plastid_OG.md` and generate `genus_OG.tsv`.
@@ -640,7 +637,33 @@ done  > runall.sh
 
 sh runall.sh 2>&1 | tee log_runall.txt
 
+for d in `find . -mindepth 1 -maxdepth 1 -type d | sort `;do \
+    export d_base=`basename $d` ; \
+    echo "perl d:/Scripts/fig_table/collect_common_basic.pl    -d $d_base" ; \
+    echo "perl d:/Scripts/alignDB/stat/common_chart_factory.pl -i $d_base/$d_base.common.xlsx" ; \
+    echo "perl d:/Scripts/alignDB/stat/multi_chart_factory.pl  -i $d_base/$d_base.multi.xlsx" ; \
+    echo "perl d:/Scripts/alignDB/stat/gc_chart_factory.pl     -i $d_base/$d_base.gc.xlsx" ; \
+    echo ; \
+done  > run_chart.bat
+perl -pi -e 's/\n/\r\n/g' run_chart.bat
+
 ```
+
+SNP t-test
+
+```bash
+mkdir -p ~/data/organelle/plastid_summary/ttest
+cd ~/data/organelle/plastid_summary/ttest
+
+cat ~/Scripts/withncbi/doc/plastid_OG.md \
+    | grep -v "^#" | grep . \
+    | cut -d',' -f 1 \
+    | parallel echo perl ~/Scripts/alignDB/stat/multi_stat_factory.pl -d {}_OG -r 52 \
+    > plastid_og_ttest.cmd.txt
+
+sh plastid_og_ttest.cmd.txt
+```
+
 ## Cyanobacteria
 
 ### Genus and Species counts
@@ -765,6 +788,8 @@ find . -mindepth 1 -maxdepth 4 -type f -name "*.phy.reduced" | parallel --no-run
 
 ## Summary
 
+### Genome list
+
 Create `plastid.list.csv` from `plastid.GENUS.csv` with sequence lengths.
 
 ```bash
@@ -774,8 +799,25 @@ find ~/data/organelle/plastid.working -type f -name "chr.sizes" | sort \
     | xargs perl -nl -e 'BEGIN{print q{genus,strain_abbr,accession,length}}; $_ =~ s/\t/\,/; $ARGV =~ /working\/(\w+)\/(\w+)\//; print qq{$1,$2,$_}' > length.tmp
 
 perl ~/Scripts/alignDB/util/merge_csv.pl \
-    -t ~/data/organelle/plastid_genomes/plastid.GENUS.csv -m length.tmp -f 1 -f2 2 --concat --stdout \
-    | perl -nl -a -F"," -e 'print qq{$F[5],$F[4],$F[2],$F[0],$F[1],$F[13]}' \
+    -t plastid.GENUS.csv -m length.tmp -f 1 -f2 2 --concat --stdout \
+    | perl -nl -a -F"," -e 'print qq{$F[8],$F[6],$F[4],$F[2],$F[0],$F[1],$F[13]}' \
     >  plastid.list.csv
+
+rm length.tmp
+
+```
+
+### Phylogenic trees of each genus with outgroup
+
+```bash
+mkdir -p ~/data/organelle/plastid_summary/trees
+
+cat ~/Scripts/withncbi/doc/plastid_OG.md \
+    | grep -v "^#" | grep . \
+    | cut -d',' -f 1 \
+    > ~/data/organelle/plastid_summary/trees/list.txt
+
+find ~/data/organelle/plastid_OG -type f -path "*_phylo*" -name "*.nwk" \
+    | parallel -j 1 cp {} ~/data/organelle/plastid_summary/trees
 
 ```
