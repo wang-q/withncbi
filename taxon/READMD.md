@@ -444,15 +444,15 @@ time sh ../plastid.cmd.txt 2>&1 | tee log_cmd.txt
 #----------------------------#
 # Approach 1: one by one
 #----------------------------#
-for d in `find . -mindepth 1 -maxdepth 1 -type d | sort `;do \
+for d in `find . -mindepth 1 -maxdepth 1 -type d | sort `;do
     echo "echo \"====> Processing $d <====\""
-    echo sh $d/1_real_chr.sh ; \
-    echo sh $d/2_file_rm.sh ; \
-    echo sh $d/3_pair_cmd.sh ; \
-    echo sh $d/4_rawphylo.sh ; \
-    echo sh $d/5_multi_cmd.sh ; \
-    echo sh $d/7_multi_db_only.sh ; \
-    echo ; \
+    echo sh $d/1_real_chr.sh ;
+    echo sh $d/2_file_rm.sh ;
+    echo sh $d/3_pair_cmd.sh ;
+    echo sh $d/4_rawphylo.sh ;
+    echo sh $d/5_multi_cmd.sh ;
+    echo sh $d/7_multi_db_only.sh ;
+    echo ;
 done  > runall.sh
 
 sh runall.sh 2>&1 | tee log_runall.txt
@@ -461,39 +461,39 @@ sh runall.sh 2>&1 | tee log_runall.txt
 # Approach 2: step by step
 #----------------------------#
 # real_chr
-for f in `find . -mindepth 1 -maxdepth 2 -type f -name 1_real_chr.sh | sort `;do \
-    echo sh $f ; \
-    echo ; \
+for f in `find . -mindepth 1 -maxdepth 2 -type f -name 1_real_chr.sh | sort `;do
+    echo sh $f ;
+    echo ;
 done  > run_1.sh
 
 # RepeatMasker
-for f in `find . -mindepth 1 -maxdepth 2 -type f -name 2_file_rm.sh | sort `;do \
-    echo sh $f ; \
-    echo ; \
+for f in `find . -mindepth 1 -maxdepth 2 -type f -name 2_file_rm.sh | sort `;do
+    echo sh $f ;
+    echo ;
 done  > run_2.sh
 
 # pair
-for f in `find . -mindepth 1 -maxdepth 2 -type f -name 3_pair_cmd.sh | sort `;do \
-    echo sh $f ; \
-    echo ; \
+for f in `find . -mindepth 1 -maxdepth 2 -type f -name 3_pair_cmd.sh | sort `;do
+    echo sh $f ;
+    echo ;
 done  > run_3.sh
 
 # rawphylo
-for f in `find . -mindepth 1 -maxdepth 2 -type f -name 4_rawphylo.sh | sort `;do \
-    echo sh $f ; \
-    echo ; \
+for f in `find . -mindepth 1 -maxdepth 2 -type f -name 4_rawphylo.sh | sort `;do
+    echo sh $f ;
+    echo ;
 done  > run_4.sh
 
 # multi cmd
-for f in `find . -mindepth 1 -maxdepth 2 -type f -name 5_multi_cmd.sh | sort `;do \
-    echo sh $f ; \
-    echo ; \
+for f in `find . -mindepth 1 -maxdepth 2 -type f -name 5_multi_cmd.sh | sort `;do
+    echo sh $f ;
+    echo ;
 done  > run_5.sh
 
 # multi db
-for f in `find . -mindepth 1 -maxdepth 2 -type f -name 7_multi_db_only.sh | sort `;do \
-    echo sh $f ; \
-    echo ; \
+for f in `find . -mindepth 1 -maxdepth 2 -type f -name 7_multi_db_only.sh | sort `;do
+    echo sh $f ;
+    echo ;
 done  > run_7.sh
 
 cat run_1.sh | grep . | parallel -j 8 2>&1 | tee log_1.txt
@@ -506,13 +506,13 @@ cat run_7.sh | grep . | parallel -j 4 2>&1 | tee log_7.txt
 #----------------------------#
 # Charting on Windows
 #----------------------------#
-for d in `find . -mindepth 1 -maxdepth 1 -type d | sort `;do \
-    export d_base=`basename $d` ; \
-    echo "perl d:/Scripts/fig_table/collect_common_basic.pl    -d $d_base" ; \
-    echo "perl d:/Scripts/alignDB/stat/common_chart_factory.pl -i $d_base/$d_base.common.xlsx" ; \
-    echo "perl d:/Scripts/alignDB/stat/multi_chart_factory.pl  -i $d_base/$d_base.multi.xlsx" ; \
-    echo "perl d:/Scripts/alignDB/stat/gc_chart_factory.pl     -i $d_base/$d_base.gc.xlsx" ; \
-    echo ; \
+for d in `find . -mindepth 1 -maxdepth 1 -type d | sort `;do
+    export d_base=`basename $d` ;
+    echo "perl d:/Scripts/fig_table/collect_common_basic.pl    -d $d_base" ;
+    echo "perl d:/Scripts/alignDB/stat/common_chart_factory.pl --replace diversity=divergence -i $d_base/$d_base.common.xlsx" ;
+    echo "perl d:/Scripts/alignDB/stat/multi_chart_factory.pl  --replace diversity=divergence -i $d_base/$d_base.multi.xlsx" ;
+    echo "perl d:/Scripts/alignDB/stat/gc_chart_factory.pl     --replace diversity=divergence -i $d_base/$d_base.gc.xlsx" ;
+    echo ;
 done  > run_chart.bat
 perl -pi -e 's/\n/\r\n/g' run_chart.bat
 
@@ -539,15 +539,15 @@ cd ~/data/organelle/plastid_self.working
 time sh ../plastid_self.cmd.txt 2>&1 | tee log_cmd.txt
 
 # Don't need 6_feature_cmd.sh
-for d in `find . -mindepth 1 -maxdepth 1 -type d | sort `;do \
+for d in `find . -mindepth 1 -maxdepth 1 -type d | sort `;do
     echo "echo \"====> Processing $d <====\""
-    echo sh $d/1_real_chr.sh ; \
-    echo sh $d/2_file_rm.sh ; \
-    echo sh $d/3_self_cmd.sh ; \
-    echo sh $d/4_proc_cmd.sh ; \
-    echo sh $d/5_circos_cmd ; \
-    echo sh $d/7_pair_stat.sh ; \
-    echo ; \
+    echo sh $d/1_real_chr.sh ;
+    echo sh $d/2_file_rm.sh ;
+    echo sh $d/3_self_cmd.sh ;
+    echo sh $d/4_proc_cmd.sh ;
+    echo sh $d/5_circos_cmd ;
+    echo sh $d/7_pair_stat.sh ;
+    echo ;
 done  > runall.sh
 
 sh runall.sh 2>&1 | tee log_runall.txt
@@ -555,12 +555,12 @@ sh runall.sh 2>&1 | tee log_runall.txt
 #----------------------------#
 # Charting on Windows
 #----------------------------#
-for d in `find . -mindepth 1 -maxdepth 1 -type d | sort `;do \
-    export d_base=`basename $d` ; \
-    echo "perl d:/Scripts/fig_table/collect_common_basic.pl    -d $d_base" ; \
-    echo "perl d:/Scripts/alignDB/stat/common_chart_factory.pl -i $d_base/${d_base}_paralog.common.xlsx" ; \
-    echo "perl d:/Scripts/alignDB/stat/gc_chart_factory.pl     -i $d_base/${d_base}_paralog.gc.xlsx" ; \
-    echo ; \
+for d in `find . -mindepth 1 -maxdepth 1 -type d | sort `;do
+    export d_base=`basename $d` ;
+    echo "perl d:/Scripts/fig_table/collect_common_basic.pl    -d $d_base" ;
+    echo "perl d:/Scripts/alignDB/stat/common_chart_factory.pl --replace diversity=divergence -i $d_base/${d_base}_paralog.common.xlsx" ;
+    echo "perl d:/Scripts/alignDB/stat/gc_chart_factory.pl     --replace diversity=divergence -i $d_base/${d_base}_paralog.gc.xlsx" ;
+    echo ;
 done  > run_chart.bat
 perl -pi -e 's/\n/\r\n/g' run_chart.bat
 
@@ -582,22 +582,22 @@ cd ~/data/organelle/plastid_families
 
 time sh ../plastid_families.cmd.txt 2>&1 | tee log_cmd.txt
 
-for d in `find . -mindepth 1 -maxdepth 1 -type d | sort `;do \
+for d in `find . -mindepth 1 -maxdepth 1 -type d | sort `;do
     echo "echo \"====> Processing $d <====\""
-    echo sh $d/1_real_chr.sh ; \
-    echo sh $d/2_file_rm.sh ; \
-    echo sh $d/3_pair_cmd.sh ; \
-    echo sh $d/4_rawphylo.sh ; \
-    echo sh $d/5_multi_cmd.sh ; \
-    echo ; \
+    echo sh $d/1_real_chr.sh ;
+    echo sh $d/2_file_rm.sh ;
+    echo sh $d/3_pair_cmd.sh ;
+    echo sh $d/4_rawphylo.sh ;
+    echo sh $d/5_multi_cmd.sh ;
+    echo ;
 done  > runall.sh
 
 sh runall.sh 2>&1 | tee log_runall.txt
 
-for d in `find . -mindepth 1 -maxdepth 1 -type d | sort `;do \
-    export d_base=`basename $d` ; \
-    echo "perl d:/Scripts/fig_table/collect_common_basic.pl    -d $d_base" ; \
-    echo ; \
+for d in `find . -mindepth 1 -maxdepth 1 -type d | sort `;do
+    export d_base=`basename $d` ;
+    echo "perl d:/Scripts/fig_table/collect_common_basic.pl    -d $d_base" ;
+    echo ;
 done  > run_chart.bat
 perl -pi -e 's/\n/\r\n/g' run_chart.bat
 
@@ -637,13 +637,13 @@ done  > runall.sh
 
 sh runall.sh 2>&1 | tee log_runall.txt
 
-for d in `find . -mindepth 1 -maxdepth 1 -type d | sort `;do \
-    export d_base=`basename $d` ; \
-    echo "perl d:/Scripts/fig_table/collect_common_basic.pl    -d $d_base" ; \
-    echo "perl d:/Scripts/alignDB/stat/common_chart_factory.pl -i $d_base/$d_base.common.xlsx" ; \
-    echo "perl d:/Scripts/alignDB/stat/multi_chart_factory.pl  -i $d_base/$d_base.multi.xlsx" ; \
-    echo "perl d:/Scripts/alignDB/stat/gc_chart_factory.pl     -i $d_base/$d_base.gc.xlsx" ; \
-    echo ; \
+for d in `find . -mindepth 1 -maxdepth 1 -type d | sort `;do
+    export d_base=`basename $d` ;
+    echo "perl d:/Scripts/fig_table/collect_common_basic.pl    -d $d_base" ;
+    echo "perl d:/Scripts/alignDB/stat/common_chart_factory.pl --replace diversity=divergence -i $d_base/$d_base.common.xlsx" ;
+    echo "perl d:/Scripts/alignDB/stat/multi_chart_factory.pl  --replace diversity=divergence -i $d_base/$d_base.multi.xlsx" ;
+    echo "perl d:/Scripts/alignDB/stat/gc_chart_factory.pl     --replace diversity=divergence -i $d_base/$d_base.gc.xlsx" ;
+    echo ;
 done  > run_chart.bat
 perl -pi -e 's/\n/\r\n/g' run_chart.bat
 
@@ -793,18 +793,6 @@ find . -mindepth 1 -maxdepth 4 -type f -name "*.phy.reduced" | parallel --no-run
 
 ## Summary
 
-### Copy xlsx files
-
-```bash
-mkdir -p ~/data/organelle/plastid_summary/xlsx
-cd ~/data/organelle/plastid_summary/xlsx
-
-find  ~/data/organelle/plastid.working -type f -name "*.common.chart.xlsx" | sort \
-    | parallel cp {} .
-
-
-```
-
 ### Groups
 
 ```bash
@@ -861,6 +849,42 @@ find ~/data/organelle/plastid_OG -type f -path "*_phylo*" -name "*.nwk" \
     | parallel -j 1 cp {} ~/data/organelle/plastid_summary/trees
 ```
 
+### Copy xlsx files
+
+```bash
+mkdir -p ~/data/organelle/plastid_summary/xlsx
+cd ~/data/organelle/plastid_summary/xlsx
+
+find  ~/data/organelle/plastid.working -type f -name "*.common.xlsx" \
+    | grep -v "vs[A-Z]" \
+    | parallel cp {} .
+
+find  ~/data/organelle/plastid_OG -type f -name "*.common.xlsx" \
+    | grep -v "vs[A-Z]" \
+    | parallel cp {} .
+
+cat <<EOF > cmd_common_chart.tt
+[% FOREACH item IN data -%]
+[% chart = 'common' -%]
+REM [% item.name %]
+if not exist [% item.name %].[% chart %].xlsx goto skip[% item.name %]
+perl d:/Scripts/alignDB/stat/[% chart %]_chart_factory.pl --replace diversity=divergence -i [% item.name %].[% chart %].xlsx
+if not exist [% item.name %]_OG.[% chart %].xlsx goto skip[% item.name %]
+perl d:/Scripts/alignDB/stat/[% chart %]_chart_factory.pl --replace diversity=divergence -i [% item.name %]_OG.[% chart %].xlsx
+:skip[% item.name %]
+
+[% END -%]
+EOF
+
+cat ~/data/organelle/plastid_summary/group/*.lst \
+    | perl -MTemplate -nl -e 'BEGIN{$tt = Template->new; } push @data, { name => $_, }; END{$tt->process(q{cmd_common_chart.tt}, { data => \@data, }) or die Template->error}' \
+    > cmd_common_chart.bat
+
+# Undre Windows
+cd /d D:/data/organelle/plastid_summary/xlsx
+cmd_common_chart.bat
+```
+
 ### Genome alignment statistics
 
 ```bash
@@ -912,10 +936,11 @@ EOF
 
 cat ~/data/organelle/plastid_summary/genus.tsv \
     | cut -f 1 \
-    | perl -MTemplate -nl -e 'BEGIN{$tt = Template->new; } push @data, { name => $_, file => qq{$_.common.chart.xlsx}, }; END{$tt->process(q{Table_alignment.tt}, { data => \@data, }) or die Template->error}' \
+    | perl -MTemplate -nl -e 'BEGIN{$tt = Template->new; } push @data, { name => $_, file => qq{$_.common.xlsx}, }; END{$tt->process(q{Table_alignment.tt}, { data => \@data, }) or die Template->error}' \
     > Table_alignment.yml
 
 # Under Windows
+cd /d D:/data/organelle/plastid_summary/xlsx
 perl d:/Scripts/fig_table/excel_table.pl -i Table_alignment.yml
 
 # Back to Mac
@@ -958,11 +983,37 @@ ranges:
 [% END -%]
 EOF
 
-cat ~/data/organelle/plastid_summary/group/others.lst \
+cat ~/data/organelle/plastid_summary/group/Others.lst \
     | perl -MTemplate -nl -e 'BEGIN{$tt = Template->new; } push @data, { name => $_, file => qq{$_.common.chart.xlsx}, }; END{$tt->process(q{Table_combine_d1.tt}, { data => \@data, }) or die Template->error}' \
-    >
+    > Table_combine_d1_Others.yml
 
 # Under Windows
-perl d:/Scripts/fig_table/excel_table.pl -i Table_combine_d1.yml
+cd /d D:/data/organelle/plastid_summary/xlsx
+perl d:/Scripts/fig_table/excel_table.pl -i Table_combine_d1_Others.yml
+
+# XXX Unfinished
+perl d:/Scripts/fig_table/ofg_chart.pl -i Table_combine_d1_Others.xlsx -xl "Distance to indes (d1)" -yl "Nucleotide divergence (D)" -xr "A2:A17" -yr "B2:B17"  --y_min 0.0 --y_max 0.04  -rb "ofg_tag" -rs "ofg_all" -fb 2 -ft 2
+
+perl fig\ofg_chart.pl -i d:\wq\GC\autochart\131224_(yeast_trans_part)(ecoli_tf)(encode)\Human_BED_FaireSeq.mg.xlsx -xl "Distance to TF binding sites" -yl "Window CV" -xr "A2:A17" -yr "C2:C17"  --y_min 0.12 --y_max 0.2  -rb "ofg_tag" -rs "ofg_all" -fb 2 -ft 2 --style_red
+
+export RMDFILE=test
+Rscript -e "require(knitr); require(markdown); knit('$(RMDFILE).rmd', '$(RMDFILE).md'); markdownToHTML('$(RMDFILE).md', '$(RMDFILE).html', options=c('use_xhtml', 'base64_images')); browseURL(paste('file://', file.path(getwd(),'$(RMDFILE).html'), sep=''))"
+```
+
+### `collect_excel.pl` d1, d2
+
+```bash
+cd ~/data/organelle/plastid_summary/xlsx
+
+cat <<EOF > collect_d1_d2.tt
+perl d:/Scripts/fig_table/collect_excel.pl [% FOREACH item IN data -%] -f [% item.name %].common.xlsx -s d1_pi_gc_cv -n [% item.name %] [% END -%] -o bac_paralog_d1.xlsx
+
+perl d:/Scripts/fig_table/collect_excel.pl [% FOREACH item IN data -%] -f [% item.name %].common.xlsx -s d2_pi_gc_cv -n [% item.name %] [% END -%] -o bac_paralog_d2.xlsx
+
+REM perl d:\wq\Scripts\alignDB\fig\ofg_chart.pl -i bac_paralog_d1.xlsx -xl "Distance to indels (d1)" -yl "Nucleotide diversity" -xr "A2:A8" -yr "B2:B8"  --y_min 0.0 --y_max 0.25 -x_min 0 -x_max 5 -rb "." -rs "NON_EXIST"
+
+
+EOF
+
 
 ```
