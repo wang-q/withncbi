@@ -647,6 +647,12 @@ for d in `find . -mindepth 1 -maxdepth 1 -type d | sort `;do \
 done  > run_chart.bat
 perl -pi -e 's/\n/\r\n/g' run_chart.bat
 
+find . -mindepth 1 -maxdepth 3 -type d -name "*_raw" | parallel --no-run-if-empty rm -fr
+find . -mindepth 1 -maxdepth 3 -type d -name "*_fasta" | parallel --no-run-if-empty rm -fr
+
+find . -mindepth 1 -maxdepth 4 -type f -name "*.phy" | parallel --no-run-if-empty rm
+find . -mindepth 1 -maxdepth 4 -type f -name "*.phy.reduced" | parallel --no-run-if-empty rm
+
 ```
 
 SNP t-test
@@ -799,6 +805,29 @@ find  ~/data/organelle/plastid.working -type f -name "*.common.chart.xlsx" | sor
 
 ```
 
+### Groups
+
+```bash
+mkdir -p ~/data/organelle/plastid_summary/group
+cd ~/data/organelle/plastid_summary/group
+
+perl -l -MPath::Tiny -e \
+'BEGIN{ @ls = map {/^#/ and s/^(#+\s*\w+).*/\1/; $_} map {s/,\w+//; $_} map {s/^###\s*//; $_} path(q{~/Scripts/withncbi/doc/plastid_OG.md})->lines( { chomp => 1}); } $fh; for (@ls) { (/^\s*$/ or /^##\s+/) and next; if (/^#\s+(\w+)/) {$fh = path("$1.txt")->openw; next;} else {print {$fh} $_}}'
+
+mv Gymnosperm.txt Gymnosperm.lst
+mv Angiosperm.txt Angiosperm.lst
+find . -type f -name "*.txt" \
+    | xargs cat \
+    > Others.lst
+rm *.txt
+
+cat *.lst \
+    | perl -e '@ls = <>; $str = qq{bp_taxonomy2tree.pl \\\n}; for (@ls) {chomp;$str .= qq{-s $_ \\\n}}  $str .= qq{-e \n}; print $str' \
+    > genera_tree.sh
+sh genera_tree.sh > genera.tree
+
+```
+
 ### Genome list
 
 Create `plastid.list.csv` from `plastid.GENUS.csv` with sequence lengths.
@@ -883,11 +912,57 @@ EOF
 
 cat ~/data/organelle/plastid_summary/genus.tsv \
     | cut -f 1 \
-    | perl -MTemplate -nl -e 'BEGIN{$tt = Template->new; } push @data, { name => $_, file => qq{$_.common.chart.xlsx}, }; END{$tt->process(q{Table_alignment.tt}, { data => \@data, }, q{Table_alignment.yml}) or die Template->error}'
+    | perl -MTemplate -nl -e 'BEGIN{$tt = Template->new; } push @data, { name => $_, file => qq{$_.common.chart.xlsx}, }; END{$tt->process(q{Table_alignment.tt}, { data => \@data, }) or die Template->error}' \
+    > Table_alignment.yml
 
 # Under Windows
 perl d:/Scripts/fig_table/excel_table.pl -i Table_alignment.yml
 
-# Back to mac
+# Back to Mac
 cp -f Table_alignment.xlsx ~/data/organelle/plastid_summary/table
+```
+
+### d1, d2
+
+```bash
+cd ~/data/organelle/plastid_summary/xlsx
+
+cat <<EOF > Table_combine_d1.tt
+---
+autofit: A:C
+texts:
+  - text: "distance"
+    pos: A1
+  - text: "variable"
+    pos: B1
+  - text: "value"
+    pos: C1
+[% FOREACH item IN data -%]
+[% curser = loop.index * 16 + 2 -%]
+[% idx = 0 -%]
+[% WHILE idx < 16 -%]
+  - text: [% item.name %]
+    pos: B[% curser + idx %]
+[% idx = idx + 1 -%]
+[% END -%]
+[% END -%]
+ranges:
+[% FOREACH item IN data -%]
+[% curser = loop.index * 16 + 2 -%]
+  [% item.file %]:
+    d1_pi_gc_cv:
+      - copy: A3:A18
+        paste: A[% curser %]
+      - copy: D3:D18
+        paste: C[% curser %]
+[% END -%]
+EOF
+
+cat ~/data/organelle/plastid_summary/group/others.lst \
+    | perl -MTemplate -nl -e 'BEGIN{$tt = Template->new; } push @data, { name => $_, file => qq{$_.common.chart.xlsx}, }; END{$tt->process(q{Table_combine_d1.tt}, { data => \@data, }) or die Template->error}' \
+    >
+
+# Under Windows
+perl d:/Scripts/fig_table/excel_table.pl -i Table_combine_d1.yml
+
 ```

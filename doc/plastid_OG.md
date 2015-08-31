@@ -8,20 +8,6 @@
 ## Thalassiosiraceae 海链藻科
 Thalassiosira,Rou_cardiophora
 
-# Chlorophyta 绿藻门 (Green Algae)
-## Bryopsidaceae 羽藻科
-### Bryopsis
-## Chlorellaceae 小球藻科
-Chlorella,Para_kessleri
-## Klebsormidiaceae
-Koliella,Int_terricola
-## Mamiellaceae
-### Micromonas
-## Nephroselmidaceae 肾藻科
-### Nephroselmis
-## Pedinomonadaceae 柄胞藻科
-### Pedinomonas
-
 # Euglenida 眼虫目
 ## Euglenaceae 眼虫科
 Euglena,Tra_volvocina
@@ -40,6 +26,20 @@ Monomorphina,Tra_volvocina
 Pyropia,Por_purpurea
 ## Gracilariaceae 江蓠科
 ### Gracilaria
+
+# Chlorophyta 绿藻门 (Green Algae)
+## Bryopsidaceae 羽藻科
+### Bryopsis
+## Chlorellaceae 小球藻科
+Chlorella,Para_kessleri
+## Klebsormidiaceae
+Koliella,Int_terricola
+## Mamiellaceae
+### Micromonas
+## Nephroselmidaceae 肾藻科
+### Nephroselmis
+## Pedinomonadaceae 柄胞藻科
+### Pedinomonas
 
 # Fern
 ## Equisetaceae 木贼科
