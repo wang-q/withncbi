@@ -1005,15 +1005,38 @@ Rscript -e "require(knitr); require(markdown); knit('$(RMDFILE).rmd', '$(RMDFILE
 ```bash
 cd ~/data/organelle/plastid_summary/xlsx
 
-cat <<EOF > collect_d1_d2.tt
-perl d:/Scripts/fig_table/collect_excel.pl [% FOREACH item IN data -%] -f [% item.name %].common.xlsx -s d1_pi_gc_cv -n [% item.name %] [% END -%] -o bac_paralog_d1.xlsx
+cat <<EOF > cmd_collect_d1_d2.tt
+perl d:/Scripts/fig_table/collect_excel.pl [% FOREACH item IN data -%] -f [% item.name %].common.xlsx -s d1_pi_gc_cv -n [% item.name %] [% END -%] -o plastid_d1.[% group %].xlsx
 
-perl d:/Scripts/fig_table/collect_excel.pl [% FOREACH item IN data -%] -f [% item.name %].common.xlsx -s d2_pi_gc_cv -n [% item.name %] [% END -%] -o bac_paralog_d2.xlsx
+perl d:/Scripts/fig_table/collect_excel.pl [% FOREACH item IN data -%] -f [% item.name %].common.xlsx -s d1_comb_pi_gc_cv -n [% item.name %] [% END -%] -o plastid_d1_comb.[% group %].xlsx
 
-REM perl d:\wq\Scripts\alignDB\fig\ofg_chart.pl -i bac_paralog_d1.xlsx -xl "Distance to indels (d1)" -yl "Nucleotide diversity" -xr "A2:A8" -yr "B2:B8"  --y_min 0.0 --y_max 0.25 -x_min 0 -x_max 5 -rb "." -rs "NON_EXIST"
-
+perl d:/Scripts/fig_table/collect_excel.pl [% FOREACH item IN data -%] -f [% item.name %].common.xlsx -s d2_comb_pi_gc_cv -n [% item.name %] [% END -%] -o plastid_d2_comb.[% group %].xlsx
 
 EOF
+
+cat ~/data/organelle/plastid_summary/group/Angiosperm.lst \
+    | perl -MTemplate -nl -e 'BEGIN{$tt = Template->new; } push @data, { name => $_, }; END{$tt->process(q{cmd_collect_d1_d2.tt}, { data => \@data, group => q{Angiosperm}, }) or die Template->error}' \
+    > cmd_collect_d1_d2.Angiosperm.bat
+
+cat ~/data/organelle/plastid_summary/group/Gymnosperm.lst \
+    | perl -MTemplate -nl -e 'BEGIN{$tt = Template->new; } push @data, { name => $_, }; END{$tt->process(q{cmd_collect_d1_d2.tt}, { data => \@data, group => q{Gymnosperm}, }) or die Template->error}' \
+    > cmd_collect_d1_d2.Gymnosperm.bat
+
+cat ~/data/organelle/plastid_summary/group/Others.lst \
+    | perl -MTemplate -nl -e 'BEGIN{$tt = Template->new; } push @data, { name => $_, }; END{$tt->process(q{cmd_collect_d1_d2.tt}, { data => \@data, group => q{Others}, }) or die Template->error}' \
+    > cmd_collect_d1_d2.Others.bat
+
+# Undre Windows
+cd /d D:/data/organelle/plastid_summary/xlsx
+cmd_collect_d1_d2.Angiosperm.bat
+cmd_collect_d1_d2.Gymnosperm.bat
+cmd_collect_d1_d2.Others.bat
+
+perl d:/Scripts/fig_table/ofg_chart.pl -i plastid_d1.Angiosperm.xlsx -xl "Distance to indels (d1)" -yl "Nucleotide divergence (D)" -xr "A2:A8" -yr "B2:B8"  --y_min 0.0 --y_max 0.1 -x_min 0 -x_max 5 -rb "." -rs "NON_EXIST"
+perl d:/Scripts/fig_table/ofg_chart.pl -i plastid_d1.Gymnosperm.xlsx -xl "Distance to indels (d1)" -yl "Nucleotide divergence (D)" -xr "A2:A8" -yr "B2:B8"  --y_min 0.0 --y_max 0.04 -x_min 0 -x_max 5 -rb "." -rs "NON_EXIST"
+perl d:/Scripts/fig_table/ofg_chart.pl -i plastid_d1.Others.xlsx -xl "Distance to indels (d1)" -yl "Nucleotide divergence (D)" -xr "A2:A8" -yr "B2:B8"  --y_min 0.0 --y_max 0.2 -x_min 0 -x_max 5 -rb "." -rs "NON_EXIST"
+
+perl d:/Scripts/fig_table/ofg_chart.pl -i plastid_d2.Angiosperm.xlsx -xl "Reciprocal of indel density (d2)" -yl "Nucleotide divergence (D)" -xr "A2:A8" -yr "B2:B8"  --y_min 0.0 --y_max 0.1 -x_min 0 -x_max 5 -rb "." -rs "NON_EXIST"
 
 
 ```
