@@ -793,62 +793,6 @@ find . -mindepth 1 -maxdepth 4 -type f -name "*.phy.reduced" | parallel --no-run
 
 ## Summary
 
-### Groups
-
-```bash
-mkdir -p ~/data/organelle/plastid_summary/group
-cd ~/data/organelle/plastid_summary/group
-
-perl -l -MPath::Tiny -e \
-'BEGIN{ @ls = map {/^#/ and s/^(#+\s*\w+).*/\1/; $_} map {s/,\w+//; $_} map {s/^###\s*//; $_} path(q{~/Scripts/withncbi/doc/plastid_OG.md})->lines( { chomp => 1}); } $fh; for (@ls) { (/^\s*$/ or /^##\s+/) and next; if (/^#\s+(\w+)/) {$fh = path("$1.txt")->openw; next;} else {print {$fh} $_}}'
-
-mv Gymnosperm.txt Gymnosperm.lst
-mv Angiosperm.txt Angiosperm.lst
-find . -type f -name "*.txt" \
-    | xargs cat \
-    > Others.lst
-rm *.txt
-
-cat *.lst \
-    | perl -e '@ls = <>; $str = qq{bp_taxonomy2tree.pl \\\n}; for (@ls) {chomp;$str .= qq{-s $_ \\\n}}  $str .= qq{-e \n}; print $str' \
-    > genera_tree.sh
-sh genera_tree.sh > genera.tree
-
-```
-
-### Genome list
-
-Create `plastid.list.csv` from `plastid.GENUS.csv` with sequence lengths.
-
-```bash
-mkdir -p ~/data/organelle/plastid_summary/table
-cd ~/data/organelle/plastid_summary/table
-
-find ~/data/organelle/plastid.working -type f -name "chr.sizes" | sort \
-    | xargs perl -nl -e 'BEGIN{print q{genus,strain_abbr,accession,length}}; $_ =~ s/\t/\,/; $ARGV =~ /working\/(\w+)\/(\w+)\//; print qq{$1,$2,$_}' > length.tmp
-
-perl ~/Scripts/alignDB/util/merge_csv.pl \
-    -t ~/data/organelle/plastid_summary/plastid.GENUS.csv -m length.tmp -f 1 -f2 2 --concat --stdout \
-    | perl -nl -a -F"," -e 'print qq{$F[8],$F[6],$F[4],$F[2],$F[0],$F[1],$F[13]}' \
-    >  plastid.list.csv
-
-rm length.tmp
-```
-
-### Phylogenic trees of each genus with outgroup
-
-```bash
-mkdir -p ~/data/organelle/plastid_summary/trees
-
-cat ~/Scripts/withncbi/doc/plastid_OG.md \
-    | grep -v "^#" | grep . \
-    | cut -d',' -f 1 \
-    > ~/data/organelle/plastid_summary/trees/list.txt
-
-find ~/data/organelle/plastid_OG -type f -path "*_phylo*" -name "*.nwk" \
-    | parallel -j 1 cp {} ~/data/organelle/plastid_summary/trees
-```
-
 ### Copy xlsx files
 
 ```bash
@@ -885,57 +829,155 @@ cd /d D:/data/organelle/plastid_summary/xlsx
 cmd_common_chart.bat
 ```
 
-### Genome alignment statistics
+### Genome list
+
+Create `plastid.list.csv` from `plastid.GENUS.csv` with sequence lengths.
 
 ```bash
-cd ~/data/organelle/plastid_summary/xlsx
+mkdir -p ~/data/organelle/plastid_summary/table
+cd ~/data/organelle/plastid_summary/table
 
+# manually set orders in `plastid_OG.md`
+echo "genus" > genus_all.order
+perl -l -MPath::Tiny -e \
+    'BEGIN{ @ls = map {/^#/ and s/^(#+\s*\w+).*/\1/; $_} map {s/,\w+//; $_} map {s/^###\s*//; $_} path(q{~/Scripts/withncbi/doc/plastid_OG.md})->lines( { chomp => 1}); } $fh; for (@ls) { (/^\s*$/ or /^##\s+/ or /^#\s+(\w+)/) and next; print $_}' \
+    >> genus_all.order
+
+echo "genus,strain_abbr,accession,length" > length.tmp
+find ~/data/organelle/plastid.working -type f -name "chr.sizes" \
+    | xargs perl -nl -e \
+    '$_ =~ s/\t/\,/; $ARGV =~ /working\/(\w+)\/(\w+)\//; print qq{$1,$2,$_}' \
+    >> length.tmp
+
+cat length.tmp \
+    | perl -nl -a -F',' -MPath::Tiny -e \
+    'BEGIN{ @ls = path(q{genus_all.order})->lines( { chomp => 1}); $o{$ls[$_]} = $_ for (0 .. $#ls); } print qq{$_,$o{$F[0]}};' \
+    | sort -n -t, -k5,5 \
+    | cut -d',' -f 1-4 \
+    > length_ordered.tmp
+
+perl ~/Scripts/alignDB/util/merge_csv.pl \
+    -t length_ordered.tmp -m ~/data/organelle/plastid_summary/plastid.GENUS.csv -f 2 -f2 1 --concat --stdout \
+    | perl -nl -a -F"," -e 'print qq{$F[12],$F[10],$F[8],$F[6],$F[4],$F[5],$F[3]}' \
+    >  plastid.list.csv
+
+rm *.tmp
+```
+
+### Genome alignment statistics
+
+Some genera will be filtered out here.
+
+```bash
 mkdir -p ~/data/organelle/plastid_summary/table
 
+cd ~/data/organelle/plastid_summary/xlsx
 cat <<EOF > Table_alignment.tt
 ---
 autofit: A:F
 texts:
   - text: "Genus"
-    pos: A2
+    pos: A1
   - text: "No. of genomes"
-    pos: B2
+    pos: B1
   - text: "Aligned length (Mb)"
-    pos: C2
+    pos: C1
   - text: "Indels Per 100 bp"
-    pos: D2
+    pos: D1
   - text: "D on average"
-    pos: E2
+    pos: E1
   - text: "GC-content"
-    pos: F2
+    pos: F1
 [% FOREACH item IN data -%]
   - text: [% item.name %]
-    pos: A[% loop.index + 3 %]
+    pos: A[% loop.index + 2 %]
 [% END -%]
 borders:
-  - range: A2:F2
+  - range: A1:F1
     top: 1
-  - range: A2:F2
+  - range: A1:F1
     bottom: 1
 ranges:
 [% FOREACH item IN data -%]
   [% item.file %]:
     basic:
       - copy: B2
-        paste: B[% loop.index + 3 %]
+        paste: B[% loop.index + 2 %]
       - copy: B4
-        paste: C[% loop.index + 3 %]
+        paste: C[% loop.index + 2 %]
       - copy: B5
-        paste: D[% loop.index + 3 %]
+        paste: D[% loop.index + 2 %]
       - copy: B7
-        paste: E[% loop.index + 3 %]
+        paste: E[% loop.index + 2 %]
       - copy: B8
-        paste: F[% loop.index + 3 %]
+        paste: F[% loop.index + 2 %]
 [% END -%]
 EOF
 
-cat ~/data/organelle/plastid_summary/genus.tsv \
-    | cut -f 1 \
+cat ~/data/organelle/plastid_summary/table/genus_all.order \
+    | grep -v "^genus" \
+    | perl -MTemplate -nl -e 'BEGIN{$tt = Template->new; } push @data, { name => $_, file => qq{$_.common.xlsx}, }; END{$tt->process(q{Table_alignment.tt}, { data => \@data, }) or die Template->error}' \
+    > Table_alignment_all.yml
+
+# Under Windows
+cd /d D:/data/organelle/plastid_summary/xlsx
+perl d:/Scripts/fig_table/excel_table.pl -i Table_alignment_all.yml
+perl d:/Scripts/fig_table/xlsx2xls.pl -d Table_alignment_all.xlsx --csv
+
+# Back to Mac
+cd ~/data/organelle/plastid_summary/xlsx
+cp -f Table_alignment_all.xlsx ~/data/organelle/plastid_summary/table
+perl -pi -e 's/\r\n/\n/g' Table_alignment_all.csv
+cp -f Table_alignment_all.csv ~/data/organelle/plastid_summary/table
+
+cd ~/data/organelle/plastid_summary/table
+
+echo "Genus,avg_size" > genus_avg_size.csv
+cat plastid.list.csv \
+    | grep -v "#" \
+    | perl -nl -a -F"," -e \
+    '$count{$F[2]}++; $sum{$F[2]} += $F[6]; END {for $k (sort keys %count) { printf qq{%s,%d\n}, $k, $sum{$k}/$count{$k}; } }' \
+    >> genus_avg_size.csv
+
+perl ~/Scripts/alignDB/util/merge_csv.pl \
+    -t Table_alignment_all.csv -m genus_avg_size.csv -f 0 -f2 0 --concat --stdout \
+    > Table_alignment_all.1.csv
+
+echo "Genus,coverage" > genus_coverage.csv
+cat Table_alignment_all.1.csv \
+    | perl -nl -a -F',' -e '$F[7] =~ /\D+/ and next; $c = $F[2] * 1000 * 1000 / $F[7]; print qq{$F[0],$c};' \
+    >> genus_coverage.csv
+
+perl ~/Scripts/alignDB/util/merge_csv.pl \
+    -t Table_alignment_all.1.csv -m genus_coverage.csv -f 0 -f2 0 --concat --stdout \
+    > Table_alignment_all.2.csv
+
+echo "Genus,indels" > genus_indels.csv
+cat Table_alignment_all.2.csv \
+    | perl -nl -a -F',' -e '$F[7] =~ /\D+/ and next; $c = $F[3] / 100 * $F[2] * 1000 * 1000; print qq{$F[0],$c};' \
+    >> genus_indels.csv
+
+perl ~/Scripts/alignDB/util/merge_csv.pl \
+    -t Table_alignment_all.2.csv -m genus_indels.csv -f 0 -f2 0 --concat --stdout \
+    > Table_alignment_all.3.csv
+
+cat Table_alignment_all.3.csv \
+    | cut -d',' -f 1-6,8,10,12 \
+    > Table_alignment_filter.csv
+
+cat Table_alignment_filter.csv \
+    | perl -nl -a -F',' -e '$F[6] =~ /\D+/ and next; print $F[0] if ($F[7] < 0.4 or $F[8] < 100);' \
+    > genus_exclude.order
+
+grep -Fx -v -f genus_exclude.order genus_all.order > genus.order
+
+rm ~/data/organelle/plastid_summary/table/Table_alignment_all.[0-9].csv
+rm ~/data/organelle/plastid_summary/table/genus*csv
+
+#
+cd ~/data/organelle/plastid_summary/xlsx
+cat ~/data/organelle/plastid_summary/table/genus.order \
+    | grep -v "^genus" \
     | perl -MTemplate -nl -e 'BEGIN{$tt = Template->new; } push @data, { name => $_, file => qq{$_.common.xlsx}, }; END{$tt->process(q{Table_alignment.tt}, { data => \@data, }) or die Template->error}' \
     > Table_alignment.yml
 
@@ -943,9 +985,54 @@ cat ~/data/organelle/plastid_summary/genus.tsv \
 cd /d D:/data/organelle/plastid_summary/xlsx
 perl d:/Scripts/fig_table/excel_table.pl -i Table_alignment.yml
 
-# Back to Mac
-cp -f Table_alignment.xlsx ~/data/organelle/plastid_summary/table
+# Mac
+cp -f ~/data/organelle/plastid_summary/xlsx/Table_alignment.xlsx ~/data/organelle/plastid_summary/table
+
 ```
+
+### Groups
+
+```bash
+mkdir -p ~/data/organelle/plastid_summary/group
+cd ~/data/organelle/plastid_summary/group
+
+perl -l -MPath::Tiny -e \
+'BEGIN{ @ls = map {/^#/ and s/^(#+\s*\w+).*/\1/; $_} map {s/,\w+//; $_} map {s/^###\s*//; $_} path(q{~/Scripts/withncbi/doc/plastid_OG.md})->lines( { chomp => 1}); } $fh; for (@ls) { (/^\s*$/ or /^##\s+/) and next; if (/^#\s+(\w+)/) {$fh = path("$1.txt")->openw; next;} else {print {$fh} $_}}'
+
+mv Gymnosperm.txt Gymnosperm.lst
+mv Angiosperm.txt Angiosperm.lst
+find . -type f -name "*.txt" \
+    | xargs cat \
+    > Others.lst
+rm *.txt
+```
+
+NCBI Taxonomy tree
+
+```bash
+cd ~/data/organelle/plastid_summary/group
+
+cat *.lst \
+    | perl -e '@ls = <>; $str = qq{bp_taxonomy2tree.pl \\\n}; for (@ls) {chomp;$str .= qq{-s $_ \\\n}}  $str .= qq{-e \n}; print $str' \
+    > genera_tree.sh
+sh genera_tree.sh > genera.tree
+
+```
+
+### Phylogenic trees of each genus with outgroup
+
+```bash
+mkdir -p ~/data/organelle/plastid_summary/trees
+
+cat ~/Scripts/withncbi/doc/plastid_OG.md \
+    | grep -v "^#" | grep . \
+    | cut -d',' -f 1 \
+    > ~/data/organelle/plastid_summary/trees/list.txt
+
+find ~/data/organelle/plastid_OG -type f -path "*_phylo*" -name "*.nwk" \
+    | parallel -j 1 cp {} ~/data/organelle/plastid_summary/trees
+```
+
 
 ### d1, d2
 
@@ -1008,6 +1095,8 @@ cd ~/data/organelle/plastid_summary/xlsx
 cat <<EOF > cmd_collect_d1_d2.tt
 perl d:/Scripts/fig_table/collect_excel.pl [% FOREACH item IN data -%] -f [% item.name %].common.xlsx -s d1_pi_gc_cv -n [% item.name %] [% END -%] -o plastid_d1.[% group %].xlsx
 
+perl d:/Scripts/fig_table/collect_excel.pl [% FOREACH item IN data -%] -f [% item.name %].common.xlsx -s d2_pi_gc_cv -n [% item.name %] [% END -%] -o plastid_d2.[% group %].xlsx
+
 perl d:/Scripts/fig_table/collect_excel.pl [% FOREACH item IN data -%] -f [% item.name %].common.xlsx -s d1_comb_pi_gc_cv -n [% item.name %] [% END -%] -o plastid_d1_comb.[% group %].xlsx
 
 perl d:/Scripts/fig_table/collect_excel.pl [% FOREACH item IN data -%] -f [% item.name %].common.xlsx -s d2_comb_pi_gc_cv -n [% item.name %] [% END -%] -o plastid_d2_comb.[% group %].xlsx
@@ -1032,11 +1121,10 @@ cmd_collect_d1_d2.Angiosperm.bat
 cmd_collect_d1_d2.Gymnosperm.bat
 cmd_collect_d1_d2.Others.bat
 
-perl d:/Scripts/fig_table/ofg_chart.pl -i plastid_d1.Angiosperm.xlsx -xl "Distance to indels (d1)" -yl "Nucleotide divergence (D)" -xr "A2:A8" -yr "B2:B8"  --y_min 0.0 --y_max 0.1 -x_min 0 -x_max 5 -rb "." -rs "NON_EXIST"
-perl d:/Scripts/fig_table/ofg_chart.pl -i plastid_d1.Gymnosperm.xlsx -xl "Distance to indels (d1)" -yl "Nucleotide divergence (D)" -xr "A2:A8" -yr "B2:B8"  --y_min 0.0 --y_max 0.04 -x_min 0 -x_max 5 -rb "." -rs "NON_EXIST"
-perl d:/Scripts/fig_table/ofg_chart.pl -i plastid_d1.Others.xlsx -xl "Distance to indels (d1)" -yl "Nucleotide divergence (D)" -xr "A2:A8" -yr "B2:B8"  --y_min 0.0 --y_max 0.2 -x_min 0 -x_max 5 -rb "." -rs "NON_EXIST"
+perl d:/Scripts/fig_table/ofg_chart.pl -i plastid_d1.Angiosperm.xlsx -xl "Distance to indels (d1)" -yl "Nucleotide divergence (D)" -xr "A2:A8" -yr "B2:B8"  --y_min 0.0 --y_max 0.08 -x_min 0 -x_max 5 -rb "." -rs "NON_EXIST" -ms
 
-perl d:/Scripts/fig_table/ofg_chart.pl -i plastid_d2.Angiosperm.xlsx -xl "Reciprocal of indel density (d2)" -yl "Nucleotide divergence (D)" -xr "A2:A8" -yr "B2:B8"  --y_min 0.0 --y_max 0.1 -x_min 0 -x_max 5 -rb "." -rs "NON_EXIST"
+perl d:/Scripts/fig_table/ofg_chart.pl -i plastid_d2_comb.Angiosperm.xlsx -xl "Reciprocal of indel density (d2)" -yl "Nucleotide divergence (D)" -xr "A2:A23" -yr "B2:B23"  --y_min 0.0 --y_max 0.1 -x_min 0 -x_max 20 -rb "." -rs "NON_EXIST"
 
+perl d:/Scripts/fig_table/ofg_chart.pl -i plastid_d2.Angiosperm.xlsx -xl "Reciprocal of indel density (d2)" -yl "Nucleotide divergence (D)" -xr "A2:A23" -yr "B2:B23"  --y_min 0.0 --y_max 0.1 -x_min 0 -x_max 20 -rb "." -rs "NON_EXIST" -ms
 
 ```
