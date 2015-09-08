@@ -820,8 +820,9 @@ perl d:/Scripts/alignDB/stat/[% chart %]_chart_factory.pl --replace diversity=di
 [% END -%]
 EOF
 
-cat ~/data/organelle/plastid_summary/group/*.lst \
-    | perl -MTemplate -nl -e 'BEGIN{$tt = Template->new; } push @data, { name => $_, }; END{$tt->process(q{cmd_common_chart.tt}, { data => \@data, }) or die Template->error}' \
+cat ~/data/organelle/plastid_summary/genus.tsv \
+    | cut -f 1 \
+    | TT_FILE=cmd_common_chart.tt perl -MTemplate -nl -e 'push @data, { name => $_, }; END{$tt = Template->new; $tt->process($ENV{TT_FILE}, { data => \@data, }) or die Template->error}' \
     > cmd_common_chart.bat
 
 # Undre Windows
@@ -867,6 +868,10 @@ rm *.tmp
 ### Genome alignment statistics
 
 Some genera will be filtered out here.
+
+Criteria:
+* Coverage >- 0.4
+* Total number of indels >= 100
 
 ```bash
 mkdir -p ~/data/organelle/plastid_summary/table
@@ -916,7 +921,7 @@ EOF
 
 cat ~/data/organelle/plastid_summary/table/genus_all.lst \
     | grep -v "^genus" \
-    | perl -MTemplate -nl -e 'BEGIN{$tt = Template->new; } push @data, { name => $_, file => qq{$_.common.xlsx}, }; END{$tt->process(q{Table_alignment.tt}, { data => \@data, }) or die Template->error}' \
+    | TT_FILE=Table_alignment.tt perl -MTemplate -nl -e 'push @data, { name => $_, file => qq{$_.common.xlsx}, }; END{$tt = Template->new; $tt->process($ENV{TT_FILE}, { data => \@data, }) or die Template->error}' \
     > Table_alignment_all.yml
 
 # Under Windows
@@ -978,7 +983,7 @@ rm ~/data/organelle/plastid_summary/table/genus*csv
 cd ~/data/organelle/plastid_summary/xlsx
 cat ~/data/organelle/plastid_summary/table/genus.lst \
     | grep -v "^genus" \
-    | perl -MTemplate -nl -e 'BEGIN{$tt = Template->new; } push @data, { name => $_, file => qq{$_.common.xlsx}, }; END{$tt->process(q{Table_alignment.tt}, { data => \@data, }) or die Template->error}' \
+    | TT_FILE=Table_alignment.tt perl -MTemplate -nl -e 'push @data, { name => $_, file => qq{$_.common.xlsx}, }; END{$tt = Template->new; $tt->process($ENV{TT_FILE}, { data => \@data, }) or die Template->error}' \
     > Table_alignment.yml
 
 # Under Windows
@@ -987,7 +992,6 @@ perl d:/Scripts/fig_table/excel_table.pl -i Table_alignment.yml
 
 # Mac
 cp -f ~/data/organelle/plastid_summary/xlsx/Table_alignment.xlsx ~/data/organelle/plastid_summary/table
-
 ```
 
 ### Groups
@@ -1001,7 +1005,6 @@ perl -l -MPath::Tiny -e \
 
 grep -Fx -f ~/data/organelle/plastid_summary/table/genus.lst Angiosperm.txt > Angiosperm.lst
 grep -Fx -f ~/data/organelle/plastid_summary/table/genus.lst Gymnosperm.txt > Gymnosperm.lst
-rm Angiosperm.txt Gymnosperm.txt
 
 find . -type f -name "*.txt" \
     | xargs cat \
@@ -1010,23 +1013,25 @@ find . -type f -name "*.txt" \
 
 cat ~/data/organelle/plastid_summary/table/Table_alignment_filter.csv \
     | cut -d, -f 1,5 \
-    | perl -nl -a -F',' -e '$F[1] > 0.02 and print $F[0];' \
-    | grep -Fx -f Angiosperm.lst \
-    > Angiosperm.3.lst
+    | perl -nl -a -F',' -e '$F[1] > 0.05 and print $F[0];' \
+    > group_4.lst
+
+cat ~/data/organelle/plastid_summary/table/Table_alignment_filter.csv \
+    | cut -d, -f 1,5 \
+    | perl -nl -a -F',' -e '$F[1] > 0.02 and $F[1] <= 0.05 and print $F[0];' \
+    > group_3.lst
 
 cat ~/data/organelle/plastid_summary/table/Table_alignment_filter.csv \
     | cut -d, -f 1,5 \
     | perl -nl -a -F',' -e '$F[1] > 0.005 and $F[1] <= 0.02 and print $F[0];' \
-    | grep -Fx -f Angiosperm.lst \
-    > Angiosperm.2.lst
+    > group_2.lst
 
 cat ~/data/organelle/plastid_summary/table/Table_alignment_filter.csv \
     | cut -d, -f 1,5 \
     | perl -nl -a -F',' -e '$F[1] <= 0.005 and print $F[0];' \
-    | grep -Fx -f Angiosperm.lst \
-    > Angiosperm.1.lst
+    > group_1.lst
 
-rm Angiosperm.lst *.txt
+rm *.txt
 ```
 
 NCBI Taxonomy tree
@@ -1034,7 +1039,7 @@ NCBI Taxonomy tree
 ```bash
 cd ~/data/organelle/plastid_summary/group
 
-cat *.lst \
+cat ~/data/organelle/plastid_summary/table/genus.lst \
     | perl -e '@ls = <>; $str = qq{bp_taxonomy2tree.pl \\\n}; for (@ls) {chomp;$str .= qq{-s $_ \\\n}}  $str .= qq{-e \n}; print $str' \
     > genera_tree.sh
 sh genera_tree.sh > genera.tree
@@ -1073,8 +1078,8 @@ perl d:/Scripts/fig_table/collect_excel.pl [% FOREACH item IN data -%] -f [% ite
 
 EOF
 
-cat ~/data/organelle/plastid_summary/group/*.lst \
-    | perl -MTemplate -nl -e 'BEGIN{$tt = Template->new; } push @data, { name => $_, }; END{$tt->process(q{cmd_collect_d1_d2.tt}, { data => \@data, }) or die Template->error}' \
+cat ~/data/organelle/plastid_summary/table/genus.lst \
+    | TT_FILE=cmd_collect_d1_d2.tt perl -MTemplate -nl -e 'push @data, { name => $_, }; END{$tt = Template->new; $tt->process($ENV{TT_FILE}, { data => \@data, }) or die Template->error}' \
     > cmd_collect_d1_d2.bat
 
 # Undre Windows
@@ -1085,41 +1090,46 @@ cmd_collect_d1_d2.bat
 `ofg_chart.pl`
 
 ```bash
+mkdir -p ~/data/organelle/plastid_summary/fig
+
 cd ~/data/organelle/plastid_summary/xlsx
 
 cat <<EOF > cmd_chart_d1_d2.tt
-perl d:/Scripts/fig_table/ofg_chart.pl -i cmd_plastid_d1.xlsx -xl "Distance to indels (d1)" -yl "Nucleotide divergence (D)" -xr "A2:A8" -yr "B2:B8"  --y_min 0.0 --y_max [% y_max %] -x_min 0 -x_max 5 -rb "^([% FOREACH item IN data %][% item.name %]|[% END %]NON_EXIST)$" -rs "NON_EXIST" --postfix [% postfix %]  -ms
+perl d:/Scripts/fig_table/ofg_chart.pl -i cmd_plastid_d1.xlsx -xl "Distance to indels (d1)" -yl "Nucleotide divergence (D)" -xr "A2:A8" -yr "B2:B8"  --y_min 0.0 --y_max [% y_max %] -x_min 0 -x_max 5 -rb "^([% FOREACH item IN data %][% item.name %]|[% END %]NON_EXIST)$" -rs "NON_EXIST" --postfix [% postfix %] --style_dot -ms
 
-perl d:/Scripts/fig_table/ofg_chart.pl -i cmd_plastid_d1_comb.xlsx -xl "Distance to indels (d1)" -yl "Nucleotide divergence (D)" -xr "A2:A8" -yr "B2:B8"  --y_min 0.0 --y_max [% y_max %] -x_min 0 -x_max 5 -rb "^([% FOREACH item IN data %][% item.name %]|[% END %]NON_EXIST)$" -rs "NON_EXIST" --postfix [% postfix %]
+perl d:/Scripts/fig_table/ofg_chart.pl -i cmd_plastid_d1_comb.xlsx -xl "Distance to indels (d1)" -yl "Nucleotide divergence (D)" -xr "A2:A8" -yr "B2:B8"  --y_min 0.0 --y_max [% y_max %] -x_min 0 -x_max 5 -rb "^([% FOREACH item IN data %][% item.name %]|[% END %]NON_EXIST)$" -rs "NON_EXIST" --postfix [% postfix %] --style_dot
 
-perl d:/Scripts/fig_table/ofg_chart.pl -i cmd_plastid_d2.xlsx -xl "Reciprocal of indel density (d2)" -yl "Nucleotide divergence (D)" -xr "A2:A23" -yr "B2:B23"  --y_min 0.0 --y_max [% y_max %] -x_min 0 -x_max 20 -rb "^([% FOREACH item IN data %][% item.name %]|[% END %]NON_EXIST)$" -rs "NON_EXIST" --postfix [% postfix %] -ms
+perl d:/Scripts/fig_table/ofg_chart.pl -i cmd_plastid_d2.xlsx -xl "Reciprocal of indel density (d2)" -yl "Nucleotide divergence (D)" -xr "A2:A23" -yr "B2:B23"  --y_min 0.0 --y_max [% y_max2 %] -x_min 0 -x_max 20 -rb "^([% FOREACH item IN data %][% item.name %]|[% END %]NON_EXIST)$" -rs "NON_EXIST" --postfix [% postfix %] --style_dot  -ms
 
-perl d:/Scripts/fig_table/ofg_chart.pl -i cmd_plastid_d2_comb.xlsx -xl "Reciprocal of indel density (d2)" -yl "Nucleotide divergence (D)" -xr "A2:A23" -yr "B2:B23"  --y_min 0.0 --y_max [% y_max %] -x_min 0 -x_max 20 -rb "^([% FOREACH item IN data %][% item.name %]|[% END %]NON_EXIST)$" -rs "NON_EXIST" --postfix [% postfix %]
+perl d:/Scripts/fig_table/ofg_chart.pl -i cmd_plastid_d2_comb.xlsx -xl "Reciprocal of indel density (d2)" -yl "Nucleotide divergence (D)" -xr "A2:A23" -yr "B2:B23"  --y_min 0.0 --y_max [% y_max2 %] -x_min 0 -x_max 20 -rb "^([% FOREACH item IN data %][% item.name %]|[% END %]NON_EXIST)$" -rs "NON_EXIST" --postfix [% postfix %] --style_dot
 
 EOF
 
-cat ~/data/organelle/plastid_summary/group/Angiosperm.1.lst \
-    | perl -MTemplate -nl -e 'BEGIN{$tt = Template->new; } push @data, { name => $_, }; END{$tt->process(q{cmd_chart_d1_d2.tt}, { data => \@data, y_max => 0.01, postfix => q{Angiosperm.1}, }) or die Template->error}' \
-    > cmd_chart_Angiosperm.1.bat
+cat ~/data/organelle/plastid_summary/group/group_1.lst \
+    | TT_FILE=cmd_chart_d1_d2.tt perl -MTemplate -nl -e 'push @data, { name => $_, }; END{$tt = Template->new; $tt->process($ENV{TT_FILE}, { data => \@data, y_max => 0.01, y_max2 => 0.01, postfix => q{group_1}, }) or die Template->error}' \
+    > cmd_chart_group_1.bat
 
-cat ~/data/organelle/plastid_summary/group/Angiosperm.2.lst \
-    | perl -MTemplate -nl -e 'BEGIN{$tt = Template->new; } push @data, { name => $_, }; END{$tt->process(q{cmd_chart_d1_d2.tt}, { data => \@data, y_max => 0.04, postfix => q{Angiosperm.2}, }) or die Template->error}' \
-    > cmd_chart_Angiosperm.2.bat
+cat ~/data/organelle/plastid_summary/group/group_2.lst \
+    | TT_FILE=cmd_chart_d1_d2.tt perl -MTemplate -nl -e 'push @data, { name => $_, }; END{$tt = Template->new; $tt->process($ENV{TT_FILE}, { data => \@data, y_max => 0.03, y_max2 => 0.04, postfix => q{group_2}, }) or die Template->error}' \
+    > cmd_chart_group_2.bat
 
-cat ~/data/organelle/plastid_summary/group/Angiosperm.3.lst \
-    | perl -MTemplate -nl -e 'BEGIN{$tt = Template->new; } push @data, { name => $_, }; END{$tt->process(q{cmd_chart_d1_d2.tt}, { data => \@data, y_max => 0.1, postfix => q{Angiosperm.3}, }) or die Template->error}' \
-    > cmd_chart_Angiosperm.3.bat
+cat ~/data/organelle/plastid_summary/group/group_3.lst \
+    | TT_FILE=cmd_chart_d1_d2.tt perl -MTemplate -nl -e 'push @data, { name => $_, }; END{$tt = Template->new; $tt->process($ENV{TT_FILE}, { data => \@data, y_max => 0.05, y_max2 => 0.05, postfix => q{group_3}, }) or die Template->error}' \
+    > cmd_chart_group_3.bat
 
-cat ~/data/organelle/plastid_summary/group/Gymnosperm.lst \
-    | perl -MTemplate -nl -e 'BEGIN{$tt = Template->new; } push @data, { name => $_, }; END{$tt->process(q{cmd_chart_d1_d2.tt}, { data => \@data, y_max => 0.05, postfix => q{Gymnosperm}, }) or die Template->error}' \
-    > cmd_chart_Gymnosperm.bat
-
-cat ~/data/organelle/plastid_summary/group/Others.lst \
-    | perl -MTemplate -nl -e 'BEGIN{$tt = Template->new; } push @data, { name => $_, }; END{$tt->process(q{cmd_chart_d1_d2.tt}, { data => \@data, y_max => 0.2, postfix => q{Others}, }) or die Template->error}' \
-    > cmd_chart_Others.bat
+cat ~/data/organelle/plastid_summary/group/group_4.lst \
+    | TT_FILE=cmd_chart_d1_d2.tt perl -MTemplate -nl -e 'push @data, { name => $_, }; END{$tt = Template->new; $tt->process($ENV{TT_FILE}, { data => \@data, y_max => 0.2, y_max2 => 0.2, postfix => q{group_4}, }) or die Template->error}' \
+    > cmd_chart_group_4.bat
 
 # Undre Windows
 cd /d D:/data/organelle/plastid_summary/xlsx
-cmd_chart_Angiosperm.1.bat
+cmd_chart_group_1.bat
+cmd_chart_group_2.bat
+cmd_chart_group_3.bat
+cmd_chart_group_4.bat
+
+# Mac
+rm ~/data/organelle/plastid_summary/xlsx/*.csv
+cp ~/data/organelle/plastid_summary/xlsx/*.pdf ~/data/organelle/plastid_summary/fig
 
 ```
