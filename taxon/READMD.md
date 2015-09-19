@@ -870,8 +870,9 @@ rm *.tmp
 Some genera will be filtered out here.
 
 Criteria:
-* Coverage >- 0.4
+* Coverage >= 0.4
 * Total number of indels >= 100
+* Genome D < 0.2
 
 ```bash
 mkdir -p ~/data/organelle/plastid_summary/table
@@ -968,10 +969,11 @@ perl ~/Scripts/alignDB/util/merge_csv.pl \
 
 cat Table_alignment_all.3.csv \
     | cut -d',' -f 1-6,8,10,12 \
-    > Table_alignment_filter.csv
+    > Table_alignment_for_filter.csv
 
-cat Table_alignment_filter.csv \
-    | perl -nl -a -F',' -e '$F[6] =~ /\D+/ and next; print $F[0] if ($F[7] < 0.4 or $F[8] < 100);' \
+# real filter
+cat Table_alignment_for_filter.csv \
+    | perl -nl -a -F',' -e '$F[6] =~ /\D+/ and next; print $F[0] if ($F[7] < 0.4 or $F[8] < 100 or $F[4] > 0.2);' \
     > genus_exclude.lst
 
 grep -v -Fx -f genus_exclude.lst genus_all.lst > genus.lst
@@ -989,9 +991,12 @@ cat ~/data/organelle/plastid_summary/table/genus.lst \
 # Under Windows
 cd /d D:/data/organelle/plastid_summary/xlsx
 perl d:/Scripts/fig_table/excel_table.pl -i Table_alignment.yml
+perl d:/Scripts/fig_table/xlsx2xls.pl -d Table_alignment.xlsx --csv
 
 # Mac
 cp -f ~/data/organelle/plastid_summary/xlsx/Table_alignment.xlsx ~/data/organelle/plastid_summary/table
+perl -pi -e 's/\r\n/\n/g' ~/data/organelle/plastid_summary/xlsx/Table_alignment.csv
+cp -f ~/data/organelle/plastid_summary/xlsx/Table_alignment.csv ~/data/organelle/plastid_summary/table
 ```
 
 ### Groups
@@ -1011,22 +1016,22 @@ find . -type f -name "*.txt" \
     | grep -Fx -f ~/data/organelle/plastid_summary/table/genus.lst \
     > Others.lst
 
-cat ~/data/organelle/plastid_summary/table/Table_alignment_filter.csv \
+cat ~/data/organelle/plastid_summary/table/Table_alignment.csv \
     | cut -d, -f 1,5 \
     | perl -nl -a -F',' -e '$F[1] > 0.05 and print $F[0];' \
     > group_4.lst
 
-cat ~/data/organelle/plastid_summary/table/Table_alignment_filter.csv \
+cat ~/data/organelle/plastid_summary/table/Table_alignment.csv \
     | cut -d, -f 1,5 \
     | perl -nl -a -F',' -e '$F[1] > 0.02 and $F[1] <= 0.05 and print $F[0];' \
     > group_3.lst
 
-cat ~/data/organelle/plastid_summary/table/Table_alignment_filter.csv \
+cat ~/data/organelle/plastid_summary/table/Table_alignment.csv \
     | cut -d, -f 1,5 \
     | perl -nl -a -F',' -e '$F[1] > 0.005 and $F[1] <= 0.02 and print $F[0];' \
     > group_2.lst
 
-cat ~/data/organelle/plastid_summary/table/Table_alignment_filter.csv \
+cat ~/data/organelle/plastid_summary/table/Table_alignment.csv \
     | cut -d, -f 1,5 \
     | perl -nl -a -F',' -e '$F[1] <= 0.005 and print $F[0];' \
     > group_1.lst
@@ -1118,7 +1123,7 @@ cat ~/data/organelle/plastid_summary/group/group_3.lst \
     > cmd_chart_group_3.bat
 
 cat ~/data/organelle/plastid_summary/group/group_4.lst \
-    | TT_FILE=cmd_chart_d1_d2.tt perl -MTemplate -nl -e 'push @data, { name => $_, }; END{$tt = Template->new; $tt->process($ENV{TT_FILE}, { data => \@data, y_max => 0.2, y_max2 => 0.2, postfix => q{group_4}, }) or die Template->error}' \
+    | TT_FILE=cmd_chart_d1_d2.tt perl -MTemplate -nl -e 'push @data, { name => $_, }; END{$tt = Template->new; $tt->process($ENV{TT_FILE}, { data => \@data, y_max => 0.15, y_max2 => 0.15, postfix => q{group_4}, }) or die Template->error}' \
     > cmd_chart_group_4.bat
 
 # Undre Windows
