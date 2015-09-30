@@ -3,6 +3,8 @@
 - [Operating steps for each groups](#operating-steps-for-each-groups)
 	- [Align](#align)
 		- [*Saccharomyces* WGS](#saccharomyces-wgs)
+		- [*Scer_wgs* WGS](#scerwgs-wgs)
+		- [*Scer_100* ASSEMBLY](#scer100-assembly)
 		- [*Candida* WGS](#candida-wgs)
 		- [*Fusarium* WGS](#fusarium-wgs)
 		- [*Aspergillus* WGS](#aspergillus-wgs)
