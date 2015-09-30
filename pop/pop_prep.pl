@@ -9,11 +9,7 @@ use Config::Tiny;
 use YAML qw(Dump Load DumpFile LoadFile);
 
 use Template;
-use File::Basename;
-use File::Find::Rule;
-use File::Spec;
-use String::Compare;
-use YAML qw(Dump Load DumpFile LoadFile);
+use Path::Tiny;
 
 use AlignDB::Stopwatch;
 
@@ -101,9 +97,9 @@ for my $item (@data) {
     }
     else {
         printf " " x 4 . $item->{name} . "\n";
-        my $dir = File::Spec->catdir( $data_dir, $item->{name} );
-        mkdir $dir if !-e $dir;
-        $item->{dir} = $dir;
+        my $dir = path( $data_dir, 'Genomes', $item->{name} );
+        $dir->mkpath;
+        $item->{dir} = $dir->stringify;
     }
 }
 
@@ -128,17 +124,17 @@ cd [% data_dir %]
 # [% item.name %]
 #----------------------------#
 echo [% item.name %]
+cd [% item.dir %]
 
 [% IF item.skip -%]
 echo '    SKIP! [% item.skip %]'
 [% ELSIF item.downloaded -%]
 echo '    Downloaded files.'
 [% IF item.pre_dir -%]
-cp -R [% item.pre_dir %] .
+find [% item.pre_dir %] -type f | parallel --no-run-if-empty cp {} .
 [% END -%]
 [% ELSE -%]
 echo '    Unzip, filter and split.'
-cd [% item.dir %]
 gzip -d -c [% item.fasta %] > toplevel.fa
 perl -p -i -e '/>/ and s/\>gi\|(\d+).*/\>gi_$1/' toplevel.fa
 [% IF item.per_seq -%]
@@ -165,7 +161,7 @@ EOF
             min_contig         => $min_contig,
             per_seq_min_contig => $per_seq_min_contig,
         },
-        File::Spec->catfile( $data_dir, $sh_name )
+        path( $data_dir, $sh_name )->stringify
     ) or die Template->error;
 
     # 02_rm.sh
@@ -246,7 +242,7 @@ EOF
             rm_species => $rm_species,
             parallel   => $parallel,
         },
-        File::Spec->catfile( $data_dir, $sh_name )
+        path( $data_dir, $sh_name )->stringify
     ) or die Template->error;
 
     # 03_strain_info.sh
@@ -282,7 +278,7 @@ EOF
             withncbi   => $withncbi,
             parallel   => $parallel,
         },
-        File::Spec->catfile( $data_dir, $sh_name )
+        path( $data_dir, $sh_name )->stringify
     ) or die Template->error;
 
     # plan_ALL.sh
@@ -329,7 +325,7 @@ EOF
             withncbi   => $withncbi,
             parallel   => $parallel,
         },
-        File::Spec->catfile( $data_dir, $sh_name )
+        path( $data_dir, $sh_name )->stringify
     ) or die Template->error;
 
     if ( exists $yml->{plans} ) {
@@ -376,7 +372,7 @@ EOF
                     plan_name  => $plan_name,
                     plan       => $plan,
                 },
-                File::Spec->catfile( $data_dir, $sh_name )
+                path( $data_dir, $sh_name )->stringify
             ) or die Template->error;
         }
     }
