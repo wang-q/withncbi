@@ -14,6 +14,7 @@ use DateTime::Format::Natural;
 use List::MoreUtils qw(any all uniq);
 use Template;
 
+use Path::Tiny;
 use File::Copy::Recursive qw(fcopy);
 use File::Spec;
 use File::Find::Rule;
@@ -39,9 +40,8 @@ my $stopwatch = AlignDB::Stopwatch->new(
 );
 
 my $working_dir = ".";
-my $seq_dir
-    ;    #  will do prep_fa() from this dir or use seqs store in $working_dir
-my @keep;    # don't touch anything inside fasta files
+my $seq_dir;    #  will do prep_fa() from this dir or use seqs store in $working_dir
+my @keep;       # don't touch anything inside fasta files
 
 my $target_id;
 my @query_ids;
@@ -133,11 +133,13 @@ die "$taxon_file doesn't exist\n" unless -e $taxon_file;
 # prepare working dir
 {
     print "Working on $name_str\n";
-    $working_dir = File::Spec->catdir( $working_dir, $name_str );
-    $working_dir = File::Spec->rel2abs($working_dir);
-    mkdir $working_dir unless -d $working_dir;
-    $working_dir = realpath($working_dir);
+    $working_dir = path( $working_dir, $name_str )->absolute;
+    $working_dir->mkpath;
+    $working_dir = $working_dir->stringify;
     print " " x 4, "Working dir is $working_dir\n";
+    
+    path($working_dir, 'Genomes')->mkpath;
+    path($working_dir, 'Pairwise')->mkpath;
 }
 
 # move $outgroup_id to last
@@ -158,9 +160,7 @@ my @data;
             = map { taxon_info( $_, $working_dir ) } ( $target_id, @query_ids );
     }
     else {
-        @data
-            = map { taxon_info_name( $_, $working_dir ) }
-            ( $target_id, @query_ids );
+        @data = map { taxon_info_name( $_, $working_dir ) } ( $target_id, @query_ids );
     }
 }
 
@@ -176,13 +176,14 @@ if ($seq_dir) {
             print " " x 8 . "Don't change fasta header for [$id]\n";
         }
 
-        my $original_dir = File::Spec->catdir( $seq_dir,     $id );
-        my $cur_dir      = File::Spec->catdir( $working_dir, $id );
-        mkdir $cur_dir unless -d $cur_dir;
+        my $original_dir = path( $seq_dir, $id )->stringify;
+        my $cur_dir = path( $working_dir, 'Genomes', $id );
+        $cur_dir->mkpath;
+        $cur_dir = $cur_dir->stringify;
 
         my @fa_files
-            = File::Find::Rule->file->name( '*.fna', '*.fa', '*.fas',
-            '*.fasta' )->in($original_dir);
+            = File::Find::Rule->file->name( '*.fna', '*.fa', '*.fas', '*.fasta' )
+            ->in($original_dir);
 
         printf " " x 8 . "Total %d fasta file(s)\n", scalar @fa_files;
 
@@ -203,8 +204,7 @@ if ($seq_dir) {
                 fcopy( $gff_file, $cur_dir );
             }
 
-            my $rm_gff_file
-                = File::Spec->catdir( $original_dir, "$basename.rm.gff" );
+            my $rm_gff_file = File::Spec->catdir( $original_dir, "$basename.rm.gff" );
             if ( -e $rm_gff_file ) {
                 fcopy( $rm_gff_file, $cur_dir );
             }
@@ -263,11 +263,8 @@ taxon_id,genus,species,sub_species,common_name
 [% item.taxon %],[% item.genus %],[% item.species %],[% item.subname %],[% item.name %]
 [% END -%]
 EOF
-    $tt->process(
-        \$text,
-        { data => \@data, },
-        File::Spec->catfile( $working_dir, "taxon.csv" )
-    ) or die Template->error;
+    $tt->process( \$text, { data => \@data, }, File::Spec->catfile( $working_dir, "taxon.csv" ) )
+        or die Template->error;
 
     #----------------------------#
     # all *.sh files
@@ -388,9 +385,9 @@ sleep 1;
 [% FOREACH q IN query_ids -%]
 perl [% egaz %]/z_batch.pl \
     --bin [% kent_bin %] \
-    -dt [% working_dir %]/[% target_id %] \
-    -dq [% working_dir %]/[% q %] \
-    -dw [% working_dir %] \
+    -dt [% working_dir %]/Genomes/[% target_id %] \
+    -dq [% working_dir %]/Genomes/[% q %] \
+    -dw [% working_dir %]/Pairwise \
     -r 2-4 \
     --parallel [% parallel %]
 
@@ -433,7 +430,7 @@ sleep 1;
 perl [% aligndb %]/extra/two_way_batch.pl \
     -t="[% id_of.$target_id %],[% target_id %]" -q="[% id_of.$q %],[% q %]" \
     -d [% target_id %]vs[% q %] \
-    -da [% working_dir %]/[% target_id %]vs[% q %] \
+    -da [% working_dir %]/Pairwise/[% target_id %]vs[% q %] \
     -taxon [% working_dir %]/taxon.csv \
     -chr [% working_dir %]/chr_length.csv \
     -lt 1000 \
@@ -531,11 +528,11 @@ cd [% working_dir %]
 
 sleep 1;
 
-if [ -d [% working_dir %]/[% multi_name %] ]; then
-    rm -fr [% working_dir %]/[% multi_name %];
-    mkdir -p [% working_dir %]/[% multi_name %];
+if [ -d [% working_dir %]/[% multi_name %]_mz ]; then
+    rm -fr [% working_dir %]/[% multi_name %]_mz;
+    mkdir -p [% working_dir %]/[% multi_name %]_mz;
 else
-    mkdir -p [% working_dir %]/[% multi_name %];
+    mkdir -p [% working_dir %]/[% multi_name %]_mz;
 fi;
 
 if [ -d [% working_dir %]/[% multi_name %]_fasta ]; then
@@ -559,43 +556,43 @@ fi;
 [% IF phylo_tree -%]
 perl [% egaz %]/mz.pl \
     [% FOREACH id IN query_ids -%]
-    -d [% working_dir %]/[% target_id %]vs[% id %] \
+    -d [% working_dir %]/Pairwise/[% target_id %]vs[% id %] \
     [% END -%]
     -bin [% kent_bin %] \
     --tree [% phylo_tree %] \
-    --out [% working_dir %]/[% multi_name %] \
+    --out [% working_dir %]/[% multi_name %]_mz \
     -syn -p [% parallel %]
 [% ELSE %]
 if [ -f [% working_dir %]/[% multi_name %]_rawphylo/[% multi_name %].nwk ]
 then
     perl [% egaz %]/mz.pl \
         [% FOREACH id IN query_ids -%]
-        -d [% working_dir %]/[% target_id %]vs[% id %] \
+        -d [% working_dir %]/Pairwise/[% target_id %]vs[% id %] \
         [% END -%]
         -bin [% kent_bin %] \
         --tree [% working_dir %]/[% multi_name %]_rawphylo/[% multi_name %].nwk \
-        --out [% working_dir %]/[% multi_name %] \
+        --out [% working_dir %]/[% multi_name %]_mz \
         -syn -p [% parallel %]
 else
     perl [% egaz %]/mz.pl \
         [% FOREACH id IN query_ids -%]
-        -d [% working_dir %]/[% target_id %]vs[% id %] \
+        -d [% working_dir %]/Pairwise/[% target_id %]vs[% id %] \
         [% END -%]
         -bin [% kent_bin %] \
         --tree [% working_dir %]/fake_tree.nwk \
-        --out [% working_dir %]/[% multi_name %] \
+        --out [% working_dir %]/[% multi_name %]_mz \
         -syn -p [% parallel %]
 fi
 [% END -%]
 
-find [% working_dir %]/[% multi_name %] -type f -name "*.maf" | parallel -j [% parallel %] gzip
+find [% working_dir %]/[% multi_name %]_mz -type f -name "*.maf" | parallel --no-run-if-empty -j [% parallel %] gzip
 
 #----------------------------#
 # maf2fas
 #----------------------------#
 mkdir -p [% working_dir %]/[% multi_name %]_fasta
-find [% working_dir %]/[% multi_name %] -name "*.maf" -or -name "*.maf.gz" \
-    | parallel -j [% parallel %] fasops maf2fas {} -o [% working_dir %]/[% multi_name %]_fasta/{/}.fas
+find [% working_dir %]/[% multi_name %]_mz -name "*.maf" -or -name "*.maf.gz" \
+    | parallel --no-run-if-empty -j [% parallel %] fasops maf2fas {} -o [% working_dir %]/[% multi_name %]_fasta/{/}.fas
 
 #----------------------------#
 # refine fasta
@@ -676,11 +673,11 @@ mkdir -p [% working_dir %]/[% multi_name %]_vcf
 #----------------------------#
 # var_list
 #----------------------------#
-find [% working_dir %]/[% multi_name %]_refined -type f -name "*.fas" \
-    | parallel basename {} \
-    | parallel -j 1 \
+find [% working_dir %]/[% multi_name %]_refined -type f -name "*.fas" -or -name "*.fas.gz" \
+    | parallel --no-run-if-empty basename {} \
+    | parallel --no-run-if-empty -j [% parallel %] \
         perl [% egaz %]/fas2vcf.pl \
-            -s [% working_dir %]/[% target_id %]/chr.sizes \
+            -s [% working_dir %]/Genomes/[% target_id %]/chr.sizes \
             -i [% working_dir %]/[% multi_name %]_refined/{} \
             -o [% working_dir %]/[% multi_name %]_vcf/{}.vcf
 
@@ -830,17 +827,13 @@ sub taxon_info {
         eol       => "\n",
         sep_char  => ",",
         file      => $taxon_file,
-        col_names => [
-            map { ( $_, $_ . "_id" ) } qw{strain species genus family order}
-        ],
+        col_names => [ map { ( $_, $_ . "_id" ) } qw{strain species genus family order} ],
     };
 
-    my $query
-        = qq{ SELECT strain_id, strain, genus, species FROM t0 WHERE strain_id = ? };
-    my $sth = $dbh->prepare($query);
+    my $query = qq{ SELECT strain_id, strain, genus, species FROM t0 WHERE strain_id = ? };
+    my $sth   = $dbh->prepare($query);
     $sth->execute($taxon_id);
-    my ( $taxonomy_id, $organism_name, $genus, $species )
-        = $sth->fetchrow_array;
+    my ( $taxonomy_id, $organism_name, $genus, $species ) = $sth->fetchrow_array;
     $species =~ s/^$genus\s+//;
     my $sub_name = $organism_name;
     $sub_name =~ s/^$genus\s+//;
@@ -854,7 +847,7 @@ sub taxon_info {
         genus   => $genus,
         species => $species,
         subname => $sub_name,
-        dir     => File::Spec->catdir( $working_dir, $taxon_id ),
+        dir     => File::Spec->catdir( $working_dir, 'Genomes', $taxon_id ),
     };
 }
 
@@ -868,17 +861,13 @@ sub taxon_info_name {
         eol       => "\n",
         sep_char  => ",",
         file      => $taxon_file,
-        col_names => [
-            map { ( $_, $_ . "_id" ) } qw{strain species genus family order}
-        ],
+        col_names => [ map { ( $_, $_ . "_id" ) } qw{strain species genus family order} ],
     };
 
-    my $query
-        = qq{ SELECT strain_id, strain, genus, species FROM t0 WHERE strain = ? };
-    my $sth = $dbh->prepare($query);
+    my $query = qq{ SELECT strain_id, strain, genus, species FROM t0 WHERE strain = ? };
+    my $sth   = $dbh->prepare($query);
     $sth->execute($name);
-    my ( $taxonomy_id, $organism_name, $genus, $species )
-        = $sth->fetchrow_array;
+    my ( $taxonomy_id, $organism_name, $genus, $species ) = $sth->fetchrow_array;
     $species =~ s/^$genus\s+//;
     my $sub_name = $organism_name;
     $sub_name =~ s/^$genus[\s_]+//;
@@ -890,7 +879,7 @@ sub taxon_info_name {
         genus   => $genus,
         species => $species,
         subname => $sub_name,
-        dir     => File::Spec->catdir( $working_dir, $name ),
+        dir     => File::Spec->catdir( $working_dir, 'Genomes', $name ),
     };
 }
 
