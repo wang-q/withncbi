@@ -15,17 +15,11 @@ use List::MoreUtils qw(any all uniq);
 use Template;
 
 use Path::Tiny;
-use File::Copy::Recursive qw(fcopy);
-use File::Spec;
 use File::Find::Rule;
-use File::Basename;
-use Cwd qw(realpath);
 
 use AlignDB::Stopwatch;
 
 use FindBin;
-use lib "$FindBin::Bin/../lib";
-use MyUtil qw(replace_home);
 
 #----------------------------------------------------------#
 # GetOpt section
@@ -62,10 +56,10 @@ my $multi_name;
 my $msa    = 'mafft';    # Default alignment program
 my $length = 1000;
 
-my $aligndb  = replace_home( $Config->{run}{aligndb} );     # alignDB path
-my $egaz     = replace_home( $Config->{run}{egaz} );        # egaz path
-my $kent_bin = replace_home( $Config->{run}{kent_bin} );    # exes of Jim Kent
-my $bat_dir  = $Config->{run}{bat};                         # Windows scripts
+my $aligndb  = path( $Config->{run}{aligndb} )->stringify;     # alignDB path
+my $egaz     = path( $Config->{run}{egaz} )->stringify;        # egaz path
+my $kent_bin = path( $Config->{run}{kent_bin} )->stringify;    # exes of Jim Kent
+my $bat_dir  = $Config->{run}{bat};                            # Windows scripts
 
 # Use name instead of taxon_id as identifier. These names should only contain
 # alphanumeric value and match with sequence directory names.
@@ -137,9 +131,9 @@ die "$taxon_file doesn't exist\n" unless -e $taxon_file;
     $working_dir->mkpath;
     $working_dir = $working_dir->stringify;
     print " " x 4, "Working dir is $working_dir\n";
-    
-    path($working_dir, 'Genomes')->mkpath;
-    path($working_dir, 'Pairwise')->mkpath;
+
+    path( $working_dir, 'Genomes' )->mkpath;
+    path( $working_dir, 'Pairwise' )->mkpath;
 }
 
 # move $outgroup_id to last
@@ -199,14 +193,13 @@ if ($seq_dir) {
                 push @target_seqs, $basename;
             }
 
-            my $gff_file = File::Spec->catdir( $original_dir, "$basename.gff" );
-            if ( -e $gff_file ) {
-                fcopy( $gff_file, $cur_dir );
+            my $gff_file = path( $original_dir, "$basename.gff" );
+            if ( $gff_file->is_file ) {
+                $gff_file->copy($cur_dir);
             }
-
-            my $rm_gff_file = File::Spec->catdir( $original_dir, "$basename.rm.gff" );
-            if ( -e $rm_gff_file ) {
-                fcopy( $rm_gff_file, $cur_dir );
+            my $rm_gff_file = path( $original_dir, "$basename.rm.gff" );
+            if ( $rm_gff_file->is_file ) {
+                $rm_gff_file->copy($cur_dir);
             }
         }
     }
@@ -216,8 +209,7 @@ if ($seq_dir) {
 my $id_of = {};
 {
     print "Create id2name.csv\n";
-    my $id2name_file = File::Spec->catfile( $working_dir, "id2name.csv" );
-    open my $fh, '>', $id2name_file;
+    my $fh = path( $working_dir, "id2name.csv" )->openw;
     if ( !$use_name ) {
 
         # if not set --use_name, use id as strain name
@@ -240,8 +232,7 @@ my $id_of = {};
 # If there's no phylo tree, generate a fake one.
 if ( !defined $phylo_tree ) {
     print "Create fake_tree.nwk\n";
-    my $fake_tree_file = File::Spec->catfile( $working_dir, "fake_tree.nwk" );
-    open my $fh, '>', $fake_tree_file;
+    my $fh = path( $working_dir, "fake_tree.nwk" )->openw;
     print {$fh} "(" x scalar(@query_ids) . "$target_id";
     for my $id (@query_ids) {
         print {$fh} ",$id)";
@@ -263,7 +254,7 @@ taxon_id,genus,species,sub_species,common_name
 [% item.taxon %],[% item.genus %],[% item.species %],[% item.subname %],[% item.name %]
 [% END -%]
 EOF
-    $tt->process( \$text, { data => \@data, }, File::Spec->catfile( $working_dir, "taxon.csv" ) )
+    $tt->process( \$text, { data => \@data, }, path( $working_dir, "taxon.csv" )->stringify )
         or die Template->error;
 
     #----------------------------#
@@ -291,8 +282,8 @@ if [ -f real_chr.csv ]; then
 fi;
 
 [% FOREACH item IN data -%]
-if [ ! -f [% item.dir%]/chr.sizes ]; then
-    faops size [% item.dir%]/*.fa > [% item.dir%]/chr.sizes;
+if [ ! -f [% item.dir %]/chr.sizes ]; then
+    faops size [% item.dir %]/*.fa > [% item.dir %]/chr.sizes;
 fi;
 perl -aln -F"\t" -e 'print qq{[% item.taxon %],$F[0],$F[1],[% item.name %]}' [% item.dir %]/chr.sizes >> real_chr.csv;
 [% END -%]
@@ -309,7 +300,7 @@ EOF
         {   data        => \@data,
             working_dir => $working_dir,
         },
-        File::Spec->catfile( $working_dir, $sh_name )
+        path( $working_dir, $sh_name )->stringify
     ) or die Template->error;
 
     # file-rm.sh
@@ -363,7 +354,7 @@ EOF
                 target_id   => $target_id,
                 query_ids   => \@query_ids,
             },
-            File::Spec->catfile( $working_dir, $sh_name )
+            path( $working_dir, $sh_name )->stringify
         ) or die Template->error;
     }
 
@@ -408,7 +399,7 @@ EOF
             outgroup_id => $outgroup_id,
             query_ids   => \@query_ids,
         },
-        File::Spec->catfile( $working_dir, $sh_name )
+        path( $working_dir, $sh_name )->stringify
     ) or die Template->error;
 
     # rawphylo.sh
@@ -513,7 +504,7 @@ EOF
                 use_name    => $use_name,
                 nostat      => $nostat,
             },
-            File::Spec->catfile( $working_dir, $sh_name )
+            path( $working_dir, $sh_name )->stringify
         ) or die Template->error;
     }
 
@@ -650,7 +641,7 @@ EOF
             multi_name  => $multi_name,
             msa         => $msa,
         },
-        File::Spec->catfile( $working_dir, $sh_name )
+        path( $working_dir, $sh_name )->stringify
     ) or die Template->error;
 
     # var_list.sh
@@ -691,7 +682,7 @@ EOF
             target_id   => $target_id,
             multi_name  => $multi_name,
         },
-        File::Spec->catfile( $working_dir, $sh_name )
+        path( $working_dir, $sh_name )->stringify
     ) or die Template->error;
 
     # pack_it_up.sh
@@ -725,7 +716,7 @@ EOF
             target_id   => $target_id,
             multi_name  => $multi_name,
         },
-        File::Spec->catfile( $working_dir, $sh_name )
+        path( $working_dir, $sh_name )->stringify
     ) or die Template->error;
 
     if ( !$nostat ) {
@@ -770,7 +761,7 @@ EOF
                 target_seqs => \@target_seqs,
                 multi_name  => $multi_name,
             },
-            File::Spec->catfile( $working_dir, $sh_name )
+            path( $working_dir, $sh_name )->stringify
         ) or die Template->error;
 
         # chart.bat
@@ -800,7 +791,7 @@ EOF
                 bat_dir     => $bat_dir,
                 multi_name  => $multi_name,
             },
-            File::Spec->catfile( $working_dir, "chart.bat" )
+            path( $working_dir, "chart.bat" )->stringify
         ) or die Template->error;
     }
 
@@ -847,7 +838,7 @@ sub taxon_info {
         genus   => $genus,
         species => $species,
         subname => $sub_name,
-        dir     => File::Spec->catdir( $working_dir, 'Genomes', $taxon_id ),
+        dir     => path( $working_dir, 'Genomes', $taxon_id )->stringify,
     };
 }
 
@@ -879,7 +870,7 @@ sub taxon_info_name {
         genus   => $genus,
         species => $species,
         subname => $sub_name,
-        dir     => File::Spec->catdir( $working_dir, 'Genomes', $name ),
+        dir     => path( $working_dir, 'Genomes', $name )->stringify,
     };
 }
 
@@ -888,11 +879,9 @@ sub prep_fa {
     my $dir    = shift;
     my $keep   = shift;
 
-    my $basename = basename( $infile, '.fna', '.fa', '.fas', '.fasta' );
-
-    my $outfile = File::Spec->catfile( $dir, "$basename.fa" );
-    open my $in_fh,  '<', $infile;
-    open my $out_fh, '>', $outfile;
+    my $basename = path($infile)->basename( '.fna', '.fa', '.fas', '.fasta' );
+    my $in_fh    = path($infile)->openr;
+    my $out_fh   = path( $dir, "$basename.fa" )->openw;
     while (<$in_fh>) {
         if ($keep) {
             print {$out_fh} $_;
