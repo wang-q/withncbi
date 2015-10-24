@@ -48,13 +48,13 @@ my $taxon_file = "strains_taxon_info.csv";
 my $msa    = 'mafft';    # Default alignment program
 my $length = 1000;
 
-my $aligndb  = replace_home( $Config->{run}{aligndb} );     # alignDB path
-my $egaz     = replace_home( $Config->{run}{egaz} );        # egaz path
-my $egas     = replace_home( $Config->{run}{egas} );        # egas path
-my $kent_bin = replace_home( $Config->{run}{kent_bin} );    # exes of Jim Kent
-my $blast    = replace_home( $Config->{run}{blast} );       # blast path
-my $circos   = replace_home( $Config->{run}{circos} );      # circos path
-my $bat_dir  = $Config->{run}{bat};                         # Windows alignDB path
+my $aligndb  = path( $Config->{run}{aligndb} )->stringify;     # alignDB path
+my $egaz     = path( $Config->{run}{egaz} )->stringify;        # egaz path
+my $egas     = path( $Config->{run}{egas} )->stringify;        # egas path
+my $kent_bin = path( $Config->{run}{kent_bin} )->stringify;    # exes of Jim Kent
+my $blast    = path( $Config->{run}{blast} )->stringify;       # blast path
+my $circos   = path( $Config->{run}{circos} )->stringify;      # circos path
+my $bat_dir  = $Config->{run}{bat};                            # Windows alignDB path
 
 # Use name instead of taxon_id as identifier. These names should only contain
 # alphanumeric value and match with sequence directory names.
