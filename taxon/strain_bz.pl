@@ -58,7 +58,6 @@ my $length = 1000;
 
 my $aligndb  = path( $Config->{run}{aligndb} )->stringify;     # alignDB path
 my $egaz     = path( $Config->{run}{egaz} )->stringify;        # egaz path
-my $kent_bin = path( $Config->{run}{kent_bin} )->stringify;    # exes of Jim Kent
 my $bat_dir  = $Config->{run}{bat};                            # Windows scripts
 
 # Use name instead of taxon_id as identifier. These names should only contain
@@ -375,7 +374,6 @@ sleep 1;
 #----------------------------#
 [% FOREACH q IN query_ids -%]
 perl [% egaz %]/z_batch.pl \
-    --bin [% kent_bin %] \
     -dt [% working_dir %]/Genomes/[% target_id %] \
     -dq [% working_dir %]/Genomes/[% q %] \
     -dw [% working_dir %]/Pairwise \
@@ -392,7 +390,6 @@ EOF
             working_dir => $working_dir,
             egaz        => $egaz,
             aligndb     => $aligndb,
-            kent_bin    => $kent_bin,
             use_name    => $use_name,
             nostat      => $nostat,
             target_id   => $target_id,
@@ -500,7 +497,6 @@ EOF
                 query_ids   => \@query_ids,
                 id_of       => $id_of,
                 multi_name  => $multi_name,
-                kent_bin    => $kent_bin,
                 use_name    => $use_name,
                 nostat      => $nostat,
             },
@@ -549,7 +545,6 @@ perl [% egaz %]/mz.pl \
     [% FOREACH id IN query_ids -%]
     -d [% working_dir %]/Pairwise/[% target_id %]vs[% id %] \
     [% END -%]
-    -bin [% kent_bin %] \
     --tree [% phylo_tree %] \
     --out [% working_dir %]/[% multi_name %]_mz \
     -syn -p [% parallel %]
@@ -560,7 +555,6 @@ then
         [% FOREACH id IN query_ids -%]
         -d [% working_dir %]/Pairwise/[% target_id %]vs[% id %] \
         [% END -%]
-        -bin [% kent_bin %] \
         --tree [% working_dir %]/[% multi_name %]_rawphylo/[% multi_name %].nwk \
         --out [% working_dir %]/[% multi_name %]_mz \
         -syn -p [% parallel %]
@@ -569,7 +563,6 @@ else
         [% FOREACH id IN query_ids -%]
         -d [% working_dir %]/Pairwise/[% target_id %]vs[% id %] \
         [% END -%]
-        -bin [% kent_bin %] \
         --tree [% working_dir %]/fake_tree.nwk \
         --out [% working_dir %]/[% multi_name %]_mz \
         -syn -p [% parallel %]
@@ -632,7 +625,6 @@ EOF
             working_dir => $working_dir,
             aligndb     => $aligndb,
             egaz        => $egaz,
-            kent_bin    => $kent_bin,
             target_id   => $target_id,
             outgroup_id => $outgroup_id,
             query_ids   => \@query_ids,

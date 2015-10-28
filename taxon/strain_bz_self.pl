@@ -51,7 +51,6 @@ my $length = 1000;
 my $aligndb  = path( $Config->{run}{aligndb} )->stringify;     # alignDB path
 my $egaz     = path( $Config->{run}{egaz} )->stringify;        # egaz path
 my $egas     = path( $Config->{run}{egas} )->stringify;        # egas path
-my $kent_bin = path( $Config->{run}{kent_bin} )->stringify;    # exes of Jim Kent
 my $blast    = path( $Config->{run}{blast} )->stringify;       # blast path
 my $circos   = path( $Config->{run}{circos} )->stringify;      # circos path
 my $bat_dir  = $Config->{run}{bat};                            # Windows alignDB path
@@ -366,7 +365,6 @@ perl [% egaz %]/bz.pl \
 # lpcna
 #----------------------------#
 perl [% egaz %]/lpcna.pl \
-    -bin [% kent_bin %] \
     -dt [% working_dir %]/Genomes/[% id %] \
     -dq [% working_dir %]/Genomes/[% id %] \
     -dl [% working_dir %]/Pairwise/[% id %]vsselfalign \
@@ -381,7 +379,6 @@ EOF
             parallel    => $parallel,
             working_dir => $working_dir,
             egaz        => $egaz,
-            kent_bin    => $kent_bin,
             name_str    => $name_str,
             all_ids     => [ $target_id, @query_ids ],
         },
