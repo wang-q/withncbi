@@ -105,7 +105,10 @@ Manually combine `~/data/alignment/Fungi/GENOMES/saccharomyces/WGS/saccharomyces
         --dd ~/data/alignment/Fungi/GENOMES/${GROUP_NAME}/DOWNLOAD \
 	    --download "name=S288c;taxon=559292" \
 	    --download "name=EC1118;taxon=643680" \
-        --plan 'name=five_way;t=S288c;qs=EC1118,RM11_1a,YJM789,BC187'
+        --plan 'name=five_way;t=S288c;qs=EC1118,RM11_1a,YJM789,BC187' \
+        --plan 'name=8_pop;t=S288c;qs=EC1118,JAY291,Kyokai_no_7,RM11_1a,Sigma1278b,T7,YJM789' \
+        --plan 'name=8_Spar;t=S288c;qs=EC1118,JAY291,Kyokai_no_7,RM11_1a,Sigma1278b,T7,YJM789;o=Spar' \
+        --plan 'name=8_Sbou;t=S288c;qs=EC1118,JAY291,Kyokai_no_7,RM11_1a,Sigma1278b,T7,YJM789;o=Sbou'
 
 	unset GROUP_NAME
     ```

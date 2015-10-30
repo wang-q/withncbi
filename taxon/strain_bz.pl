@@ -464,7 +464,7 @@ find [% working_dir %]/[% multi_name %]_rawphylo -type f -name "RAxML*" | parall
 perl [% egaz%]/concat_fasta.pl \
     -i [% working_dir %]/[% multi_name %]_raw \
     -o [% working_dir %]/[% multi_name %]_rawphylo/[% multi_name %].phy \
-    -p
+    --relaxed
 
 raxmlHPC-PTHREADS -T [% IF parallel > 8 %] 8 [% ELSIF parallel > 3 %] [% parallel - 1 %] [% ELSE %] 2 [% END %] \
     -f a -m GTRGAMMA -p $(openssl rand 3 | od -DAn) -N 100 -x $(openssl rand 3 | od -DAn) \
@@ -600,7 +600,7 @@ cd [% working_dir %]/[% multi_name %]_phylo
 perl [% egaz %]/concat_fasta.pl \
     -i [% working_dir %]/[% multi_name %]_refined \
     -o [% working_dir %]/[% multi_name %]_phylo/[% multi_name %].phy \
-    -p
+    --relaxed
 
 find [% working_dir %]/[% multi_name %]_phylo -type f -name "RAxML*" | parallel --no-run-if-empty rm
 

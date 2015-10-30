@@ -107,6 +107,6 @@ perl ar_db.pl --db ar_genbank --file ar_strains_genbank.csv
 perl ar_overview.pl --db ar_refseq
 perl ar_overview.pl --db ar_genbank
 
-cp -f *.xlsx ../db
+cp -f *.xlsx ../doc
 rm *.xlsx *.csv
 ```
