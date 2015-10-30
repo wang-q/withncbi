@@ -14,6 +14,7 @@ use DateTime::Format::Natural;
 use List::MoreUtils qw(any all uniq);
 use Template;
 
+use IPC::Cmd qw(can_run);
 use Path::Tiny;
 use File::Find::Rule;
 
@@ -56,9 +57,9 @@ my $multi_name;
 my $msa    = 'mafft';    # Default alignment program
 my $length = 1000;
 
-my $aligndb  = path( $Config->{run}{aligndb} )->stringify;     # alignDB path
-my $egaz     = path( $Config->{run}{egaz} )->stringify;        # egaz path
-my $bat_dir  = $Config->{run}{bat};                            # Windows scripts
+my $aligndb = path( $Config->{run}{aligndb} )->stringify;    # alignDB path
+my $egaz    = path( $Config->{run}{egaz} )->stringify;       # egaz path
+my $bat_dir = $Config->{run}{bat};                           # Windows scripts
 
 # Use name instead of taxon_id as identifier. These names should only contain
 # alphanumeric value and match with sequence directory names.
@@ -466,12 +467,21 @@ perl [% egaz%]/concat_fasta.pl \
     -o [% working_dir %]/[% multi_name %]_rawphylo/[% multi_name %].phy \
     --relaxed
 
+[% IF avx -%]
+raxmlHPC-PTHREADS-AVX -T [% IF parallel > 8 %] 8 [% ELSIF parallel > 3 %] [% parallel - 1 %] [% ELSE %] 2 [% END %] \
+    -f a -m GTRGAMMA -p $(openssl rand 3 | od -DAn) -N 100 -x $(openssl rand 3 | od -DAn) \
+[% IF outgroup_id -%]
+    -o [% outgroup_id %] \
+[% END -%]
+    --no-bfgs -n [% multi_name %] -s [% working_dir %]/[% multi_name %]_rawphylo/[% multi_name %].phy
+[% ELSE -%]
 raxmlHPC-PTHREADS -T [% IF parallel > 8 %] 8 [% ELSIF parallel > 3 %] [% parallel - 1 %] [% ELSE %] 2 [% END %] \
     -f a -m GTRGAMMA -p $(openssl rand 3 | od -DAn) -N 100 -x $(openssl rand 3 | od -DAn) \
 [% IF outgroup_id -%]
     -o [% outgroup_id %] \
 [% END -%]
-    -n [% multi_name %] -s [% working_dir %]/[% multi_name %]_rawphylo/[% multi_name %].phy
+    --no-bfgs -n [% multi_name %] -s [% working_dir %]/[% multi_name %]_rawphylo/[% multi_name %].phy
+[% END -%]
 
 cp [% working_dir %]/[% multi_name %]_rawphylo/RAxML_best* [% working_dir %]/[% multi_name %]_rawphylo/[% multi_name %].nwk
 
@@ -499,6 +509,7 @@ EOF
                 multi_name  => $multi_name,
                 use_name    => $use_name,
                 nostat      => $nostat,
+                avx         => can_run('raxmlHPC-PTHREADS-AVX'),
             },
             path( $working_dir, $sh_name )->stringify
         ) or die Template->error;
@@ -604,12 +615,21 @@ perl [% egaz %]/concat_fasta.pl \
 
 find [% working_dir %]/[% multi_name %]_phylo -type f -name "RAxML*" | parallel --no-run-if-empty rm
 
+[% IF avx -%]
+raxmlHPC-PTHREADS-AVX -T [% IF parallel > 8 %] 8 [% ELSIF parallel > 3 %] [% parallel - 1 %] [% ELSE %] 2 [% END %] \
+    -f a -m GTRGAMMA -p $(openssl rand 3 | od -DAn) -N 100 -x $(openssl rand 3 | od -DAn) \
+[% IF outgroup_id -%]
+    -o [% outgroup_id %] \
+[% END -%]
+    --no-bfgs -n [% multi_name %] -s [% working_dir %]/[% multi_name %]_phylo/[% multi_name %].phy
+[% ELSE -%]
 raxmlHPC-PTHREADS -T [% IF parallel > 8 %] 8 [% ELSIF parallel > 3 %] [% parallel - 1 %] [% ELSE %] 2 [% END %] \
     -f a -m GTRGAMMA -p $(openssl rand 3 | od -DAn) -N 100 -x $(openssl rand 3 | od -DAn) \
 [% IF outgroup_id -%]
     -o [% outgroup_id %] \
 [% END -%]
-    -n [% multi_name %] -s [% working_dir %]/[% multi_name %]_phylo/[% multi_name %].phy
+    --no-bfgs -n [% multi_name %] -s [% working_dir %]/[% multi_name %]_phylo/[% multi_name %].phy
+[% END -%]
 
 cp [% working_dir %]/[% multi_name %]_phylo/RAxML_bipartitions.* [% working_dir %]/[% multi_name %]_phylo/[% multi_name %].nwk
 
@@ -632,6 +652,7 @@ EOF
             phylo_tree  => $phylo_tree,
             multi_name  => $multi_name,
             msa         => $msa,
+            avx         => can_run('raxmlHPC-PTHREADS-AVX'),
         },
         path( $working_dir, $sh_name )->stringify
     ) or die Template->error;
