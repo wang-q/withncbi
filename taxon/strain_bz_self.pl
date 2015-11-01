@@ -355,7 +355,7 @@ fi
 #----------------------------#
 perl [% egaz %]/bz.pl \
     --is_self \
-    -s set01 -C 0 --noaxt -pb lastz --lastz \
+    -s set01 -C 0 --noaxt \
     -dt [% working_dir %]/Genomes/[% id %] \
     -dq [% working_dir %]/Genomes/[% id %] \
     -dl [% working_dir %]/Pairwise/[% id %]vsselfalign \

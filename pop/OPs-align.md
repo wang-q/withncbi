@@ -45,6 +45,8 @@ for genomes out of WGS, which usually in better assembling levels.
 2. Rest routing things.
 
     ```bash
+    cd ~/data/alignment/Fungi/saccharomyces
+
     # pop_prep.pl
     perl ~/Scripts/withncbi/pop/pop_prep.pl -p 8 -i ~/Scripts/withncbi/pop/saccharomyces_test.yml
 
@@ -106,9 +108,9 @@ Manually combine `~/data/alignment/Fungi/GENOMES/saccharomyces/WGS/saccharomyces
 	    --download "name=S288c;taxon=559292" \
 	    --download "name=EC1118;taxon=643680" \
         --plan 'name=five_way;t=S288c;qs=EC1118,RM11_1a,YJM789,BC187' \
-        --plan 'name=8_pop;t=S288c;qs=EC1118,JAY291,Kyokai_no_7,RM11_1a,Sigma1278b,T7,YJM789' \
-        --plan 'name=8_Spar;t=S288c;qs=EC1118,JAY291,Kyokai_no_7,RM11_1a,Sigma1278b,T7,YJM789;o=Spar' \
-        --plan 'name=8_Sbou;t=S288c;qs=EC1118,JAY291,Kyokai_no_7,RM11_1a,Sigma1278b,T7,YJM789;o=Sbou'
+        --plan 'name=Scer_n8_Spar;t=S288c;qs=EC1118,JAY291,Kyokai_no_7,RM11_1a,Sigma1278b,T7,YJM789,Spar;o=Spar' \
+        --plan 'name=Scer_n8;t=S288c;qs=EC1118,JAY291,Kyokai_no_7,RM11_1a,Sigma1278b,T7,YJM789' \
+        --plan 'name=Scer_n8_Sbou;t=S288c;qs=EC1118,JAY291,Kyokai_no_7,RM11_1a,Sigma1278b,T7,YJM789,Sbou;o=Sbou'
 
 	unset GROUP_NAME
     ```
@@ -116,6 +118,8 @@ Manually combine `~/data/alignment/Fungi/GENOMES/saccharomyces/WGS/saccharomyces
 2. Rest routing things.
 
     ```bash
+	cd ~/data/alignment/Fungi/${GROUP_NAME}
+	
     # pop_prep.pl
     perl ~/Scripts/withncbi/pop/pop_prep.pl -p 8 -i ~/Scripts/withncbi/pop/scer_wgs_test.yml
 
@@ -134,10 +138,24 @@ Manually combine `~/data/alignment/Fungi/GENOMES/saccharomyces/WGS/saccharomyces
 
     # other plans
     sh plan_five_way.sh
-
     sh 5_multi_cmd.sh
     sh 7_multi_db_only.sh
-    ```
+
+    # other plans
+    sh plan_Scer_n8_Spar.sh
+    sh 5_multi_cmd.sh
+    sh 7_multi_db_only.sh
+
+    # other plans
+    sh plan_Scer_n8.sh
+    sh 5_multi_cmd.sh
+    sh 7_multi_db_only.sh
+
+    # other plans
+    sh plan_Scer_n8_Sbou.sh
+    sh 5_multi_cmd.sh
+    sh 7_multi_db_only.sh
+	```
 
 3. Create a summary xlsx.
 
