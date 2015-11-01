@@ -523,7 +523,7 @@ EOF
     # circos.conf
     $text = <<'EOF';
 <image>
-dir*   = [% working_dir %]/[% taxon_id %]_result
+dir*   = [% working_dir %]/Results/[% taxon_id %]
 file*  = [% taxon_id %].circos.png
 background*     = white
 
@@ -733,10 +733,31 @@ perl -anl -e '$i++; print qq{chr - $F[0] $F[0] 0 $F[1] chr$i}' [% working_dir %]
 # gff to highlight
 #----------------------------#
 # coding and other features
-perl -anl -e '/^#/ and next; $F[0] =~ s/\.\d+//; $color = q{}; $F[2] eq q{CDS} and $color = q{chr9}; $F[2] eq q{ncRNA} and $color = q{dark2-8-qual-1}; $F[2] eq q{rRNA} and $color = q{dark2-8-qual-2}; $F[2] eq q{tRNA} and $color = q{dark2-8-qual-3}; $F[2] eq q{tmRNA} and $color = q{dark2-8-qual-4}; $color and ($F[4] - $F[3] > 49) and print qq{$F[0] $F[3] $F[4] fill_color=$color};' [% working_dir %]/[% id %]/*.gff > highlight.features.[% id %].txt
+perl -anl -e '
+    /^#/ and next;
+    $F[0] =~ s/\.\d+//;
+    $color = q{};
+    $F[2] eq q{CDS} and $color = q{chr9};
+    $F[2] eq q{ncRNA} and $color = q{dark2-8-qual-1};
+    $F[2] eq q{rRNA} and $color = q{dark2-8-qual-2};
+    $F[2] eq q{tRNA} and $color = q{dark2-8-qual-3};
+    $F[2] eq q{tmRNA} and $color = q{dark2-8-qual-4};
+    $color and ($F[4] - $F[3] > 49) and print qq{$F[0] $F[3] $F[4] fill_color=$color};
+    ' \
+    [% working_dir %]/Genomes/[% id %]/*.gff \
+    > highlight.features.[% id %].txt
 
 # repeats
-perl -anl -e '/^#/ and next; $F[0] =~ s/\.\d+//; $color = q{}; $F[2] eq q{region} and $F[8] =~ /mobile_element|Transposon/i and $color = q{chr15}; $F[2] =~ /repeat/ and $F[8] !~ /RNA/ and $color = q{chr15}; $color and ($F[4] - $F[3] > 49) and print qq{$F[0] $F[3] $F[4] fill_color=$color};' [% working_dir %]/[% id %]/*.gff > highlight.repeats.[% id %].txt
+perl -anl -e '
+    /^#/ and next;
+    $F[0] =~ s/\.\d+//;
+    $color = q{};
+    $F[2] eq q{region} and $F[8] =~ /mobile_element|Transposon/i and $color = q{chr15};
+    $F[2] =~ /repeat/ and $F[8] !~ /RNA/ and $color = q{chr15};
+    $color and ($F[4] - $F[3] > 49) and print qq{$F[0] $F[3] $F[4] fill_color=$color};
+    ' \
+    [% working_dir %]/Genomes/[% id %]/*.gff \
+    > highlight.repeats.[% id %].txt
 
 #----------------------------#
 # run circos
@@ -779,16 +800,52 @@ cd [% working_dir %]
 cd [% working_dir %]/Processing/[% id %]
 
 # coding
-perl -anl -e '/^#/ and next; $F[0] =~ s/\.\d+//; $F[2] eq q{CDS} and print qq{$F[0]\t$F[3]\t$F[4]};' [% working_dir %]/Genomes/[% id %]/*.gff > feature.coding.[% id %].bed
+perl -anl -e '
+    /^#/ and next;
+    $F[0] =~ s/\.\d+//;
+    $F[2] eq q{CDS} and print qq{$F[0]\t$F[3]\t$F[4]};
+    ' \
+    [% working_dir %]/Genomes/[% id %]/*.gff \
+    > feature.coding.[% id %].bed
 
 # repeats
-perl -anl -e '/^#/ and next; $F[0] =~ s/\.\d+//; $F[2] eq q{region} and $F[8] =~ /mobile_element|Transposon/i and print qq{$F[0]\t$F[3]\t$F[4]};' [% working_dir %]/Genomes/[% id %]/*.gff > feature.repeats.[% id %].bed
-perl -anl -e '/^#/ and next; $F[0] =~ s/\.\d+//; $F[2] =~ /repeat/ and $F[8] !~ /RNA/ and print qq{$F[0]\t$F[3]\t$F[4]};' [% working_dir %]/Genomes/[% id %]/*.gff >> feature.repeats.[% id %].bed
+perl -anl -e '
+    /^#/ and next;
+    $F[0] =~ s/\.\d+//;
+    $F[2] eq q{region} and $F[8] =~ /mobile_element|Transposon/i and print qq{$F[0]\t$F[3]\t$F[4]};
+    ' \
+    [% working_dir %]/Genomes/[% id %]/*.gff \
+    > feature.repeats.[% id %].bed
+perl -anl -e '
+    /^#/ and next;
+    $F[0] =~ s/\.\d+//;
+    $F[2] =~ /repeat/ and $F[8] !~ /RNA/ and print qq{$F[0]\t$F[3]\t$F[4]};
+    ' \
+    [% working_dir %]/Genomes/[% id %]/*.gff \
+    >> feature.repeats.[% id %].bed
 
 # others
-perl -anl -e '/^#/ and next; $F[0] =~ s/\.\d+//; $F[2] eq q{ncRNA} and print qq{$F[0]\t$F[3]\t$F[4]};' [% working_dir %]/Genomes/[% id %]/*.gff > feature.ncRNA.[% id %].bed
-perl -anl -e '/^#/ and next; $F[0] =~ s/\.\d+//; $F[2] eq q{rRNA} and print qq{$F[0]\t$F[3]\t$F[4]};' [% working_dir %]/Genomes/[% id %]/*.gff > feature.rRNA.[% id %].bed
-perl -anl -e '/^#/ and next; $F[0] =~ s/\.\d+//; $F[2] eq q{tRNA} and print qq{$F[0]\t$F[3]\t$F[4]};' [% working_dir %]/Genomes/[% id %]/*.gff > feature.tRNA.[% id %].bed
+perl -anl -e '
+    /^#/ and next;
+    $F[0] =~ s/\.\d+//;
+    $F[2] eq q{ncRNA} and print qq{$F[0]\t$F[3]\t$F[4]};
+    ' \
+    [% working_dir %]/Genomes/[% id %]/*.gff \
+    > feature.ncRNA.[% id %].bed
+perl -anl -e '
+    /^#/ and next;
+    $F[0] =~ s/\.\d+//;
+    $F[2] eq q{rRNA} and print qq{$F[0]\t$F[3]\t$F[4]};
+    ' \
+    [% working_dir %]/Genomes/[% id %]/*.gff \
+    > feature.rRNA.[% id %].bed
+perl -anl -e '
+    /^#/ and next;
+    $F[0] =~ s/\.\d+//;
+    $F[2] eq q{tRNA} and print qq{$F[0]\t$F[3]\t$F[4]};
+    ' \
+    [% working_dir %]/Genomes/[% id %]/*.gff \
+    > feature.tRNA.[% id %].bed
 
 #----------------------------#
 # merge bed and stat
