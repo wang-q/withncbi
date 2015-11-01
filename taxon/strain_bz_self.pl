@@ -912,40 +912,6 @@ EOF
         path( $working_dir, $sh_name )->stringify
     ) or die Template->error;
 
-    # pack_it_up.sh
-    $sh_name = "9_pack_it_up.sh";
-    print "Create $sh_name\n";
-    $text = <<'EOF';
-#!/bin/bash
-# perl [% stopwatch.cmd_line %]
-
-cd [% working_dir %]
-
-sleep 1;
-
-find . -type f \
-    | grep -v -E "\.(sh|2bit|bat)$" \
-    | grep -v -E "(chr_length|id2name|taxon|fake_taxon)\.csv$" \
-    | grep -v -F "fake_tree.nwk" \
-    > file_list.temp.txt
-
-tar -czvf [% name_str %].tar.gz -T file_list.temp.txt
-
-rm file_list.temp.txt
-
-EOF
-    $tt->process(
-        \$text,
-        {   stopwatch   => $stopwatch,
-            parallel    => $parallel,
-            working_dir => $working_dir,
-            egaz        => $egaz,
-            target_id   => $target_id,
-            name_str    => $name_str,
-        },
-        path( $working_dir, $sh_name )->stringify
-    ) or die Template->error;
-
     if ( !$nostat ) {
         $sh_name = "7_pair_stat.sh";
         print "Create $sh_name\n";
@@ -1055,6 +1021,40 @@ EOF
             path( $working_dir, "chart.bat" )->stringify
         ) or die Template->error;
     }
+
+    # pack_it_up.sh
+    $sh_name = "9_pack_it_up.sh";
+    print "Create $sh_name\n";
+    $text = <<'EOF';
+#!/bin/bash
+# perl [% stopwatch.cmd_line %]
+
+cd [% working_dir %]
+
+sleep 1;
+
+find . -type f \
+    | grep -v -E "\.(sh|2bit|bat)$" \
+    | grep -v -E "(chr_length|id2name|taxon|fake_taxon)\.csv$" \
+    | grep -v -F "fake_tree.nwk" \
+    > file_list.temp.txt
+
+tar -czvf [% name_str %].tar.gz -T file_list.temp.txt
+
+rm file_list.temp.txt
+
+EOF
+    $tt->process(
+        \$text,
+        {   stopwatch   => $stopwatch,
+            parallel    => $parallel,
+            working_dir => $working_dir,
+            egaz        => $egaz,
+            target_id   => $target_id,
+            name_str    => $name_str,
+        },
+        path( $working_dir, $sh_name )->stringify
+    ) or die Template->error;
 
     # message
     $stopwatch->block_message("Execute *.sh files in order.");

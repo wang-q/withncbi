@@ -23,6 +23,7 @@ doc/alignment
 *.fas
 *.fasta
 *.html
+*.tree
 
 *_test.yml
 
