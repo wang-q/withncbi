@@ -558,7 +558,7 @@ perl [% egaz %]/mz.pl \
     [% END -%]
     --tree [% phylo_tree %] \
     --out [% working_dir %]/[% multi_name %]_mz \
-    -syn -p [% parallel %]
+    -p [% parallel %]
 [% ELSE %]
 if [ -f [% working_dir %]/[% multi_name %]_rawphylo/[% multi_name %].nwk ]
 then
@@ -568,7 +568,7 @@ then
         [% END -%]
         --tree [% working_dir %]/[% multi_name %]_rawphylo/[% multi_name %].nwk \
         --out [% working_dir %]/[% multi_name %]_mz \
-        -syn -p [% parallel %]
+        -p [% parallel %]
 else
     perl [% egaz %]/mz.pl \
         [% FOREACH id IN query_ids -%]
@@ -576,7 +576,7 @@ else
         [% END -%]
         --tree [% working_dir %]/fake_tree.nwk \
         --out [% working_dir %]/[% multi_name %]_mz \
-        -syn -p [% parallel %]
+        -p [% parallel %]
 fi
 [% END -%]
 
@@ -585,6 +585,7 @@ find [% working_dir %]/[% multi_name %]_mz -type f -name "*.maf" | parallel --no
 #----------------------------#
 # maf2fas
 #----------------------------#
+echo "Convert maf to fas"
 mkdir -p [% working_dir %]/[% multi_name %]_fasta
 find [% working_dir %]/[% multi_name %]_mz -name "*.maf" -or -name "*.maf.gz" \
     | parallel --no-run-if-empty -j [% parallel %] fasops maf2fas {} -o [% working_dir %]/[% multi_name %]_fasta/{/}.fas
@@ -592,6 +593,7 @@ find [% working_dir %]/[% multi_name %]_mz -name "*.maf" -or -name "*.maf.gz" \
 #----------------------------#
 # refine fasta
 #----------------------------#
+echo "Refine fasta"
 perl [% egaz %]/refine_fasta.pl \
     --msa [% msa %] --block -p [% parallel %] \
 [% IF outgroup_id -%]
