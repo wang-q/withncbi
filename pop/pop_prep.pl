@@ -3,19 +3,15 @@ use strict;
 use warnings;
 use autodie;
 
-use Getopt::Long;
-use Pod::Usage;
+use Getopt::Long qw(HelpMessage);
 use Config::Tiny;
+use FindBin;
 use YAML qw(Dump Load DumpFile LoadFile);
 
 use Template;
 use Path::Tiny;
 
 use AlignDB::Stopwatch;
-
-use FindBin;
-use lib "$FindBin::Bin/../lib";
-use MyUtil qw(replace_home);
 
 #----------------------------------------------------------#
 # GetOpt section
@@ -29,24 +25,28 @@ my $stopwatch = AlignDB::Stopwatch->new(
     program_conf => $Config,
 );
 
-my $withncbi = replace_home( $Config->{run}{withncbi} );    # withncbi path
+=head1 NAME
 
-my $file_yaml;
+pop_prep.pl - prepare pop
 
-my $parallel;
+=head1 SYNOPSIS
 
-my $man  = 0;
-my $help = 0;
+    perl pop_prep.pl [options]
+      Options:
+        --help      -?          brief help message
+        -i, --file          input yaml
+        --parallel          number of child processes
+
+=cut
+
+my $withncbi = path( $Config->{run}{withncbi} )->stringify;
 
 GetOptions(
-    'help'       => \$help,
-    'man'        => \$man,
-    'i|file=s'   => \$file_yaml,
-    'parallel=i' => \$parallel,
-) or pod2usage(2);
+    'help|?' => sub { HelpMessage(0) },
 
-pod2usage(1) if $help;
-pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
+    'file|i=s'   => \my $file_yaml,
+    'parallel=i' => \my $parallel,
+) or HelpMessage(1);
 
 die "Need a YAML file" unless $file_yaml;
 
@@ -59,8 +59,8 @@ my $yml = LoadFile($file_yaml);
 
 # these three are needed
 my $group_name = $yml->{group_name};
-my $base_dir   = replace_home( $yml->{base_dir} );
-my $data_dir   = replace_home( $yml->{data_dir} );
+my $base_dir   = path( $yml->{base_dir} )->stringify;
+my $data_dir   = path( $yml->{data_dir} )->stringify;
 
 # Can load from .ini file
 my $split_about
@@ -135,8 +135,8 @@ find [% item.pre_dir %] -type f | parallel --no-run-if-empty cp {} .
 [% END -%]
 [% ELSE -%]
 echo '    Unzip, filter and split.'
-gzip -d -c [% item.fasta %] > toplevel.fa
-perl -p -i -e '/>/ and s/\>gi\|(\d+).*/\>gi_$1/' toplevel.fa
+gzip -d -c --force [% item.fasta %] > toplevel.fa
+perl -p -i -e '/\>gi\|/ and s/\>gi\|(\d+).*/\>gi_$1/' toplevel.fa
 [% IF item.per_seq -%]
 faops count toplevel.fa | perl -aln -e 'next if $F[0] eq 'total'; print $F[0] if $F[1] > [% per_seq_min_contig * 10 %]; print $F[0] if $F[1] > [% per_seq_min_contig %]  and $F[6]/$F[1] < 0.05' | uniq > listFile
 faops some toplevel.fa listFile toplevel.filtered.fa
@@ -289,7 +289,7 @@ EOF
 cd [% data_dir %]
 
 #----------------------------------------------------------#
-# alignment plan of all genomes 
+# alignment plan of all genomes
 #----------------------------------------------------------#
 # Don't copy sequences (RepeatMasker done)
 # This plan includes all genomes.
@@ -383,18 +383,3 @@ $stopwatch->end_message;
 exit;
 
 __END__
-
-=head1 NAME
-
-pop_prep.pl - prepare pop
-
-=head1 SYNOPSIS
-
-    perl pop_prep.pl [options]
-      Options:
-        --help              brief help message
-        --man               full documentation
-        -i, --file          input yaml
-        --parallel          number of child processes
-
-=cut
