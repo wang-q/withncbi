@@ -1,14 +1,14 @@
 <!-- TOC depth:6 withLinks:1 updateOnSave:1 orderedList:0 -->
 
 - [Operating steps for each groups](#operating-steps-for-each-groups)
-	- [Align](#align)
-		- [*Saccharomyces* WGS](#saccharomyces-wgs)
-		- [*Scer_wgs* WGS](#scerwgs-wgs)
-		- [*Scer_100* ASSEMBLY](#scer100-assembly)
-		- [*Candida* WGS](#candida-wgs)
-		- [*Fusarium* WGS](#fusarium-wgs)
-		- [*Aspergillus* WGS](#aspergillus-wgs)
-		- [*Penicillium* WGS](#penicillium-wgs)
+    - [Align](#align)
+        - [*Saccharomyces* WGS](#saccharomyces-wgs)
+        - [*Scer_wgs* WGS](#scerwgs-wgs)
+        - [*Scer_100* ASSEMBLY](#scer100-assembly)
+        - [*Candida* WGS](#candida-wgs)
+        - [*Fusarium* WGS](#fusarium-wgs)
+        - [*Aspergillus* WGS](#aspergillus-wgs)
+        - [*Penicillium* WGS](#penicillium-wgs)
 <!-- /TOC -->
 
 # Operating steps for each groups
@@ -84,7 +84,7 @@ Manually combine `~/data/alignment/Fungi/GENOMES/saccharomyces/WGS/saccharomyces
     ```bash
     export GROUP_NAME=scer_wgs
 
-	# create downloaded genome list
+    # create downloaded genome list
     cat ~/data/alignment/Fungi/GENOMES/${GROUP_NAME}/DOWNLOAD/${GROUP_NAME}.seq.csv \
         | grep -v "^#" \
         | cut -d',' -f1,3 \
@@ -105,21 +105,21 @@ Manually combine `~/data/alignment/Fungi/GENOMES/saccharomyces/WGS/saccharomyces
         --opt data_dir="~/data/alignment/Fungi/${GROUP_NAME}" \
         --opt rm_species=Fungi \
         --dd ~/data/alignment/Fungi/GENOMES/${GROUP_NAME}/DOWNLOAD \
-	    --download "name=S288c;taxon=559292" \
-	    --download "name=EC1118;taxon=643680" \
+        --download "name=S288c;taxon=559292" \
+        --download "name=EC1118;taxon=643680" \
         --plan 'name=five_way;t=S288c;qs=EC1118,RM11_1a,YJM789,BC187' \
         --plan 'name=Scer_n8_Spar;t=S288c;qs=EC1118,JAY291,Kyokai_no_7,RM11_1a,Sigma1278b,T7,YJM789,Spar;o=Spar' \
         --plan 'name=Scer_n8;t=S288c;qs=EC1118,JAY291,Kyokai_no_7,RM11_1a,Sigma1278b,T7,YJM789' \
         --plan 'name=Scer_n8_Sbou;t=S288c;qs=EC1118,JAY291,Kyokai_no_7,RM11_1a,Sigma1278b,T7,YJM789,Sbou;o=Sbou'
 
-	unset GROUP_NAME
+    unset GROUP_NAME
     ```
 
 2. Rest routing things.
 
     ```bash
-	cd ~/data/alignment/Fungi/${GROUP_NAME}
-	
+    cd ~/data/alignment/Fungi/${GROUP_NAME}
+
     # pop_prep.pl
     perl ~/Scripts/withncbi/pop/pop_prep.pl -p 8 -i ~/Scripts/withncbi/pop/scer_wgs_test.yml
 
@@ -155,7 +155,7 @@ Manually combine `~/data/alignment/Fungi/GENOMES/saccharomyces/WGS/saccharomyces
     sh plan_Scer_n8_Sbou.sh
     sh 5_multi_cmd.sh
     sh 7_multi_db_only.sh
-	```
+    ```
 
 3. Create a summary xlsx.
 
@@ -171,7 +171,7 @@ Manually combine `~/data/alignment/Fungi/GENOMES/scer_wgs/WGS/scer_wgs.csv` and
     ```bash
     export GROUP_NAME=scer_100
 
-	# create downloaded genome list
+    # create downloaded genome list
     cat ~/data/alignment/Fungi/GENOMES/${GROUP_NAME}/DOWNLOAD/${GROUP_NAME}.seq.csv \
         | grep -v "^#" \
         | cut -d',' -f1,3 \
@@ -198,103 +198,103 @@ Manually combine `~/data/alignment/Fungi/GENOMES/scer_wgs/WGS/scer_wgs.csv` and
         --opt data_dir="~/data/alignment/Fungi/${GROUP_NAME}" \
         --opt rm_species=Fungi \
         --dd ~/data/alignment/Fungi/GENOMES/${GROUP_NAME}/DOWNLOAD \
-	    --download "name=S288c;taxon=559292" \
-	    --download "name=YJM993;taxon=1294331" \
-	    --download "name=YJM1078;taxon=1296266" \
-	    --download "name=YJM195;taxon=1294305" \
-	    --download "name=YJM270;taxon=1294308" \
-	    --download "name=YJM470;taxon=1294313" \
-	    --download "name=YJM683;taxon=1294320" \
-	    --download "name=YJM689;taxon=1294321" \
-	    --download "name=YJM693;taxon=1294322" \
-	    --download "name=YJM1248;taxon=1294340" \
-	    --download "name=YJM1252;taxon=1294342" \
-	    --download "name=YJM1273;taxon=1294343" \
-	    --download "name=YJM1342;taxon=1294352" \
-	    --download "name=YJM1385;taxon=1294357" \
-	    --download "name=YJM1387;taxon=1294359" \
-	    --download "name=YJM1388;taxon=1294360" \
-	    --download "name=YJM1389;taxon=1294361" \
-	    --download "name=YJM1399;taxon=1294362" \
-	    --download "name=YJM1402;taxon=1294365" \
-	    --download "name=YJM1418;taxon=1294368" \
-	    --download "name=YJM1439;taxon=1294372" \
-	    --download "name=YJM1443;taxon=1294373" \
-	    --download "name=YJM1444;taxon=1294374" \
-	    --download "name=YJM1447;taxon=1294375" \
-	    --download "name=YJM1460;taxon=1294377" \
-	    --download "name=YJM1549;taxon=1294384" \
-	    --download "name=YJM1573;taxon=1294385" \
-	    --download "name=YJM1592;taxon=1294387" \
-	    --download "name=YJM244;taxon=1294306" \
-	    --download "name=YJM1083;taxon=1292971" \
-	    --download "name=YJM1129;taxon=1293430" \
-	    --download "name=YJM189;taxon=1294303" \
-	    --download "name=YJM193;taxon=1294304" \
-	    --download "name=YJM248;taxon=1294307" \
-	    --download "name=YJM271;taxon=1294309" \
-	    --download "name=YJM320;taxon=947042" \
-	    --download "name=YJM326;taxon=468558" \
-	    --download "name=YJM428;taxon=947044" \
-	    --download "name=YJM450;taxon=1294310" \
-	    --download "name=YJM451;taxon=502869" \
-	    --download "name=YJM453;taxon=1294311" \
-	    --download "name=YJM456;taxon=1294312" \
-	    --download "name=YJM541;taxon=1294314" \
-	    --download "name=YJM554;taxon=1294315" \
-	    --download "name=YJM555;taxon=1294316" \
-	    --download "name=YJM627;taxon=1294317" \
-	    --download "name=YJM681;taxon=1294318" \
-	    --download "name=YJM682;taxon=1294319" \
-	    --download "name=YJM969;taxon=1294323" \
-	    --download "name=YJM972;taxon=1294324" \
-	    --download "name=YJM975;taxon=1294325" \
-	    --download "name=YJM978;taxon=1294326" \
-	    --download "name=YJM981;taxon=1294327" \
-	    --download "name=YJM984;taxon=1294328" \
-	    --download "name=YJM987;taxon=1294329" \
-	    --download "name=YJM990;taxon=1294330" \
-	    --download "name=YJM996;taxon=1294332" \
-	    --download "name=YJM1133;taxon=1294333" \
-	    --download "name=YJM1190;taxon=1294334" \
-	    --download "name=YJM1199;taxon=1294335" \
-	    --download "name=YJM1202;taxon=1294336" \
-	    --download "name=YJM1208;taxon=1294337" \
-	    --download "name=YJM1242;taxon=1294338" \
-	    --download "name=YJM1244;taxon=1294339" \
-	    --download "name=YJM1250;taxon=1294341" \
-	    --download "name=YJM1307;taxon=1294345" \
-	    --download "name=YJM1311;taxon=1294346" \
-	    --download "name=YJM1326;taxon=1294347" \
-	    --download "name=YJM1332;taxon=1294348" \
-	    --download "name=YJM1336;taxon=1294349" \
-	    --download "name=YJM1338;taxon=1294350" \
-	    --download "name=YJM1341;taxon=1294351" \
-	    --download "name=YJM1355;taxon=1294353" \
-	    --download "name=YJM1356;taxon=1294354" \
-	    --download "name=YJM1381;taxon=1294355" \
-	    --download "name=YJM1383;taxon=1294356" \
-	    --download "name=YJM1386;taxon=1294358" \
-	    --download "name=YJM1400;taxon=1294363" \
-	    --download "name=YJM1401;taxon=1294364" \
-	    --download "name=YJM1415;taxon=1294366" \
-	    --download "name=YJM1417;taxon=1294367" \
-	    --download "name=YJM1419;taxon=1294369" \
-	    --download "name=YJM1433;taxon=1294370" \
-	    --download "name=YJM1450;taxon=1294376" \
-	    --download "name=YJM1463;taxon=1294378" \
-	    --download "name=YJM1477;taxon=1294379" \
-	    --download "name=YJM1478;taxon=1294380" \
-	    --download "name=YJM1479;taxon=1294381" \
-	    --download "name=YJM1526;taxon=1294382" \
-	    --download "name=YJM1527;taxon=1294383" \
-	    --download "name=YJM1574;taxon=1294386" \
-	    --download "name=YJM1615;taxon=1294388" \
-	    --download "name=YJM1304;taxon=1294344" \
-	    --download "name=YJM1434;taxon=1294371" \
+        --download "name=S288c;taxon=559292" \
+        --download "name=YJM993;taxon=1294331" \
+        --download "name=YJM1078;taxon=1296266" \
+        --download "name=YJM195;taxon=1294305" \
+        --download "name=YJM270;taxon=1294308" \
+        --download "name=YJM470;taxon=1294313" \
+        --download "name=YJM683;taxon=1294320" \
+        --download "name=YJM689;taxon=1294321" \
+        --download "name=YJM693;taxon=1294322" \
+        --download "name=YJM1248;taxon=1294340" \
+        --download "name=YJM1252;taxon=1294342" \
+        --download "name=YJM1273;taxon=1294343" \
+        --download "name=YJM1342;taxon=1294352" \
+        --download "name=YJM1385;taxon=1294357" \
+        --download "name=YJM1387;taxon=1294359" \
+        --download "name=YJM1388;taxon=1294360" \
+        --download "name=YJM1389;taxon=1294361" \
+        --download "name=YJM1399;taxon=1294362" \
+        --download "name=YJM1402;taxon=1294365" \
+        --download "name=YJM1418;taxon=1294368" \
+        --download "name=YJM1439;taxon=1294372" \
+        --download "name=YJM1443;taxon=1294373" \
+        --download "name=YJM1444;taxon=1294374" \
+        --download "name=YJM1447;taxon=1294375" \
+        --download "name=YJM1460;taxon=1294377" \
+        --download "name=YJM1549;taxon=1294384" \
+        --download "name=YJM1573;taxon=1294385" \
+        --download "name=YJM1592;taxon=1294387" \
+        --download "name=YJM244;taxon=1294306" \
+        --download "name=YJM1083;taxon=1292971" \
+        --download "name=YJM1129;taxon=1293430" \
+        --download "name=YJM189;taxon=1294303" \
+        --download "name=YJM193;taxon=1294304" \
+        --download "name=YJM248;taxon=1294307" \
+        --download "name=YJM271;taxon=1294309" \
+        --download "name=YJM320;taxon=947042" \
+        --download "name=YJM326;taxon=468558" \
+        --download "name=YJM428;taxon=947044" \
+        --download "name=YJM450;taxon=1294310" \
+        --download "name=YJM451;taxon=502869" \
+        --download "name=YJM453;taxon=1294311" \
+        --download "name=YJM456;taxon=1294312" \
+        --download "name=YJM541;taxon=1294314" \
+        --download "name=YJM554;taxon=1294315" \
+        --download "name=YJM555;taxon=1294316" \
+        --download "name=YJM627;taxon=1294317" \
+        --download "name=YJM681;taxon=1294318" \
+        --download "name=YJM682;taxon=1294319" \
+        --download "name=YJM969;taxon=1294323" \
+        --download "name=YJM972;taxon=1294324" \
+        --download "name=YJM975;taxon=1294325" \
+        --download "name=YJM978;taxon=1294326" \
+        --download "name=YJM981;taxon=1294327" \
+        --download "name=YJM984;taxon=1294328" \
+        --download "name=YJM987;taxon=1294329" \
+        --download "name=YJM990;taxon=1294330" \
+        --download "name=YJM996;taxon=1294332" \
+        --download "name=YJM1133;taxon=1294333" \
+        --download "name=YJM1190;taxon=1294334" \
+        --download "name=YJM1199;taxon=1294335" \
+        --download "name=YJM1202;taxon=1294336" \
+        --download "name=YJM1208;taxon=1294337" \
+        --download "name=YJM1242;taxon=1294338" \
+        --download "name=YJM1244;taxon=1294339" \
+        --download "name=YJM1250;taxon=1294341" \
+        --download "name=YJM1307;taxon=1294345" \
+        --download "name=YJM1311;taxon=1294346" \
+        --download "name=YJM1326;taxon=1294347" \
+        --download "name=YJM1332;taxon=1294348" \
+        --download "name=YJM1336;taxon=1294349" \
+        --download "name=YJM1338;taxon=1294350" \
+        --download "name=YJM1341;taxon=1294351" \
+        --download "name=YJM1355;taxon=1294353" \
+        --download "name=YJM1356;taxon=1294354" \
+        --download "name=YJM1381;taxon=1294355" \
+        --download "name=YJM1383;taxon=1294356" \
+        --download "name=YJM1386;taxon=1294358" \
+        --download "name=YJM1400;taxon=1294363" \
+        --download "name=YJM1401;taxon=1294364" \
+        --download "name=YJM1415;taxon=1294366" \
+        --download "name=YJM1417;taxon=1294367" \
+        --download "name=YJM1419;taxon=1294369" \
+        --download "name=YJM1433;taxon=1294370" \
+        --download "name=YJM1450;taxon=1294376" \
+        --download "name=YJM1463;taxon=1294378" \
+        --download "name=YJM1477;taxon=1294379" \
+        --download "name=YJM1478;taxon=1294380" \
+        --download "name=YJM1479;taxon=1294381" \
+        --download "name=YJM1526;taxon=1294382" \
+        --download "name=YJM1527;taxon=1294383" \
+        --download "name=YJM1574;taxon=1294386" \
+        --download "name=YJM1615;taxon=1294388" \
+        --download "name=YJM1304;taxon=1294344" \
+        --download "name=YJM1434;taxon=1294371" \
         --plan 'name=plan_og_spar;t=S288c;qs=YJM993,YJM1078,YJM195,YJM270,YJM470,YJM683,YJM689,YJM693,YJM1248,YJM1252,YJM1273,YJM1342,YJM1385,YJM1387,YJM1388,YJM1389,YJM1399,YJM1402,YJM1418,YJM1439,YJM1443,YJM1444,YJM1447,YJM1460,YJM1549,YJM1573,YJM1592,YJM244,YJM1083,YJM1129,YJM189,YJM193,YJM248,YJM271,YJM320,YJM326,YJM428,YJM450,YJM451,YJM453,YJM456,YJM541,YJM554,YJM555,YJM627,YJM681,YJM682,YJM969,YJM972,YJM975,YJM978,YJM981,YJM984,YJM987,YJM990,YJM996,YJM1133,YJM1190,YJM1199,YJM1202,YJM1208,YJM1242,YJM1244,YJM1250,YJM1307,YJM1311,YJM1326,YJM1332,YJM1336,YJM1338,YJM1341,YJM1355,YJM1356,YJM1381,YJM1383,YJM1386,YJM1400,YJM1401,YJM1415,YJM1417,YJM1419,YJM1433,YJM1450,YJM1463,YJM1477,YJM1478,YJM1479,YJM1526,YJM1527,YJM1574,YJM1615;o=Spar'
 
-	unset GROUP_NAME
+    unset GROUP_NAME
     ```
 
 2. Rest routing things.
@@ -344,8 +344,8 @@ Manually combine `~/data/alignment/Fungi/GENOMES/scer_wgs/WGS/scer_wgs.csv` and
         --opt data_dir='~/data/alignment/Fungi/candida' \
         --opt rm_species=Fungi \
         --dd ~/data/alignment/Fungi/candida/DOWNLOAD \
-        --downloaded 'name=Cdub_CD36;taxon=573826;sciname=Candida dubliniensis CD36' \
-        --downloaded 'name=Corh_Co_90_125;taxon=1136231;sciname=Candida orthopsilosis Co 90-125' \
+        --download 'name=Cdub_CD36;taxon=573826;sciname=Candida dubliniensis CD36' \
+        --download 'name=Corh_Co_90_125;taxon=1136231;sciname=Candida orthopsilosis Co 90-125' \
         --plan 'name=four_way;t=Cdub_CD36;qs=Corh_Co_90_125,Calb_WO_1,Ctro_MYA_3404' \
         --plan 'name=four_way_2;t=Corh_Co_90_125;qs=Cdub_CD36,Calb_WO_1,Ctro_MYA_3404'
     ```
@@ -403,8 +403,8 @@ Manually combine `~/data/alignment/Fungi/GENOMES/scer_wgs/WGS/scer_wgs.csv` and
         --opt data_dir='~/data/alignment/Fungi/fusarium' \
         --opt rm_species=Fungi \
         --dd ~/data/alignment/Fungi/fusarium/DOWNLOAD \
-        --downloaded 'name=Cdub_CD36;taxon=573826;sciname=Candida dubliniensis CD36' \
-        --downloaded 'name=Corh_Co_90_125;taxon=1136231;sciname=Candida orthopsilosis Co 90-125' \
+        --download 'name=Cdub_CD36;taxon=573826;sciname=Candida dubliniensis CD36' \
+        --download 'name=Corh_Co_90_125;taxon=1136231;sciname=Candida orthopsilosis Co 90-125' \
         --plan 'name=four_way;t=Cdub_CD36;qs=Corh_Co_90_125,Calb_WO_1,Ctro_MYA_3404' \
         --plan 'name=four_way_2;t=Corh_Co_90_125;qs=Cdub_CD36,Calb_WO_1,Ctro_MYA_3404'
     ```
@@ -457,8 +457,8 @@ Manually combine `~/data/alignment/Fungi/GENOMES/scer_wgs/WGS/scer_wgs.csv` and
         --opt data_dir='~/data/alignment/Fungi/aspergillus' \
         --opt rm_species=Fungi \
         --dd ~/data/alignment/Fungi/aspergillus/DOWNLOAD \
-        --downloaded 'name=Afum_Af293;taxon=330879;sciname=Aspergillus fumigatus Af293' \
-        --downloaded 'name=Anid_FGSC_A4;taxon=227321;sciname=Aspergillus nidulans FGSC A4' \
+        --download 'name=Afum_Af293;taxon=330879;sciname=Aspergillus fumigatus Af293' \
+        --download 'name=Anid_FGSC_A4;taxon=227321;sciname=Aspergillus nidulans FGSC A4' \
         --plan 'name=Afum_7way;t=Afum_Af293;qs=Afum_A1163,Afum_AF10,Afum_AF210,Afum_Af293,Afum_niveus,Afum_Z5' \
         --plan 'name=four_way_2;t=Anid_FGSC_A4;qs=Afum_Af293,Anig_ATCC_1015,Aory_RIB40'
     ```
@@ -527,6 +527,135 @@ Manually combine `~/data/alignment/Fungi/GENOMES/scer_wgs/WGS/scer_wgs.csv` and
 
     sh 01_file.sh
     sh 02_rm.sh
+    sh 03_strain_info.sh
+
+    # plan_ALL.sh
+    sh plan_ALL.sh
+
+    sh 1_real_chr.sh
+    sh 3_pair_cmd.sh
+    sh 4_rawphylo.sh
+    sh 5_multi_cmd.sh
+    sh 7_multi_db_only.sh
+    ```
+
+### *Arabidopsis* 19 genomes
+
+0. Create data.yml manually.
+
+    ```bash
+    mkdir -p ~/data/alignment/arabidopsis82
+    cd ~/data/alignment/arabidopsis82
+
+    cat <<EOF > arabidopsis82_data.yml
+---
+data:
+  - coverage: 25
+    name: Bur_0
+    origin: Ireland
+    original_id: 3702
+  - coverage: 47
+    name: Can_0
+    origin: Canary Isles
+    original_id: 3702
+  - coverage: 50
+    name: Ct_1
+    origin: Italy
+    original_id: 3702
+  - coverage: 52
+    name: Edi_0
+    origin: Scotland
+    original_id: 3702
+  - coverage: 33
+    name: Hi_0
+    origin: Netherlands
+    original_id: 3702
+  - coverage: 28
+    name: Kn_0
+    origin: Lithuania
+    original_id: 3702
+  - coverage: 27
+    name: Ler_0
+    origin: Poland
+    original_id: 3702
+  - coverage: 30
+    name: Mt_0
+    origin: Libya
+    original_id: 3702
+  - coverage: 38
+    name: No_0
+    origin: Germany
+    original_id: 3702
+  - coverage: 54
+    name: Oy_0
+    origin: Norway
+    original_id: 3702
+  - coverage: 41
+    name: Po_0
+    origin: Germany
+    original_id: 3702
+  - coverage: 38
+    name: Rsch_4
+    origin: Russia
+    original_id: 3702
+  - coverage: 40
+    name: Sf_2
+    origin: Spain
+    original_id: 3702
+  - coverage: 48
+    name: Tsu_0
+    origin: Japan
+    original_id: 3702
+  - coverage: 40
+    name: Wil_2
+    origin: Russia
+    original_id: 3702
+  - coverage: 33
+    name: Ws_0
+    origin: Russia
+    original_id: 3702
+  - coverage: 26
+    name: Wu_0
+    origin: Germany
+    original_id: 3702
+  - coverage: 31
+    name: Zu_0
+    origin: Germany
+    original_id: 3702
+EOF
+
+    ```
+
+1. `gen_pop_conf.pl`
+
+    ```bash
+    mkdir -p ~/data/alignment/arabidopsis82
+    cd ~/data/alignment/arabidopsis82
+
+    perl ~/Scripts/withncbi/pop/gen_pop_conf.pl \
+        -i arabidopsis82_data.yml \
+        -o ~/Scripts/withncbi/pop/arabidopsis82_test.yml \
+        -d ~/data/alignment/others/19genomes/fasta/MASKED \
+        -m name \
+        -r '*.fas' \
+        --opt group_name=arabidopsis82 \
+        --opt base_dir='~/data/alignment' \
+        --opt data_dir='~/data/alignment/arabidopsis82' \
+        --opt rm_species=Plant \
+        --dd ~/data/alignment/Ensembl \
+        --download 'name=Atha;taxon=3702;sciname=Arabidopsis thaliana' \
+        --download 'name=Alyr;taxon=59689;sciname=Arabidopsis lyrata' \
+        --plan 'name=Ath_n19_pop;t=Atha;qs=Bur_0,Can_0,Ct_1,Edi_0,Hi_0,Kn_0,Ler_0,Mt_0,No_0,Oy_0,Po_0,Rsch_4,Sf_2,Tsu_0,Wil_2,Ws_0,Wu_0,Zu_0' \
+        --plan 'name=Ath_n19_Alyr;t=Atha;qs=Bur_0,Can_0,Ct_1,Edi_0,Hi_0,Kn_0,Ler_0,Mt_0,No_0,Oy_0,Po_0,Rsch_4,Sf_2,Tsu_0,Wil_2,Ws_0,Wu_0,Zu_0'
+    ```
+
+2. Rest routing things.
+
+    ```bash
+    # pop_prep.pl
+    perl ~/Scripts/withncbi/pop/pop_prep.pl -p 12 -i ~/Scripts/withncbi/pop/arabidopsis82_test.yml
+
+    sh 01_file.sh
     sh 03_strain_info.sh
 
     # plan_ALL.sh

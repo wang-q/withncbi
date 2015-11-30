@@ -9,6 +9,7 @@
 		- [*Fusarium* WGS](#fusarium-wgs)
 		- [*Aspergillus* WGS](#aspergillus-wgs)
 		- [*Penicillium* WGS](#penicillium-wgs)
+		- [*Arabidopsis* 19 genomes](#arabidopsis-19-genomes)
 <!-- /TOC -->
 
 # Operating steps for each groups
@@ -118,12 +119,12 @@ for genomes out of WGS, which usually in better assembling levels.
     ```bash
     echo -e '#name\tprefix\torganism\tcontigs' > scer_wgs.tsv
     cat saccharomyces.tsv | grep Scer_ | sed "s/^Scer_//" >> scer_wgs.tsv
-	rm saccharomyces.tsv
+    rm saccharomyces.tsv
 
-	# outgroups
-	echo -e "Spar\tAABY\tSaccharomyces paradoxus NRRL Y-17217\t832" >> scer_wgs.tsv
-	echo -e "Spas\tJTFI\tSaccharomyces pastorianus\t878" >> scer_wgs.tsv
-	echo -e "Sbou\tJRHY\tSaccharomyces sp. boulardii\t193" >> scer_wgs.tsv
+    # outgroups
+    echo -e "Spar\tAABY\tSaccharomyces paradoxus NRRL Y-17217\t832" >> scer_wgs.tsv
+    echo -e "Spas\tJTFI\tSaccharomyces pastorianus\t878" >> scer_wgs.tsv
+    echo -e "Sbou\tJRHY\tSaccharomyces sp. boulardii\t193" >> scer_wgs.tsv
     ```
 
     Edit them to fix names and comment out bad strains.
@@ -186,10 +187,10 @@ for genomes out of WGS, which usually in better assembling levels.
 
     echo -e '#name\tprefix\torganism\tcontigs' > scer_100.tsv
 
-	# outgroups
-	echo -e "Spar\tAABY\tSaccharomyces paradoxus NRRL Y-17217\t832" >> scer_100.tsv
-	echo -e "Spas\tJTFI\tSaccharomyces pastorianus\t878" >> scer_100.tsv
-	echo -e "Sbou\tJRHY\tSaccharomyces sp. boulardii\t193" >> scer_100.tsv
+    # outgroups
+    echo -e "Spar\tAABY\tSaccharomyces paradoxus NRRL Y-17217\t832" >> scer_100.tsv
+    echo -e "Spas\tJTFI\tSaccharomyces pastorianus\t878" >> scer_100.tsv
+    echo -e "Sbou\tJRHY\tSaccharomyces sp. boulardii\t193" >> scer_100.tsv
 
     perl ~/Scripts/withncbi/taxon/wgs_prep.pl \
         -f scer_100.tsv \
@@ -213,7 +214,7 @@ for genomes out of WGS, which usually in better assembling levels.
     mkdir -p ~/data/alignment/Fungi/GENOMES/scer_100/DOWNLOAD
     cd ~/data/alignment/Fungi/GENOMES/scer_100/DOWNLOAD
 
-	# Download S288c separately
+    # Download S288c separately
     perl ~/Scripts/withncbi/taxon/assembly_csv.pl \
         -f ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/All/GCF_000146045.2.assembly.txt \
         --nuclear -name S288c \
@@ -237,7 +238,7 @@ for genomes out of WGS, which usually in better assembling levels.
     perl ~/Scripts/withncbi/taxon/batch_get_seq.pl \
         -p -f scer_100.seq.csv
 
-	```
+    ```
 
 ### *Candida* WGS
 
@@ -593,3 +594,51 @@ for genomes out of WGS, which usually in better assembling levels.
     | assigned name | organism_name                      | assembly_accession |
     | :------------ | :------------                      | :------------      |
     | Pchr_P2niaD18 | *Penicillium chrysogenum* P2niaD18 | GCA_000710275.1    |
+
+### *Arabidopsis* 19 genomes
+
+1. Sources.
+
+    [Project page](http://mus.well.ox.ac.uk/19genomes/).
+
+    [Download page](http://mus.well.ox.ac.uk/19genomes/fasta/).
+
+2. Download with my web page crawler.
+
+    ```bash
+    mkdir -p ~/data/alignment/others
+    cd ~/data/alignment/others
+
+    perl ~/Scripts/download/list.pl -u http://mus.well.ox.ac.uk/19genomes/fasta/
+    perl ~/Scripts/download/download.pl -i 19genomes_fasta.yml -a
+    aria2c -x 12 -s 4 -i /home/wangq/data/alignment/others/19genomes_fasta.yml.txt
+    ```
+
+3. *A. thaliana* and *A. lyrata* from ensembl genomes.
+
+    Check [ensembl.md](ensembl.md). Ensembl data stored in `~/data/ensembl82`.
+
+    ```bash
+    # Atha
+    mkdir -p ~/data/alignment/Ensembl/Atha
+    cd ~/data/alignment/Ensembl/Atha
+
+    find ~/data/ensembl82/fasta/arabidopsis_thaliana/dna/ -name "*dna_sm.toplevel*" | xargs gzip -d -c > toplevel.fa
+    faops count toplevel.fa | perl -aln -e 'next if $F[0] eq 'total'; print $F[0] if $F[1] > 50000; print $F[0] if $F[1] > 5000  and $F[6]/$F[1] < 0.05' | uniq > listFile
+    faops some toplevel.fa listFile toplevel.filtered.fa
+    faops split-name toplevel.filtered.fa .
+    rm toplevel.fa toplevel.filtered.fa listFile
+
+    mv Mt.fa Mt.fa.skip
+    mv Pt.fa Pt.fa.skip
+
+    # Alyr
+    mkdir -p ~/data/alignment/Ensembl/Alyr
+    cd ~/data/alignment/Ensembl/Alyr
+
+    find ~/data/ensembl82/fasta/arabidopsis_lyrata/dna/ -name "*dna_sm.toplevel*" | xargs gzip -d -c > toplevel.fa
+    faops count toplevel.fa | perl -aln -e 'next if $F[0] eq 'total'; print $F[0] if $F[1] > 50000; print $F[0] if $F[1] > 5000  and $F[6]/$F[1] < 0.05' | uniq > listFile
+    faops some toplevel.fa listFile toplevel.filtered.fa
+    faops split-about toplevel.filtered.fa 10000000 .
+    rm toplevel.fa toplevel.filtered.fa listFile
+	```
