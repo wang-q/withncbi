@@ -672,9 +672,9 @@ for genomes out of WGS, which usually in better assembling levels.
 3. nipponbare and 9311 from ensembl genomes.
 
     ```bash
-    # OstaJap
-    mkdir -p ~/data/alignment/Ensembl/OstaJap
-    cd ~/data/alignment/Ensembl/OstaJap
+    # OsatJap
+    mkdir -p ~/data/alignment/Ensembl/OsatJap
+    cd ~/data/alignment/Ensembl/OsatJap
 
     find ~/data/ensembl82/fasta/oryza_sativa/dna/ -name "*dna_sm.toplevel*" | xargs gzip -d -c > toplevel.fa
     faops count toplevel.fa | perl -aln -e 'next if $F[0] eq 'total'; print $F[0] if $F[1] > 50000; print $F[0] if $F[1] > 5000  and $F[6]/$F[1] < 0.05' | uniq > listFile
@@ -684,9 +684,9 @@ for genomes out of WGS, which usually in better assembling levels.
 
     rm AC*.fa AP*.fa Syng*.fa
 
-    # OstaInd
-    mkdir -p ~/data/alignment/Ensembl/OstaInd
-    cd ~/data/alignment/Ensembl/OstaInd
+    # OsatInd
+    mkdir -p ~/data/alignment/Ensembl/OsatInd
+    cd ~/data/alignment/Ensembl/OsatInd
 
     find ~/data/ensembl82/fasta/oryza_indica/dna/ -name "*dna_sm.toplevel*" | xargs gzip -d -c > toplevel.fa
     faops count toplevel.fa | perl -aln -e 'next if $F[0] eq 'total'; print $F[0] if $F[1] > 50000; print $F[0] if $F[1] > 5000  and $F[6]/$F[1] < 0.05' | uniq > listFile
