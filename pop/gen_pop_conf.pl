@@ -3,9 +3,9 @@ use strict;
 use warnings;
 use autodie;
 
-use Getopt::Long;
-use Pod::Usage;
+use Getopt::Long qw(HelpMessage);
 use Config::Tiny;
+use FindBin;
 use YAML qw(Dump Load DumpFile LoadFile);
 
 use File::Basename;
@@ -17,14 +17,10 @@ use Set::Scalar;
 
 use AlignDB::Stopwatch;
 
-use FindBin;
-use lib "$FindBin::Bin/../lib";
-use MyUtil qw(replace_home wgs_worker);
-
 #----------------------------------------------------------#
 # GetOpt section
 #----------------------------------------------------------#
-my $Config = Config::Tiny->read("$FindBin::Bin/../config.ini");
+my $Config = Config::Tiny->read("$FindBin::RealBin/../config.ini");
 
 # record ARGV and Config
 my $stopwatch = AlignDB::Stopwatch->new(
@@ -33,50 +29,54 @@ my $stopwatch = AlignDB::Stopwatch->new(
     program_conf => $Config,
 );
 
-my $file_input;
-my $file_output;
-my $dir_scan;
+=head1 NAME
 
-my $match_field = 'name';
+gen_pop_conf.pl - for each @data entries in YAML, find matched files, check parameters and store other options.
 
-my @name_rules;
-my $pattern;
+=head1 SYNOPSIS
 
-my %skip;
-my @per_seq;
+    perl gen_pop_conf.pl <-i data.yml> [options]
+      Options:
+        --help      -?          brief help message
+        --input     -i  STR     input yaml
+        --output    -o  STR     output yaml
+        --dir       -d  STR     Where sequence files live
+        --match     -m  STR     Key of each @data entry. name, prefix or sciname...
+        --rule      -r  @STR    File::Find::Rule, '*.fsa_nt.gz' for NCBI WGS
+        --pattern   -p  STR     For ensembl, 'dna.toplevel'
+        --opt       STR=STR     Other options for running pop
+        --skip      STR=STR     Skip this strain
+        --per_seq       @STR    Split fasta by names, target or good assembles
+        --arbitrary     INT     For unrecorded strains, give them arbitrary ids, default is [100_000_000]
+        --dd            STR     Where downloaded files live
+                                Default is ".".
+        --download      @STR    Add entries to @data which were download previously
+                                'name=Scer_S288c;taxon=559292;sciname=Saccharomyces cerevisiae S288c'
+        --plan          @STR    Add alignment plans
+                                'name=four_way;t=Scer_S288c;qs=Sbou_ATCC_MYA_796,Spar_NRRL_Y_17217,Spas_CBS_1483'
+        --yes       -y          Overwrite existing YAML file
 
-my $dir_download = ".";
-my @downloaded;
+=cut
 
-my @plan;
-
-my %other_opts;
-
-my $yes;
-
-my $man  = 0;
-my $help = 0;
+#
 
 GetOptions(
-    'help'        => \$help,
-    'man'         => \$man,
-    'i|input=s'   => \$file_input,
-    'o|output=s'  => \$file_output,
-    'd|dir=s'     => \$dir_scan,
-    'm|match=s'   => \$match_field,
-    'r|rule=s'    => \@name_rules,
-    'p|pattern=s' => \$pattern,
-    'opt=s'       => \%other_opts,
-    'skip=s'      => \%skip,
-    'per_seq=s'   => \@per_seq,
-    'dd=s'        => \$dir_download,
-    'download=s'  => \@downloaded,
-    'plan=s'      => \@plan,
-    'y|yes'       => \$yes,
-) or pod2usage(2);
-
-pod2usage(1) if $help;
-pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
+    'help|?'     => sub { HelpMessage(0) },
+    'input|i=s'  => \my $file_input,
+    'output|o=s' => \my $file_output,
+    'dir|d=s'    => \my $dir_scan,
+    'match|m=s' => \( my $match_field = 'name' ),
+    'rule|r=s' => \my @name_rules,
+    'pattern|p=s' => \my $pattern,
+    'opt=s'       => \my %other_opts,
+    'skip=s'      => \my %skip,
+    'per_seq=s'   => \my @per_seq,
+    'arbitrary=i' => \( my $arbitrary = 100_000_000 ),
+    'dd=s'        => \( my $dir_download = "." ),
+    'download=s'  => \my @downloaded,
+    'plan=s'      => \my @plan,
+    'yes|y'       => \my $yes,
+) or HelpMessage(1);
 
 die "Need a YAML file" unless $file_input;
 
@@ -122,12 +122,11 @@ if ( defined $dir_scan and -d $dir_scan ) {
             map { [ $_, compare( $_, $item->{$match_field} ) ] }
             keys %{$file_of};
         $item->{fasta} = $file_of->{$fasta};
-        printf " " x 4 . "%s => %s => %s\n", $item->{$match_field}, $fasta,
-            $item->{fasta};
+        printf " " x 4 . "%s => %s => %s\n", $item->{$match_field}, $fasta, $item->{fasta};
 
-        if ( index( $item->{fasta}, $item->{name} ) == -1 ) {
+        if ( index( lc( $item->{fasta} ), lc( $item->{name} ) ) == -1 ) {
             printf " " x 4 . "[%s] with [%s] matches to [%s]\n", $item->{name},
-                $item->{prefix}, $item->{fasta};
+                $item->{$match_field}, $item->{fasta};
             print " " x 4 . "Filtering with prefix and try again.\n";
             die "Match errors. Please check.\n";
         }
@@ -139,8 +138,7 @@ my $name_set = Set::Scalar->new;
 $name_set->insert( $_->{name} ) for @data;
 for my $name ( keys %per_seq, keys %skip ) {
     if ( !$name_set->has($name) ) {
-        die
-            "Check you --skip or --per_seq for [$name], which isn't present in YAML-data-names.\n";
+        die "Check you --skip or --per_seq for [$name], which isn't present in YAML-data-names.\n";
     }
 }
 
@@ -152,6 +150,14 @@ for my $item (@data) {
     if ( $per_seq{ $item->{name} } ) {
         printf "[%s] Mark flag 'per_seq'\n", $item->{name};
         $item->{per_seq} = 1;
+    }
+}
+
+# arbitrary ids
+for my $item (@data) {
+    if ( !exists $item->{taxon} ) {
+        $arbitrary++;
+        $item->{taxon} = $arbitrary;
     }
 }
 
@@ -212,8 +218,7 @@ if ( scalar @plan ) {
             next unless defined $name;
             if ( !$name_set->has($name) ) {
                 printf "In plan [%s]\n", $hash{name};
-                die
-                    "Please check for [$name], which isn't present in YAML-data-names.\n";
+                die "Please check for [$name], which isn't present in YAML-data-names.\n";
             }
         }
 
@@ -255,32 +260,3 @@ $stopwatch->end_message;
 exit;
 
 __END__
-
-=head1 NAME
-
-gen_pop_conf.pl - for each @data entries in YAML, find matched files, check parameters and store other options.
-
-=head1 SYNOPSIS
-
-    perl gen_pop_conf.pl <-i data.yml> [options]
-      Options:
-        --help              brief help message
-        --man               full documentation
-        -i, --input STR     input yaml
-        -o, --output STR    output yaml
-        -d, --dir STR       Where sequence files live
-        -m, --match STR     Key of each @data entry. name, prefix or sciname...
-        -r, --rule @STR     File::Find::Rule, '*.fsa_nt.gz' for NCBI WGS
-        -p, --pattern STR   For ensembl, 'dna.toplevel'
-        --opt STR=STR       Other options for running pop
-        --skip STR=STR      Skip this strain
-        --per_seq @STR      Split fasta by names, target or good assembles
-        --dd STR            Where downloaded files live
-                            Default is ".".
-        --download @STR     Add entries to @data which were download previously
-                            'name=Scer_S288c;taxon=559292;sciname=Saccharomyces cerevisiae S288c'
-        --plan @STR         Add alignment plans
-                            'name=four_way;t=Scer_S288c;qs=Sbou_ATCC_MYA_796,Spar_NRRL_Y_17217,Spas_CBS_1483'
-        -y, --yes           Overwrite existing YAML file
-
-=cut
