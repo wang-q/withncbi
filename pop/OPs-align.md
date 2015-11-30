@@ -1,14 +1,15 @@
 <!-- TOC depth:6 withLinks:1 updateOnSave:1 orderedList:0 -->
 
 - [Operating steps for each groups](#operating-steps-for-each-groups)
-    - [Align](#align)
-        - [*Saccharomyces* WGS](#saccharomyces-wgs)
-        - [*Scer_wgs* WGS](#scerwgs-wgs)
-        - [*Scer_100* ASSEMBLY](#scer100-assembly)
-        - [*Candida* WGS](#candida-wgs)
-        - [*Fusarium* WGS](#fusarium-wgs)
-        - [*Aspergillus* WGS](#aspergillus-wgs)
-        - [*Penicillium* WGS](#penicillium-wgs)
+	- [*Saccharomyces* WGS](#saccharomyces-wgs)
+	- [*Scer_wgs* WGS](#scerwgs-wgs)
+	- [*Scer_100* ASSEMBLY](#scer100-assembly)
+	- [*Candida* WGS](#candida-wgs)
+	- [*Fusarium* WGS](#fusarium-wgs)
+	- [*Aspergillus* WGS](#aspergillus-wgs)
+	- [*Penicillium* WGS](#penicillium-wgs)
+	- [*Arabidopsis* 19 genomes](#arabidopsis-19-genomes)
+	- [*Orazy sativa* Japonica 24 genomes](#orazy-sativa-japonica-24-genomes)
 <!-- /TOC -->
 
 # Operating steps for each groups
@@ -16,9 +17,7 @@
 Less detailed than Trichoderma in [README.md](README.md), but include examples
 for genomes out of WGS, which usually in better assembling levels.
 
-## Align
-
-### *Saccharomyces* WGS
+## *Saccharomyces* WGS
 
 1. `gen_pop_conf.pl`
 
@@ -77,7 +76,7 @@ Run `chart.bat` under Windows.
 Manually combine `~/data/alignment/Fungi/GENOMES/saccharomyces/WGS/saccharomyces.csv` and
 `~/data/alignment/Fungi/saccharomyces/basicstat.xlsx`.
 
-### *Scer_wgs* WGS
+## *Scer_wgs* WGS
 
 1. `gen_pop_conf.pl`
 
@@ -164,7 +163,7 @@ Run `chart.bat` under Windows.
 Manually combine `~/data/alignment/Fungi/GENOMES/scer_wgs/WGS/scer_wgs.csv` and
 `~/data/alignment/Fungi/scer_wgs/basicstat.xlsx`.
 
-### *Scer_100* ASSEMBLY
+## *Scer_100* ASSEMBLY
 
 1. `gen_pop_conf.pl`
 
@@ -323,7 +322,7 @@ Manually combine `~/data/alignment/Fungi/GENOMES/scer_wgs/WGS/scer_wgs.csv` and
     sh 7_multi_db_only.sh
     ```
 
-### *Candida* WGS
+## *Candida* WGS
 
 1. `gen_pop_conf.pl`
 
@@ -382,7 +381,7 @@ Manually combine `~/data/alignment/Fungi/GENOMES/scer_wgs/WGS/scer_wgs.csv` and
     sh 7_multi_db_only.sh
     ```
 
-### *Fusarium* WGS
+## *Fusarium* WGS
 
 1. `gen_pop_conf.pl`
 
@@ -436,7 +435,7 @@ Manually combine `~/data/alignment/Fungi/GENOMES/scer_wgs/WGS/scer_wgs.csv` and
     sh 7_multi_db_only.sh
     ```
 
-### *Aspergillus* WGS
+## *Aspergillus* WGS
 
 1. `gen_pop_conf.pl`
 
@@ -495,7 +494,7 @@ Manually combine `~/data/alignment/Fungi/GENOMES/scer_wgs/WGS/scer_wgs.csv` and
     sh 7_multi_db_only.sh
     ```
 
-### *Penicillium* WGS
+## *Penicillium* WGS
 
 1. `gen_pop_conf.pl`
 
@@ -539,7 +538,7 @@ Manually combine `~/data/alignment/Fungi/GENOMES/scer_wgs/WGS/scer_wgs.csv` and
     sh 7_multi_db_only.sh
     ```
 
-### *Arabidopsis* 19 genomes
+## *Arabidopsis* 19 genomes
 
 0. Create data.yml manually.
 
@@ -623,7 +622,6 @@ data:
     origin: Germany
     original_id: 3702
 EOF
-
     ```
 
 1. `gen_pop_conf.pl`
@@ -646,7 +644,8 @@ EOF
         --download 'name=Atha;taxon=3702;sciname=Arabidopsis thaliana' \
         --download 'name=Alyr;taxon=59689;sciname=Arabidopsis lyrata' \
         --plan 'name=Ath_n19_pop;t=Atha;qs=Bur_0,Can_0,Ct_1,Edi_0,Hi_0,Kn_0,Ler_0,Mt_0,No_0,Oy_0,Po_0,Rsch_4,Sf_2,Tsu_0,Wil_2,Ws_0,Wu_0,Zu_0' \
-        --plan 'name=Ath_n19_Alyr;t=Atha;qs=Bur_0,Can_0,Ct_1,Edi_0,Hi_0,Kn_0,Ler_0,Mt_0,No_0,Oy_0,Po_0,Rsch_4,Sf_2,Tsu_0,Wil_2,Ws_0,Wu_0,Zu_0'
+        --plan 'name=Ath_n19_Alyr;t=Atha;qs=Bur_0,Can_0,Ct_1,Edi_0,Hi_0,Kn_0,Ler_0,Mt_0,No_0,Oy_0,Po_0,Rsch_4,Sf_2,Tsu_0,Wil_2,Ws_0,Wu_0,Zu_0,Alyr;o=Alyr' \
+        -y
     ```
 
 2. Rest routing things.
@@ -654,6 +653,156 @@ EOF
     ```bash
     # pop_prep.pl
     perl ~/Scripts/withncbi/pop/pop_prep.pl -p 12 -i ~/Scripts/withncbi/pop/arabidopsis82_test.yml
+
+    sh 01_file.sh
+    sh 03_strain_info.sh
+
+    # plan_ALL.sh
+    sh plan_ALL.sh
+
+    sh 1_real_chr.sh
+    sh 3_pair_cmd.sh
+    sh 4_rawphylo.sh
+    sh 5_multi_cmd.sh
+    sh 7_multi_db_only.sh
+    ```
+
+## *Orazy sativa* Japonica 24 genomes
+
+0. Create data.yml manually.
+
+    ```bash
+    mkdir -p ~/data/alignment/rice82
+    cd ~/data/alignment/rice82
+
+    cat <<EOF > rice82_data.yml
+---
+data:
+  - coverage: 11.33
+    name: IRGC1107
+    original_id: 4530
+    subgroup: TEJ
+  - coverage: 17.49
+    name: IRGC2540
+    original_id: 4530
+    subgroup: TEJ
+  - coverage: 9.6
+    name: IRGC27630
+    original_id: 4530
+    subgroup: TEJ
+  - coverage: 13.21
+    name: IRGC32399
+    original_id: 4530
+    subgroup: TEJ
+  - coverage: 13.27
+    name: IRGC418
+    original_id: 4530
+    subgroup: TEJ
+  - coverage: 15.99
+    name: IRGC55471
+    original_id: 4530
+    subgroup: TEJ
+  - coverage: 13.75
+    name: IRGC8191
+    original_id: 4530
+    subgroup: TEJ
+  - coverage: 16.07
+    name: IRGC38698
+    original_id: 4530
+    subgroup: TEJ
+  - coverage: 11.51
+    name: IRGC11010
+    original_id: 4530
+    subgroup: TRJ
+  - coverage: 10.74
+    name: IRGC17757
+    original_id: 4530
+    subgroup: TRJ
+  - coverage: 12.5
+    name: IRGC328
+    original_id: 4530
+    subgroup: TRJ
+  - coverage: 11.79
+    name: IRGC43325
+    original_id: 4530
+    subgroup: TRJ
+  - coverage: 10.97
+    name: IRGC43675
+    original_id: 4530
+    subgroup: TRJ
+  - coverage: 15.35
+    name: IRGC50448
+    original_id: 4530
+    subgroup: TRJ
+  - coverage: 11.83
+    name: IRGC66756
+    original_id: 4530
+    subgroup: TRJ
+  - coverage: 11.27
+    name: IRGC8244
+    original_id: 4530
+    subgroup: TRJ
+  - coverage: 12.78
+    name: IRGC26872
+    original_id: 4530
+    subgroup: TRJ
+  - coverage: 14.64
+    name: IRGC12793
+    original_id: 4530
+    subgroup: ARO
+  - coverage: 13.6
+    name: IRGC38994
+    original_id: 4530
+    subgroup: ARO
+  - coverage: 12.13
+    name: IRGC9060
+    original_id: 4530
+    subgroup: ARO
+  - coverage: 13.11
+    name: IRGC9062
+    original_id: 4530
+    subgroup: ARO
+  - coverage: 13.98
+    name: RA4952
+    original_id: 4530
+    subgroup: ARO
+  - coverage: 12.45
+    name: IRGC31856
+    original_id: 4530
+    subgroup: ARO
+EOF
+    ```
+
+1. `gen_pop_conf.pl`
+
+    ```bash
+    mkdir -p ~/data/alignment/rice82
+    cd ~/data/alignment/rice82
+
+    perl ~/Scripts/withncbi/pop/gen_pop_conf.pl \
+        -i rice82_data.yml \
+        -o ~/Scripts/withncbi/pop/rice82_test.yml \
+        -d ~/data/alignment/others/japonica24 \
+        -m name \
+        -r '*.fa' \
+        --opt group_name=rice82 \
+        --opt base_dir='~/data/alignment' \
+        --opt data_dir='~/data/alignment/rice82' \
+        --opt rm_species=Plant \
+        --dd ~/data/alignment/Ensembl \
+        --download 'name=OstaJap;taxon=39947;sciname=Oryza sativa Japonica' \
+        --download 'name=OstaInd;taxon=39946;sciname=Oryza sativa Indica' \
+        --plan 'name=OstaJap_n8_OstaInd;t=OstaJap;qs=IRGC2540,IRGC38698,IRGC50448,IRGC26872,IRGC12793,RA4952,OstaInd;o=OstaInd' \
+        --plan 'name=OstaJap_n24_pop;t=OstaJap;qs=IRGC1107,IRGC2540,IRGC27630,IRGC32399,IRGC418,IRGC55471,IRGC8191,IRGC38698,IRGC11010,IRGC17757,IRGC328,IRGC43325,IRGC43675,IRGC50448,IRGC66756,IRGC8244,IRGC26872,IRGC12793,IRGC38994,IRGC9060,IRGC9062,RA4952,IRGC31856' \
+        --plan 'name=OstaJap_n24_OstaInd;t=OstaJap;qs=IRGC1107,IRGC2540,IRGC27630,IRGC32399,IRGC418,IRGC55471,IRGC8191,IRGC38698,IRGC11010,IRGC17757,IRGC328,IRGC43325,IRGC43675,IRGC50448,IRGC66756,IRGC8244,IRGC26872,IRGC12793,IRGC38994,IRGC9060,IRGC9062,RA4952,IRGC31856,OstaInd;o=OstaInd' \
+        -y
+    ```
+
+2. Rest routing things.
+
+    ```bash
+    # pop_prep.pl
+    perl ~/Scripts/withncbi/pop/pop_prep.pl -p 12 -i ~/Scripts/withncbi/pop/rice82_test.yml
 
     sh 01_file.sh
     sh 03_strain_info.sh

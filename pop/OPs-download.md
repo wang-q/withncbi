@@ -1,15 +1,15 @@
 <!-- TOC depth:6 withLinks:1 updateOnSave:1 orderedList:0 -->
 
 - [Operating steps for each groups](#operating-steps-for-each-groups)
-	- [Download](#download)
-		- [*Saccharomyces* WGS](#saccharomyces-wgs)
-		- [*Scer_wgs* WGS](#scerwgs-wgs)
-		- [*Scer_100* ASSEMBLY](#scer100-assembly)
-		- [*Candida* WGS](#candida-wgs)
-		- [*Fusarium* WGS](#fusarium-wgs)
-		- [*Aspergillus* WGS](#aspergillus-wgs)
-		- [*Penicillium* WGS](#penicillium-wgs)
-		- [*Arabidopsis* 19 genomes](#arabidopsis-19-genomes)
+	- [*Saccharomyces* WGS](#saccharomyces-wgs)
+	- [*Scer_wgs* WGS](#scerwgs-wgs)
+	- [*Scer_100* ASSEMBLY](#scer100-assembly)
+	- [*Candida* WGS](#candida-wgs)
+	- [*Fusarium* WGS](#fusarium-wgs)
+	- [*Aspergillus* WGS](#aspergillus-wgs)
+	- [*Penicillium* WGS](#penicillium-wgs)
+	- [*Arabidopsis* 19 genomes](#arabidopsis-19-genomes)
+	- [*Orazy sativa* Japonica 24 genomes](#orazy-sativa-japonica-24-genomes)
 <!-- /TOC -->
 
 # Operating steps for each groups
@@ -17,9 +17,7 @@
 Less detailed than Trichoderma in [README.md](README.md), but include examples
 for genomes out of WGS, which usually in better assembling levels.
 
-## Download
-
-### *Saccharomyces* WGS
+## *Saccharomyces* WGS
 
 1. Create `pop/saccharomyces.tsv` manually.
 
@@ -91,7 +89,7 @@ for genomes out of WGS, which usually in better assembling levels.
         -p -f Scer_S288c.seq.csv
     ```
 
-### *Scer_wgs* WGS
+## *Scer_wgs* WGS
 
 1. Create `pop/scer_wgs.tsv` manually.
 
@@ -177,7 +175,7 @@ for genomes out of WGS, which usually in better assembling levels.
 
     ```
 
-### *Scer_100* ASSEMBLY
+## *Scer_100* ASSEMBLY
 
 1. Create working directory and download WGS strains as outgroups.
 
@@ -240,7 +238,7 @@ for genomes out of WGS, which usually in better assembling levels.
 
     ```
 
-### *Candida* WGS
+## *Candida* WGS
 
 1. Create `pop/candida.tsv` manually.
 
@@ -332,7 +330,7 @@ for genomes out of WGS, which usually in better assembling levels.
         -p -f Corh_Co_90_125.seq.csv
     ```
 
-### *Fusarium* WGS
+## *Fusarium* WGS
 
 1. Create `pop/fusarium.tsv` manually.
 
@@ -438,7 +436,7 @@ for genomes out of WGS, which usually in better assembling levels.
         -p -f Fver_7600.seq.csv
     ```
 
-### *Aspergillus* WGS
+## *Aspergillus* WGS
 
 1. Create `pop/aspergillus.tsv` manually.
 
@@ -530,7 +528,7 @@ for genomes out of WGS, which usually in better assembling levels.
         -p -f Anid_FGSC_A4.seq.csv
     ```
 
-### *Penicillium* WGS
+## *Penicillium* WGS
 
 1. Create `pop/penicillium.tsv` manually.
 
@@ -595,13 +593,13 @@ for genomes out of WGS, which usually in better assembling levels.
     | :------------ | :------------                      | :------------      |
     | Pchr_P2niaD18 | *Penicillium chrysogenum* P2niaD18 | GCA_000710275.1    |
 
-### *Arabidopsis* 19 genomes
+## *Arabidopsis* 19 genomes
 
 1. Sources.
 
-    [Project page](http://mus.well.ox.ac.uk/19genomes/).
-
-    [Download page](http://mus.well.ox.ac.uk/19genomes/fasta/).
+    * [Project page](http://mus.well.ox.ac.uk/19genomes/)
+    * [Download page](http://mus.well.ox.ac.uk/19genomes/fasta/)
+	* [Paper](http://www.nature.com/nature/journal/v477/n7365/full/nature10414.html)
 
 2. Download with my web page crawler.
 
@@ -641,4 +639,60 @@ for genomes out of WGS, which usually in better assembling levels.
     faops some toplevel.fa listFile toplevel.filtered.fa
     faops split-about toplevel.filtered.fa 10000000 .
     rm toplevel.fa toplevel.filtered.fa listFile
+	```
+
+## *Orazy sativa* Japonica 24 genomes
+
+1. Sources.
+
+	* [SRA](http://trace.ncbi.nlm.nih.gov/Traces/sra/?study=SRP003189)
+	* [Paper](http://www.nature.com/nbt/journal/v30/n1/full/nbt.2050.html)
+
+2. 23 Japonica rices restore from previous .2bit files.
+
+	I've used bwa-gatk pipeline to generate 23 Japonica rice genomes.
+
+	Reference assembly of nipponbare in that time was MSU6, now is IRGSP-1.0. But I don't want to waste time to rebuild and RepeatMasker all sequences.
+
+	```bash
+	find ~/data/alignment/rice/ -name "*.2bit" \
+		| grep -v "_65" \
+		| parallel basename {//} \
+		| sort
+
+	mkdir -p ~/data/alignment/others/japonica24
+	cd ~/data/alignment/others/japonica24
+
+	for d in IRGC11010 IRGC1107 IRGC12793 IRGC17757 IRGC2540 IRGC26872 IRGC27630 IRGC31856 IRGC32399 IRGC328 IRGC38698 IRGC38994 IRGC418 IRGC43325 IRGC43675 IRGC50448 IRGC55471 IRGC66756 IRGC8191 IRGC8244 IRGC9060 IRGC9062 RA4952
+	do
+		twoBitToFa ~/data/alignment/rice/${d}/chr.2bit ${d}.fa;
+	done
+	```
+
+3. nipponbare and 9311 from ensembl genomes.
+
+    ```bash
+    # OstaJap
+    mkdir -p ~/data/alignment/Ensembl/OstaJap
+    cd ~/data/alignment/Ensembl/OstaJap
+
+    find ~/data/ensembl82/fasta/oryza_sativa/dna/ -name "*dna_sm.toplevel*" | xargs gzip -d -c > toplevel.fa
+    faops count toplevel.fa | perl -aln -e 'next if $F[0] eq 'total'; print $F[0] if $F[1] > 50000; print $F[0] if $F[1] > 5000  and $F[6]/$F[1] < 0.05' | uniq > listFile
+    faops some toplevel.fa listFile toplevel.filtered.fa
+    faops split-name toplevel.filtered.fa .
+    rm toplevel.fa toplevel.filtered.fa listFile
+
+    rm AC*.fa AP*.fa Syng*.fa
+
+    # OstaInd
+    mkdir -p ~/data/alignment/Ensembl/OstaInd
+    cd ~/data/alignment/Ensembl/OstaInd
+
+    find ~/data/ensembl82/fasta/oryza_indica/dna/ -name "*dna_sm.toplevel*" | xargs gzip -d -c > toplevel.fa
+    faops count toplevel.fa | perl -aln -e 'next if $F[0] eq 'total'; print $F[0] if $F[1] > 50000; print $F[0] if $F[1] > 5000  and $F[6]/$F[1] < 0.05' | uniq > listFile
+    faops some toplevel.fa listFile toplevel.filtered.fa
+    faops split-name toplevel.filtered.fa .
+    rm toplevel.fa toplevel.filtered.fa listFile
+
+	rm AA*.fa CH*.fa Sup*.fa
 	```
