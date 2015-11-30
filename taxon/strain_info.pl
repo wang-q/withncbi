@@ -42,9 +42,6 @@ my $stdin_with_name;
 # for arbitrary ids
 my %species_of;
 
-# for unrecorded strains, give them arbitrary ids
-my $arbitrary = 10_000_000;
-
 # running options
 my $td_dir = replace_home( $Config->{path}{td} );    # taxdmp
 
@@ -112,8 +109,7 @@ my $csv = Text::CSV_XS->new( { binary => 1, eol => "\n" } );
 open my $csv_fh, ">", $filename;
 
 # headers
-$csv->print( $csv_fh,
-    [ map { ( $_, $_ . "_id" ) } qw{strain species genus family order} ] );
+$csv->print( $csv_fh, [ map { ( $_, $_ . "_id" ) } qw{strain species genus family order} ] );
 
 ID: for my $taxon_id (@ids) {
     my @row;
@@ -123,8 +119,7 @@ ID: for my $taxon_id (@ids) {
 
         $strain = $taxon_db->get_taxon( -taxonid => $species_of{$taxon_id} );
         if ( !$strain ) {
-            warn
-                "Can't find taxon for $species_of{$taxon_id}. Fake id is $taxon_id\n";
+            warn "Can't find taxon for $species_of{$taxon_id}. Fake id is $taxon_id\n";
             next;
         }
 
