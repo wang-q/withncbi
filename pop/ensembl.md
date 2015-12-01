@@ -6,7 +6,7 @@ Ensembl provides rsync service.
 
 Ensembl genomes only provide ftp.
 
-## ensembl
+## Ensembl
 
 ### mysql
 
@@ -49,9 +49,6 @@ rsync -avP rsync://ftp.ensembl.org/ensembl/pub/release-82/fasta/papio_anubis .
 rsync -avP rsync://ftp.ensembl.org/ensembl/pub/release-82/fasta/chlorocebus_sabaeus .
 rsync -avP rsync://ftp.ensembl.org/ensembl/pub/release-82/fasta/macaca_mulatta .
 
-rsync -avP rsync://ftp.ensembl.org/ensembl/pub/release-82/fasta/drosophila_melanogaster .
-rsync -avP rsync://ftp.ensembl.org/ensembl/pub/release-82/fasta/caenorhabditis_elegans .
-
 rsync -avP rsync://ftp.ensembl.org/ensembl/pub/release-82/fasta/rattus_norvegicus .
 rsync -avP rsync://ftp.ensembl.org/ensembl/pub/release-82/fasta/mus_musculus .
 
@@ -61,7 +58,7 @@ rsync -avP rsync://ftp.ensembl.org/ensembl/pub/release-82/fasta/microcebus_murin
 
 ```
 
-## plants
+## Plants and Metazoa
 
 ### mysql
 
@@ -82,6 +79,18 @@ wget -m ftp://ftp.ensemblgenomes.org/pub/plants/release-29/mysql/solanum_lycoper
 wget -m ftp://ftp.ensemblgenomes.org/pub/plants/release-29/mysql/solanum_tuberosum_core_29_82_4 .
 
 mv ftp.ensemblgenomes.org/pub/plants/release-29/mysql/* .
+rm -fr ftp.ensemblgenomes.org
+find . -name ".listing" | xargs rm
+
+wget -m ftp://ftp.ensemblgenomes.org/pub/metazoa/release-29/mysql/drosophila_melanogaster_core_29_82_6 .
+wget -m ftp://ftp.ensemblgenomes.org/pub/metazoa/release-29/mysql/drosophila_sechellia_core_29_82_1 .
+wget -m ftp://ftp.ensemblgenomes.org/pub/metazoa/release-29/mysql/drosophila_simulans_core_29_82_1 .
+
+wget -m ftp://ftp.ensemblgenomes.org/pub/metazoa/release-29/mysql/caenorhabditis_elegans_core_29_82_245 .
+wget -m ftp://ftp.ensemblgenomes.org/pub/metazoa/release-29/mysql/caenorhabditis_briggsae_core_29_82_230 .
+wget -m ftp://ftp.ensemblgenomes.org/pub/metazoa/release-29/mysql/caenorhabditis_remanei_core_29_82_233 .
+
+mv ftp.ensemblgenomes.org/pub/metazoa/release-29/mysql/* .
 rm -fr ftp.ensemblgenomes.org
 find . -name ".listing" | xargs rm
 
@@ -107,6 +116,18 @@ wget -m ftp://ftp.ensemblgenomes.org/pub/plants/release-29/fasta/solanum_lycoper
 wget -m ftp://ftp.ensemblgenomes.org/pub/plants/release-29/fasta/solanum_tuberosum .
 
 mv ftp.ensemblgenomes.org/pub/plants/release-29/fasta/* .
+rm -fr ftp.ensemblgenomes.org
+find . -name ".listing" | xargs rm
+
+wget -m ftp://ftp.ensemblgenomes.org/pub/metazoa/release-29/fasta/drosophila_melanogaster .
+wget -m ftp://ftp.ensemblgenomes.org/pub/metazoa/release-29/fasta/drosophila_sechellia .
+wget -m ftp://ftp.ensemblgenomes.org/pub/metazoa/release-29/fasta/drosophila_simulans .
+
+wget -m ftp://ftp.ensemblgenomes.org/pub/metazoa/release-29/fasta/caenorhabditis_elegans .
+wget -m ftp://ftp.ensemblgenomes.org/pub/metazoa/release-29/fasta/caenorhabditis_briggsae .
+wget -m ftp://ftp.ensemblgenomes.org/pub/metazoa/release-29/fasta/caenorhabditis_remanei .
+
+mv ftp.ensemblgenomes.org/pub/metazoa/release-29/fasta/* .
 rm -fr ftp.ensemblgenomes.org
 find . -name ".listing" | xargs rm
 
