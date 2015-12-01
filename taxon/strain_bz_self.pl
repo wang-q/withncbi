@@ -3,9 +3,9 @@ use strict;
 use warnings;
 use autodie;
 
-use Getopt::Long;
-use Pod::Usage;
+use Getopt::Long qw(HelpMessage);
 use Config::Tiny;
+use FindBin;
 use YAML qw(Dump Load DumpFile LoadFile);
 
 use DBI;
@@ -19,12 +19,10 @@ use File::Find::Rule;
 
 use AlignDB::Stopwatch;
 
-use FindBin;
-
 #----------------------------------------------------------#
 # GetOpt section
 #----------------------------------------------------------#
-my $Config = Config::Tiny->read("$FindBin::Bin/../config.ini");
+my $Config = Config::Tiny->read("$FindBin::RealBin/../config.ini");
 
 # record ARGV and Config
 my $stopwatch = AlignDB::Stopwatch->new(
@@ -33,20 +31,34 @@ my $stopwatch = AlignDB::Stopwatch->new(
     program_conf => $Config,
 );
 
-my $working_dir = ".";
-my $seq_dir;    #  will do prep_fa() from this dir or use seqs store in $working_dir
-my @keep;       # don't touch anything inside fasta files
+=head1 NAME
 
-my $target_id;
-my @query_ids;
+strain_bz_self.pl - Full procedure for self genome alignments.
 
-my $name_str = "working";
+=head1 SYNOPSIS
 
-# All taxons in this project (may also contain unused taxons)
-my $taxon_file = "strains_taxon_info.csv";
+    perl strain_bz_self.pl [options]
+      Options:
+        --help          -?          brief help message
+        --file              STR     All taxons in this project (may also contain unused taxons)
+        --working_dir   -w  STR     Default is [.]
+        --seq_dir       -s  STR     Will do prep_fa() from this dir or use seqs store in $working_dir
+        --keep              @STR    don't touch anything inside fasta files
+        --target_id     -t  STR
+        --query_ids     -q  @STR
+        --length            INT     Minimal length of paralogous fragments
+        --name_str      -n  STR     Default is []
+        --use_name      -un         Use name instead of taxon_id as identifier. These names should only contain
+                                    alphanumeric value and match with sequence directory names.
+                                    For strains not recorded in NCBI taxonomy, you should assign them fake ids.
+                                    If this option set to be true, all $target_id, @query_ids are actually names.        
+        --msa               STR     Aligning program for refine. Default is [mafft]
+        --norm                      RepeatMasker has been done.
+        --nostat                    Don't do stat stuffs
+        --norawphylo                Skip rawphylo
+        --parallel          INT     number of child processes
 
-my $msa    = 'mafft';    # Default alignment program
-my $length = 1000;
+=cut
 
 my $aligndb  = path( $Config->{run}{aligndb} )->stringify;     # alignDB path
 my $egaz     = path( $Config->{run}{egaz} )->stringify;        # egaz path
@@ -55,48 +67,24 @@ my $blast    = path( $Config->{run}{blast} )->stringify;       # blast path
 my $circos   = path( $Config->{run}{circos} )->stringify;      # circos path
 my $bat_dir  = $Config->{run}{bat};                            # Windows alignDB path
 
-# Use name instead of taxon_id as identifier. These names should only contain
-# alphanumeric value and match with sequence directory names.
-# For strains not recorded in NCBI taxonomy, you should assign them fake ids.
-# If this option set to be true, all $target_id, @query_ids is actually names.
-my $use_name;
-
-# RepeatMasker has been done.
-my $norm;
-
-# Don't do stat stuffs
-my $nostat;
-
-# Useless here, just keep compatibility with strain_bz.pl
-my $norawphylo;
-
-# run in parallel mode
-my $parallel = $Config->{run}{parallel};
-
-my $man  = 0;
-my $help = 0;
-
 GetOptions(
-    'help'            => \$help,
-    'man'             => \$man,
-    'file=s'          => \$taxon_file,
-    'w|working_dir=s' => \$working_dir,
-    's|seq_dir=s'     => \$seq_dir,
-    'keep=s'          => \@keep,
-    't|target_id=s'   => \$target_id,
-    'q|query_ids=s'   => \@query_ids,
-    'length=i'        => \$length,
-    'n|name_str=s'    => \$name_str,
-    'un|use_name'     => \$use_name,
-    'msa=s'           => \$msa,
-    'norm'            => \$norm,
-    'nostat'          => \$nostat,
-    'norawphylo'      => \$norawphylo,
-    'parallel=i'      => \$parallel,
-) or pod2usage(2);
+    'help|?' => sub { HelpMessage(0) },
+    'file=s'          => \( my $taxon_file  = "strains_taxon_info.csv" ),
+    'working_dir|w=s' => \( my $working_dir = "." ),
+    'seq_dir|s=s'     => \my $seq_dir,
+    'keep=s'          => \my @keep,
+    'target_id|t=s'   => \my $target_id,
+    'query_ids|q=s'   => \my @query_ids,
+    'length=i'        => \(my $length = 1000),
+    'name_str|n=s'    => \( my $name_str    = "working" ),
+    'use_name|un'     => \my $use_name,
+    'msa=s'           => \( my $msa         = 'mafft' ),
+    'norm'            => \my $norm,
+    'nostat'          => \my $nostat,
+    'norawphylo'      => \my $norawphylo,
+    'parallel=i'      => \( my $parallel    = $Config->{run}{parallel} ),
+) or HelpMessage(1);
 
-pod2usage(1) if $help;
-pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
 
 #----------------------------------------------------------#
 # init
@@ -1163,5 +1151,3 @@ sub prep_fa {
 }
 
 __END__
-
-perl strain_bz_self.pl 
