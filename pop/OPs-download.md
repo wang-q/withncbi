@@ -202,7 +202,6 @@ for genomes out of WGS, which usually in better assembling levels.
 
     ```
 
-
 2. Download strains of *Saccharomyces cerevisiae* at good assembly status.
 
     Click the `Download table` link on the top-right of [Genome list](http://www.ncbi.nlm.nih.gov/genome/genomes/15),
@@ -592,6 +591,126 @@ for genomes out of WGS, which usually in better assembling levels.
     | assigned name | organism_name                      | assembly_accession |
     | :------------ | :------------                      | :------------      |
     | Pchr_P2niaD18 | *Penicillium chrysogenum* P2niaD18 | GCA_000710275.1    |
+
+## *Plasmodium* WGS
+
+    | name                      | taxon |
+    | :---                      | :---  |
+    | Plasmodium                | 5820  |
+    | Plasmodium falciparum     | 5833  |
+    | Plasmodium falciparum 3D7 | 36329 |
+
+1. Create `pop/plasmodium.tsv` manually.
+
+    * http://www.ncbi.nlm.nih.gov/Traces/wgs/?page=1&term=plasmodium&order=organism
+    * http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?mode=Info&id=5820
+    * http://www.ncbi.nlm.nih.gov/assembly?term=txid5820[Organism:exp]
+    * http://www.ncbi.nlm.nih.gov/genome/?term=txid5820[Organism:exp]
+
+    ```bash
+    export GENUS_ID=5820
+    export GENUS=plasmodium
+    mkdir -p ~/data/alignment/Protists/$GENUS          # operation directory
+    mkdir -p ~/data/alignment/Protists/GENOMES/$GENUS  # sequence directory
+
+    cd ~/data/alignment/Protists/GENOMES/$GENUS
+
+    ...
+
+    # Cleaning
+    rm raw*.*sv
+    unset GENUS_ID
+    unset GENUS
+    ```
+
+    Remove all strains of Plasmodium falciparum. 3D7 will be injected later.
+
+    ```bash
+    mv plasmodium.tsv all.tsv
+    cat all.tsv | grep -v Pfal_ > plasmodium.tsv
+    ```
+
+    Edit them to fix names and comment out bad strains.
+
+
+2. Create working directory and download WGS sequences.
+
+    ```bash
+    mkdir -p ~/data/alignment/Protists/GENOMES/plasmodium
+    cd ~/data/alignment/Protists/GENOMES/plasmodium
+
+    perl ~/Scripts/withncbi/taxon/wgs_prep.pl \
+        -f ~/Scripts/withncbi/pop/plasmodium.tsv \
+        --fix \
+        -o WGS \
+        -a
+
+    aria2c -UWget -x 6 -s 3 -c -i WGS/plasmodium.url.txt
+
+    find WGS -name "*.gz" | xargs gzip -t
+    ```
+
+3. Download *Plasmodium falciparum* 3D7.
+  This step is totally manual operation. **Be careful.**
+
+    | assigned name | organism_name               | assembly_accession           |
+    | :------------ | :------------               | :------------                |
+    | Pfal_3D7      | *Plasmodium falciparum* 3D7 | GCF_000002765.3.assembly.txt |
+
+    ```bash
+    mkdir -p ~/data/alignment/Protists/GENOMES/plasmodium/DOWNLOAD
+    cd ~/data/alignment/Protists/GENOMES/plasmodium/DOWNLOAD
+
+    # Omit chrMt
+    perl ~/Scripts/withncbi/taxon/assembly_csv.pl \
+        -f ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/All/GCF_000002765.3.assembly.txt \
+        -name Pfal_3D7 \
+        --nuclear \
+        > Pfal_3D7.seq.csv
+
+    # Download, rename files and change fasta headers
+    perl ~/Scripts/withncbi/taxon/batch_get_seq.pl \
+        -p -f Pfal_3D7.seq.csv
+    ```
+
+## *Plasmodium falciparum* ASSEMBLY
+
+
+2. Download strains of *Plasmodium falciparum* at good assembly status.
+
+    Click the `Download table` link on the top-right of [Genome list](http://www.ncbi.nlm.nih.gov/genome/genomes/33),
+    save it as .csv file.
+
+    ```bash
+    mkdir -p ~/data/alignment/Protists/GENOMES/Pfal/DOWNLOAD
+    cd ~/data/alignment/Protists/GENOMES/Pfal/DOWNLOAD
+
+    # Download Plasmodium falciparum 3D7 separately (36329)
+    perl ~/Scripts/withncbi/taxon/assembly_csv.pl \
+        -f ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/All/GCF_000002765.3.assembly.txt \
+        --nuclear -name 3D7 \
+        > 3D7.seq.csv
+
+    mysql -ualignDB -palignDB ar_genbank -e "SELECT organism_name, species, assembly_accession FROM ar WHERE wgs_master = '' AND organism_name != species AND species_id = 5833" \
+        | perl -nl -a -F"\t" -e '$n = $F[0]; $rx = quotemeta $F[1]; $n =~ s/$rx\s+//; $n =~ s/\W+/_/g; printf qq{%s\t%s\n}, $n, $F[2];' \
+        | grep -v organism_name | grep -v S288c | grep -v EC1118 \
+        | perl -nl -a -F"\t" -e '$str = q{echo } . $F[0] . qq{ \n}; $str .= q{perl ~/Scripts/withncbi/taxon/assembly_csv.pl} . qq{ \\\n}; $str .= q{-f ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/All/} . $F[1] . qq{.assembly.txt \\\n}; $str .= q{--nuclear --genbank --chromosome -name } . $F[0] . qq{ \\\n}; $str .= q{>> non_wgs.seq.csv}; print $str . qq{\n}' \
+        > ass_csv.sh
+
+    echo > non_wgs.seq.csv
+    sh ass_csv.sh
+
+    echo "#strain_name,accession,strain_taxon_id,seq_name" > scer_100.seq.csv
+    cat S288c.seq.csv non_wgs.seq.csv \
+        | perl -nl -e '/^#/ and next; /^\s*$/ and next; print;' \
+        >> scer_100.seq.csv
+
+    # Download, rename files and change fasta headers
+    perl ~/Scripts/withncbi/taxon/batch_get_seq.pl \
+        -p -f scer_100.seq.csv
+
+    ```
+
 
 ## *Arabidopsis* 19 genomes
 

@@ -1,0 +1,18 @@
+#name	prefix	organism	contigs
+Pvin_petteri	AMYN	Plasmodium vinckei petteri	297
+Pvin_vinckei	AMYS	Plasmodium vinckei vinckei	349
+Pcoa_Hackeri	JFFQ	Plasmodium coatneyi	661
+Pyoe_17X	AMYO	Plasmodium yoelii 17X	1131
+Pviv_Mauritania_I	AFNI	Plasmodium vivax Mauritania I	1510
+Pfra	JOOM	Plasmodium fragile	1770
+Pinu_San_Antonio_1	AMYR	Plasmodium inui San Antonio 1	1862
+Pviv_Brazil_I	AFMK	Plasmodium vivax Brazil I	1999
+Prei	CBXM	Plasmodium reichenowi	2055
+Pviv_North_Korean	AFNJ	Plasmodium vivax North Korean	2499
+Pviv	AAKM	Plasmodium vivax	2770
+Pcyn_strain_B	BAEJ	Plasmodium cynomolgi strain B	3341
+Pviv_India_VII	AFBK	Plasmodium vivax India VII	3358
+Pyoe_yoelii	AABL	Plasmodium yoelii yoelii	5687
+#Pber	CAAI	Plasmodium berghei	7479
+#Pcha_chabaudi	CAAJ	Plasmodium chabaudi chabaudi	10690
+#Pgab_Pgk	CBUG	Plasmodium gaboni	25756

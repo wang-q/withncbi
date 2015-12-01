@@ -8,6 +8,7 @@
 	- [*Fusarium* WGS](#fusarium-wgs)
 	- [*Aspergillus* WGS](#aspergillus-wgs)
 	- [*Penicillium* WGS](#penicillium-wgs)
+	- [*Plasmodium* WGS](#plasmodium-wgs)
 	- [*Arabidopsis* 19 genomes](#arabidopsis-19-genomes)
 	- [*Orazy sativa* Japonica 24 genomes](#orazy-sativa-japonica-24-genomes)
 	- [*Drosophila* Population Genomics Project (dpgp)](#drosophila-population-genomics-project-dpgp)
@@ -539,6 +540,64 @@ Manually combine `~/data/alignment/Fungi/GENOMES/scer_wgs/WGS/scer_wgs.csv` and
     sh 7_multi_db_only.sh
     ```
 
+## *Plasmodium* WGS
+
+1. `gen_pop_conf.pl`
+
+    ```bash
+    mkdir -p ~/data/alignment/Protists/plasmodium
+    cd ~/data/alignment/Protists/plasmodium
+
+    perl ~/Scripts/withncbi/pop/gen_pop_conf.pl \
+        -i ~/data/alignment/Protists/GENOMES/plasmodium/WGS/plasmodium.data.yml \
+        -o ~/Scripts/withncbi/pop/plasmodium_test.yml \
+        -d ~/data/alignment/Protists/GENOMES/plasmodium/WGS \
+        -m prefix \
+        -r '*.fsa_nt.gz' \
+        --opt group_name=plasmodium \
+        --opt base_dir='~/data/alignment/Protists' \
+        --opt data_dir='~/data/alignment/Protists/plasmodium' \
+        --dd ~/data/alignment/Protists/GENOMES/plasmodium/DOWNLOAD \
+        --download 'name=Pfal_3D7;taxon=36329;sciname=Plasmodium falciparum 3D7' \
+        -y
+
+    ```
+
+2. Rest routing things.
+
+    ```bash
+    cd ~/data/alignment/Protists/plasmodium
+
+    # pop_prep.pl
+    perl ~/Scripts/withncbi/pop/pop_prep.pl -p 8 -i ~/Scripts/withncbi/pop/plasmodium_test.yml
+
+    sh 01_file.sh
+    sh 02_rm.sh
+    sh 03_strain_info.sh
+
+    # plan_ALL.sh
+    sh plan_ALL.sh
+
+    sh 1_real_chr.sh
+    sh 3_pair_cmd.sh
+    sh 4_rawphylo.sh
+    sh 5_multi_cmd.sh
+    sh 7_multi_db_only.sh
+
+    # other plans
+    sh plan_plan_test.sh
+
+    sh 5_multi_cmd.sh
+    sh 7_multi_db_only.sh
+    ```
+
+3. Create a summary xlsx.
+
+    Run `chart.bat` under Windows.
+
+    Manually combine `~/data/alignment/Fungi/GENOMES/saccharomyces/WGS/saccharomyces.csv` and
+    `~/data/alignment/Fungi/saccharomyces/basicstat.xlsx`.
+
 ## *Arabidopsis* 19 genomes
 
 0. Create data.yml manually.
@@ -640,7 +699,6 @@ EOF
         --opt group_name=arabidopsis82 \
         --opt base_dir='~/data/alignment' \
         --opt data_dir='~/data/alignment/arabidopsis82' \
-        --opt rm_species=Plant \
         --dd ~/data/alignment/Ensembl \
         --download 'name=Atha;taxon=3702;sciname=Arabidopsis thaliana' \
         --download 'name=Alyr;taxon=59689;sciname=Arabidopsis lyrata' \
@@ -796,7 +854,6 @@ EOF
         --opt group_name=rice82 \
         --opt base_dir='~/data/alignment' \
         --opt data_dir='~/data/alignment/rice82' \
-        --opt rm_species=Plant \
         --dd ~/data/alignment/Ensembl \
         --download 'name=OsatJap;taxon=39947;sciname=Oryza sativa Japonica' \
         --download 'name=OsatInd;taxon=39946;sciname=Oryza sativa Indica' \
@@ -917,7 +974,6 @@ EOF
         --opt group_name=dpgp82 \
         --opt base_dir='~/data/alignment' \
         --opt data_dir='~/data/alignment/dpgp82' \
-        --opt rm_species=Drosophila \
         --dd ~/data/alignment/Ensembl \
         --download 'name=Dmel;taxon=7227;sciname=Drosophila melanogaster' \
         --download 'name=Dsim;taxon=7240;sciname=Drosophila simulans' \
