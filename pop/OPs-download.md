@@ -696,3 +696,57 @@ for genomes out of WGS, which usually in better assembling levels.
 
 	rm AA*.fa CH*.fa Sup*.fa
 	```
+
+## *Drosophila* Population Genomics Project (dpgp)
+
+1. Sources.
+
+	* [SRA](http://trace.ncbi.nlm.nih.gov/Traces/sra/?study=SRP005599)
+	* [Paper](http://journals.plos.org/plosgenetics/article?id=10.1371/journal.pgen.1003080)
+
+2. 21 genomes restore from previous .2bit files.
+
+	```bash
+	find ~/data/alignment/dpgp/ -name "*.2bit" \
+		| grep -v "_65" \
+		| parallel basename {//} \
+		| sort
+
+	mkdir -p ~/data/alignment/others/dpgp
+	cd ~/data/alignment/others/dpgp
+
+	for d in CK1 CO15N CO2 CO4N ED10N EZ5N FR207 FR217 FR229 FR361 GA125 GA129 GA130 GA132 GA185 GU10 KN6 KR39 KT1 NG3N RC1 RG15 SP254 TZ8 UG7 UM526 ZI268 ZL130 ZO12 ZS37
+	do
+		twoBitToFa ~/data/alignment/dpgp/${d}/chr.2bit ${d}.fa;
+	done
+	```
+
+3. Dmel and Dsim from ensembl genomes.
+
+    ```bash
+    # Dmel
+    mkdir -p ~/data/alignment/Ensembl/Dmel
+    cd ~/data/alignment/Ensembl/Dmel
+
+    find ~/data/ensembl82/fasta/drosophila_melanogaster/dna/ -name "*dna_sm.toplevel*" | xargs gzip -d -c > toplevel.fa
+    faops count toplevel.fa | perl -aln -e 'next if $F[0] eq 'total'; print $F[0] if $F[1] > 50000; print $F[0] if $F[1] > 5000  and $F[6]/$F[1] < 0.05' | uniq > listFile
+    faops some toplevel.fa listFile toplevel.filtered.fa
+    faops split-name toplevel.filtered.fa .
+    rm toplevel.fa toplevel.filtered.fa listFile
+
+    rm *Scaffold*.fa 211*.fa
+	mv 4.fa 4.fa.skip
+	mv Y.fa Y.fa.skip
+	mv rDNA.fa rDNA.fa.skip
+	mv dmel_mitochondrion_genome.fa dmel_mitochondrion_genome.fa.skip
+
+	# Dsim
+    mkdir -p ~/data/alignment/Ensembl/Dsim
+    cd ~/data/alignment/Ensembl/Dsim
+
+    find ~/data/ensembl82/fasta/drosophila_simulans/dna/ -name "*dna_sm.toplevel*" | xargs gzip -d -c > toplevel.fa
+    faops count toplevel.fa | perl -aln -e 'next if $F[0] eq 'total'; print $F[0] if $F[1] > 50000; print $F[0] if $F[1] > 5000  and $F[6]/$F[1] < 0.05' | uniq > listFile
+    faops some toplevel.fa listFile toplevel.filtered.fa
+    faops split-about toplevel.filtered.fa 10000000 .
+    rm toplevel.fa toplevel.filtered.fa listFile
+	```

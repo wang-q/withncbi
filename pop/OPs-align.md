@@ -10,6 +10,7 @@
 	- [*Penicillium* WGS](#penicillium-wgs)
 	- [*Arabidopsis* 19 genomes](#arabidopsis-19-genomes)
 	- [*Orazy sativa* Japonica 24 genomes](#orazy-sativa-japonica-24-genomes)
+	- [*Drosophila* Population Genomics Project (dpgp)](#drosophila-population-genomics-project-dpgp)
 <!-- /TOC -->
 
 # Operating steps for each groups
@@ -665,6 +666,13 @@ EOF
     sh 4_rawphylo.sh
     sh 5_multi_cmd.sh
     sh 7_multi_db_only.sh
+
+    # other plans
+    sh plan_Ath_n19_pop.sh
+
+    sh 5_multi_cmd.sh
+    sh 7_multi_db_only.sh
+
     ```
 
 ## *Orazy sativa* Japonica 24 genomes
@@ -803,6 +811,126 @@ EOF
     ```bash
     # pop_prep.pl
     perl ~/Scripts/withncbi/pop/pop_prep.pl -p 12 -i ~/Scripts/withncbi/pop/rice82_test.yml
+
+    sh 01_file.sh
+    sh 03_strain_info.sh
+
+    # plan_ALL.sh
+    sh plan_ALL.sh
+
+    sh 1_real_chr.sh
+    sh 3_pair_cmd.sh
+    sh 4_rawphylo.sh
+    sh 5_multi_cmd.sh
+    sh 7_multi_db_only.sh
+    ```
+
+## *Drosophila* Population Genomics Project (dpgp)
+
+0. Create data.yml manually.
+
+    ```bash
+    mkdir -p ~/data/alignment/dpgp82
+    cd ~/data/alignment/dpgp82
+
+    cat <<EOF > dpgp82_data.yml
+---
+data:
+  - coverage: 37.8
+    name: CK1
+    original_id: 7227
+  - coverage: 41.3
+    name: CO15N
+    original_id: 7227
+  - coverage: 36.23
+    name: ED10N
+    original_id: 7227
+  - coverage: 33.81
+    name: EZ5N
+    original_id: 7227
+  - coverage: 38.44
+    name: FR217
+    original_id: 7227
+  - coverage: 47.37
+    name: GA185
+    original_id: 7227
+  - coverage: 37.08
+    name: GU10
+    original_id: 7227
+  - coverage: 37.05
+    name: KN6
+    original_id: 7227
+  - coverage: 33
+    name: KR39
+    original_id: 7227
+  - coverage: 35.21
+    name: KT1
+    original_id: 7227
+  - coverage: 36.97
+    name: NG3N
+    original_id: 7227
+  - coverage: 28.41
+    name: RC1
+    original_id: 7227
+  - coverage: 41.3
+    name: RG15
+    original_id: 7227
+  - coverage: 40.78
+    name: SP254
+    original_id: 7227
+  - coverage: 33.76
+    name: TZ8
+    original_id: 7227
+  - coverage: 36.39
+    name: UG7
+    original_id: 7227
+  - coverage: 42.83
+    name: UM526
+    original_id: 7227
+  - coverage: 39.92
+    name: ZI268
+    original_id: 7227
+  - coverage: 42.65
+    name: ZL130
+    original_id: 7227
+  - coverage: 38.76
+    name: ZO12
+    original_id: 7227
+  - coverage: 39.11
+    name: ZS37
+    original_id: 7227
+EOF
+    ```
+
+1. `gen_pop_conf.pl`
+
+    ```bash
+    mkdir -p ~/data/alignment/dpgp82
+    cd ~/data/alignment/dpgp82
+
+    perl ~/Scripts/withncbi/pop/gen_pop_conf.pl \
+        -i dpgp82_data.yml \
+        -o ~/Scripts/withncbi/pop/dpgp82_test.yml \
+        -d ~/data/alignment/others/dpgp \
+        -m name \
+        -r '*.fa' \
+        --opt group_name=dpgp82 \
+        --opt base_dir='~/data/alignment' \
+        --opt data_dir='~/data/alignment/dpgp82' \
+        --opt rm_species=Drosophila \
+        --dd ~/data/alignment/Ensembl \
+        --download 'name=Dmel;taxon=7227;sciname=Drosophila melanogaster' \
+        --download 'name=Dsim;taxon=7240;sciname=Drosophila simulans' \
+        --plan 'name=Dmel_n22_pop;t=Dmel;qs=CK1,CO15N,ED10N,EZ5N,FR217,GA185,GU10,KN6,KR39,KT1,NG3N,RC1,RG15,SP254,TZ8,UG7,UM526,ZI268,ZL130,ZO12,ZS37' \
+        --plan 'name=Dmel_n22_Dsim;t=Dmel;qs=CK1,CO15N,ED10N,EZ5N,FR217,GA185,GU10,KN6,KR39,KT1,NG3N,RC1,RG15,SP254,TZ8,UG7,UM526,ZI268,ZL130,ZO12,ZS37,Dsim;o=Dsim' \
+        -y
+    ```
+
+2. Rest routing things.
+
+    ```bash
+    # pop_prep.pl
+    perl ~/Scripts/withncbi/pop/pop_prep.pl -p 12 -i ~/Scripts/withncbi/pop/dpgp82_test.yml
 
     sh 01_file.sh
     sh 03_strain_info.sh
