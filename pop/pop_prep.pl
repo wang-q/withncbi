@@ -27,15 +27,15 @@ my $stopwatch = AlignDB::Stopwatch->new(
 
 =head1 NAME
 
-pop_prep.pl - prepare pop
+pop_prep.pl - prepare pop: file, rm and info.
 
 =head1 SYNOPSIS
 
     perl pop_prep.pl [options]
       Options:
         --help      -?          brief help message
-        -i, --file          input yaml
-        --parallel          number of child processes
+        --file      -i  STR     input yaml
+        --parallel      INT     number of child processes
 
 =cut
 
@@ -43,7 +43,6 @@ my $withncbi = path( $Config->{run}{withncbi} )->stringify;
 
 GetOptions(
     'help|?' => sub { HelpMessage(0) },
-
     'file|i=s'   => \my $file_yaml,
     'parallel=i' => \my $parallel,
 ) or HelpMessage(1);
@@ -84,6 +83,11 @@ if ( !$parallel ) {
 my $rm_species;
 if ( exists $yml->{rm_species} ) {
     $rm_species = $yml->{rm_species};
+}
+
+my $phylo_tree;
+if ( exists $yml->{phylo_tree} ) {
+    $phylo_tree = $yml->{phylo_tree};
 }
 
 #----------------------------------------------------------#
@@ -305,6 +309,9 @@ perl [% withncbi %]/taxon/strain_bz.pl \
     --use_name \
     --parallel [% parallel %] \
     --norm \
+[% IF phylo_tree -%]
+    --phylo_tree [% phylo_tree %] \
+[% END -%]
 [% FOREACH item IN data -%]
 [% IF loop.index != 0 -%]
 [% IF ! item.skip -%]
@@ -322,6 +329,7 @@ EOF
             group_name => $group_name,
             data_dir   => $data_dir,
             base_dir   => $base_dir,
+            phylo_tree => $phylo_tree,
             withncbi   => $withncbi,
             parallel   => $parallel,
         },
