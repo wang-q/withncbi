@@ -39,7 +39,7 @@ spaces matters.
     ORDER BY assembly_level , organism_name
     ```
 
-    For genus comtains many species, you should be careful that "Gspe" (G_enus spe_cies) style
+    For genus contains many species, you should be careful that "Gspe" (G_enus spe_cies) style
     abbreviation may mix up two or more species.
 
     ```sql
@@ -51,7 +51,7 @@ spaces matters.
         genus = 'Trichoderma'
     ```
 
-    When the two approach get very different number of strains, you run the following steps. Check
+    When the two approaches get very different number of strains, you run the following steps. Check
     intermediate results on necessary.
 
     Working directory should be `~/data/alignment/Fungi/GENOMES/trichoderma` in this section.
