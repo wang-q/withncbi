@@ -26,6 +26,7 @@ rsync -avP \
     rsync://ftp.ensembl.org/ensembl/pub/release-82/mysql/ \
     .
 
+rsync -avP rsync://ftp.ensembl.org/ensembl/pub/grch37/release-82/mysql/homo_sapiens_core_82_37 .
 ```
 
 ### fasta
@@ -34,28 +35,14 @@ rsync -avP \
 mkdir -p ~/data/ensembl82/fasta
 cd ~/data/ensembl82/fasta
 
-rsync -avP rsync://ftp.ensembl.org/ensembl/pub/release-82/fasta/saccharomyces_cerevisiae .
+rsync -avP \
+    --exclude='caenorhabditis_elegans' \
+    --exclude='drosophila_melanogaster' \
+    --exclude='saccharomyces_cerevisiae' \
+    rsync://ftp.ensembl.org/ensembl/pub/release-82/fasta/ \
+    .
 
 rsync -avP rsync://ftp.ensembl.org/ensembl/pub/release-75/fasta/homo_sapiens . # GRCh37
-
-rsync -avP rsync://ftp.ensembl.org/ensembl/pub/release-82/fasta/nomascus_leucogenys .
-rsync -avP rsync://ftp.ensembl.org/ensembl/pub/release-82/fasta/pongo_abelii .
-rsync -avP rsync://ftp.ensembl.org/ensembl/pub/release-82/fasta/gorilla_gorilla .
-rsync -avP rsync://ftp.ensembl.org/ensembl/pub/release-82/fasta/pan_troglodytes .
-
-rsync -avP rsync://ftp.ensembl.org/ensembl/pub/release-82/fasta/tarsius_syrichta .
-rsync -avP rsync://ftp.ensembl.org/ensembl/pub/release-82/fasta/callithrix_jacchus .
-rsync -avP rsync://ftp.ensembl.org/ensembl/pub/release-82/fasta/papio_anubis .
-rsync -avP rsync://ftp.ensembl.org/ensembl/pub/release-82/fasta/chlorocebus_sabaeus .
-rsync -avP rsync://ftp.ensembl.org/ensembl/pub/release-82/fasta/macaca_mulatta .
-
-rsync -avP rsync://ftp.ensembl.org/ensembl/pub/release-82/fasta/rattus_norvegicus .
-rsync -avP rsync://ftp.ensembl.org/ensembl/pub/release-82/fasta/mus_musculus .
-
-rsync -avP rsync://ftp.ensembl.org/ensembl/pub/release-82/fasta/tupaia_belangeri .
-rsync -avP rsync://ftp.ensembl.org/ensembl/pub/release-82/fasta/otolemur_garnettii .
-rsync -avP rsync://ftp.ensembl.org/ensembl/pub/release-82/fasta/microcebus_murinus .
-
 ```
 
 ## Plants and Metazoa
