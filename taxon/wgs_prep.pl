@@ -46,6 +46,8 @@ my $csvonly;
 # sometimes WGS records miss assigning strain id
 my $fix_strain;
 
+my @nofix;
+
 # for unrecorded strains, give them arbitrary ids
 my $arbitrary = 100_000_000;
 
@@ -59,6 +61,7 @@ GetOptions(
     'o|d|dir=s'  => \$dir_output,
     'a|aria2'    => \$aria2,
     'fix'        => \$fix_strain,
+    'nofix=s' => \@nofix,
     'csvonly'    => \$csvonly,
 ) or pod2usage(2);
 
@@ -159,12 +162,15 @@ $stopwatch->block_message(
         my %info = %{ $master->{$key} };
 
         if ( !$csvonly and $fix_strain ) {
-            if ( $info{Organism} =~ /$info{Biosource}/ ) {
+            if (grep {$_ eq $key} @nofix) {
+                print "Skip $info{name} as you don't want fix it\n";
+            }
+            elsif ( $info{Organism} =~ /$info{Biosource}/ ) {
                 print "Don't need fixing for $info{name}\n";
             }
             else {
-                # Sometimes the uploader didn't create a new strain, assign
-                # its own id and marked species name as strain name.
+                # Sometimes the uploader didn't create a new strain, assign its own id and marked
+                # species name as strain name.
                 # So try looking up this strain in taxonomy dumps
                 print "Fix strain taxon info for $info{name}\n";
                 $info{Organism} = $info{Organism} . " " . $info{Biosource};
