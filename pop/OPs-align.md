@@ -542,6 +542,15 @@ Manually combine `~/data/alignment/Fungi/GENOMES/scer_wgs/WGS/scer_wgs.csv` and
 
 ## *Plasmodium* WGS
 
+0. RM species
+
+    It't OK to not specifies RM species. Protists have very few repeats records.
+
+    ```bash
+    /usr/local/Cellar/repeatmasker/4.0.5/libexec/util/queryTaxonomyDatabase.pl -taxDBFile /usr/local/Cellar/repeatmasker/4.0.5/libexec/Libraries/taxonomy.dat -species Apicomplexa
+    /usr/local/Cellar/repeatmasker/4.0.5/libexec/util/queryRepeatDatabase.pl -species Apicomplexa -stat
+    ```
+
 1. `gen_pop_conf.pl`
 
     ```bash
@@ -583,20 +592,11 @@ Manually combine `~/data/alignment/Fungi/GENOMES/scer_wgs/WGS/scer_wgs.csv` and
     sh 4_rawphylo.sh
     sh 5_multi_cmd.sh
     sh 7_multi_db_only.sh
-
-    # other plans
-    sh plan_plan_test.sh
-
-    sh 5_multi_cmd.sh
-    sh 7_multi_db_only.sh
     ```
 
-3. Create a summary xlsx.
+3. Pick outgroup.
 
-    Run `chart.bat` under Windows.
-
-    Manually combine `~/data/alignment/Fungi/GENOMES/saccharomyces/WGS/saccharomyces.csv` and
-    `~/data/alignment/Fungi/saccharomyces/basicstat.xlsx`.
+	Prei is the only one.
 
 ## *Arabidopsis* 19 genomes
 
