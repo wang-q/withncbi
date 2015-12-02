@@ -39,6 +39,7 @@ rsync -avP \
     --exclude='caenorhabditis_elegans' \
     --exclude='drosophila_melanogaster' \
     --exclude='saccharomyces_cerevisiae' \
+    --exclude='homo_sapiens' \
     rsync://ftp.ensembl.org/ensembl/pub/release-82/fasta/ \
     .
 
