@@ -300,7 +300,7 @@ your disk capacity.
 * I've 500 genomes of *E. coli*, the manually editing step 1 kills me.
 
     The whole `pop/` and much of `util/` scripts are for Eukaryotes. For small genomes of bacteria,
-    archea and organelles, check `taxon/bac_prepare.pl`.
+    archaea and organelles, check `taxon/bac_prepare.pl`.
 
 * Your command lines executed and the results are wired.
 
@@ -308,7 +308,7 @@ your disk capacity.
 
     Or send what you want to me and let me do the job.
 
-* I've a very good assembly on chromosome level, but I can't find it in WGS.
+* I have a very good assembly on chromosome level, but I can't find it in WGS.
 
     Best genomes on the world went to NCBI RefSeq. Use tools in `util/` to
-    download them. Examples can be found in `pop/OPs.md`.
+    download them. Examples can be found in `pop/OPs-download.md`.
