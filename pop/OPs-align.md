@@ -569,7 +569,6 @@ Manually combine `~/data/alignment/Fungi/GENOMES/scer_wgs/WGS/scer_wgs.csv` and
         --dd ~/data/alignment/Protists/GENOMES/plasmodium/DOWNLOAD \
         --download 'name=Pfal_3D7;taxon=36329;sciname=Plasmodium falciparum 3D7' \
         -y
-
     ```
 
 2. Rest routing things.
@@ -597,6 +596,50 @@ Manually combine `~/data/alignment/Fungi/GENOMES/scer_wgs/WGS/scer_wgs.csv` and
 3. Pick outgroup.
 
 	Prei is the only one.
+
+## *Plasmodium falciparum* WGS
+
+1. `gen_pop_conf.pl`
+
+    ```bash
+    mkdir -p ~/data/alignment/Protists/pfal
+    cd ~/data/alignment/Protists/pfal
+
+    perl ~/Scripts/withncbi/pop/gen_pop_conf.pl \
+        -i ~/data/alignment/Protists/GENOMES/pfal/WGS/pfal.data.yml \
+        -o ~/Scripts/withncbi/pop/pfal_test.yml \
+        -d ~/data/alignment/Protists/GENOMES/pfal/WGS \
+        -m prefix \
+        -r '*.fsa_nt.gz' \
+        --opt group_name=pfal \
+        --opt base_dir='~/data/alignment/Protists' \
+        --opt data_dir='~/data/alignment/Protists/pfal' \
+        --dd ~/data/alignment/Protists/GENOMES/pfal/DOWNLOAD \
+        --download 'name=3D7;taxon=36329;sciname=Plasmodium falciparum 3D7' \
+        -y
+    ```
+
+2. Rest routing things.
+
+    ```bash
+    cd ~/data/alignment/Protists/pfal
+
+    # pop_prep.pl
+    perl ~/Scripts/withncbi/pop/pop_prep.pl -p 8 -i ~/Scripts/withncbi/pop/pfal_test.yml
+
+    sh 01_file.sh
+    sh 02_rm.sh
+    sh 03_strain_info.sh
+
+    # plan_ALL.sh
+    sh plan_ALL.sh
+
+    sh 1_real_chr.sh
+    sh 3_pair_cmd.sh
+    sh 4_rawphylo.sh
+    sh 5_multi_cmd.sh
+    sh 7_multi_db_only.sh
+    ```
 
 ## *Arabidopsis* 19 genomes
 

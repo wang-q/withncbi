@@ -630,7 +630,7 @@ for genomes out of WGS, which usually in better assembling levels.
     cat all.tsv | grep -v Pfal_ > plasmodium.tsv
     ```
 
-    Edit them to fix names and comment out bad strains.
+    Edit the tsv file to fix names and comment out bad strains.
 
 
 2. Create working directory and download WGS sequences.
@@ -673,17 +673,64 @@ for genomes out of WGS, which usually in better assembling levels.
         -p -f Pfal_3D7.seq.csv
     ```
 
-## *Plasmodium falciparum* ASSEMBLY
+## *Plasmodium falciparum* WGS
 
+1. Create `pop/Pfal.tsv` manually.
 
-2. Download strains of *Plasmodium falciparum* at good assembly status.
+    ```bash
+    export GENUS_ID=5820
+    export GENUS=plasmodium
+    mkdir -p ~/data/alignment/Protists/pfal          # operation directory
+    mkdir -p ~/data/alignment/Protists/GENOMES/pfal  # sequence directory
+
+    cd ~/data/alignment/Protists/GENOMES/pfal
+
+    ... # paste codes from README.md
+
+    # Cleaning
+    rm raw*.*sv
+    unset GENUS_ID
+    unset GENUS
+    ```
+
+    Remove other species of Plasmodium. Add Prei as outgroup.
+
+    ```bash
+    echo -e '#name\tprefix\torganism\tcontigs' > pfal.tsv
+    cat plasmodium.tsv | grep Pfal_ | sed "s/^Pfal_//" >> pfal.tsv
+    rm plasmodium.tsv
+
+    # outgroup
+    echo -e "Prei\tCBXM\tPlasmodium reichenowi\t2055" >> pfal.tsv
+	```
+
+    Edit the tsv file to fix names and comment out bad strains.
+
+2. Create working directory and download WGS sequences.
+
+    ```bash
+    cd ~/data/alignment/Protists/GENOMES/pfal
+
+    perl ~/Scripts/withncbi/taxon/wgs_prep.pl \
+        -f ~/Scripts/withncbi/pop/pfal.tsv \
+        --fix \
+		--nofix Prei \
+        -o WGS \
+        -a
+
+    aria2c -UWget -x 6 -s 3 -c -i WGS/pfal.url.txt
+
+    find WGS -name "*.gz" | xargs gzip -t
+    ```
+
+3. Download *Plasmodium falciparum* 3D7.
 
     Click the `Download table` link on the top-right of [Genome list](http://www.ncbi.nlm.nih.gov/genome/genomes/33),
     save it as .csv file.
 
     ```bash
-    mkdir -p ~/data/alignment/Protists/GENOMES/Pfal/DOWNLOAD
-    cd ~/data/alignment/Protists/GENOMES/Pfal/DOWNLOAD
+    mkdir -p ~/data/alignment/Protists/GENOMES/pfal/DOWNLOAD
+    cd ~/data/alignment/Protists/GENOMES/pfal/DOWNLOAD
 
     # Download Plasmodium falciparum 3D7 separately (36329)
     perl ~/Scripts/withncbi/taxon/assembly_csv.pl \
@@ -691,26 +738,10 @@ for genomes out of WGS, which usually in better assembling levels.
         --nuclear -name 3D7 \
         > 3D7.seq.csv
 
-    mysql -ualignDB -palignDB ar_genbank -e "SELECT organism_name, species, assembly_accession FROM ar WHERE wgs_master = '' AND organism_name != species AND species_id = 5833" \
-        | perl -nl -a -F"\t" -e '$n = $F[0]; $rx = quotemeta $F[1]; $n =~ s/$rx\s+//; $n =~ s/\W+/_/g; printf qq{%s\t%s\n}, $n, $F[2];' \
-        | grep -v organism_name | grep -v S288c | grep -v EC1118 \
-        | perl -nl -a -F"\t" -e '$str = q{echo } . $F[0] . qq{ \n}; $str .= q{perl ~/Scripts/withncbi/taxon/assembly_csv.pl} . qq{ \\\n}; $str .= q{-f ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/All/} . $F[1] . qq{.assembly.txt \\\n}; $str .= q{--nuclear --genbank --chromosome -name } . $F[0] . qq{ \\\n}; $str .= q{>> non_wgs.seq.csv}; print $str . qq{\n}' \
-        > ass_csv.sh
-
-    echo > non_wgs.seq.csv
-    sh ass_csv.sh
-
-    echo "#strain_name,accession,strain_taxon_id,seq_name" > scer_100.seq.csv
-    cat S288c.seq.csv non_wgs.seq.csv \
-        | perl -nl -e '/^#/ and next; /^\s*$/ and next; print;' \
-        >> scer_100.seq.csv
-
     # Download, rename files and change fasta headers
     perl ~/Scripts/withncbi/taxon/batch_get_seq.pl \
-        -p -f scer_100.seq.csv
-
+        -p -f 3D7.seq.csv
     ```
-
 
 ## *Arabidopsis* 19 genomes
 
@@ -868,4 +899,37 @@ for genomes out of WGS, which usually in better assembling levels.
     faops some toplevel.fa listFile toplevel.filtered.fa
     faops split-about toplevel.filtered.fa 10000000 .
     rm toplevel.fa toplevel.filtered.fa listFile
+	```
+
+## Primates
+
+1. Guild tree
+
+	```bash
+	cd ~/data/alignment
+	wget http://hgdownload.soe.ucsc.edu/goldenPath/hg19/multiz100way/hg19.100way.commonNames.nh
+	tree_doctor hg19.100way.commonNames.nh --newick  \
+		--prune-all-but \
+		Human,Chimp,Gorilla,Orangutan,Gibbon,Rhesus,Crab_eating_macaque,Baboon,Green_monkey,Marmoset,Squirrel_monkey,Bushbaby,Chinese_tree_shrew \
+		> primates_13way.nwk
+
+	```
+
+2. All from ensembl.
+
+    ```bash
+    # Human
+    mkdir -p ~/data/alignment/Ensembl/Human
+    cd ~/data/alignment/Ensembl/Human
+
+    find ~/data/ensembl82/fasta/homo_sapiens/dna/ -name "*dna_sm.primary_assembly*" | xargs gzip -d -c > toplevel.fa
+    faops count toplevel.fa | perl -aln -e 'next if $F[0] eq 'total'; print $F[0] if $F[1] > 50000; print $F[0] if $F[1] > 5000  and $F[6]/$F[1] < 0.05' | uniq > listFile
+    faops some toplevel.fa listFile toplevel.filtered.fa
+    faops split-name toplevel.filtered.fa .
+    rm toplevel.fa toplevel.filtered.fa listFile
+
+	rm GL*.fa
+
+	mv Y.fa Y.fa.skip
+	mv MT.fa MT.fa.skip
 	```
