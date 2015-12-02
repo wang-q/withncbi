@@ -46,7 +46,7 @@ rsync -avP \
 rsync -avP rsync://ftp.ensembl.org/ensembl/pub/release-75/fasta/homo_sapiens . # GRCh37
 ```
 
-## Plants and Metazoa
+## Ensembl genomes
 
 ### mysql
 
@@ -54,6 +54,7 @@ rsync -avP rsync://ftp.ensembl.org/ensembl/pub/release-75/fasta/homo_sapiens . #
 mkdir -p ~/data/ensembl82/mysql
 cd ~/data/ensembl82/mysql
 
+# Plants
 wget -m ftp://ftp.ensemblgenomes.org/pub/plants/release-29/mysql/arabidopsis_thaliana_core_29_82_10 .
 wget -m ftp://ftp.ensemblgenomes.org/pub/plants/release-29/mysql/arabidopsis_lyrata_core_29_82_10 .
 
@@ -66,10 +67,7 @@ wget -m ftp://ftp.ensemblgenomes.org/pub/plants/release-29/mysql/brassica_rapa_c
 wget -m ftp://ftp.ensemblgenomes.org/pub/plants/release-29/mysql/solanum_lycopersicum_core_29_82_250 .
 wget -m ftp://ftp.ensemblgenomes.org/pub/plants/release-29/mysql/solanum_tuberosum_core_29_82_4 .
 
-mv ftp.ensemblgenomes.org/pub/plants/release-29/mysql/* .
-rm -fr ftp.ensemblgenomes.org
-find . -name ".listing" | xargs rm
-
+# Metazoa
 wget -m ftp://ftp.ensemblgenomes.org/pub/metazoa/release-29/mysql/drosophila_melanogaster_core_29_82_6 .
 wget -m ftp://ftp.ensemblgenomes.org/pub/metazoa/release-29/mysql/drosophila_sechellia_core_29_82_1 .
 wget -m ftp://ftp.ensemblgenomes.org/pub/metazoa/release-29/mysql/drosophila_simulans_core_29_82_1 .
@@ -78,6 +76,15 @@ wget -m ftp://ftp.ensemblgenomes.org/pub/metazoa/release-29/mysql/caenorhabditis
 wget -m ftp://ftp.ensemblgenomes.org/pub/metazoa/release-29/mysql/caenorhabditis_briggsae_core_29_82_230 .
 wget -m ftp://ftp.ensemblgenomes.org/pub/metazoa/release-29/mysql/caenorhabditis_remanei_core_29_82_233 .
 
+# Fungi
+wget -m ftp://ftp.ensemblgenomes.org/pub/fungi/release-29/mysql/saccharomyces_cerevisiae_core_29_82_4 .
+wget -m ftp://ftp.ensemblgenomes.org/pub/fungi/release-29/mysql/schizosaccharomyces_pombe_core_29_82_2 .
+wget -m ftp://ftp.ensemblgenomes.org/pub/fungi/release-29/mysql/aspergillus_fumigatus_core_29_82_2 .
+
+# Protists
+wget -m ftp://ftp.ensemblgenomes.org/pub/protists/release-29/mysql/plasmodium_falciparum_core_29_82_3 .
+
+# clean
 mv ftp.ensemblgenomes.org/pub/metazoa/release-29/mysql/* .
 rm -fr ftp.ensemblgenomes.org
 find . -name ".listing" | xargs rm
@@ -91,6 +98,7 @@ find . -name ".listing" | xargs rm
 mkdir -p ~/data/ensembl82/fasta
 cd ~/data/ensembl82/fasta
 
+# Plants
 wget -m ftp://ftp.ensemblgenomes.org/pub/plants/release-29/fasta/arabidopsis_thaliana .
 wget -m ftp://ftp.ensemblgenomes.org/pub/plants/release-29/fasta/arabidopsis_lyrata .
 
@@ -103,10 +111,7 @@ wget -m ftp://ftp.ensemblgenomes.org/pub/plants/release-29/fasta/brassica_rapa .
 wget -m ftp://ftp.ensemblgenomes.org/pub/plants/release-29/fasta/solanum_lycopersicum .
 wget -m ftp://ftp.ensemblgenomes.org/pub/plants/release-29/fasta/solanum_tuberosum .
 
-mv ftp.ensemblgenomes.org/pub/plants/release-29/fasta/* .
-rm -fr ftp.ensemblgenomes.org
-find . -name ".listing" | xargs rm
-
+# Metazoa
 wget -m ftp://ftp.ensemblgenomes.org/pub/metazoa/release-29/fasta/drosophila_melanogaster .
 wget -m ftp://ftp.ensemblgenomes.org/pub/metazoa/release-29/fasta/drosophila_sechellia .
 wget -m ftp://ftp.ensemblgenomes.org/pub/metazoa/release-29/fasta/drosophila_simulans .
@@ -114,6 +119,14 @@ wget -m ftp://ftp.ensemblgenomes.org/pub/metazoa/release-29/fasta/drosophila_sim
 wget -m ftp://ftp.ensemblgenomes.org/pub/metazoa/release-29/fasta/caenorhabditis_elegans .
 wget -m ftp://ftp.ensemblgenomes.org/pub/metazoa/release-29/fasta/caenorhabditis_briggsae .
 wget -m ftp://ftp.ensemblgenomes.org/pub/metazoa/release-29/fasta/caenorhabditis_remanei .
+
+# Fungi
+wget -m ftp://ftp.ensemblgenomes.org/pub/fungi/release-29/fasta/saccharomyces_cerevisiae .
+wget -m ftp://ftp.ensemblgenomes.org/pub/fungi/release-29/fasta/schizosaccharomyces_pombe .
+wget -m ftp://ftp.ensemblgenomes.org/pub/fungi/release-29/fasta/aspergillus_fumigatus .
+
+# Protists
+wget -m ftp://ftp.ensemblgenomes.org/pub/protists/release-29/fasta/plasmodium_falciparum .
 
 mv ftp.ensemblgenomes.org/pub/metazoa/release-29/fasta/* .
 rm -fr ftp.ensemblgenomes.org
