@@ -3,25 +3,22 @@ use strict;
 use warnings;
 use autodie;
 
-use Getopt::Long;
-use Pod::Usage;
+use Getopt::Long qw(HelpMessage);
 use Config::Tiny;
+use FindBin;
 use YAML qw(Dump Load DumpFile LoadFile);
 
 use Template;
+use Path::Tiny;
 use List::MoreUtils qw(uniq zip);
 use Text::CSV_XS;
-use File::Basename;
-use File::Slurp;
-use File::Spec;
 
 use Bio::DB::Taxonomy;
 
 use AlignDB::Stopwatch;
 
-use FindBin;
 use lib "$FindBin::Bin/../lib";
-use MyUtil qw(replace_home wgs_worker);
+use MyUtil qw(wgs_worker);
 
 #----------------------------------------------------------#
 # GetOpt section
@@ -35,38 +32,45 @@ my $stopwatch = AlignDB::Stopwatch->new(
     program_conf => $Config,
 );
 
-my $td_dir = replace_home( $Config->{path}{td} );    # taxdmp
+=head1 NAME
 
-my $file_input;
-my $dir_output;
-my $aria2;    # generate a aria2 input file
+wgs_prep.pl - prepare WGS materials
 
-my $csvonly;
+=head1 SYNOPSIS
 
-# sometimes WGS records miss assigning strain id
-my $fix_strain;
+    perl wgs_prep.pl [options]
+      Options:
+        --help      -?          brief help message
 
-my @nofix;
+        -i, -f, --file      tab seperated file containing wgs prefix and name
+        -o, -d, --dir       output dir
+        --aria2     -a          url file is for aria2
+        --fix                   sometimes WGS records miss assigning strain id
+        --nofix         @STR    Skip some strains
+        --csvonly               only generate the csv file
+
+    perl wgs_prep.pl -a -f trichoderma.tsv -o WGS
+    Three files will be generated.
+    trichoderma.csv
+    trichoderma.url.txt
+    trichoderma.data.txt
+
+=cut
+
+my $td_dir = path( $Config->{path}{td} )->stringify;    # taxdmp
 
 # for unrecorded strains, give them arbitrary ids
 my $arbitrary = 100_000_000;
 
-my $man  = 0;
-my $help = 0;
-
 GetOptions(
-    'help'       => \$help,
-    'man'        => \$man,
-    'i|f|file=s' => \$file_input,
-    'o|d|dir=s'  => \$dir_output,
-    'a|aria2'    => \$aria2,
-    'fix'        => \$fix_strain,
-    'nofix=s' => \@nofix,
-    'csvonly'    => \$csvonly,
-) or pod2usage(2);
-
-pod2usage(1) if $help;
-pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
+    'help|?'     => sub { HelpMessage(0) },
+    'i|f|file=s' => \my $file_input,
+    'o|d|dir=s'  => \my $dir_output,
+    'a|aria2'    => \my $aria2,
+    'fix'        => \my $fix_strain,
+    'nofix=s'    => \my @nofix,
+    'csvonly'    => \my $csvonly,
+) or HelpMessage(1);
 
 $dir_output = "." unless $dir_output;
 
@@ -93,12 +97,12 @@ else {
 # Read
 #----------------------------#
 $stopwatch->block_message("Load $file_input.");
-my $basename = basename( $file_input, ".txt", ".tab", ".tsv" );
+my $basename = path($file_input)->basename( ".txt", ".tab", ".tsv" );
 
 my $wgsid_of = {};
 my @orig_orders;
 {
-    my @lines = read_file($file_input);
+    my @lines = path($file_input)->lines;
     for my $line (@lines) {
         chomp $line;
         $line =~ /^#/ and next;
@@ -130,8 +134,7 @@ my $master = {};
 #----------------------------#
 # csv and url
 #----------------------------#
-$stopwatch->block_message(
-    "Generate .csv for info and .url.txt for downloading ");
+$stopwatch->block_message("Generate .csv for info and .url.txt for downloading ");
 {
     mkdir $dir_output unless -d $dir_output;
 
@@ -139,19 +142,15 @@ $stopwatch->block_message(
         or die "Cannot use CSV: " . Text::CSV_XS->error_diag;
     $csv->eol("\n");
 
-    my $file_csv = File::Spec->catfile( $dir_output, "$basename.csv" );
+    my $file_csv = path( $dir_output, "$basename.csv" )->stringify;
 
     open my $csv_fh, ">", $file_csv;
 
     my @columns = (
-        'prefix',                'taxon_id',
-        'name',                  'Organism',
-        'Biosource',             'BioProject',
-        'Keywords',              'Genome_Coverage',
-        'Sequencing_Technology', '#_of_Contigs',
-        'Total_length',          'Assembly_Method',
-        'Assembly_Name',         'Update_date',
-        'pubmed',
+        'prefix',                'taxon_id',     'name',         'Organism',
+        'Biosource',             'BioProject',   'Keywords',     'Genome_Coverage',
+        'Sequencing_Technology', '#_of_Contigs', 'Total_length', 'Assembly_Method',
+        'Assembly_Name',         'Update_date',  'pubmed',
     );
 
     $csv->print( $csv_fh, \@columns );
@@ -162,7 +161,7 @@ $stopwatch->block_message(
         my %info = %{ $master->{$key} };
 
         if ( !$csvonly and $fix_strain ) {
-            if (grep {$_ eq $key} @nofix) {
+            if ( grep { $_ eq $key } @nofix ) {
                 print "Skip $info{name} as you don't want fix it\n";
             }
             elsif ( $info{Organism} =~ /$info{Biosource}/ ) {
@@ -197,7 +196,7 @@ $stopwatch->block_message(
     print ".csv generated.\n";
 
     if ( !$csvonly ) {
-        my $file_url = File::Spec->catfile( $dir_output, "$basename.url.txt" );
+        my $file_url = path( $dir_output, "$basename.url.txt" )->stringify;
         open my $url_fh, ">", $file_url;
         for my $key (@orig_orders) {
 
@@ -235,7 +234,7 @@ $stopwatch->block_message(
 if ( !$csvonly ) {
     $stopwatch->block_message("Generate .data.yml");
 
-    my $file_data = File::Spec->catfile( $dir_output, "$basename.data.yml" );
+    my $file_data = path( $dir_output, "$basename.data.yml" )->stringify;
 
     my $text = <<'EOF';
 ---
@@ -253,8 +252,7 @@ data:
 
 EOF
     my $tt = Template->new;
-    $tt->process( \$text, { names => [@orig_orders], master => $master, },
-        $file_data )
+    $tt->process( \$text, { names => [@orig_orders], master => $master, }, $file_data )
         or die Template->error;
 
     print ".data.txt generated.\n";
@@ -265,27 +263,3 @@ $stopwatch->end_message;
 exit;
 
 __END__
-
-=head1 NAME
-
-wgs_prep.pl - prepare WGS materials
-
-=head1 SYNOPSIS
-
-    wgs_prep.pl [options]
-      Options:
-        --help              brief help message
-        --man               full documentation
-        -i, -f, --file      tab seperated file containing wgs prefix and name
-        -o, -d, --dir       output dir
-        -a, --aria2         url file is for aria2
-        --fix               sometimes WGS records miss assigning strain id
-        --csvonly           only generate the csv file
-
-    perl wgs_prep.pl -a -f trichoderma.tsv -o WGS
-    Three files will be generated.
-    trichoderma.csv
-    trichoderma.url.txt
-    trichoderma.data.txt
-
-=cut
