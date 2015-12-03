@@ -1,17 +1,3 @@
-<!-- TOC depth:6 withLinks:1 updateOnSave:1 orderedList:0 -->
-
-- [Operating steps for each groups](#operating-steps-for-each-groups)
-	- [*Saccharomyces* WGS](#saccharomyces-wgs)
-	- [*Scer_wgs* WGS](#scerwgs-wgs)
-	- [*Scer_100* ASSEMBLY](#scer100-assembly)
-	- [*Candida* WGS](#candida-wgs)
-	- [*Fusarium* WGS](#fusarium-wgs)
-	- [*Aspergillus* WGS](#aspergillus-wgs)
-	- [*Penicillium* WGS](#penicillium-wgs)
-	- [*Arabidopsis* 19 genomes](#arabidopsis-19-genomes)
-	- [*Orazy sativa* Japonica 24 genomes](#orazy-sativa-japonica-24-genomes)
-<!-- /TOC -->
-
 # Operating steps for each groups
 
 Less detailed than Trichoderma in [README.md](README.md), but include examples
@@ -702,7 +688,7 @@ for genomes out of WGS, which usually in better assembling levels.
 
     # outgroup
     echo -e "Prei\tCBXM\tPlasmodium reichenowi\t2055" >> pfal.tsv
-	```
+    ```
 
     Edit the tsv file to fix names and comment out bad strains.
 
@@ -714,7 +700,7 @@ for genomes out of WGS, which usually in better assembling levels.
     perl ~/Scripts/withncbi/taxon/wgs_prep.pl \
         -f ~/Scripts/withncbi/pop/pfal.tsv \
         --fix \
-		--nofix Prei \
+        --nofix Prei \
         -o WGS \
         -a
 
@@ -738,9 +724,25 @@ for genomes out of WGS, which usually in better assembling levels.
         --nuclear -name 3D7 \
         > 3D7.seq.csv
 
+    mysql -ualignDB -palignDB ar_genbank -e \
+        "SELECT organism_name, species, assembly_accession FROM ar WHERE taxonomy_id IN (1036723, 5843, 1237627, 1036727, 1036725, 1036726, 57270, 5835, 1036724, 57266, 478859)" \
+        | perl -nl -a -F"\t" -e '$n = $F[0]; $rx = quotemeta $F[1]; $n =~ s/$rx\s+//; $n =~ s/\W+/_/g; printf qq{%s\t%s\n}, $n, $F[2];' \
+        | grep -v organism_name \
+        | perl -nl -a -F"\t" -e '$str = q{echo } . $F[0] . qq{ \n}; $str .= q{perl ~/Scripts/withncbi/taxon/assembly_csv.pl} . qq{ \\\n}; $str .= q{-f ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/All/} . $F[1] . qq{.assembly.txt \\\n}; $str .= q{ --scaffold --length 5000 --genbank -name } . $F[0] . qq{ \\\n}; $str .= q{>> non_wgs.seq.csv}; print $str . qq{\n}' \
+        > ass_csv.sh
+
+    echo > non_wgs.seq.csv
+    sh ass_csv.sh
+
+    echo "#strain_name,accession,strain_taxon_id,seq_name" > pfal.seq.csv
+    cat 3D7.seq.csv non_wgs.seq.csv \
+        | perl -nl -e '/^#/ and next; /^\s*$/ and next; print;' \
+        >> pfal.seq.csv
+
     # Download, rename files and change fasta headers
     perl ~/Scripts/withncbi/taxon/batch_get_seq.pl \
-        -p -f 3D7.seq.csv
+        -p -f pfal.seq.csv
+
     ```
 
 ## *Arabidopsis* 19 genomes
@@ -749,7 +751,7 @@ for genomes out of WGS, which usually in better assembling levels.
 
     * [Project page](http://mus.well.ox.ac.uk/19genomes/)
     * [Download page](http://mus.well.ox.ac.uk/19genomes/fasta/)
-	* [Paper](http://www.nature.com/nature/journal/v477/n7365/full/nature10414.html)
+    * [Paper](http://www.nature.com/nature/journal/v477/n7365/full/nature10414.html)
 
 2. Download with my web page crawler.
 
@@ -789,35 +791,35 @@ for genomes out of WGS, which usually in better assembling levels.
     faops some toplevel.fa listFile toplevel.filtered.fa
     faops split-about toplevel.filtered.fa 10000000 .
     rm toplevel.fa toplevel.filtered.fa listFile
-	```
+    ```
 
 ## *Orazy sativa* Japonica 24 genomes
 
 1. Sources.
 
-	* [SRA](http://trace.ncbi.nlm.nih.gov/Traces/sra/?study=SRP003189)
-	* [Paper](http://www.nature.com/nbt/journal/v30/n1/full/nbt.2050.html)
+    * [SRA](http://trace.ncbi.nlm.nih.gov/Traces/sra/?study=SRP003189)
+    * [Paper](http://www.nature.com/nbt/journal/v30/n1/full/nbt.2050.html)
 
 2. 23 Japonica rices restore from previous .2bit files.
 
-	I've used bwa-gatk pipeline to generate 23 Japonica rice genomes.
+    I've used bwa-gatk pipeline to generate 23 Japonica rice genomes.
 
-	Reference assembly of nipponbare in that time was MSU6, now is IRGSP-1.0. But I don't want to waste time to rebuild and RepeatMasker all sequences.
+    Reference assembly of nipponbare in that time was MSU6, now is IRGSP-1.0. But I don't want to waste time to rebuild and RepeatMasker all sequences.
 
-	```bash
-	find ~/data/alignment/rice/ -name "*.2bit" \
-		| grep -v "_65" \
-		| parallel basename {//} \
-		| sort
+    ```bash
+    find ~/data/alignment/rice/ -name "*.2bit" \
+        | grep -v "_65" \
+        | parallel basename {//} \
+        | sort
 
-	mkdir -p ~/data/alignment/others/japonica24
-	cd ~/data/alignment/others/japonica24
+    mkdir -p ~/data/alignment/others/japonica24
+    cd ~/data/alignment/others/japonica24
 
-	for d in IRGC11010 IRGC1107 IRGC12793 IRGC17757 IRGC2540 IRGC26872 IRGC27630 IRGC31856 IRGC32399 IRGC328 IRGC38698 IRGC38994 IRGC418 IRGC43325 IRGC43675 IRGC50448 IRGC55471 IRGC66756 IRGC8191 IRGC8244 IRGC9060 IRGC9062 RA4952
-	do
-		twoBitToFa ~/data/alignment/rice/${d}/chr.2bit ${d}.fa;
-	done
-	```
+    for d in IRGC11010 IRGC1107 IRGC12793 IRGC17757 IRGC2540 IRGC26872 IRGC27630 IRGC31856 IRGC32399 IRGC328 IRGC38698 IRGC38994 IRGC418 IRGC43325 IRGC43675 IRGC50448 IRGC55471 IRGC66756 IRGC8191 IRGC8244 IRGC9060 IRGC9062 RA4952
+    do
+        twoBitToFa ~/data/alignment/rice/${d}/chr.2bit ${d}.fa;
+    done
+    ```
 
 3. nipponbare and 9311 from ensembl genomes.
 
@@ -844,32 +846,32 @@ for genomes out of WGS, which usually in better assembling levels.
     faops split-name toplevel.filtered.fa .
     rm toplevel.fa toplevel.filtered.fa listFile
 
-	rm AA*.fa CH*.fa Sup*.fa
-	```
+    rm AA*.fa CH*.fa Sup*.fa
+    ```
 
 ## *Drosophila* Population Genomics Project (dpgp)
 
 1. Sources.
 
-	* [SRA](http://trace.ncbi.nlm.nih.gov/Traces/sra/?study=SRP005599)
-	* [Paper](http://journals.plos.org/plosgenetics/article?id=10.1371/journal.pgen.1003080)
+    * [SRA](http://trace.ncbi.nlm.nih.gov/Traces/sra/?study=SRP005599)
+    * [Paper](http://journals.plos.org/plosgenetics/article?id=10.1371/journal.pgen.1003080)
 
 2. 21 genomes restore from previous .2bit files.
 
-	```bash
-	find ~/data/alignment/dpgp/ -name "*.2bit" \
-		| grep -v "_65" \
-		| parallel basename {//} \
-		| sort
+    ```bash
+    find ~/data/alignment/dpgp/ -name "*.2bit" \
+        | grep -v "_65" \
+        | parallel basename {//} \
+        | sort
 
-	mkdir -p ~/data/alignment/others/dpgp
-	cd ~/data/alignment/others/dpgp
+    mkdir -p ~/data/alignment/others/dpgp
+    cd ~/data/alignment/others/dpgp
 
-	for d in CK1 CO15N CO2 CO4N ED10N EZ5N FR207 FR217 FR229 FR361 GA125 GA129 GA130 GA132 GA185 GU10 KN6 KR39 KT1 NG3N RC1 RG15 SP254 TZ8 UG7 UM526 ZI268 ZL130 ZO12 ZS37
-	do
-		twoBitToFa ~/data/alignment/dpgp/${d}/chr.2bit ${d}.fa;
-	done
-	```
+    for d in CK1 CO15N CO2 CO4N ED10N EZ5N FR207 FR217 FR229 FR361 GA125 GA129 GA130 GA132 GA185 GU10 KN6 KR39 KT1 NG3N RC1 RG15 SP254 TZ8 UG7 UM526 ZI268 ZL130 ZO12 ZS37
+    do
+        twoBitToFa ~/data/alignment/dpgp/${d}/chr.2bit ${d}.fa;
+    done
+    ```
 
 3. Dmel and Dsim from ensembl genomes.
 
@@ -885,12 +887,12 @@ for genomes out of WGS, which usually in better assembling levels.
     rm toplevel.fa toplevel.filtered.fa listFile
 
     rm *Scaffold*.fa 211*.fa
-	mv 4.fa 4.fa.skip
-	mv Y.fa Y.fa.skip
-	mv rDNA.fa rDNA.fa.skip
-	mv dmel_mitochondrion_genome.fa dmel_mitochondrion_genome.fa.skip
+    mv 4.fa 4.fa.skip
+    mv Y.fa Y.fa.skip
+    mv rDNA.fa rDNA.fa.skip
+    mv dmel_mitochondrion_genome.fa dmel_mitochondrion_genome.fa.skip
 
-	# Dsim
+    # Dsim
     mkdir -p ~/data/alignment/Ensembl/Dsim
     cd ~/data/alignment/Ensembl/Dsim
 
@@ -899,21 +901,21 @@ for genomes out of WGS, which usually in better assembling levels.
     faops some toplevel.fa listFile toplevel.filtered.fa
     faops split-about toplevel.filtered.fa 10000000 .
     rm toplevel.fa toplevel.filtered.fa listFile
-	```
+    ```
 
 ## Primates
 
 1. Guild tree
 
-	```bash
-	cd ~/data/alignment
-	wget http://hgdownload.soe.ucsc.edu/goldenPath/hg19/multiz100way/hg19.100way.commonNames.nh
-	tree_doctor hg19.100way.commonNames.nh --newick  \
-		--prune-all-but \
-		Human,Chimp,Gorilla,Orangutan,Gibbon,Rhesus,Crab_eating_macaque,Baboon,Green_monkey,Marmoset,Squirrel_monkey,Bushbaby,Chinese_tree_shrew \
-		> primates_13way.nwk
+    ```bash
+    cd ~/data/alignment
+    wget http://hgdownload.soe.ucsc.edu/goldenPath/hg19/multiz100way/hg19.100way.commonNames.nh
+    tree_doctor hg19.100way.commonNames.nh --newick  \
+        --prune-all-but \
+        Human,Chimp,Gorilla,Orangutan,Gibbon,Rhesus,Crab_eating_macaque,Baboon,Green_monkey,Marmoset,Squirrel_monkey,Bushbaby,Chinese_tree_shrew \
+        > primates_13way.nwk
 
-	```
+    ```
 
 2. All from ensembl.
 
@@ -928,8 +930,8 @@ for genomes out of WGS, which usually in better assembling levels.
     faops split-name toplevel.filtered.fa .
     rm toplevel.fa toplevel.filtered.fa listFile
 
-	rm GL*.fa
+    rm GL*.fa
 
-	mv Y.fa Y.fa.skip
-	mv MT.fa MT.fa.skip
-	```
+    mv Y.fa Y.fa.skip
+    mv MT.fa MT.fa.skip
+    ```

@@ -1,19 +1,3 @@
-<!-- TOC depth:6 withLinks:1 updateOnSave:1 orderedList:0 -->
-
-- [Operating steps for each groups](#operating-steps-for-each-groups)
-	- [*Saccharomyces* WGS](#saccharomyces-wgs)
-	- [*Scer_wgs* WGS](#scerwgs-wgs)
-	- [*Scer_100* ASSEMBLY](#scer100-assembly)
-	- [*Candida* WGS](#candida-wgs)
-	- [*Fusarium* WGS](#fusarium-wgs)
-	- [*Aspergillus* WGS](#aspergillus-wgs)
-	- [*Penicillium* WGS](#penicillium-wgs)
-	- [*Plasmodium* WGS](#plasmodium-wgs)
-	- [*Arabidopsis* 19 genomes](#arabidopsis-19-genomes)
-	- [*Orazy sativa* Japonica 24 genomes](#orazy-sativa-japonica-24-genomes)
-	- [*Drosophila* Population Genomics Project (dpgp)](#drosophila-population-genomics-project-dpgp)
-<!-- /TOC -->
-
 # Operating steps for each groups
 
 Less detailed than Trichoderma in [README.md](README.md), but include examples
@@ -595,7 +579,7 @@ Manually combine `~/data/alignment/Fungi/GENOMES/scer_wgs/WGS/scer_wgs.csv` and
 
 3. Pick outgroup.
 
-	Prei is the only one.
+    Prei is the only one.
 
 ## *Plasmodium falciparum* WGS
 
@@ -604,6 +588,12 @@ Manually combine `~/data/alignment/Fungi/GENOMES/scer_wgs/WGS/scer_wgs.csv` and
     ```bash
     mkdir -p ~/data/alignment/Protists/pfal
     cd ~/data/alignment/Protists/pfal
+
+    cat ~/data/alignment/Protists/GENOMES/pfal/DOWNLOAD/pfal.seq.csv \
+        | grep -v "^#" \
+        | cut -d',' -f1,3 \
+        | uniq \
+        | perl -nl -a -F"," -e 'printf qq{    --download "name=%s;taxon=%s" \\\n}, $F[0], $F[1];'
 
     perl ~/Scripts/withncbi/pop/gen_pop_conf.pl \
         -i ~/data/alignment/Protists/GENOMES/pfal/WGS/pfal.data.yml \
@@ -616,6 +606,18 @@ Manually combine `~/data/alignment/Fungi/GENOMES/scer_wgs/WGS/scer_wgs.csv` and
         --opt data_dir='~/data/alignment/Protists/pfal' \
         --dd ~/data/alignment/Protists/GENOMES/pfal/DOWNLOAD \
         --download 'name=3D7;taxon=36329;sciname=Plasmodium falciparum 3D7' \
+        --download "name=CAMP_Malaysia;taxon=5835" \
+        --download "name=NF54;taxon=5843" \
+        --download "name=7G8;taxon=57266" \
+        --download "name=Palo_Alto_Uganda;taxon=57270" \
+        --download "name=Santa_Lucia;taxon=478859" \
+        --download "name=Vietnam_Oak_Knoll_FVO_;taxon=1036723" \
+        --download "name=FCH_4;taxon=1036724" \
+        --download "name=Tanzania_2000708_;taxon=1036725" \
+        --download "name=NF135_5_C10;taxon=1036726" \
+        --download "name=MaliPS096_E11;taxon=1036727" \
+        --download "name=UGT5_1;taxon=1237627" \
+        --plan 'name=Pfal_n10_Prei;t=3D7;qs=IGH_CR14,HB3,Dd2,CAMP_Malaysia,Santa_Lucia,NF135_5_C10,7G8,Vietnam_Oak_Knoll_FVO_,Tanzania_2000708_,Prei;o=Prei' \
         -y
     ```
 
