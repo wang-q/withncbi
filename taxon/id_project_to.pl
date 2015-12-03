@@ -3,46 +3,60 @@ use strict;
 use warnings;
 use autodie;
 
-use Getopt::Long;
-use Pod::Usage;
+use Getopt::Long qw(HelpMessage);
 use Config::Tiny;
+use FindBin;
 use YAML qw(Dump Load DumpFile LoadFile);
 
+use Path::Tiny;
 use Scalar::Util::Numeric qw(isint);
 use Bio::DB::Taxonomy;
-
-use FindBin;
-use lib "$FindBin::Bin/../lib";
-use MyUtil qw(replace_home);
 
 #----------------------------------------------------------#
 # GetOpt section
 #----------------------------------------------------------#
-my $Config = Config::Tiny->read("$FindBin::Bin/../config.ini");
+my $Config = Config::Tiny->read("$FindBin::RealBin/../config.ini");
 
-my $column    = 1;
-my $seperator = '\s+';
+=head1 NAME
 
-my $rank;
-my $rankid;
+id_project_to.pl - Project taxonomy ids to names, sepcies, genus or higher ranks.
+
+=head1 SYNOPSIS
+
+    cat <file> | perl id_project_to.pl [options]
+      Options:
+        --help      -?          brief help message
+        --column    -c  INT     column order where ids are, start from 1
+        --seperator -s  STR     seperator of the line, default is "\s+"
+        --rank          STR     Project to which rank, default is scientific name.
+        --rankid                Also append rank id
+
+=head1 EXAMPLE
+
+    $ echo 9606 | perl taxon/id_project_to.pl 
+    9606,Homo sapiens
+
+    $ echo 9606 | perl taxon/id_project_to.pl --rank class 
+    9606,Mammalia
+
+    $ echo 9606 Human | perl taxon/id_project_to.pl --rank class --rankid
+    9606,Human,Mammalia,40674
+
+    $ echo Human,9606  | perl taxon/id_project_to.pl -c 2 -s ","
+    Human,9606,Homo sapiens
+
+=cut
 
 # running options
-my $td_dir = replace_home( $Config->{path}{td} );    # taxdmp
-
-my $man  = 0;
-my $help = 0;
+my $td_dir = path( $Config->{path}{td} )->stringify;    # taxdmp
 
 GetOptions(
-    'help'          => \$help,
-    'man'           => \$man,
-    'c|column=i'    => \$column,
-    's|seperator=s' => \$seperator,
-    'rank=s'        => \$rank,
-    'rankid'        => \$rankid,
-) or pod2usage(2);
-
-pod2usage(1) if $help;
-pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
+    'help|?' => sub { HelpMessage(0) },
+    'column|c=i'    => \(my $column    = 1),
+    'seperator=|ss' => \(my $seperator = '\s+'),
+    'rank=s'        => \my $rank,
+    'rankid'        => \my $rankid,
+) or HelpMessage(1);
 
 #----------------------------------------------------------#
 # init
@@ -135,34 +149,3 @@ RANK: while (1) {
 }
 
 __END__
-
-=head1 NAME
-
-id_project_to.pl - Project taxonomy ids to names, sepcies, genus or higher ranks.
-
-=head1 SYNOPSIS
-
-    cat <file> | perl id_project_to.pl [options]
-      Options:
-        --help                  brief help message
-        --man                   full documentation
-        -c, --column INT        column order where ids are, start from 1
-        -s, --seperator STR     seperator of the line, default is "\s+"
-        --rank STR              Project to which rank, default is scientific name.
-        --rankid                Also append rank id
-
-=head1 EXAMPLE
-
-    $ echo 9606 | perl taxon/id_project_to.pl 
-    9606,Homo sapiens
-
-    $ echo 9606 | perl taxon/id_project_to.pl --rank class 
-    9606,Mammalia
-
-    $ echo 9606 Human | perl taxon/id_project_to.pl --rank class --rankid
-    9606,Human,Mammalia,40674
-
-    $ echo Human,9606  | perl taxon/id_project_to.pl -c 2 -s ","
-    Human,9606,Homo sapiens
-
-=cut

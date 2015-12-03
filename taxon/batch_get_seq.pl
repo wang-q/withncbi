@@ -3,33 +3,58 @@ use strict;
 use warnings;
 use autodie;
 
-use Getopt::Long;
-use Pod::Usage;
+use Getopt::Long qw(HelpMessage);
+use Config::Tiny;
+use FindBin;
+use YAML qw(Dump Load DumpFile LoadFile);
 
 use Text::CSV_XS;
 use File::Copy;
 
-use FindBin;
-
 #----------------------------------------------------------#
 # GetOpt section
 #----------------------------------------------------------#
-my $in_file;
 
-my $pure_gff;
+=head1 NAME
 
-my $man  = 0;
-my $help = 0;
+batch_get_seq.pl - retrieve all sequences listed in a file
+
+=head1 SYNOPSIS
+
+    perl batch_get_seq.pl <-f seq.csv> [options]
+      Options:
+        --help      -?          brief help message
+        --file      -f  STR     input csv file
+        --pure      -p          remove fasta sequences from generated gff files
+
+=head1 CSV file format
+
+Example:
+
+    strain_name,accession,strain_taxon_id,seq_name # This line is needed
+    S288c,NC_001133,559292,I
+    S288c,NC_001134,559292,II
+    S288c,NC_001135,559292,III
+
+Columns:
+
+    strain_name     =>  files will be stored in a directory named after this
+    accession       =>  NCBI sequence accession
+    strain_taxon_id =>  optional, not needed
+    seq_name        =>  optional, with -r, rename filename and sequence header
+
+=head1 EXAMPLE
+
+    cd ~/data/alignment/yeast_genome
+    perl ~/Scripts/withncbi/taxon/batch_get_seq.pl -p -f yeast_name_seq.csv 2>&1 | tee yeast_name_seq.log
+
+=cut
 
 GetOptions(
-    'help'     => \$help,
-    'man'      => \$man,
-    'f|file=s' => \$in_file,
-    'p|pure'   => \$pure_gff,
-) or pod2usage(2);
-
-pod2usage(1) if $help;
-pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
+    'help|?'   => sub { HelpMessage(0) },
+    'file|f=s' => \my $in_file,
+    'pure|p'   => \my $pure_gff,
+) or HelpMessage(1);
 
 die "Provide a .csv file\n" unless defined $in_file and -e $in_file;
 
@@ -64,8 +89,7 @@ while ( my $row = $csv->getline($csv_fh) ) {
         my $seq_name = $row->[3];
         print " " x 4 . "Replace locus $seq to $seq_name\n";
 
-        system
-            "perl -i -nlp -e '/^(?:LOCUS)/ and s/$seq/$seq_name/' $id/$seq.gb";
+        system "perl -i -nlp -e '/^(?:LOCUS)/ and s/$seq/$seq_name/' $id/$seq.gb";
         system "perl -i -nlp -e '/^(?:>)/ and s/.+/>$seq_name/' $id/$seq.fasta";
     }
     else {
@@ -92,39 +116,3 @@ while ( my $row = $csv->getline($csv_fh) ) {
 close $csv_fh;
 
 __END__
-
-=head1 NAME
-
-batch_get_seq.pl - retrieve all sequences listed in a file
-
-=head1 SYNOPSIS
-
-    perl batch_get_seq.pl <-f seq.csv> [options]
-      Options:
-        --help              brief help message
-        --man               full documentation
-        -f STR              input csv file
-        -p                  remove fasta sequences from generated gff files
-
-=head1 CSV file format
-
-Example:
-
-    strain_name,accession,strain_taxon_id,seq_name # This line is needed
-    S288c,NC_001133,559292,I
-    S288c,NC_001134,559292,II
-    S288c,NC_001135,559292,III
-
-Columns:
-
-    strain_name     =>  files will be stored in a directory named after this
-    accession       =>  NCBI sequence accession
-    strain_taxon_id =>  optional, not needed
-    seq_name        =>  optional, with -r, rename filename and sequence header
-
-=head1 EXAMPLE
-
-    cd ~/data/alignment/yeast_genome
-    perl ~/Scripts/withncbi/taxon/batch_get_seq.pl -p -f yeast_name_seq.csv 2>&1 | tee yeast_name_seq.log
-
-=cut
