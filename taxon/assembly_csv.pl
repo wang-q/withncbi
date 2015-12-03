@@ -3,8 +3,10 @@ use strict;
 use warnings;
 use autodie;
 
-use Getopt::Long;
-use Pod::Usage;
+use Getopt::Long qw(HelpMessage);
+use Config::Tiny;
+use FindBin;
+use YAML qw(Dump Load DumpFile LoadFile);
 
 use IO::All;
 use Text::CSV_XS;
@@ -12,38 +14,47 @@ use Text::CSV_XS;
 #----------------------------------------------------------#
 # GetOpt section
 #----------------------------------------------------------#
-my $in_file;
 
-my $strain_name;
-my $taxon_id;
+=head1 NAME
 
-my $genbank;
-my $ucsc;
-my $scaffold;
-my $nuclear;
-my $chromosome;
+assemble_csv.pl - convert NCBI assemble report to a .csv file for batch_get_seq.pl
 
-my $man  = 0;
-my $help = 0;
+=head1 SYNOPSIS
+
+    perl assemble_csv.pl <-f assembly.txt> [options]
+      Options:
+        --help      -?          brief help message
+
+        --file      -f  STR     input assemble report file
+                                GCA_000149445.2.assembly.txt
+                                ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/All/GCF_000146045.2.assembly.txt
+        --name      -n  STR     name of the strain, optional
+        --taxon     -t  INT     taxonomy id of the strain, optional
+        --genbank               genbank instead of refseq
+        --ucsc                  UCSC-style sequence names
+        --scaffold              include scaffolds
+        --nuclear               exclude non-nuclear (Mt, Pt, Plasmids)
+        --chromosome            keep chromosomes only
+
+=head1 EXAMPLE
+
+    perl ~/Scripts/withncbi/taxon/assembly_csv.pl -f ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/All/GCF_000146045.2.assembly.txt
+
+=cut
 
 GetOptions(
-    'help'      => \$help,
-    'man'       => \$man,
-    'f|file=s'  => \$in_file,
-    'n|name=s'  => \$strain_name,
-    't|taxon=i' => \$taxon_id,
-    'genbank'   => \$genbank,
-    'ucsc'      => \$ucsc,
-    'scaffold'  => \$scaffold,
-    'nuclear'   => \$nuclear,
-    'chromosome'   => \$chromosome,
-) or pod2usage(2);
+    'help|?'     => sub { HelpMessage(0) },
+    'file|f=s'   => \my $in_file,
+    'name|n=s'   => \my $strain_name,
+    'taxon|t=i'  => \my $taxon_id,
+    'genbank'    => \my $genbank,
+    'ucsc'       => \my $ucsc,
+    'scaffold'   => \my $scaffold,
+    'nuclear'    => \my $nuclear,
+    'chromosome' => \my $chromosome,
+) or HelpMessage(1);
 
-pod2usage(1) if $help;
-pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
-
-die
-    "Provide a input file (like GCA_000146045.2.assembly.txt) or a remote url.\n"
+die "Provide a input file (like GCA_000146045.2.assembly.txt) or a remote url.\n"
     unless defined $in_file;
 
 # 0 Sequence-Name
@@ -64,8 +75,7 @@ my $handle = io($in_file);
 my $csv = Text::CSV_XS->new( { binary => 1, eol => "\n" } );
 
 # Header line
-$csv->print( *STDOUT,
-    [ '#strain_name', 'accession', 'strain_taxon_id', 'seq_name' ] );
+$csv->print( *STDOUT, [ '#strain_name', 'accession', 'strain_taxon_id', 'seq_name' ] );
 
 while ( defined( my $line = $handle->getline ) ) {
     chomp $line;
@@ -98,7 +108,7 @@ while ( defined( my $line = $handle->getline ) ) {
     if ( $nuclear and $fields[7] eq 'non-nuclear' ) {
         next;
     }
-    
+
     # keep chromosomes only
     if ( $chromosome and $fields[3] ne 'Chromosome' ) {
         next;
@@ -110,37 +120,9 @@ while ( defined( my $line = $handle->getline ) ) {
     $accession =~ s/\.\d+//;
 
     my $seq_name = $ucsc ? $fields[9] : $fields[0];
-    if ($seq_name =~ /(.+)\./) {
-        $seq_name = $1;
-    }
+    $seq_name =~ s/\W+/_/g;
 
     $csv->print( *STDOUT, [ $strain_name, $accession, $taxon_id, $seq_name ] );
 }
 
 __END__
-
-=head1 NAME
-
-assemble_csv.pl - convert NCBI assemble report to a .csv file for batch_get_seq.pl
-
-=head1 SYNOPSIS
-
-    perl assemble_csv.pl <-f assembly.txt> [options]
-      Options:
-        --help              brief help message
-        --man               full documentation
-        -f, --file          input assemble report file
-                            GCA_000149445.2.assembly.txt
-                            ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/All/GCF_000146045.2.assembly.txt
-        -n, --name          name of the strain, optional
-        -t, --taxon         taxonomy id of the strain, optional
-        --genbank           genbank instead of refseq
-        --ucsc              UCSC-style sequence names
-        --scaffold          include scaffolds
-        --nuclear           exclude non-nuclear (Mt, Pt, Plasmids)
-
-=head1 EXAMPLE
-
-    perl ~/Scripts/withncbi/taxon/assembly_csv.pl -f ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/All/GCF_000146045.2.assembly.txt
-
-=cut
