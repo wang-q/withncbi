@@ -35,6 +35,7 @@ assemble_csv.pl - convert NCBI assemble report to a .csv file for batch_get_seq.
         --scaffold              include scaffolds
         --nuclear               exclude non-nuclear (Mt, Pt, Plasmids)
         --chromosome            keep chromosomes only
+        --length        INT     skip sequences short than this
 
 =head1 EXAMPLE
 
@@ -52,6 +53,7 @@ GetOptions(
     'scaffold'   => \my $scaffold,
     'nuclear'    => \my $nuclear,
     'chromosome' => \my $chromosome,
+    'length=i'   => \my $length,
 ) or HelpMessage(1);
 
 die "Provide a input file (like GCA_000146045.2.assembly.txt) or a remote url.\n"
@@ -111,6 +113,11 @@ while ( defined( my $line = $handle->getline ) ) {
 
     # keep chromosomes only
     if ( $chromosome and $fields[3] ne 'Chromosome' ) {
+        next;
+    }
+
+    # skip short sequences
+    if ( $length and $fields[8] < $length ) {
         next;
     }
 
