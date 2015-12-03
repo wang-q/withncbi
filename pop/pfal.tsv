@@ -1,24 +1,24 @@
 #name	prefix	organism	contigs
 IGH_CR14	ACBS	Plasmodium falciparum IGH-CR14	1974
-RAJ116	ACBR	Plasmodium falciparum RAJ116	2728
+#RAJ116	ACBR	Plasmodium falciparum RAJ116	2728  # small total size
 HB3	AANS	Plasmodium falciparum HB3	2971
 Dd2	AASM	Plasmodium falciparum Dd2	4511
-CAMP_Malaysia	AOPU	Plasmodium falciparum CAMP/Malaysia	4583
-Santa_Lucia	ABHA	Plasmodium falciparum Santa Lucia	4589
-NF135_5_C10	AOPS	Plasmodium falciparum NF135/5.C10	4690
-7G8	ABGZ	Plasmodium falciparum 7G8	4776
-Vietnam_Oak_Knoll_FVO_	AOPP	Plasmodium falciparum Vietnam Oak-Knoll (FVO)	5696
-UGT5_1	AMYP	Plasmodium falciparum UGT5.1	6335
-Palo_Alto_Uganda	AOPT	Plasmodium falciparum Palo Alto/Uganda	6477
-Tanzania_2000708_	AOPR	Plasmodium falciparum Tanzania (2000708)	6555
-MaliPS096_E11	AOPQ	Plasmodium falciparum MaliPS096_E11	6813
-#Senegal_V34_04	ABGT	Plasmodium falciparum Senegal_V34.04	6840
-#FCH_4	AOPV	Plasmodium falciparum FCH/4	7279
-#K1	ABGV	Plasmodium falciparum K1	7553
-#NF54	AMYQ	Plasmodium falciparum NF54	7685
-#D10	ABGX	Plasmodium falciparum D10	7724
-#D6	ABGY	Plasmodium falciparum D6	8394
-#FCC_2_Hainan	ABGW	Plasmodium falciparum FCC-2/Hainan	8543
-#RO_33	ABGU	Plasmodium falciparum RO-33	8879
-#VS_1	ABGS	Plasmodium falciparum VS/1	9898
+#CAMP_Malaysia	AOPU	Plasmodium falciparum CAMP/Malaysia	4583	# use scaffold
+#Santa_Lucia	ABHA	Plasmodium falciparum Santa Lucia	4589	# use scaffold
+#NF135_5_C10	AOPS	Plasmodium falciparum NF135/5.C10	4690	# use scaffold
+#7G8	ABGZ	Plasmodium falciparum 7G8	4776	# use scaffold
+#Vietnam_Oak_Knoll_FVO_	AOPP	Plasmodium falciparum Vietnam Oak-Knoll (FVO)	5696	# use scaffold
+#UGT5_1	AMYP	Plasmodium falciparum UGT5.1	6335	# use scaffold
+#Palo_Alto_Uganda	AOPT	Plasmodium falciparum Palo Alto/Uganda	6477	# use scaffold
+#Tanzania_2000708_	AOPR	Plasmodium falciparum Tanzania (2000708)	6555	# use scaffold
+#MaliPS096_E11	AOPQ	Plasmodium falciparum MaliPS096_E11	6813    # use scaffold
+#Senegal_V34_04	ABGT	Plasmodium falciparum Senegal_V34.04	6840  # small total size
+#FCH_4	AOPV	Plasmodium falciparum FCH/4	7279	# use scaffold
+#K1	ABGV	Plasmodium falciparum K1	7553  # small total size
+#NF54	AMYQ	Plasmodium falciparum NF54	7685	# use scaffold
+#D10	ABGX	Plasmodium falciparum D10	7724  # small total size
+#D6	ABGY	Plasmodium falciparum D6	8394  # small total size
+#FCC_2_Hainan	ABGW	Plasmodium falciparum FCC-2/Hainan	8543  # small total size
+#RO_33	ABGU	Plasmodium falciparum RO-33	8879  # small total size
+#VS_1	ABGS	Plasmodium falciparum VS/1	9898  # small total size
 Prei	CBXM	Plasmodium reichenowi	2055
