@@ -75,6 +75,8 @@ wget -m ftp://ftp.ensemblgenomes.org/pub/metazoa/release-29/mysql/drosophila_sim
 wget -m ftp://ftp.ensemblgenomes.org/pub/metazoa/release-29/mysql/caenorhabditis_elegans_core_29_82_245 .
 wget -m ftp://ftp.ensemblgenomes.org/pub/metazoa/release-29/mysql/caenorhabditis_briggsae_core_29_82_230 .
 wget -m ftp://ftp.ensemblgenomes.org/pub/metazoa/release-29/mysql/caenorhabditis_remanei_core_29_82_233 .
+wget -m ftp://ftp.ensemblgenomes.org/pub/metazoa/release-29/mysql/caenorhabditis_brenneri_core_29_82_233 .
+wget -m ftp://ftp.ensemblgenomes.org/pub/metazoa/release-29/mysql/caenorhabditis_japonica_core_29_82_233 .
 
 # Fungi
 wget -m ftp://ftp.ensemblgenomes.org/pub/fungi/release-29/mysql/saccharomyces_cerevisiae_core_29_82_4 .
@@ -119,6 +121,8 @@ wget -m ftp://ftp.ensemblgenomes.org/pub/metazoa/release-29/fasta/drosophila_sim
 wget -m ftp://ftp.ensemblgenomes.org/pub/metazoa/release-29/fasta/caenorhabditis_elegans .
 wget -m ftp://ftp.ensemblgenomes.org/pub/metazoa/release-29/fasta/caenorhabditis_briggsae .
 wget -m ftp://ftp.ensemblgenomes.org/pub/metazoa/release-29/fasta/caenorhabditis_remanei .
+wget -m ftp://ftp.ensemblgenomes.org/pub/metazoa/release-29/fasta/caenorhabditis_brenneri .
+wget -m ftp://ftp.ensemblgenomes.org/pub/metazoa/release-29/fasta/caenorhabditis_japonica .
 
 # Fungi
 wget -m ftp://ftp.ensemblgenomes.org/pub/fungi/release-29/fasta/saccharomyces_cerevisiae .
