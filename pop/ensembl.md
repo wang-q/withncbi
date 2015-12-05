@@ -12,7 +12,6 @@ Ensembl genomes only provide ftp.
 
 ```bash
 mkdir -p ~/data/ensembl82/mysql
-cd ~/data/ensembl82/mysql
 
 rsync -avP \
     --exclude='*_cdna_82*' \
@@ -24,16 +23,15 @@ rsync -avP \
     --exclude='ensembl_*' \
     --exclude='*_mart_82' \
     rsync://ftp.ensembl.org/ensembl/pub/release-82/mysql/ \
-    .
+    ~/data/ensembl82/mysql
 
-rsync -avP rsync://ftp.ensembl.org/ensembl/pub/grch37/release-82/mysql/homo_sapiens_core_82_37 .
+rsync -avP rsync://ftp.ensembl.org/ensembl/pub/grch37/release-82/mysql/homo_sapiens_core_82_37 ~/data/ensembl82/mysql
 ```
 
 ### fasta
 
 ```bash
 mkdir -p ~/data/ensembl82/fasta
-cd ~/data/ensembl82/fasta
 
 rsync -avP \
     --exclude='caenorhabditis_elegans' \
@@ -41,9 +39,9 @@ rsync -avP \
     --exclude='saccharomyces_cerevisiae' \
     --exclude='homo_sapiens' \
     rsync://ftp.ensembl.org/ensembl/pub/release-82/fasta/ \
-    .
+    ~/data/ensembl82/fasta
 
-rsync -avP rsync://ftp.ensembl.org/ensembl/pub/release-75/fasta/homo_sapiens . # GRCh37
+rsync -avP rsync://ftp.ensembl.org/ensembl/pub/release-75/fasta/homo_sapiens ~/data/ensembl82/fasta # GRCh37
 ```
 
 ## Ensembl genomes
