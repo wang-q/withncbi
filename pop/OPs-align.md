@@ -617,7 +617,11 @@ Manually combine `~/data/alignment/Fungi/GENOMES/scer_wgs/WGS/scer_wgs.csv` and
         --download "name=NF135_5_C10;taxon=1036726" \
         --download "name=MaliPS096_E11;taxon=1036727" \
         --download "name=UGT5_1;taxon=1237627" \
-        --plan 'name=Pfal_n10_Prei;t=3D7;qs=IGH_CR14,HB3,Dd2,CAMP_Malaysia,Santa_Lucia,NF135_5_C10,7G8,Vietnam_Oak_Knoll_FVO_,Tanzania_2000708_,Prei;o=Prei' \
+        --plan 'name=Pfal_n15_Prei;t=3D7;qs=7G8,CAMP_Malaysia,Dd2,FCH_4,HB3,IGH_CR14,MaliPS096_E11,NF135_5_C10,NF54,Palo_Alto_Uganda,Santa_Lucia,Tanzania_2000708_,UGT5_1,Vietnam_Oak_Knoll_FVO_,Prei;o=Prei' \
+        --plan 'name=Pfal_n11_Prei;t=3D7;qs=7G8,CAMP_Malaysia,HB3,IGH_CR14,MaliPS096_E11,NF135_5_C10,Palo_Alto_Uganda,Santa_Lucia,Tanzania_2000708_,UGT5_1,Vietnam_Oak_Knoll_FVO_,Prei;o=Prei' \
+        --plan 'name=Pfal_n11_pop;t=3D7;qs=7G8,CAMP_Malaysia,HB3,IGH_CR14,MaliPS096_E11,NF135_5_C10,Palo_Alto_Uganda,Santa_Lucia,Tanzania_2000708_,UGT5_1,Vietnam_Oak_Knoll_FVO_' \
+        --plan 'name=Pfal_n7_pop;t=3D7;qs=7G8,CAMP_Malaysia,HB3,NF135_5_C10,Santa_Lucia,Vietnam_Oak_Knoll_FVO_' \
+        --plan 'name=Pfal_n7_Prei;t=3D7;qs=7G8,CAMP_Malaysia,HB3,NF135_5_C10,Santa_Lucia,Vietnam_Oak_Knoll_FVO_,Prei;o=Prei' \
         -y
     ```
 
@@ -639,6 +643,27 @@ Manually combine `~/data/alignment/Fungi/GENOMES/scer_wgs/WGS/scer_wgs.csv` and
     sh 1_real_chr.sh
     sh 3_pair_cmd.sh
     sh 4_rawphylo.sh
+    sh 5_multi_cmd.sh
+    sh 7_multi_db_only.sh
+
+    # other plans
+    sh plan_Pfal_n15_Prei.sh
+    sh 5_multi_cmd.sh
+    sh 7_multi_db_only.sh
+
+    sh plan_Pfal_n11_Prei.sh
+    sh 5_multi_cmd.sh
+    sh 7_multi_db_only.sh
+
+    sh plan_Pfal_n11_pop.sh
+    sh 5_multi_cmd.sh
+    sh 7_multi_db_only.sh
+
+    sh plan_Pfal_n7_Prei.sh
+    sh 5_multi_cmd.sh
+    sh 7_multi_db_only.sh
+
+    sh plan_Pfal_n7_pop.sh
     sh 5_multi_cmd.sh
     sh 7_multi_db_only.sh
     ```
@@ -772,6 +797,11 @@ EOF
 
     # other plans
     sh plan_Ath_n19_pop.sh
+
+    sh 5_multi_cmd.sh
+    sh 7_multi_db_only.sh
+
+    sh Ath_n19_Alyr.sh
 
     sh 5_multi_cmd.sh
     sh 7_multi_db_only.sh
@@ -925,6 +955,19 @@ EOF
     sh 4_rawphylo.sh
     sh 5_multi_cmd.sh
     sh 7_multi_db_only.sh
+
+    # other plans
+    sh plan_OsatJap_n8_OsatInd.sh
+    sh 5_multi_cmd.sh
+    sh 7_multi_db_only.sh
+
+    sh plan_OsatJap_n24_pop.sh
+    sh 5_multi_cmd.sh
+    sh 7_multi_db_only.sh
+
+    sh plan_OsatJap_n24_OsatInd.sh
+    sh 5_multi_cmd.sh
+    sh 7_multi_db_only.sh
     ```
 
 ## *Drosophila* Population Genomics Project (dpgp)
@@ -1044,4 +1087,183 @@ EOF
     sh 4_rawphylo.sh
     sh 5_multi_cmd.sh
     sh 7_multi_db_only.sh
+    ```
+
+
+## *Caenorhabditis elegans* million mutation project (cele_mmp)
+
+0. Create data.yml manually.
+
+    Information came from [here](http://genome.cshlp.org/content/suppl/2013/08/20/gr.157651.113.DC2/Supplemental_Table_3.xls).
+
+    Format yaml with yamllint(http://www.yamllint.com/).
+
+    ```bash
+    mkdir -p ~/data/alignment/cele82
+    cd ~/data/alignment/cele82
+
+    cat <<EOF > cele82_data.yml
+---
+data:
+  -
+    coverage: 29
+    name: AB1
+    original_id: 7227
+  -
+    coverage: 27.6
+    name: AB3
+    original_id: 7227
+  -
+    coverage: 28.8
+    name: CB4853
+    original_id: 7227
+  -
+    coverage: 29.9
+    name: CB4854
+    original_id: 7227
+  -
+    coverage: 30.8
+    name: CB4856
+    original_id: 7227
+  -
+    coverage: 30.1
+    name: ED3017
+    original_id: 7227
+  -
+    coverage: 29.2
+    name: ED3021
+    original_id: 7227
+  -
+    coverage: 28.8
+    name: ED3040
+    original_id: 7227
+  -
+    coverage: 29.2
+    name: ED3042
+    original_id: 7227
+  -
+    coverage: 28.6
+    name: ED3049
+    original_id: 7227
+  -
+    coverage: 28.6
+    name: ED3052
+    original_id: 7227
+  -
+    coverage: 30.3
+    name: ED3057
+    original_id: 7227
+  -
+    coverage: 28.9
+    name: ED3072
+    original_id: 7227
+  -
+    coverage: 29.4
+    name: GXW1
+    original_id: 7227
+  -
+    coverage: 30.4
+    name: JU1088
+    original_id: 7227
+  -
+    coverage: 28.1
+    name: JU1171
+    original_id: 7227
+  -
+    coverage: 29.5
+    name: JU1400
+    original_id: 7227
+  -
+    coverage: 28.9
+    name: JU1401
+    original_id: 7227
+  -
+    coverage: 27.9
+    name: JU1652
+    original_id: 7227
+  -
+    coverage: 28.5
+    name: JU258
+    original_id: 7227
+  -
+    coverage: 28.7
+    name: JU263
+    original_id: 7227
+  -
+    coverage: 30
+    name: JU300
+    original_id: 7227
+  -
+    coverage: 30.6
+    name: JU312
+    original_id: 7227
+  -
+    coverage: 28.2
+    name: JU322
+    original_id: 7227
+  -
+    coverage: 30.3
+    name: JU345
+    original_id: 7227
+  -
+    coverage: 29.2
+    name: JU360
+    original_id: 7227
+  -
+    coverage: 29.3
+    name: JU361
+    original_id: 7227
+  -
+    coverage: 30.9
+    name: JU394
+    original_id: 7227
+  -
+    coverage: 27.8
+    name: JU397
+    original_id: 7227
+  -
+    coverage: 28.6
+    name: JU533
+    original_id: 7227
+  -
+    coverage: 28.5
+    name: JU642
+    original_id: 7227
+  -
+    coverage: 30.2
+    name: JU775
+    original_id: 7227
+  -
+    coverage: 30.1
+    name: KR314
+    original_id: 7227
+  -
+    coverage: 29.5
+    name: LKC34
+    original_id: 7227
+  -
+    coverage: 28.7
+    name: MY1
+    original_id: 7227
+  -
+    coverage: 25.9
+    name: MY14
+    original_id: 7227
+  -
+    coverage: 24
+    name: MY16
+    original_id: 7227
+  -
+    coverage: 29
+    name: MY2
+    original_id: 7227
+  -
+    coverage: 24.1
+    name: MY6
+    original_id: 7227
+  -
+    coverage: 28.8
+    name: PX174
+    original_id: 7227
+EOF
     ```

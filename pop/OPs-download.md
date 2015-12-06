@@ -935,3 +935,31 @@ for genomes out of WGS, which usually in better assembling levels.
     mv Y.fa Y.fa.skip
     mv MT.fa MT.fa.skip
     ```
+
+## *Caenorhabditis elegans*
+
+There are no suitable outgroups for C. elegans.
+
+http://hgdownload.soe.ucsc.edu/goldenPath/ce10/multiz7way/ce10.commonNames.7way.nh
+
+1. 40 wild strains from cele_mmp.
+
+	```bash
+
+	```
+
+2. Reference strain N2 from ensembl genomes
+
+    ```bash
+    # Dmel
+    mkdir -p ~/data/alignment/Ensembl/Cele
+    cd ~/data/alignment/Ensembl/Cele
+
+    find ~/data/ensembl82/fasta/caenorhabditis_elegans/dna/ -name "*dna_sm.toplevel*" | xargs gzip -d -c > toplevel.fa
+    faops count toplevel.fa | perl -aln -e 'next if $F[0] eq 'total'; print $F[0] if $F[1] > 50000; print $F[0] if $F[1] > 5000  and $F[6]/$F[1] < 0.05' | uniq > listFile
+    faops some toplevel.fa listFile toplevel.filtered.fa
+    faops split-name toplevel.filtered.fa .
+    rm toplevel.fa toplevel.filtered.fa listFile
+
+    mv MtDNA.fa MtDNA.fa.skip
+	```
