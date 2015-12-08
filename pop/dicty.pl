@@ -69,11 +69,8 @@ my $store_dir = shift
 [% item.taxon %],Dictyostelium,discoideum,[% item.name %],,
 [% END -%]
 EOF
-    $tt->process(
-        \$text,
-        { data => \@data, },
-        File::Spec->catfile( $store_dir, "taxon.csv" )
-    ) or die Template->error;
+    $tt->process( \$text, { data => \@data, }, File::Spec->catfile( $store_dir, "taxon.csv" ) )
+        or die Template->error;
 
     # chr_length.csv
     $text = <<'EOF';
@@ -81,11 +78,8 @@ EOF
 [% item.taxon %],chrUn,999999999,[% item.name %]/dicty
 [% END -%]
 EOF
-    $tt->process(
-        \$text,
-        { data => \@data, },
-        File::Spec->catfile( $store_dir, "chr_length.csv" )
-    ) or die Template->error;
+    $tt->process( \$text, { data => \@data, }, File::Spec->catfile( $store_dir, "chr_length.csv" ) )
+        or die Template->error;
 
     $text = <<'EOF';
 #!/bin/bash
@@ -221,7 +215,7 @@ EOF
 
     $text = <<'EOF';
 #!/bin/bash
-    
+
 #----------------------------#
 # amp
 #----------------------------#
@@ -234,7 +228,7 @@ perl [% pl_dir %]/blastz/amp.pl -syn -dt [% data_dir %]/dicty_65 -dq [% data_dir
 EOF
     $tt->process(
         \$text,
-        {   data => [  @data ],
+        {   data        => [@data],
             data_dir    => $data_dir,
             pl_dir      => $pl_dir,
             kentbin_dir => $kentbin_dir
@@ -259,7 +253,7 @@ gzip [% data_dir %]/Dictyvs[% item.name %]/axtNet/*.axt
 EOF
     $tt->process(
         \$text,
-        {   data => [  @data ],
+        {   data     => [@data],
             data_dir => $data_dir,
             pl_dir   => $pl_dir,
         },
@@ -268,7 +262,7 @@ EOF
 
     $text = <<'EOF';
 #!/bin/bash
-    
+
 #----------------------------#
 # tar-gzip
 #----------------------------#
@@ -331,9 +325,7 @@ EOF
 
     my $tt         = Template->new;
     my $strains_of = {
-        DictyvsIX => [
-            qw{ 68 70 QS36 QS37 QS69 QS73 QS74 QS80 S224 }
-        ],
+        DictyvsIX    => [ qw{ 68 70 QS36 QS37 QS69 QS73 QS74 QS80 S224 } ],
         DictyvsXVIII => [
             qw{ 68 70 AX4 QS11 QS17 QS18 QS23 QS36 QS37 QS4 QS69 QS73 QS74 QS80 QS9 S224 WS14 WS15 }
         ],
@@ -351,7 +343,7 @@ EOF
 
     my $text = <<'EOF';
 #!/bin/bash
-    
+
 #----------------------------#
 # mz
 #----------------------------#
@@ -426,7 +418,7 @@ EOF
 
     $text = <<'EOF';
 #!/bin/bash
-    
+
 #----------------------------#
 # multi_way_batch
 #----------------------------#
