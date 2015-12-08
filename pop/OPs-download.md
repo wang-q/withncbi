@@ -800,6 +800,8 @@ for genomes out of WGS, which usually in better assembling levels.
     * [SRA](http://trace.ncbi.nlm.nih.gov/Traces/sra/?study=SRP003189)
     * [Paper](http://www.nature.com/nbt/journal/v30/n1/full/nbt.2050.html)
 
+    Mapping strategy in [here](https://github.com/wang-q/sra/blob/master/japonica24_seq.pl).
+
 2. 23 Japonica rices restore from previous .2bit files.
 
     I've used bwa-gatk pipeline to generate 23 Japonica rice genomes.
@@ -855,6 +857,8 @@ for genomes out of WGS, which usually in better assembling levels.
 
     * [SRA](http://trace.ncbi.nlm.nih.gov/Traces/sra/?study=SRP005599)
     * [Paper](http://journals.plos.org/plosgenetics/article?id=10.1371/journal.pgen.1003080)
+
+    Mapping strategy in [here](https://github.com/wang-q/sra/blob/master/dpgp_seq.pl).
 
 2. 21 genomes restore from previous .2bit files.
 
@@ -943,6 +947,8 @@ There are no suitable outgroups for C. elegans.
 http://hgdownload.soe.ucsc.edu/goldenPath/ce10/multiz7way/ce10.commonNames.7way.nh
 
 1. 40 wild strains from cele_mmp.
+
+    Mapping strategy in [here](https://github.com/wang-q/sra/blob/master/cele_mmp_seq.pl).
 
 	```bash
 
