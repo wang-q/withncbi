@@ -1108,162 +1108,162 @@ data:
   -
     coverage: 29
     name: AB1
-    original_id: 7227
+    original_id: 6239
   -
     coverage: 27.6
     name: AB3
-    original_id: 7227
+    original_id: 6239
   -
     coverage: 28.8
     name: CB4853
-    original_id: 7227
+    original_id: 6239
   -
     coverage: 29.9
     name: CB4854
-    original_id: 7227
+    original_id: 6239
   -
     coverage: 30.8
     name: CB4856
-    original_id: 7227
+    original_id: 6239
   -
     coverage: 30.1
     name: ED3017
-    original_id: 7227
+    original_id: 6239
   -
     coverage: 29.2
     name: ED3021
-    original_id: 7227
+    original_id: 6239
   -
     coverage: 28.8
     name: ED3040
-    original_id: 7227
+    original_id: 6239
   -
     coverage: 29.2
     name: ED3042
-    original_id: 7227
+    original_id: 6239
   -
     coverage: 28.6
     name: ED3049
-    original_id: 7227
+    original_id: 6239
   -
     coverage: 28.6
     name: ED3052
-    original_id: 7227
+    original_id: 6239
   -
     coverage: 30.3
     name: ED3057
-    original_id: 7227
+    original_id: 6239
   -
     coverage: 28.9
     name: ED3072
-    original_id: 7227
+    original_id: 6239
   -
     coverage: 29.4
     name: GXW1
-    original_id: 7227
+    original_id: 6239
   -
     coverage: 30.4
     name: JU1088
-    original_id: 7227
+    original_id: 6239
   -
     coverage: 28.1
     name: JU1171
-    original_id: 7227
+    original_id: 6239
   -
     coverage: 29.5
     name: JU1400
-    original_id: 7227
+    original_id: 6239
   -
     coverage: 28.9
     name: JU1401
-    original_id: 7227
+    original_id: 6239
   -
     coverage: 27.9
     name: JU1652
-    original_id: 7227
+    original_id: 6239
   -
     coverage: 28.5
     name: JU258
-    original_id: 7227
+    original_id: 6239
   -
     coverage: 28.7
     name: JU263
-    original_id: 7227
+    original_id: 6239
   -
     coverage: 30
     name: JU300
-    original_id: 7227
+    original_id: 6239
   -
     coverage: 30.6
     name: JU312
-    original_id: 7227
+    original_id: 6239
   -
     coverage: 28.2
     name: JU322
-    original_id: 7227
+    original_id: 6239
   -
     coverage: 30.3
     name: JU345
-    original_id: 7227
+    original_id: 6239
   -
     coverage: 29.2
     name: JU360
-    original_id: 7227
+    original_id: 6239
   -
     coverage: 29.3
     name: JU361
-    original_id: 7227
+    original_id: 6239
   -
     coverage: 30.9
     name: JU394
-    original_id: 7227
+    original_id: 6239
   -
     coverage: 27.8
     name: JU397
-    original_id: 7227
+    original_id: 6239
   -
     coverage: 28.6
     name: JU533
-    original_id: 7227
+    original_id: 6239
   -
     coverage: 28.5
     name: JU642
-    original_id: 7227
+    original_id: 6239
   -
     coverage: 30.2
     name: JU775
-    original_id: 7227
+    original_id: 6239
   -
     coverage: 30.1
     name: KR314
-    original_id: 7227
+    original_id: 6239
   -
     coverage: 29.5
     name: LKC34
-    original_id: 7227
+    original_id: 6239
   -
     coverage: 28.7
     name: MY1
-    original_id: 7227
+    original_id: 6239
   -
     coverage: 25.9
     name: MY14
-    original_id: 7227
+    original_id: 6239
   -
     coverage: 24
     name: MY16
-    original_id: 7227
+    original_id: 6239
   -
     coverage: 29
     name: MY2
-    original_id: 7227
+    original_id: 6239
   -
     coverage: 24.1
     name: MY6
-    original_id: 7227
+    original_id: 6239
   -
     coverage: 28.8
     name: PX174
-    original_id: 7227
+    original_id: 6239
 EOF
     ```
