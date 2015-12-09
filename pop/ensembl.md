@@ -87,10 +87,14 @@ wget -m ftp://ftp.ensemblgenomes.org/pub/fungi/release-29/mysql/aspergillus_fumi
 
 # Protists
 wget -m ftp://ftp.ensemblgenomes.org/pub/protists/release-29/mysql/plasmodium_falciparum_core_29_82_3 .
+wget -m ftp://ftp.ensemblgenomes.org/pub/protists/release-29/mysql/dictyostelium_discoideum_core_29_82_1 .
 
 # clean
 mv ftp.ensemblgenomes.org/pub/metazoa/release-29/mysql/* .
-rm -fr ftp.ensemblgenomes.org
+mv ftp.ensemblgenomes.org/pub/plants/release-29/mysql/* .
+mv ftp.ensemblgenomes.org/pub/fungi/release-29/mysql/* .
+mv ftp.ensemblgenomes.org/pub/protists/release-29/mysql/* .
+
 find . -name ".listing" | xargs rm
 
 # rsync -avP wangq@45.79.80.100:data/ensembl82/mysql/ ~/data/ensembl82/mysql
@@ -133,9 +137,13 @@ wget -m ftp://ftp.ensemblgenomes.org/pub/fungi/release-29/fasta/aspergillus_fumi
 
 # Protists
 wget -m ftp://ftp.ensemblgenomes.org/pub/protists/release-29/fasta/plasmodium_falciparum .
+wget -m ftp://ftp.ensemblgenomes.org/pub/protists/release-29/fasta/dictyostelium_discoideum .
 
 mv ftp.ensemblgenomes.org/pub/metazoa/release-29/fasta/* .
-rm -fr ftp.ensemblgenomes.org
+mv ftp.ensemblgenomes.org/pub/plants/release-29/fasta/* .
+mv ftp.ensemblgenomes.org/pub/fungi/release-29/fasta/* .
+mv ftp.ensemblgenomes.org/pub/protists/release-29/fasta/* .
+
 find . -name ".listing" | xargs rm
 
 # rsync -avP wangq@45.79.80.100:data/ensembl82/fasta/ ~/data/ensembl82/fasta
