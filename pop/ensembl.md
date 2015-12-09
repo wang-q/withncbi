@@ -38,6 +38,10 @@ rsync -avP \
     --exclude='drosophila_melanogaster' \
     --exclude='saccharomyces_cerevisiae' \
     --exclude='homo_sapiens' \
+    --exclude='*.dna.*' \
+    --exclude='*.dna_rm.*' \
+    --exclude='*.chromosome.*' \
+    --exclude='*.nonchromosomal.*' \
     rsync://ftp.ensembl.org/ensembl/pub/release-82/fasta/ \
     ~/data/ensembl82/fasta
 

@@ -1087,6 +1087,15 @@ EOF
     sh 4_rawphylo.sh
     sh 5_multi_cmd.sh
     sh 7_multi_db_only.sh
+
+    # other plans
+    sh plan_Dmel_n22_pop.sh
+    sh 5_multi_cmd.sh
+    sh 7_multi_db_only.sh
+
+    sh plan_Dmel_n22_Dsim.sh
+    sh 5_multi_cmd.sh
+    sh 7_multi_db_only.sh
     ```
 
 
