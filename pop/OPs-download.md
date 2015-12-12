@@ -969,3 +969,145 @@ http://hgdownload.soe.ucsc.edu/goldenPath/ce10/multiz7way/ce10.commonNames.7way.
 
     mv MtDNA.fa MtDNA.fa.skip
 	```
+
+## *Dictyostelium* WGS
+
+    | name                         | taxon  |
+    | :---                         | :---   |
+    | Dictyostelium                | 5782   |
+    | Dictyostelium discoideum     | 44689  |
+    | Dictyostelium discoideum AX4 | 352472 |
+
+1. Create `pop/dictyostelium.tsv` manually.
+
+    * http://www.ncbi.nlm.nih.gov/Traces/wgs/?page=1&term=dictyostelium&order=organism
+    * http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?mode=Info&id=5782
+    * http://www.ncbi.nlm.nih.gov/assembly?term=txid5782[Organism:exp]
+    * http://www.ncbi.nlm.nih.gov/genome/?term=txid5782[Organism:exp]
+
+    ```bash
+    export GENUS_ID=5782
+    export GENUS=dictyostelium
+    mkdir -p ~/data/alignment/Protists/$GENUS          # operation directory
+    mkdir -p ~/data/alignment/Protists/GENOMES/$GENUS  # sequence directory
+
+    cd ~/data/alignment/Protists/GENOMES/$GENUS
+
+    ...
+
+    # Cleaning
+    rm raw*.*sv
+    unset GENUS_ID
+    unset GENUS
+    ```
+
+    Remove Ddis AX4. AX4 will be injected later.
+
+    ```bash
+    mv dictyostelium.tsv all.tsv
+    cat all.tsv | grep -v Ddis_ > dictyostelium.tsv
+    ```
+
+    Edit the tsv file to fix names and comment out bad strains.
+
+
+2. Create working directory and download WGS sequences.
+
+    ```bash
+    mkdir -p ~/data/alignment/Protists/GENOMES/dictyostelium
+    cd ~/data/alignment/Protists/GENOMES/dictyostelium
+
+    perl ~/Scripts/withncbi/taxon/wgs_prep.pl \
+        -f ~/Scripts/withncbi/pop/dictyostelium.tsv \
+        --fix \
+        -o WGS \
+        -a
+
+    aria2c -UWget -x 6 -s 3 -c -i WGS/dictyostelium.url.txt
+
+    find WGS -name "*.gz" | xargs gzip -t
+    ```
+
+3. Download *Dictyostelium discoideum* AX4.
+  This step is totally manual operation. **Be careful.**
+
+    | assigned name | organism_name                  | assembly_accession           |
+    | :------------ | :------------                  | :------------                |
+    | Ddis_AX4      | *Dictyostelium discoideum* AX4 | GCF_000004695.1.assembly.txt |
+
+    ```bash
+    mkdir -p ~/data/alignment/Protists/GENOMES/dictyostelium/DOWNLOAD
+    cd ~/data/alignment/Protists/GENOMES/dictyostelium/DOWNLOAD
+
+    # Omit MT and Ddp5 plasmid
+    perl ~/Scripts/withncbi/taxon/assembly_csv.pl \
+        -f ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/All/GCF_000004695.1.assembly.txt \
+        -name Ddis_AX4 \
+        --nuclear \
+        | grep -v Ddp5 \
+        > Ddis_AX4.seq.csv
+
+    mysql -ualignDB -palignDB ar_genbank -e \
+        "SELECT organism_name, species, assembly_accession FROM ar WHERE taxonomy_id IN (5786, 261658, 361076, 79012, 361072)" \
+        | perl -nl -a -F"\t" -e '$n = $F[0]; $rx = quotemeta $F[1]; $n =~ s/$rx\s+//; $n =~ s/\W+/_/g; printf qq{%s\t%s\n}, $n, $F[2];' \
+        | grep -v organism_name \
+        | perl -nl -a -F"\t" -e '$str = q{echo } . $F[0] . qq{ \n}; $str .= q{perl ~/Scripts/withncbi/taxon/assembly_csv.pl} . qq{ \\\n}; $str .= q{-f ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/All/} . $F[1] . qq{.assembly.txt \\\n}; $str .= q{ --scaffold --length 5000 --genbank -name } . $F[0] . qq{ \\\n}; $str .= q{>> non_wgs.seq.csv}; print $str . qq{\n}' \
+        > ass_csv.sh
+
+    echo > non_wgs.seq.csv
+    sh ass_csv.sh
+
+    echo "#strain_name,accession,strain_taxon_id,seq_name" > dictyostelium.seq.csv
+    cat Ddis_AX4.seq.csv non_wgs.seq.csv \
+        | perl -nl -e '/^#/ and next; /^\s*$/ and next; print;' \
+        >> dictyostelium.seq.csv
+
+    # Download, rename files and change fasta headers
+    perl ~/Scripts/withncbi/taxon/batch_get_seq.pl \
+        -p -f dictyostelium.seq.csv
+
+    ```
+
+## *Dictyostelium discoideum*
+
+1. Sources.
+
+    * [SRA](http://trace.ncbi.nlm.nih.gov/Traces/sra/?study=SRP002085)
+    * [Reference genome](https://www.hgsc.bcm.edu/microbiome/dictyostelium-discoideum-ax4)
+
+    Mapping strategy in [here](https://github.com/wang-q/sra/blob/master/dicty_seq.pl).
+
+2. 18 genomes restore from previous .2bit files.
+
+    One of which is AX4, the reference genome resequenced.
+
+    ```bash
+    find ~/data/alignment/dicty/ -name "*.2bit" \
+        | grep -v "_65" \
+        | parallel basename {//} \
+        | sort
+
+    mkdir -p ~/data/alignment/others/dicty
+    cd ~/data/alignment/others/dicty
+
+    for d in 68 70 AX4 QS11 QS17 QS18 QS23 QS36 QS37 QS4 QS69 QS73 QS74 QS80 QS9 S224 WS14 WS15
+    do
+        twoBitToFa ~/data/alignment/dicty/${d}/chr.2bit ${d}.fa;
+    done
+    ```
+
+3. Ddis from ensembl genomes.
+
+    ```bash
+    # Dmel
+    mkdir -p ~/data/alignment/Ensembl/Ddis
+    cd ~/data/alignment/Ensembl/Ddis
+
+    find ~/data/ensembl82/fasta/dictyostelium_discoideum/dna/ -name "*dna_sm.toplevel*" | xargs gzip -d -c > toplevel.fa
+    faops count toplevel.fa | perl -aln -e 'next if $F[0] eq 'total'; print $F[0] if $F[1] > 50000; print $F[0] if $F[1] > 5000  and $F[6]/$F[1] < 0.05' | uniq > listFile
+    faops some toplevel.fa listFile toplevel.filtered.fa
+    faops split-name toplevel.filtered.fa .
+    rm toplevel.fa toplevel.filtered.fa listFile
+
+    rm CH*.fa
+    ```

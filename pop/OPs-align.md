@@ -1098,7 +1098,6 @@ EOF
     sh 7_multi_db_only.sh
     ```
 
-
 ## *Caenorhabditis elegans* million mutation project (cele_mmp)
 
 0. Create data.yml manually.
@@ -1275,4 +1274,186 @@ data:
     name: PX174
     original_id: 6239
 EOF
+    ```
+
+## *Dictyostelium* WGS
+
+0. RM species
+
+    It't OK to not specifies RM species. Protists have very few repeats records.
+
+    ```bash
+    /usr/local/Cellar/repeatmasker/4.0.5/libexec/util/queryTaxonomyDatabase.pl -taxDBFile /usr/local/Cellar/repeatmasker/4.0.5/libexec/Libraries/taxonomy.dat -species Dictyosteliida
+    /usr/local/Cellar/repeatmasker/4.0.5/libexec/util/queryRepeatDatabase.pl -species Dictyosteliida -stat
+    ```
+
+1. `gen_pop_conf.pl`
+
+    ```bash
+    mkdir -p ~/data/alignment/Protists/dictyostelium
+    cd ~/data/alignment/Protists/dictyostelium
+
+    perl ~/Scripts/withncbi/pop/gen_pop_conf.pl \
+        -i ~/data/alignment/Protists/GENOMES/dictyostelium/WGS/dictyostelium.data.yml \
+        -o ~/Scripts/withncbi/pop/dictyostelium_test.yml \
+        -d ~/data/alignment/Protists/GENOMES/dictyostelium/WGS \
+        -m prefix \
+        -r '*.fsa_nt.gz' \
+        --opt group_name=dictyostelium \
+        --opt base_dir='~/data/alignment/Protists' \
+        --opt data_dir='~/data/alignment/Protists/dictyostelium' \
+        --dd ~/data/alignment/Protists/GENOMES/dictyostelium/DOWNLOAD \
+        --download 'name=Ddis_AX4;taxon=352472;sciname=Dictyostelium discoideum AX4' \
+        --download 'name=Dictyostelium_purpureum;taxon=5786;sciname=Dictyostelium purpureum' \
+        --download 'name=Dictyostelium_firmibasis;taxon=79012;sciname=Dictyostelium firmibasis' \
+        --download 'name=Dictyostelium_fasciculatum;taxon=261658;sciname=Dictyostelium fasciculatum' \
+        --download 'name=Dictyostelium_citrinum;taxon=361072;sciname=Dictyostelium citrinum' \
+        --download 'name=Dictyostelium_intermedium;taxon=361076;sciname=Dictyostelium intermedium' \
+        -y
+    ```
+
+2. Rest routing things.
+
+    ```bash
+    cd ~/data/alignment/Protists/dictyostelium
+
+    # pop_prep.pl
+    perl ~/Scripts/withncbi/pop/pop_prep.pl -p 8 -i ~/Scripts/withncbi/pop/dictyostelium_test.yml
+
+    sh 01_file.sh
+    sh 02_rm.sh
+    sh 03_strain_info.sh
+
+    # plan_ALL.sh
+    sh plan_ALL.sh
+
+    sh 1_real_chr.sh
+    sh 3_pair_cmd.sh
+    sh 4_rawphylo.sh
+    sh 5_multi_cmd.sh
+    sh 7_multi_db_only.sh
+    ```
+
+3. Pick outgroup.
+
+    Prei is the only one.
+
+## *Dictyostelium discoideum*
+
+0. Create data.yml manually.
+
+    Coverages are not real.
+
+    ```bash
+    mkdir -p ~/data/alignment/ddis82
+    cd ~/data/alignment/ddis82
+
+    cat <<EOF > ddis82_data.yml
+---
+data:
+  - coverage: 10
+    name: 68
+    original_id: 44689
+  - coverage: 10
+    name: 70
+    original_id: 44689
+  - coverage: 10
+    name: AX4
+    original_id: 44689
+  - coverage: 10
+    name: QS11
+    original_id: 44689
+  - coverage: 10
+    name: QS17
+    original_id: 44689
+  - coverage: 10
+    name: QS18
+    original_id: 44689
+  - coverage: 10
+    name: QS23
+    original_id: 44689
+  - coverage: 10
+    name: QS36
+    original_id: 44689
+  - coverage: 10
+    name: QS37
+    original_id: 44689
+  - coverage: 10
+    name: QS4
+    original_id: 44689
+  - coverage: 10
+    name: QS69
+    original_id: 44689
+  - coverage: 10
+    name: QS73
+    original_id: 44689
+  - coverage: 10
+    name: QS74
+    original_id: 44689
+  - coverage: 10
+    name: QS80
+    original_id: 44689
+  - coverage: 10
+    name: QS9
+    original_id: 44689
+  - coverage: 10
+    name: S224
+    original_id: 44689
+  - coverage: 10
+    name: WS14
+    original_id: 44689
+  - coverage: 10
+    name: WS15
+    original_id: 44689
+EOF
+    ```
+
+1. `gen_pop_conf.pl`
+
+    ```bash
+    mkdir -p ~/data/alignment/ddis82
+    cd ~/data/alignment/ddis82
+
+    perl ~/Scripts/withncbi/pop/gen_pop_conf.pl \
+        -i ddis82_data.yml \
+        -o ~/Scripts/withncbi/pop/ddis82_test.yml \
+        -d ~/data/alignment/others/dicty \
+        -m name \
+        -r '*.fa' \
+        --opt group_name=ddis82 \
+        --opt base_dir='~/data/alignment' \
+        --opt data_dir='~/data/alignment/ddis82' \
+        --dd ~/data/alignment/Ensembl \
+        --download 'name=Ddis;taxon=352472;sciname=Dictyostelium discoideum AX4' \
+        --plan 'name=Ddis_n18_pop;t=Ddis;qs=68,70,QS11,QS17,QS18,QS23,QS36,QS37,QS4,QS69,QS73,QS74,QS80,QS9,S224,WS14,WS15' \
+        --plan 'name=Ddis_n10_pop;t=Ddis;qs=68,70,QS36,QS37,QS69,QS73,QS74,QS80,S224' \
+        -y
+    ```
+
+2. Rest routing things.
+
+    ```bash
+    # pop_prep.pl
+    perl ~/Scripts/withncbi/pop/pop_prep.pl -p 12 -i ~/Scripts/withncbi/pop/ddis82_test.yml
+
+    sh 01_file.sh
+    sh 03_strain_info.sh
+
+    # plan_ALL.sh
+    sh plan_ALL.sh
+
+    sh 1_real_chr.sh
+    sh 3_pair_cmd.sh
+    sh 4_rawphylo.sh
+    sh 5_multi_cmd.sh
+    sh 7_multi_db_only.sh
+
+    # other plans
+    sh plan_Ddis_n10_pop.sh
+    sh 5_multi_cmd.sh
+    sh 7_multi_db_only.sh
+
+    sh plan_Ddis_n18_pop.sh
+    sh 5_multi_cmd.sh
+    sh 7_multi_db_only.sh
     ```
