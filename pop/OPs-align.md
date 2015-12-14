@@ -1336,7 +1336,7 @@ EOF
 
 3. Pick outgroup.
 
-    Prei is the only one.
+    Dictyostelium_citrinum or Dictyostelium_firmibasis assemblies.
 
 ## *Dictyostelium discoideum*
 
@@ -1345,10 +1345,10 @@ EOF
     Coverages are not real.
 
     ```bash
-    mkdir -p ~/data/alignment/ddis82
-    cd ~/data/alignment/ddis82
+    mkdir -p ~/data/alignment/Protists/Ddis
+    cd ~/data/alignment/Protists/Ddis
 
-    cat <<EOF > ddis82_data.yml
+    cat <<EOF > ddis_data.yml
 ---
 data:
   - coverage: 10
@@ -1356,9 +1356,6 @@ data:
     original_id: 44689
   - coverage: 10
     name: 70
-    original_id: 44689
-  - coverage: 10
-    name: AX4
     original_id: 44689
   - coverage: 10
     name: QS11
@@ -1411,22 +1408,26 @@ EOF
 1. `gen_pop_conf.pl`
 
     ```bash
-    mkdir -p ~/data/alignment/ddis82
-    cd ~/data/alignment/ddis82
+    mkdir -p ~/data/alignment/Protists/Ddis
+    cd ~/data/alignment/Protists/Ddis
 
     perl ~/Scripts/withncbi/pop/gen_pop_conf.pl \
-        -i ddis82_data.yml \
-        -o ~/Scripts/withncbi/pop/ddis82_test.yml \
+        -i ddis_data.yml \
+        -o ~/Scripts/withncbi/pop/ddis_test.yml \
         -d ~/data/alignment/others/dicty \
         -m name \
         -r '*.fa' \
-        --opt group_name=ddis82 \
-        --opt base_dir='~/data/alignment' \
-        --opt data_dir='~/data/alignment/ddis82' \
-        --dd ~/data/alignment/Ensembl \
-        --download 'name=Ddis;taxon=352472;sciname=Dictyostelium discoideum AX4' \
-        --plan 'name=Ddis_n18_pop;t=Ddis;qs=68,70,QS11,QS17,QS18,QS23,QS36,QS37,QS4,QS69,QS73,QS74,QS80,QS9,S224,WS14,WS15' \
-        --plan 'name=Ddis_n10_pop;t=Ddis;qs=68,70,QS36,QS37,QS69,QS73,QS74,QS80,S224' \
+        --opt group_name=Ddis \
+        --opt base_dir='~/data/alignment/Protists' \
+        --opt data_dir='~/data/alignment/Protists/Ddis' \
+        --dd ~/data/alignment/Protists/GENOMES/Ddis/DOWNLOAD \
+        --download 'name=AX4;taxon=352472;sciname=Dictyostelium discoideum AX4' \
+        --download 'name=Dfir;taxon=79012;sciname=Dictyostelium firmibasis' \
+        --download 'name=Dcit;taxon=361072;sciname=Dictyostelium citrinum' \
+        --plan 'name=Ddis_n18_pop;t=AX4;qs=68,70,QS11,QS17,QS18,QS23,QS36,QS37,QS4,QS69,QS73,QS74,QS80,QS9,S224,WS14,WS15' \
+        --plan 'name=Ddis_n10_pop;t=AX4;qs=68,70,QS36,QS37,QS69,QS73,QS74,QS80,S224' \
+        --plan 'name=Ddis_n10_Dfir;t=AX4;qs=68,70,QS36,QS37,QS69,QS73,QS74,QS80,S224,Dfir;o=Dfir' \
+        --plan 'name=Ddis_n10_Dcit;t=AX4;qs=68,70,QS36,QS37,QS69,QS73,QS74,QS80,S224,Dcit;o=Dcit' \
         -y
     ```
 
@@ -1434,9 +1435,10 @@ EOF
 
     ```bash
     # pop_prep.pl
-    perl ~/Scripts/withncbi/pop/pop_prep.pl -p 12 -i ~/Scripts/withncbi/pop/ddis82_test.yml
+    perl ~/Scripts/withncbi/pop/pop_prep.pl -p 12 -i ~/Scripts/withncbi/pop/ddis_test.yml
 
     sh 01_file.sh
+    sh 02_rm.sh
     sh 03_strain_info.sh
 
     # plan_ALL.sh

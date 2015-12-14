@@ -1096,18 +1096,37 @@ http://hgdownload.soe.ucsc.edu/goldenPath/ce10/multiz7way/ce10.commonNames.7way.
     done
     ```
 
-3. Ddis from ensembl genomes.
+3. Ddis, Dfir, Dcit from NCBI.
 
     ```bash
-    # Dmel
-    mkdir -p ~/data/alignment/Ensembl/Ddis
-    cd ~/data/alignment/Ensembl/Ddis
+    mkdir -p ~/data/alignment/Protists/GENOMES/Ddis/DOWNLOAD
+    cd ~/data/alignment/Protists/GENOMES/Ddis/DOWNLOAD
 
-    find ~/data/ensembl82/fasta/dictyostelium_discoideum/dna/ -name "*dna_sm.toplevel*" | xargs gzip -d -c > toplevel.fa
-    faops count toplevel.fa | perl -aln -e 'next if $F[0] eq 'total'; print $F[0] if $F[1] > 50000; print $F[0] if $F[1] > 5000  and $F[6]/$F[1] < 0.05' | uniq > listFile
-    faops some toplevel.fa listFile toplevel.filtered.fa
-    faops split-name toplevel.filtered.fa .
-    rm toplevel.fa toplevel.filtered.fa listFile
+    perl ~/Scripts/withncbi/taxon/assembly_csv.pl \
+        -f ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/All/GCF_000004695.1.assembly.txt \
+        -name AX4 \
+        --nuclear \
+        | grep -v Ddp5 \
+        > AX4.seq.csv
 
-    rm CH*.fa
+    echo > non_wgs.seq.csv
+    perl ~/Scripts/withncbi/taxon/assembly_csv.pl \
+        -f ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/All/GCA_000286055.1.assembly.txt \
+         --scaffold --length 5000 --genbank -name Dcit \
+        >> non_wgs.seq.csv
+
+    perl ~/Scripts/withncbi/taxon/assembly_csv.pl \
+        -f ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/All/GCA_000277485.1.assembly.txt \
+         --scaffold --length 5000 --genbank -name Dfir \
+        >> non_wgs.seq.csv
+
+    echo "#strain_name,accession,strain_taxon_id,seq_name" > Ddis.seq.csv
+    cat AX4.seq.csv non_wgs.seq.csv \
+        | perl -nl -e '/^#/ and next; /^\s*$/ and next; print;' \
+        >> Ddis.seq.csv
+
+    # Download, rename files and change fasta headers
+    perl ~/Scripts/withncbi/taxon/batch_get_seq.pl \
+        -p -f Ddis.seq.csv
+
     ```
