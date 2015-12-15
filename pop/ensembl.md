@@ -22,6 +22,7 @@ rsync -avP \
     --exclude='*_rnaseq_82*' \
     --exclude='ensembl_*' \
     --exclude='*_mart_82' \
+    --exclude='homo_sapiens_core_82_38' \
     rsync://ftp.ensembl.org/ensembl/pub/release-82/mysql/ \
     ~/data/ensembl82/mysql
 
@@ -89,6 +90,9 @@ wget -m ftp://ftp.ensemblgenomes.org/pub/fungi/release-29/mysql/aspergillus_fumi
 wget -m ftp://ftp.ensemblgenomes.org/pub/protists/release-29/mysql/plasmodium_falciparum_core_29_82_3 .
 wget -m ftp://ftp.ensemblgenomes.org/pub/protists/release-29/mysql/dictyostelium_discoideum_core_29_82_1 .
 
+# compara
+wget -m ftp://ftp.ensemblgenomes.org/pub/release-29/fungi/mysql/ensembl_compara_fungi_29_82 .
+
 # clean
 mv ftp.ensemblgenomes.org/pub/metazoa/release-29/mysql/* .
 mv ftp.ensemblgenomes.org/pub/plants/release-29/mysql/* .
@@ -147,4 +151,23 @@ mv ftp.ensemblgenomes.org/pub/protists/release-29/fasta/* .
 find . -name ".listing" | xargs rm
 
 # rsync -avP wangq@45.79.80.100:data/ensembl82/fasta/ ~/data/ensembl82/fasta
+```
+
+## Build local databases
+
+Use `build_ensembl.pl`.
+
+```bash
+perl ~/Scripts/alignDB/util/build_ensembl.pl --checksum --ensembl ~/data/ensembl82/mysql/homo_sapiens_core_82_37
+
+perl ~/Scripts/alignDB/util/build_ensembl.pl --initdb --db human_82 --ensembl ~/data/ensembl82/mysql/homo_sapiens_core_82_37
+```
+
+Or use `ensembl_batch.pl`.
+
+```bash
+cd ~/Scripts/alignDB/util
+
+perl ensembl_batch.pl -i ensembl_82.yml
+sh ensembl.build.sh
 ```
