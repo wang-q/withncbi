@@ -1425,9 +1425,9 @@ EOF
         --download 'name=Dfir;taxon=79012;sciname=Dictyostelium firmibasis' \
         --download 'name=Dcit;taxon=361072;sciname=Dictyostelium citrinum' \
         --plan 'name=Ddis_n18_pop;t=AX4;qs=68,70,QS11,QS17,QS18,QS23,QS36,QS37,QS4,QS69,QS73,QS74,QS80,QS9,S224,WS14,WS15' \
-        --plan 'name=Ddis_n10_pop;t=AX4;qs=68,70,QS36,QS37,QS69,QS73,QS74,QS80,S224' \
-        --plan 'name=Ddis_n10_Dfir;t=AX4;qs=68,70,QS36,QS37,QS69,QS73,QS74,QS80,S224,Dfir;o=Dfir' \
-        --plan 'name=Ddis_n10_Dcit;t=AX4;qs=68,70,QS36,QS37,QS69,QS73,QS74,QS80,S224,Dcit;o=Dcit' \
+        --plan 'name=Ddis_n11_pop;t=AX4;qs=68,70,QS23,QS36,QS37,QS69,QS73,QS74,QS80,S224' \
+        --plan 'name=Ddis_n11_Dfir;t=AX4;qs=68,70,QS23,QS36,QS37,QS69,QS73,QS74,QS80,S224,Dfir;o=Dfir' \
+        --plan 'name=Ddis_n11_Dcit;t=AX4;qs=68,70,QS23,QS36,QS37,QS69,QS73,QS74,QS80,S224,Dcit;o=Dcit' \
         -y
     ```
 
@@ -1451,11 +1451,19 @@ EOF
     sh 7_multi_db_only.sh
 
     # other plans
-    sh plan_Ddis_n10_pop.sh
+    sh plan_Ddis_n11_pop.sh
     sh 5_multi_cmd.sh
     sh 7_multi_db_only.sh
 
     sh plan_Ddis_n18_pop.sh
+    sh 5_multi_cmd.sh
+    sh 7_multi_db_only.sh
+
+    sh plan_Ddis_n11_Dfir.sh
+    sh 5_multi_cmd.sh
+    sh 7_multi_db_only.sh
+
+    sh plan_Ddis_n11_Dcit.sh
     sh 5_multi_cmd.sh
     sh 7_multi_db_only.sh
     ```
