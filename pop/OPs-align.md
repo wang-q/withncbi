@@ -1098,6 +1098,77 @@ EOF
     sh 7_multi_db_only.sh
     ```
 
+## Primates
+
+0. Create data.yml manually.
+
+    ```bash
+    mkdir -p ~/data/alignment/primates82
+    cd ~/data/alignment/primates82
+
+    cat <<EOF > primates82_data.yml
+---
+data: []
+EOF
+    ```
+
+1. `gen_pop_conf.pl`
+
+    ```bash
+    mkdir -p ~/data/alignment/primates82
+    cd ~/data/alignment/primates82
+
+    perl ~/Scripts/withncbi/pop/gen_pop_conf.pl \
+        -i primates82_data.yml \
+        -o ~/Scripts/withncbi/pop/primates82_test.yml \
+        --opt group_name=primates82 \
+        --opt base_dir='~/data/alignment' \
+        --opt data_dir='~/data/alignment/primates82' \
+        --opt phylo_tree='~/data/alignment/primates_13way.nwk' \
+        --dd ~/data/alignment/Ensembl \
+        --download 'name=Human;taxon=9606;sciname=Homo sapiens' \
+        --download 'name=Chimp;taxon=9598;sciname=Pan troglodytes;coverage=6x sanger' \
+        --download 'name=Gorilla;taxon=9595;sciname=Gorilla gorilla;coverage=2.1x sanger, 35x solexa' \
+        --download 'name=Orangutan;taxon=9601;sciname=Pongo abelii;coverage=6x sanger' \
+        --download 'name=Rhesus;taxon=9544;sciname=Macaca mulatta;coverage=6.1x sanger' \
+        --plan 'name=HC_R;t=Human;qs=Chimp,Rhesus;o=Rhesus' \
+        --plan 'name=HCGO_R;t=Human;qs=Chimp,Gorilla,Orangutan,Rhesus;o=Rhesus' \
+        -y
+
+        # --download 'name=Gibbon;taxon=61853;sciname=Nomascus leucogenys;coverage=5.6x sanger' \
+        # --download 'name=Marmoset;taxon=9483;sciname=Callithrix jacchus;coverage=6x sanger' \
+        # --download 'name=Tarsier;taxon=9478;sciname=Tarsius syrichta;coverage=1.82x sanger' \
+        # --download 'name=Lemur;taxon=30608;sciname=Microcebus murinus;coverage=1.93x sanger' \
+        # --download 'name=Bushbaby;taxon=30611;sciname=Otolemur garnettii;coverage=2x sanger' \
+    ```
+
+2. Rest routing things.
+
+    ```bash
+    # pop_prep.pl
+    perl ~/Scripts/withncbi/pop/pop_prep.pl -p 12 -i ~/Scripts/withncbi/pop/primates82_test.yml
+
+    sh 01_file.sh
+    sh 03_strain_info.sh
+
+    # plan_ALL.sh
+    sh plan_ALL.sh
+
+    sh 1_real_chr.sh
+    sh 3_pair_cmd.sh
+    sh 5_multi_cmd.sh
+    sh 7_multi_db_only.sh
+
+    # other plans
+    sh plan_HC_R.sh
+    sh 5_multi_cmd.sh
+    sh 7_multi_db_only.sh
+
+    sh plan_HCGO_R.sh
+    sh 5_multi_cmd.sh
+    sh 7_multi_db_only.sh
+    ```
+
 ## *Caenorhabditis elegans* million mutation project (cele_mmp)
 
 0. Create data.yml manually.

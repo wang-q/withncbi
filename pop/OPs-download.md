@@ -938,6 +938,55 @@ for genomes out of WGS, which usually in better assembling levels.
 
     mv Y.fa Y.fa.skip
     mv MT.fa MT.fa.skip
+
+    # Chimp
+    mkdir -p ~/data/alignment/Ensembl/Chimp
+    cd ~/data/alignment/Ensembl/Chimp
+
+    find ~/data/ensembl82/fasta/pan_troglodytes/dna/ -name "*dna_sm.toplevel*" | xargs gzip -d -c > toplevel.fa
+    faops count toplevel.fa | perl -aln -e 'next if $F[0] eq 'total'; print $F[0] if $F[1] > 50000; print $F[0] if $F[1] > 5000  and $F[6]/$F[1] < 0.05' | uniq > listFile
+    faops some toplevel.fa listFile toplevel.filtered.fa
+    faops split-name toplevel.filtered.fa .
+    rm toplevel.fa toplevel.filtered.fa listFile
+
+    cat GL*.fa > Un.fa
+    cat AACZ*.fa >> Un.fa
+
+    rm GL*.fa AACZ*.fa
+
+    # Gorilla
+    mkdir -p ~/data/alignment/Ensembl/Gorilla
+    cd ~/data/alignment/Ensembl/Gorilla
+
+    find ~/data/ensembl82/fasta/gorilla_gorilla/dna/ -name "*dna_sm.toplevel*" | xargs gzip -d -c > toplevel.fa
+    faops count toplevel.fa | perl -aln -e 'next if $F[0] eq 'total'; print $F[0] if $F[1] > 50000; print $F[0] if $F[1] > 5000  and $F[6]/$F[1] < 0.05' | uniq > listFile
+    faops some toplevel.fa listFile toplevel.filtered.fa
+    faops split-name toplevel.filtered.fa .
+    rm toplevel.fa toplevel.filtered.fa listFile
+
+    # Orangutan
+    mkdir -p ~/data/alignment/Ensembl/Orangutan
+    cd ~/data/alignment/Ensembl/Orangutan
+
+    find ~/data/ensembl82/fasta/pongo_abelii/dna/ -name "*dna_sm.toplevel*" | xargs gzip -d -c > toplevel.fa
+    faops count toplevel.fa | perl -aln -e 'next if $F[0] eq 'total'; print $F[0] if $F[1] > 50000; print $F[0] if $F[1] > 5000  and $F[6]/$F[1] < 0.05' | uniq > listFile
+    faops some toplevel.fa listFile toplevel.filtered.fa
+    faops split-name toplevel.filtered.fa .
+    rm toplevel.fa toplevel.filtered.fa listFile
+
+    # Rhesus
+    mkdir -p ~/data/alignment/Ensembl/Rhesus
+    cd ~/data/alignment/Ensembl/Rhesus
+
+    find ~/data/ensembl82/fasta/macaca_mulatta/dna/ -name "*dna_sm.toplevel*" | xargs gzip -d -c > toplevel.fa
+    faops count toplevel.fa | perl -aln -e 'next if $F[0] eq 'total'; print $F[0] if $F[1] > 50000; print $F[0] if $F[1] > 5000  and $F[6]/$F[1] < 0.05' | uniq > listFile
+    faops some toplevel.fa listFile toplevel.filtered.fa
+    faops split-name toplevel.filtered.fa .
+    rm toplevel.fa toplevel.filtered.fa listFile
+
+    cat 1099*.fa > Un.fa
+
+    rm 1099*.fa
     ```
 
 ## *Caenorhabditis elegans*
@@ -972,11 +1021,11 @@ http://hgdownload.soe.ucsc.edu/goldenPath/ce10/multiz7way/ce10.commonNames.7way.
 
 ## *Dictyostelium* WGS
 
-    | name                         | taxon  |
-    | :---                         | :---   |
-    | Dictyostelium                | 5782   |
-    | Dictyostelium discoideum     | 44689  |
-    | Dictyostelium discoideum AX4 | 352472 |
+| name                         | taxon  |
+| :---                         | :---   |
+| Dictyostelium                | 5782   |
+| Dictyostelium discoideum     | 44689  |
+| Dictyostelium discoideum AX4 | 352472 |
 
 1. Create `pop/dictyostelium.tsv` manually.
 
@@ -1029,11 +1078,11 @@ http://hgdownload.soe.ucsc.edu/goldenPath/ce10/multiz7way/ce10.commonNames.7way.
     ```
 
 3. Download *Dictyostelium discoideum* AX4.
-  This step is totally manual operation. **Be careful.**
+    This step is totally manual operation. **Be careful.**
 
-    | assigned name | organism_name                  | assembly_accession           |
-    | :------------ | :------------                  | :------------                |
-    | Ddis_AX4      | *Dictyostelium discoideum* AX4 | GCF_000004695.1.assembly.txt |
+| assigned name | organism_name                  | assembly_accession           |
+| :------------ | :------------                  | :------------                |
+| Ddis_AX4      | *Dictyostelium discoideum* AX4 | GCF_000004695.1.assembly.txt |
 
     ```bash
     mkdir -p ~/data/alignment/Protists/GENOMES/dictyostelium/DOWNLOAD
