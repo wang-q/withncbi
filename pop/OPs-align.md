@@ -1347,6 +1347,50 @@ data:
 EOF
     ```
 
+1. `gen_pop_conf.pl`
+
+    ```bash
+    mkdir -p ~/data/alignment/cele82
+    cd ~/data/alignment/cele82
+
+    perl ~/Scripts/withncbi/pop/gen_pop_conf.pl \
+        -i cele82_data.yml \
+        -o ~/Scripts/withncbi/pop/cele82_test.yml \
+        -d ~/data/alignment/others/cele \
+        -m name \
+        -r '*.vcf.fasta' \
+        --opt group_name=cele82 \
+        --opt base_dir='~/data/alignment' \
+        --opt data_dir='~/data/alignment/cele82' \
+        --opt rm_species='Caenorhabditis elegans' \
+        --dd ~/data/alignment/Ensembl \
+        --download 'name=Cele;taxon=6239;sciname=Caenorhabditis elegans' \
+        --plan 'name=Cele_n41_pop;t=Cele;qs=AB1,AB3,CB4853,CB4854,CB4856,ED3017,ED3021,ED3040,ED3042,ED3049,ED3052,ED3057,ED3072,GXW1,JU1088,JU1171,JU1400,JU1401,JU1652,JU258,JU263,JU300,JU312,JU322,JU345,JU360,JU361,JU394,JU397,JU533,JU642,JU775,KR314,LKC34,MY14,MY16,MY1,MY2,MY6,PX174' \
+        -y
+    ```
+
+2. Rest routing things.
+
+    ```bash
+    cd ~/data/alignment/cele82
+
+    # pop_prep.pl
+    perl ~/Scripts/withncbi/pop/pop_prep.pl -p 12 -i ~/Scripts/withncbi/pop/cele82_test.yml
+
+    sh 01_file.sh
+    sh 02_rm.sh
+    sh 03_strain_info.sh
+
+    # plan_ALL.sh
+    sh plan_ALL.sh
+
+    sh 1_real_chr.sh
+    sh 3_pair_cmd.sh
+    sh 4_rawphylo.sh
+    sh 5_multi_cmd.sh
+    sh 7_multi_db_only.sh
+    ```
+
 ## *Dictyostelium* WGS
 
 0. RM species

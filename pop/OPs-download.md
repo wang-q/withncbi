@@ -991,7 +991,7 @@ for genomes out of WGS, which usually in better assembling levels.
 
 ## *Caenorhabditis elegans*
 
-There are no suitable outgroups for C. elegans.
+There are no suitable outgroups for *C. elegans*.
 
 http://hgdownload.soe.ucsc.edu/goldenPath/ce10/multiz7way/ce10.commonNames.7way.nh
 
@@ -1000,7 +1000,11 @@ http://hgdownload.soe.ucsc.edu/goldenPath/ce10/multiz7way/ce10.commonNames.7way.
     Mapping strategy in [here](https://github.com/wang-q/sra/blob/master/cele_mmp_seq.pl).
 
 	```bash
+    mkdir -p ~/data/alignment/others/cele
+    cd ~/data/alignment/others/cele
 
+    find ~/data/dna-seq/cele_mmp/ -name "*.vcf.fasta" \
+        | parallel -j 1 cp {} .
 	```
 
 2. Reference strain N2 from ensembl genomes
