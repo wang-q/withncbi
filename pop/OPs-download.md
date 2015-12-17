@@ -1,4 +1,4 @@
-# Operating steps for each groups
+# Downloading steps for each groups
 
 Less detailed than Trichoderma in [README.md](README.md), but include examples
 for genomes out of WGS, which usually in better assembling levels.
@@ -1184,9 +1184,51 @@ http://hgdownload.soe.ucsc.edu/goldenPath/ce10/multiz7way/ce10.commonNames.7way.
 
     ```
 
+## Mouse
+
+1. Sources.
+
+    * [SRA](http://trace.ncbi.nlm.nih.gov/Traces/sra/?study=ERP000927)
+    * [Project website](http://www.sanger.ac.uk/science/data/mouse-genomes-project)
+    * [Paper](http://dx.doi.org/10.1038/nature10413)
+
+2. Download masked de novo assemblies from sanger-mouse ftp server.
+
+    ```bash
+    mkdir -p ~/data/alignment/others/sanger-mouse
+    cd ~/data/alignment/others/sanger-mouse
+    wget -m ftp://ftp-mouse.sanger.ac.uk/REL-1509-Assembly --accept "*.fa.masked.gz,README" .
+    mv ftp-mouse.sanger.ac.uk/REL-1509-Assembly/* .
+    rm -fr ftp-mouse.sanger.ac.uk
+
+    # rsync -avP wangq@45.79.80.100:data/alignment/others/sanger-mouse/ ~/data/alignment/others/sanger-mouse
+    ```
+
+3. Reference strain C57BL/6J (GRCm38) from ensembl.
+
+    ```bash
+    # Mouse
+    mkdir -p ~/data/alignment/Ensembl/Mouse
+    cd ~/data/alignment/Ensembl/Mouse
+
+    find ~/data/ensembl82/fasta/mus_musculus/dna/ -name "*dna_sm.primary_assembly*" | xargs gzip -d -c > toplevel.fa
+    faops count toplevel.fa | perl -aln -e 'next if $F[0] eq 'total'; print $F[0] if $F[1] > 50000; print $F[0] if $F[1] > 5000  and $F[6]/$F[1] < 0.05' | uniq > listFile
+    faops some toplevel.fa listFile toplevel.filtered.fa
+    faops split-name toplevel.filtered.fa .
+    rm toplevel.fa toplevel.filtered.fa listFile
+
+    cat GL*.fa > Un.fa
+    cat JH*.fa >> Un.fa
+
+    rm GL*.fa JH*.fa
+
+    mv Y.fa Y.fa.skip
+    mv MT.fa MT.fa.skip
+	```
+
 ## Currently not used
 
-* *Drosophila*
+* Genus *Drosophila*
 
     * Phylogenetic tree
 
@@ -1251,4 +1293,16 @@ http://hgdownload.soe.ucsc.edu/goldenPath/ce10/multiz7way/ce10.commonNames.7way.
             { taxon => 900520, name => "DGRP-897", coverage => 32.81, },
         );
 
+        ```
+
+* Primates
+
+    * taxon
+
+        ```bash
+        --download 'name=Gibbon;taxon=61853;sciname=Nomascus leucogenys;coverage=5.6x sanger' \
+        --download 'name=Marmoset;taxon=9483;sciname=Callithrix jacchus;coverage=6x sanger' \
+        --download 'name=Tarsier;taxon=9478;sciname=Tarsius syrichta;coverage=1.82x sanger' \
+        --download 'name=Lemur;taxon=30608;sciname=Microcebus murinus;coverage=1.93x sanger' \
+        --download 'name=Bushbaby;taxon=30611;sciname=Otolemur garnettii;coverage=2x sanger' \
         ```

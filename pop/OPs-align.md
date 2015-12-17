@@ -1,4 +1,4 @@
-# Operating steps for each groups
+# Aligning steps for each groups
 
 Less detailed than Trichoderma in [README.md](README.md), but include examples
 for genomes out of WGS, which usually in better assembling levels.
@@ -1134,12 +1134,6 @@ EOF
         --plan 'name=HC_R;t=Human;qs=Chimp,Rhesus;o=Rhesus' \
         --plan 'name=HCGO_R;t=Human;qs=Chimp,Gorilla,Orangutan,Rhesus;o=Rhesus' \
         -y
-
-        # --download 'name=Gibbon;taxon=61853;sciname=Nomascus leucogenys;coverage=5.6x sanger' \
-        # --download 'name=Marmoset;taxon=9483;sciname=Callithrix jacchus;coverage=6x sanger' \
-        # --download 'name=Tarsier;taxon=9478;sciname=Tarsius syrichta;coverage=1.82x sanger' \
-        # --download 'name=Lemur;taxon=30608;sciname=Microcebus murinus;coverage=1.93x sanger' \
-        # --download 'name=Bushbaby;taxon=30611;sciname=Otolemur garnettii;coverage=2x sanger' \
     ```
 
 2. Rest routing things.
@@ -1175,8 +1169,6 @@ EOF
 
     Information came from [here](http://genome.cshlp.org/content/suppl/2013/08/20/gr.157651.113.DC2/Supplemental_Table_3.xls).
 
-    Format yaml with yamllint(http://www.yamllint.com/).
-
     ```bash
     mkdir -p ~/data/alignment/cele82
     cd ~/data/alignment/cele82
@@ -1184,164 +1176,124 @@ EOF
     cat <<EOF > cele82_data.yml
 ---
 data:
-  -
-    coverage: 29
+  - coverage: 29
     name: AB1
     original_id: 6239
-  -
-    coverage: 27.6
+  - coverage: 27.6
     name: AB3
     original_id: 6239
-  -
-    coverage: 28.8
+  - coverage: 28.8
     name: CB4853
     original_id: 6239
-  -
-    coverage: 29.9
+  - coverage: 29.9
     name: CB4854
     original_id: 6239
-  -
-    coverage: 30.8
+  - coverage: 30.8
     name: CB4856
     original_id: 6239
-  -
-    coverage: 30.1
+  - coverage: 30.1
     name: ED3017
     original_id: 6239
-  -
-    coverage: 29.2
+  - coverage: 29.2
     name: ED3021
     original_id: 6239
-  -
-    coverage: 28.8
+  - coverage: 28.8
     name: ED3040
     original_id: 6239
-  -
-    coverage: 29.2
+  - coverage: 29.2
     name: ED3042
     original_id: 6239
-  -
-    coverage: 28.6
+  - coverage: 28.6
     name: ED3049
     original_id: 6239
-  -
-    coverage: 28.6
+  - coverage: 28.6
     name: ED3052
     original_id: 6239
-  -
-    coverage: 30.3
+  - coverage: 30.3
     name: ED3057
     original_id: 6239
-  -
-    coverage: 28.9
+  - coverage: 28.9
     name: ED3072
     original_id: 6239
-  -
-    coverage: 29.4
+  - coverage: 29.4
     name: GXW1
     original_id: 6239
-  -
-    coverage: 30.4
+  - coverage: 30.4
     name: JU1088
     original_id: 6239
-  -
-    coverage: 28.1
+  - coverage: 28.1
     name: JU1171
     original_id: 6239
-  -
-    coverage: 29.5
+  - coverage: 29.5
     name: JU1400
     original_id: 6239
-  -
-    coverage: 28.9
+  - coverage: 28.9
     name: JU1401
     original_id: 6239
-  -
-    coverage: 27.9
+  - coverage: 27.9
     name: JU1652
     original_id: 6239
-  -
-    coverage: 28.5
+  - coverage: 28.5
     name: JU258
     original_id: 6239
-  -
-    coverage: 28.7
+  - coverage: 28.7
     name: JU263
     original_id: 6239
-  -
-    coverage: 30
+  - coverage: 30
     name: JU300
     original_id: 6239
-  -
-    coverage: 30.6
+  - coverage: 30.6
     name: JU312
     original_id: 6239
-  -
-    coverage: 28.2
+  - coverage: 28.2
     name: JU322
     original_id: 6239
-  -
-    coverage: 30.3
+  - coverage: 30.3
     name: JU345
     original_id: 6239
-  -
-    coverage: 29.2
+  - coverage: 29.2
     name: JU360
     original_id: 6239
-  -
-    coverage: 29.3
+  - coverage: 29.3
     name: JU361
     original_id: 6239
-  -
-    coverage: 30.9
+  - coverage: 30.9
     name: JU394
     original_id: 6239
-  -
-    coverage: 27.8
+  - coverage: 27.8
     name: JU397
     original_id: 6239
-  -
-    coverage: 28.6
+  - coverage: 28.6
     name: JU533
     original_id: 6239
-  -
-    coverage: 28.5
+  - coverage: 28.5
     name: JU642
     original_id: 6239
-  -
-    coverage: 30.2
+  - coverage: 30.2
     name: JU775
     original_id: 6239
-  -
-    coverage: 30.1
+  - coverage: 30.1
     name: KR314
     original_id: 6239
-  -
-    coverage: 29.5
+  - coverage: 29.5
     name: LKC34
     original_id: 6239
-  -
-    coverage: 28.7
+  - coverage: 28.7
     name: MY1
     original_id: 6239
-  -
-    coverage: 25.9
+  - coverage: 25.9
     name: MY14
     original_id: 6239
-  -
-    coverage: 24
+  - coverage: 24
     name: MY16
     original_id: 6239
-  -
-    coverage: 29
+  - coverage: 29
     name: MY2
     original_id: 6239
-  -
-    coverage: 24.1
+  - coverage: 24.1
     name: MY6
     original_id: 6239
-  -
-    coverage: 28.8
+  - coverage: 28.8
     name: PX174
     original_id: 6239
 EOF
@@ -1581,4 +1533,88 @@ EOF
     sh plan_Ddis_n11_Dcit.sh
     sh 5_multi_cmd.sh
     sh 7_multi_db_only.sh
+    ```
+
+
+## Mouse
+
+0. Create data.yml manually.
+
+    ```bash
+    mkdir -p ~/data/alignment/mouse82
+    cd ~/data/alignment/mouse82
+
+    cat <<EOF > mouse82_data.yml
+---
+data:
+  - coverage: 25
+    name: Bur_0
+    origin: Ireland
+    original_id: 3702
+  - coverage: 47
+    name: Can_0
+    origin: Canary Isles
+    original_id: 3702
+  - coverage: 50
+    name: Ct_1
+    origin: Italy
+    original_id: 3702
+  - coverage: 52
+    name: Edi_0
+    origin: Scotland
+    original_id: 3702
+EOF
+    ```
+
+1. `gen_pop_conf.pl`
+
+    ```bash
+    mkdir -p ~/data/alignment/mouse82
+    cd ~/data/alignment/mouse82
+
+    perl ~/Scripts/withncbi/pop/gen_pop_conf.pl \
+        -i mouse82_data.yml \
+        -o ~/Scripts/withncbi/pop/mouse82_test.yml \
+        -d ~/data/alignment/others/sanger-mouse \
+        -m name \
+        -r '*.fa.masked.gz' \
+        --opt group_name=mouse82 \
+        --opt base_dir='~/data/alignment' \
+        --opt data_dir='~/data/alignment/mouse82' \
+        --dd ~/data/alignment/Ensembl \
+        --download 'name=Mouse;taxon=10090;sciname=Arabidopsis thaliana' \
+        --plan 'name=Ath_n19_pop;t=Atha;qs=Bur_0,Can_0,Ct_1,Edi_0,Hi_0,Kn_0,Ler_0,Mt_0,No_0,Oy_0,Po_0,Rsch_4,Sf_2,Tsu_0,Wil_2,Ws_0,Wu_0,Zu_0' \
+        --plan 'name=Ath_n19_Alyr;t=Atha;qs=Bur_0,Can_0,Ct_1,Edi_0,Hi_0,Kn_0,Ler_0,Mt_0,No_0,Oy_0,Po_0,Rsch_4,Sf_2,Tsu_0,Wil_2,Ws_0,Wu_0,Zu_0,Alyr;o=Alyr' \
+        -y
+    ```
+
+2. Rest routing things.
+
+    ```bash
+    # pop_prep.pl
+    perl ~/Scripts/withncbi/pop/pop_prep.pl -p 12 -i ~/Scripts/withncbi/pop/arabidopsis82_test.yml
+
+    sh 01_file.sh
+    sh 03_strain_info.sh
+
+    # plan_ALL.sh
+    sh plan_ALL.sh
+
+    sh 1_real_chr.sh
+    sh 3_pair_cmd.sh
+    sh 4_rawphylo.sh
+    sh 5_multi_cmd.sh
+    sh 7_multi_db_only.sh
+
+    # other plans
+    sh plan_Ath_n19_pop.sh
+
+    sh 5_multi_cmd.sh
+    sh 7_multi_db_only.sh
+
+    sh Ath_n19_Alyr.sh
+
+    sh 5_multi_cmd.sh
+    sh 7_multi_db_only.sh
+
     ```
