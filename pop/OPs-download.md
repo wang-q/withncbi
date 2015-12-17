@@ -1183,3 +1183,72 @@ http://hgdownload.soe.ucsc.edu/goldenPath/ce10/multiz7way/ce10.commonNames.7way.
         -p -f Ddis.seq.csv
 
     ```
+
+## Currently not used
+
+* *Drosophila*
+
+    * Phylogenetic tree
+
+        ```bash
+        # download from http://hgdownload.soe.ucsc.edu/goldenPath/dm6/multiz27way/
+        ~/share/phast/bin/tree_doctor dm6.27way.scientificNames.nh --newick \
+            --rename "Drosophila_melanogaster -> Dmel ; Drosophila_simulans -> Dsim ; Drosophila_sechellia -> Dsech" \
+            > temp1.nwk
+
+        ~/share/phast/bin/tree_doctor temp1.nwk --newick \
+            --rename "Drosophila_yakuba -> Dyak ; Drosophila_erecta -> Dere" \
+            > temp2.nwk
+
+        ~/share/phast/bin/tree_doctor temp2.nwk --newick \
+            --rename "Drosophila_pseudoobscura_pseudoobscura -> Dpse ; Drosophila_persimilis -> Dper" \
+            > temp3.nwk
+
+        ~/share/phast/bin/tree_doctor temp3.nwk --newick \
+            --prune-all-but Dmel,Dsim,Dsech,Dyak,Dere,Dpse,Dper \
+            > fly_7way.nwk
+
+        rm temp[0-9].nwk
+        ```
+
+    * taxon
+
+        ```bash
+        --download 'name=Dmel;taxon=7227;sciname=Drosophila melanogaster' \
+        --download 'name=Dsim;taxon=7240;sciname=Drosophila simulans' \
+        --download 'name=Dsech;taxon=7238;sciname=Drosophila sechellia' \
+        --download 'name=Dyak;taxon=7245;sciname=Drosophila yakuba' \
+        --download 'name=Dere;taxon=7220;sciname=Drosophila erecta' \
+        --download 'name=Dpse;taxon=7237;sciname=Drosophila pseudoobscura' \
+        --download 'name=Dper;taxon=7234;sciname=Drosophila persimilis simulans' \
+        ```
+
+* DGRP
+
+    * taxon
+
+        ```perl
+        my @data = (
+            { taxon => 900501, name => "DGRP-138", coverage => 34, },
+            { taxon => 900502, name => "DGRP-176", coverage => 38.48, },
+            { taxon => 900503, name => "DGRP-181", coverage => 30.66, },
+            { taxon => 900504, name => "DGRP-208", coverage => 34.51, },
+            { taxon => 900505, name => "DGRP-321", coverage => 41.75, },
+            { taxon => 900506, name => "DGRP-332", coverage => 31.53, },
+            { taxon => 900507, name => "DGRP-375", coverage => 41.91, },
+            { taxon => 900508, name => "DGRP-38",  coverage => 34.1, },
+            { taxon => 900509, name => "DGRP-380", coverage => 36.73, },
+            { taxon => 900510, name => "DGRP-391", coverage => 47.62, },
+            { taxon => 900511, name => "DGRP-40",  coverage => 41.27, },
+            { taxon => 900512, name => "DGRP-406", coverage => 30.3, },
+            { taxon => 900513, name => "DGRP-443", coverage => 33.35, },
+            { taxon => 900514, name => "DGRP-517", coverage => 45.97, },
+            { taxon => 900515, name => "DGRP-57",  coverage => 38.28, },
+            { taxon => 900516, name => "DGRP-727", coverage => 33.64, },
+            { taxon => 900517, name => "DGRP-738", coverage => 31.74, },
+            { taxon => 900518, name => "DGRP-757", coverage => 32.87, },
+            { taxon => 900519, name => "DGRP-852", coverage => 40.42, },
+            { taxon => 900520, name => "DGRP-897", coverage => 32.81, },
+        );
+
+        ```
