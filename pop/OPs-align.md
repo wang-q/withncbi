@@ -1611,6 +1611,7 @@ EOF
         --plan 'name=Mouse_n11_SPRET_EiJ;t=Mouse;qs=129S1_SvImJ,A_J,AKR_J,BALB_cJ,C3H_HeJ,CBA_J,DBA_2J,LP_J,NOD_ShiLtJ,NZO_HlLtJ,SPRET_EiJ;o=SPRET_EiJ' \
         --plan 'name=Mouse_n14_pop;t=Mouse;qs=129S1_SvImJ,A_J,AKR_J,BALB_cJ,C3H_HeJ,CAROLI_EiJ,CBA_J,DBA_2J,FVB_NJ,LP_J,NOD_ShiLtJ,NZO_HlLtJ,Pahari_EiJ' \
         --plan 'name=Mouse_n14_SPRET_EiJ;t=Mouse;qs=129S1_SvImJ,A_J,AKR_J,BALB_cJ,C3H_HeJ,CAROLI_EiJ,CBA_J,DBA_2J,FVB_NJ,LP_J,NOD_ShiLtJ,NZO_HlLtJ,Pahari_EiJ,SPRET_EiJ;o=SPRET_EiJ' \
+        --plan 'name=Mouse_n5_Rat;t=Mouse;qs=CAST_EiJ,PWK_PhJ,SPRET_EiJ,WSB_EiJ,Rat;o=Rat' \
         -y
     ```
 
@@ -1634,13 +1635,14 @@ EOF
 
     # other plans
     sh plan_Mouse_n11_pop.sh
-
     sh 5_multi_cmd.sh
     sh 7_multi_db_only.sh
 
     sh plan_Mouse_n11_SPRET_EiJ.sh
-
     sh 5_multi_cmd.sh
     sh 7_multi_db_only.sh
 
+    sh plan_Mouse_n5_Rat.sh
+    sh 5_multi_cmd.sh
+    sh 7_multi_db_only.sh    
     ```
