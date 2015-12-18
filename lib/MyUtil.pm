@@ -23,23 +23,12 @@ use vars qw(@ISA @EXPORT_OK %EXPORT_TAGS);
 %EXPORT_TAGS = (
     all => [
         qw{
-            replace_home wgs_worker find_ancestor find_group abbr abbr_most
+            wgs_worker find_ancestor find_group abbr abbr_most
             },
     ],
 );
 
 @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
-
-sub replace_home {
-    my $path = shift;
-
-    if ( $path =~ /^\~\// ) {
-        $path =~ s/^\~\///;
-        $path = File::Spec->catdir( File::HomeDir->my_home, $path );
-    }
-
-    return $path;
-}
 
 sub wgs_worker {
     my $term = shift;
@@ -73,8 +62,7 @@ sub wgs_worker {
 
         for my $table (@tables) {
             print " " x 4 . "Extract from table ", $table, "\n";
-            my $te
-                = HTML::TableExtract->new( attribs => { class => $table, }, );
+            my $te = HTML::TableExtract->new( attribs => { class => $table, }, );
             $te->parse($page);
 
             my %srr_info;
@@ -240,9 +228,7 @@ sub find_group {
                             }
                         }
                         elsif ( $phylum eq 'Chordata' ) {
-                            if ( grep {/^(Testudines|Lepidosauria|Crocodylia)$/}
-                                @names )
-                            {
+                            if ( grep {/^(Testudines|Lepidosauria|Crocodylia)$/} @names ) {
                                 $subgroup = 'Reptiles';
                             }
                             elsif (
@@ -358,7 +344,7 @@ WORD: for my $word ( @{$list} ) {
 sub abbr_most {
     my $list  = shift;
     my $min   = shift;
-    my $creat = shift; # don't abbreviate 1 letter. "I'd spell creat with an e."
+    my $creat = shift;    # don't abbreviate 1 letter. "I'd spell creat with an e."
     return {} unless @{$list};
 
     # don't abbreviate

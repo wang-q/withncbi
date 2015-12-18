@@ -3,8 +3,9 @@ use strict;
 use warnings;
 use autodie;
 
-use Getopt::Long;
-use Pod::Usage;
+use Getopt::Long qw(HelpMessage);
+use Config::Tiny;
+use FindBin;
 use YAML qw(Dump Load DumpFile LoadFile);
 
 use WWW::Mechanize;
@@ -14,29 +15,33 @@ use AlignDB::Run;
 #----------------------------------------------------------#
 # GetOpt section
 #----------------------------------------------------------#
-my $gi_file          = '';
-my $length_threshold = 10;
-my $outfile          = undef;
-my $failed_file      = undef;
-my $parallel         = 5;
-my $batch_number     = 100;
 
-my $man  = 0;
-my $help = 0;
+=head1 NAME
+
+fetch_gi_seq.pl - Fetch fasta file of gi's from NCBI
+
+=head1 SYNOPSIS
+
+    perl fetch_gi_seq.pl [options]
+      Options:
+        --help      -?          brief help message
+        --length                length threshold
+        --infile                gi filename
+        --outfile                output dir of fasta files
+        --length                length threshold
+        --parallel              run in parallel mode
+
+=cut
 
 GetOptions(
-    'help'       => \$help,
-    'man'        => \$man,
-    'length=i'   => \$length_threshold,
-    'infile=s'   => \$gi_file,
-    'outfile=s'  => \$outfile,
-    'failed=s'   => \$failed_file,
-    'parallel=i' => \$parallel,
-    'batch=i'    => \$batch_number,
-) or pod2usage(2);
-
-pod2usage(1) if $help;
-pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
+    'help|?' => sub { HelpMessage(0) },
+    'length=i' => \( my $length_threshold = 10 ),
+    'infile=s' => \( my $gi_file          = '' ),
+    'outfile=s'  => \my $outfile,
+    'failed=s'   => \my $failed_file,
+    'parallel=i' => \( my $parallel = 4 ),
+    'batch=i'    => \( my $batch_number = 100 ),
+) or HelpMessage(1);
 
 unless ( defined $outfile ) {
     $outfile = $gi_file;
@@ -89,8 +94,7 @@ my $worker = sub {
 GET: while ( scalar @gids ) {
         my $gi = shift @gids;
 
-        my $url = join '',
-            ( $url_part_1, $url_part_2, $url_part_3, $gi, $url_part_4 );
+        my $url = join '', ( $url_part_1, $url_part_2, $url_part_3, $gi, $url_part_4 );
 
         print "Getting gi: [$gi]\n";
         $mech->get($url);
@@ -151,21 +155,3 @@ $run->run;
 exit;
 
 __END__
-
-=head1 NAME
-
-fetch_gi_seq.pl - Fetch fasta file of gi's from NCBI
-
-=head1 SYNOPSIS
-
-    perl fetch_gi_seq.pl [options]
-        Options:
-            --help              brief help message
-            --man               full documentation
-            --length            length threshold
-            --infile            gi filename
-            --outfile            output dir of fasta files
-            --length            length threshold
-            --parallel          run in parallel mode
-
-=cut

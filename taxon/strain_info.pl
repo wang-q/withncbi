@@ -3,28 +3,24 @@ use strict;
 use warnings;
 use autodie;
 
-use Getopt::Long;
-use Pod::Usage;
+use Getopt::Long qw(HelpMessage);
 use Config::Tiny;
+use FindBin;
 use YAML qw(Dump Load DumpFile LoadFile);
 
-use DBI;
+use Path::Tiny;
 use Text::CSV_XS;
-use DateTime::Format::Natural;
-use List::MoreUtils qw(any all uniq);
-
 use Bio::DB::Taxonomy;
 
 use AlignDB::Stopwatch;
 
-use FindBin;
-use lib "$FindBin::Bin/../lib";
-use MyUtil qw(replace_home);
+use lib "$FindBin::RealBin/../lib";
+use MyUtil qw(find_ancestor);
 
 #----------------------------------------------------------#
 # GetOpt section
 #----------------------------------------------------------#
-my $Config = Config::Tiny->read("$FindBin::Bin/../config.ini");
+my $Config = Config::Tiny->read("$FindBin::RealBin/../config.ini");
 
 # record ARGV and Config
 my $stopwatch = AlignDB::Stopwatch->new(
@@ -33,41 +29,52 @@ my $stopwatch = AlignDB::Stopwatch->new(
     program_conf => $Config,
 );
 
-my @ids;
-my %name_of;
+=head1 NAME
 
-my $stdin;
-my $stdin_with_name;
+strain_info.pl - generate a csv file for taxonomy info
 
-# for arbitrary ids
-my %species_of;
+=head1 SYNOPSIS
+
+    perl strain_info.pl [options]
+      Options:
+        --help              brief help message
+        --man               full documentation
+        -o, --file STR      output filename
+        --id @INT           ids
+        --stdin             Read ids from stdin, --id is still working
+        --withname          stdin is id,name, 9606,Human
+        --name INT=STR      Assign name to id
+        --species INT=STR   fake id need this
+        --simple            means use subspecies strain name as name
+        --entrez            don't use local taxdmp
+
+=head1 EXAMPLE
+
+    perl strain_info.pl \
+        --file   yeast_ncbi.csv \
+        --simple \
+        --id     559292         \
+        --id     285006         \
+        --id     307796         \
+        --id     226125         \
+        --name   226125=Spar
+
+=cut
 
 # running options
-my $td_dir = replace_home( $Config->{path}{td} );    # taxdmp
-
-my $filename = "strains_taxon_info.csv";
-
-my $simple;
-my $entrez;
-
-my $man  = 0;
-my $help = 0;
+my $td_dir = path( $Config->{path}{td} )->stringify;    # taxdmp
 
 GetOptions(
-    'help'      => \$help,
-    'man'       => \$man,
-    'id=i'      => \@ids,
-    'stdin'     => \$stdin,
-    'withname'  => \$stdin_with_name,
-    'name=s'    => \%name_of,
-    'species=s' => \%species_of,
-    'o|file=s'  => \$filename,
-    'simple'    => \$simple,
-    'entrez'    => \$entrez,
-) or pod2usage(2);
-
-pod2usage(1) if $help;
-pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
+    'help|?'    => sub { HelpMessage(0) },
+    'id=i'      => \my @ids,
+    'stdin'     => \my $stdin,
+    'withname'  => \my $stdin_with_name,
+    'name=s'    => \my %name_of,
+    'species=s' => \my %species_of,
+    'file|o=s' => \( my $filename = "strains_taxon_info.csv" ),
+    'simple'   => \my $simple,
+    'entrez'   => \my $entrez,
+) or HelpMessage(1);
 
 #----------------------------------------------------------#
 # init
@@ -179,54 +186,4 @@ close $csv_fh;
 $stopwatch->end_message;
 exit;
 
-#----------------------------------------------------------#
-# Subroutines
-#----------------------------------------------------------#
-sub find_ancestor {
-    my $taxon = shift;
-    my $rank = shift || 'species';
-
-    return $taxon if $taxon->rank eq $rank;
-
-RANK: while (1) {
-        $taxon = $taxon->ancestor;
-        last RANK unless defined $taxon;
-        return $taxon if $taxon->rank eq $rank;
-    }
-
-    return;
-}
-
 __END__
-
-=head1 NAME
-
-strain_info.pl - generate a csv file for taxonomy info
-
-=head1 SYNOPSIS
-
-    perl strain_info.pl [options]
-      Options:
-        --help              brief help message
-        --man               full documentation
-        -o, --file STR      output filename
-        --id @INT           ids
-        --stdin             Read ids from stdin, --id is still working
-        --withname          stdin is id,name, 9606,Human
-        --name INT=STR      Assign name to id
-        --species INT=STR   fake id need this
-        --simple            means use subspecies strain name as name
-        --entrez            don't use local taxdmp
-
-=head1 EXAMPLE
-
-    perl strain_info.pl \
-        --file   yeast_ncbi.csv \
-        --simple \
-        --id     559292         \
-        --id     285006         \
-        --id     307796         \
-        --id     226125         \
-        --name   226125=Spar
-
-=cut

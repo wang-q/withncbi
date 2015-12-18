@@ -3,9 +3,9 @@ use strict;
 use warnings;
 use autodie;
 
-use Getopt::Long;
-use Pod::Usage;
+use Getopt::Long qw(HelpMessage);
 use Config::Tiny;
+use FindBin;
 use YAML qw(Dump Load DumpFile LoadFile);
 
 use File::Find::Rule;
@@ -23,14 +23,13 @@ use Bio::DB::Taxonomy;
 use AlignDB::IntSpan;
 use AlignDB::Stopwatch;
 
-use FindBin;
-use lib "$FindBin::Bin/../lib";
-use MyUtil qw(replace_home find_ancestor);
+use lib "$FindBin::RealBin/../lib";
+use MyUtil qw(find_ancestor);
 
 #----------------------------------------------------------#
 # GetOpt section
 #----------------------------------------------------------#
-my $Config = Config::Tiny->read("$FindBin::Bin/../config.ini");
+my $Config = Config::Tiny->read("$FindBin::RealBin/../config.ini");
 
 # record ARGV and Config
 my $stopwatch = AlignDB::Stopwatch->new(
@@ -39,78 +38,47 @@ my $stopwatch = AlignDB::Stopwatch->new(
     program_conf => $Config,
 );
 
-# running options
-my $seq_dir     = "~/data/bacteria/bac_seq_dir";
-my $working_dir = ".";
+=head1 NAME
 
-my $parent_id = "562,585054";    # E.coli and E. fergusonii
-my $target_id;
-my $outgroup_id;
-my $exclude_ids = '0';
+bac_prepare.pl
 
-# is self alignment (paralog)
-my $is_self;
+=head1 SYNOPSIS
 
-# paralog length
-my $paralog_length = 1000;
+    perl bac_prepare.pl --base_dir d:/bacteria/bacteria_101015 --parent 562
+    perl d:/wq/Scripts/tool/replace.pl -d d:/wq/Scripts/alignDB/bac -p "cmd.bat" -f /home/wangq -r d:/wq
 
-# use custom name_str
-# working dir and goal db name
-# mysql restrict db name length 64
-my $name_str;
-
-# Database init values
-my $server   = $Config->{database}{server};
-my $port     = $Config->{database}{port};
-my $username = $Config->{database}{username};
-my $password = $Config->{database}{password};
-my $db_name  = $Config->{database}{db};
-
-# download sequences via get_seq.pl if not existing
-my $get_seq;
-
-# including scaffolds and contigs
-my $scaffold;
+=cut
 
 # paths
-my $td_dir  = replace_home( $Config->{path}{td} );     # taxdmp
-my $nb_dir  = replace_home( $Config->{path}{nb} );     # NCBI genomes bac
-my $nbd_dir = replace_home( $Config->{path}{nbd} );    # NCBI genomes bac draft
-my $ngbd_dir
-    = replace_home( $Config->{path}{ngbd} );           # NCBI genbank genomes bac draft
-
-# run in parallel mode
-my $parallel = $Config->{run}{parallel};
-
-my $man  = 0;
-my $help = 0;
+my $td_dir   = path( $Config->{path}{td} )->stringify;      # taxdmp
+my $nb_dir   = path( $Config->{path}{nb} )->stringify;      # NCBI genomes bac
+my $nbd_dir  = path( $Config->{path}{nbd} )->stringify;     # NCBI genomes bac draft
+my $ngbd_dir = path( $Config->{path}{ngbd} )->stringify;    # NCBI genbank genomes bac draft
 
 GetOptions(
-    'help'           => \$help,
-    'man'            => \$man,
-    's|server=s'     => \$server,
-    'P|port=i'       => \$port,
-    'u|username=s'   => \$username,
-    'p|password=s'   => \$password,
-    'd|db=s'         => \$db_name,
-    'seq_dir=s'      => \$seq_dir,
-    'working_dir=s'  => \$working_dir,
-    'p|parent_id=s'  => \$parent_id,
-    't|target_id=i'  => \$target_id,
-    'o|r|outgroup=i' => \$outgroup_id,
-    'e|exclude=s'    => \$exclude_ids,
-    'n|name_str=s'   => \$name_str,
-    'is_self'        => \$is_self,
-    'length=i'       => \$paralog_length,
-    'get_seq'        => \$get_seq,
-    'scaffold'       => \$scaffold,
-    'parallel=i'     => \$parallel,
-) or pod2usage(2);
+    'help|?' => sub { HelpMessage(0) },
+    'server|s=s'    => \( my $server      = $Config->{database}{server} ),
+    'port|P=i'      => \( my $port        = $Config->{database}{port} ),
+    'db|d=s'        => \( my $db_name     = $Config->{database}{db} ),
+    'username|u=s'  => \( my $username    = $Config->{database}{username} ),
+    'password|p=s'  => \( my $password    = $Config->{database}{password} ),
+    'seq_dir=s'     => \( my $seq_dir     = "~/data/bacteria/bac_seq_dir" ),
+    'working_dir=s' => \( my $working_dir = "." ),
+    'parent_id|p=s' => \( my $parent_id = "562,585054" ),    # E.coli and E. fergusonii
+    'target_id|t=i' => \my $target_id,
+    'r|outgroup|o=i' => \my $outgroup_id,
+    'exclude|e=s'    => \( my $exclude_ids = '0' ),
+    'name_str|n=s'   => \
+        my $name_str
+    ,    # use custom name_str, working dir and goal db name. mysql restrict db name length 64
+    'is_self' => \my $is_self,                       # is self alignment (paralog)
+    'length=i' => \( my $paralog_length = 1000 ),    # paralog length
+    'get_seq'  => \my $get_seq,     # download sequences via get_seq.pl if not existing
+    'scaffold' => \my $scaffold,    # including scaffolds and contigs
+    'parallel=i' => \( my $parallel = $Config->{run}{parallel} ),
+) or HelpMessage(1);
 
-pod2usage(1) if $help;
-pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
-
-$seq_dir = replace_home($seq_dir);
+$seq_dir = path($seq_dir)->stringify;
 
 #----------------------------------------------------------#
 # init
@@ -519,6 +487,3 @@ sub prep_scaff {
 }
 
 __END__
-
-perl bac_prepare.pl --base_dir d:/bacteria/bacteria_101015 --parent 562
-perl d:/wq/Scripts/tool/replace.pl -d d:/wq/Scripts/alignDB/bac -p "cmd.bat" -f /home/wangq -r d:/wq

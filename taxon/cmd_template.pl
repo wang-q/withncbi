@@ -3,42 +3,42 @@ use strict;
 use warnings;
 use autodie;
 
-use Getopt::Long;
-use Pod::Usage;
+use Getopt::Long qw(HelpMessage);
 use Config::Tiny;
+use FindBin;
 use YAML qw(Dump Load DumpFile LoadFile);
 
 use Template;
 
-use FindBin;
-use lib "$FindBin::Bin/../lib";
-use MyUtil qw(replace_home);
-
 #----------------------------------------------------------#
 # GetOpt section
 #----------------------------------------------------------#
-my $Config = Config::Tiny->read("$FindBin::Bin/../config.ini");
+my $Config = Config::Tiny->read("$FindBin::RealBin/../config.ini");
 
-my $seq_dir;
-my $taxon_file;
+=head1 NAME
 
-my $withncbi = replace_home( $Config->{run}{withncbi} );    # withncbi path
+cmd_template.pl - Simple template for strain_bz.pl
 
-my $parallel = 4;
+=head1 SYNOPSIS
 
-my $man  = 0;
-my $help = 0;
+    cat <file> | perl cmd_template.pl [options]
+      Options:
+        --help              brief help message
+        --man               full documentation
+        --seq_dir           ~/data/organelle/plastid_genomes
+        --taxon_file        ~/data/organelle/plastid_genomes/plastid_ncbi.csv
+        --parallel          number of child processes
+
+=cut
+
+my $withncbi = path( $Config->{run}{withncbi} )->stringify;    # withncbi path
 
 GetOptions(
-    'help'         => \$help,
-    'man'          => \$man,
-    'seq_dir=s'    => \$seq_dir,
-    'taxon_file=s' => \$taxon_file,
-    'parallel=i'   => \$parallel,
-) or pod2usage(2);
-
-pod2usage(1) if $help;
-pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
+    'help|?'       => sub { HelpMessage(0) },
+    'seq_dir=s'    => \my $seq_dir,
+    'taxon_file=s' => \my $taxon_file,
+    'parallel=i' => \( my $parallel = 4 ),
+) or HelpMessage(1);
 
 #----------------------------------------------------------#
 # start
@@ -91,19 +91,3 @@ while (<>) {
 exit;
 
 __END__
-
-=head1 NAME
-
-cmd_template.pl - Simple template for strain_bz.pl
-
-=head1 SYNOPSIS
-
-    cat <file> | perl cmd_template.pl [options]
-      Options:
-        --help              brief help message
-        --man               full documentation
-        --seq_dir           ~/data/organelle/plastid_genomes
-        --taxon_file        ~/data/organelle/plastid_genomes/plastid_ncbi.csv
-        --parallel          number of child processes
-
-=cut
