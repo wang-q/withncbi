@@ -801,11 +801,10 @@ EOF
     sh 5_multi_cmd.sh
     sh 7_multi_db_only.sh
 
-    sh Ath_n19_Alyr.sh
+    sh plan_Ath_n19_Alyr.sh
 
     sh 5_multi_cmd.sh
     sh 7_multi_db_only.sh
-
     ```
 
 ## *Orazy sativa* Japonica 24 genomes
@@ -1547,22 +1546,46 @@ EOF
     cat <<EOF > mouse82_data.yml
 ---
 data:
-  - coverage: 25
-    name: Bur_0
-    origin: Ireland
-    original_id: 3702
-  - coverage: 47
-    name: Can_0
-    origin: Canary Isles
-    original_id: 3702
-  - coverage: 50
-    name: Ct_1
-    origin: Italy
-    original_id: 3702
-  - coverage: 52
-    name: Edi_0
-    origin: Scotland
-    original_id: 3702
+  - name: 129S1_SvImJ
+    original_id: 10090
+  - name: A_J
+    original_id: 10090
+  - name: AKR_J
+    original_id: 10090
+  - name: BALB_cJ
+    original_id: 10090
+  - name: C3H_HeJ
+    original_id: 10090
+  - name: C57BL_6NJ
+    original_id: 10090
+  - name: CAROLI_EiJ
+    original_id: 10090
+  - name: CAST_EiJ
+    taxon: 10091
+    sciname: Mus musculus castaneus
+  - name: CBA_J
+    original_id: 10090
+  - name: DBA_2J
+    original_id: 10090
+  - name: FVB_NJ
+    original_id: 10090
+  - name: LP_J
+    original_id: 10090
+  - name: NOD_ShiLtJ
+    original_id: 10090
+  - name: NZO_HlLtJ
+    original_id: 10090
+  - name: Pahari_EiJ
+    original_id: 10090
+  - name: PWK_PhJ
+    taxon: 39442
+    sciname: Mus musculus musculus
+  - name: SPRET_EiJ
+    taxon: 10096
+    sciname: Mus spretus
+  - name: WSB_EiJ
+    taxon: 10092
+    sciname: Mus musculus domesticus
 EOF
     ```
 
@@ -1582,9 +1605,12 @@ EOF
         --opt base_dir='~/data/alignment' \
         --opt data_dir='~/data/alignment/mouse82' \
         --dd ~/data/alignment/Ensembl \
-        --download 'name=Mouse;taxon=10090;sciname=Arabidopsis thaliana' \
-        --plan 'name=Ath_n19_pop;t=Atha;qs=Bur_0,Can_0,Ct_1,Edi_0,Hi_0,Kn_0,Ler_0,Mt_0,No_0,Oy_0,Po_0,Rsch_4,Sf_2,Tsu_0,Wil_2,Ws_0,Wu_0,Zu_0' \
-        --plan 'name=Ath_n19_Alyr;t=Atha;qs=Bur_0,Can_0,Ct_1,Edi_0,Hi_0,Kn_0,Ler_0,Mt_0,No_0,Oy_0,Po_0,Rsch_4,Sf_2,Tsu_0,Wil_2,Ws_0,Wu_0,Zu_0,Alyr;o=Alyr' \
+        --download 'name=Mouse;taxon=10090;sciname=Mus musculus' \
+        --download 'name=Rat;taxon=10116;sciname=Rattus norvegicus' \
+        --plan 'name=Mouse_n11_pop;t=Mouse;qs=129S1_SvImJ,A_J,AKR_J,BALB_cJ,C3H_HeJ,CBA_J,DBA_2J,LP_J,NOD_ShiLtJ,NZO_HlLtJ' \
+        --plan 'name=Mouse_n11_SPRET_EiJ;t=Mouse;qs=129S1_SvImJ,A_J,AKR_J,BALB_cJ,C3H_HeJ,CBA_J,DBA_2J,LP_J,NOD_ShiLtJ,NZO_HlLtJ,SPRET_EiJ;o=SPRET_EiJ' \
+        --plan 'name=Mouse_n14_pop;t=Mouse;qs=129S1_SvImJ,A_J,AKR_J,BALB_cJ,C3H_HeJ,CAROLI_EiJ,CBA_J,DBA_2J,FVB_NJ,LP_J,NOD_ShiLtJ,NZO_HlLtJ,Pahari_EiJ' \
+        --plan 'name=Mouse_n14_SPRET_EiJ;t=Mouse;qs=129S1_SvImJ,A_J,AKR_J,BALB_cJ,C3H_HeJ,CAROLI_EiJ,CBA_J,DBA_2J,FVB_NJ,LP_J,NOD_ShiLtJ,NZO_HlLtJ,Pahari_EiJ,SPRET_EiJ;o=SPRET_EiJ' \
         -y
     ```
 
@@ -1592,7 +1618,7 @@ EOF
 
     ```bash
     # pop_prep.pl
-    perl ~/Scripts/withncbi/pop/pop_prep.pl -p 12 -i ~/Scripts/withncbi/pop/arabidopsis82_test.yml
+    perl ~/Scripts/withncbi/pop/pop_prep.pl -p 12 -i ~/Scripts/withncbi/pop/mouse82_test.yml
 
     sh 01_file.sh
     sh 03_strain_info.sh
@@ -1607,12 +1633,12 @@ EOF
     sh 7_multi_db_only.sh
 
     # other plans
-    sh plan_Ath_n19_pop.sh
+    sh plan_Mouse_n11_pop.sh
 
     sh 5_multi_cmd.sh
     sh 7_multi_db_only.sh
 
-    sh Ath_n19_Alyr.sh
+    sh plan_Mouse_n11_SPRET_EiJ.sh
 
     sh 5_multi_cmd.sh
     sh 7_multi_db_only.sh

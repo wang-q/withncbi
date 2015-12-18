@@ -1204,7 +1204,7 @@ http://hgdownload.soe.ucsc.edu/goldenPath/ce10/multiz7way/ce10.commonNames.7way.
     # rsync -avP wangq@45.79.80.100:data/alignment/others/sanger-mouse/ ~/data/alignment/others/sanger-mouse
     ```
 
-3. Reference strain C57BL/6J (GRCm38) from ensembl.
+3. Reference strain C57BL/6J (GRCm38) and rat from ensembl.
 
     ```bash
     # Mouse
@@ -1221,6 +1221,24 @@ http://hgdownload.soe.ucsc.edu/goldenPath/ce10/multiz7way/ce10.commonNames.7way.
     cat JH*.fa >> Un.fa
 
     rm GL*.fa JH*.fa
+
+    mv Y.fa Y.fa.skip
+    mv MT.fa MT.fa.skip
+
+    # Rat
+    mkdir -p ~/data/alignment/Ensembl/Rat
+    cd ~/data/alignment/Ensembl/Rat
+
+    find ~/data/ensembl82/fasta/rattus_norvegicus/dna/ -name "*dna_sm.toplevel*" | xargs gzip -d -c > toplevel.fa
+    faops count toplevel.fa | perl -aln -e 'next if $F[0] eq 'total'; print $F[0] if $F[1] > 50000; print $F[0] if $F[1] > 5000  and $F[6]/$F[1] < 0.05' | uniq > listFile
+    faops some toplevel.fa listFile toplevel.filtered.fa
+    faops split-name toplevel.filtered.fa .
+    rm toplevel.fa toplevel.filtered.fa listFile
+
+    cat KL*.fa > Un.fa
+    cat AABR*.fa >> Un.fa
+
+    rm KL*.fa AABR*.fa
 
     mv Y.fa Y.fa.skip
     mv MT.fa MT.fa.skip
