@@ -1,21 +1,20 @@
 #!/usr/bin/perl
 use strict;
 use warnings;
+use autodie;
 
-use Getopt::Long;
-use Pod::Usage;
+use Getopt::Long qw(HelpMessage);
 use Config::Tiny;
+use FindBin;
 use YAML qw(Dump Load DumpFile LoadFile);
 
 use AlignDB::Stopwatch;
 use AlignDB::ToXLSX;
 
-use FindBin;
-
 #----------------------------------------------------------#
 # GetOpt section
 #----------------------------------------------------------#
-my $Config = Config::Tiny->read("$FindBin::Bin/../config.ini");
+my $Config = Config::Tiny->read("$FindBin::RealBin/../config.ini");
 
 # record ARGV and Config
 my $stopwatch = AlignDB::Stopwatch->new(
@@ -24,32 +23,25 @@ my $stopwatch = AlignDB::Stopwatch->new(
     program_conf => $Config,
 );
 
-# Database init values
-my $server   = $Config->{database}{server};
-my $port     = $Config->{database}{port};
-my $username = $Config->{database}{username};
-my $password = $Config->{database}{password};
-my $db_name  = $Config->{database}{db};
+=head1 NAME
 
-# running options
-my $outfile;
+gr_overview.pl - Overviews for NCBI GENOME_REPORTS
 
-my $man  = 0;
-my $help = 0;
+=head1 SYNOPSIS
+
+    perl gr_overview.pl --db gr
+
+=cut
 
 GetOptions(
-    'help'         => \$help,
-    'man'          => \$man,
-    's|server=s'   => \$server,
-    'P|port=i'     => \$port,
-    'u|username=s' => \$username,
-    'p|password=s' => \$password,
-    'd|db=s'       => \$db_name,
-    'o|output=s'   => \$outfile,
-) or pod2usage(2);
-
-pod2usage(1) if $help;
-pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
+    'help|?' => sub { HelpMessage(0) },
+    'server|s=s'   => \( my $server   = $Config->{database}{server} ),
+    'port|P=i'     => \( my $port     = $Config->{database}{port} ),
+    'db|d=s'       => \( my $db_name  = $Config->{database}{db} ),
+    'username|u=s' => \( my $username = $Config->{database}{username} ),
+    'password|p=s' => \( my $password = $Config->{database}{password} ),
+    'output|o=s'   => \my $outfile,
+) or HelpMessage(1);
 
 unless ($outfile) {
     $outfile = $db_name . "_overview.xlsx";
@@ -87,8 +79,7 @@ my $strains = sub {
             sheet_row => $sheet_row,
             sheet_col => $sheet_col,
         );
-        ( $sheet, $sheet_row )
-            = $to_xlsx->write_header_sql( $sheet_name, \%option );
+        ( $sheet, $sheet_row ) = $to_xlsx->write_header_sql( $sheet_name, \%option );
     }
 
     {    # write contents
@@ -127,8 +118,7 @@ my $species = sub {
             sheet_col => $sheet_col,
             header    => \@headers,
         );
-        ( $sheet, $sheet_row )
-            = $to_xlsx->write_header_direct( $sheet_name, \%option );
+        ( $sheet, $sheet_row ) = $to_xlsx->write_header_direct( $sheet_name, \%option );
     }
 
     {    # write contents
@@ -177,8 +167,7 @@ my $gc_checklist = sub {
             sheet_col => $sheet_col,
             header    => \@headers,
         );
-        ( $sheet, $sheet_row )
-            = $to_xlsx->write_header_direct( $sheet_name, \%option );
+        ( $sheet, $sheet_row ) = $to_xlsx->write_header_direct( $sheet_name, \%option );
     }
 
     {    # write contents
@@ -227,8 +216,7 @@ my $gr_gc_checklist = sub {
             sheet_col => $sheet_col,
             header    => \@headers,
         );
-        ( $sheet, $sheet_row )
-            = $to_xlsx->write_header_direct( $sheet_name, \%option );
+        ( $sheet, $sheet_row ) = $to_xlsx->write_header_direct( $sheet_name, \%option );
     }
 
     {    # write contents
@@ -272,13 +260,3 @@ $stopwatch->end_message;
 exit;
 
 __END__
-
-=head1 NAME
-
-gr_overview.pl - Overviews for NCBI GENOME_REPORTS
-
-=head1 SYNOPSIS
-
-    perl gr_overview.pl --db gr
-
-=cut

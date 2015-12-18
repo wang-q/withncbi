@@ -3,26 +3,22 @@ use strict;
 use warnings;
 use autodie;
 
-use Getopt::Long;
-use Pod::Usage;
+use Getopt::Long qw(HelpMessage);
 use Config::Tiny;
+use FindBin;
 use YAML qw(Dump Load DumpFile LoadFile);
 
 use DBI;
+use Path::Tiny;
 use Text::CSV_XS;
-use File::Slurp;
-use List::MoreUtils qw(any all uniq);
+use List::MoreUtils qw(uniq);
 
 use AlignDB::Stopwatch;
-
-use FindBin;
-use lib "$FindBin::Bin/../lib";
-use MyUtil qw(replace_home);
 
 #----------------------------------------------------------#
 # GetOpt section
 #----------------------------------------------------------#
-my $Config = Config::Tiny->read("$FindBin::Bin/../config.ini");
+my $Config = Config::Tiny->read("$FindBin::RealBin/../config.ini");
 
 # record ARGV and Config
 my $stopwatch = AlignDB::Stopwatch->new(
@@ -31,41 +27,36 @@ my $stopwatch = AlignDB::Stopwatch->new(
     program_conf => $Config,
 );
 
-# Database init values
-my $server   = $Config->{database}{server};
-my $port     = $Config->{database}{port};
-my $username = $Config->{database}{username};
-my $password = $Config->{database}{password};
-my $db_name  = $Config->{database}{db};
+=head1 NAME
 
-my $init_sql = "$FindBin::Bin/../init.sql";
+gr_db.pl
 
-# running options
-my $strain_file = "prok_strains.csv";
-my $gr_dir      = replace_home( $Config->{path}{gr} );
+=head1 SYNOPSIS
 
-# append euk
-my $append;
+    # linux, mac
+    perl gr_db.pl --db gr --file prok_strains.csv
+    
+    perl gr_db.pl --db gr --append --file euk_strains.csv
+    
+    # windows
+    perl gr_db.pl --db gr --file prok_strains.csv --gr d:/data/NCBI/genomes/GENOME_REPORTS
+    
+    perl gr_db.pl --db gr --append --file euk_strains.csv --gr d:/data/NCBI/genomes/GENOME_REPORTS
 
-my $man  = 0;
-my $help = 0;
+=cut
 
 GetOptions(
-    'help'         => \$help,
-    'man'          => \$man,
-    's|server=s'   => \$server,
-    'P|port=i'     => \$port,
-    'u|username=s' => \$username,
-    'p|password=s' => \$password,
-    'd|db=s'       => \$db_name,
-    'init_sql=s'   => \$init_sql,
-    'file=s'       => \$strain_file,
-    'gr=s'         => \$gr_dir,
-    'append'       => \$append,
-) or pod2usage(2);
-
-pod2usage(1) if $help;
-pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
+    'help|?' => sub { HelpMessage(0) },
+    'server|s=s'   => \( my $server      = $Config->{database}{server} ),
+    'port|P=i'     => \( my $port        = $Config->{database}{port} ),
+    'db|d=s'       => \( my $db_name     = $Config->{database}{db} ),
+    'username|u=s' => \( my $username    = $Config->{database}{username} ),
+    'password|p=s' => \( my $password    = $Config->{database}{password} ),
+    'init_sql=s'   => \( my $init_sql    = "$FindBin::RealBin/../init.sql" ),
+    'file=s'       => \( my $strain_file = "prok_strains.csv" ),
+    'gr=s'         => \( my $gr_dir      = path( $Config->{path}{gr} )->stringify ),
+    'append' => \my $append,    # append euk
+) or HelpMessage(1);
 
 #----------------------------------------------------------#
 # init
@@ -85,11 +76,8 @@ if ( !$append ) {
     # don't need this and crash under win32
     #$drh->func( 'reload',   $db_name, $server, $username, $password, 'admin' );
 
-    my $dbh
-        = DBI->connect( "dbi:mysql:$db_name:$server", $username, $password );
-    open my $infh, '<', $init_sql;
-    my $content = do { local $/; <$infh> };
-    close $infh;
+    my $dbh        = DBI->connect( "dbi:mysql:$db_name:$server", $username, $password );
+    my $content    = path($init_sql)->slurp;
     my @statements = grep {/\w/} split /;/, $content;
     for (@statements) {
         $dbh->do($_) or die $dbh->errstr;
@@ -127,12 +115,9 @@ if ( !$append ) {
     $dbh->do(q{ ALTER TABLE gr ADD COLUMN code text });
 
     my @references;
-    for my $file (
-        "$gr_dir/prok_reference_genomes.txt",
-        "$gr_dir/prok_representative_genomes.txt"
-        )
+    for my $file ( "$gr_dir/prok_reference_genomes.txt", "$gr_dir/prok_representative_genomes.txt" )
     {
-        my @lines = read_file( $file, chomp => 1, );
+        my @lines = path($file)->lines( { chomp => 1, } );
         push @references, @lines;
     }
 
@@ -234,21 +219,3 @@ $stopwatch->end_message;
 exit;
 
 __END__
-
-=head1 NAME
-
-gr_db.pl
-
-=head1 SYNOPSIS
-
-    # linux, mac
-    perl gr_db.pl --db gr --file prok_strains.csv
-    
-    perl gr_db.pl --db gr --append --file euk_strains.csv
-    
-    # windows
-    perl gr_db.pl --db gr --file prok_strains.csv --gr d:/data/NCBI/genomes/GENOME_REPORTS
-    
-    perl gr_db.pl --db gr --append --file euk_strains.csv --gr d:/data/NCBI/genomes/GENOME_REPORTS
-
-=cut

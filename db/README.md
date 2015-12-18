@@ -61,7 +61,6 @@ rsync -av -P ftp.ncbi.nlm.nih.gov::genbank/genomes/Bacteria/ \
 
 rsync -av -P ftp.ncbi.nlm.nih.gov::genbank/genomes/Bacteria_DRAFT/ \
     ~/data/NCBI/genbank/genomes/Bacteria_DRAFT/
-
 ```
 
 ## Databases
@@ -93,7 +92,7 @@ perl gr_overview.pl --db gr_prok
 perl gr_overview.pl --db gr_euk
 ```
 
-### Assembly reprots
+### Assembly reports
 
 ```bash
 cd ~/Scripts/withncbi/db

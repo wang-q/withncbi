@@ -3,12 +3,13 @@ use strict;
 use warnings;
 use autodie;
 
-use Getopt::Long;
-use Pod::Usage;
+use Getopt::Long qw(HelpMessage);
 use Config::Tiny;
+use FindBin;
 use YAML qw(Dump Load DumpFile LoadFile);
 
 use DBI;
+use Path::Tiny;
 use Text::CSV_XS;
 use Bio::Taxon;
 use Bio::DB::Taxonomy;
@@ -17,14 +18,13 @@ use List::MoreUtils qw(any all uniq);
 
 use AlignDB::Stopwatch;
 
-use FindBin;
-use lib "$FindBin::Bin/../lib";
-use MyUtil qw(replace_home find_ancestor);
+use lib "$FindBin::RealBin/../lib";
+use MyUtil qw(find_ancestor);
 
 #----------------------------------------------------------#
 # GetOpt section
 #----------------------------------------------------------#
-my $Config = Config::Tiny->read("$FindBin::Bin/../config.ini");
+my $Config = Config::Tiny->read("$FindBin::RealBin/../config.ini");
 
 # record ARGV and Config
 my $stopwatch = AlignDB::Stopwatch->new(
@@ -33,27 +33,27 @@ my $stopwatch = AlignDB::Stopwatch->new(
     program_conf => $Config,
 );
 
+=head1 NAME
+
+gr_strains.pl
+
+=head1 SYNOPSIS
+
+    perl gr_strains.pl -o prok_strains.csv
+
+    perl gr_strains.pl --euk -o euk_strains.csv
+
+=cut
+
 # running options
-my $gr_dir = replace_home( $Config->{path}{gr} );    # genome report
-my $td_dir = replace_home( $Config->{path}{td} );    # taxdmp
-
-# eukaryotes instead of prokaryotes
-my $euk;
-
-my $strain_file = "prok_strains.csv";
-
-my $man  = 0;
-my $help = 0;
+my $gr_dir = path( $Config->{path}{gr} )->stringify;    # genome report
+my $td_dir = path( $Config->{path}{td} )->stringify;    # taxdmp
 
 GetOptions(
-    'help'       => \$help,
-    'man'        => \$man,
-    'euk'        => \$euk,
-    'o|output=s' => \$strain_file,
-) or pod2usage(2);
-
-pod2usage(1) if $help;
-pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
+    'help|?' => sub { HelpMessage(0) },
+    'euk'    => \my $euk, # eukaryotes instead of prokaryotes
+    'output|o=s' => \( my $strain_file = "prok_strains.csv" ),
+) or HelpMessage(1);
 
 #----------------------------------------------------------#
 # init
@@ -212,9 +212,7 @@ else {
 
 if ( $^O ne "Win32" ) {
     print "\n";
-    system "wc -l $_"
-        for "$gr_dir/prokaryotes.txt", "$gr_dir/eukaryotes.txt",
-        $strain_file;
+    system "wc -l $_" for "$gr_dir/prokaryotes.txt", "$gr_dir/eukaryotes.txt", $strain_file;
 }
 
 #----------------------------#
@@ -224,15 +222,3 @@ $stopwatch->end_message;
 exit;
 
 __END__
-
-=head1 NAME
-
-gr_strains.pl
-
-=head1 SYNOPSIS
-
-    perl gr_strains.pl -o prok_strains.csv
-
-    perl gr_strains.pl --euk -o euk_strains.csv
-
-=cut

@@ -3,12 +3,13 @@ use strict;
 use warnings;
 use autodie;
 
-use Getopt::Long;
-use Pod::Usage;
+use Getopt::Long qw(HelpMessage);
 use Config::Tiny;
+use FindBin;
 use YAML qw(Dump Load DumpFile LoadFile);
 
 use DBI;
+use Path::Tiny;
 use Text::CSV_XS;
 use Bio::Taxon;
 use Bio::DB::Taxonomy;
@@ -17,14 +18,13 @@ use List::MoreUtils qw(any all uniq);
 
 use AlignDB::Stopwatch;
 
-use FindBin;
-use lib "$FindBin::Bin/../lib";
-use MyUtil qw(replace_home find_ancestor find_group);
+use lib "$FindBin::RealBin/../lib";
+use MyUtil qw(find_ancestor find_group);
 
 #----------------------------------------------------------#
 # GetOpt section
 #----------------------------------------------------------#
-my $Config = Config::Tiny->read("$FindBin::Bin/../config.ini");
+my $Config = Config::Tiny->read("$FindBin::RealBin/../config.ini");
 
 # record ARGV and Config
 my $stopwatch = AlignDB::Stopwatch->new(
@@ -33,27 +33,27 @@ my $stopwatch = AlignDB::Stopwatch->new(
     program_conf => $Config,
 );
 
+=head1 NAME
+
+ar_strains.pl
+
+=head1 SYNOPSIS
+
+    perl ar_strains.pl -o ar_strains.csv
+
+    perl ar_strains.pl --genbank -o ar_strains_genbank.csv
+
+=cut
+
 # running options
-my $ar_dir = replace_home( $Config->{path}{ar} );    # assembly report
-my $td_dir = replace_home( $Config->{path}{td} );    # taxdmp
-
-# genbank instead of refseq
-my $genbank;
-
-my $strain_file = "ar_strains.csv";
-
-my $man  = 0;
-my $help = 0;
+my $ar_dir = path( $Config->{path}{ar} )->stringify;    # assembly report
+my $td_dir = path( $Config->{path}{td} )->stringify;    # taxdmp
 
 GetOptions(
-    'help'       => \$help,
-    'man'        => \$man,
-    'genbank'    => \$genbank,
-    'o|output=s' => \$strain_file,
-) or pod2usage(2);
-
-pod2usage(1) if $help;
-pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
+    'help|?'  => sub { HelpMessage(0) },
+    'genbank' => \my $genbank, # genbank instead of refseq
+    'output|o=s' => \( my $strain_file = "ar_strains.csv" ),
+) or HelpMessage(1);
 
 #----------------------------------------------------------#
 # init
@@ -208,15 +208,3 @@ $stopwatch->end_message;
 exit;
 
 __END__
-
-=head1 NAME
-
-ar_strains.pl
-
-=head1 SYNOPSIS
-
-    perl ar_strains.pl -o ar_strains.csv
-
-    perl ar_strains.pl --genbank -o ar_strains_genbank.csv
-
-=cut
