@@ -8,7 +8,7 @@ M3838	AMQE	Saccharomyces cerevisiae M3838	84
 M3707	AMQB	Saccharomyces cerevisiae M3707	97
 AWRI796	ADVS	Saccharomyces cerevisiae AWRI796	105
 M3837	AMQD	Saccharomyces cerevisiae M3837	113
-RM11_1a	AAEG	Saccharomyces cerevisiae RM11-1a	115
+#RM11_1a	AAEG	Saccharomyces cerevisiae RM11-1a	115 # use assembly
 M3836	AMQC	Saccharomyces cerevisiae M3836	119
 M3839	AMQF	Saccharomyces cerevisiae M3839	120
 VL3	AEJS	Saccharomyces cerevisiae VL3	125

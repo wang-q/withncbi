@@ -91,22 +91,22 @@ Manually combine `~/data/alignment/Fungi/GENOMES/saccharomyces/WGS/saccharomyces
         --opt rm_species=Fungi \
         --dd ~/data/alignment/Fungi/GENOMES/${GROUP_NAME}/DOWNLOAD \
         --download "name=S288c;taxon=559292" \
+        --download "name=RM11_1a;taxon=285006" \
         --download "name=EC1118;taxon=643680" \
         --plan 'name=five_way;t=S288c;qs=EC1118,RM11_1a,YJM789,BC187' \
         --plan 'name=Scer_n8_Spar;t=S288c;qs=EC1118,JAY291,Kyokai_no_7,RM11_1a,Sigma1278b,T7,YJM789,Spar;o=Spar' \
         --plan 'name=Scer_n8;t=S288c;qs=EC1118,JAY291,Kyokai_no_7,RM11_1a,Sigma1278b,T7,YJM789' \
-        --plan 'name=Scer_n8_Sbou;t=S288c;qs=EC1118,JAY291,Kyokai_no_7,RM11_1a,Sigma1278b,T7,YJM789,Sbou;o=Sbou'
-
-    unset GROUP_NAME
+        --plan 'name=Scer_n8_Sbou;t=S288c;qs=EC1118,JAY291,Kyokai_no_7,RM11_1a,Sigma1278b,T7,YJM789,Sbou;o=Sbou' \
+        -y
     ```
 
 2. Rest routing things.
 
     ```bash
-    cd ~/data/alignment/Fungi/${GROUP_NAME}
+    cd ~/data/alignment/Fungi/scer_wgs
 
     # pop_prep.pl
-    perl ~/Scripts/withncbi/pop/pop_prep.pl -p 8 -i ~/Scripts/withncbi/pop/scer_wgs_test.yml
+    perl ~/Scripts/withncbi/pop/pop_prep.pl -p 12 -i ~/Scripts/withncbi/pop/scer_wgs_test.yml
 
     sh 01_file.sh
     sh 02_rm.sh

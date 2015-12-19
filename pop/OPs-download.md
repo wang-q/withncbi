@@ -139,7 +139,7 @@ for genomes out of WGS, which usually in better assembling levels.
     mkdir -p ~/data/alignment/Fungi/GENOMES/scer_wgs/DOWNLOAD
     cd ~/data/alignment/Fungi/GENOMES/scer_wgs/DOWNLOAD
 
-    # Download S288c and EC1118 separately
+    # Download S288c, EC1118 and RM11_1a separately
     perl ~/Scripts/withncbi/taxon/assembly_csv.pl \
         -f ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/All/GCF_000146045.2.assembly.txt \
         --nuclear -name S288c \
@@ -150,8 +150,13 @@ for genomes out of WGS, which usually in better assembling levels.
         --nuclear --genbank --scaffold -name EC1118 \
         > EC1118.seq.csv
 
+    perl ~/Scripts/withncbi/taxon/assembly_csv.pl \
+        -f ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/All/GCA_000149365.1.assembly.txt \
+        --genbank --scaffold -name RM11_1a \
+        > RM11_1a.seq.csv
+
     echo "#strain_name,accession,strain_taxon_id,seq_name" > scer_wgs.seq.csv
-    cat S288c.seq.csv EC1118.seq.csv \
+    cat S288c.seq.csv EC1118.seq.csv RM11_1a.seq.csv \
         | perl -nl -e '/^#/ and next; /^\s*$/ and next; print;' \
         >> scer_wgs.seq.csv
 
