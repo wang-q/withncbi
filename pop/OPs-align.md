@@ -62,7 +62,7 @@ Run `chart.bat` under Windows.
 Manually combine `~/data/alignment/Fungi/GENOMES/saccharomyces/WGS/saccharomyces.csv` and
 `~/data/alignment/Fungi/saccharomyces/basicstat.xlsx`.
 
-## *Scer_wgs* WGS
+## Scer_wgs WGS
 
 1. `gen_pop_conf.pl`
 
@@ -149,7 +149,7 @@ Run `chart.bat` under Windows.
 Manually combine `~/data/alignment/Fungi/GENOMES/scer_wgs/WGS/scer_wgs.csv` and
 `~/data/alignment/Fungi/scer_wgs/basicstat.xlsx`.
 
-## *Scer_100* ASSEMBLY
+## Scer_100 ASSEMBLY
 
 1. `gen_pop_conf.pl`
 

@@ -75,7 +75,7 @@ for genomes out of WGS, which usually in better assembling levels.
         -p -f Scer_S288c.seq.csv
     ```
 
-## *Scer_wgs* WGS
+## Scer_wgs WGS
 
 1. Create `pop/scer_wgs.tsv` manually.
 
@@ -166,7 +166,7 @@ for genomes out of WGS, which usually in better assembling levels.
 
     ```
 
-## *Scer_100* ASSEMBLY
+## Scer_100 ASSEMBLY
 
 1. Create working directory and download WGS strains as outgroups.
 
