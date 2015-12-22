@@ -1,75 +1,88 @@
 #!/usr/bin/perl
 use strict;
 use warnings;
+use autodie;
 
-use Getopt::Long;
-use Pod::Usage;
+use Getopt::Long qw(HelpMessage);
 use Config::Tiny;
+use FindBin;
 use YAML qw(Dump Load DumpFile LoadFile);
 
-use FindBin;
-use lib "$FindBin::Bin/../lib";
+use Path::Tiny;
+
+use Bio::EnsEMBL::DBSQL::DBAdaptor;
+use Bio::EnsEMBL::DBSQL::SliceAdaptor;
+use Bio::EnsEMBL::Mapper::RangeRegistry;
+
 use AlignDB::Stopwatch;
-use AlignDB::Ensembl;
 
 #----------------------------------------------------------#
 # GetOpt section
 #----------------------------------------------------------#
-my $Config = Config::Tiny->new();
-$Config = Config::Tiny->read("$FindBin::Bin/../alignDB.ini");
+my $Config = Config::Tiny->read("$FindBin::RealBin/../config.ini");
 
-# Database init values
-my $server     = $Config->{database}{server};
-my $port       = $Config->{database}{port};
-my $username   = $Config->{database}{username};
-my $password   = $Config->{database}{password};
-my $ensembl_db = $Config->{database}{ensembl};
+# record ARGV and Config
+my $stopwatch = AlignDB::Stopwatch->new(
+    program_name => $0,
+    program_argv => [@ARGV],
+    program_conf => $Config,
+);
 
-my @chr_names;
-my $out_file;
+=head1 NAME
 
-my $man  = 0;
-my $help = 0;
+chr_kary.pl - Fetch Karyotype Band from ensembl db
+
+=head1 SYNOPSIS
+
+    perl chr_kary.pl -e <ensembl> [options]
+      Options:
+        --help      -?          brief help message
+        --server    -s  STR     MySQL server IP/Domain name
+        --port      -P  INT     MySQL server port
+        --username  -u  STR     username
+        --password  -p  STR     password
+        --ensembl   -e  STR     ensembl database name
+        --chr           @STR    chromosome name
+        --output        STR     output file name
+
+=cut
 
 GetOptions(
-    'help|?'       => \$help,
-    'man'          => \$man,
-    's|server=s'   => \$server,
-    'P|port=i'     => \$port,
-    'u|username=s' => \$username,
-    'p|password=s' => \$password,
-    'e|ensembl=s'  => \$ensembl_db,
-    'chr=s'        => \@chr_names,
-    'output=s'     => \$out_file,
-) or pod2usage(2);
+    'help|?' => sub { HelpMessage(0) },
+    'server|s=s'   => \( my $server   = $Config->{database}{server} ),
+    'port|P=i'     => \( my $port     = $Config->{database}{port} ),
+    'username|u=s' => \( my $username = $Config->{database}{username} ),
+    'password|p=s' => \( my $password = $Config->{database}{password} ),
+    'ensembl|e=s'  => \my $ensembl_db,
+    'chr=s'        => \my @chr_names,
+    'output=s'     => \my $out_file,
+) or HelpMessage(1);
 
-pod2usage(1) if $help;
-pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
+if ( !defined $ensembl_db ) {
+    die HelpMessage(1);
+}
 
-$out_file ||= "chromosome.band.$ensembl_db.txt";
+$out_file ||= "$ensembl_db.kary.tsv";
 @chr_names = qw{ 1 } unless @chr_names;
 
 #----------------------------------------------------------#
 # Init objects
 #----------------------------------------------------------#
-my $stopwatch = AlignDB::Stopwatch->new;
 $stopwatch->start_message("Drawing chr bands...");
 
-# ensembl object
-my $ensembl = AlignDB::Ensembl->new(
-    server => $server,
-    db     => $ensembl_db,
-    user   => $username,
-    passwd => $password,
-);
+my $db_adaptor = Bio::EnsEMBL::DBSQL::DBAdaptor->new(
+    -host   => $server,
+    -dbname => $ensembl_db,
+    -user   => $username,
+    -pass   => $password,
+) or die "Cannot connect to EnsEMBL database [$ensembl_db]\n";
 
-my $db_adaptor   = $ensembl->db_adaptor;
 my $kary_adaptor = $db_adaptor->get_KaryotypeBandAdaptor;
 
 #----------------------------------------------------------#
 # Start
 #----------------------------------------------------------#
-open my $band_fh, '>', $out_file;
+my $band_fh = path($out_file)->openw;
 print {$band_fh} "#chrom\tchromStart\tchromEnd\tname\tgieStain\n";
 for my $chr (@chr_names) {
     print "chr$chr\n";
@@ -77,8 +90,7 @@ for my $chr (@chr_names) {
 
     my @bands = sort { $a->start <=> $b->start } @$band;
     for (@bands) {
-        print {$band_fh} "chr$chr\t@{[$_->start]}\t@{[$_->end]}\t";
-        print {$band_fh} "@{[$_->name]}\t@{[$_->stain]}\n";
+        printf {$band_fh} "%s\t%s\t%s\t%s\t%s\n", $chr, $_->start, $_->end, $_->name, $_->stain;
     }
 }
 close $band_fh;
@@ -87,41 +99,3 @@ $stopwatch->end_message;
 exit;
 
 __END__
-
-=head1 NAME
-
-    chr_kary.pl - Fetch Karyotype Band from ensembl db
-
-=head1 SYNOPSIS
-
-    chr_kary.pl [options]
-        Options:
-            --help              brief help message
-            --man               full documentation
-            --server            MySQL server IP/Domain name
-            --username          username
-            --password          password
-            --ensembl           ensembl db name
-            --chr_name          chromosome name
-            --output            output file name
-
-=head1 OPTIONS
-
-=over 8
-
-=item B<-help>
-
-Print a brief help message and exits.
-
-=item B<-man>
-
-Prints the manual page and exits.
-
-=back
-
-=head1 DESCRIPTION
-
-B<This program> will read the given input file(s) and do someting
-useful with the contents thereof.
-
-=cut
