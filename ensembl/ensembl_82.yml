@@ -1,0 +1,119 @@
+---
+dir:
+  mysql: "~/data/ensembl82/mysql/"
+  fasta: "~/data/ensembl82/fasta/"
+species:
+  "Homo sapiens":
+    core:
+      aliases:
+        - human
+    initrc: 1
+  "Pan troglodytes":
+    core:
+      aliases:
+        - chimp
+    initrc: 1
+  "Gorilla gorilla":
+    core:
+      aliases:
+        - gorilla
+    initrc: 1
+  "Pongo abelii":
+    core:
+      aliases:
+        - Orangutan
+    initrc: 1
+  "Macaca mulatta":
+    core:
+      aliases:
+        - rhesus
+    initrc: 1
+  "Mus musculus":
+    core:
+      aliases:
+        - mouse
+    initrc: 1
+  "Arabidopsis thaliana":
+    core: 1
+    initrc: 1
+  "Arabidopsis thaliana":
+    core: 1
+    initrc: 1
+  "Arabidopsis thaliana":
+    core: 1
+    initrc: 1
+  "Arabidopsis thaliana":
+    core: 1
+    initrc: 1
+  "Arabidopsis lyrata":
+    core: 1
+    initrc: 1
+  "Oryza sativa":
+    core: 1
+    initrc: 1
+  "Oryza indica":
+    core: 1
+    initrc: 1
+  "Brassica oleracea":
+    core: 1
+    initrc: 1
+  "Brassica rapa":
+    core: 1
+    initrc: 1
+  "Solanum lycopersicum":
+    core: 1
+    initrc: 1
+  "Solanum tuberosum":
+    core: 1
+    initrc: 1
+  "Drosophila melanogaster":
+    core: 1
+    initrc: 1
+  "Drosophila sechellia":
+    core: 1
+    initrc: 1
+  "Drosophila simulans":
+    core: 1
+    initrc: 1
+  "Caenorhabditis elegans":
+    core: 1
+    initrc: 1
+  "Caenorhabditis briggsae":
+    core: 1
+    initrc: 1
+  "Caenorhabditis remanei":
+    core: 1
+    initrc: 1
+  "Caenorhabditis brenneri":
+    core: 1
+    initrc: 1
+  "Caenorhabditis japonica":
+    core: 1
+    initrc: 1
+  "Plasmodium falciparum":
+    core: 1
+    initrc: 1
+  "Dictyostelium discoideum":
+    core: 1
+    initrc: 1
+  "Aspergillus fumigatus":
+    core: 1
+    initrc: 1
+  "Saccharomyces cerevisiae":
+    core:
+      aliases:
+        - yeast
+    initrc: 1
+  "Schizosaccharomyces pombe":
+    core: 1
+    initrc: 1
+  "Fungi":
+    skip: 1
+    compara:
+      aliases:
+        - compara_fungi
+    initrc: 1
+meta:
+  version: 82
+  initrc_file: "ensembl.initrc.pm"
+  sh_file: "ensembl.build.sh"

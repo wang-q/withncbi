@@ -1,0 +1,62 @@
+---
+dir:
+  mysql: "/home/wangq/data/ensemblgenomes10_63/fungi/mysql/"
+  fasta: "/home/wangq/data/ensemblgenomes5_58/fungi/fasta/"
+species:
+  "Aspergillus clavatus":
+    core:
+      aliases:
+        - Acla
+    masked_seq: 0
+    initrc: 1
+  "Aspergillus flavus":
+    core: 1
+    masked_seq: 0
+    initrc: 1
+  "Aspergillus fumigatus":
+    core: 1
+    masked_seq: 0
+    initrc: 1
+  "Aspergillus nidulans":
+    core: 1
+    masked_seq: 0
+    initrc: 1
+  "Aspergillus niger":
+    core: 1
+    masked_seq: 0
+    initrc: 1
+  "Aspergillus oryzae":
+    core: 1
+    masked_seq: 0
+    initrc: 1
+  "Aspergillus terreus":
+    core: 1
+    masked_seq: 0
+    initrc: 1
+  "Neosartorya fischeri":
+    core: 1
+    masked_seq: 0
+    initrc: 1
+  "Neurospora crassa":
+    core: 1
+    masked_seq: 0
+    initrc: 1
+  "Saccharomyces cerevisiae":
+    core: 1
+    funcgen: 1
+    otherfeatures: 1
+    variation: 1
+    masked_seq: 0
+    initrc: 1
+  "Schizosaccharomyces pombe":
+    core: 1
+    masked_seq: 0
+    initrc: 1
+  "Fungi":
+    compara:
+      aliases:
+        - compara_fungi
+    initrc: 1
+meta:
+  version: 63
+  initrc_file: "fungi.initrc.pm"

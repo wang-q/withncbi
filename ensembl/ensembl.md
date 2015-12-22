@@ -27,6 +27,8 @@ rsync -avP \
     ~/data/ensembl82/mysql
 
 rsync -avP rsync://ftp.ensembl.org/ensembl/pub/grch37/release-82/mysql/homo_sapiens_core_82_37 ~/data/ensembl82/mysql
+
+rsync -avP rsync://ftp.ensembl.org/ensembl/pub/release-82/mysql/ensembl_compara_82 ~/data/ensembl82/mysql
 ```
 
 ### fasta
