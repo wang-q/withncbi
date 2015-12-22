@@ -80,6 +80,10 @@ my $kary_adaptor = $db_adaptor->get_KaryotypeBandAdaptor;
 
 if (! @chr_names) {
     @chr_names = map { $_->seq_region_name } @{ $db_adaptor->get_GenomeContainer->get_karyotype };
+    
+    # The following codes return unsorted chromosome names
+    #@chr_names = map { $_->seq_region_name } @{ $db_adaptor->get_SliceAdaptor->fetch_all('chromosome') };
+    
     print "Write all available karyotypes\n";
     print Dump \@chr_names;
 }
