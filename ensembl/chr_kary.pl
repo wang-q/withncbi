@@ -42,7 +42,7 @@ chr_kary.pl - Fetch Karyotype Band from ensembl db
         --username  -u  STR     username
         --password  -p  STR     password
         --ensembl   -e  STR     ensembl database name
-        --chr           @STR    chromosome name
+        --chr           @STR    chromosome names, leave empty will write all chromosomes
         --output        STR     output file name
 
 =cut
@@ -63,7 +63,6 @@ if ( !defined $ensembl_db ) {
 }
 
 $out_file ||= "$ensembl_db.kary.tsv";
-@chr_names = qw{ 1 } unless @chr_names;
 
 #----------------------------------------------------------#
 # Init objects
@@ -79,13 +78,19 @@ my $db_adaptor = Bio::EnsEMBL::DBSQL::DBAdaptor->new(
 
 my $kary_adaptor = $db_adaptor->get_KaryotypeBandAdaptor;
 
+if (! @chr_names) {
+    @chr_names = map { $_->seq_region_name } @{ $db_adaptor->get_GenomeContainer->get_karyotype };
+    print "Write all available karyotypes\n";
+    print Dump \@chr_names;
+}
+
 #----------------------------------------------------------#
 # Start
 #----------------------------------------------------------#
 my $band_fh = path($out_file)->openw;
 print {$band_fh} "#chrom\tchromStart\tchromEnd\tname\tgieStain\n";
 for my $chr (@chr_names) {
-    print "chr$chr\n";
+    print "Region [$chr]\n";
     my $band = $kary_adaptor->fetch_all_by_chr_name($chr);
 
     my @bands = sort { $a->start <=> $b->start } @$band;
