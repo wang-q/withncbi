@@ -53,6 +53,7 @@ strain_bz_self.pl - Full procedure for self genome alignments.
                                     For strains not recorded in NCBI taxonomy, you should assign them fake ids.
                                     If this option set to be true, all $target_id, @query_ids are actually names.        
         --msa               STR     Aligning program for refine. Default is [mafft]
+        --noblast                   Don't blast against genomes
         --norm                      RepeatMasker has been done.
         --nostat                    Don't do stat stuffs
         --norawphylo                Skip rawphylo
@@ -60,12 +61,12 @@ strain_bz_self.pl - Full procedure for self genome alignments.
 
 =cut
 
-my $aligndb  = path( $Config->{run}{aligndb} )->stringify;     # alignDB path
-my $egaz     = path( $Config->{run}{egaz} )->stringify;        # egaz path
-my $egas     = path( $Config->{run}{egas} )->stringify;        # egas path
-my $blast    = path( $Config->{run}{blast} )->stringify;       # blast path
-my $circos   = path( $Config->{run}{circos} )->stringify;      # circos path
-my $bat_dir  = $Config->{run}{bat};                            # Windows alignDB path
+my $aligndb = path( $Config->{run}{aligndb} )->stringify;    # alignDB path
+my $egaz    = path( $Config->{run}{egaz} )->stringify;       # egaz path
+my $egas    = path( $Config->{run}{egas} )->stringify;       # egas path
+my $blast   = path( $Config->{run}{blast} )->stringify;      # blast path
+my $circos  = path( $Config->{run}{circos} )->stringify;     # circos path
+my $bat_dir = $Config->{run}{bat};                           # Windows alignDB path
 
 GetOptions(
     'help|?' => sub { HelpMessage(0) },
@@ -75,16 +76,16 @@ GetOptions(
     'keep=s'          => \my @keep,
     'target_id|t=s'   => \my $target_id,
     'query_ids|q=s'   => \my @query_ids,
-    'length=i'        => \(my $length = 1000),
+    'length=i'        => \( my $length      = 1000 ),
     'name_str|n=s'    => \( my $name_str    = "working" ),
     'use_name|un'     => \my $use_name,
     'msa=s'           => \( my $msa         = 'mafft' ),
+    'noblast'           => \my $noblast,
     'norm'            => \my $norm,
     'nostat'          => \my $nostat,
     'norawphylo'      => \my $norawphylo,
     'parallel=i'      => \( my $parallel    = $Config->{run}{parallel} ),
 ) or HelpMessage(1);
-
 
 #----------------------------------------------------------#
 # init
@@ -403,70 +404,130 @@ fi
 cd [% working_dir %]/Processing/[% id %]
 
 #----------------------------#
-# quick and dirty coverage
+# genome sequences
 #----------------------------#
-fasops axt2fas [% working_dir %]/Pairwise/[% id %]vsselfalign/axtNet/*.axt.gz -l [% length %] -o stdout > [% id %]vsselfalign.axt.fas
-fasops covers [% id %]vsselfalign.axt.fas -n target -o [% id %]vsselfalign.target.yml
-runlist stat --size ../S288c/chr.sizes S288cvsselfalign.target.yml -o [% working_dir %]/Results/[% id %]/[% id %].[% length %].csv
-
-#----------------------------#
-# genome blast
-#----------------------------#
+echo "* Recreate genome.fa"
+sleep 1;
 find [% working_dir %]/Genomes/[% id %] -type f -name "*.fa" \
     | sort | xargs cat \
-    | perl -nl -e '/^>/ or uc; print' \
-    > [% id %].genome.fa
-
-echo "* build genome blast db [% id %].genome.fa"
-[% blast %]/bin/formatdb -p F -o T -i [% id %].genome.fa
-
-echo "* blast [% id %]vsselfalign.axt.fasta"
-[% blast %]/bin/blastall -p blastn -F "m D" -m 0 -b 10 -v 10 -e 1e-3 -a 8 -i [% id %]vsselfalign.axt.fas -d [% id %].genome.fa -o [% id %]vsselfalign.axt.blast
+    | perl -nl -e '/^>/ or $_ = uc; print' \
+    > genome.fa
+faops size genome.fa > chr.sizes
 
 #----------------------------#
-# paralog sequences
+# Correct genomic positions
 #----------------------------#
-# Omit genome locations in .axt files.
-# There are errors, especially for queries.
-perl [% egas %]/blastn_genome_location.pl -f [% id %]vsselfalign.axt.blast -m 0 -i 90 -c 0.95
+echo "* Correct genomic positions"
+sleep 1;
+
+echo "* axt2fas"
+fasops axt2fas [% working_dir %]/Pairwise/[% id %]vsselfalign/axtNet/*.axt.gz -l [% length %] -o stdout > axt.fas
+fasops separate axt.fas -o [% working_dir %]/Processing/[% id %] --nodash -s .sep.fasta
+
+echo "* Target positions"
+perl [% egas %]/sparsemem_exact.pl -f target.sep.fasta -g genome.fa \
+    --length 500 -o replace.target.tsv
+fasops replace axt.fas replace.target.tsv -o axt.target.fas
+
+echo "* Query positions"
+perl [% egas %]/sparsemem_exact.pl -f query.sep.fasta -g genome.fa \
+    --length 500 -o replace.query.tsv
+fasops replace axt.target.fas replace.query.tsv -o axt.correct.fas
 
 #----------------------------#
-# paralog blast
+# Coverage stats
 #----------------------------#
-echo "* build paralog blast db [% id %]vsselfalign.gl.fasta"
-[% blast %]/bin/formatdb -p F -o T -i [% id %]vsselfalign.gl.fasta
+echo "* Coverage stats"
+sleep 1;
+fasops covers axt.correct.fas -o axt.correct.yml
+runlist split axt.correct.yml -s .temp.yml
+runlist compare --op union target.temp.yml query.temp.yml -o axt.union.yml
+runlist stat --size chr.sizes axt.union.yml -o [% working_dir %]/Results/[% id %]/S288c.union.csv
 
-echo "* blast [% id %]vsselfalign.gl.fasta"
-[% blast %]/bin/blastall -p blastn -F "m D" -m 0 -b 10 -v 10 -e 1e-3 -a 8 -i [% id %]vsselfalign.gl.fasta -d [% id %]vsselfalign.gl.fasta -o [% id %]vsselfalign.gl.blast
+# links by lastz-chain
+fasops links axt.correct.fas -o stdout \
+    | perl -nl -e 's/(target|query)\.//g; print;' \
+    > links.lastz.tsv
+
+# remove species names
+fasops separate axt.correct.fas --nodash -o stdout \
+    | perl -nl -e '/^>/ and s/^>(target|query)\./\>/; print;' \
+    > axt.gl.fasta
+
+[% IF noblast -%]
+#----------------------------#
+# Lastz paralogs
+#----------------------------#
+cat axt.gl.fasta > axt.all.fasta
+[% ELSE -%]
+#----------------------------#
+# Get more paralogs
+#----------------------------#
+echo "* Get more paralogs"
+perl [% egas %]/blastn_genome.pl -c 0.95 -f axt.gl.fasta -g genome.fa -o axt.bg.fasta
+cat axt.gl.fasta axt.bg.fasta > axt.all.fasta
+[% END -%]
 
 #----------------------------#
-# merge
+# Link paralogs
 #----------------------------#
-perl [% egas %]/blastn_paralog.pl -f [% id %]vsselfalign.gl.blast -m 0 -i 90 -c 0.9
+echo "* Link paralogs"
+sleep 1;
+perl [% egas %]/blastn_paralog.pl -f axt.all.fasta -c 0.95 -o links.blast.tsv
 
-perl [% egas %]/merge_node.pl    -v -f [% id %]vsselfalign.blast.tsv -o [% id %]vsselfalign.merge.yml -c 0.9
-perl [% egas %]/paralog_graph.pl -v -f [% id %]vsselfalign.blast.tsv -m [% id %]vsselfalign.merge.yml --nonself -o [% id %]vsselfalign.merge.graph.yml
-perl [% egas %]/cc.pl               -f [% id %]vsselfalign.merge.graph.yml
-perl [% egas %]/proc_cc_chop.pl     -f [% id %]vsselfalign.cc.yml --size [% working_dir %]/Genomes/[% id %]/chr.sizes --msa [% msa %]
-perl [% egas %]/proc_cc_stat.pl     -f [% id %]vsselfalign.cc.yml --size [% working_dir %]/Genomes/[% id %]/chr.sizes
+#----------------------------#
+# Merge paralogs
+#----------------------------#
+echo "* Merge paralogs"
+sleep 1;
 
-runlist stat --size [% working_dir %]/Genomes/[% id %]/chr.sizes [% id %]vsselfalign.cc.chr.runlist.yml;
+perl [% egas %]/merge_node.pl -v -c 0.95 -o [% id %].merge.yml \
+[% IF noblast -%]
+    -f links.lastz.tsv
+[% ELSE -%]
+    -f links.lastz.tsv -f links.blast.tsv
+[% END -%]
+
+perl [% egas %]/paralog_graph.pl -v -m [% id %].merge.yml --nonself -o [% id %].merge.graph.yml \
+[% IF noblast -%]
+    -f links.lastz.tsv
+[% ELSE -%]
+    -f links.lastz.tsv -f links.blast.tsv
+[% END -%]
+
+echo "* CC sequences and stats"
+perl [% egas %]/cc.pl           -f [% id %].merge.graph.yml
+perl [% egas %]/proc_cc_chop.pl -f [% id %].cc.yml --size chr.sizes --genome genome.fa --msa [% msa %]
+perl [% egas %]/proc_cc_stat.pl -f [% id %].cc.yml --size chr.sizes
+
+echo "* Coverage figure"
+runlist stat --size chr.sizes [% id %].cc.chr.runlist.yml;
+perl [% egas %]/cover_figure.pl --size chr.sizes -f [% id %].cc.chr.runlist.yml;
 
 #----------------------------#
 # result
 #----------------------------#
-cp [% id %]vsselfalign.cc.yml [% working_dir %]/Results/[% id %]
-mv [% id %]vsselfalign.cc.csv [% working_dir %]/Results/[% id %]
-cp [% id %]vsselfalign.cc.chr.runlist.yml.csv [% working_dir %]/Results/[% id %]/[% id %]vsselfalign.chr.csv
+echo "* Results"
+sleep 1;
 
-cp [% id %]vsselfalign.cc.pairwise.fas [% working_dir %]/Results/[% id %]
+mv [% id %].cc.pairwise.fas         [% working_dir %]/Results/[% id %]
+cp [% id %].cc.yml                  [% working_dir %]/Results/[% id %]
+mv [% id %].cc.csv                  [% working_dir %]/Results/[% id %]
+mv [% id %].cc.chr.runlist.yml.csv  [% working_dir %]/Results/[% id %]/[% id %].chr.csv
+mv [% id %].cc.chr.runlist.yml      [% working_dir %]/Results/[% id %]/[% id %].paralog.yml
+mv [% id %].cc.chr.runlist.png      [% working_dir %]/Results/[% id %]/[% id %].chr.png
 
 #----------------------------#
 # clean
 #----------------------------#
-find [% working_dir %]/Processing/[% id %] -type f -name "*genome.fa*" | parallel --no-run-if-empty rm
-find [% working_dir %]/Processing/[% id %] -type f -name "*gl.fasta*" | parallel --no-run-if-empty rm
-find [% working_dir %]/Processing/[% id %] -type f -name "*.blast" | parallel --no-run-if-empty rm
+echo "* Clean up"
+sleep 1;
+
+find [% working_dir %]/Processing/[% id %] -type f -name "*genome.fa*"   | parallel --no-run-if-empty rm
+find [% working_dir %]/Processing/[% id %] -type f -name "*gl.fasta*"    | parallel --no-run-if-empty rm
+find [% working_dir %]/Processing/[% id %] -type f -name "*.sep.fasta"   | parallel --no-run-if-empty rm
+find [% working_dir %]/Processing/[% id %] -type f -name "axt.*"         | parallel --no-run-if-empty rm
+find [% working_dir %]/Processing/[% id %] -type f -name "replace.*.tsv" | parallel --no-run-if-empty rm
 
 [% END -%]
 EOF
@@ -480,6 +541,7 @@ EOF
             egas        => $egas,
             blast       => $blast,
             msa         => $msa,
+            noblast       => $noblast,
             name_str    => $name_str,
             all_ids     => [ $target_id, @query_ids ],
             data        => \@data,
@@ -515,7 +577,7 @@ chromosomes_display_default = yes
 <links>
 
 <link>
-file          = [% taxon_id %]vsselfalign.cc.link4.txt
+file          = [% taxon_id %].cc.link4.txt
 radius        = 0.88r
 bezier_radius = 0.2r
 color         = purple
@@ -526,7 +588,7 @@ stroke_thickness = 2
 </link>
 
 <link>
-file          = [% taxon_id %]vsselfalign.cc.link3.txt
+file          = [% taxon_id %].cc.link3.txt
 radius        = 0.88r
 bezier_radius = 0.1r
 color         = dgreen
@@ -537,7 +599,7 @@ stroke_thickness = 2
 </link>
 
 <link>
-file          = [% taxon_id %]vsselfalign.cc.link2.txt
+file          = [% taxon_id %].cc.link2.txt
 radius        = 0.88r
 bezier_radius = 0r
 color         = dorange
@@ -564,7 +626,7 @@ r1 = 0.98r
 </highlight>
 
 <highlight>
-file = [% taxon_id %]vsselfalign.cc.linkN.txt
+file = [% taxon_id %].cc.linkN.txt
 r0 = 0.89r
 r1 = 0.92r
 stroke_thickness = 2
@@ -829,7 +891,7 @@ do
         # create empty runlists from chr.sizes
         perl -ane'BEGIN { print qq{---\n} }; print qq{$F[0]: "-"\n}; END {print qq{\n}};' [% working_dir %]/Genomes/[% id %]/chr.sizes > feature.$ftr.[% id %].yml;
     fi;
-    stat_runlist stat --size [% working_dir %]/Genomes/[% id %]/chr.sizes feature.$ftr.[% id %].yml;
+    runlist stat --size [% working_dir %]/Genomes/[% id %]/chr.sizes feature.$ftr.[% id %].yml;
 done
 
 echo "feature,name,length,size,coverage" > [% working_dir %]/Results/[% id %]/[% id %].feature.csv
@@ -840,27 +902,27 @@ done >> [% working_dir %]/Results/[% id %]/[% id %].feature.csv
 
 for ftr in coding repeats ncRNA rRNA tRNA
 do
-    runlist compare --op intersect --mk [% id %]vsselfalign.cc.runlist.yml feature.$ftr.[% id %].yml -o [% id %]vsselfalign.cc.runlist.$ftr.yml
+    runlist compare --op intersect --mk [% id %].cc.runlist.yml feature.$ftr.[% id %].yml -o [% id %].cc.runlist.$ftr.yml
 done
 
 for ftr in coding repeats ncRNA rRNA tRNA
 do
-    runlist stat --mk --size [% working_dir %]/Genomes/[% id %]/chr.sizes [% id %]vsselfalign.cc.runlist.$ftr.yml;
+    runlist stat --mk --size [% working_dir %]/Genomes/[% id %]/chr.sizes [% id %].cc.runlist.$ftr.yml;
 done
 
-echo "feature,copy,name,length,size,coverage" > [% working_dir %]/Results/[% id %]/[% id %]vsselfalign.feature.copies.csv
+echo "feature,copy,name,length,size,coverage" > [% working_dir %]/Results/[% id %]/[% id %].feature.copies.csv
 for ftr in coding repeats ncRNA rRNA tRNA
 do
-    FTR=$ftr perl -nl -e '/^key/ and next; /\,all\,/ or next; print qq{$ENV{FTR},$_};' [% id %]vsselfalign.cc.runlist.$ftr.yml.csv;
-done >> [% working_dir %]/Results/[% id %]/[% id %]vsselfalign.feature.copies.csv
+    FTR=$ftr perl -nl -e '/^key/ and next; /\,all\,/ or next; print qq{$ENV{FTR},$_};' [% id %].cc.runlist.$ftr.yml.csv;
+done >> [% working_dir %]/Results/[% id %]/[% id %].feature.copies.csv
 
 for ftr in coding repeats ncRNA rRNA tRNA
 do
     rm feature.$ftr.[% id %].bed;
     rm feature.$ftr.[% id %].yml;
     rm feature.$ftr.[% id %].yml.csv;
-    rm [% id %]vsselfalign.cc.runlist.$ftr.yml;
-    rm [% id %]vsselfalign.cc.runlist.$ftr.yml.csv;
+    rm [% id %].cc.runlist.$ftr.yml;
+    rm [% id %].cc.runlist.$ftr.yml.csv;
 done
 
 [% END -%]
