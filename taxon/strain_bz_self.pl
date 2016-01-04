@@ -891,7 +891,7 @@ do
         # create empty runlists from chr.sizes
         perl -ane'BEGIN { print qq{---\n} }; print qq{$F[0]: "-"\n}; END {print qq{\n}};' [% working_dir %]/Genomes/[% id %]/chr.sizes > feature.$ftr.[% id %].yml;
     fi;
-    runlist stat --size [% working_dir %]/Genomes/[% id %]/chr.sizes feature.$ftr.[% id %].yml;
+    runlist stat --size chr.sizes feature.$ftr.[% id %].yml;
 done
 
 echo "feature,name,length,size,coverage" > [% working_dir %]/Results/[% id %]/[% id %].feature.csv
@@ -907,7 +907,7 @@ done
 
 for ftr in coding repeats ncRNA rRNA tRNA
 do
-    runlist stat --mk --size [% working_dir %]/Genomes/[% id %]/chr.sizes [% id %].cc.runlist.$ftr.yml;
+    runlist stat --mk --size chr.sizes [% id %].cc.runlist.$ftr.yml;
 done
 
 echo "feature,copy,name,length,size,coverage" > [% working_dir %]/Results/[% id %]/[% id %].feature.copies.csv
