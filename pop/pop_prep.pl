@@ -297,7 +297,11 @@ cd [% data_dir %]
 #----------------------------------------------------------#
 # Don't copy sequences (RepeatMasker done)
 # This plan includes all genomes.
+[% IF phylo_tree -%]
+# Use [% phylo_tree %] as guide tree for other plans.
+[% ELSE -%]
 # Use the generated phylogenetic tree in this step as guide tree for other plans.
+[% END -%]
 
 # plan_ALL
 cd [% data_dir %]
@@ -359,7 +363,9 @@ perl [% withncbi %]/taxon/strain_bz.pl \
     --use_name \
     --parallel [% parallel %] \
     --norm \
-    --phylo_tree [% data_dir %]/plan_ALL_phylo/plan_ALL.nwk \
+[% IF phylo_tree -%]
+    --phylo_tree [% phylo_tree %] \
+[% END -%]
 [% IF plan.o -%]
     -o [% plan.o %] \
 [% END -%]
