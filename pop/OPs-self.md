@@ -89,7 +89,10 @@ cd ~/data/alignment/self/arabidopsis
 
 sh 1_real_chr.sh
 sh 3_self_cmd.sh
-sh 4_proc_cmd.sh
+time sh 4_proc_cmd.sh
+# real    25m5.028s
+# user    63m3.210s
+# sys     14m29.024s
 sh 5_circos_cmd.sh
 ```
 
@@ -113,6 +116,138 @@ cd ~/data/alignment/self/rice
 
 sh 1_real_chr.sh
 sh 3_self_cmd.sh
-sh 4_proc_cmd.sh
+time sh 4_proc_cmd.sh
+# real    280m25.802s
+# user    1005m20.730s
+# sys     69m0.916s
+sh 5_circos_cmd.sh
+```
+
+## Fly
+
+```bash
+cd ~/data/alignment/self
+
+perl ~/Scripts/withncbi/taxon/strain_bz_self.pl \
+    --file ~/data/alignment/self/ensembl_taxon.csv \
+    --working_dir ~/data/alignment/self \
+    --seq_dir ~/data/alignment/Ensembl \
+    --length 1000  \
+    --use_name \
+    --norm \
+    --name fly \
+    --parallel 8 \
+    -t Dmel
+
+cd ~/data/alignment/self/fly
+
+sh 1_real_chr.sh
+sh 3_self_cmd.sh
+time sh 4_proc_cmd.sh
+# real    11m22.152s
+# user    31m12.044s
+# sys     5m52.670s
+sh 5_circos_cmd.sh
+```
+
+## Human
+
+```bash
+cd ~/data/alignment/self
+
+perl ~/Scripts/withncbi/taxon/strain_bz_self.pl \
+    --file ~/data/alignment/self/ensembl_taxon.csv \
+    --working_dir ~/data/alignment/self \
+    --seq_dir ~/data/alignment/Ensembl \
+    --length 1000  \
+    --use_name \
+    --norm \
+    --name human \
+    --parallel 8 \
+    -t Human
+
+cd ~/data/alignment/self/human
+
+sh 1_real_chr.sh
+time sh 3_self_cmd.sh
+time sh 4_proc_cmd.sh
+sh 5_circos_cmd.sh
+```
+
+## Cele
+
+```bash
+cd ~/data/alignment/self
+
+perl ~/Scripts/withncbi/taxon/strain_bz_self.pl \
+    --file ~/data/alignment/self/ensembl_taxon.csv \
+    --working_dir ~/data/alignment/self \
+    --seq_dir ~/data/alignment/Ensembl \
+    --length 1000  \
+    --use_name \
+    --norm \
+    --name worm \
+    --parallel 8 \
+    -t Cele
+
+cd ~/data/alignment/self/worm
+
+sh 1_real_chr.sh
+time sh 3_self_cmd.sh
+# real    26m9.090s
+# user    150m18.730s
+# sys     0m49.323s
+time sh 4_proc_cmd.sh
+# real    6m49.232s
+# user    12m26.789s
+# sys     4m51.724s
+sh 5_circos_cmd.sh
+```
+
+## Ddis
+
+```bash
+cd ~/data/alignment/self
+
+perl ~/Scripts/withncbi/taxon/strain_bz_self.pl \
+    --file ~/data/alignment/self/ensembl_taxon.csv \
+    --working_dir ~/data/alignment/self \
+    --seq_dir ~/data/alignment/Ensembl \
+    --length 1000  \
+    --use_name \
+    --norm \
+    --name dicty \
+    --parallel 8 \
+    -t Ddis
+
+cd ~/data/alignment/self/dicty
+
+sh 1_real_chr.sh
+sh 3_self_cmd.sh
+time sh 4_proc_cmd.sh
+sh 5_circos_cmd.sh
+```
+
+## Mouse
+
+```bash
+cd ~/data/alignment/self
+
+perl ~/Scripts/withncbi/taxon/strain_bz_self.pl \
+    --file ~/data/alignment/self/ensembl_taxon.csv \
+    --working_dir ~/data/alignment/self \
+    --seq_dir ~/data/alignment/Ensembl \
+    --length 1000  \
+    --use_name \
+    --norm \
+    --name mouse \
+    --parallel 8 \
+    -t Mouse
+
+cd ~/data/alignment/self/mouse
+
+sh 1_real_chr.sh
+time sh 3_self_cmd.sh
+time sh 4_proc_cmd.sh
 sh 5_circos_cmd.sh
 ```

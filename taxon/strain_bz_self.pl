@@ -510,11 +510,12 @@ perl [% egas %]/cover_figure.pl --size chr.sizes -f [% id %].cc.chr.runlist.yml;
 echo "* Results"
 sleep 1;
 
-mv [% id %].cc.pairwise.fas         [% working_dir %]/Results/[% id %]
+mv [% id %].cc.pairwise.fas         [% working_dir %]/Results/[% id %]/[% id %].pairwise.fas
 cp [% id %].cc.yml                  [% working_dir %]/Results/[% id %]
-mv [% id %].cc.csv                  [% working_dir %]/Results/[% id %]
+mv [% id %].cc.csv                  [% working_dir %]/Results/[% id %]/[% id %].copy.csv
+mv [% id %].cc.runlist.yml          [% working_dir %]/Results/[% id %]/[% id %].copy.runlist.yml
 mv [% id %].cc.chr.runlist.yml.csv  [% working_dir %]/Results/[% id %]/[% id %].chr.csv
-mv [% id %].cc.chr.runlist.yml      [% working_dir %]/Results/[% id %]/[% id %].paralog.yml
+mv [% id %].cc.chr.runlist.yml      [% working_dir %]/Results/[% id %]/[% id %].chr.runlist.yml
 mv [% id %].cc.chr.runlist.png      [% working_dir %]/Results/[% id %]/[% id %].chr.png
 
 #----------------------------#
