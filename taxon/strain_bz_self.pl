@@ -442,7 +442,7 @@ sleep 1;
 fasops covers axt.correct.fas -o axt.correct.yml
 runlist split axt.correct.yml -s .temp.yml
 runlist compare --op union target.temp.yml query.temp.yml -o axt.union.yml
-runlist stat --size chr.sizes axt.union.yml -o [% working_dir %]/Results/[% id %]/S288c.union.csv
+runlist stat --size chr.sizes axt.union.yml -o [% working_dir %]/Results/[% id %]/[% id %].union.csv
 
 # links by lastz-chain
 fasops links axt.correct.fas -o stdout \
@@ -464,7 +464,7 @@ cat axt.gl.fasta > axt.all.fasta
 # Get more paralogs
 #----------------------------#
 echo "* Get more paralogs"
-perl [% egas %]/blastn_genome.pl -c 0.95 -f axt.gl.fasta -g genome.fa -o axt.bg.fasta
+perl [% egas %]/blastn_genome.pl -c 0.95 -f axt.gl.fasta -g genome.fa -o axt.bg.fasta --parallel [% parallel %]
 cat axt.gl.fasta axt.bg.fasta > axt.all.fasta
 [% END -%]
 
@@ -473,7 +473,7 @@ cat axt.gl.fasta axt.bg.fasta > axt.all.fasta
 #----------------------------#
 echo "* Link paralogs"
 sleep 1;
-perl [% egas %]/blastn_paralog.pl -f axt.all.fasta -c 0.95 -o links.blast.tsv
+perl [% egas %]/blastn_paralog.pl -f axt.all.fasta -c 0.95 -o links.blast.tsv --parallel [% parallel %]
 
 #----------------------------#
 # Merge paralogs
@@ -481,7 +481,7 @@ perl [% egas %]/blastn_paralog.pl -f axt.all.fasta -c 0.95 -o links.blast.tsv
 echo "* Merge paralogs"
 sleep 1;
 
-perl [% egas %]/merge_node.pl -v -c 0.95 -o [% id %].merge.yml \
+perl [% egas %]/merge_node.pl -v -c 0.95 -o [% id %].merge.yml --parallel [% parallel %] \
 [% IF noblast -%]
     -f links.lastz.tsv
 [% ELSE -%]
@@ -497,7 +497,7 @@ perl [% egas %]/paralog_graph.pl -v -m [% id %].merge.yml --nonself -o [% id %].
 
 echo "* CC sequences and stats"
 perl [% egas %]/cc.pl           -f [% id %].merge.graph.yml
-perl [% egas %]/proc_cc_chop.pl -f [% id %].cc.yml --size chr.sizes --genome genome.fa --msa [% msa %]
+perl [% egas %]/proc_cc_chop.pl -f [% id %].cc.raw.yml --size chr.sizes --genome genome.fa --msa [% msa %] --parallel [% parallel %]
 perl [% egas %]/proc_cc_stat.pl -f [% id %].cc.yml --size chr.sizes
 
 echo "* Coverage figure"
@@ -528,6 +528,7 @@ find [% working_dir %]/Processing/[% id %] -type f -name "*gl.fasta*"    | paral
 find [% working_dir %]/Processing/[% id %] -type f -name "*.sep.fasta"   | parallel --no-run-if-empty rm
 find [% working_dir %]/Processing/[% id %] -type f -name "axt.*"         | parallel --no-run-if-empty rm
 find [% working_dir %]/Processing/[% id %] -type f -name "replace.*.tsv" | parallel --no-run-if-empty rm
+find [% working_dir %]/Processing/[% id %] -type f -name "*.temp.yml"    | parallel --no-run-if-empty rm
 
 [% END -%]
 EOF
