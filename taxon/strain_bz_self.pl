@@ -417,11 +417,12 @@ faops size genome.fa > chr.sizes
 #----------------------------#
 # Correct genomic positions
 #----------------------------#
-echo "* Correct genomic positions"
+echo "* Get exact copies in the genome"
 sleep 1;
 
 echo "* axt2fas"
-fasops axt2fas [% working_dir %]/Pairwise/[% id %]vsselfalign/axtNet/*.axt.gz -l [% length %] -o stdout > axt.fas
+fasops axt2fas [% working_dir %]/Pairwise/[% id %]vsselfalign/axtNet/*.axt.gz \
+    -l [% length %] -s chr.sizes -o stdout > axt.fas
 fasops separate axt.fas -o [% working_dir %]/Processing/[% id %] --nodash -s .sep.fasta
 
 echo "* Target positions"
