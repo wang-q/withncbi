@@ -1,12 +1,10 @@
 #!/usr/bin/perl
 use strict;
 use warnings;
+use autodie;
 
 use Template;
-use File::Basename;
-use File::Find::Rule;
 use File::Spec;
-use String::Compare;
 use YAML qw(Dump Load DumpFile LoadFile);
 
 my $store_dir = shift
@@ -127,22 +125,11 @@ my $parallel = 12;
     for my $item ( sort @data ) {
         my $name = $item->{name};
 
-        ## match the most similar name
-       #my ($file) = map { $_->[0] }
-       #    sort { $b->[1] <=> $a->[1] }
-       #    map { [ $_, compare( lc basename($_), lc $item->{name} ) ] } @files;
-       #$item->{seq} = $file;
-
         # prepare working dir
         my $dir = File::Spec->catdir( $data_dir, $name );
         mkdir $dir if !-e $dir;
         $item->{dir} = $dir;
     }
-
-    #for my $d ( qw{ maf } ) {
-    #    my $dir = File::Spec->catdir( $data_dir, $d );
-    #    mkdir $dir if !-e $dir;
-    #}
 
     print Dump \@data;
 
