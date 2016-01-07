@@ -773,11 +773,9 @@ find . -type f \
     | grep -v -E "\.(sh|2bit|bat)$" \
     | grep -v -E "(chr_length|id2name|taxon|fake_taxon)\.csv$" \
     | grep -v -F "fake_tree.nwk" \
-    > file_list.temp.txt
+    > file_list.txt
 
-tar -czvf [% multi_name %].tar.gz -T file_list.temp.txt
-
-rm file_list.temp.txt
+tar -czvf [% multi_name %].tar.gz -T file_list.txt
 
 EOF
     $tt->process(
