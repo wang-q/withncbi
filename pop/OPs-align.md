@@ -1099,7 +1099,7 @@ EOF
 
 ## Primates
 
-0. Create data.yml manually.
+0. Create an empty data.yml.
 
     ```bash
     mkdir -p ~/data/alignment/primates82
@@ -1155,11 +1155,116 @@ EOF
     # other plans
     sh plan_HC_R.sh
     sh 5_multi_cmd.sh
-    sh 7_multi_db_only.sh
 
     sh plan_HCGO_R.sh
     sh 5_multi_cmd.sh
+    ```
+
+## Human individuals from Simons project
+
+0. Create data.yml manually.
+
+    ```bash
+    mkdir -p ~/data/alignment/human_simons
+    cd ~/data/alignment/human_simons
+
+    cat <<EOF > human_simons_data.yml
+---
+data:
+  - name: HGDP00456
+    population: Mbuti
+    gender: M
+    original_id: 9606
+  - name: HGDP00521
+    population: French
+    gender: M
+    original_id: 9606
+  - name: HGDP00542
+    population: Papuan
+    gender: M
+    original_id: 9606
+  - name: HGDP00665
+    population: Sardinian
+    gender: M
+    original_id: 9606
+  - name: HGDP00778
+    population: Han
+    gender: M
+    original_id: 9606
+  - name: HGDP00927
+    population: Yoruba
+    gender: M
+    original_id: 9606
+  - name: HGDP00998
+    population: Karitiana
+    gender: M
+    original_id: 9606
+  - name: HGDP01029
+    population: San
+    gender: M
+    original_id: 9606
+  - name: HGDP01284
+    population: Mandenka
+    gender: M
+    original_id: 9606
+  - name: HGDP01307
+    population: Dai
+    gender: M
+    original_id: 9606
+  - name: MIXE
+    population: Mixe
+    gender: F
+    original_id: 9606
+EOF
+    ```
+
+1. `gen_pop_conf.pl`
+
+    ```bash
+    mkdir -p ~/data/alignment/human_simons
+    cd ~/data/alignment/human_simons
+
+    perl ~/Scripts/withncbi/pop/gen_pop_conf.pl \
+        -i human_simons_data.yml \
+        -o ~/Scripts/withncbi/pop/human_simons_test.yml \
+        -d ~/data/alignment/others/simons-phase0 \
+        -m name \
+        -r '*.fa.gz' \
+        --opt group_name=human_simons \
+        --opt base_dir='~/data/alignment' \
+        --opt data_dir='~/data/alignment/human_simons' \
+        --dd ~/data/alignment/Ensembl \
+        --download 'name=Human;taxon=9606;sciname=Homo sapiens' \
+        --download 'name=Chimp;taxon=9598;sciname=Pan troglodytes;coverage=6x sanger' \
+        --plan 'name=Human_n12_pop;t=Human;qs=HGDP00456,HGDP00521,HGDP00542,HGDP00665,HGDP00778,HGDP00927,HGDP00998,HGDP01029,HGDP01284,HGDP01307,MIXE' \
+        --plan 'name=Human_n12_Chimp;t=Human;qs=HGDP00456,HGDP00521,HGDP00542,HGDP00665,HGDP00778,HGDP00927,HGDP00998,HGDP01029,HGDP01284,HGDP01307,MIXE,Chimp;o=Chimp' \
+        -y
+    ```
+
+2. Rest routing things.
+
+    ```bash
+    # pop_prep.pl
+    cd ~/data/alignment/human_simons
+    perl ~/Scripts/withncbi/pop/pop_prep.pl -p 12 -i ~/Scripts/withncbi/pop/human_simons_test.yml
+
+    sh 01_file.sh
+    sh 03_strain_info.sh
+
+    # plan_ALL.sh
+    sh plan_ALL.sh
+
+    sh 1_real_chr.sh
+    sh 3_pair_cmd.sh
+    sh 5_multi_cmd.sh
     sh 7_multi_db_only.sh
+
+    # other plans
+    sh plan_Human_n12_pop.sh
+    sh 5_multi_cmd.sh
+
+    sh plan_Human_n12_Chimp.sh
+    sh 5_multi_cmd.sh
     ```
 
 ## *Caenorhabditis elegans* million mutation project (cele_mmp)
