@@ -994,6 +994,38 @@ for genomes out of WGS, which usually in better assembling levels.
     rm 1099*.fa
     ```
 
+## Human individuals from Simons project
+
+1. Sources
+
+    * https://www.simonsfoundation.org/life-sciences/simons-genome-diversity-project-dataset/
+    * Download with Globus
+        * https://www.globus.org/xfer/StartTransfer?origin=simonsfoundation%23sf_data/SGVP/Whole_Genome/Public/HMS_Reich/&source_id=d20e60cc-6d04-11e5-ba46-22000b92c6ec&source_path=/SGVP/Whole_Genome/Public/HMS_Reich/
+    * The data were mapped to hg19/GRCh37.
+        * https://www.simonsfoundation.org/life-sciences/simons-genome-diversity-project/
+
+2. The data are experimentally phased. Pick one from diploid genomes.
+
+    ```bash
+    mkdir -p ~/data/alignment/others/simons-phase0
+    tree ~/data/alignment/others/simons-phase0
+    ```
+
+    ```text
+    ~/data/alignment/others/simons-phase0
+    ├── HGDP00456.phased.0.Q40.fa.gz
+    ├── HGDP00521.phased.0.Q40.fa.gz
+    ├── HGDP00542.phased.0.Q40.fa.gz
+    ├── HGDP00665.phased.0.Q40.fa.gz
+    ├── HGDP00778.phased.0.Q40.fa.gz
+    ├── HGDP00927.phased.0.Q40.fa.gz
+    ├── HGDP00998.phased.0.Q40.fa.gz
+    ├── HGDP01029.phased.0.Q40.fa.gz
+    ├── HGDP01284.phased.0.Q40.fa.gz
+    ├── HGDP01307.phased.0.Q40.fa.gz
+    └── MIXE.phased.0.Q40.fa.gz
+    ```
+
 ## *Caenorhabditis elegans*
 
 There are no suitable outgroups for *C. elegans*.
