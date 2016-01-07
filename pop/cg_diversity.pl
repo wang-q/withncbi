@@ -5,7 +5,6 @@ use warnings;
 use Template;
 use File::Basename;
 use File::Find::Rule;
-use File::Remove qw(remove);
 use File::Spec;
 use String::Compare;
 use YAML qw(Dump Load DumpFile LoadFile);
@@ -19,9 +18,6 @@ my $parallel = 12;
     my $pl_dir   = File::Spec->catdir( $ENV{HOME}, "Scripts" );
     my $kentbin_dir = File::Spec->catdir( $ENV{HOME}, "bin/x86_64" );
     my $vcfbin_dir  = File::Spec->catdir( $ENV{HOME}, "share/vcftools" );
-
-    # nature 2011
-    my $seq_dir = File::Spec->catdir( $ENV{HOME}, "data/ath19/process/" );
 
     # CG 69 genomes
     my $all_vcf = File::Spec->catdir( $ENV{HOME},
@@ -127,8 +123,6 @@ my $parallel = 12;
  #{taxon =>902046,name => "NA19129",pop =>"YRI",column =>"NA19129-200-37-ASM",},
 
     );
-
-    #my @files = File::Find::Rule->file->name('*.vcf.fasta')->in($seq_dir);
 
     for my $item ( sort @data ) {
         my $name = $item->{name};
