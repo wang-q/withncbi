@@ -182,40 +182,9 @@ my $acc_of = {};
 }
 
 {
-    print "Create id2name.csv\n";
-    my $fh = path( $working_dir, "id2name.csv" )->openw;
-    if ( !$use_name ) {
-
-        # if not set --use_name, use id as strain name
-        for my $id ( $target_id, @query_ids ) {
-            print {$fh} "$id,$id\n";
-        }
-    }
-    else {
-        for my $name ( $target_id, @query_ids ) {
-            my ($id)
-                = map { $_->{taxon} } grep { $_->{name} eq $name } @data;
-            print {$fh} "$id,$name\n";
-        }
-    }
-    close $fh;
-}
-
-{
     my $tt = Template->new;
     my $text;
     my $sh_name;
-
-    # taxon.csv
-    print "Create taxon.csv\n";
-    $text = <<'EOF';
-taxon_id,genus,species,sub_species,common_name
-[% FOREACH item IN data -%]
-[% item.taxon %],[% item.genus %],[% item.species %],[% item.subname %],[% item.name %]
-[% END -%]
-EOF
-    $tt->process( \$text, { data => \@data, }, path( $working_dir, "taxon.csv" )->stringify )
-        or die Template->error;
 
     #----------------------------#
     # all *.sh files
@@ -231,9 +200,9 @@ cd [% working_dir %]
 sleep 1;
 
 cat << DELIMITER > chrUn.csv
-taxon_id,chr,length,name,assembly
+common_name,taxon_id,chr,length,name,assembly
 [% FOREACH item IN data -%]
-[% item.taxon %],chrUn,999999999,[% item.name %]
+[% item.name %],[% item.taxon %],chrUn,999999999,
 [% END -%]
 DELIMITER
 
@@ -245,7 +214,7 @@ fi;
 if [ ! -f [% item.dir %]/chr.sizes ]; then
     faops size [% item.dir %]/*.fa > [% item.dir %]/chr.sizes;
 fi;
-perl -aln -F"\t" -e 'print qq{[% item.taxon %],$F[0],$F[1],[% item.name %]}' [% item.dir %]/chr.sizes >> real_chr.csv;
+perl -aln -F"\t" -e 'print qq{[% item.name %],[% item.taxon %],$F[0],$F[1],}' [% item.dir %]/chr.sizes >> real_chr.csv;
 [% END -%]
 
 cat chrUn.csv real_chr.csv > chr_length.csv
@@ -964,8 +933,6 @@ perl [% aligndb %]/extra/multi_way_batch.pl \
     -da [% working_dir %]/Results/[% id %] \
     --gff_files [% FOREACH acc IN acc_of.${id} %][% working_dir %]/Genomes/[% item.taxon %]/[% acc %].gff,[% END %] \
     --rm_gff_files [% FOREACH acc IN acc_of.${id} %][% working_dir %]/Genomes/[% item.taxon %]/[% acc %].rm.gff,[% END %] \
-    --id [% working_dir %]/id2name.csv \
-    -taxon [% working_dir %]/taxon.csv \
     -chr [% working_dir %]/chr_length.csv \
     -lt 1000 --parallel [% parallel %] --run 1-5,21,40
 
@@ -977,8 +944,6 @@ perl [% aligndb %]/extra/multi_way_batch.pl \
 # init db
 perl [% aligndb %]/extra/multi_way_batch.pl \
     -d [% name_str %]_paralog \
-    --id [% working_dir %]/id2name.csv \
-    -taxon [% working_dir %]/taxon.csv \
     -chr [% working_dir %]/chr_length.csv \
     -r 1
 
@@ -991,7 +956,6 @@ perl [% aligndb %]/extra/multi_way_batch.pl \
 # gen_alignDB to existing database
 perl [% aligndb %]/extra/multi_way_batch.pl \
     -d [% name_str %]_paralog \
-    --id [% working_dir %]/id2name.csv \
     -da [% working_dir %]/Results/[% id %] \
     -lt 1000 --parallel [% parallel %] --run 2
 
