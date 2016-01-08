@@ -229,10 +229,10 @@ if [ -f real_chr.csv ]; then
 fi;
 
 [% FOREACH item IN data -%]
-if [ ! -f [% item.dir %]/chr.sizes ]; then
-    faops size [% item.dir %]/*.fa > [% item.dir %]/chr.sizes;
-fi;
+# [% item.name %]
+faops size [% item.dir %]/*.fa > [% item.dir %]/chr.sizes;
 perl -aln -F"\t" -e 'print qq{[% item.name %],[% item.taxon %],$F[0],$F[1],}' [% item.dir %]/chr.sizes >> real_chr.csv;
+
 [% END -%]
 
 cat chrUn.csv real_chr.csv > chr_length.csv
