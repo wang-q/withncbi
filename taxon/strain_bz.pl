@@ -326,6 +326,7 @@ perl [% egaz %]/z_batch.pl \
     -dq [% working_dir %]/Genomes/[% q %] \
     -dw [% working_dir %]/Pairwise \
     -r 2-4 \
+    --clean \
     --parallel [% parallel %]
 
 [% END -%]
@@ -471,16 +472,18 @@ cd [% working_dir %]
 
 sleep 1;
 
+#----------------------------#
+# Clean previous directories
+#----------------------------#
 if [ -d [% working_dir %]/[% multi_name %]_mz ]; then
     rm -fr [% working_dir %]/[% multi_name %]_mz;
-    mkdir -p [% working_dir %]/[% multi_name %]_mz;
-else
-    mkdir -p [% working_dir %]/[% multi_name %]_mz;
 fi;
+mkdir -p [% working_dir %]/[% multi_name %]_mz;
 
 if [ -d [% working_dir %]/[% multi_name %]_fasta ]; then
     rm -fr [% working_dir %]/[% multi_name %]_fasta;
 fi;
+mkdir -p [% working_dir %]/[% multi_name %]_fasta
 
 if [ -d [% working_dir %]/[% multi_name %]_refined ]; then
     rm -fr [% working_dir %]/[% multi_name %]_refined;
@@ -488,10 +491,8 @@ fi;
 
 if [ -d [% working_dir %]/[% multi_name %]_phylo ]; then
     rm -fr [% working_dir %]/[% multi_name %]_phylo;
-    mkdir -p [% working_dir %]/[% multi_name %]_phylo;
-else
-    mkdir -p [% working_dir %]/[% multi_name %]_phylo;
 fi;
+mkdir -p [% working_dir %]/[% multi_name %]_phylo;
 
 #----------------------------#
 # mz
@@ -531,7 +532,6 @@ find [% working_dir %]/[% multi_name %]_mz -type f -name "*.maf" | parallel --no
 # maf2fas
 #----------------------------#
 echo "Convert maf to fas"
-mkdir -p [% working_dir %]/[% multi_name %]_fasta
 find [% working_dir %]/[% multi_name %]_mz -name "*.maf" -or -name "*.maf.gz" \
     | parallel --no-run-if-empty -j [% parallel %] fasops maf2fas {} -o [% working_dir %]/[% multi_name %]_fasta/{/}.fas
 
