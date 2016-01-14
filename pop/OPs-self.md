@@ -150,30 +150,6 @@ time sh 4_proc_cmd.sh
 sh 5_circos_cmd.sh
 ```
 
-## Human
-
-```bash
-cd ~/data/alignment/self
-
-perl ~/Scripts/withncbi/taxon/strain_bz_self.pl \
-    --file ~/data/alignment/self/ensembl_taxon.csv \
-    --working_dir ~/data/alignment/self \
-    --seq_dir ~/data/alignment/Ensembl \
-    --length 1000  \
-    --use_name \
-    --norm \
-    --name human \
-    --parallel 8 \
-    -t Human
-
-cd ~/data/alignment/self/human
-
-sh 1_real_chr.sh
-time sh 3_self_cmd.sh
-time sh 4_proc_cmd.sh
-sh 5_circos_cmd.sh
-```
-
 ## Cele
 
 ```bash
@@ -225,6 +201,36 @@ cd ~/data/alignment/self/dicty
 sh 1_real_chr.sh
 sh 3_self_cmd.sh
 time sh 4_proc_cmd.sh
+sh 5_circos_cmd.sh
+```
+
+## Human
+
+```bash
+cd ~/data/alignment/self
+
+perl ~/Scripts/withncbi/taxon/strain_bz_self.pl \
+    --file ~/data/alignment/self/ensembl_taxon.csv \
+    --working_dir ~/data/alignment/self \
+    --seq_dir ~/data/alignment/Ensembl \
+    --length 1000  \
+    --use_name \
+    --norm \
+    --name human \
+    --parallel 8 \
+    -t Human
+
+cd ~/data/alignment/self/human
+
+sh 1_real_chr.sh
+time sh 3_self_cmd.sh
+# real    4156m4.259s
+# user    32775m39.086s
+# sys     227m18.093s
+time sh 4_proc_cmd.sh
+# real    1888m49.720s
+# user    7892m55.508s
+# sys     220m35.101s
 sh 5_circos_cmd.sh
 ```
 
