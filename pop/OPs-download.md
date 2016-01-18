@@ -956,7 +956,6 @@ for genomes out of WGS, which usually in better assembling levels.
 
     cat GL*.fa > Un.fa
     cat AACZ*.fa >> Un.fa
-
     rm GL*.fa AACZ*.fa
 
     # Gorilla
@@ -1256,9 +1255,9 @@ http://hgdownload.soe.ucsc.edu/goldenPath/ce10/multiz7way/ce10.commonNames.7way.
 
     cat GL*.fa > Un.fa
     cat JH*.fa >> Un.fa
-
     rm GL*.fa JH*.fa
 
+    mv Un.fa Un.fa.skip
     mv Y.fa Y.fa.skip
     mv MT.fa MT.fa.skip
 
@@ -1274,9 +1273,9 @@ http://hgdownload.soe.ucsc.edu/goldenPath/ce10/multiz7way/ce10.commonNames.7way.
 
     cat KL*.fa > Un.fa
     cat AABR*.fa >> Un.fa
-
     rm KL*.fa AABR*.fa
 
+    mv Un.fa Un.fa.skip
     mv Y.fa Y.fa.skip
     mv MT.fa MT.fa.skip
 	```

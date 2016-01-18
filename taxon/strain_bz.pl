@@ -218,7 +218,7 @@ cd [% working_dir %]
 sleep 1;
 
 cat << DELIMITER > chrUn.csv
-common_name,taxon_id,chr,length,name,assembly
+common_name,taxon_id,chr,length,assembly
 [% FOREACH item IN data -%]
 [% item.name %],[% item.taxon %],chrUn,999999999,
 [% END -%]

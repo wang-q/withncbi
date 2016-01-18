@@ -67,35 +67,33 @@ Manually combine `~/data/alignment/Fungi/GENOMES/saccharomyces/WGS/saccharomyces
 1. `gen_pop_conf.pl`
 
     ```bash
-    export GROUP_NAME=scer_wgs
-
     # create downloaded genome list
-    cat ~/data/alignment/Fungi/GENOMES/${GROUP_NAME}/DOWNLOAD/${GROUP_NAME}.seq.csv \
+    cat ~/data/alignment/Fungi/GENOMES/scer_wgs/DOWNLOAD/scer_wgs.seq.csv \
         | grep -v "^#" \
         | cut -d',' -f1,3 \
         | uniq \
         | perl -nl -a -F"," -e 'printf qq{    --download "name=%s;taxon=%s" \\\n}, $F[0], $F[1];'
 
-    mkdir -p ~/data/alignment/Fungi/${GROUP_NAME}
-    cd ~/data/alignment/Fungi/${GROUP_NAME}
+    mkdir -p ~/data/alignment/Fungi/scer_wgs
+    cd ~/data/alignment/Fungi/scer_wgs
 
     perl ~/Scripts/withncbi/pop/gen_pop_conf.pl \
-        -i ~/data/alignment/Fungi/GENOMES/${GROUP_NAME}/WGS/${GROUP_NAME}.data.yml \
-        -o ~/Scripts/withncbi/pop/${GROUP_NAME}_test.yml \
-        -d ~/data/alignment/Fungi/GENOMES/${GROUP_NAME}/WGS \
+        -i ~/data/alignment/Fungi/GENOMES/scer_wgs/WGS/scer_wgs.data.yml \
+        -o ~/Scripts/withncbi/pop/scer_wgs_test.yml \
+        -d ~/data/alignment/Fungi/GENOMES/scer_wgs/WGS \
         -m prefix \
         -r '*.fsa_nt.gz' \
-        --opt group_name=${GROUP_NAME} \
+        --opt group_name=scer_wgs \
         --opt base_dir='~/data/alignment/Fungi' \
-        --opt data_dir="~/data/alignment/Fungi/${GROUP_NAME}" \
+        --opt data_dir="~/data/alignment/Fungi/scer_wgs" \
         --opt rm_species=Fungi \
-        --dd ~/data/alignment/Fungi/GENOMES/${GROUP_NAME}/DOWNLOAD \
+        --dd ~/data/alignment/Fungi/GENOMES/scer_wgs/DOWNLOAD \
         --download "name=S288c;taxon=559292" \
         --download "name=RM11_1a;taxon=285006" \
         --download "name=EC1118;taxon=643680" \
         --plan 'name=five_way;t=S288c;qs=EC1118,RM11_1a,YJM789,BC187' \
+        --plan 'name=Scer_n8_pop;t=S288c;qs=EC1118,JAY291,Kyokai_no_7,RM11_1a,Sigma1278b,T7,YJM789' \
         --plan 'name=Scer_n8_Spar;t=S288c;qs=EC1118,JAY291,Kyokai_no_7,RM11_1a,Sigma1278b,T7,YJM789,Spar;o=Spar' \
-        --plan 'name=Scer_n8;t=S288c;qs=EC1118,JAY291,Kyokai_no_7,RM11_1a,Sigma1278b,T7,YJM789' \
         --plan 'name=Scer_n8_Sbou;t=S288c;qs=EC1118,JAY291,Kyokai_no_7,RM11_1a,Sigma1278b,T7,YJM789,Sbou;o=Sbou' \
         -y
     ```
@@ -127,12 +125,12 @@ Manually combine `~/data/alignment/Fungi/GENOMES/saccharomyces/WGS/saccharomyces
     sh 7_multi_db_only.sh
 
     # other plans
-    sh plan_Scer_n8_Spar.sh
+    sh plan_Scer_n8_pop.sh
     sh 5_multi_cmd.sh
     sh 7_multi_db_only.sh
 
     # other plans
-    sh plan_Scer_n8.sh
+    sh plan_Scer_n8_Spar.sh
     sh 5_multi_cmd.sh
     sh 7_multi_db_only.sh
 

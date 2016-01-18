@@ -254,6 +254,9 @@ cd ~/data/alignment/self/mouse
 
 sh 1_real_chr.sh
 time sh 3_self_cmd.sh
+# real    3801m39.031s
+# user    29792m18.127s
+# sys     133m41.809s
 time sh 4_proc_cmd.sh
 sh 5_circos_cmd.sh
 ```
