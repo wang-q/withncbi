@@ -1243,6 +1243,8 @@ http://hgdownload.soe.ucsc.edu/goldenPath/ce10/multiz7way/ce10.commonNames.7way.
 3. Reference strain C57BL/6J (GRCm38) and rat from ensembl.
 
     ```bash
+    #rsync -avP wangq@wq.nju.edu.cn:data/alignment/Ensembl/ ~/data/alignment/Ensembl
+
     # Mouse
     mkdir -p ~/data/alignment/Ensembl/Mouse
     cd ~/data/alignment/Ensembl/Mouse
