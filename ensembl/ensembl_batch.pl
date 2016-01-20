@@ -10,7 +10,7 @@ use YAML qw(Dump Load DumpFile LoadFile);
 
 use Path::Tiny;
 use String::Compare;
-use Set::Light;
+use Set::Scalar;
 use Template;
 
 use AlignDB::Stopwatch;
@@ -164,7 +164,7 @@ sub build_cmd {
 
     my %score_of;
     my ( $genus, $species, $strain ) = split " ", $sp;
-    my $set = Set::Light->new(qw{ core funcgen otherfeatures variation });
+    my $set = Set::Scalar->new(qw{ core funcgen otherfeatures variation });
     my $str;
     if ( $set->has($group) ) {
         $str = lc join "_", grep {$_} ( $genus, $species, $strain, $group );
