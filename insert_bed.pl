@@ -3,9 +3,9 @@ use strict;
 use warnings;
 use autodie;
 
-use Getopt::Long;
-use Pod::Usage;
+use Getopt::Long qw(HelpMessage);
 use Config::Tiny;
+use FindBin;
 use YAML qw(Dump Load DumpFile LoadFile);
 
 use Roman;
@@ -17,7 +17,6 @@ use AlignDB::Run;
 use AlignDB::Window;
 use AlignDB::Stopwatch;
 
-use FindBin;
 use lib "$FindBin::Bin/../lib";
 use AlignDB;
 use AlignDB::Ofg;
@@ -25,8 +24,7 @@ use AlignDB::Ofg;
 #----------------------------------------------------------#
 # GetOpt section
 #----------------------------------------------------------#
-my $Config = Config::Tiny->new;
-$Config = Config::Tiny->read("$FindBin::Bin/../alignDB.ini");
+my $Config = Config::Tiny->read("$FindBin::Bin/../alignDB.ini");
 
 # record ARGV and Config
 my $stopwatch = AlignDB::Stopwatch->new(
@@ -35,50 +33,65 @@ my $stopwatch = AlignDB::Stopwatch->new(
     program_conf => $Config,
 );
 
-# Database init values
-my $server   = $Config->{database}{server};
-my $port     = $Config->{database}{port};
-my $username = $Config->{database}{username};
-my $password = $Config->{database}{password};
-my $db       = $Config->{database}{db};
+=head1 NAME
 
-my @tags;
-my @types;
-my $style = "center_intact";
-my $noclean;    # do not clean ofg tables
+insert_bed.pl - Insert beds to alignDB
 
-my @files;
+=head1 SYNOPSIS
 
-# run in parallel mode
-my $parallel = $Config->{generate}{parallel};
+    perl insert_bed.pl [options]
+      Options:
+        --help      -?          brief help message
+        --server    -s  STR     MySQL server IP/Domain name
+        --port      -P  INT     MySQL server port
+        --db        -d  STR     database name
+        --username  -u  STR     username
+        --password  -p  STR     password
+        --password  -p  STR     password
+        --file      -f  @STR    bed files
+        --tag           @STR    tags
+        --type          @STR    types
+        --style         STR     ofg style, default is [center_intact]
+        --batch         INT     number of alignments in one child process
+        --noclean               do not clean ofg tables
+        --dG                    calculate deltaG
 
-# number of alignments process in one child process
-my $batch_number = $Config->{generate}{batch};
+        
+    Styles:
+        edge
+        ------+------------------------------------+--------
+           2 1 -1 -2     -89 -90  -90 -89     -2 -1 1 2
+        
+        edge_only
+        ------+-----------------------+--------
+           2 1 -1 -2             -2 -1 1 2
+        
+        center
+        ------+-----------------+--------
+        7 6 5 4 3 2 1 0 1 2 3 4 5 6 7 8
+        
+        center_intact
+        ------+-----------------+--------
+         3 2 1        0          1 2 3 4
 
-my $multi;
-
-my $man  = 0;
-my $help = 0;
+=cut
 
 GetOptions(
-    'help|?'       => \$help,
-    'man'          => \$man,
-    's|server=s'   => \$server,
-    'P|port=i'     => \$port,
-    'd|db=s'       => \$db,
-    'u|username=s' => \$username,
-    'p|password=s' => \$password,
-    'f|file=s'     => \@files,
-    'tag=s'        => \@tags,
-    'type=s'       => \@types,
-    'style=s'      => \$style,
-    'parallel=i'   => \$parallel,
-    'batch=i'      => \$batch_number,
-    'noclean'      => \$noclean,
-) or pod2usage(2);
-
-pod2usage(1) if $help;
-pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
+    'help|?' => sub { HelpMessage(0) },
+    'server|s=s'   => \( my $server       = $Config->{database}{server} ),
+    'port|P=i'     => \( my $port         = $Config->{database}{port} ),
+    'db|d=s'       => \( my $db           = $Config->{database}{db} ),
+    'username|u=s' => \( my $username     = $Config->{database}{username} ),
+    'password|p=s' => \( my $password     = $Config->{database}{password} ),
+    'file|f=s'     => \my @files,
+    'tag=s'        => \my @tags,
+    'type=s'       => \my @types,
+    'style=s'      => \( my $style        = "center_intact" ),
+    'parallel=i'   => \( my $parallel     = $Config->{generate}{parallel} ),
+    'batch=i'      => \( my $batch_number = $Config->{generate}{batch} ),
+    'noclean'      => \( my $noclean ),
+    'dG'           => \( my $deltaG ),
+) or HelpMessage(1);
 
 #----------------------------------------------------------#
 # Init objects
@@ -116,14 +129,20 @@ my @jobs;
 # prepare
 my @args = zip @files, @tags, @types;
 
+$stopwatch->block_message("bed information");
+print Dump \@args;
+
+unless (@args) {
+    die "No bed to be processed\n";    
+}
+
 my @all_data;
 my %chr_data_set;
-
 while (@args) {
     my $file = shift @args;
     my $tag  = shift @args;
     my $type = shift @args;
-    
+
     print "File [$file]\n";
 
     open my $data_fh, '<', $file;
@@ -140,8 +159,7 @@ while (@args) {
             ( $start, $end ) = ( $end, $start );
         }
         my $set = AlignDB::IntSpan->new("$start-$end");
-        push @all_data,
-            { chr => $chr, set => $set, tag => $tag, type => $type };
+        push @all_data, { chr => $chr, set => $set, tag => $tag, type => $type };
         if ( !exists $chr_data_set{$chr} ) {
             $chr_data_set{$chr} = AlignDB::IntSpan->new;
         }
@@ -167,12 +185,17 @@ my $worker = sub {
     $obj->max_out_distance(20);
     $obj->max_in_distance(20);
 
+    if ($deltaG) {
+        $obj->insert_dG(1);
+    }
     $obj->insert_ofg( \@align_ids, \@all_data, \%chr_data_set );
 };
 
 #----------------------------------------------------------#
 # start update
 #----------------------------------------------------------#
+$stopwatch->block_message("Start update");
+
 my $run = AlignDB::Run->new(
     parallel => $parallel,
     jobs     => \@jobs,
@@ -194,15 +217,3 @@ END {
 exit;
 
 __END__
-
-=head1 NAME
-
-    insert_bed.pl - Add annotation info to alignDB
-
-=head1 SYNOPSIS
-
-perl init/init_alignDB.pl -d S288Cvsself
-perl init/gen_alignDB_genome.pl -d S288Cvsself -t "4932,S288C" --dir d:\data\alignment\self_alignment\S288C\  --parallel 4
-perl ofg/insert_bed.pl -d S288Cvsself --tag hot --type hot -f d:\wq\Scripts\alignDB\ofg\spo11\spo11_hot.bed --batch 10 --parallel 1
-
-=cut
