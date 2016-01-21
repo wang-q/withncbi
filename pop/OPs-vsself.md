@@ -121,3 +121,20 @@ perl ~/Scripts/alignDB/init/gen_alignDB_genome.pl \
 
 perl ~/Scripts/alignDB/util/dup_db.pl -d Mousevsself -f ~/data/dumps/mysql/Mousevsself.sql.gz
 ```
+
+## S288c
+
+```bash
+perl ~/Scripts/alignDB/init/init_alignDB.pl \
+    -d S288cvsself \
+    --chr ~/data/alignment/Ensembl/chr_length.csv
+
+perl ~/Scripts/alignDB/init/gen_alignDB_genome.pl \
+    -d S288cvsself \
+    -t S288c \
+    --dir ~/data/alignment/Ensembl/S288c \
+    --length 500000 \
+    --parallel 8
+
+perl ~/Scripts/alignDB/util/dup_db.pl -d S288cvsself -f ~/data/dumps/mysql/S288cvsself.sql.gz
+```
