@@ -11,21 +11,14 @@ use YAML qw(Dump Load DumpFile LoadFile);
 use File::Basename;
 use Digest::MD5;
 
-use AlignDB::IntSpan;
-use AlignDB::Run;
-use AlignDB::Window;
 use AlignDB::Stopwatch;
 
 use FindBin;
-use lib "$FindBin::Bin/../lib";
-use AlignDB;
-use AlignDB::Ofg;
 
 #----------------------------------------------------------#
 # GetOpt section
 #----------------------------------------------------------#
-my $Config = Config::Tiny->new;
-$Config = Config::Tiny->read("$FindBin::Bin/../alignDB.ini");
+my $Config = Config::Tiny->read("$FindBin::Bin/../alignDB.ini");
 
 # record ARGV and Config
 my $stopwatch = AlignDB::Stopwatch->new(
@@ -53,7 +46,7 @@ GetOptions(
     'm|meta=s'   => \$file_metainfo,
     'r|result=s' => \$dir_result,
     's|size=s'   => \$file_chr_size,
-    't|type=s'     => \$filetype,
+    't|type=s'   => \$filetype,
 ) or pod2usage(2);
 
 pod2usage(1) if $help;
@@ -100,10 +93,7 @@ if ( $filetype eq "bigBed" ) {
     # maxDepth: 2.000000
     # std of depth: 0.019330
 
-    my $cmd
-        = "$kent_bin/bigBedInfo"
-        . " $file_encode"
-        . " > $dir_result/$basename.info.txt";
+    my $cmd = "$kent_bin/bigBedInfo" . " $file_encode" . " > $dir_result/$basename.info.txt";
     system $cmd if !-e "$dir_result/$basename.info.txt";
 
     # bigBedToBed - Convert from bigBed to ascii bed format.
@@ -115,45 +105,41 @@ if ( $filetype eq "bigBed" ) {
     #   -end=N - if set, restict output to only that under end
     #   -maxItems=N - if set, restrict output to first N items
     #   -udcDir=/dir/to/cache - place to put cache for remote bigBed/bigWigs
-    $cmd
-        = "$kent_bin/bigBedToBed"
-        . " $file_encode "
-        . " $dir_result/$basename.bed";
+    $cmd = "$kent_bin/bigBedToBed" . " $file_encode " . " $dir_result/$basename.bed";
     system $cmd if !-e "$dir_result/$basename.bed";
 }
 elsif ( $filetype eq "bed" ) {
     print "    basename $basename\n";
-    
+
     my $cmd;
     if ( $file_encode =~ /\.gz$/ ) {
-        $cmd
-            = "gunzip -c " . " $file_encode" . " > $dir_result/$basename.bed";
+        $cmd = "gunzip -c " . " $file_encode" . " > $dir_result/$basename.bed";
         system $cmd if !-e "$dir_result/$basename.bed";
     }
     else {
         $cmd = "cp " . " $file_encode" . " $dir_result/$basename.bed";
         system $cmd if !-e "$dir_result/$basename.bed";
     }
-    
-    # bedToBigBed v. 4 - Convert bed file to bigBed.
-    # usage:
-    #    bedToBigBed in.bed chrom.sizes out.bb
-    # Where in.bed is in one of the ascii bed formats, but not including track lines
-    # and chrom.sizes is two column: <chromosome name> <size in bases>
-    # and out.bb is the output indexed big bed file.
-    # The in.bed file must be sorted by chromosome,start,
-    #   to sort a bed file, use the unix sort command:
-    #      sort -k1,1 -k2,2n unsorted.bed > sorted.bed
-    # 
-    # options:
-    #    -blockSize=N - Number of items to bundle in r-tree.  Default 256
-    #    -itemsPerSlot=N - Number of data points bundled at lowest level. Default 512
-    #    -bedFields=N - Number of fields that fit standard bed definition.  If undefined
-    #                   assumes all fields in bed are defined.
-    #    -as=fields.as - If have non-standard fields, it's great to put a definition
-    #                    of each field in a row in AutoSql format here.
-    #    -unc - If set, do not use compression.   -tabs - If set, expect fields to be tab separated, normally
-    #            expects white space separator.
+
+# bedToBigBed v. 4 - Convert bed file to bigBed.
+# usage:
+#    bedToBigBed in.bed chrom.sizes out.bb
+# Where in.bed is in one of the ascii bed formats, but not including track lines
+# and chrom.sizes is two column: <chromosome name> <size in bases>
+# and out.bb is the output indexed big bed file.
+# The in.bed file must be sorted by chromosome,start,
+#   to sort a bed file, use the unix sort command:
+#      sort -k1,1 -k2,2n unsorted.bed > sorted.bed
+#
+# options:
+#    -blockSize=N - Number of items to bundle in r-tree.  Default 256
+#    -itemsPerSlot=N - Number of data points bundled at lowest level. Default 512
+#    -bedFields=N - Number of fields that fit standard bed definition.  If undefined
+#                   assumes all fields in bed are defined.
+#    -as=fields.as - If have non-standard fields, it's great to put a definition
+#                    of each field in a row in AutoSql format here.
+#    -unc - If set, do not use compression.   -tabs - If set, expect fields to be tab separated, normally
+#            expects white space separator.
     $cmd
         = "$kent_bin/bedToBigBed"
         . " -bedFields=3"
@@ -161,7 +147,7 @@ elsif ( $filetype eq "bed" ) {
         . " $file_chr_size"
         . " $dir_result/$basename.bb";
     system $cmd if !-e "$dir_result/$basename.bb";
-    
+
     $cmd
         = "$kent_bin/bigBedInfo"
         . " $dir_result/$basename.bb"
@@ -191,32 +177,24 @@ elsif ( $filetype eq "bigWig" ) {
     # min: -1.765402
     # max: 1.942196
     # std: 0.853118
-    my $cmd
-        = "$kent_bin/bigWigInfo"
-        . " $file_encode"
-        . " > $dir_result/$basename.info.txt";
+    my $cmd = "$kent_bin/bigWigInfo" . " $file_encode" . " > $dir_result/$basename.info.txt";
     system $cmd if !-e "$dir_result/$basename.info.txt";
 
-# bigWigToWig - Convert bigWig to wig.  This will keep more of the same structure of the
-# original wig than bigWigToBedGraph does, but still will break up large stepped sections
-# into smaller ones.
-# usage:
-#    bigWigToWig in.bigWig out.wig
-# options:
-#    -chrom=chr1 - if set restrict output to given chromosome
-#    -start=N - if set, restrict output to only that over start
-#    -end=N - if set, restict output to only that under end
-#    -udcDir=/dir/to/cache - place to put cache for remote bigBed/bigWigs
-    $cmd
-        = "$kent_bin/bigWigToWig"
-        . " $file_encode "
-        . " $dir_result/$basename.wig";
+    # bigWigToWig - Convert bigWig to wig.  This will keep more of the same structure of the
+    # original wig than bigWigToBedGraph does, but still will break up large stepped sections
+    # into smaller ones.
+    # usage:
+    #    bigWigToWig in.bigWig out.wig
+    # options:
+    #    -chrom=chr1 - if set restrict output to given chromosome
+    #    -start=N - if set, restrict output to only that over start
+    #    -end=N - if set, restict output to only that under end
+    #    -udcDir=/dir/to/cache - place to put cache for remote bigBed/bigWigs
+    $cmd = "$kent_bin/bigWigToWig" . " $file_encode " . " $dir_result/$basename.wig";
     system $cmd if !-e "$dir_result/$basename.wig";
 
     $cmd
-        = "wig2bed --do-not-sort"
-        . " < $dir_result/$basename.wig"
-        . " > $dir_result/$basename.bed";
+        = "wig2bed --do-not-sort" . " < $dir_result/$basename.wig" . " > $dir_result/$basename.bed";
     system $cmd if !-e "$dir_result/$basename.bed";
 }
 else {

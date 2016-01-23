@@ -16,21 +16,15 @@ use File::Spec;
 
 use Text::CSV_XS;
 
-use AlignDB::IntSpan;
 use AlignDB::Run;
-use AlignDB::Window;
 use AlignDB::Stopwatch;
 
 use FindBin;
-use lib "$FindBin::Bin/../lib";
-use AlignDB;
-use AlignDB::Ofg;
 
 #----------------------------------------------------------#
 # GetOpt section
 #----------------------------------------------------------#
-my $Config = Config::Tiny->new;
-$Config = Config::Tiny->read("$FindBin::Bin/../alignDB.ini");
+my $Config = Config::Tiny->read("$FindBin::Bin/../alignDB.ini");
 
 # record ARGV and Config
 my $stopwatch = AlignDB::Stopwatch->new(
