@@ -8,18 +8,18 @@ use Config::Tiny;
 use FindBin;
 use YAML qw(Dump Load DumpFile LoadFile);
 
-use Roman;
-use List::Util qw(first max maxstr min minstr reduce shuffle sum);
-use List::MoreUtils qw(any all uniq zip);
+use MCE;
+use MCE::Flow Sereal => 1;
+
+use List::MoreUtils qw(zip);
 
 use AlignDB::IntSpan;
-use AlignDB::Run;
-use AlignDB::Window;
 use AlignDB::Stopwatch;
+use AlignDB::Window;
 
 use lib "$FindBin::Bin/../lib";
 use AlignDB;
-use AlignDB::Ofg;
+use AlignDB::Position;
 
 #----------------------------------------------------------#
 # GetOpt section
@@ -52,7 +52,7 @@ insert_bed.pl - Insert beds to alignDB
         --tag           @STR    tags
         --type          @STR    types
         --style         STR     ofg style, default is [center_intact]
-        --batch         INT     number of alignments in one child process
+        --batch         INT     number of beds in one child process, default is [500]
         --noclean               do not clean ofg tables
         --dG                    calculate deltaG
 
@@ -88,9 +88,9 @@ GetOptions(
     'type=s'       => \my @types,
     'style=s'      => \( my $style        = "center_intact" ),
     'parallel=i'   => \( my $parallel     = $Config->{generate}{parallel} ),
-    'batch=i'      => \( my $batch_number = $Config->{generate}{batch} ),
+    'batch=i'      => \( my $batch_number = 500 ),
     'noclean'      => \( my $noclean ),
-    'dG'           => \( my $deltaG ),
+    'dG'           => \( my $insert_deltaG ),
 ) or HelpMessage(1);
 
 #----------------------------------------------------------#
@@ -98,7 +98,6 @@ GetOptions(
 #----------------------------------------------------------#
 $stopwatch->start_message("Update data of $db...");
 
-my @jobs;
 {
     my $obj = AlignDB->new(
         mysql  => "$db:$server",
@@ -114,13 +113,6 @@ my @jobs;
         $obj->empty_table( 'ofgsw', 'with_window' );
         $obj->create_column( "ofgsw", "ofgsw_dG", "DOUBLE" );
     }
-
-    my @align_ids = @{ $obj->get_align_ids };
-
-    while ( scalar @align_ids ) {
-        my @batching = splice @align_ids, 0, $batch_number;
-        push @jobs, [@batching];
-    }
 }
 
 #----------------------------------------------------------#
@@ -133,7 +125,7 @@ $stopwatch->block_message("bed information");
 print Dump \@args;
 
 unless (@args) {
-    die "No bed to be processed\n";    
+    die "No bed to be processed\n";
 }
 
 my @all_data;
@@ -149,8 +141,7 @@ while (@args) {
     while ( my $string = <$data_fh> ) {
         next unless defined $string;
         chomp $string;
-        my ( $chr, $start, $end )
-            = ( split /\t/, $string )[ 0, 1, 2 ];
+        my ( $chr, $start, $end ) = ( split /\t/, $string )[ 0, 1, 2 ];
         next unless $chr =~ /^\w+$/;
         $chr =~ s/chr0?//i;
         next unless $start =~ /^\d+$/;
@@ -158,50 +149,235 @@ while (@args) {
         if ( $start > $end ) {
             ( $start, $end ) = ( $end, $start );
         }
-        my $set = AlignDB::IntSpan->new("$start-$end");
-        push @all_data, { chr => $chr, set => $set, tag => $tag, type => $type };
-        if ( !exists $chr_data_set{$chr} ) {
-            $chr_data_set{$chr} = AlignDB::IntSpan->new;
-        }
-        $chr_data_set{$chr}->merge($set);
+        push @all_data,
+            {
+            chr_name  => $chr,
+            chr_start => $start,
+            chr_end   => $end,
+            tag       => $tag,
+            type      => $type
+            };
     }
     close $data_fh;
 }
 
-#----------------------------------------------------------#
-# worker
-#----------------------------------------------------------#
-my $worker = sub {
-    my $job       = shift;
-    my @align_ids = @$job;
+#----------------------------#
+# Insert beds
+#----------------------------#
+$stopwatch->block_message("Insert beds");
+
+my $worker_insert = sub {
+    my ( $self, $chunk_ref, $chunk_id ) = @_;
+    my $wid = MCE->wid;
+    print "* Process task [$chunk_id] by worker #$wid\n";
+
+    my @data = @{$chunk_ref};
 
     my $obj = AlignDB->new(
         mysql  => "$db:$server",
         user   => $username,
         passwd => $password,
     );
-    AlignDB::Ofg->meta->apply($obj);
-    $obj->style($style);
-    $obj->max_out_distance(20);
-    $obj->max_in_distance(20);
+    my $dbh = $obj->dbh;
+    my $pos_finder = AlignDB::Position->new( dbh => $dbh );
 
-    if ($deltaG) {
-        $obj->insert_dG(1);
+    # insert into ofg
+    my $ofg_insert_sth = $dbh->prepare(
+        q{
+        INSERT INTO ofg (
+            ofg_id, window_id, ofg_tag, ofg_type
+        )
+        VALUES (
+            NULL, ?, ?, ?
+        )
+        }
+    );
+
+    my %info_of;
+    for my $item (@data) {
+        my ( $align_id, $dummy )
+            = @{ $obj->find_align( $item->{chr_name}, $item->{chr_start}, $item->{chr_end} ) };
+        if ( !defined $align_id ) {
+            warn " " x 4, "Can't find align for this bed\n";
+            warn Dump $item;
+            next;
+        }
+        elsif ( defined $dummy ) {
+            warn " " x 4, "Overlapped alignment in this bed!\n";
+            warn Dump $item;
+        }
+
+        my $target_info = $obj->get_target_info($align_id);
+
+        # target runlist
+        my $target_set = AlignDB::IntSpan->new( $target_info->{seq_runlist} );
+
+        # insert internal indels, that are, indels in target_set
+        # indels in query_set is equal to spans of target_set minus one
+        my $internal_indel_flag = 1;
+
+        my $item_start = $pos_finder->at_align( $align_id, $item->{chr_start} );
+        my $item_end   = $pos_finder->at_align( $align_id, $item->{chr_end} );
+        next if $item_start > $item_end;
+
+        my $item_set = AlignDB::IntSpan->new;
+        $item_set->add_pair( $item_start, $item_end );
+        $item_set = $item_set->intersect($target_set);
+
+        # window
+        my ($cur_window_id) = $obj->insert_window( $align_id, $item_set, $internal_indel_flag );
+
+        # insert to table
+        $ofg_insert_sth->execute( $cur_window_id, $item->{tag}, $item->{type} );
+
+        $info_of{ $obj->last_insert_id } = {
+            align_id => $align_id,
+            set      => $item_set,
+        };
     }
-    $obj->insert_ofg( \@align_ids, \@all_data, \%chr_data_set );
+
+    printf " " x 4 . "Insert %d beds\n", scalar keys %info_of;
+    MCE->gather(%info_of);
 };
 
-#----------------------------------------------------------#
-# start update
-#----------------------------------------------------------#
-$stopwatch->block_message("Start update");
+MCE::Flow::init {
+    chunk_size  => $batch_number,
+    max_workers => $parallel,
+};
+my %ofg_info_of = mce_flow $worker_insert, \@all_data;
+MCE::Flow::finish;
 
-my $run = AlignDB::Run->new(
-    parallel => $parallel,
-    jobs     => \@jobs,
-    code     => $worker,
-);
-$run->run;
+#----------------------------#
+# Insert sw
+#----------------------------#
+$stopwatch->block_message("Insert sliding windows");
+
+my $worker_sw = sub {
+    my ( $self, $chunk_ref, $chunk_id ) = @_;
+    my $wid = MCE->wid;
+    print "* Process task [$chunk_id] by worker #$wid\n";
+
+    my @ofg_ids = @{$chunk_ref};
+
+    my $obj = AlignDB->new(
+        mysql  => "$db:$server",
+        user   => $username,
+        passwd => $password,
+    );
+    my $dbh          = $obj->dbh;
+    my $window_maker = AlignDB::Window->new(
+        sw_size          => 100,
+        max_out_distance => 20,
+        max_in_distance  => 20,
+    );
+
+    # prepare ofgsw_insert
+    my $ofgsw_insert = $dbh->prepare(
+        q{
+        INSERT INTO ofgsw (
+            ofgsw_id, window_id, ofg_id,
+            ofgsw_type, ofgsw_distance
+        )
+        VALUES (
+            NULL, ?, ?,
+            ?, ?
+        )
+        }
+    );
+
+    for my $ofg_id (@ofg_ids) {
+        my $align_id = $ofg_info_of{$ofg_id}->{align_id};
+        my $ofg_set  = $ofg_info_of{$ofg_id}->{set};
+
+        my $target_info = $obj->get_target_info($align_id);
+
+        # target runlist
+        my $target_set = AlignDB::IntSpan->new( $target_info->{seq_runlist} );
+
+        # insert internal indels, that are, indels in target_set
+        # indels in query_set is equal to spans of target_set minus one
+        my $internal_indel_flag = 1;
+
+        if ( $style =~ /^edge/ ) {
+
+            # outside rsw
+            my @out_rsw
+                = $window_maker->outside_window( $target_set, $ofg_set->min, $ofg_set->max );
+
+            for my $outside_rsw (@out_rsw) {
+                my ($cur_window_id)
+                    = $obj->insert_window( $align_id, $outside_rsw->{set}, $internal_indel_flag );
+
+                $ofgsw_insert->execute( $cur_window_id, $ofg_id,
+                    $outside_rsw->{type}, $outside_rsw->{distance},
+                );
+            }
+
+            # inside rsw
+            my @in_rsw = $window_maker->inside_window( $target_set, $ofg_set->min, $ofg_set->max );
+
+            for my $inside_rsw (@in_rsw) {
+                my ($cur_window_id)
+                    = $obj->insert_window( $align_id, $inside_rsw->{set}, $internal_indel_flag );
+
+                $ofgsw_insert->execute( $cur_window_id, $ofg_id,
+                    $inside_rsw->{type}, $inside_rsw->{distance},
+                );
+            }
+
+            if ( $style ne 'edge_only' ) {
+
+                # inside rsw 2
+                # rsw2 start from -90, so there will be no conflicts with rsw
+                my @in_rsw2
+                    = $window_maker->inside_window2( $target_set, $ofg_set->min, $ofg_set->max );
+
+                for my $inside_rsw (@in_rsw2) {
+                    my ($cur_window_id)
+                        = $obj->insert_window( $align_id, $inside_rsw->{set},
+                        $internal_indel_flag );
+
+                    $ofgsw_insert->execute( $cur_window_id, $ofg_id,
+                        $inside_rsw->{type}, $inside_rsw->{distance},
+                    );
+                }
+            }
+        }
+        elsif ( $style eq 'center' ) {
+            my @center_rsw
+                = $window_maker->center_window( $target_set, $ofg_set->min, $ofg_set->max );
+
+            for my $rsw (@center_rsw) {
+                my ($cur_window_id)
+                    = $obj->insert_window( $align_id, $rsw->{set}, $internal_indel_flag );
+
+                $ofgsw_insert->execute( $cur_window_id, $ofg_id, $rsw->{type}, $rsw->{distance}, );
+            }
+        }
+        elsif ( $style eq 'center_intact' ) {
+            my @center_rsw
+                = $window_maker->center_intact_window( $target_set, $ofg_set->min, $ofg_set->max );
+
+            for my $rsw (@center_rsw) {
+                my ($cur_window_id)
+                    = $obj->insert_window( $align_id, $rsw->{set}, $internal_indel_flag );
+
+                $ofgsw_insert->execute( $cur_window_id, $ofg_id, $rsw->{type}, $rsw->{distance}, );
+            }
+        }
+    }
+};
+
+MCE::Flow::init {
+    chunk_size  => $batch_number,
+    max_workers => $parallel,
+};
+mce_flow $worker_sw, [ keys %ofg_info_of ];
+MCE::Flow::finish;
+
+my $report = sprintf "Ofg in files: [%s]\tOfg inserted: [%d]", scalar @all_data,
+    scalar keys %ofg_info_of;
+$stopwatch->block_message($report);
 
 $stopwatch->end_message;
 
@@ -215,5 +391,17 @@ END {
     )->add_meta_stopwatch($stopwatch);
 }
 exit;
+
+sub _calc_deltaG {
+    my $self     = shift;
+    my $align_id = shift;
+    my $set      = shift;
+
+    my $seqs_ref   = $self->get_seqs($align_id);
+    my @seq_slices = map { $set->substr_span($_) } @{$seqs_ref};
+    my @seq_dG     = map { $self->dG_calc->polymer_deltaG($_) } @seq_slices;
+
+    return mean(@seq_dG);
+}
 
 __END__
