@@ -14,6 +14,7 @@ mkdir -p ~/data/dumps/mysql
 ```bash
 cd ~/data/alignment/xlsx
 
+#
 perl ~/Scripts/alignDB/extra/multi_way_batch.pl \
     -d Human_n11cg_chimp_basic \
     -da ~/data/alignment/human_cg/fas_mft  \
@@ -23,6 +24,7 @@ perl ~/Scripts/alignDB/extra/multi_way_batch.pl \
     -lt 5000 --parallel 12 \
     --run basic
 
+#
 perl ~/Scripts/alignDB/util/dup_db.pl -d Human_n11cg_chimp_basic -f ~/data/dumps/mysql/Human_n11cg_chimp_basic.sql.gz
 
 perl ~/Scripts/alignDB/extra/multi_way_batch.pl \
