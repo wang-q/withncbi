@@ -19,8 +19,6 @@ use Text::CSV_XS;
 use AlignDB::Stopwatch;
 
 use FindBin;
-use lib "$FindBin::Bin/../lib";
-use AlignDB::WriteExcel;
 
 #----------------------------------------------------------#
 # GetOpt section
