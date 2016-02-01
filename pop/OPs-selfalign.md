@@ -201,6 +201,9 @@ cd ~/data/alignment/self/dicty
 sh 1_real_chr.sh
 sh 3_self_cmd.sh
 time sh 4_proc_cmd.sh
+# real    1321m40.107s
+# user    2021m26.837s
+# sys     2m50.047s
 sh 5_circos_cmd.sh
 ```
 
