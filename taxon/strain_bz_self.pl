@@ -422,7 +422,7 @@ fasops links axt.correct.fas -o stdout \
 # remove species names
 fasops separate axt.correct.fas --nodash -o stdout \
     | perl -nl -e '/^>/ and s/^>(target|query)\./\>/; print;' \
-    > axt.gl.fasta
+    | faops filter -u stdin axt.gl.fasta
 
 [% IF noblast -%]
 #----------------------------#
@@ -435,7 +435,8 @@ cat axt.gl.fasta > axt.all.fasta
 #----------------------------#
 echo "* Get more paralogs"
 perl [% egas %]/blastn_genome.pl -c 0.95 -f axt.gl.fasta -g genome.fa -o axt.bg.fasta --parallel [% parallel %]
-cat axt.gl.fasta axt.bg.fasta > axt.all.fasta
+cat axt.gl.fasta axt.bg.fasta \
+    | faops filter -u stdin axt.all.fasta
 [% END -%]
 
 #----------------------------#
