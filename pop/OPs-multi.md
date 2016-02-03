@@ -152,4 +152,15 @@ perl ~/Scripts/alignDB/util/dup_db.pl -d Human_n11cg_chimp -f ~/data/dumps/mysql
 ```bash
 cd ~/data/alignment/xlsx
 
+perl ~/Scripts/alignDB/extra/multi_way_batch.pl \
+    -d Mouse_n11_pop \
+    -da ~/data/alignment/mouse82/Mouse_n11_pop_refined  \
+    -e mus_musculus_core_82_38 \
+    --block --outgroup \
+    -chr ~/data/alignment/mouse82/chr_length.csv \
+    -lt 5000 --parallel 12 \
+    --run all
+
+perl ~/Scripts/alignDB/util/dup_db.pl -d Mouse_n11_pop -f ~/data/dumps/mysql/Mouse_n11_pop.sql.gz
+
 ```

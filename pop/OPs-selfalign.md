@@ -90,9 +90,9 @@ cd ~/data/alignment/self/arabidopsis
 sh 1_real_chr.sh
 sh 3_self_cmd.sh
 time sh 4_proc_cmd.sh
-# real    25m5.028s
-# user    63m3.210s
-# sys     14m29.024s
+# real    12m24.901s
+# user    33m26.245s
+# sys     18m0.224s
 sh 5_circos_cmd.sh
 ```
 
@@ -199,11 +199,14 @@ perl ~/Scripts/withncbi/taxon/strain_bz_self.pl \
 cd ~/data/alignment/self/dicty
 
 sh 1_real_chr.sh
-sh 3_self_cmd.sh
+time sh 3_self_cmd.sh
+# real    1m53.391s
+# user    13m25.636s
+# sys     0m7.271s
 time sh 4_proc_cmd.sh
-# real    1321m40.107s
-# user    2021m26.837s
-# sys     2m50.047s
+# real    360m55.622s
+# user    380m48.148s
+# sys     9m59.570s
 sh 5_circos_cmd.sh
 ```
 
