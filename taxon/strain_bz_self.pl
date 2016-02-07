@@ -422,10 +422,11 @@ fasops links axt.correct.fas -o stdout \
 # remove species names
 # remove duplicated sequences
 # remove sequences with more than 250 Ns
-fasops separate axt.correct.fas --nodash -o stdout \
+fasops separate axt.correct.fas --nodash --rc -o stdout \
     | perl -nl -e '/^>/ and s/^>(target|query)\./\>/; print;' \
     | faops filter -u stdin stdout \
-    | faops filter -n 250 stdin axt.gl.fasta
+    | faops filter -n 250 stdin stdout \
+    > axt.gl.fasta
 
 [% IF noblast -%]
 #----------------------------#
@@ -438,9 +439,10 @@ cat axt.gl.fasta > axt.all.fasta
 #----------------------------#
 echo "* Get more paralogs"
 perl [% egas %]/blastn_genome.pl -c 0.95 -f axt.gl.fasta -g genome.fa -o axt.bg.fasta --parallel [% parallel %]
-cat axt.gl.fasta axt.bg.fasta \
+cat axt.bg.fasta \
     | faops filter -u stdin stdout \
-    | faops filter -n 250 stdin axt.all.fasta
+    | faops filter -n 250 stdin stdout \
+    > axt.all.fasta
 [% END -%]
 
 #----------------------------#
