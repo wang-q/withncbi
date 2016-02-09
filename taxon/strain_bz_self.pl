@@ -440,7 +440,7 @@ cat axt.gl.fasta > axt.all.fasta
 echo "* Get more paralogs"
 perl [% egas %]/fasta_blastn.pl  -f axt.gl.fasta -g genome.fa -o axt.bg.blast --parallel [% parallel %]
 perl [% egas %]/blastn_genome.pl -f axt.bg.blast -g genome.fa -o axt.bg.fasta -c 0.95 --parallel [% parallel %]
-cat axt.bg.fasta \
+cat axt.gl.fasta axt.bg.fasta \
     | faops filter -u stdin stdout \
     | faops filter -n 250 stdin stdout \
     > axt.all.fasta
