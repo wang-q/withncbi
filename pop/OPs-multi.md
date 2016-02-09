@@ -108,7 +108,7 @@ perl ~/Scripts/alignDB/extra/multi_way_batch.pl \
     -da ~/data/alignment/Protists/Ddis/Ddis_n18_pop_refined \
     -e dictyostelium_discoideum_core_29_82_1 \
     --block \
-    -chr ~/data/alignment/Protists/Ddis/chr_length.csv \
+    --chr ~/data/alignment/Protists/Ddis/chr_length.csv \
     -lt 5000 --parallel 12 \
     --run all
 

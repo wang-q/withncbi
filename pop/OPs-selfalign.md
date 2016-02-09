@@ -65,7 +65,10 @@ cd ~/data/alignment/self/yeast
 
 sh 1_real_chr.sh
 sh 3_self_cmd.sh
-sh 4_proc_cmd.sh
+time sh 4_proc_cmd.sh
+# real    0m46.075s
+# user    1m19.171s
+# sys     0m42.335s
 sh 5_circos_cmd.sh
 ```
 
@@ -90,9 +93,9 @@ cd ~/data/alignment/self/arabidopsis
 sh 1_real_chr.sh
 sh 3_self_cmd.sh
 time sh 4_proc_cmd.sh
-# real    12m24.901s
-# user    33m26.245s
-# sys     18m0.224s
+# real    10m21.329s
+# user    27m48.637s
+# sys     12m24.249s
 sh 5_circos_cmd.sh
 ```
 
@@ -144,9 +147,9 @@ cd ~/data/alignment/self/fly
 sh 1_real_chr.sh
 sh 3_self_cmd.sh
 time sh 4_proc_cmd.sh
-# real    11m22.152s
-# user    31m12.044s
-# sys     5m52.670s
+# real    7m10.761s
+# user    22m18.783s
+# sys     7m7.160s
 sh 5_circos_cmd.sh
 ```
 
@@ -174,9 +177,9 @@ time sh 3_self_cmd.sh
 # user    150m18.730s
 # sys     0m49.323s
 time sh 4_proc_cmd.sh
-# real    6m49.232s
-# user    12m26.789s
-# sys     4m51.724s
+# real    3m24.714s
+# user    6m42.150s
+# sys     4m1.954s
 sh 5_circos_cmd.sh
 ```
 
@@ -204,9 +207,9 @@ time sh 3_self_cmd.sh
 # user    13m25.636s
 # sys     0m7.271s
 time sh 4_proc_cmd.sh
-# real    360m55.622s
-# user    380m48.148s
-# sys     9m59.570s
+# real    353m10.864s
+# user    364m44.545s
+# sys     2m29.146s
 sh 5_circos_cmd.sh
 ```
 
