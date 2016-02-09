@@ -438,7 +438,8 @@ cat axt.gl.fasta > axt.all.fasta
 # Get more paralogs
 #----------------------------#
 echo "* Get more paralogs"
-perl [% egas %]/blastn_genome.pl -c 0.95 -f axt.gl.fasta -g genome.fa -o axt.bg.fasta --parallel [% parallel %]
+perl [% egas %]/fasta_blastn.pl  -f axt.gl.fasta -g genome.fa -o axt.bg.blast --parallel [% parallel %]
+perl [% egas %]/blastn_genome.pl -f axt.bg.blast -g genome.fa -o axt.bg.fasta -c 0.95 --parallel [% parallel %]
 cat axt.bg.fasta \
     | faops filter -u stdin stdout \
     | faops filter -n 250 stdin stdout \
@@ -450,7 +451,8 @@ cat axt.bg.fasta \
 #----------------------------#
 echo "* Link paralogs"
 sleep 1;
-perl [% egas %]/blastn_paralog.pl -f axt.all.fasta -c 0.95 -o links.blast.tsv --parallel [% parallel %]
+perl [% egas %]/fasta_blastn.pl   -f axt.all.fasta -g axt.all.fasta -o axt.all.blast --parallel [% parallel %]
+perl [% egas %]/blastn_paralog.pl -f axt.all.blast -c 0.95 -o links.blast.tsv --parallel [% parallel %]
 
 #----------------------------#
 # Merge paralogs
