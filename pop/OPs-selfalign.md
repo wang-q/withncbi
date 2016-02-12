@@ -120,9 +120,9 @@ cd ~/data/alignment/self/rice
 sh 1_real_chr.sh
 sh 3_self_cmd.sh
 time sh 4_proc_cmd.sh
-# real    280m25.802s
-# user    1005m20.730s
-# sys     69m0.916s
+# real    71m5.201s
+# user    227m26.010s
+# sys     58m26.511s
 sh 5_circos_cmd.sh
 ```
 
@@ -237,9 +237,9 @@ time sh 3_self_cmd.sh
 # user    32775m39.086s
 # sys     227m18.093s
 time sh 4_proc_cmd.sh
-# real    1888m49.720s
-# user    7892m55.508s
-# sys     220m35.101s
+# real    940m13.950s
+# user    3947m24.734s
+# sys     248m12.852s
 sh 5_circos_cmd.sh
 ```
 
@@ -267,5 +267,8 @@ time sh 3_self_cmd.sh
 # user    29792m18.127s
 # sys     133m41.809s
 time sh 4_proc_cmd.sh
+# real    1750m33.958s
+# user    5020m19.404s
+# sys     365m30.568s
 sh 5_circos_cmd.sh
 ```
