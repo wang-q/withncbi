@@ -697,15 +697,6 @@ REM perl [% stopwatch.cmd_line %]
 REM basicstat
 perl [% bat_dir %]/fig_table/collect_common_basic.pl -d .
 
-REM common chart
-if exist [% multi_name %].common.xlsx perl [% bat_dir %]/alignDB/stat/common_chart_factory.pl -i [% multi_name %].common.xlsx
-
-REM multi chart
-if exist [% multi_name %].multi.xlsx  perl [% bat_dir %]/alignDB/stat/multi_chart_factory.pl -i [% multi_name %].multi.xlsx
-
-REM gc chart
-if exist [% multi_name %].gc.xlsx     perl [% bat_dir %]/alignDB/stat/gc_chart_factory.pl --add_trend 1 -i [% multi_name %].gc.xlsx
-
 EOF
         $tt->process(
             \$text,
