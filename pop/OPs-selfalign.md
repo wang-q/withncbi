@@ -24,6 +24,10 @@ perl       ~/Scripts/withncbi/taxon/strain_info.pl \
     --name 352472=Ddis                             \
     --id   10090                                   \
     --name 10090=Mouse                             \
+    --id   3712                                    \
+    --name 3712=Bole                               \
+    --id   3711                                    \
+    --name 3711=Brap                               \
     --entrez
 
 ```
@@ -270,5 +274,53 @@ time sh 4_proc_cmd.sh
 # real    1750m33.958s
 # user    5020m19.404s
 # sys     365m30.568s
+sh 5_circos_cmd.sh
+```
+
+## Brassica oleracea
+
+```bash
+cd ~/data/alignment/self
+
+perl ~/Scripts/withncbi/taxon/strain_bz_self.pl \
+    --file ~/data/alignment/self/ensembl_taxon.csv \
+    --working_dir ~/data/alignment/self \
+    --seq_dir ~/data/alignment/Ensembl \
+    --length 1000  \
+    --use_name \
+    --norm \
+    --name Bole \
+    --parallel 8 \
+    -t Bole
+
+cd ~/data/alignment/self/Bole
+
+sh 1_real_chr.sh
+time sh 3_self_cmd.sh
+time sh 4_proc_cmd.sh
+sh 5_circos_cmd.sh
+```
+
+## Brassica rapa
+
+```bash
+cd ~/data/alignment/self
+
+perl ~/Scripts/withncbi/taxon/strain_bz_self.pl \
+    --file ~/data/alignment/self/ensembl_taxon.csv \
+    --working_dir ~/data/alignment/self \
+    --seq_dir ~/data/alignment/Ensembl \
+    --length 1000  \
+    --use_name \
+    --norm \
+    --name Brap \
+    --parallel 8 \
+    -t Brap
+
+cd ~/data/alignment/self/Brap
+
+sh 1_real_chr.sh
+time sh 3_self_cmd.sh
+time sh 4_proc_cmd.sh
 sh 5_circos_cmd.sh
 ```

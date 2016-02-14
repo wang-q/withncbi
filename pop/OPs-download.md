@@ -1282,6 +1282,36 @@ http://hgdownload.soe.ucsc.edu/goldenPath/ce10/multiz7way/ce10.commonNames.7way.
     mv MT.fa MT.fa.skip
 	```
 
+## Other plants
+
+1. From Ensembl genomes
+
+    ```bash
+    # Brassica oleracea
+    mkdir -p ~/data/alignment/Ensembl/Bole
+    cd ~/data/alignment/Ensembl/Bole
+
+    find ~/data/ensembl82/fasta/brassica_oleracea/dna/ -name "*dna_sm.toplevel*" | xargs gzip -d -c > toplevel.fa
+    faops count toplevel.fa | perl -aln -e 'next if $F[0] eq 'total'; print $F[0] if $F[1] > 50000; print $F[0] if $F[1] > 5000  and $F[6]/$F[1] < 0.05' | uniq > listFile
+    faops some toplevel.fa listFile toplevel.filtered.fa
+    faops split-name toplevel.filtered.fa .
+    rm toplevel.fa toplevel.filtered.fa listFile
+
+    rm Scaffold*.fa
+
+    # Brassica rapa
+    mkdir -p ~/data/alignment/Ensembl/Brap
+    cd ~/data/alignment/Ensembl/Brap
+
+    find ~/data/ensembl82/fasta/brassica_rapa/dna/ -name "*dna_sm.toplevel*" | xargs gzip -d -c > toplevel.fa
+    faops count toplevel.fa | perl -aln -e 'next if $F[0] eq 'total'; print $F[0] if $F[1] > 50000; print $F[0] if $F[1] > 5000  and $F[6]/$F[1] < 0.05' | uniq > listFile
+    faops some toplevel.fa listFile toplevel.filtered.fa
+    faops split-name toplevel.filtered.fa .
+    rm toplevel.fa toplevel.filtered.fa listFile
+
+    rm Scaffold*.fa
+    ```
+
 ## Currently not used
 
 * Genus *Drosophila*
