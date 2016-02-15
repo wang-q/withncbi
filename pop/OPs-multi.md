@@ -156,11 +156,29 @@ perl ~/Scripts/alignDB/extra/multi_way_batch.pl \
     -d Mouse_n11_pop \
     -da ~/data/alignment/mouse82/Mouse_n11_pop_refined  \
     -e mus_musculus_core_82_38 \
-    --block --outgroup \
-    -chr ~/data/alignment/mouse82/chr_length.csv \
+    --block \
+    --chr ~/data/alignment/mouse82/chr_length.csv \
     -lt 5000 --parallel 12 \
     --run all
 
 perl ~/Scripts/alignDB/util/dup_db.pl -d Mouse_n11_pop -f ~/data/dumps/mysql/Mouse_n11_pop.sql.gz
+
+```
+
+## Pfal
+
+```bash
+cd ~/data/alignment/xlsx
+
+perl ~/Scripts/alignDB/extra/multi_way_batch.pl \
+    -d Pfal_n7_pop \
+    -da ~/data/alignment/Protists/pfal/Pfal_n7_pop_refined  \
+    -e plasmodium_falciparum_core_29_82_3 \
+    --block \
+    --chr ~/data/alignment/Protists/pfal/chr_length.csv \
+    -lt 5000 --parallel 12 \
+    --run all
+
+perl ~/Scripts/alignDB/util/dup_db.pl -d Pfal_n7_pop -f ~/data/dumps/mysql/Pfal_n7_pop.sql.gz
 
 ```
