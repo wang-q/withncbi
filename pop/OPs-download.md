@@ -1287,6 +1287,25 @@ http://hgdownload.soe.ucsc.edu/goldenPath/ce10/multiz7way/ce10.commonNames.7way.
 1. From Ensembl genomes
 
     ```bash
+    # Amborella trichopoda
+    # Arabidopsis lyrata
+    # Brachypodium distachyon
+    # Chlamydomonas reinhardtii
+    # Cyanidioschyzon merolae
+    # Glycine max
+    # Leersia perrieri
+    # Medicago truncatula
+    # Musa acuminata
+    # Ostreococcus lucimarinus
+    # Physcomitrella patens
+    # Populus trichocarpa
+    # Prunus persica
+    # Selaginella moellendorffii
+    # Setaria italica
+    # Sorghum bicolor
+    # Theobroma cacao
+    # Vitis vinifera
+
     # Brassica oleracea
     mkdir -p ~/data/alignment/Ensembl/Bole
     cd ~/data/alignment/Ensembl/Bole
@@ -1310,6 +1329,28 @@ http://hgdownload.soe.ucsc.edu/goldenPath/ce10/multiz7way/ce10.commonNames.7way.
     rm toplevel.fa toplevel.filtered.fa listFile
 
     rm Scaffold*.fa
+
+    # Solanum lycopersicum
+    mkdir -p ~/data/alignment/Ensembl/Slyc
+    cd ~/data/alignment/Ensembl/Slyc
+
+    find ~/data/ensembl82/fasta/solanum_lycopersicum/dna/ -name "*dna_sm.toplevel*" | xargs gzip -d -c > toplevel.fa
+    faops count toplevel.fa | perl -aln -e 'next if $F[0] eq 'total'; print $F[0] if $F[1] > 50000; print $F[0] if $F[1] > 5000  and $F[6]/$F[1] < 0.05' | uniq > listFile
+    faops some toplevel.fa listFile toplevel.filtered.fa
+    faops split-name toplevel.filtered.fa .
+    rm toplevel.fa toplevel.filtered.fa listFile
+
+    rm SL2*.fa
+
+    # Solanum tuberosum
+    mkdir -p ~/data/alignment/Ensembl/Stub
+    cd ~/data/alignment/Ensembl/Stub
+
+    find ~/data/ensembl82/fasta/solanum_tuberosum/dna/ -name "*dna_sm.toplevel*" | xargs gzip -d -c > toplevel.fa
+    faops count toplevel.fa | perl -aln -e 'next if $F[0] eq 'total'; print $F[0] if $F[1] > 50000; print $F[0] if $F[1] > 5000  and $F[6]/$F[1] < 0.05' | uniq > listFile
+    faops some toplevel.fa listFile toplevel.filtered.fa
+    faops split-name toplevel.filtered.fa .
+    rm toplevel.fa toplevel.filtered.fa listFile
     ```
 
 ## Currently not used
