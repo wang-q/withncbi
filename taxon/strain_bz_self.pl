@@ -51,9 +51,10 @@ strain_bz_self.pl - Full procedure for self genome alignments.
         --use_name      -un         Use name instead of taxon_id as identifier. These names should only contain
                                     alphanumeric value and match with sequence directory names.
                                     For strains not recorded in NCBI taxonomy, you should assign them fake ids.
-                                    If this option set to be true, all $target_id, @query_ids are actually names.        
-        --msa               STR     Aligning program for refine. Default is [mafft]
+                                    If this option set to be true, all $target_id, @query_ids are actually names.
+        --parted                    Sequences are partitioned
         --noblast                   Don't blast against genomes
+        --msa               STR     Aligning program for refine. Default is [mafft]
         --norm                      RepeatMasker has been done.
         --nostat                    Don't do stat stuffs
         --norawphylo                Skip rawphylo
@@ -79,8 +80,9 @@ GetOptions(
     'length=i'        => \( my $length      = 1000 ),
     'name_str|n=s'    => \( my $name_str    = "working" ),
     'use_name|un'     => \my $use_name,
+    'parted'          => \my $parted,
+    'noblast'         => \my $noblast,
     'msa=s'           => \( my $msa         = 'mafft' ),
-    'noblast'           => \my $noblast,
     'norm'            => \my $norm,
     'nostat'          => \my $nostat,
     'norawphylo'      => \my $norawphylo,
@@ -200,7 +202,7 @@ cd [% working_dir %]
 sleep 1;
 
 cat << DELIMITER > chrUn.csv
-common_name,taxon_id,chr,length,name,assembly
+common_name,taxon_id,chr,length,assembly
 [% FOREACH item IN data -%]
 [% item.name %],[% item.taxon %],chrUn,999999999,
 [% END -%]
@@ -313,7 +315,7 @@ fi
 #----------------------------#
 perl [% egaz %]/bz.pl \
     --is_self \
-    -s set01 -C 0 --noaxt \
+    -s set01 -C 0 --noaxt [% IF parted %]-tp -qp[% END %] \
     -dt [% working_dir %]/Genomes/[% id %] \
     -dq [% working_dir %]/Genomes/[% id %] \
     -dl [% working_dir %]/Pairwise/[% id %]vsselfalign \
@@ -337,6 +339,7 @@ EOF
             parallel    => $parallel,
             working_dir => $working_dir,
             egaz        => $egaz,
+            parted      => $parted,
             name_str    => $name_str,
             all_ids     => [ $target_id, @query_ids ],
         },
@@ -522,7 +525,7 @@ EOF
             egas        => $egas,
             blast       => $blast,
             msa         => $msa,
-            noblast       => $noblast,
+            noblast     => $noblast,
             name_str    => $name_str,
             all_ids     => [ $target_id, @query_ids ],
             data        => \@data,
