@@ -28,6 +28,10 @@ perl       ~/Scripts/withncbi/taxon/strain_info.pl \
     --name 3712=Bole                               \
     --id   3711                                    \
     --name 3711=Brap                               \
+    --id   4081                                    \
+    --name 4081=Slyc                               \
+    --id   4113                                    \
+    --name 4113=Stub                               \
     --entrez
 
 ```
@@ -78,30 +82,75 @@ sh 5_circos_cmd.sh
 
 ## Arabidopsis
 
-```bash
-cd ~/data/alignment/self
+1. full chromosomes
 
-perl ~/Scripts/withncbi/taxon/strain_bz_self.pl \
-    --file ~/data/alignment/self/ensembl_taxon.csv \
-    --working_dir ~/data/alignment/self \
-    --seq_dir ~/data/alignment/Ensembl \
-    --length 1000  \
-    --use_name \
-    --norm \
-    --name arabidopsis \
-    --parallel 8 \
-    -t Atha
+    ```bash
+    cd ~/data/alignment/self
 
-cd ~/data/alignment/self/arabidopsis
+    perl ~/Scripts/withncbi/taxon/strain_bz_self.pl \
+        --file ~/data/alignment/self/ensembl_taxon.csv \
+        --working_dir ~/data/alignment/self \
+        --seq_dir ~/data/alignment/Ensembl \
+        --length 1000  \
+        --use_name \
+        --norm \
+        --name arabidopsis \
+        --parallel 8 \
+        -t Atha
 
-sh 1_real_chr.sh
-sh 3_self_cmd.sh
-time sh 4_proc_cmd.sh
-# real    10m21.329s
-# user    27m48.637s
-# sys     12m24.249s
-sh 5_circos_cmd.sh
-```
+    cd ~/data/alignment/self/arabidopsis
+
+    sh 1_real_chr.sh
+    time sh 3_self_cmd.sh
+    # real    25m15.804s
+    # user    161m4.543s
+    # sys     1m10.534s
+    time sh 4_proc_cmd.sh
+    # real    10m21.329s
+    # user    27m48.637s
+    # sys     12m24.249s
+    sh 5_circos_cmd.sh
+    ```
+
+2. partition sequences
+
+    ```bash
+    cd ~/data/alignment/self
+
+    mkdir -p ~/data/alignment/self/arabidopsis_parted/Genomes
+    perl ~/Scripts/egaz/part_seq.pl \
+        -i ~/data/alignment/Ensembl/Atha \
+        -o ~/data/alignment/self/arabidopsis_parted/Genomes/Atha \
+        --chunk 10010000 --overlap 10000
+
+    perl ~/Scripts/withncbi/taxon/strain_bz_self.pl \
+        --file ~/data/alignment/self/ensembl_taxon.csv \
+        --working_dir ~/data/alignment/self \
+        --parted \
+        --length 1000  \
+        --use_name \
+        --norm \
+        --name arabidopsis_parted \
+        --parallel 8 \
+        -t Atha
+
+    cd ~/data/alignment/self/arabidopsis_parted
+
+    sh 1_real_chr.sh
+    time sh 3_self_cmd.sh
+    # real    21m10.875s
+    # user    156m48.601s
+    # sys     1m54.846s
+    time sh 4_proc_cmd.sh
+    # real    9m33.086s
+    # user    24m56.361s
+    # sys     11m21.288s
+    sh 5_circos_cmd.sh
+    ```
+
+3. Comparison
+
+    **11.50% vs 9.96%. Use full chromosomes if the running time is acceptable.**
 
 ## Rice
 
@@ -277,47 +326,36 @@ time sh 4_proc_cmd.sh
 sh 5_circos_cmd.sh
 ```
 
-## Brassica oleracea
+## Other plants
+
+### Parted sequences
 
 ```bash
 cd ~/data/alignment/self
 
-perl ~/Scripts/withncbi/taxon/strain_bz_self.pl \
-    --file ~/data/alignment/self/ensembl_taxon.csv \
-    --working_dir ~/data/alignment/self \
-    --seq_dir ~/data/alignment/Ensembl \
-    --length 1000  \
-    --use_name \
-    --norm \
-    --name Bole \
-    --parallel 8 \
-    -t Bole
+mkdir -p ~/data/alignment/self/plants_parted/Genomes
 
-cd ~/data/alignment/self/Bole
-
-sh 1_real_chr.sh
-time sh 3_self_cmd.sh
-time sh 4_proc_cmd.sh
-sh 5_circos_cmd.sh
-```
-
-## Brassica rapa
-
-```bash
-cd ~/data/alignment/self
+perl ~/Scripts/egaz/part_seq.pl \
+    -i ~/data/alignment/Ensembl/Bole \
+    -o ~/data/alignment/self/plants_parted/Genomes/Bole \
+    --chunk 10010000 --overlap 10000
+perl ~/Scripts/egaz/part_seq.pl \
+    -i ~/data/alignment/Ensembl/Brap \
+    -o ~/data/alignment/self/plants_parted/Genomes/Brap \
+    --chunk 10010000 --overlap 10000
 
 perl ~/Scripts/withncbi/taxon/strain_bz_self.pl \
     --file ~/data/alignment/self/ensembl_taxon.csv \
     --working_dir ~/data/alignment/self \
-    --seq_dir ~/data/alignment/Ensembl \
     --length 1000  \
     --use_name \
     --norm \
-    --name Brap \
+    --name plants_parted \
     --parallel 8 \
-    -t Brap
+    -t Bole \
+    -q Brap
 
-cd ~/data/alignment/self/Brap
+cd ~/data/alignment/self/plants_parted
 
 sh 1_real_chr.sh
 time sh 3_self_cmd.sh
