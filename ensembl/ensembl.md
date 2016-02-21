@@ -125,6 +125,9 @@ wget -m ftp://ftp.ensemblgenomes.org/pub/plants/release-29/fasta/brassica_rapa .
 wget -m ftp://ftp.ensemblgenomes.org/pub/plants/release-29/fasta/solanum_lycopersicum .
 wget -m ftp://ftp.ensemblgenomes.org/pub/plants/release-29/fasta/solanum_tuberosum .
 
+# All plants
+wget -m ftp://ftp.ensemblgenomes.org/pub/plants/release-29/fasta .
+
 # Metazoa
 wget -m ftp://ftp.ensemblgenomes.org/pub/metazoa/release-29/fasta/drosophila_melanogaster .
 wget -m ftp://ftp.ensemblgenomes.org/pub/metazoa/release-29/fasta/drosophila_sechellia .
