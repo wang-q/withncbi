@@ -363,7 +363,8 @@ sleep 1;
 #----------------------------------------------------------#
 if [ -d [% working_dir %]/Processing/[% id %] ]
 then
-    find [% working_dir %]/Processing/[% id %] -type f -not -name "circos.conf" | parallel --no-run-if-empty rm
+    find [% working_dir %]/Processing/[% id %] -type f -not -name "circos.conf" -and -not -name "karyotype*" \
+        | parallel --no-run-if-empty rm
 else
     mkdir -p [% working_dir %]/Processing/[% id %]
 fi
@@ -740,8 +741,13 @@ cd [% working_dir %]
 #----------------------------#
 cd [% working_dir %]/Processing/[% id %]
 
-# generate karyotype file
-perl -anl -e '$i++; print qq{chr - $F[0] $F[0] 0 $F[1] chr$i}' [% working_dir %]/Genomes/[% id %]/chr.sizes > karyotype.[% id %].txt
+if [ !-e [% working_dir %]/Processing/[% id %]/karyotype.[% id %].txt ]
+then
+    # generate karyotype file
+    perl -anl -e '$i++; print qq{chr - $F[0] $F[0] 0 $F[1] chr$i}' \
+        [% working_dir %]/Genomes/[% id %]/chr.sizes \
+        > karyotype.[% id %].txt
+fi
 
 #----------------------------#
 # gff to highlight

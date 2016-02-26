@@ -82,75 +82,75 @@ sh 5_circos_cmd.sh
 
 ## Arabidopsis
 
-1. full chromosomes
+### 1. full chromosomes
 
-    ```bash
-    cd ~/data/alignment/self
+```bash
+cd ~/data/alignment/self
 
-    perl ~/Scripts/withncbi/taxon/strain_bz_self.pl \
-        --file ~/data/alignment/self/ensembl_taxon.csv \
-        --working_dir ~/data/alignment/self \
-        --seq_dir ~/data/alignment/Ensembl \
-        --length 1000  \
-        --use_name \
-        --norm \
-        --name arabidopsis \
-        --parallel 8 \
-        -t Atha
+perl ~/Scripts/withncbi/taxon/strain_bz_self.pl \
+    --file ~/data/alignment/self/ensembl_taxon.csv \
+    --working_dir ~/data/alignment/self \
+    --seq_dir ~/data/alignment/Ensembl \
+    --length 1000  \
+    --use_name \
+    --norm \
+    --name arabidopsis \
+    --parallel 8 \
+    -t Atha
 
-    cd ~/data/alignment/self/arabidopsis
+cd ~/data/alignment/self/arabidopsis
 
-    sh 1_real_chr.sh
-    time sh 3_self_cmd.sh
-    # real    25m15.804s
-    # user    161m4.543s
-    # sys     1m10.534s
-    time sh 4_proc_cmd.sh
-    # real    10m21.329s
-    # user    27m48.637s
-    # sys     12m24.249s
-    sh 5_circos_cmd.sh
-    ```
+sh 1_real_chr.sh
+time sh 3_self_cmd.sh
+# real    25m15.804s
+# user    161m4.543s
+# sys     1m10.534s
+time sh 4_proc_cmd.sh
+# real    10m21.329s
+# user    27m48.637s
+# sys     12m24.249s
+sh 5_circos_cmd.sh
+```
 
-2. partition sequences
+### 2. partition sequences
 
-    ```bash
-    cd ~/data/alignment/self
+```bash
+cd ~/data/alignment/self
 
-    mkdir -p ~/data/alignment/self/arabidopsis_parted/Genomes
-    perl ~/Scripts/egaz/part_seq.pl \
-        -i ~/data/alignment/Ensembl/Atha \
-        -o ~/data/alignment/self/arabidopsis_parted/Genomes/Atha \
-        --chunk 10010000 --overlap 10000
+mkdir -p ~/data/alignment/self/arabidopsis_parted/Genomes
+perl ~/Scripts/egaz/part_seq.pl \
+    -i ~/data/alignment/Ensembl/Atha \
+    -o ~/data/alignment/self/arabidopsis_parted/Genomes/Atha \
+    --chunk 10010000 --overlap 10000
 
-    perl ~/Scripts/withncbi/taxon/strain_bz_self.pl \
-        --file ~/data/alignment/self/ensembl_taxon.csv \
-        --working_dir ~/data/alignment/self \
-        --parted \
-        --length 1000  \
-        --use_name \
-        --norm \
-        --name arabidopsis_parted \
-        --parallel 8 \
-        -t Atha
+perl ~/Scripts/withncbi/taxon/strain_bz_self.pl \
+    --file ~/data/alignment/self/ensembl_taxon.csv \
+    --working_dir ~/data/alignment/self \
+    --parted \
+    --length 1000  \
+    --use_name \
+    --norm \
+    --name arabidopsis_parted \
+    --parallel 8 \
+    -t Atha
 
-    cd ~/data/alignment/self/arabidopsis_parted
+cd ~/data/alignment/self/arabidopsis_parted
 
-    sh 1_real_chr.sh
-    time sh 3_self_cmd.sh
-    # real    21m10.875s
-    # user    156m48.601s
-    # sys     1m54.846s
-    time sh 4_proc_cmd.sh
-    # real    9m33.086s
-    # user    24m56.361s
-    # sys     11m21.288s
-    sh 5_circos_cmd.sh
-    ```
+sh 1_real_chr.sh
+time sh 3_self_cmd.sh
+# real    21m10.875s
+# user    156m48.601s
+# sys     1m54.846s
+time sh 4_proc_cmd.sh
+# real    9m33.086s
+# user    24m56.361s
+# sys     11m21.288s
+sh 5_circos_cmd.sh
+```
 
-3. Comparison
+### 3. Comparison
 
-    **11.50% vs 9.96%. Use full chromosomes if the running time is acceptable.**
+**11.50% vs 9.96%. Use full chromosomes if the running time is acceptable.**
 
 ## Rice
 
@@ -170,6 +170,9 @@ perl ~/Scripts/withncbi/taxon/strain_bz_self.pl \
 
 cd ~/data/alignment/self/rice
 
+perl ~/Scripts/withncbi/ensembl/chr_kary.pl -e oryza_sativa_core_29_82_7
+sh ~/share/circos/data/karyotype/parse.karyotype oryza_sativa_core_29_82_7.kary.tsv > Processing/OsatJap/karyotype.OsatJap.txt
+
 sh 1_real_chr.sh
 sh 3_self_cmd.sh
 time sh 4_proc_cmd.sh
@@ -177,6 +180,7 @@ time sh 4_proc_cmd.sh
 # user    227m26.010s
 # sys     58m26.511s
 sh 5_circos_cmd.sh
+
 ```
 
 ## Fly
@@ -328,7 +332,11 @@ sh 5_circos_cmd.sh
 
 ## Other plants
 
-### Parted sequences
+### Partitioned sequences
+
+Bole contains exact matched pieces with copy number large than one thousand.
+
+To speed up processing, use partitioned sequences in `3_self_cmd.sh` and `--discard 50` in `4_proc_cmd.sh`.
 
 ```bash
 cd ~/data/alignment/self
@@ -347,6 +355,7 @@ perl ~/Scripts/egaz/part_seq.pl \
 perl ~/Scripts/withncbi/taxon/strain_bz_self.pl \
     --file ~/data/alignment/self/ensembl_taxon.csv \
     --working_dir ~/data/alignment/self \
+    --parted \
     --length 1000  \
     --use_name \
     --norm \
@@ -359,6 +368,9 @@ cd ~/data/alignment/self/plants_parted
 
 sh 1_real_chr.sh
 time sh 3_self_cmd.sh
+# real    1663m54.797s
+# user    12106m42.605s
+# sys     291m51.433s
 time sh 4_proc_cmd.sh
 sh 5_circos_cmd.sh
 ```
