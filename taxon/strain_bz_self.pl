@@ -399,12 +399,12 @@ fasops separate axt.fas -o [% working_dir %]/Processing/[% id %] --nodash -s .se
 
 echo "* Target positions"
 perl [% egas %]/sparsemem_exact.pl -f target.sep.fasta -g genome.fa \
-    --length 500 -o replace.target.tsv
+    --length 500 --discard 50 -o replace.target.tsv
 fasops replace axt.fas replace.target.tsv -o axt.target.fas
 
 echo "* Query positions"
 perl [% egas %]/sparsemem_exact.pl -f query.sep.fasta -g genome.fa \
-    --length 500 -o replace.query.tsv
+    --length 500 --discard 50 -o replace.query.tsv
 fasops replace axt.target.fas replace.query.tsv -o axt.correct.fas
 
 #----------------------------#
