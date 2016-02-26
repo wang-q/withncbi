@@ -71,13 +71,13 @@ perl ~/Scripts/withncbi/taxon/strain_bz_self.pl \
 
 cd ~/data/alignment/self/yeast
 
-sh 1_real_chr.sh
-sh 3_self_cmd.sh
-time sh 4_proc_cmd.sh
+bash 1_real_chr.sh
+bash 3_self_cmd.sh
+time bash 4_proc_cmd.sh
 # real    0m46.075s
 # user    1m19.171s
 # sys     0m42.335s
-sh 5_circos_cmd.sh
+bash 5_circos_cmd.sh
 ```
 
 ## Arabidopsis
@@ -100,16 +100,46 @@ perl ~/Scripts/withncbi/taxon/strain_bz_self.pl \
 
 cd ~/data/alignment/self/arabidopsis
 
-sh 1_real_chr.sh
-time sh 3_self_cmd.sh
+# ath centromere position from the follow file:
+# ftp://ftp.arabidopsis.org/home/tair/Sequences/whole_chromosomes/tair9_Assembly_gaps.gff
+# chr1 14511722	14803970
+# chr2 3611839	3633423
+# chr3 13589757	13867121
+# chr4 3133664	3133674
+# chr5 11194538	11723210
+
+# Hosouchi, T., Kumekawa, N., Tsuruoka, H. & Kotani, H. Physical Map-Based Sizes of the Centromeric Regions of Arabidopsis thaliana Chromosomes 1, 2, and 3. DNA Res 9, 117®C121 (2002).
+TAB=$'\t'
+cat <<EOF > Atha.kary.tsv
+#chrom${TAB}chromStart${TAB}chromEnd${TAB}name${TAB}gieStain
+1${TAB}1${TAB}14200000${TAB}p1${TAB}gpos50${TAB}#14.2M
+1${TAB}14200000${TAB}15627671${TAB}p1${TAB}acen
+1${TAB}15627671${TAB}30427671${TAB}q1${TAB}gpos50${TAB}#14.8M
+2${TAB}1${TAB}3000000${TAB}p2${TAB}gpos50${TAB}#3.0M
+2${TAB}3000000${TAB}3898289${TAB}p2${TAB}acen
+2${TAB}3898289${TAB}19698289${TAB}q2${TAB}gpos50${TAB}#15.8M
+3${TAB}1${TAB}13200000${TAB}p3${TAB}gpos50${TAB}#13.2M
+3${TAB}13200000${TAB}14459830${TAB}p3${TAB}acen
+3${TAB}14459830${TAB}23459830${TAB}q3${TAB}gpos50${TAB}#9M
+4${TAB}1${TAB}3000000${TAB}p4${TAB}gpos50${TAB}#3M
+4${TAB}3000000${TAB}5085056${TAB}p4${TAB}acen
+4${TAB}5085056${TAB}18585056${TAB}q4${TAB}gpos50${TAB}#13.5M
+5${TAB}1${TAB}11100000${TAB}p5${TAB}gpos50${TAB}#${TAB}1.1M
+5${TAB}11100000${TAB}12575502${TAB}p5${TAB}acen
+5${TAB}12575502${TAB}26975502${TAB}q5${TAB}gpos50${TAB}#14.4M
+EOF
+bash ~/share/circos/data/karyotype/parse.karyotype Atha.kary.tsv > Processing/Atha/karyotype.Atha.txt
+
+bash 1_real_chr.sh
+time bash 3_self_cmd.sh
 # real    25m15.804s
 # user    161m4.543s
 # sys     1m10.534s
-time sh 4_proc_cmd.sh
+time bash 4_proc_cmd.sh
 # real    10m21.329s
 # user    27m48.637s
 # sys     12m24.249s
-sh 5_circos_cmd.sh
+bash 5_circos_cmd.sh
 ```
 
 ### 2. partition sequences
@@ -136,16 +166,16 @@ perl ~/Scripts/withncbi/taxon/strain_bz_self.pl \
 
 cd ~/data/alignment/self/arabidopsis_parted
 
-sh 1_real_chr.sh
-time sh 3_self_cmd.sh
+bash 1_real_chr.sh
+time bash 3_self_cmd.sh
 # real    21m10.875s
 # user    156m48.601s
 # sys     1m54.846s
-time sh 4_proc_cmd.sh
+time bash 4_proc_cmd.sh
 # real    9m33.086s
 # user    24m56.361s
 # sys     11m21.288s
-sh 5_circos_cmd.sh
+bash 5_circos_cmd.sh
 ```
 
 ### 3. Comparison
@@ -171,15 +201,15 @@ perl ~/Scripts/withncbi/taxon/strain_bz_self.pl \
 cd ~/data/alignment/self/rice
 
 perl ~/Scripts/withncbi/ensembl/chr_kary.pl -e oryza_sativa_core_29_82_7
-sh ~/share/circos/data/karyotype/parse.karyotype oryza_sativa_core_29_82_7.kary.tsv > Processing/OsatJap/karyotype.OsatJap.txt
+bash ~/share/circos/data/karyotype/parse.karyotype oryza_sativa_core_29_82_7.kary.tsv > Processing/OsatJap/karyotype.OsatJap.txt
 
-sh 1_real_chr.sh
-sh 3_self_cmd.sh
-time sh 4_proc_cmd.sh
+bash 1_real_chr.sh
+bash 3_self_cmd.sh
+time bash 4_proc_cmd.sh
 # real    71m5.201s
 # user    227m26.010s
 # sys     58m26.511s
-sh 5_circos_cmd.sh
+bash 5_circos_cmd.sh
 
 ```
 
@@ -201,13 +231,13 @@ perl ~/Scripts/withncbi/taxon/strain_bz_self.pl \
 
 cd ~/data/alignment/self/fly
 
-sh 1_real_chr.sh
-sh 3_self_cmd.sh
-time sh 4_proc_cmd.sh
+bash 1_real_chr.sh
+bash 3_self_cmd.sh
+time bash  4_proc_cmd.sh
 # real    7m10.761s
 # user    22m18.783s
 # sys     7m7.160s
-sh 5_circos_cmd.sh
+bash 5_circos_cmd.sh
 ```
 
 ## Cele
@@ -228,16 +258,16 @@ perl ~/Scripts/withncbi/taxon/strain_bz_self.pl \
 
 cd ~/data/alignment/self/worm
 
-sh 1_real_chr.sh
-time sh 3_self_cmd.sh
+bash 1_real_chr.sh
+time bash 3_self_cmd.sh
 # real    26m9.090s
 # user    150m18.730s
 # sys     0m49.323s
-time sh 4_proc_cmd.sh
+time bash 4_proc_cmd.sh
 # real    3m24.714s
 # user    6m42.150s
 # sys     4m1.954s
-sh 5_circos_cmd.sh
+bash 5_circos_cmd.sh
 ```
 
 ## Ddis
@@ -258,16 +288,16 @@ perl ~/Scripts/withncbi/taxon/strain_bz_self.pl \
 
 cd ~/data/alignment/self/dicty
 
-sh 1_real_chr.sh
-time sh 3_self_cmd.sh
+bash 1_real_chr.sh
+time bash 3_self_cmd.sh
 # real    1m53.391s
 # user    13m25.636s
 # sys     0m7.271s
-time sh 4_proc_cmd.sh
+time bash 4_proc_cmd.sh
 # real    353m10.864s
 # user    364m44.545s
 # sys     2m29.146s
-sh 5_circos_cmd.sh
+bash 5_circos_cmd.sh
 ```
 
 ## Human
@@ -288,16 +318,16 @@ perl ~/Scripts/withncbi/taxon/strain_bz_self.pl \
 
 cd ~/data/alignment/self/human
 
-sh 1_real_chr.sh
-time sh 3_self_cmd.sh
+bash 1_real_chr.sh
+time bash 3_self_cmd.sh
 # real    4156m4.259s
 # user    32775m39.086s
 # sys     227m18.093s
-time sh 4_proc_cmd.sh
+time bash 4_proc_cmd.sh
 # real    940m13.950s
 # user    3947m24.734s
 # sys     248m12.852s
-sh 5_circos_cmd.sh
+bash 5_circos_cmd.sh
 ```
 
 ## Mouse
@@ -318,16 +348,16 @@ perl ~/Scripts/withncbi/taxon/strain_bz_self.pl \
 
 cd ~/data/alignment/self/mouse
 
-sh 1_real_chr.sh
-time sh 3_self_cmd.sh
+bash 1_real_chr.sh
+time bash 3_self_cmd.sh
 # real    3801m39.031s
 # user    29792m18.127s
 # sys     133m41.809s
-time sh 4_proc_cmd.sh
+time bash 4_proc_cmd.sh
 # real    1750m33.958s
 # user    5020m19.404s
 # sys     365m30.568s
-sh 5_circos_cmd.sh
+bash 5_circos_cmd.sh
 ```
 
 ## Other plants
@@ -366,11 +396,11 @@ perl ~/Scripts/withncbi/taxon/strain_bz_self.pl \
 
 cd ~/data/alignment/self/plants_parted
 
-sh 1_real_chr.sh
-time sh 3_self_cmd.sh
+bash 1_real_chr.sh
+time bash 3_self_cmd.sh
 # real    1663m54.797s
 # user    12106m42.605s
 # sys     291m51.433s
-time sh 4_proc_cmd.sh
-sh 5_circos_cmd.sh
+time bash 4_proc_cmd.sh
+bash 5_circos_cmd.sh
 ```
