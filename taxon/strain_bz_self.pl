@@ -623,8 +623,7 @@ stroke_color = grey
 <ideogram>
 
 <spacing>
-    default = 0u
-    break   = 0u
+    default = 0r
 </spacing>
 
 # thickness (px) of chromosome ideogram
@@ -674,13 +673,13 @@ grid_end         = dims(ideogram,radius_inner)
     label_size                 = 8p
     multiplier                 = 0.001
     color                      = black
+    show_label                 = no
 
 <tick>
     spacing        = 10u
     size           = 8p
     thickness      = 2p
     color          = black
-    show_label     = no
     grid           = yes
     grid_color     = grey
     grid_thickness = 1p
@@ -691,11 +690,6 @@ grid_end         = dims(ideogram,radius_inner)
     size           = 8p
     thickness      = 2p
     color          = black
-    show_label     = yes
-    suffix = " kb"
-    label_size     = 36p
-    label_offset   = 5p
-    format         = %s
     grid           = yes
     grid_color     = dgrey
     grid_thickness = 1p
@@ -741,12 +735,46 @@ cd [% working_dir %]
 #----------------------------#
 cd [% working_dir %]/Processing/[% id %]
 
-if [ !-e [% working_dir %]/Processing/[% id %]/karyotype.[% id %].txt ]
+# generate karyotype files
+if [ ! -e [% working_dir %]/Processing/[% id %]/karyotype.[% id %].txt ]
 then
-    # generate karyotype file
+    echo "==> Create deafult karyotype"
     perl -anl -e '$i++; print qq{chr - $F[0] $F[0] 0 $F[1] chr$i}' \
         [% working_dir %]/Genomes/[% id %]/chr.sizes \
         > karyotype.[% id %].txt
+fi
+
+# spaces among chromosomes
+if [ -e [% working_dir %]/Genomes/[% id %]/chr.sizes ]
+then
+    if [[ $(perl -n -e '$l++; END{print qq{$l\n}}' [% working_dir %]/Genomes/[% id %]/chr.sizes ) > 1 ]]
+    then
+        echo "==> Multiple chromosomes"
+        perl -nlpi -e 's/    default = 0r/    default = 0.005r/;' [% working_dir %]/Processing/[% id %]/circos.conf
+        perl -nlpi -e 's/show_label     = no/show_label     = yes/;' [% working_dir %]/Processing/[% id %]/circos.conf
+    fi
+fi
+
+# chromosome units
+if [ -e [% working_dir %]/Genomes/[% id %]/chr.sizes ]
+then
+    SIZE=$(perl -an -F'\t' -e '$s += $F[1]; END{print qq{$s\n}}' [% working_dir %]/Genomes/[% id %]/chr.sizes )
+    echo "==> Genome size ${SIZE}"
+    if [ ${SIZE} -ge 1000000000 ]
+    then
+        echo "* Set chromosome unit to 1 Mbp"
+        perl -nlpi -e 's/chromosomes_units = 1000/chromosomes_units = 100000/;' [% working_dir %]/Processing/[% id %]/circos.conf
+    elif [ ${SIZE} -ge 100000000 ]
+    then
+        echo "* Set chromosome unit to 100 kbp"
+        perl -nlpi -e 's/chromosomes_units = 1000/chromosomes_units = 100000/;' [% working_dir %]/Processing/[% id %]/circos.conf
+    elif [ ${SIZE} -ge 10000000 ]
+    then
+        echo "* Set chromosome unit to 10 kbp"
+        perl -nlpi -e 's/chromosomes_units = 1000/chromosomes_units = 10000/;' [% working_dir %]/Processing/[% id %]/circos.conf
+    else
+        echo "* Keep chromosome unit as 1 kbp"
+    fi
 fi
 
 #----------------------------#
