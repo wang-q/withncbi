@@ -66,7 +66,7 @@ strain_bz.pl - Full procedure for multiple genome alignments.
 
 my $aligndb = path( $Config->{run}{aligndb} )->stringify;    # alignDB path
 my $egaz    = path( $Config->{run}{egaz} )->stringify;       # egaz path
-my $bat_dir  = $Config->{run}{bat};                            # Windows alignDB path
+my $bat_dir = $Config->{run}{bat};                           # Windows alignDB path
 
 GetOptions(
     'help|?' => sub { HelpMessage(0) },
@@ -541,6 +541,7 @@ find [% working_dir %]/[% multi_name %]_mz -name "*.maf" -or -name "*.maf.gz" \
 echo "Refine fasta"
 perl [% egaz %]/refine_fasta.pl \
     --msa [% msa %] --block -p [% parallel %] \
+    --quick --expand 500 --join 500 \
 [% IF outgroup_id -%]
     --outgroup \
 [% END -%]
