@@ -62,12 +62,12 @@ strain_bz_self.pl - Full procedure for self genome alignments.
 
 =cut
 
-my $aligndb = path( $Config->{run}{aligndb} )->stringify;    # alignDB path
-my $egaz    = path( $Config->{run}{egaz} )->stringify;       # egaz path
-my $egas    = path( $Config->{run}{egas} )->stringify;       # egas path
-my $blast   = path( $Config->{run}{blast} )->stringify;      # blast path
-my $circos  = path( $Config->{run}{circos} )->stringify;     # circos path
-my $bat_dir = $Config->{run}{bat};                           # Windows alignDB path
+my $aligndb   = path( $Config->{run}{aligndb} )->stringify;
+my $egaz      = path( $Config->{run}{egaz} )->stringify;
+my $egas      = path( $Config->{run}{egas} )->stringify;
+my $fig_table = path( $Config->{run}{fig_table} )->stringify;
+my $blast     = path( $Config->{run}{blast} )->stringify;
+my $circos    = path( $Config->{run}{circos} )->stringify;
 
 GetOptions(
     'help|?' => sub { HelpMessage(0) },
@@ -1034,25 +1034,20 @@ EOF
             path( $working_dir, $sh_name )->stringify
         ) or die Template->error;
 
-        # chart.bat
-        print "Create chart.bat\n";
+        # chart.sh
+        print "Create chart.sh\n";
         $text = <<'EOF';
-REM strain_bz_self.pl
-REM perl [% stopwatch.cmd_line %]
-
-REM basicstat
-perl [% bat_dir %]/fig_table/collect_common_basic.pl -d .
+# basicstat
+perl [% fig_table %]/collect_common_basic.pl -d .
 
 EOF
         $tt->process(
             \$text,
             {   stopwatch   => $stopwatch,
-                parallel    => $parallel,
                 working_dir => $working_dir,
-                bat_dir     => $bat_dir,
-                name_str    => $name_str,
+                fig_table   => $fig_table,
             },
-            path( $working_dir, "chart.bat" )->stringify
+            path( $working_dir, "chart.sh" )->stringify
         ) or die Template->error;
     }
 

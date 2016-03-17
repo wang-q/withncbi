@@ -64,9 +64,9 @@ strain_bz.pl - Full procedure for multiple genome alignments.
 
 =cut
 
-my $aligndb = path( $Config->{run}{aligndb} )->stringify;    # alignDB path
-my $egaz    = path( $Config->{run}{egaz} )->stringify;       # egaz path
-my $bat_dir = $Config->{run}{bat};                           # Windows alignDB path
+my $aligndb   = path( $Config->{run}{aligndb} )->stringify;
+my $egaz      = path( $Config->{run}{egaz} )->stringify;
+my $fig_table = path( $Config->{run}{fig_table} )->stringify;
 
 GetOptions(
     'help|?' => sub { HelpMessage(0) },
@@ -689,25 +689,20 @@ EOF
             path( $working_dir, $sh_name )->stringify
         ) or die Template->error;
 
-        # chart.bat
-        print "Create chart.bat\n";
+        # chart.sh
+        print "Create chart.sh\n";
         $text = <<'EOF';
-REM strain_bz.pl
-REM perl [% stopwatch.cmd_line %]
-
-REM basicstat
-perl [% bat_dir %]/fig_table/collect_common_basic.pl -d .
+# basicstat
+perl [% fig_table %]/collect_common_basic.pl -d .
 
 EOF
         $tt->process(
             \$text,
             {   stopwatch   => $stopwatch,
-                parallel    => $parallel,
                 working_dir => $working_dir,
-                bat_dir     => $bat_dir,
-                multi_name  => $multi_name,
+                fig_table   => $fig_table,
             },
-            path( $working_dir, "chart.bat" )->stringify
+            path( $working_dir, "chart.sh" )->stringify
         ) or die Template->error;
     }
 
