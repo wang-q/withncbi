@@ -541,7 +541,7 @@ find [% working_dir %]/[% multi_name %]_mz -name "*.maf" -or -name "*.maf.gz" \
 echo "Refine fasta"
 perl [% egaz %]/refine_fasta.pl \
     --msa [% msa %] --block -p [% parallel %] \
-    --quick --expand 500 --join 500 \
+    --quick --expand 100 --join 100 \
 [% IF outgroup_id -%]
     --outgroup \
 [% END -%]
