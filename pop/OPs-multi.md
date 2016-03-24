@@ -89,7 +89,7 @@ cd ~/data/alignment/xlsx
 perl ~/Scripts/alignDB/extra/multi_way_batch.pl \
     -d Cele_n41_pop \
     -da ~/data/alignment/cele82/Cele_n41_pop_refined \
-    -e caenorhabditis_elegans_core_29_82_245 \
+    -e caenorhabditis_elegans_core_82_245 \
     --block \
     -chr ~/data/alignment/cele82/chr_length.csv \
     -lt 5000 --parallel 12 \
@@ -145,6 +145,24 @@ perl ~/Scripts/alignDB/extra/multi_way_batch.pl \
 
 perl ~/Scripts/alignDB/util/dup_db.pl -d Human_n11cg_chimp -f ~/data/dumps/mysql/Human_n11cg_chimp.sql.gz
 
+```
+
+## Human (Simons data)
+
+```bash
+cd ~/data/alignment/xlsx
+
+#
+perl ~/Scripts/alignDB/extra/multi_way_batch.pl \
+    -d Human_n12_pop \
+    -da ~/data/alignment/human_simons/Human_n12_pop_refined \
+    -e homo_sapiens_core_82_37 \
+    --block \
+    -chr ~/data/alignment/human_simons/chr_length.csv \
+    -lt 5000 --parallel 12 \
+    --run all
+
+perl ~/Scripts/alignDB/util/dup_db.pl -d Human_n12_pop -f ~/data/dumps/mysql/Human_n12_pop.sql.gz
 ```
 
 ## Mouse
