@@ -158,6 +158,21 @@ find . -name ".listing" | xargs rm
 # rsync -avP wangq@45.79.80.100:data/ensembl82/fasta/ ~/data/ensembl82/fasta
 ```
 
+### gff3
+
+
+```bash
+mkdir -p ~/data/ensembl82/gff3
+cd ~/data/ensembl82/gff3
+
+# All plants
+wget -m ftp://ftp.ensemblgenomes.org/pub/plants/release-29/gff3 .
+
+mv ftp.ensemblgenomes.org/pub/plants/release-29/gff3/* .
+
+find . -name ".listing" | xargs rm
+```
+
 ## Build local databases
 
 Use `build_ensembl.pl`.
