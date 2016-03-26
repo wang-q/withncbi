@@ -1244,7 +1244,7 @@ EOF
     ```bash
     # pop_prep.pl
     cd ~/data/alignment/human_simons
-    perl ~/Scripts/withncbi/pop/pop_prep.pl -p 22 -i ~/Scripts/withncbi/pop/human_simons_test.yml
+    perl ~/Scripts/withncbi/pop/pop_prep.pl -p 23 -i ~/Scripts/withncbi/pop/human_simons_test.yml
 
     sh 01_file.sh
     sh 03_strain_info.sh
