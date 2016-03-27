@@ -3,8 +3,8 @@ use strict;
 use warnings;
 use autodie;
 
-use File::Spec;
 use File::HomeDir;
+use Path::Tiny;
 
 use List::MoreUtils qw(firstidx uniq zip);
 use List::Util qw(first max maxstr min minstr reduce shuffle sum);
@@ -23,7 +23,7 @@ use vars qw(@ISA @EXPORT_OK %EXPORT_TAGS);
 %EXPORT_TAGS = (
     all => [
         qw{
-            wgs_worker find_ancestor find_group abbr abbr_most
+            wgs_worker find_ancestor find_group abbr abbr_most read_sizes
             },
     ],
 );
@@ -377,6 +377,21 @@ sub abbr_most {
 
         return \%abbr_of;
     }
+}
+
+sub read_sizes {
+    my $file       = shift;
+    my $remove_chr = shift;
+
+    my @lines = path($file)->lines( { chomp => 1 } );
+    my %length_of;
+    for (@lines) {
+        my ( $key, $value ) = split /\t/;
+        $key =~ s/chr0?// if $remove_chr;
+        $length_of{$key} = $value;
+    }
+
+    return \%length_of;
 }
 
 1;
