@@ -9,6 +9,7 @@ use YAML::Syck qw(Dump Load DumpFile LoadFile);
 
 use Path::Tiny;
 use IO::Zlib;
+use Set::Scalar;
 use AlignDB::IntSpan;
 
 use lib "$FindBin::RealBin/../lib";
@@ -29,7 +30,8 @@ gff2runlist.pl - Convert gff3 file to chromosome runlists
         --help          -?          brief help message
         --file          -f  STR     one gff3 file, gzipped file is supported
         --size          -s  STR     chr.sizes
-        --range         -r  INT     range of up/down-stream. Default is [5000]
+        --range         -r  INT     range of up/down-stream. Default is [1000]
+        --clean         -c          up/down-stream don't contain any regions of other genes
 
 =cut
 
@@ -37,7 +39,8 @@ GetOptions(
     'help|?'   => sub { HelpMessage(0) },
     'file|f=s' => \my $infile,
     'size|s=s' => \my $size,
-    'range|r=i' => \( my $range = 5000 ),
+    'range|r=i' => \( my $range = 1000 ),
+    'clean|c' => \my $clean,
 ) or HelpMessage(1);
 
 #----------------------------------------------------------#
@@ -67,6 +70,9 @@ my $in_fh = IO::Zlib->new( $infile, "rb" );
 # runlists
 my $all_gene = {};    # all genes combined
 my $sep_gene = {};    # seperated genes
+
+# chromosome names
+my $all_name_set = Set::Scalar->new;
 
 # current transcript
 my $cur_transcript;
@@ -119,6 +125,8 @@ while (1) {
             print " " x 4 . "$line\n";
         }
         printf "gene: %s\n", $gene_id;
+
+        $all_name_set->insert($chr);
 
         # gene and up/down-stream
         my $set_of = {
@@ -218,10 +226,10 @@ if ( scalar @{ $cache->{exon} } > 0 ) {
 }
 
 # intergenic regions
-if ($size) {
-    print "==> intergenic\n";
+{
+    print "==> Intergenic\n";
     $all_gene->{intergenic} = {};
-    for my $chr ( keys %{$chr_set_of} ) {
+    for my $chr ( $all_name_set->members ) {
         my $set = $chr_set_of->{$chr}->copy;
         for my $f (qw{gene upstream downstream}) {
             if ( exists $all_gene->{$f}{$chr} ) {
@@ -233,15 +241,18 @@ if ($size) {
 }
 
 # clean up/down-stream
-for my $f (qw{upstream downstream}) {
-    print "==> Clean $f\n";
-    for my $chr ( keys %{ $all_gene->{gene} } ) {
-        $all_gene->{$f}{$chr}->remove( $all_gene->{gene}{$chr} );
-    }
-    for my $id ( keys %{ $sep_gene->{gene} } ) {
-        for my $chr ( keys %{ $sep_gene->{gene}{$id} } ) {
-            print "$f $id $chr\n";
-            $sep_gene->{$f}{$id}{$chr}->remove( $all_gene->{gene}{$chr} );
+if ($clean) {
+    for my $f (qw{upstream downstream}) {
+        print "==> Clean $f\n";
+        for my $chr ( $all_name_set->members ) {
+            $all_gene->{$f}{$chr}->remove( $all_gene->{gene}{$chr} );
+        }
+        for my $id ( keys %{ $sep_gene->{gene} } ) {
+            for my $chr ( keys %{ $sep_gene->{gene}{$id} } ) {
+
+                #print "$f $id $chr\n";
+                $sep_gene->{$f}{$id}{$chr}->remove( $all_gene->{gene}{$chr} );
+            }
         }
     }
 }
@@ -249,8 +260,9 @@ for my $f (qw{upstream downstream}) {
 #----------------------------------------------------------#
 # Outputs
 #----------------------------------------------------------#
+print "==> Write Output files\n";
 for my $f (qw{gene upstream downstream exon five_prime_UTR three_prime_UTR CDS intron}) {
-    for my $chr ( keys $all_gene->{$f} ) {
+    for my $chr ( $all_name_set->members ) {
         $all_gene->{$f}{$chr} = $all_gene->{$f}{$chr}->runlist;
     }
     for my $id ( keys %{ $sep_gene->{$f} } ) {
