@@ -1287,22 +1287,23 @@ http://hgdownload.soe.ucsc.edu/goldenPath/ce10/multiz7way/ce10.commonNames.7way.
 1. From Ensembl genomes
 
     ```bash
+    ## scaffolds only
     # Amborella trichopoda
+
+    ## not exists
+    # Phyllostachys heterocycla
+
     # Arabidopsis lyrata
-    # Brachypodium distachyon
     # Chlamydomonas reinhardtii
     # Cyanidioschyzon merolae
     # Glycine max
     # Leersia perrieri
     # Medicago truncatula
-    # Musa acuminata
     # Ostreococcus lucimarinus
     # Physcomitrella patens
     # Populus trichocarpa
     # Prunus persica
     # Selaginella moellendorffii
-    # Setaria italica
-    # Sorghum bicolor
     # Theobroma cacao
     # Vitis vinifera
 
@@ -1351,6 +1352,52 @@ http://hgdownload.soe.ucsc.edu/goldenPath/ce10/multiz7way/ce10.commonNames.7way.
     faops some toplevel.fa listFile toplevel.filtered.fa
     faops split-name toplevel.filtered.fa .
     rm toplevel.fa toplevel.filtered.fa listFile
+
+    # Musa acuminata
+    mkdir -p ~/data/alignment/Ensembl/Macu
+    cd ~/data/alignment/Ensembl/Macu
+
+    find ~/data/ensembl82/fasta/musa_acuminata/dna/ -name "*dna_sm.toplevel*" | xargs gzip -d -c > toplevel.fa
+    faops count toplevel.fa | perl -aln -e 'next if $F[0] eq 'total'; print $F[0] if $F[1] > 50000; print $F[0] if $F[1] > 5000  and $F[6]/$F[1] < 0.05' | uniq > listFile
+    faops some toplevel.fa listFile toplevel.filtered.fa
+    faops split-name toplevel.filtered.fa .
+    rm toplevel.fa toplevel.filtered.fa listFile
+
+    # Setaria italica
+    mkdir -p ~/data/alignment/Ensembl/Sita
+    cd ~/data/alignment/Ensembl/Sita
+
+    find ~/data/ensembl82/fasta/setaria_italica/dna/ -name "*dna_sm.toplevel*" | xargs gzip -d -c > toplevel.fa
+    faops count toplevel.fa | perl -aln -e 'next if $F[0] eq 'total'; print $F[0] if $F[1] > 50000; print $F[0] if $F[1] > 5000  and $F[6]/$F[1] < 0.05' | uniq > listFile
+    faops some toplevel.fa listFile toplevel.filtered.fa
+    faops split-name toplevel.filtered.fa .
+    rm toplevel.fa toplevel.filtered.fa listFile
+
+    rm scaffold*.fa
+
+    # Sorghum bicolor
+    mkdir -p ~/data/alignment/Ensembl/Sbic
+    cd ~/data/alignment/Ensembl/Sbic
+
+    find ~/data/ensembl82/fasta/sorghum_bicolor/dna/ -name "*dna_sm.toplevel*" | xargs gzip -d -c > toplevel.fa
+    faops count toplevel.fa | perl -aln -e 'next if $F[0] eq 'total'; print $F[0] if $F[1] > 50000; print $F[0] if $F[1] > 5000  and $F[6]/$F[1] < 0.05' | uniq > listFile
+    faops some toplevel.fa listFile toplevel.filtered.fa
+    faops split-name toplevel.filtered.fa .
+    rm toplevel.fa toplevel.filtered.fa listFile
+
+    rm GL*.fa
+
+    # Brachypodium distachyon
+    mkdir -p ~/data/alignment/Ensembl/Bdis
+    cd ~/data/alignment/Ensembl/Bdis
+
+    find ~/data/ensembl82/fasta/brachypodium_distachyon/dna/ -name "*dna_sm.toplevel*" | xargs gzip -d -c > toplevel.fa
+    faops count toplevel.fa | perl -aln -e 'next if $F[0] eq 'total'; print $F[0] if $F[1] > 50000; print $F[0] if $F[1] > 5000  and $F[6]/$F[1] < 0.05' | uniq > listFile
+    faops some toplevel.fa listFile toplevel.filtered.fa
+    faops split-name toplevel.filtered.fa .
+    rm toplevel.fa toplevel.filtered.fa listFile
+
+    rm GG*.fa
     ```
 
 ## Currently not used

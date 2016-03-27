@@ -32,6 +32,15 @@ perl       ~/Scripts/withncbi/taxon/strain_info.pl \
     --name 4081=Slyc                               \
     --id   4113                                    \
     --name 4113=Stub                               \
+    --id   4641                                    \
+    --name 4641=Macu                               \
+    --id   4555                                    \
+    --name 4555=Sita                               \
+    --id   4558                                    \
+    --name 4558=Sbic                               \
+    --id   15368                                   \
+    --name 15368=Bdis                              \
+    --id   38705                                   \
     --entrez
 
 ```
@@ -203,6 +212,11 @@ cd ~/data/alignment/self/rice
 perl ~/Scripts/withncbi/ensembl/chr_kary.pl -e oryza_sativa_core_29_82_7
 bash ~/share/circos/data/karyotype/parse.karyotype oryza_sativa_core_29_82_7.kary.tsv > Processing/OsatJap/karyotype.OsatJap.txt
 
+# ensembldb.ensembl.org         5306
+# mysql-eg-publicsql.ebi.ac.uk  4157
+mysql -hmysql-eg-publicsql.ebi.ac.uk -P4157 -uanonymous
+perl ~/Scripts/withncbi/ensembl/chr_kary.pl -s  mysql-eg-publicsql.ebi.ac.uk --port 4157 -u anonymous -p '' -e oryza_sativa_core_29_82_7
+
 bash 1_real_chr.sh
 bash 3_self_cmd.sh
 time bash 4_proc_cmd.sh
@@ -361,6 +375,36 @@ bash 5_circos_cmd.sh
 ```
 
 ## Other plants
+
+### Full chromosomes
+
+```bash
+cd ~/data/alignment/self
+
+perl ~/Scripts/withncbi/taxon/strain_bz_self.pl \
+    --file ~/data/alignment/self/ensembl_taxon.csv \
+    --working_dir ~/data/alignment/self \
+    --seq_dir ~/data/alignment/Ensembl \
+    --length 1000  \
+    --use_name \
+    --norm \
+    --name plants \
+    --parallel 12 \
+    -t Atha \
+    -q Macu \
+    -q Sita \
+    -q Sbic \
+    -q Bdis
+
+cd ~/data/alignment/self/plants
+
+bash 1_real_chr.sh
+time bash 3_self_cmd.sh
+
+time bash 4_proc_cmd.sh
+
+bash 5_circos_cmd.sh
+```
 
 ### Partitioned sequences
 
