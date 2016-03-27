@@ -38,19 +38,24 @@ chr_kary.pl - Fetch Karyotype Band from ensembl db
       Options:
         --help      -?          brief help message
         --server    -s  STR     MySQL server IP/Domain name
-        --port      -P  INT     MySQL server port
+        --port          INT     MySQL server port
         --username  -u  STR     username
         --password  -p  STR     password
         --ensembl   -e  STR     ensembl database name
         --chr           @STR    chromosome names, leave empty will write all chromosomes
         --output        STR     output file name
 
+    perl ~/Scripts/withncbi/ensembl/chr_kary.pl \
+        -s mysql-eg-publicsql.ebi.ac.uk \
+        --port 4157 -u anonymous -p '' \
+        -e oryza_sativa_core_29_82_7
+
 =cut
 
 GetOptions(
     'help|?' => sub { HelpMessage(0) },
     'server|s=s'   => \( my $server   = $Config->{database}{server} ),
-    'port|P=i'     => \( my $port     = $Config->{database}{port} ),
+    'port=i'       => \( my $port     = $Config->{database}{port} ),
     'username|u=s' => \( my $username = $Config->{database}{username} ),
     'password|p=s' => \( my $password = $Config->{database}{password} ),
     'ensembl|e=s'  => \my $ensembl_db,
@@ -71,6 +76,7 @@ $stopwatch->start_message("Drawing chr bands...");
 
 my $db_adaptor = Bio::EnsEMBL::DBSQL::DBAdaptor->new(
     -host   => $server,
+    -port   => $port,
     -dbname => $ensembl_db,
     -user   => $username,
     -pass   => $password,
@@ -78,12 +84,12 @@ my $db_adaptor = Bio::EnsEMBL::DBSQL::DBAdaptor->new(
 
 my $kary_adaptor = $db_adaptor->get_KaryotypeBandAdaptor;
 
-if (! @chr_names) {
+if ( !@chr_names ) {
     @chr_names = map { $_->seq_region_name } @{ $db_adaptor->get_GenomeContainer->get_karyotype };
-    
-    # The following codes return unsorted chromosome names
-    #@chr_names = map { $_->seq_region_name } @{ $db_adaptor->get_SliceAdaptor->fetch_all('chromosome') };
-    
+
+# The following codes return unsorted chromosome names
+#@chr_names = map { $_->seq_region_name } @{ $db_adaptor->get_SliceAdaptor->fetch_all('chromosome') };
+
     print "Write all available karyotypes\n";
     print Dump \@chr_names;
 }
