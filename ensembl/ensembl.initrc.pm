@@ -630,7 +630,7 @@ my $pass = 'alignDB';
         'pabe_core_82',
         'pabe_82',
         'pongo_abelii_core_82_1',
-        'Orangutan',
+        'orangutan',
     );
 
     Bio::EnsEMBL::Utils::ConfigRegistry->add_alias(
@@ -659,6 +659,7 @@ my $pass = 'alignDB';
         'scer_82',
         'saccharomyces_cerevisiae_core_29_82_4',
         'yeast',
+        'S288c',
     );
 
     Bio::EnsEMBL::Utils::ConfigRegistry->add_alias(
