@@ -1105,6 +1105,11 @@ http://hgdownload.soe.ucsc.edu/goldenPath/ce10/multiz7way/ce10.commonNames.7way.
     # Amborella trichopoda
 
     ## not exists
+    # Cajanus cajan
+    # Phaseolus vulgaris
+    # Thellungiella salsuginea
+    # Sesamum indicum
+    # Capsicum annuum
     # Phyllostachys heterocycla
 
     # Arabidopsis lyrata

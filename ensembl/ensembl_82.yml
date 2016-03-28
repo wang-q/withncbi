@@ -78,6 +78,18 @@ species:
         mv Un.fa Un.fa.skip
         mv Y.fa Y.fa.skip
         mv MT.fa MT.fa.skip
+  "Medicago truncatula":
+    fasta:
+      append: |
+        cat scaffold*.fa > Un.fa
+        mv Un.fa Un.fa.skip
+        rm scaffold*.fa
+  "Glycine max":
+    fasta:
+      append: |
+        cat scaffold*.fa > Un.fa
+        mv Un.fa Un.fa.skip
+        rm scaffold*.fa
   "Arabidopsis thaliana":
     core: 1
     initrc: 1
@@ -86,13 +98,13 @@ species:
         mv Mt.fa Mt.fa.skip
         mv Pt.fa Pt.fa.skip
   "Arabidopsis lyrata":
-    core: 1
-    initrc: 1
     fasta:
       append: |
         cat scaffold*.fa > Un.fa
         rm scaffold*.fa
         mv Un.fa Un.fa.skip
+  "Vitis vinifera":
+    fasta: 1
   "Oryza sativa":
     core: 1
     initrc: 1
@@ -105,8 +117,6 @@ species:
         rm AC*.fa AP*.fa Syng*.fa
         mv Un.fa Un.fa.skip
   "Oryza indica":
-    core: 1
-    initrc: 1
     fasta:
       alias: OsatInd
       append: |
@@ -116,8 +126,6 @@ species:
         rm AA*.fa CH*.fa Sup*.fa
         mv Un.fa Un.fa.skip
   "Brassica oleracea":
-    core: 1
-    initrc: 1
     fasta:
       append: |
         cat Scaffold*.fa > Un.fa
@@ -146,9 +154,9 @@ species:
   "Setaria italica":
     fasta:
       append: |
-        cat Scaffold*.fa > Un.fa
+        cat scaffold*.fa > Un.fa
         mv Un.fa Un.fa.skip
-        rm Scaffold*.fa
+        rm scaffold*.fa
   "Sorghum bicolor":
     fasta:
       append: |
