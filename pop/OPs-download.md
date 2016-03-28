@@ -1098,9 +1098,9 @@ http://hgdownload.soe.ucsc.edu/goldenPath/ce10/multiz7way/ce10.commonNames.7way.
 
 1. From Ensembl genomes
 
-    [ensembl_82.yml](ensembl/ensembl_82.yml) creates `Bole`, `Brap`, `Slyc`, `Stub`, `Sita`, `Sbic`, `Bdis` and `Macu` in `~/data/alignment/Ensembl`.
+    [ensembl_82.yml](ensembl/ensembl_82.yml) creates `Mtru`, `Gmax`, `Vvin`, `Bole`, `Brap`, `Slyc`, `Stub`, `Sita`, `Sbic`, `Bdis` and `Macu` in `~/data/alignment/Ensembl`.
 
-    ```bash
+    ```text
     ## scaffolds only
     # Amborella trichopoda
 
@@ -1112,20 +1112,15 @@ http://hgdownload.soe.ucsc.edu/goldenPath/ce10/multiz7way/ce10.commonNames.7way.
     # Capsicum annuum
     # Phyllostachys heterocycla
 
-    # Arabidopsis lyrata
     # Chlamydomonas reinhardtii
     # Cyanidioschyzon merolae
-    # Glycine max
     # Leersia perrieri
-    # Medicago truncatula
     # Ostreococcus lucimarinus
     # Physcomitrella patens
     # Populus trichocarpa
     # Prunus persica
     # Selaginella moellendorffii
     # Theobroma cacao
-    # Vitis vinifera
-
     ```
 
 ## Currently not used
