@@ -178,15 +178,15 @@ find . -name ".listing" | xargs rm
 Use `build_ensembl.pl`.
 
 ```bash
-perl ~/Scripts/alignDB/util/build_ensembl.pl --checksum --ensembl ~/data/ensembl82/mysql/homo_sapiens_core_82_37
+perl ~/Scripts/withncbi/ensembl/build_ensembl.pl --checksum --ensembl ~/data/ensembl82/mysql/homo_sapiens_core_82_37
 
-perl ~/Scripts/alignDB/util/build_ensembl.pl --initdb --db human_82 --ensembl ~/data/ensembl82/mysql/homo_sapiens_core_82_37
+perl ~/Scripts/withncbi/ensembl/build_ensembl.pl --initdb --db human_82 --ensembl ~/data/ensembl82/mysql/homo_sapiens_core_82_37
 ```
 
 Or use `ensembl_batch.pl`.
 
 ```bash
-cd ~/Scripts/alignDB/util
+cd ~/Scripts/withncbi/ensembl
 
 perl ensembl_batch.pl -i ensembl_82.yml
 sh ensembl.build.sh
