@@ -1,83 +1,191 @@
 ---
 dir:
-  mysql: "~/data/ensembl82/mysql/"
-  fasta: "~/data/ensembl82/fasta/"
+  mysql: "~/data/ensembl82/mysql"
+  fasta: "~/data/ensembl82/fasta"
+  dest: "~/data/alignment/Ensembl"
 species:
   "Homo sapiens":
     core:
       aliases:
         - human
     initrc: 1
+    fasta:
+      alias: Human
+      pattern: "*dna_sm.primary_assembly*"
+      append: |
+        cat GL*.fa > Un.fa
+        rm GL*.fa
+        mv Un.fa Un.fa.skip
+        mv Y.fa Y.fa.skip
+        mv MT.fa MT.fa.skip
   "Pan troglodytes":
     core:
       aliases:
         - chimp
     initrc: 1
+    fasta:
+      alias: Chimp
+      append: |
+        cat GL*.fa > Un.fa
+        cat AACZ*.fa >> Un.fa
+        rm GL*.fa AACZ*.fa
   "Gorilla gorilla":
     core:
       aliases:
         - gorilla
     initrc: 1
+    fasta:
+      alias: Gorilla
   "Pongo abelii":
     core:
       aliases:
-        - Orangutan
+        - orangutan
     initrc: 1
+    fasta:
+      alias: Orangutan
   "Macaca mulatta":
     core:
       aliases:
         - rhesus
     initrc: 1
+    fasta:
+      alias: Rhesus
+      append: |
+        cat 1099*.fa > Un.fa
+        rm 1099*.fa
   "Mus musculus":
     core:
       aliases:
         - mouse
     initrc: 1
+    fasta:
+      alias: Mouse
+      pattern: "*dna_sm.primary_assembly*"
+      append: |
+        cat GL*.fa > Un.fa
+        cat JH*.fa >> Un.fa
+        rm GL*.fa JH*.fa
+        mv Un.fa Un.fa.skip
+        mv Y.fa Y.fa.skip
+        mv MT.fa MT.fa.skip
+  "Rattus norvegicus":
+    fasta:
+      alias: Rat
+      append: |
+        cat KL*.fa > Un.fa
+        cat AABR*.fa >> Un.fa
+        rm KL*.fa AABR*.fa
+        mv Un.fa Un.fa.skip
+        mv Y.fa Y.fa.skip
+        mv MT.fa MT.fa.skip
   "Arabidopsis thaliana":
     core: 1
     initrc: 1
-  "Arabidopsis thaliana":
-    core: 1
-    initrc: 1
-  "Arabidopsis thaliana":
-    core: 1
-    initrc: 1
-  "Arabidopsis thaliana":
-    core: 1
-    initrc: 1
+    fasta:
+      append: |
+        mv Mt.fa Mt.fa.skip
+        mv Pt.fa Pt.fa.skip
   "Arabidopsis lyrata":
     core: 1
     initrc: 1
+    fasta:
+      append: |
+        cat scaffold*.fa > Un.fa
+        rm scaffold*.fa
+        mv Un.fa Un.fa.skip
   "Oryza sativa":
     core: 1
     initrc: 1
+    fasta:
+      alias: OsatJap
+      append: |
+        cat AC*.fa > Un.fa
+        cat AP*.fa >> Un.fa
+        cat Syng*.fa >> Un.fa
+        rm AC*.fa AP*.fa Syng*.fa
+        mv Un.fa Un.fa.skip
   "Oryza indica":
     core: 1
     initrc: 1
+    fasta:
+      alias: OsatInd
+      append: |
+        cat AA*.fa > Un.fa
+        cat CH*.fa >> Un.fa
+        cat Sup*.fa >> Un.fa
+        rm AA*.fa CH*.fa Sup*.fa
+        mv Un.fa Un.fa.skip
   "Brassica oleracea":
     core: 1
     initrc: 1
+    fasta:
+      append: |
+        cat Scaffold*.fa > Un.fa
+        mv Un.fa Un.fa.skip
+        rm Scaffold*.fa
   "Brassica rapa":
     core: 1
     initrc: 1
+    fasta:
+      append: |
+        cat Scaffold*.fa > Un.fa
+        mv Un.fa Un.fa.skip
+        rm Scaffold*.fa
   "Solanum lycopersicum":
     core: 1
     initrc: 1
+    fasta:
+      append: |
+        cat SL2*.fa > Un.fa
+        mv Un.fa Un.fa.skip
+        rm SL2*.fa
   "Solanum tuberosum":
     core: 1
     initrc: 1
+    fasta: 1
+  "Setaria italica":
+    fasta:
+      append: |
+        cat Scaffold*.fa > Un.fa
+        mv Un.fa Un.fa.skip
+        rm Scaffold*.fa
+  "Sorghum bicolor":
+    fasta:
+      append: |
+        cat GL*.fa > Un.fa
+        mv Un.fa Un.fa.skip
+        rm GL*.fa
+  "Brachypodium distachyon":
+    fasta:
+      append: |
+        cat GG*.fa > Un.fa
+        mv Un.fa Un.fa.skip
+        rm GG*.fa
+  "Musa acuminata":
+    fasta: 1
   "Drosophila melanogaster":
     core: 1
     initrc: 1
+    fasta:
+      append: |
+        rm *Scaffold*.fa 211*.fa
+        mv 4.fa 4.fa.skip
+        mv Y.fa Y.fa.skip
+        mv rDNA.fa rDNA.fa.skip
+        mv dmel_mitochondrion_genome.fa dmel_mitochondrion_genome.fa.skip
   "Drosophila sechellia":
     core: 1
     initrc: 1
   "Drosophila simulans":
     core: 1
     initrc: 1
+    fasta: 1
   "Caenorhabditis elegans":
     core: 1
     initrc: 1
+    fasta:
+      append: |
+        mv MtDNA.fa MtDNA.fa.skip
   "Caenorhabditis briggsae":
     core: 1
     initrc: 1
@@ -103,7 +211,12 @@ species:
     core:
       aliases:
         - yeast
+        - S288c
     initrc: 1
+    fasta:
+      alias: S288c
+      append: |
+        mv Mito.fa Mito.fa.skip
   "Schizosaccharomyces pombe":
     core: 1
     initrc: 1
@@ -116,4 +229,5 @@ species:
 meta:
   version: 82
   initrc_file: "ensembl.initrc.pm"
-  sh_file: "ensembl.build.sh"
+  build_file: "ensembl.build.sh"
+  fasta_file: "ensembl.fasta.sh"

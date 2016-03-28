@@ -37,7 +37,7 @@ ensembl_batch.pl - Ensembl batching
       Options:
         --help      -?          brief help message
         --server    -s  STR     MySQL server IP/Domain name
-        --port      -P  INT     MySQL server port
+        --port          INT     MySQL server port
         --username  -u  STR     username
         --password  -p  STR     password
         --file      -i  STR     YAML file
@@ -49,7 +49,7 @@ ensembl_batch.pl - Ensembl batching
 GetOptions(
     'help|?' => sub { HelpMessage(0) },
     'server|s=s'   => \( my $server   = $Config->{database}{server} ),
-    'port|P=i'     => \( my $port     = $Config->{database}{port} ),
+    'port=i'       => \( my $port     = $Config->{database}{port} ),
     'username|u=s' => \( my $username = $Config->{database}{username} ),
     'password|p=s' => \( my $password = $Config->{database}{password} ),
     'file|i=s'     => \( my $yml_file = "$FindBin::Bin/ensembl_82.yml" ),
@@ -64,17 +64,16 @@ my $dispatch = LoadFile($yml_file);
 
 my $mysql_dir = path( $dispatch->{dir}{mysql} )->absolute->stringify;
 my $fasta_dir = path( $dispatch->{dir}{fasta} )->absolute->stringify;
+my $dest_dir  = path( $dispatch->{dir}{dest} )->absolute->stringify;
 
 my $species_ref = $dispatch->{species};
 
-my $version     = $dispatch->{meta}{version};
-my $initrc_file = $dispatch->{meta}{initrc_file};
-my $sh_file     = $dispatch->{meta}{sh_file};
+my $version = $dispatch->{meta}{version};
 
 #----------------------------------------------------------#
 # Write .axt files from alignDB
 #----------------------------------------------------------#
-my $initrc_str = q{
+my $initrc_str = qq{
 use strict;
 use warnings;
 use autodie;
@@ -83,19 +82,27 @@ use Bio::EnsEMBL::Utils::ConfigRegistry;
 use Bio::EnsEMBL::DBSQL::DBAdaptor;
 use Bio::EnsEMBL::Compara::DBSQL::DBAdaptor;
 
-my $host = 'localhost';
-my $port = 3306;
-my $user = 'alignDB';
-my $pass = 'alignDB';
+my \$host = '$server';
+my \$port = $port;
+my \$user = '$username';
+my \$pass = '$password';
 
 };
-my $sh_str;
+
+my $build_str = q{#/bin/bash
+
+};
+my $fasta_str = q{#/bin/bash
+
+};
+
 for my $sp ( sort keys %{$species_ref} ) {
     print "$sp\n";
     if ( $species_ref->{$sp}{skip} ) {
         print " " x 4, "Skip $sp\n";
         next;
     }
+    my $info = $species_ref->{$sp};
 
     my (@aliases);
     {
@@ -118,25 +125,43 @@ for my $sp ( sort keys %{$species_ref} ) {
 
     # build databases
     for my $group (qw{core funcgen otherfeatures variation compara}) {
-        if ( $species_ref->{$sp}{$group} ) {
-            my ( $ensembl_db, $cmd ) = build_cmd( $sp, $group, $mysql_dir );
-            $sh_str .= $cmd;
-            if ( $species_ref->{$sp}{initrc} ) {
+        if ( $info->{$group} ) {
+            my ( $ensembl_base, $cmd ) = build_cmd( $sp, $group, $mysql_dir );
+            $build_str .= $cmd;
+            if ( $info->{initrc} ) {
+
                 # Don't affect other groups' aliases
                 my $aliases_ref = [@aliases];
                 push @{$aliases_ref}, $aliases[0] . "_$group" . "_$version";
                 push @{$aliases_ref}, $aliases[0] . "_$version"
                     if $group eq 'core';
-                push @{$aliases_ref}, $ensembl_db;
+                push @{$aliases_ref}, $ensembl_base;
 
-                if ( ref $species_ref->{$sp}{$group} eq 'HASH'
-                    and exists $species_ref->{$sp}{$group}{aliases} )
-                {
-                    push @{$aliases_ref}, @{ $species_ref->{$sp}{$group}{aliases} };
+                if ( ref $info->{$group} eq 'HASH' and exists $info->{$group}{aliases} ) {
+                    push @{$aliases_ref}, @{ $info->{$group}{aliases} };
                 }
-                $initrc_str .= build_initrc( $sp, $group, $ensembl_db, $aliases_ref );
+                $initrc_str .= build_initrc( $sp, $group, $ensembl_base, $aliases_ref );
             }
         }
+    }
+
+    # build fasta
+    if ( $info->{fasta} ) {
+        my $alias   = $aliases[1];
+        my $pattern = "*dna_sm.toplevel*";
+        my $append;
+        if ( ref $info->{fasta} eq 'HASH' ) {
+            if ( exists $info->{fasta}{alias} ) {
+                $alias = $info->{fasta}{alias};
+            }
+            if ( exists $info->{fasta}{pattern} ) {
+                $pattern = $info->{fasta}{pattern};
+            }
+            if ( exists $info->{fasta}{append} ) {
+                $append = $info->{fasta}{append} . "\n";
+            }
+        }
+        $fasta_str .= build_fasta( $sp, $fasta_dir, $dest_dir, $alias, $pattern, $append );
     }
 }
 
@@ -148,8 +173,9 @@ $initrc_str .= q{
 # Write outfiles
 #----------------------------#
 {
-    path($initrc_file)->spew($initrc_str);
-    path($sh_file)->spew($sh_str);
+    path( $dispatch->{meta}{initrc_file} )->spew($initrc_str);
+    path( $dispatch->{meta}{build_file} )->spew($build_str);
+    path( $dispatch->{meta}{fasta_file} )->spew($fasta_str);
 }
 
 $stopwatch->end_message;
@@ -157,6 +183,85 @@ $stopwatch->end_message;
 #----------------------------------------------------------#
 # Subroutines
 #----------------------------------------------------------#
+sub build_fasta {
+    my $sp        = shift;
+    my $fasta_dir = shift;
+    my $dest_fir  = shift;
+    my $alias     = shift;
+    my $pattern   = shift;
+    my $append    = shift;
+
+    my %score_of;
+    my ( $genus, $species, $strain ) = split " ", $sp;
+    my $str = lc join "_", grep {$_} ( $genus, $species, $strain );
+
+    my $iter = path($fasta_dir)->iterator( { recurse => 0, } );
+    while ( my $child = $iter->() ) {
+        next unless $child->is_dir;
+        my $base_dir = $child->basename;
+        my $score = String::Compare::char_by_char( $base_dir, $str );
+        $score_of{ $child->stringify } = $score;
+    }
+
+    my ($ensembl_dir)
+        = sort { $score_of{$b} <=> $score_of{$a} } keys %score_of;
+    my $ensembl_base = path($ensembl_dir)->basename;
+    printf " " x 4 . "Find %s for %s\n", $ensembl_base, $str;
+    if ( index( $ensembl_base, $str ) != 0 ) {
+        print " " x 4, "*** Be careful for [$str]\n";
+    }
+
+    if ($append) {
+        $append = join "\n", map { " " x 4 . $_ } split( "\n", $append );
+    }
+
+    my $text = <<'EOF';
+# [% sp %]
+if [ ! -d [% dest %]/[% alias %] ]
+then
+    echo "==> [% sp %]"
+
+    mkdir -p [% dest %]/[% alias %]
+    cd [% dest %]/[% alias %]
+    
+    find [% dir %]/dna/ -name "[% pattern %]" \
+        | xargs gzip -d -c > toplevel.fa
+    
+    faops count toplevel.fa \
+        | perl -aln -e '
+            next if $F[0] eq 'total';
+            print $F[0] if $F[1] > 50000;
+            print $F[0] if $F[1] > 5000  and $F[6]/$F[1] < 0.05;
+            ' \
+        | uniq > listFile
+    faops some toplevel.fa listFile toplevel.filtered.fa
+    faops split-name toplevel.filtered.fa .
+    rm toplevel.fa toplevel.filtered.fa listFile
+
+[% append %]
+else
+    echo "==> [% dest %]/[% alias %] exists"
+fi
+
+EOF
+
+    my $tt = Template->new;
+    my $output;
+    $tt->process(
+        \$text,
+        {   sp      => $sp,
+            dir     => $ensembl_dir,
+            dest    => $dest_dir,
+            alias   => $alias,
+            pattern => $pattern,
+            append  => $append,
+        },
+        \$output
+    ) or die Template->error;
+
+    return $output;
+}
+
 sub build_cmd {
     my $sp        = shift;
     my $group     = shift;
@@ -183,23 +288,27 @@ sub build_cmd {
 
     my ($ensembl_dir)
         = sort { $score_of{$b} <=> $score_of{$a} } keys %score_of;
-    my $ensembl_db = path($ensembl_dir)->basename;
-    print " " x 4, "Find $ensembl_db for $str\n";
-    if ( index( $ensembl_db, $str ) != 0 ) {
-        print " " x 4, "Be careful for [$str]\n";
+    my $ensembl_base = path($ensembl_dir)->basename;
+    printf " " x 4 . "Find %s for %s\n", $ensembl_base, $str;
+    if ( index( $ensembl_base, $str ) != 0 ) {
+        print " " x 4, "*** Be careful for [$str]\n";
     }
 
     my $cmd
-        = "perl $FindBin::Bin/build_ensembl.pl"
+        = "# $sp\n"
+        . "perl $FindBin::Bin/build_ensembl.pl" . " \\\n"
+        . " " x 4
         . " -s $server"
         . " --port $port"
         . " -u $username"
-        . " --password $password"
+        . " --password $password" . " \\\n"
+        . " " x 4
         . " --initdb"
-        . " --db $ensembl_db"
+        . " --db $ensembl_base" . " \\\n"
+        . " " x 4
         . " --ensembl $ensembl_dir" . "\n\n";
 
-    return ( $ensembl_db, $cmd );
+    return ( $ensembl_base, $cmd );
 }
 
 sub build_initrc {
