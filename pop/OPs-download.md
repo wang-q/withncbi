@@ -771,32 +771,7 @@ for genomes out of WGS, which usually in better assembling levels.
 
 3. *A. thaliana* and *A. lyrata* from ensembl genomes.
 
-    Check [ensembl.md](ensembl.md). Ensembl data stored in `~/data/ensembl82`.
-
-    ```bash
-    # Atha
-    mkdir -p ~/data/alignment/Ensembl/Atha
-    cd ~/data/alignment/Ensembl/Atha
-
-    find ~/data/ensembl82/fasta/arabidopsis_thaliana/dna/ -name "*dna_sm.toplevel*" | xargs gzip -d -c > toplevel.fa
-    faops count toplevel.fa | perl -aln -e 'next if $F[0] eq 'total'; print $F[0] if $F[1] > 50000; print $F[0] if $F[1] > 5000  and $F[6]/$F[1] < 0.05' | uniq > listFile
-    faops some toplevel.fa listFile toplevel.filtered.fa
-    faops split-name toplevel.filtered.fa .
-    rm toplevel.fa toplevel.filtered.fa listFile
-
-    mv Mt.fa Mt.fa.skip
-    mv Pt.fa Pt.fa.skip
-
-    # Alyr
-    mkdir -p ~/data/alignment/Ensembl/Alyr
-    cd ~/data/alignment/Ensembl/Alyr
-
-    find ~/data/ensembl82/fasta/arabidopsis_lyrata/dna/ -name "*dna_sm.toplevel*" | xargs gzip -d -c > toplevel.fa
-    faops count toplevel.fa | perl -aln -e 'next if $F[0] eq 'total'; print $F[0] if $F[1] > 50000; print $F[0] if $F[1] > 5000  and $F[6]/$F[1] < 0.05' | uniq > listFile
-    faops some toplevel.fa listFile toplevel.filtered.fa
-    faops split-about toplevel.filtered.fa 10000000 .
-    rm toplevel.fa toplevel.filtered.fa listFile
-    ```
+    [ensembl_82.yml](ensembl/ensembl_82.yml) creates `Atha` and `Alyr` in `~/data/alignment/Ensembl`.
 
 ## *Orazy sativa* Japonica 24 genomes
 
@@ -830,31 +805,7 @@ for genomes out of WGS, which usually in better assembling levels.
 
 3. nipponbare and 9311 from ensembl genomes.
 
-    ```bash
-    # OsatJap
-    mkdir -p ~/data/alignment/Ensembl/OsatJap
-    cd ~/data/alignment/Ensembl/OsatJap
-
-    find ~/data/ensembl82/fasta/oryza_sativa/dna/ -name "*dna_sm.toplevel*" | xargs gzip -d -c > toplevel.fa
-    faops count toplevel.fa | perl -aln -e 'next if $F[0] eq 'total'; print $F[0] if $F[1] > 50000; print $F[0] if $F[1] > 5000  and $F[6]/$F[1] < 0.05' | uniq > listFile
-    faops some toplevel.fa listFile toplevel.filtered.fa
-    faops split-name toplevel.filtered.fa .
-    rm toplevel.fa toplevel.filtered.fa listFile
-
-    rm AC*.fa AP*.fa Syng*.fa
-
-    # OsatInd
-    mkdir -p ~/data/alignment/Ensembl/OsatInd
-    cd ~/data/alignment/Ensembl/OsatInd
-
-    find ~/data/ensembl82/fasta/oryza_indica/dna/ -name "*dna_sm.toplevel*" | xargs gzip -d -c > toplevel.fa
-    faops count toplevel.fa | perl -aln -e 'next if $F[0] eq 'total'; print $F[0] if $F[1] > 50000; print $F[0] if $F[1] > 5000  and $F[6]/$F[1] < 0.05' | uniq > listFile
-    faops some toplevel.fa listFile toplevel.filtered.fa
-    faops split-name toplevel.filtered.fa .
-    rm toplevel.fa toplevel.filtered.fa listFile
-
-    rm AA*.fa CH*.fa Sup*.fa
-    ```
+    [ensembl_82.yml](ensembl/ensembl_82.yml) creates `OsatJap` and `OsatInd` in `~/data/alignment/Ensembl`.
 
 ## *Drosophila* Population Genomics Project (dpgp)
 
@@ -884,33 +835,7 @@ for genomes out of WGS, which usually in better assembling levels.
 
 3. Dmel and Dsim from ensembl genomes.
 
-    ```bash
-    # Dmel
-    mkdir -p ~/data/alignment/Ensembl/Dmel
-    cd ~/data/alignment/Ensembl/Dmel
-
-    find ~/data/ensembl82/fasta/drosophila_melanogaster/dna/ -name "*dna_sm.toplevel*" | xargs gzip -d -c > toplevel.fa
-    faops count toplevel.fa | perl -aln -e 'next if $F[0] eq 'total'; print $F[0] if $F[1] > 50000; print $F[0] if $F[1] > 5000  and $F[6]/$F[1] < 0.05' | uniq > listFile
-    faops some toplevel.fa listFile toplevel.filtered.fa
-    faops split-name toplevel.filtered.fa .
-    rm toplevel.fa toplevel.filtered.fa listFile
-
-    rm *Scaffold*.fa 211*.fa
-    mv 4.fa 4.fa.skip
-    mv Y.fa Y.fa.skip
-    mv rDNA.fa rDNA.fa.skip
-    mv dmel_mitochondrion_genome.fa dmel_mitochondrion_genome.fa.skip
-
-    # Dsim
-    mkdir -p ~/data/alignment/Ensembl/Dsim
-    cd ~/data/alignment/Ensembl/Dsim
-
-    find ~/data/ensembl82/fasta/drosophila_simulans/dna/ -name "*dna_sm.toplevel*" | xargs gzip -d -c > toplevel.fa
-    faops count toplevel.fa | perl -aln -e 'next if $F[0] eq 'total'; print $F[0] if $F[1] > 50000; print $F[0] if $F[1] > 5000  and $F[6]/$F[1] < 0.05' | uniq > listFile
-    faops some toplevel.fa listFile toplevel.filtered.fa
-    faops split-about toplevel.filtered.fa 10000000 .
-    rm toplevel.fa toplevel.filtered.fa listFile
-    ```
+    [ensembl_82.yml](ensembl/ensembl_82.yml) creates `Dmel` and `Dsim` in `~/data/alignment/Ensemble`.
 
 ## Primates
 
@@ -928,70 +853,7 @@ for genomes out of WGS, which usually in better assembling levels.
 
 2. All from ensembl.
 
-    ```bash
-    # Human
-    mkdir -p ~/data/alignment/Ensembl/Human
-    cd ~/data/alignment/Ensembl/Human
-
-    find ~/data/ensembl82/fasta/homo_sapiens/dna/ -name "*dna_sm.primary_assembly*" | xargs gzip -d -c > toplevel.fa
-    faops count toplevel.fa | perl -aln -e 'next if $F[0] eq 'total'; print $F[0] if $F[1] > 50000; print $F[0] if $F[1] > 5000  and $F[6]/$F[1] < 0.05' | uniq > listFile
-    faops some toplevel.fa listFile toplevel.filtered.fa
-    faops split-name toplevel.filtered.fa .
-    rm toplevel.fa toplevel.filtered.fa listFile
-
-    rm GL*.fa
-
-    mv Y.fa Y.fa.skip
-    mv MT.fa MT.fa.skip
-
-    # Chimp
-    mkdir -p ~/data/alignment/Ensembl/Chimp
-    cd ~/data/alignment/Ensembl/Chimp
-
-    find ~/data/ensembl82/fasta/pan_troglodytes/dna/ -name "*dna_sm.toplevel*" | xargs gzip -d -c > toplevel.fa
-    faops count toplevel.fa | perl -aln -e 'next if $F[0] eq 'total'; print $F[0] if $F[1] > 50000; print $F[0] if $F[1] > 5000  and $F[6]/$F[1] < 0.05' | uniq > listFile
-    faops some toplevel.fa listFile toplevel.filtered.fa
-    faops split-name toplevel.filtered.fa .
-    rm toplevel.fa toplevel.filtered.fa listFile
-
-    cat GL*.fa > Un.fa
-    cat AACZ*.fa >> Un.fa
-    rm GL*.fa AACZ*.fa
-
-    # Gorilla
-    mkdir -p ~/data/alignment/Ensembl/Gorilla
-    cd ~/data/alignment/Ensembl/Gorilla
-
-    find ~/data/ensembl82/fasta/gorilla_gorilla/dna/ -name "*dna_sm.toplevel*" | xargs gzip -d -c > toplevel.fa
-    faops count toplevel.fa | perl -aln -e 'next if $F[0] eq 'total'; print $F[0] if $F[1] > 50000; print $F[0] if $F[1] > 5000  and $F[6]/$F[1] < 0.05' | uniq > listFile
-    faops some toplevel.fa listFile toplevel.filtered.fa
-    faops split-name toplevel.filtered.fa .
-    rm toplevel.fa toplevel.filtered.fa listFile
-
-    # Orangutan
-    mkdir -p ~/data/alignment/Ensembl/Orangutan
-    cd ~/data/alignment/Ensembl/Orangutan
-
-    find ~/data/ensembl82/fasta/pongo_abelii/dna/ -name "*dna_sm.toplevel*" | xargs gzip -d -c > toplevel.fa
-    faops count toplevel.fa | perl -aln -e 'next if $F[0] eq 'total'; print $F[0] if $F[1] > 50000; print $F[0] if $F[1] > 5000  and $F[6]/$F[1] < 0.05' | uniq > listFile
-    faops some toplevel.fa listFile toplevel.filtered.fa
-    faops split-name toplevel.filtered.fa .
-    rm toplevel.fa toplevel.filtered.fa listFile
-
-    # Rhesus
-    mkdir -p ~/data/alignment/Ensembl/Rhesus
-    cd ~/data/alignment/Ensembl/Rhesus
-
-    find ~/data/ensembl82/fasta/macaca_mulatta/dna/ -name "*dna_sm.toplevel*" | xargs gzip -d -c > toplevel.fa
-    faops count toplevel.fa | perl -aln -e 'next if $F[0] eq 'total'; print $F[0] if $F[1] > 50000; print $F[0] if $F[1] > 5000  and $F[6]/$F[1] < 0.05' | uniq > listFile
-    faops some toplevel.fa listFile toplevel.filtered.fa
-    faops split-name toplevel.filtered.fa .
-    rm toplevel.fa toplevel.filtered.fa listFile
-
-    cat 1099*.fa > Un.fa
-
-    rm 1099*.fa
-    ```
+    [ensembl_82.yml](ensembl/ensembl_82.yml) creates `Human`, `Chimp`, `Gorilla`, `Orangutan` and `Rhesus` in `~/data/alignment/Ensembl`.
 
 ## Human individuals from Simons project
 
@@ -1045,19 +907,7 @@ http://hgdownload.soe.ucsc.edu/goldenPath/ce10/multiz7way/ce10.commonNames.7way.
 
 2. Reference strain N2 from ensembl genomes
 
-    ```bash
-    # Dmel
-    mkdir -p ~/data/alignment/Ensembl/Cele
-    cd ~/data/alignment/Ensembl/Cele
-
-    find ~/data/ensembl82/fasta/caenorhabditis_elegans/dna/ -name "*dna_sm.toplevel*" | xargs gzip -d -c > toplevel.fa
-    faops count toplevel.fa | perl -aln -e 'next if $F[0] eq 'total'; print $F[0] if $F[1] > 50000; print $F[0] if $F[1] > 5000  and $F[6]/$F[1] < 0.05' | uniq > listFile
-    faops some toplevel.fa listFile toplevel.filtered.fa
-    faops split-name toplevel.filtered.fa .
-    rm toplevel.fa toplevel.filtered.fa listFile
-
-    mv MtDNA.fa MtDNA.fa.skip
-	```
+    [ensembl_82.yml](ensembl/ensembl_82.yml) creates `Cele` in `~/data/alignment/Ensembl`.
 
 ## *Dictyostelium* WGS
 
@@ -1242,49 +1092,13 @@ http://hgdownload.soe.ucsc.edu/goldenPath/ce10/multiz7way/ce10.commonNames.7way.
 
 3. Reference strain C57BL/6J (GRCm38) and rat from ensembl.
 
-    ```bash
-    #rsync -avP wangq@wq.nju.edu.cn:data/alignment/Ensembl/ ~/data/alignment/Ensembl
-
-    # Mouse
-    mkdir -p ~/data/alignment/Ensembl/Mouse
-    cd ~/data/alignment/Ensembl/Mouse
-
-    find ~/data/ensembl82/fasta/mus_musculus/dna/ -name "*dna_sm.primary_assembly*" | xargs gzip -d -c > toplevel.fa
-    faops count toplevel.fa | perl -aln -e 'next if $F[0] eq 'total'; print $F[0] if $F[1] > 50000; print $F[0] if $F[1] > 5000  and $F[6]/$F[1] < 0.05' | uniq > listFile
-    faops some toplevel.fa listFile toplevel.filtered.fa
-    faops split-name toplevel.filtered.fa .
-    rm toplevel.fa toplevel.filtered.fa listFile
-
-    cat GL*.fa > Un.fa
-    cat JH*.fa >> Un.fa
-    rm GL*.fa JH*.fa
-
-    mv Un.fa Un.fa.skip
-    mv Y.fa Y.fa.skip
-    mv MT.fa MT.fa.skip
-
-    # Rat
-    mkdir -p ~/data/alignment/Ensembl/Rat
-    cd ~/data/alignment/Ensembl/Rat
-
-    find ~/data/ensembl82/fasta/rattus_norvegicus/dna/ -name "*dna_sm.toplevel*" | xargs gzip -d -c > toplevel.fa
-    faops count toplevel.fa | perl -aln -e 'next if $F[0] eq 'total'; print $F[0] if $F[1] > 50000; print $F[0] if $F[1] > 5000  and $F[6]/$F[1] < 0.05' | uniq > listFile
-    faops some toplevel.fa listFile toplevel.filtered.fa
-    faops split-name toplevel.filtered.fa .
-    rm toplevel.fa toplevel.filtered.fa listFile
-
-    cat KL*.fa > Un.fa
-    cat AABR*.fa >> Un.fa
-    rm KL*.fa AABR*.fa
-
-    mv Un.fa Un.fa.skip
-    mv Y.fa Y.fa.skip
-    mv MT.fa MT.fa.skip
-	```
+    [ensembl_82.yml](ensembl/ensembl_82.yml) creates `Mouse` and `Rat` in `~/data/alignment/Ensembl`.
 
 ## Other plants
 
 1. From Ensembl genomes
+
+    [ensembl_82.yml](ensembl/ensembl_82.yml) creates `Bole`, `Brap`, `Slyc`, `Stub`, `Sita`, `Sbic`, `Bdis` and `Macu` in `~/data/alignment/Ensembl`.
 
     ```bash
     ## scaffolds only
@@ -1307,97 +1121,6 @@ http://hgdownload.soe.ucsc.edu/goldenPath/ce10/multiz7way/ce10.commonNames.7way.
     # Theobroma cacao
     # Vitis vinifera
 
-    # Brassica oleracea
-    mkdir -p ~/data/alignment/Ensembl/Bole
-    cd ~/data/alignment/Ensembl/Bole
-
-    find ~/data/ensembl82/fasta/brassica_oleracea/dna/ -name "*dna_sm.toplevel*" | xargs gzip -d -c > toplevel.fa
-    faops count toplevel.fa | perl -aln -e 'next if $F[0] eq 'total'; print $F[0] if $F[1] > 50000; print $F[0] if $F[1] > 5000  and $F[6]/$F[1] < 0.05' | uniq > listFile
-    faops some toplevel.fa listFile toplevel.filtered.fa
-    faops split-name toplevel.filtered.fa .
-    rm toplevel.fa toplevel.filtered.fa listFile
-
-    rm Scaffold*.fa
-
-    # Brassica rapa
-    mkdir -p ~/data/alignment/Ensembl/Brap
-    cd ~/data/alignment/Ensembl/Brap
-
-    find ~/data/ensembl82/fasta/brassica_rapa/dna/ -name "*dna_sm.toplevel*" | xargs gzip -d -c > toplevel.fa
-    faops count toplevel.fa | perl -aln -e 'next if $F[0] eq 'total'; print $F[0] if $F[1] > 50000; print $F[0] if $F[1] > 5000  and $F[6]/$F[1] < 0.05' | uniq > listFile
-    faops some toplevel.fa listFile toplevel.filtered.fa
-    faops split-name toplevel.filtered.fa .
-    rm toplevel.fa toplevel.filtered.fa listFile
-
-    rm Scaffold*.fa
-
-    # Solanum lycopersicum
-    mkdir -p ~/data/alignment/Ensembl/Slyc
-    cd ~/data/alignment/Ensembl/Slyc
-
-    find ~/data/ensembl82/fasta/solanum_lycopersicum/dna/ -name "*dna_sm.toplevel*" | xargs gzip -d -c > toplevel.fa
-    faops count toplevel.fa | perl -aln -e 'next if $F[0] eq 'total'; print $F[0] if $F[1] > 50000; print $F[0] if $F[1] > 5000  and $F[6]/$F[1] < 0.05' | uniq > listFile
-    faops some toplevel.fa listFile toplevel.filtered.fa
-    faops split-name toplevel.filtered.fa .
-    rm toplevel.fa toplevel.filtered.fa listFile
-
-    rm SL2*.fa
-
-    # Solanum tuberosum
-    mkdir -p ~/data/alignment/Ensembl/Stub
-    cd ~/data/alignment/Ensembl/Stub
-
-    find ~/data/ensembl82/fasta/solanum_tuberosum/dna/ -name "*dna_sm.toplevel*" | xargs gzip -d -c > toplevel.fa
-    faops count toplevel.fa | perl -aln -e 'next if $F[0] eq 'total'; print $F[0] if $F[1] > 50000; print $F[0] if $F[1] > 5000  and $F[6]/$F[1] < 0.05' | uniq > listFile
-    faops some toplevel.fa listFile toplevel.filtered.fa
-    faops split-name toplevel.filtered.fa .
-    rm toplevel.fa toplevel.filtered.fa listFile
-
-    # Musa acuminata
-    mkdir -p ~/data/alignment/Ensembl/Macu
-    cd ~/data/alignment/Ensembl/Macu
-
-    find ~/data/ensembl82/fasta/musa_acuminata/dna/ -name "*dna_sm.toplevel*" | xargs gzip -d -c > toplevel.fa
-    faops count toplevel.fa | perl -aln -e 'next if $F[0] eq 'total'; print $F[0] if $F[1] > 50000; print $F[0] if $F[1] > 5000  and $F[6]/$F[1] < 0.05' | uniq > listFile
-    faops some toplevel.fa listFile toplevel.filtered.fa
-    faops split-name toplevel.filtered.fa .
-    rm toplevel.fa toplevel.filtered.fa listFile
-
-    # Setaria italica
-    mkdir -p ~/data/alignment/Ensembl/Sita
-    cd ~/data/alignment/Ensembl/Sita
-
-    find ~/data/ensembl82/fasta/setaria_italica/dna/ -name "*dna_sm.toplevel*" | xargs gzip -d -c > toplevel.fa
-    faops count toplevel.fa | perl -aln -e 'next if $F[0] eq 'total'; print $F[0] if $F[1] > 50000; print $F[0] if $F[1] > 5000  and $F[6]/$F[1] < 0.05' | uniq > listFile
-    faops some toplevel.fa listFile toplevel.filtered.fa
-    faops split-name toplevel.filtered.fa .
-    rm toplevel.fa toplevel.filtered.fa listFile
-
-    rm scaffold*.fa
-
-    # Sorghum bicolor
-    mkdir -p ~/data/alignment/Ensembl/Sbic
-    cd ~/data/alignment/Ensembl/Sbic
-
-    find ~/data/ensembl82/fasta/sorghum_bicolor/dna/ -name "*dna_sm.toplevel*" | xargs gzip -d -c > toplevel.fa
-    faops count toplevel.fa | perl -aln -e 'next if $F[0] eq 'total'; print $F[0] if $F[1] > 50000; print $F[0] if $F[1] > 5000  and $F[6]/$F[1] < 0.05' | uniq > listFile
-    faops some toplevel.fa listFile toplevel.filtered.fa
-    faops split-name toplevel.filtered.fa .
-    rm toplevel.fa toplevel.filtered.fa listFile
-
-    rm GL*.fa
-
-    # Brachypodium distachyon
-    mkdir -p ~/data/alignment/Ensembl/Bdis
-    cd ~/data/alignment/Ensembl/Bdis
-
-    find ~/data/ensembl82/fasta/brachypodium_distachyon/dna/ -name "*dna_sm.toplevel*" | xargs gzip -d -c > toplevel.fa
-    faops count toplevel.fa | perl -aln -e 'next if $F[0] eq 'total'; print $F[0] if $F[1] > 50000; print $F[0] if $F[1] > 5000  and $F[6]/$F[1] < 0.05' | uniq > listFile
-    faops some toplevel.fa listFile toplevel.filtered.fa
-    faops split-name toplevel.filtered.fa .
-    rm toplevel.fa toplevel.filtered.fa listFile
-
-    rm GG*.fa
     ```
 
 ## Currently not used
