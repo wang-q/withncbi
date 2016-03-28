@@ -36,7 +36,7 @@ build_ensembl.pl - Build an ensembl database from mysqldump files
       Options:
         --help      -?          brief help message
         --server    -s  STR     MySQL server IP/Domain name
-        --port      -P  INT     MySQL server port
+        --port          INT     MySQL server port
         --username  -u  STR     username
         --password  -p  STR     password
         --db        -d  STR     database name
@@ -55,7 +55,7 @@ build_ensembl.pl - Build an ensembl database from mysqldump files
 GetOptions(
     'help|?' => sub { HelpMessage(0) },
     'server|s=s'   => \( my $server      = $Config->{database}{server} ),
-    'port|P=i'     => \( my $port        = $Config->{database}{port} ),
+    'port=i'       => \( my $port        = $Config->{database}{port} ),
     'username|u=s' => \( my $username    = $Config->{database}{username} ),
     'password|p=s' => \( my $password    = $Config->{database}{password} ),
     'db|d=s'       => \( my $db          = $Config->{database}{db} ),
