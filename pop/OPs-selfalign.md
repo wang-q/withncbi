@@ -325,7 +325,7 @@ time bash 4_proc_cmd.sh
 bash 5_circos_cmd.sh
 ```
 
-## Other plants
+## All plants
 
 ### Full chromosomes
 
@@ -350,7 +350,9 @@ cd ~/data/alignment/self/plants
 
 bash 1_real_chr.sh
 time bash 3_self_cmd.sh
-
+# real    658m10.559s
+# user    5623m25.407s
+# sys     74m46.390s
 time bash 4_proc_cmd.sh
 
 bash 5_circos_cmd.sh

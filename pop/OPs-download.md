@@ -1,7 +1,7 @@
 # Downloading steps for each groups
 
-Less detailed than Trichoderma in [README.md](README.md), but include examples
-for genomes out of WGS, which usually in better assembling levels.
+Less detailed than Trichoderma in [README.md](README.md), but include examples for genomes out of
+WGS, which usually in better assembling levels.
 
 ## *Saccharomyces* WGS
 
@@ -53,7 +53,8 @@ for genomes out of WGS, which usually in better assembling levels.
     ```
 
 3. Download *Saccharomyces cerevisiae* S288c.
-  This step is totally manual operation. **Be careful.**
+
+    This step is totally manual operation. **Be careful.**
 
     | assigned name | organism_name                    | assembly_accession |
     | :------------ | :------------                    | :------------      |
@@ -132,8 +133,8 @@ for genomes out of WGS, which usually in better assembling levels.
 
 3. Download strains of *Saccharomyces cerevisiae* at good assembly status.
 
-    Click the `Download table` link on the top-right of [Genome list](http://www.ncbi.nlm.nih.gov/genome/genomes/15),
-    save it as .csv file.
+    Click the `Download table` link on the top-right of [Genome
+    list](http://www.ncbi.nlm.nih.gov/genome/genomes/15), save it as .csv file.
 
     ```bash
     mkdir -p ~/data/alignment/Fungi/GENOMES/scer_wgs/DOWNLOAD
@@ -195,8 +196,8 @@ for genomes out of WGS, which usually in better assembling levels.
 
 2. Download strains of *Saccharomyces cerevisiae* at good assembly status.
 
-    Click the `Download table` link on the top-right of [Genome list](http://www.ncbi.nlm.nih.gov/genome/genomes/15),
-    save it as .csv file.
+    Click the `Download table` link on the top-right of [Genome
+    list](http://www.ncbi.nlm.nih.gov/genome/genomes/15), save it as .csv file.
 
     ```bash
     mkdir -p ~/data/alignment/Fungi/GENOMES/scer_100/DOWNLOAD
@@ -642,7 +643,8 @@ for genomes out of WGS, which usually in better assembling levels.
     ```
 
 3. Download *Plasmodium falciparum* 3D7.
-  This step is totally manual operation. **Be careful.**
+
+    This step is totally manual operation. **Be careful.**
 
     | assigned name | organism_name               | assembly_accession           |
     | :------------ | :------------               | :------------                |
@@ -786,7 +788,8 @@ for genomes out of WGS, which usually in better assembling levels.
 
     I've used bwa-gatk pipeline to generate 23 Japonica rice genomes.
 
-    Reference assembly of nipponbare in that time was MSU6, now is IRGSP-1.0. But I don't want to waste time to rebuild and RepeatMasker all sequences.
+    Reference assembly of nipponbare in that time was MSU6, now is IRGSP-1.0. But I don't want to
+    waste time to rebuild and RepeatMasker all sequences.
 
     ```bash
     find ~/data/alignment/rice/ -name "*.2bit" \
@@ -853,7 +856,8 @@ for genomes out of WGS, which usually in better assembling levels.
 
 2. All from ensembl.
 
-    [ensembl_82.yml](ensembl/ensembl_82.yml) creates `Human`, `Chimp`, `Gorilla`, `Orangutan` and `Rhesus` in `~/data/alignment/Ensembl`.
+    [ensembl_82.yml](ensembl/ensembl_82.yml) creates `Human`, `Chimp`, `Gorilla`, `Orangutan` and
+    `Rhesus` in `~/data/alignment/Ensembl`.
 
 ## Human individuals from Simons project
 
@@ -968,11 +972,12 @@ http://hgdownload.soe.ucsc.edu/goldenPath/ce10/multiz7way/ce10.commonNames.7way.
     ```
 
 3. Download *Dictyostelium discoideum* AX4.
+
     This step is totally manual operation. **Be careful.**
 
-| assigned name | organism_name                  | assembly_accession           |
-| :------------ | :------------                  | :------------                |
-| Ddis_AX4      | *Dictyostelium discoideum* AX4 | GCF_000004695.1.assembly.txt |
+    | assigned name | organism_name                  | assembly_accession           |
+    | :------------ | :------------                  | :------------                |
+    | Ddis_AX4      | *Dictyostelium discoideum* AX4 | GCF_000004695.1.assembly.txt |
 
     ```bash
     mkdir -p ~/data/alignment/Protists/GENOMES/dictyostelium/DOWNLOAD
@@ -1098,7 +1103,8 @@ http://hgdownload.soe.ucsc.edu/goldenPath/ce10/multiz7way/ce10.commonNames.7way.
 
 1. From Ensembl genomes
 
-    [ensembl_82.yml](ensembl/ensembl_82.yml) creates `Mtru`, `Gmax`, `Vvin`, `Bole`, `Brap`, `Slyc`, `Stub`, `Sita`, `Sbic`, `Bdis` and `Macu` in `~/data/alignment/Ensembl`.
+    [ensembl_82.yml](ensembl/ensembl_82.yml) creates `Mtru`, `Gmax`, `Vvin`, `Bole`, `Brap`, `Slyc`,
+    `Stub`, `Sita`, `Sbic`, `Bdis` and `Macu` in `~/data/alignment/Ensembl`.
 
     ```text
     ## scaffolds only

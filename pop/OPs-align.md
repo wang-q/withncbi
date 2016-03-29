@@ -1,7 +1,7 @@
 # Aligning steps for each groups
 
-Less detailed than Trichoderma in [README.md](README.md), but include examples
-for genomes out of WGS, which usually in better assembling levels.
+Less detailed than Trichoderma in [README.md](README.md), but include examples for genomes out of
+WGS, which usually in better assembling levels.
 
 ## *Saccharomyces* WGS
 
