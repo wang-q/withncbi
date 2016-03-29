@@ -152,7 +152,7 @@ perl ~/Scripts/alignDB/util/dup_db.pl -d Human_n11cg_chimp -f ~/data/dumps/mysql
 ```bash
 cd ~/data/alignment/xlsx
 
-#
+# Runtime 2 days and 11 hours
 perl ~/Scripts/alignDB/extra/multi_way_batch.pl \
     -d Human_n12_pop \
     -da ~/data/alignment/human_simons/Human_n12_pop_refined \
@@ -162,6 +162,7 @@ perl ~/Scripts/alignDB/extra/multi_way_batch.pl \
     -lt 5000 --parallel 12 \
     --run all
 
+# Runtime 1 hour and 8 minutes.
 perl ~/Scripts/alignDB/util/dup_db.pl -d Human_n12_pop -f ~/data/dumps/mysql/Human_n12_pop.sql.gz
 ```
 
