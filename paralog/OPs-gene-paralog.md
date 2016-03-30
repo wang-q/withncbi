@@ -52,6 +52,30 @@ perl ~/Scripts/alignDB/util/merge_csv.pl \
     | perl -nl -a -F',' -e '$c1 = $F[3]/$F[2]; $c2 = $F[4]/$F[5]; $r = $c2 / $c1; print join(q{,}, @F[0, 1, 2, 3, 5, 4], $c1, $c2, $r)' \
     >> ${GENOME_NAME}.feature.stat.csv
 
+for ftr in gene upstream downstream exon five_prime_UTR three_prime_UTR CDS intron
+do
+    echo "==> ${ftr}"
+    echo "    stat genome"
+    runlist stat sep-${ftr}.yml -s chr.sizes --mk -o stdout \
+        | grep ',all,' \
+        | cut -d ',' -f 1,4 \
+        > tmp1.csv
+    echo "    compare paralog"
+    runlist compare sep-${ftr}.yml paralog.yml --op intersect --mk -o tmp.yml
+    echo "    stat paralog"
+    runlist stat tmp.yml -s chr.sizes --mk -o stdout \
+        | grep ',all,' \
+        | cut -d ',' -f 1,4 \
+        > tmp2.csv
+    echo "    concat csv"
+    perl ~/Scripts/alignDB/util/merge_csv.pl \
+        -t tmp1.csv -m tmp2.csv \
+        -f 0 -f2 0 --concat --stdout \
+        > paralog.${ftr}.csv
+    echo "    clean"
+    rm tmp.yml tmp1.csv tmp2.csv
+done
+
 ```
 
 # OsatJap
