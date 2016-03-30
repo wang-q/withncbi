@@ -354,7 +354,9 @@ time bash 3_self_cmd.sh
 # user    5623m25.407s
 # sys     74m46.390s
 time bash 4_proc_cmd.sh
-
+# real    971m49.779s
+# user    2130m57.202s
+# sys     435m29.950s
 bash 5_circos_cmd.sh
 ```
 
