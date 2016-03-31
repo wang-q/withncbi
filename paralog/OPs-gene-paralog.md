@@ -7,7 +7,7 @@
 
 ## Atha
 
-* Convert gff3 to runlists
+### Convert gff3 to runlists
 
 ```bash
 GENOME_NAME=Atha
@@ -32,13 +32,15 @@ time perl ~/Scripts/withncbi/paralog/gff2runlist.pl \
     --file Arabidopsis_thaliana.TAIR10.29.gff3.gz \
     --size chr.sizes \
     --range 2000
+```
 
-# all genes
+### All gene stats
+
+```bash
 runlist stat all-gene.yml -s chr.sizes --mk
 runlist compare all-gene.yml paralog.yml --op intersect --mk -o all-gene-paralog.yml
 runlist stat all-gene-paralog.yml -s chr.sizes --mk
 
-# paralog length
 PARALOG_LENGTH=$(runlist stat paralog.yml -s chr.sizes -o stdout | grep 'all,' | cut -d ',' -f 3)
 
 echo "feature,chr,chr_length,feature_size,paralog_length,paralog_size,coverage,paralog_coverage,ratio" \
@@ -51,7 +53,11 @@ perl ~/Scripts/alignDB/util/merge_csv.pl \
     | parallel --keep-order echo "{},${PARALOG_LENGTH}" \
     | perl -nl -a -F',' -e '$c1 = $F[3]/$F[2]; $c2 = $F[4]/$F[5]; $r = $c2 / $c1; print join(q{,}, @F[0, 1, 2, 3, 5, 4], $c1, $c2, $r)' \
     >> ${GENOME_NAME}.feature.stat.csv
+```
 
+### Separate gene stats
+
+```bash
 for ftr in gene upstream downstream exon five_prime_UTR three_prime_UTR CDS intron
 do
     echo "==> ${ftr}"
@@ -76,11 +82,26 @@ do
     rm tmp.yml tmp1.csv tmp2.csv
 done
 
+perl ~/Scripts/alignDB/util/merge_csv.pl \
+    -t paralog.gene.csv -m  paralog.upstream.csv \
+    -f 0 -f2 0 --concat --stdout \
+    > paralog.gene1.csv
+perl ~/Scripts/alignDB/util/merge_csv.pl \
+    -t paralog.gene1.csv -m  paralog.downstream.csv \
+    -f 0 -f2 0 --concat --stdout \
+    > paralog.gene2.csv
+echo "gene_id,gene_length,gene_paralog,upstream,upstream_paralog,downstream,downstream_paralog" \
+    > ${GENOME_NAME}.paralog.gene.csv
+cat paralog.gene2.csv \
+    | cut -d ',' -f 1,2,4,6,8,10,12 \
+    >> ${GENOME_NAME}.paralog.gene.csv
+rm paralog.gene1.csv paralog.gene2.csv
+
 ```
 
-# OsatJap
+## OsatJap
 
-* Convert gff3 to runlists
+### Convert gff3 to runlists
 
 ```bash
 GENOME_NAME=OsatJap
@@ -98,13 +119,15 @@ time perl ~/Scripts/withncbi/paralog/gff2runlist.pl \
     --file Oryza_sativa.IRGSP-1.0.29.gff3.gz \
     --size chr.sizes \
     --range 2000
+```
 
-# all genes
+### All gene stats
+
+```bash
 runlist stat all-gene.yml -s chr.sizes --mk
 runlist compare all-gene.yml paralog.yml --op intersect --mk -o all-gene-paralog.yml
 runlist stat all-gene-paralog.yml -s chr.sizes --mk
 
-# paralog length
 PARALOG_LENGTH=$(runlist stat paralog.yml -s chr.sizes -o stdout | grep 'all,' | cut -d ',' -f 3)
 
 echo "feature,chr,chr_length,feature_size,paralog_length,paralog_size,coverage,paralog_coverage,ratio" \
