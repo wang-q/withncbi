@@ -238,7 +238,9 @@ EOF
     cp ~/data/ensembl82/gff3/arabidopsis_thaliana/Arabidopsis_thaliana.TAIR10.29.gff3.gz gff3.gz
     cp ~/data/alignment/self/arabidopsis/Genomes/Atha/chr.sizes chr.sizes
     cp ~/data/alignment/self/arabidopsis/Results/Atha/Atha.chr.runlist.yml paralog.yml
-    cp ~/data/alignment/gene-paralog/download_mite/MITE/MITE-SEQ-V2/03_arabidopsis_mite_seq.fa mite.fa
+    wget http://pmite.hzau.edu.cn/MITE/MITE-SEQ-V2/03_arabidopsis_mite_seq.fa -O mite.fa
+
+    runlist stat paralog.yml -s chr.sizes
 
     # Convert gff3 to runlists
     cd ~/data/alignment/gene-paralog/${GENOME_NAME}/feature
@@ -257,25 +259,21 @@ EOF
         --range 2000
     ```
 
-2. All gene stats
+2. Gene-paralog stats
 
     ```bash
+    cd ~/data/alignment/gene-paralog/Atha/stat
+
     bash ~/data/alignment/gene-paralog/proc_all_gene.sh Atha paralog
-    ```
 
-3. Separate gene stats
-
-    ```bash
     bash ~/data/alignment/gene-paralog/proc_sep_gene.sh Atha paralog
     ```
 
-4. MITE
+3. MITE
 
     ```bash
     GENOME_NAME=Atha
-
     cd ~/data/alignment/gene-paralog/${GENOME_NAME}/data
-    cp ~/data/alignment/gene-paralog/download_mite/MITE/MITE-SEQ-V2/03_arabidopsis_mite_seq.fa mite.fa
 
     faops size mite.fa \
         | perl -nla -F"\t" -e '
@@ -298,27 +296,18 @@ EOF
         | sort | uniq \
         > mite.position.txt
 
+    wc -l mite.position.txt >> mite_stat.txt
     runlist covers mite.position.txt -o mite.yml
+
+    runlist stat mite.yml -s chr.sizes
     ```
 
     ```bash
-    cd ~/data/alignment/gene-paralog/${GENOME_NAME}/stat
+    cd ~/data/alignment/gene-paralog/Atha/stat
 
-    ../../stat_runlists.sh ../feature/all-gene.yml ../data/mite.yml ../data/chr.sizes
-    cat stat.all-gene.mite.csv \
-        | perl -nla -F',' -e '
-            ($in_rows) = grep {/^\d+$/} @F;
-            if ($in_rows) {
-                $c1 = $F[2]/$F[1];
-                $c2 = $F[4]/$F[3];
-                $r = $c2 / $c1;
-                print join(q{,}, @F, $c1, $c2, $r)
-            }
-            else {
-                print join(q{,}, @F, qw{c1 c2 ratio})
-            }
-            ' \
-        > ${GENOME_NAME}.feature.mite.csv
+    bash ~/data/alignment/gene-paralog/proc_all_gene.sh Atha mite
+
+    bash ~/data/alignment/gene-paralog/proc_sep_gene.sh Atha mite
     ```
 
 ## OsatJap
@@ -337,6 +326,7 @@ EOF
     cp ~/data/ensembl82/gff3/oryza_sativa/Oryza_sativa.IRGSP-1.0.29.gff3.gz gff3.gz
     cp ~/data/alignment/self/rice/Genomes/OsatJap/chr.sizes chr.sizes
     cp ~/data/alignment/self/rice/Results/OsatJap/OsatJap.chr.runlist.yml paralog.yml
+    wget http://pmite.hzau.edu.cn/MITE/MITE-SEQ-V2/26_nipponbare_mite_seq.fa -O mite.fa
 
     # Convert gff3 to runlists
     cd ~/data/alignment/gene-paralog/${GENOME_NAME}/feature
@@ -348,14 +338,51 @@ EOF
         --range 2000
     ```
 
-2. All gene stats
+2. Gene-paralog stats
 
     ```bash
+    cd ~/data/alignment/gene-paralog/OsatJap/stat
+
     bash ~/data/alignment/gene-paralog/proc_all_gene.sh OsatJap paralog
+
+    bash ~/data/alignment/gene-paralog/proc_sep_gene.sh OsatJap paralog
     ```
 
-3. Separate gene stats
+3. MITE
 
     ```bash
-    bash ~/data/alignment/gene-paralog/proc_sep_gene.sh OsatJap paralog
+    GENOME_NAME=OsatJap
+    cd ~/data/alignment/gene-paralog/${GENOME_NAME}/data
+
+    faops size mite.fa \
+        | perl -nla -F"\t" -e '
+            next unless defined $F[1];
+            $min = defined $min && $min < $F[1] ? $min : $F[1];
+            $max = defined $max && $max > $F[1] ? $max : $F[1];
+            $n++;
+            END{ print qq{seq_number\t$n}; print qq{min_length\t$min}; print qq{max_length\t$max} }' \
+        > mite_stat.txt
+
+    find ~/data/alignment/Ensembl/${GENOME_NAME} -type f -name "*.fa" \
+        | sort | xargs cat \
+        | perl -nl -e '/^>/ or $_ = uc; print' \
+        > genome.fa
+
+    perl ~/Scripts/egas/sparsemem_exact.pl -f mite.fa -l 25 -g genome.fa -o mite.replace.tsv
+    cat mite.replace.tsv \
+        | perl -nla -F"\t" -e ' print for @F' \
+        | grep ':' \
+        | sort | uniq \
+        > mite.position.txt
+
+    wc -l mite.position.txt >> mite_stat.txt
+    runlist covers mite.position.txt -o mite.yml
+    ```
+
+    ```bash
+    cd ~/data/alignment/gene-paralog/OsatJap/stat
+
+    bash ~/data/alignment/gene-paralog/proc_all_gene.sh OsatJap mite
+
+    bash ~/data/alignment/gene-paralog/proc_sep_gene.sh OsatJap mite
     ```
