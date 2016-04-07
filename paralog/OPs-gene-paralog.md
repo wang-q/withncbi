@@ -320,18 +320,18 @@ EOF
     # Convert gff3 to runlists
     cd ~/data/alignment/gene-paralog/${GENOME_NAME}/feature
 
+    # real	0m41.121s
+    time perl ~/Scripts/withncbi/paralog/gff2runlist.pl \
+        --file ../data/gff3.gz \
+        --size ../data/chr.sizes \
+        --range 2000
+
     # real	50m49.994s
     # time perl ~/Scripts/withncbi/paralog/gff2runlist.pl \
     #     --file Arabidopsis_thaliana.TAIR10.29.gff3.gz \
     #     --size chr.sizes \
     #     --range 2000 \
     #     --clean
-
-    # real	0m41.121s
-    time perl ~/Scripts/withncbi/paralog/gff2runlist.pl \
-        --file ../data/gff3.gz \
-        --size ../data/chr.sizes \
-        --range 2000
     ```
 
 2. Gene-paralog stats
