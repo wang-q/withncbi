@@ -229,6 +229,35 @@ else
     echo "==> /home/wangq/data/alignment/Ensembl/Dsim exists"
 fi
 
+# Glycine max
+if [ ! -d /home/wangq/data/alignment/Ensembl/Gmax ]
+then
+    echo "==> Glycine max"
+
+    mkdir -p /home/wangq/data/alignment/Ensembl/Gmax
+    cd /home/wangq/data/alignment/Ensembl/Gmax
+    
+    find /home/wangq/data/ensembl82/fasta/glycine_max/dna/ -name "*dna_sm.toplevel*" \
+        | xargs gzip -d -c > toplevel.fa
+    
+    faops count toplevel.fa \
+        | perl -aln -e '
+            next if $F[0] eq 'total';
+            print $F[0] if $F[1] > 50000;
+            print $F[0] if $F[1] > 5000  and $F[6]/$F[1] < 0.05;
+            ' \
+        | uniq > listFile
+    faops some toplevel.fa listFile toplevel.filtered.fa
+    faops split-name toplevel.filtered.fa .
+    rm toplevel.fa toplevel.filtered.fa listFile
+
+    cat scaffold*.fa > Un.fa
+    mv Un.fa Un.fa.skip
+    rm scaffold*.fa
+else
+    echo "==> /home/wangq/data/alignment/Ensembl/Gmax exists"
+fi
+
 # Gorilla gorilla
 if [ ! -d /home/wangq/data/alignment/Ensembl/Gorilla ]
 then
@@ -313,6 +342,35 @@ then
     rm 1099*.fa
 else
     echo "==> /home/wangq/data/alignment/Ensembl/Rhesus exists"
+fi
+
+# Medicago truncatula
+if [ ! -d /home/wangq/data/alignment/Ensembl/Mtru ]
+then
+    echo "==> Medicago truncatula"
+
+    mkdir -p /home/wangq/data/alignment/Ensembl/Mtru
+    cd /home/wangq/data/alignment/Ensembl/Mtru
+    
+    find /home/wangq/data/ensembl82/fasta/medicago_truncatula/dna/ -name "*dna_sm.toplevel*" \
+        | xargs gzip -d -c > toplevel.fa
+    
+    faops count toplevel.fa \
+        | perl -aln -e '
+            next if $F[0] eq 'total';
+            print $F[0] if $F[1] > 50000;
+            print $F[0] if $F[1] > 5000  and $F[6]/$F[1] < 0.05;
+            ' \
+        | uniq > listFile
+    faops some toplevel.fa listFile toplevel.filtered.fa
+    faops split-name toplevel.filtered.fa .
+    rm toplevel.fa toplevel.filtered.fa listFile
+
+    cat scaffold*.fa > Un.fa
+    mv Un.fa Un.fa.skip
+    rm scaffold*.fa
+else
+    echo "==> /home/wangq/data/alignment/Ensembl/Mtru exists"
 fi
 
 # Mus musculus
@@ -573,9 +631,9 @@ then
     faops split-name toplevel.filtered.fa .
     rm toplevel.fa toplevel.filtered.fa listFile
 
-    cat Scaffold*.fa > Un.fa
+    cat scaffold*.fa > Un.fa
     mv Un.fa Un.fa.skip
-    rm Scaffold*.fa
+    rm scaffold*.fa
 else
     echo "==> /home/wangq/data/alignment/Ensembl/Sita exists"
 fi
@@ -663,5 +721,32 @@ then
     rm GL*.fa
 else
     echo "==> /home/wangq/data/alignment/Ensembl/Sbic exists"
+fi
+
+# Vitis vinifera
+if [ ! -d /home/wangq/data/alignment/Ensembl/Vvin ]
+then
+    echo "==> Vitis vinifera"
+
+    mkdir -p /home/wangq/data/alignment/Ensembl/Vvin
+    cd /home/wangq/data/alignment/Ensembl/Vvin
+    
+    find /home/wangq/data/ensembl82/fasta/vitis_vinifera/dna/ -name "*dna_sm.toplevel*" \
+        | xargs gzip -d -c > toplevel.fa
+    
+    faops count toplevel.fa \
+        | perl -aln -e '
+            next if $F[0] eq 'total';
+            print $F[0] if $F[1] > 50000;
+            print $F[0] if $F[1] > 5000  and $F[6]/$F[1] < 0.05;
+            ' \
+        | uniq > listFile
+    faops some toplevel.fa listFile toplevel.filtered.fa
+    faops split-name toplevel.filtered.fa .
+    rm toplevel.fa toplevel.filtered.fa listFile
+
+
+else
+    echo "==> /home/wangq/data/alignment/Ensembl/Vvin exists"
 fi
 

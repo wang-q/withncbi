@@ -1,11 +1,5 @@
 #/bin/bash
 
-# Arabidopsis lyrata
-perl /home/wangq/Scripts/withncbi/ensembl/build_ensembl.pl \
-     -s localhost --port 3306 -u alignDB --password alignDB \
-     --initdb --db arabidopsis_lyrata_core_29_82_10 \
-     --ensembl /home/wangq/data/ensembl82/mysql/arabidopsis_lyrata_core_29_82_10
-
 # Arabidopsis thaliana
 perl /home/wangq/Scripts/withncbi/ensembl/build_ensembl.pl \
      -s localhost --port 3306 -u alignDB --password alignDB \
@@ -17,12 +11,6 @@ perl /home/wangq/Scripts/withncbi/ensembl/build_ensembl.pl \
      -s localhost --port 3306 -u alignDB --password alignDB \
      --initdb --db aspergillus_fumigatus_core_29_82_2 \
      --ensembl /home/wangq/data/ensembl82/mysql/aspergillus_fumigatus_core_29_82_2
-
-# Brassica oleracea
-perl /home/wangq/Scripts/withncbi/ensembl/build_ensembl.pl \
-     -s localhost --port 3306 -u alignDB --password alignDB \
-     --initdb --db brassica_oleracea_core_29_82_1 \
-     --ensembl /home/wangq/data/ensembl82/mysql/brassica_oleracea_core_29_82_1
 
 # Brassica rapa
 perl /home/wangq/Scripts/withncbi/ensembl/build_ensembl.pl \
@@ -107,12 +95,6 @@ perl /home/wangq/Scripts/withncbi/ensembl/build_ensembl.pl \
      -s localhost --port 3306 -u alignDB --password alignDB \
      --initdb --db mus_musculus_core_82_38 \
      --ensembl /home/wangq/data/ensembl82/mysql/mus_musculus_core_82_38
-
-# Oryza indica
-perl /home/wangq/Scripts/withncbi/ensembl/build_ensembl.pl \
-     -s localhost --port 3306 -u alignDB --password alignDB \
-     --initdb --db oryza_indica_core_29_82_2 \
-     --ensembl /home/wangq/data/ensembl82/mysql/oryza_indica_core_29_82_2
 
 # Oryza sativa
 perl /home/wangq/Scripts/withncbi/ensembl/build_ensembl.pl \

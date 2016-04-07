@@ -12,33 +12,6 @@ my $port = 3306;
 my $user = 'alignDB';
 my $pass = 'alignDB';
 
-# Arabidopsis lyrata
-{
-    Bio::EnsEMBL::DBSQL::DBAdaptor->new(
-        -host    => $host,
-        -user    => $user,
-        -pass    => $pass,
-        -port    => $port,
-        -species => 'Arabidopsis lyrata',
-        -group   => 'core',
-        -dbname  => 'arabidopsis_lyrata_core_29_82_10',
-    );
-
-    my @aliases = (
-        'alyr',
-        'Alyr',
-        'Arabidopsis_lyrata',
-        'alyr_core_82',
-        'alyr_82',
-        'arabidopsis_lyrata_core_29_82_10',
-    );
-
-    Bio::EnsEMBL::Utils::ConfigRegistry->add_alias(
-        -species => 'Arabidopsis lyrata',
-        -alias   => \@aliases,
-    );
-}
-
 # Arabidopsis thaliana
 {
     Bio::EnsEMBL::DBSQL::DBAdaptor->new(
@@ -89,33 +62,6 @@ my $pass = 'alignDB';
 
     Bio::EnsEMBL::Utils::ConfigRegistry->add_alias(
         -species => 'Aspergillus fumigatus',
-        -alias   => \@aliases,
-    );
-}
-
-# Brassica oleracea
-{
-    Bio::EnsEMBL::DBSQL::DBAdaptor->new(
-        -host    => $host,
-        -user    => $user,
-        -pass    => $pass,
-        -port    => $port,
-        -species => 'Brassica oleracea',
-        -group   => 'core',
-        -dbname  => 'brassica_oleracea_core_29_82_1',
-    );
-
-    my @aliases = (
-        'bole',
-        'Bole',
-        'Brassica_oleracea',
-        'bole_core_82',
-        'bole_82',
-        'brassica_oleracea_core_29_82_1',
-    );
-
-    Bio::EnsEMBL::Utils::ConfigRegistry->add_alias(
-        -species => 'Brassica oleracea',
         -alias   => \@aliases,
     );
 }
@@ -498,33 +444,6 @@ my $pass = 'alignDB';
 
     Bio::EnsEMBL::Utils::ConfigRegistry->add_alias(
         -species => 'Mus musculus',
-        -alias   => \@aliases,
-    );
-}
-
-# Oryza indica
-{
-    Bio::EnsEMBL::DBSQL::DBAdaptor->new(
-        -host    => $host,
-        -user    => $user,
-        -pass    => $pass,
-        -port    => $port,
-        -species => 'Oryza indica',
-        -group   => 'core',
-        -dbname  => 'oryza_indica_core_29_82_2',
-    );
-
-    my @aliases = (
-        'oind',
-        'Oind',
-        'Oryza_indica',
-        'oind_core_82',
-        'oind_82',
-        'oryza_indica_core_29_82_2',
-    );
-
-    Bio::EnsEMBL::Utils::ConfigRegistry->add_alias(
-        -species => 'Oryza indica',
         -alias   => \@aliases,
     );
 }
