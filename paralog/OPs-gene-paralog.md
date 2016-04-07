@@ -222,6 +222,75 @@ EOF
 
 ```
 
+### `proc_mite.sh`
+
+```bash
+
+cat <<'EOF' > ~/data/alignment/gene-paralog/proc_mite.sh
+#!/bin/bash
+
+USAGE="Usage: $0 GENOME_NAME"
+
+if [ "$#" -lt 1 ]; then
+	echo "$USAGE"
+	exit 1
+fi
+
+echo "====> parameters"
+echo "    " $@
+
+GENOME_NAME=$1
+cd ~/data/alignment/gene-paralog/${GENOME_NAME}/data
+
+echo "==> mite_stat"
+faops size mite.fa \
+    | perl -nla -F"\t" -MStatistics::Descriptive -e '
+        BEGIN {$stat = Statistics::Descriptive::Full->new;}
+        next unless defined $F[1];
+        $stat->add_data($F[1]);
+        END {
+            printf qq{Total:\t%d\nSum:\t%d\n}, $stat->count, $stat->sum;
+            printf qq{Median:\t%d\nMean:\t%.1f\n}, $stat->median, $stat->mean;
+            printf qq{Min:\t%d\nMax:\t%d\n}, $stat->min, $stat->max;
+            printf qq{\n};
+            printf qq{Length\t#Seqs\n};
+            %distrib = $stat->frequency_distribution(10);
+            for (sort {$a <=> $b} keys %distrib) {
+            	printf qq{%.1f\t%d\n}, $_, $distrib{$_};
+            }
+            printf qq{\n};
+        }' \
+    > mite_stat.txt
+
+echo "==> genome blast"
+faops filter -a 40  mite.fa mite.filter.fa
+perl ~/Scripts/egas/fasta_blastn.pl -f mite.filter.fa -g genome.fa -o mite.bg.blast --parallel 8
+perl ~/Scripts/egas/blastn_genome.pl -f mite.bg.blast -g genome.fa -o mite.bg.fasta -c 0.95 --parallel 8
+cat mite.fa mite.bg.fasta \
+    | faops filter -u stdin stdout \
+    | faops filter -a 40 stdin stdout \
+    > mite.all.fasta
+
+echo "==> sparsemem_exact"
+perl ~/Scripts/egas/sparsemem_exact.pl -f mite.all.fasta -l 40 -g genome.fa -o mite.replace.tsv
+cat mite.replace.tsv \
+    | perl -nla -F"\t" -e ' print for @F' \
+    | grep ':' \
+    | sort | uniq \
+    > mite.position.txt
+
+echo "==> mite covers"
+wc -l mite.position.txt >> mite_stat.txt
+runlist covers mite.position.txt -o mite.yml
+runlist stat mite.yml -s chr.sizes
+
+echo "==> clean"
+rm mite.all.fasta mite.bg.blast mite.bg.fasta mite.filter.fa mite.replace.tsv
+
+EOF
+
+```
+
 ## Atha
 
 1. Prepare
@@ -239,6 +308,12 @@ EOF
     cp ~/data/alignment/self/arabidopsis/Genomes/Atha/chr.sizes chr.sizes
     cp ~/data/alignment/self/arabidopsis/Results/Atha/Atha.chr.runlist.yml paralog.yml
     wget http://pmite.hzau.edu.cn/MITE/MITE-SEQ-V2/03_arabidopsis_mite_seq.fa -O mite.fa
+
+    # genome
+    find ~/data/alignment/Ensembl/${GENOME_NAME} -type f -name "*.fa" \
+        | sort | xargs cat \
+        | perl -nl -e '/^>/ or $_ = uc; print' \
+        > genome.fa
 
     runlist stat paralog.yml -s chr.sizes
 
@@ -272,34 +347,9 @@ EOF
 3. MITE
 
     ```bash
-    GENOME_NAME=Atha
-    cd ~/data/alignment/gene-paralog/${GENOME_NAME}/data
+    cd ~/data/alignment/gene-paralog/Atha/data
 
-    faops size mite.fa \
-        | perl -nla -F"\t" -e '
-            next unless defined $F[1];
-            $min = defined $min && $min < $F[1] ? $min : $F[1];
-            $max = defined $max && $max > $F[1] ? $max : $F[1];
-            $n++;
-            END{ print qq{seq_number\t$n}; print qq{min_length\t$min}; print qq{max_length\t$max} }' \
-        > mite_stat.txt
-
-    find ~/data/alignment/Ensembl/${GENOME_NAME} -type f -name "*.fa" \
-        | sort | xargs cat \
-        | perl -nl -e '/^>/ or $_ = uc; print' \
-        > genome.fa
-
-    perl ~/Scripts/egas/sparsemem_exact.pl -f mite.fa -l 30 -g genome.fa -o mite.replace.tsv
-    cat mite.replace.tsv \
-        | perl -nla -F"\t" -e ' print for @F' \
-        | grep ':' \
-        | sort | uniq \
-        > mite.position.txt
-
-    wc -l mite.position.txt >> mite_stat.txt
-    runlist covers mite.position.txt -o mite.yml
-
-    runlist stat mite.yml -s chr.sizes
+    bash ~/data/alignment/gene-paralog/proc_mite.sh Atha
     ```
 
     ```bash
@@ -328,6 +378,12 @@ EOF
     cp ~/data/alignment/self/rice/Results/OsatJap/OsatJap.chr.runlist.yml paralog.yml
     wget http://pmite.hzau.edu.cn/MITE/MITE-SEQ-V2/26_nipponbare_mite_seq.fa -O mite.fa
 
+    # genome
+    find ~/data/alignment/Ensembl/${GENOME_NAME} -type f -name "*.fa" \
+        | sort | xargs cat \
+        | perl -nl -e '/^>/ or $_ = uc; print' \
+        > genome.fa
+
     # Convert gff3 to runlists
     cd ~/data/alignment/gene-paralog/${GENOME_NAME}/feature
 
@@ -351,32 +407,9 @@ EOF
 3. MITE
 
     ```bash
-    GENOME_NAME=OsatJap
-    cd ~/data/alignment/gene-paralog/${GENOME_NAME}/data
+    cd ~/data/alignment/gene-paralog/OsatJap/data
 
-    faops size mite.fa \
-        | perl -nla -F"\t" -e '
-            next unless defined $F[1];
-            $min = defined $min && $min < $F[1] ? $min : $F[1];
-            $max = defined $max && $max > $F[1] ? $max : $F[1];
-            $n++;
-            END{ print qq{seq_number\t$n}; print qq{min_length\t$min}; print qq{max_length\t$max} }' \
-        > mite_stat.txt
-
-    find ~/data/alignment/Ensembl/${GENOME_NAME} -type f -name "*.fa" \
-        | sort | xargs cat \
-        | perl -nl -e '/^>/ or $_ = uc; print' \
-        > genome.fa
-
-    perl ~/Scripts/egas/sparsemem_exact.pl -f mite.fa -l 25 -g genome.fa -o mite.replace.tsv
-    cat mite.replace.tsv \
-        | perl -nla -F"\t" -e ' print for @F' \
-        | grep ':' \
-        | sort | uniq \
-        > mite.position.txt
-
-    wc -l mite.position.txt >> mite_stat.txt
-    runlist covers mite.position.txt -o mite.yml
+    bash ~/data/alignment/gene-paralog/proc_mite.sh OsatJap
     ```
 
     ```bash
