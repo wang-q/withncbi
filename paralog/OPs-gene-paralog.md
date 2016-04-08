@@ -42,44 +42,21 @@ FILE_OUTPUT="stat.${BASE_Y1}.${BASE_Y2}.csv"
 echo "==> parameters"
 echo "    " $@
 
-echo "==> bases"
-echo "    " ${BASE_Y1} ${BASE_Y2}
+echo "==> compare ${BASE_Y1} ${BASE_Y2}"
+runlist stat2 ${FILE_Y1} ${FILE_Y2} -s ${FILE_SIZE} --op intersect --mk -o stdout \
+    > ${FILE_OUTPUT}.tmp
 
-echo "==> stat ${BASE_Y2}"
-LENGTH_Y2=$(runlist stat ${FILE_Y2} -s ${FILE_SIZE} -o stdout | grep 'all,' | cut -d ',' -f 3)
-
-echo "==> stat ${BASE_Y1}"
-runlist stat ${FILE_Y1} -s ${FILE_SIZE} --mk -o stdout \
-    | grep ',all,' \
-    | cut -d ',' -f 1,3,4 \
-    | parallel -j 1 --keep-order echo "{},${LENGTH_Y2}" \
-    > tmp1.csv
-
-echo "==> compare ${BASE_Y2}"
-runlist compare ${FILE_Y1} ${FILE_Y2} --op intersect --mk -o tmp_intersect.yml
-
-echo "==> stat ${BASE_Y1} ${BASE_Y2}"
-runlist stat tmp_intersect.yml -s ${FILE_SIZE} --mk -o stdout \
-    | grep ',all,' \
-    | cut -d ',' -f 1,4 \
-    > tmp2.csv
-
-echo "==> concat csv"
-echo "key,chr_length,key_size,${BASE_Y2}_length,key,${BASE_Y2}_size," \
-    > tmp_output.csv
-perl ~/Scripts/alignDB/util/merge_csv.pl \
-    -t tmp1.csv -m tmp2.csv \
-    -f 0 -f2 0 --concat --stdout \
-    >> tmp_output.csv
-
-echo "==> output"
-echo "    " ${FILE_OUTPUT}
-cat tmp_output.csv \
-    | cut -d ',' -f 1-4,6 \
+echo "==> output ${FILE_OUTPUT}"
+head -n 1 ${FILE_OUTPUT}.tmp \
+    | cut -d ',' -f 1,3-9 \
     > ${FILE_OUTPUT}
+cat ${FILE_OUTPUT}.tmp \
+    | grep ',all,' \
+    | cut -d ',' -f 1,3-9 \
+    >> ${FILE_OUTPUT}
 
 echo "==> clean"
-rm tmp_intersect.yml tmp1.csv tmp2.csv tmp_output.csv
+rm ${FILE_OUTPUT}.tmp
 
 EOF
 
@@ -150,25 +127,12 @@ echo "====> parameters"
 echo "    " $@
 
 GENOME_NAME=$1
-mkdir -p ~/data/alignment/gene-paralog/${GENOME_NAME}/stat
-cd ~/data/alignment/gene-paralog/${GENOME_NAME}/stat
 FEATURE=$2
 
+cd ~/data/alignment/gene-paralog/${GENOME_NAME}/stat
+
 ../../stat_runlists.sh ../feature/all-gene.yml ../data/${FEATURE}.yml ../data/chr.sizes
-cat stat.all-gene.${FEATURE}.csv \
-    | perl -nla -F',' -e '
-        ($in_rows) = grep {/^\d+$/} @F;
-        if ($in_rows) {
-            $c1 = $F[2]/$F[1];
-            $c2 = $F[4]/$F[3];
-            $r = $c2 / $c1;
-            print join(q{,}, @F, $c1, $c2, $r)
-        }
-        else {
-            print join(q{,}, @F, qw{c1 c2 ratio})
-        }
-        ' \
-    > ${GENOME_NAME}.feature.${FEATURE}.csv
+mv stat.all-gene.${FEATURE}.csv ${GENOME_NAME}.all-gene.${FEATURE}.csv
 
 EOF
 
@@ -192,31 +156,41 @@ echo "====> parameters"
 echo "    " $@
 
 GENOME_NAME=$1
-mkdir -p ~/data/alignment/gene-paralog/${GENOME_NAME}/stat
-cd ~/data/alignment/gene-paralog/${GENOME_NAME}/stat
 FEATURE=$2
+
+cd ~/data/alignment/gene-paralog/${GENOME_NAME}/stat
 
 for ftr in gene upstream downstream exon five_prime_UTR three_prime_UTR CDS intron
 do
     echo "====> ${ftr}"
+    sleep 1
     ../../stat_runlists.sh ../feature/sep-${ftr}.yml ../data/${FEATURE}.yml ../data/chr.sizes
+    cat stat.sep-${ftr}.${FEATURE}.csv \
+        | cut -d ',' -f 1,3,5 \
+        > stat.sep-${ftr}.${FEATURE}.csv.tmp
 done
 
-../../concat_csv.sh stat.sep-gene.${FEATURE}.csv stat.sep-upstream.${FEATURE}.csv stat.sep-downstream.${FEATURE}.csv
+echo "====> concat gene"
+../../concat_csv.sh stat.sep-gene.${FEATURE}.csv.tmp stat.sep-upstream.${FEATURE}.csv.tmp stat.sep-downstream.${FEATURE}.csv.tmp
 echo "gene_id,gene_length,gene_${FEATURE},upstream,upstream_${FEATURE},downstream,downstream_${FEATURE}" \
     > ${GENOME_NAME}.gene.${FEATURE}.csv
 cat concat.csv \
-    | cut -d ',' -f 1,3,5,8,10,13,15 \
+    | cut -d ',' -f 1,2,3,5,6,8,9 \
     >> ${GENOME_NAME}.gene.${FEATURE}.csv
 rm concat.csv
 
-../../concat_csv.sh stat.sep-exon.${FEATURE}.csv stat.sep-intron.${FEATURE}.csv stat.sep-CDS.${FEATURE}.csv stat.sep-five_prime_UTR.${FEATURE}.csv stat.sep-three_prime_UTR.${FEATURE}.csv
+echo "====> concat trans"
+../../concat_csv.sh stat.sep-exon.${FEATURE}.csv.tmp stat.sep-intron.${FEATURE}.csv.tmp stat.sep-CDS.${FEATURE}.csv.tmp stat.sep-five_prime_UTR.${FEATURE}.csv.tmp stat.sep-three_prime_UTR.${FEATURE}.csv.tmp
 echo "trans_id,exon_length,exon_${FEATURE},intron,intron_${FEATURE},CDS,CDS_${FEATURE},five_prime_UTR,five_prime_UTR_${FEATURE},three_prime_UTR,three_prime_UTR_${FEATURE}" \
     > ${GENOME_NAME}.trans.${FEATURE}.csv
 cat concat.csv \
-    | cut -d ',' -f 1,3,5,8,10,13,15,18,20,23,25 \
+    | cut -d ',' -f 1,2,3,5,6,8,9,11,12,14,15,17,18 \
     >> ${GENOME_NAME}.trans.${FEATURE}.csv
 rm concat.csv
+
+echo "====> clean"
+rm stat.sep-*.${FEATURE}.csv.tmp
+rm stat.sep-*.${FEATURE}.csv
 
 EOF
 
@@ -351,6 +325,8 @@ EOF
 
     bash ~/data/alignment/gene-paralog/proc_mite.sh Atha
     ```
+
+    Don't run in parallel with step 2.
 
     ```bash
     cd ~/data/alignment/gene-paralog/Atha/stat
