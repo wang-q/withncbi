@@ -398,12 +398,13 @@ perl ~/Scripts/withncbi/taxon/strain_bz_self.pl \
     -q Vvin \
     -q Slyc \
     -q Stub \
-    -q Macu \
     -q Sita \
     -q OsatJap \
     -q Bdis \
     -t Atha \
     --parted
+
+    # -q Macu \
 
 cd ~/data/alignment/self/plants_parted
 
@@ -417,9 +418,6 @@ cd ~/data/alignment/self/plants_parted
 
 bash 1_real_chr.sh
 time bash 3_self_cmd.sh
-# real    1663m54.797s
-# user    12106m42.605s
-# sys     291m51.433s
 time bash 4_proc_cmd.sh
 # real    611m4.351s
 # user    1484m10.343s
