@@ -64,7 +64,7 @@ if ( defined $size ) {
     }
 }
 
-printf "==> Load gff3\n";
+printf "==> Load file\n";
 my $in_fh = IO::Zlib->new( $infile, "rb" );
 
 # runlists
