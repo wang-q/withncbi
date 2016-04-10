@@ -26,7 +26,7 @@ merge_csv.pl - Merge csv files based on @fields
         --help      -?          brief help message
         --outfile   -o  STR     output filename. Default is [stdout] for screen
         --fields    -f  @INT    fields as identifies. Default is [0], first column
-        --concat                do concat other than merge. Keep first ID fields
+        --concat    -c          do concat other than merge. Keep first ID fields
 
     cat 1.csv 2.csv | perl merge_csv.pl -f 0 -f 1
 
@@ -36,7 +36,7 @@ GetOptions(
     'help|?' => sub { HelpMessage(0) },
     'outfile|o=s' => \( my $outfile = 'stdout' ),
     'fields|f=s'  => \my @fields,
-    'concat'      => \my $concat,
+    'concat|c'    => \my $concat,
 ) or HelpMessage(1);
 
 if ( !scalar @fields ) {
