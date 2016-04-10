@@ -64,7 +64,7 @@ printf "==> Load file\n";
 my $in_fh = IO::Zlib->new( $infile, "rb" );
 
 # runlists
-my $all_gene = {};    # all genes combined
+my $all_repeat = {};    # all repeats combined
 
 tie my %qr_of, 'Tie::IxHash';
 %qr_of = (
@@ -81,11 +81,6 @@ tie my %qr_of, 'Tie::IxHash';
     Small_RNA      => qr{^\w*(RNA)$}i,
     UNCLASSIFIED   => qr{^(UNCLASSIFIED)$}i,                      # not exists
 );
-
-my %count_of = map { $_ => undef } keys %qr_of;
-
-# chromosome names
-my $all_name_set = Set::Scalar->new;
 
 while (1) {
     my $line = <$in_fh>;
@@ -105,7 +100,7 @@ while (1) {
     my $chr   = $array[4];
     my $start = $array[5];
     my $end   = $array[6];
-    
+
     # only keep chromosomes listed in chr.sizes
     if ( defined $size ) {
         next unless exists $chr_set_of->{$chr};
@@ -116,35 +111,38 @@ while (1) {
         if ( $type =~ $qr_of{$c} ) {
             $family    = $c;
             $subfamily = $2;
-            $count_of{$family}++;
             last;
         }
     }
 
     if ( !defined $family ) {
         print "$type\n";
-        $count_of{UNCLASSIFIED}++;
+        $family = "UNCLASSIFIED";
     }
+
+    # initialize sets
+    if ( !exists $all_repeat->{$family} ) {
+        $all_repeat->{$family} = {};
+        $all_repeat->{$family} = {};
+    }
+    if ( !exists $all_repeat->{$family}{$chr} ) {
+        $all_repeat->{$family}{$chr} = AlignDB::IntSpan->new;
+    }
+
+    # add sets
+    $all_repeat->{$family}{$chr}->add_pair( $start, $end );
 }
 $in_fh->close;
 
-print Dump \%count_of;
-
-# #----------------------------------------------------------#
-# # Outputs
-# #----------------------------------------------------------#
-# print "==> Write Output files\n";
-# for my $f (qw{gene upstream downstream exon five_prime_UTR three_prime_UTR CDS intron}) {
-#     for my $chr ( $all_name_set->members ) {
-#         $all_gene->{$f}{$chr} = $all_gene->{$f}{$chr}->runlist;
-#     }
-#     for my $id ( keys %{ $sep_gene->{$f} } ) {
-#         for my $chr ( keys %{ $sep_gene->{$f}{$id} } ) {
-#             $sep_gene->{$f}{$id}{$chr} = $sep_gene->{$f}{$id}{$chr}->runlist;
-#         }
-#     }
-#     DumpFile( "sep-$f.yml", $sep_gene->{$f} );
-# }
-# DumpFile( "all-gene.yml", $all_gene );
+#----------------------------------------------------------#
+# Outputs
+#----------------------------------------------------------#
+print "==> Write Output files\n";
+for my $f ( keys %{$all_repeat} ) {
+    for my $chr ( keys %{ $all_repeat->{$f} } ) {
+        $all_repeat->{$f}{$chr} = $all_repeat->{$f}{$chr}->runlist;
+    }
+    DumpFile( "$f.yml", $all_repeat->{$f} );
+}
 
 exit;
