@@ -141,7 +141,7 @@ done \
     "
 
 echo "====> concat gene"
-../../concat_csv.sh stat.sep-gene.${FEATURE}.csv.tmp stat.sep-upstream.${FEATURE}.csv.tmp stat.sep-downstream.${FEATURE}.csv.tmp
+../../concat_csv.sh stat.sep-gene.${FEATURE_BASE}.csv.tmp stat.sep-upstream.${FEATURE_BASE}.csv.tmp stat.sep-downstream.${FEATURE_BASE}.csv.tmp
 echo "gene_id,gene_length,gene_${FEATURE_BASE},upstream,upstream_${FEATURE_BASE},downstream,downstream_${FEATURE_BASE}" \
     > ${GENOME_NAME}.gene.${FEATURE_BASE}.csv
 cat concat.csv \
@@ -226,10 +226,90 @@ cat mite.replace.tsv \
 echo "==> mite covers"
 wc -l mite.position.txt >> mite_stat.txt
 runlist covers mite.position.txt -o mite.yml
+
+runlist span --op excise -n 10 mite.yml   -o mite.1.yml # remove small spans
+runlist span --op fill   -n 10 mite.1.yml -o mite.2.yml # fill small holes
+mv mite.2.yml mite.yml
+rm mite.1.yml
+
 runlist stat mite.yml -s chr.sizes
 
 echo "==> clean"
 rm mite.all.fasta mite.bg.blast mite.bg.fasta mite.filter.fa mite.replace.tsv
+
+EOF
+
+```
+
+### `proc_repeat.sh`
+
+```bash
+
+cat <<'EOF' > ~/data/alignment/gene-paralog/proc_repeat.sh
+#!/bin/bash
+
+USAGE="Usage: $0 GENOME_NAME"
+
+if [ "$#" -lt 1 ]; then
+	echo "$USAGE"
+	exit 1
+fi
+
+echo "====> parameters"
+echo "    " $@
+
+GENOME_NAME=$1
+cd ~/data/alignment/gene-paralog/${GENOME_NAME}/repeat
+
+find . -type f -name "*.yml" -or -name "*.csv" | parallel rm
+
+echo "==> gff types"
+gzip -d -c ../data/gff3.gz \
+    | perl -nla -e '/^#/ and next; print $F[2]' \
+    | sort | uniq -c \
+    > gff.type.txt
+
+gzip -d -c ../data/gff3.gz \
+    | perl -nla -e '
+        /^#/ and next;
+        $F[2] eq q{repeat_region} or next;
+        $F[8] =~ /description\=(\w+)/i or next;
+        print qq{$F[2]\t$F[1]\t$1};
+        ' \
+    | sort | uniq -c \
+    > gff.repeat.txt
+
+echo "==> rmout families"
+cat ../data/genome.fa.out \
+    | perl -nla -e '/^\s*\d+/ or next; print $F[10]' \
+    | sort | uniq -c \
+    > rmout.family.txt
+
+echo "==> rmout results"
+perl ~/Scripts/withncbi/paralog/rmout2runlist.pl \
+    --file ../data/genome.fa.out \
+    --size ../data/chr.sizes
+
+runlist split ../feature/all-repeat.yml -o .
+runlist merge *.yml -o all-repeat.yml
+find . -type f -name "*.yml" -not -name "all-*" | parallel rm
+
+runlist span --op excise -n 10 --mk all-repeat.yml -o all-repeat.1.yml   # remove small spans
+runlist span --op fill   -n 10 --mk all-repeat.1.yml -o all-repeat.2.yml # fill small holes
+runlist split all-repeat.2.yml -o .
+mv all-repeat.2.yml all-repeat.yml
+rm all-repeat.1.yml
+
+# basic stat for all repeats
+runlist stat all-repeat.yml -s ../data/chr.sizes --mk --all
+
+# find repeat families large enough
+cat all-repeat.yml.csv \
+    | perl -nla -F"," -e '
+        next if $F[3] =~ /^c/;
+        print $F[0] if $F[3] > 0.0005
+    ' \
+    > repeat.family.txt
 
 EOF
 
@@ -317,54 +397,21 @@ EOF
 
     ```bash
     GENOME_NAME=Atha
-    cd ~/data/alignment/gene-paralog/${GENOME_NAME}/repeat
 
-    gzip -d -c ../data/gff3.gz \
-        | perl -nla -e '/^#/ and next; print $F[2]' \
-        | sort | uniq -c \
-        > gff.type.txt
+    bash ~/data/alignment/gene-paralog/proc_repeat.sh Atha
+    ```
 
-    gzip -d -c ../data/gff3.gz \
-        | perl -nla -e '
-            /^#/ and next;
-            $F[2] eq q{repeat_region} or next;
-            $F[8] =~ /description\=(\w+)/i or next;
-            print qq{$F[2]\t$F[1]\t$1};
-            ' \
-        | sort | uniq -c \
-        > gff.repeat.txt
+    ```bash
+    cd ~/data/alignment/gene-paralog/Atha/stat
 
-    cat ../data/genome.fa.out \
-        | perl -nla -e '/^\s*\d+/ or next; print $F[10]' \
-        | sort | uniq -c \
-        > rmout.family.txt
-
-    time perl ~/Scripts/withncbi/paralog/rmout2runlist.pl \
-        --file ../data/genome.fa.out \
-        --size ../data/chr.sizes
-
-    runlist split ../feature/all-repeat.yml -o .
-    runlist merge *.yml -o all-repeat.yml
-    find . -type f -name "*.yml" -not -name "all-*" | parallel rm
-
-    # remove small spans
-    runlist span --op excise -n 10 --mk all-repeat.yml -o all-repeat.1.yml
-    # fill small holes
-    runlist span --op holes  -n 10 --mk all-repeat.1.yml -o all-repeat.2.yml
-    runlist split all-repeat.2.yml -o .
-    mv all-repeat.2.yml all-repeat.yml
-    rm all-repeat.1.yml
-
-    runlist stat all-repeat.yml -s ../data/chr.sizes --mk
-    # find repeat families large enough
-    find . -type f -name "*.yml" -size +5k \
-        | perl -nlp -e 's/^\.\///' \
-        > repeat.family.txt
-
-    # basic stats
-    cat repeat.family.txt \
+    cat ../repeat/repeat.family.txt \
         | parallel -j 8 --keep-order "
-            runlist stat {} -s ../data/chr.sizes
+            bash ~/data/alignment/gene-paralog/proc_all_gene.sh Atha ../repeat/{}.yml
+        "
+
+    cat ../repeat/repeat.family.txt \
+        | parallel -j 8 --keep-order "
+            bash ~/data/alignment/gene-paralog/proc_sep_gene.sh Atha ../repeat/{}.yml
         "
     ```
 
