@@ -68,8 +68,9 @@ printf "==> Load file\n";
 my $in_fh = IO::Zlib->new( $infile, "rb" );
 
 # runlists
-my $all_gene = {};    # all genes combined
-my $sep_gene = {};    # seperated genes
+my $all_gene   = {};    # all genes combined
+my $sep_gene   = {};    # seperated genes
+my $all_repeat = {};    # dust and trf, repeatmasker in rmout2runlist.pl
 
 # chromosome names
 my $all_name_set = Set::Scalar->new;
@@ -165,6 +166,27 @@ while (1) {
             $all_gene->{$f}{$chr}->add( $set_of->{$f} );
             $sep_gene->{$f}{$gene_id} = { $chr => $set_of->{$f} };
         }
+    }
+
+    if ( $type eq 'repeat_region' ) {
+        my $f;
+        if ( exists $attr_of{description} ) {
+            $f = $attr_of{description};
+            next unless ( $f eq "dust" or $f eq "trf" );
+        }
+
+        # initialize sets
+        if ( !exists $all_repeat->{$f} ) {
+            $all_repeat->{$f} = {};
+            $all_repeat->{$f} = {};
+        }
+        if ( !exists $all_repeat->{$f}{$chr} ) {
+            $all_repeat->{$f}{$chr} = AlignDB::IntSpan->new;
+        }
+        $all_name_set->insert($chr);
+
+        # add sets
+        $all_repeat->{$f}{$chr}->add_pair( $start, $end );
     }
 
     if ( ( defined $cur_transcript ) and ( $type eq "transcript" ) ) {
@@ -273,6 +295,13 @@ for my $f (qw{gene upstream downstream exon five_prime_UTR three_prime_UTR CDS i
     DumpFile( "sep-$f.yml", $sep_gene->{$f} );
 }
 DumpFile( "all-gene.yml", $all_gene );
+
+for my $f ( keys %{$all_repeat} ) {
+    for my $chr ( keys %{ $all_repeat->{$f} } ) {
+        $all_repeat->{$f}{$chr} = $all_repeat->{$f}{$chr}->runlist;
+    }
+}
+DumpFile( "all-repeat.yml", $all_repeat );
 
 exit;
 
