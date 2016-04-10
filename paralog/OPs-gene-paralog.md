@@ -17,52 +17,14 @@ perl ~/Scripts/download/list.pl --ncp -u http://pmite.hzau.edu.cn/download_mite/
 perl ~/Scripts/download/download.pl -i download_mite.yml
 ```
 
+## Other repeats
+
+Ensembl gff3 files contain correct descriptions for dust and trf, but repeatmasker's descriptions
+is not usable.
+
+So I rerun RepeatMasker on every genomes and get repeats reports from `genome.fa.out`.
+
 ## Scripts
-
-### `stat_runlists.sh`
-
-Need three arguments:
-* Multikey runlist
-* A genomic feature, such as `paralog.yml`
-* chr.sizes
-
-```bash
-
-cat <<'EOF' > ~/data/alignment/gene-paralog/stat_runlists.sh
-#!/bin/bash
-
-FILE_Y1="$1"
-FILE_Y2="$2"
-FILE_SIZE="$3"
-
-BASE_Y1=`basename "${FILE_Y1%.*}"`
-BASE_Y2=`basename "${FILE_Y2%.*}"`
-FILE_OUTPUT="stat.${BASE_Y1}.${BASE_Y2}.csv"
-
-echo "==> parameters"
-echo "    " $@
-
-echo "==> compare ${BASE_Y1} ${BASE_Y2}"
-runlist stat2 ${FILE_Y1} ${FILE_Y2} -s ${FILE_SIZE} --op intersect --mk -o stdout \
-    > ${FILE_OUTPUT}.tmp
-
-echo "==> output ${FILE_OUTPUT}"
-head -n 1 ${FILE_OUTPUT}.tmp \
-    | cut -d ',' -f 1,3-9 \
-    > ${FILE_OUTPUT}
-cat ${FILE_OUTPUT}.tmp \
-    | grep ',all,' \
-    | cut -d ',' -f 1,3-9 \
-    >> ${FILE_OUTPUT}
-
-echo "==> clean"
-rm ${FILE_OUTPUT}.tmp
-
-EOF
-
-chmod +x ~/data/alignment/gene-paralog/stat_runlists.sh
-
-```
 
 ### `concat_csv.sh`
 
@@ -116,7 +78,7 @@ chmod +x ~/data/alignment/gene-paralog/concat_csv.sh
 cat <<'EOF' > ~/data/alignment/gene-paralog/proc_all_gene.sh
 #!/bin/bash
 
-USAGE="Usage: $0 GENOME_NAME FEATURE"
+USAGE="Usage: $0 GENOME_NAME FEATURE_FILE"
 
 if [ "$#" -lt 2 ]; then
 	echo "$USAGE"
@@ -127,12 +89,14 @@ echo "====> parameters"
 echo "    " $@
 
 GENOME_NAME=$1
-FEATURE=$2
+FEATURE_FILE=$2
+FEATURE_BASE=`basename "${FEATURE_FILE%.*}"`
 
 cd ~/data/alignment/gene-paralog/${GENOME_NAME}/stat
 
-../../stat_runlists.sh ../feature/all-gene.yml ../data/${FEATURE}.yml ../data/chr.sizes
-mv stat.all-gene.${FEATURE}.csv ${GENOME_NAME}.all-gene.${FEATURE}.csv
+runlist stat2 ../feature/all-gene.yml ${FEATURE_FILE} -s ../data/chr.sizes \
+    --op intersect --mk --all \
+    -o ${GENOME_NAME}.all-gene.${FEATURE_BASE}.csv
 
 EOF
 
@@ -145,7 +109,7 @@ EOF
 cat <<'EOF' > ~/data/alignment/gene-paralog/proc_sep_gene.sh
 #!/bin/bash
 
-USAGE="Usage: $0 GENOME_NAME FEATURE"
+USAGE="Usage: $0 GENOME_NAME FEATURE_FILE"
 
 if [ "$#" -lt 2 ]; then
 	echo "$USAGE"
@@ -156,7 +120,8 @@ echo "====> parameters"
 echo "    " $@
 
 GENOME_NAME=$1
-FEATURE=$2
+FEATURE_FILE=$2
+FEATURE_BASE=`basename "${FEATURE_FILE%.*}"`
 
 cd ~/data/alignment/gene-paralog/${GENOME_NAME}/stat
 
@@ -165,36 +130,37 @@ do
     echo ${ftr}
 done \
     | parallel -j 8 --keep-order "
-        echo \"====> {} ${FEATURE}\";
+        echo \"====> {} ${FEATURE_BASE}\";
         sleep 1;
-        ../../stat_runlists.sh ../feature/sep-{}.yml ../data/${FEATURE}.yml ../data/chr.sizes
-        cat stat.sep-{}.${FEATURE}.csv \
+        runlist stat2 ../feature/sep-{}.yml ${FEATURE_FILE} -s ../data/chr.sizes \
+            --op intersect --mk --all \
+            -o stat.sep-{}.${FEATURE_BASE}.csv;
+        cat stat.sep-{}.${FEATURE_BASE}.csv \
             | cut -d ',' -f 1,3,5 \
-            > stat.sep-{}.${FEATURE}.csv.tmp
-        echo \"====> DONE {} ${FEATURE}\";
+            > stat.sep-{}.${FEATURE_BASE}.csv.tmp;
     "
 
 echo "====> concat gene"
 ../../concat_csv.sh stat.sep-gene.${FEATURE}.csv.tmp stat.sep-upstream.${FEATURE}.csv.tmp stat.sep-downstream.${FEATURE}.csv.tmp
-echo "gene_id,gene_length,gene_${FEATURE},upstream,upstream_${FEATURE},downstream,downstream_${FEATURE}" \
-    > ${GENOME_NAME}.gene.${FEATURE}.csv
+echo "gene_id,gene_length,gene_${FEATURE_BASE},upstream,upstream_${FEATURE_BASE},downstream,downstream_${FEATURE_BASE}" \
+    > ${GENOME_NAME}.gene.${FEATURE_BASE}.csv
 cat concat.csv \
     | cut -d ',' -f 1,2,3,5,6,8,9 \
-    >> ${GENOME_NAME}.gene.${FEATURE}.csv
+    >> ${GENOME_NAME}.gene.${FEATURE_BASE}.csv
 rm concat.csv
 
 echo "====> concat trans"
-../../concat_csv.sh stat.sep-exon.${FEATURE}.csv.tmp stat.sep-intron.${FEATURE}.csv.tmp stat.sep-CDS.${FEATURE}.csv.tmp stat.sep-five_prime_UTR.${FEATURE}.csv.tmp stat.sep-three_prime_UTR.${FEATURE}.csv.tmp
-echo "trans_id,exon_length,exon_${FEATURE},intron,intron_${FEATURE},CDS,CDS_${FEATURE},five_prime_UTR,five_prime_UTR_${FEATURE},three_prime_UTR,three_prime_UTR_${FEATURE}" \
-    > ${GENOME_NAME}.trans.${FEATURE}.csv
+../../concat_csv.sh stat.sep-exon.${FEATURE_BASE}.csv.tmp stat.sep-intron.${FEATURE_BASE}.csv.tmp stat.sep-CDS.${FEATURE_BASE}.csv.tmp stat.sep-five_prime_UTR.${FEATURE_BASE}.csv.tmp stat.sep-three_prime_UTR.${FEATURE_BASE}.csv.tmp
+echo "trans_id,exon_length,exon_${FEATURE_BASE},intron,intron_${FEATURE_BASE},CDS,CDS_${FEATURE_BASE},five_prime_UTR,five_prime_UTR_${FEATURE_BASE},three_prime_UTR,three_prime_UTR_${FEATURE_BASE}" \
+    > ${GENOME_NAME}.trans.${FEATURE_BASE}.csv
 cat concat.csv \
     | cut -d ',' -f 1,2,3,5,6,8,9,11,12,14,15,17,18 \
-    >> ${GENOME_NAME}.trans.${FEATURE}.csv
+    >> ${GENOME_NAME}.trans.${FEATURE_BASE}.csv
 rm concat.csv
 
 echo "====> clean"
-rm stat.sep-*.${FEATURE}.csv.tmp
-rm stat.sep-*.${FEATURE}.csv
+rm stat.sep-*.${FEATURE_BASE}.csv.tmp
+rm stat.sep-*.${FEATURE_BASE}.csv
 
 EOF
 
@@ -278,6 +244,7 @@ EOF
 
     mkdir -p ~/data/alignment/gene-paralog/${GENOME_NAME}/data
     mkdir -p ~/data/alignment/gene-paralog/${GENOME_NAME}/feature
+    mkdir -p ~/data/alignment/gene-paralog/${GENOME_NAME}/repeat
     mkdir -p ~/data/alignment/gene-paralog/${GENOME_NAME}/stat
 
     # copy needed files here
@@ -310,6 +277,12 @@ EOF
     #     --size chr.sizes \
     #     --range 2000 \
     #     --clean
+
+    # Do RepeatMasker
+    RepeatMasker genome.fa -species Viridiplantae -xsmall --parallel 12
+    rm genome.fa.{cat.gz,masked}
+    rm -fr RM_*
+
     ```
 
 2. Gene-paralog stats
@@ -317,9 +290,9 @@ EOF
     ```bash
     cd ~/data/alignment/gene-paralog/Atha/stat
 
-    bash ~/data/alignment/gene-paralog/proc_all_gene.sh Atha paralog
+    bash ~/data/alignment/gene-paralog/proc_all_gene.sh Atha ../data/paralog.yml
 
-    bash ~/data/alignment/gene-paralog/proc_sep_gene.sh Atha paralog
+    bash ~/data/alignment/gene-paralog/proc_sep_gene.sh Atha ../data/paralog.yml
     ```
 
 3. MITE
@@ -335,9 +308,64 @@ EOF
     ```bash
     cd ~/data/alignment/gene-paralog/Atha/stat
 
-    bash ~/data/alignment/gene-paralog/proc_all_gene.sh Atha mite
+    bash ~/data/alignment/gene-paralog/proc_all_gene.sh Atha ../data/mite.yml
 
-    bash ~/data/alignment/gene-paralog/proc_sep_gene.sh Atha mite
+    bash ~/data/alignment/gene-paralog/proc_sep_gene.sh Atha ../data/mite.yml
+    ```
+
+4. Other Repeats
+
+    ```bash
+    GENOME_NAME=Atha
+    cd ~/data/alignment/gene-paralog/${GENOME_NAME}/repeat
+
+    gzip -d -c ../data/gff3.gz \
+        | perl -nla -e '/^#/ and next; print $F[2]' \
+        | sort | uniq -c \
+        > gff.type.txt
+
+    gzip -d -c ../data/gff3.gz \
+        | perl -nla -e '
+            /^#/ and next;
+            $F[2] eq q{repeat_region} or next;
+            $F[8] =~ /description\=(\w+)/i or next;
+            print qq{$F[2]\t$F[1]\t$1};
+            ' \
+        | sort | uniq -c \
+        > gff.repeat.txt
+
+    cat ../data/genome.fa.out \
+        | perl -nla -e '/^\s*\d+/ or next; print $F[10]' \
+        | sort | uniq -c \
+        > rmout.family.txt
+
+    time perl ~/Scripts/withncbi/paralog/rmout2runlist.pl \
+        --file ../data/genome.fa.out \
+        --size ../data/chr.sizes
+
+    runlist split ../feature/all-repeat.yml -o .
+    runlist merge *.yml -o all-repeat.yml
+    find . -type f -name "*.yml" -not -name "all-*" | parallel rm
+
+    # remove small spans
+    runlist span --op excise -n 10 --mk all-repeat.yml -o all-repeat.1.yml
+    # fill small holes
+    runlist span --op holes  -n 10 --mk all-repeat.1.yml -o all-repeat.2.yml
+    runlist split all-repeat.2.yml -o .
+    mv all-repeat.2.yml all-repeat.yml
+    rm all-repeat.1.yml
+
+    runlist stat all-repeat.yml -s ../data/chr.sizes --mk
+    # find repeat families large enough
+    find . -type f -name "*.yml" -size +5k \
+        | perl -nlp -e 's/^\.\///' \
+        > repeat.family.txt
+
+    # basic stats
+    cat repeat.family.txt \
+        | parallel -j 8 --keep-order "
+            runlist stat {} -s ../data/chr.sizes
+        "
     ```
 
 ## OsatJap
