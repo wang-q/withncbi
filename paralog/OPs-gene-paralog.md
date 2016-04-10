@@ -13,7 +13,7 @@
 ```bash
 mkdir -p ~/data/alignment/gene-paralog/
 cd ~/data/alignment/gene-paralog/
-perl ~/Scripts/download/list.pl -ncp -u http://pmite.hzau.edu.cn/download_mite/
+perl ~/Scripts/download/list.pl --ncp -u http://pmite.hzau.edu.cn/download_mite/
 perl ~/Scripts/download/download.pl -i download_mite.yml
 ```
 
@@ -162,13 +162,17 @@ cd ~/data/alignment/gene-paralog/${GENOME_NAME}/stat
 
 for ftr in gene upstream downstream exon five_prime_UTR three_prime_UTR CDS intron
 do
-    echo "====> ${ftr}"
-    sleep 1
-    ../../stat_runlists.sh ../feature/sep-${ftr}.yml ../data/${FEATURE}.yml ../data/chr.sizes
-    cat stat.sep-${ftr}.${FEATURE}.csv \
-        | cut -d ',' -f 1,3,5 \
-        > stat.sep-${ftr}.${FEATURE}.csv.tmp
-done
+    echo ${ftr}
+done \
+    | parallel -j 8 --keep-order "
+        echo \"====> {} ${FEATURE}\";
+        sleep 1;
+        ../../stat_runlists.sh ../feature/sep-{}.yml ../data/${FEATURE}.yml ../data/chr.sizes
+        cat stat.sep-{}.${FEATURE}.csv \
+            | cut -d ',' -f 1,3,5 \
+            > stat.sep-{}.${FEATURE}.csv.tmp
+        echo \"====> DONE {} ${FEATURE}\";
+    "
 
 echo "====> concat gene"
 ../../concat_csv.sh stat.sep-gene.${FEATURE}.csv.tmp stat.sep-upstream.${FEATURE}.csv.tmp stat.sep-downstream.${FEATURE}.csv.tmp
