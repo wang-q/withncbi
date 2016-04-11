@@ -26,51 +26,6 @@ So I rerun RepeatMasker on every genomes and get repeats reports from `genome.fa
 
 ## Scripts
 
-### `concat_csv.sh`
-
-```bash
-
-cat <<'EOF' > ~/data/alignment/gene-paralog/concat_csv.sh
-#!/bin/bash
-
-USAGE="Need two or more csv files.
-Usage: $0 csv1 csv2 ... csvN"
-
-if [ "$#" -lt 2 ]; then
-	echo "$USAGE"
-	exit 1
-fi
-
-echo "==> parameters"
-echo "    " $@
-
-# First file
-COUNTER=1
-cp "$1" tmp.concat.${COUNTER}.csv
-shift
-
-# Additional files
-while (( "$#" ));
-do
-    COUNTER_1=${COUNTER}
-    let "COUNTER++"  
-    COUNTER_2=${COUNTER}
-    perl ~/Scripts/alignDB/util/merge_csv.pl \
-        -t tmp.concat.${COUNTER_1}.csv -m $1 \
-        -f 0 -f2 0 --concat --stdout \
-        > tmp.concat.${COUNTER_2}.csv
-    shift
-done
-
-cp tmp.concat.${COUNTER}.csv concat.csv
-rm tmp.concat.*.csv
-
-EOF
-
-chmod +x ~/data/alignment/gene-paralog/concat_csv.sh
-
-```
-
 ### `proc_all_gene.sh`
 
 ```bash
@@ -125,7 +80,7 @@ FEATURE_BASE=`basename "${FEATURE_FILE%.*}"`
 
 cd ~/data/alignment/gene-paralog/${GENOME_NAME}/stat
 
-for ftr in gene upstream downstream exon five_prime_UTR three_prime_UTR CDS intron
+for ftr in gene upstream downstream exon CDS intron five_prime_UTR three_prime_UTR
 do
     echo ${ftr}
 done \
@@ -141,22 +96,36 @@ done \
     "
 
 echo "====> concat gene"
-../../concat_csv.sh stat.sep-gene.${FEATURE_BASE}.csv.tmp stat.sep-upstream.${FEATURE_BASE}.csv.tmp stat.sep-downstream.${FEATURE_BASE}.csv.tmp
-echo "gene_id,gene_length,gene_${FEATURE_BASE},upstream,upstream_${FEATURE_BASE},downstream,downstream_${FEATURE_BASE}" \
-    > ${GENOME_NAME}.gene.${FEATURE_BASE}.csv
-cat concat.csv \
-    | cut -d ',' -f 1,2,3,5,6,8,9 \
+printf "gene_id," > ${GENOME_NAME}.gene.${FEATURE_BASE}.csv
+for ftr in gene upstream downstream
+do
+    printf "${ftr}_length,${ftr}_${FEATURE_BASE},"
+done >> ${GENOME_NAME}.gene.${FEATURE_BASE}.csv
+echo >> ${GENOME_NAME}.gene.${FEATURE_BASE}.csv
+
+for ftr in gene upstream downstream
+do
+    cat stat.sep-${ftr}.${FEATURE_BASE}.csv.tmp
+done \
+    | grep -v "^key"
+    | perl ~/Scripts/withncbi/taxon/merge_csv.pl --concat -f 0 -o stdout \
     >> ${GENOME_NAME}.gene.${FEATURE_BASE}.csv
-rm concat.csv
 
 echo "====> concat trans"
-../../concat_csv.sh stat.sep-exon.${FEATURE_BASE}.csv.tmp stat.sep-intron.${FEATURE_BASE}.csv.tmp stat.sep-CDS.${FEATURE_BASE}.csv.tmp stat.sep-five_prime_UTR.${FEATURE_BASE}.csv.tmp stat.sep-three_prime_UTR.${FEATURE_BASE}.csv.tmp
-echo "trans_id,exon_length,exon_${FEATURE_BASE},intron,intron_${FEATURE_BASE},CDS,CDS_${FEATURE_BASE},five_prime_UTR,five_prime_UTR_${FEATURE_BASE},three_prime_UTR,three_prime_UTR_${FEATURE_BASE}" \
-    > ${GENOME_NAME}.trans.${FEATURE_BASE}.csv
-cat concat.csv \
-    | cut -d ',' -f 1,2,3,5,6,8,9,11,12,14,15,17,18 \
+printf "trans_id," > ${GENOME_NAME}.trans.${FEATURE_BASE}.csv
+for ftr in exon CDS intron five_prime_UTR three_prime_UTR
+do
+    printf "${ftr}_length,${ftr}_${FEATURE_BASE},"
+done >> ${GENOME_NAME}.trans.${FEATURE_BASE}.csv
+echo >> ${GENOME_NAME}.trans.${FEATURE_BASE}.csv
+
+for ftr in exon CDS intron five_prime_UTR three_prime_UTR
+do
+    cat stat.sep-${ftr}.${FEATURE_BASE}.csv.tmp
+done \
+    | grep -v "^key"
+    | perl ~/Scripts/withncbi/taxon/merge_csv.pl --concat -f 0 -o stdout \
     >> ${GENOME_NAME}.trans.${FEATURE_BASE}.csv
-rm concat.csv
 
 echo "====> clean"
 rm stat.sep-*.${FEATURE_BASE}.csv.tmp
@@ -237,6 +206,9 @@ runlist stat mite.yml -s chr.sizes
 echo "==> clean"
 rm mite.all.fasta mite.bg.blast mite.bg.fasta mite.filter.fa mite.replace.tsv
 
+mv mite.yml.csv ../stat
+mv mite_stat.txt ../stat
+
 EOF
 
 ```
@@ -311,6 +283,9 @@ cat all-repeat.yml.csv \
     ' \
     > repeat.family.txt
 
+echo "==> clean"
+mv all-repeat.yml.csv ../stat
+
 EOF
 
 ```
@@ -341,6 +316,12 @@ EOF
         > genome.fa
 
     runlist stat paralog.yml -s chr.sizes
+    mv paralog.yml.csv ../stat
+
+    # Run RepeatMasker
+    RepeatMasker genome.fa -species Viridiplantae -xsmall --parallel 12
+    rm genome.fa.{cat.gz,masked}
+    rm -fr RM_*
 
     # Convert gff3 to runlists
     cd ~/data/alignment/gene-paralog/${GENOME_NAME}/feature
@@ -357,11 +338,6 @@ EOF
     #     --size chr.sizes \
     #     --range 2000 \
     #     --clean
-
-    # Do RepeatMasker
-    RepeatMasker genome.fa -species Viridiplantae -xsmall --parallel 12
-    rm genome.fa.{cat.gz,masked}
-    rm -fr RM_*
 
     ```
 
@@ -383,8 +359,6 @@ EOF
     bash ~/data/alignment/gene-paralog/proc_mite.sh Atha
     ```
 
-    Don't run in parallel with step 2.
-
     ```bash
     cd ~/data/alignment/gene-paralog/Atha/stat
 
@@ -396,7 +370,7 @@ EOF
 4. Other Repeats
 
     ```bash
-    GENOME_NAME=Atha
+    cd ~/data/alignment/gene-paralog/Atha/repeat
 
     bash ~/data/alignment/gene-paralog/proc_repeat.sh Atha
     ```
@@ -410,7 +384,7 @@ EOF
         "
 
     cat ../repeat/repeat.family.txt \
-        | parallel -j 8 --keep-order "
+        | parallel -j 1 --keep-order "
             bash ~/data/alignment/gene-paralog/proc_sep_gene.sh Atha ../repeat/{}.yml
         "
     ```
