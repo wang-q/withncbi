@@ -22,9 +22,60 @@ perl ~/Scripts/download/download.pl -i download_mite.yml
 Ensembl gff3 files contain correct descriptions for dust and trf, but repeatmasker's descriptions
 is not usable.
 
-So I rerun RepeatMasker on every genomes and get repeats reports from `genome.fa.out`.
+So I rerun RepeatMasker on every genomes and get reports from `genome.fa.out`.
 
 ## Scripts
+
+Same for each species.
+
+### `proc_prepare.sh`
+
+```bash
+
+cat <<'EOF' > ~/data/alignment/gene-paralog/proc_prepare.sh
+#!/bin/bash
+
+USAGE="Usage: $0 GENOME_NAME"
+
+if [ "$#" -lt 1 ]; then
+	echo "$USAGE"
+	exit 1
+fi
+
+echo "====> parameters"
+echo "    " $@
+
+GENOME_NAME=$1
+
+cd ~/data/alignment/gene-paralog/${GENOME_NAME}/data
+
+echo "====> get genome"
+find ~/data/alignment/Ensembl/${GENOME_NAME} -type f -name "*.fa" \
+    | sort | xargs cat \
+    | perl -nl -e '/^>/ or $_ = uc; print' \
+    > genome.fa
+
+echo "====> run RepeatMasker"
+RepeatMasker genome.fa -species Viridiplantae -xsmall --parallel 8
+rm genome.fa.{cat.gz,masked}
+rm -fr RM_*
+
+echo "====> paralog stat"
+runlist stat paralog.yml -s chr.sizes
+mv paralog.yml.csv ../stat
+
+echo "====> Convert gff3 to runlists"
+cd ~/data/alignment/gene-paralog/${GENOME_NAME}/feature
+
+# For Atha, 0m41.121s. With --clean, 50m49.994s
+time perl ~/Scripts/withncbi/paralog/gff2runlist.pl \
+    --file ../data/gff3.gz \
+    --size ../data/chr.sizes \
+    --range 2000
+
+EOF
+
+```
 
 ### `proc_all_gene.sh`
 
@@ -80,6 +131,7 @@ FEATURE_BASE=`basename "${FEATURE_FILE%.*}"`
 
 cd ~/data/alignment/gene-paralog/${GENOME_NAME}/stat
 
+echo "====> intersect"
 for ftr in gene upstream downstream exon CDS intron five_prime_UTR three_prime_UTR
 do
     echo ${ftr}
@@ -272,10 +324,10 @@ runlist split all-repeat.2.yml -o .
 mv all-repeat.2.yml all-repeat.yml
 rm all-repeat.1.yml
 
-# basic stat for all repeats
+echo "==> basic stat"
 runlist stat all-repeat.yml -s ../data/chr.sizes --mk --all
 
-# find repeat families large enough
+echo "==> find repeat families large enough"
 cat all-repeat.yml.csv \
     | perl -nla -F"," -e '
         next if $F[3] =~ /^c/;
@@ -297,48 +349,24 @@ EOF
     ```bash
     GENOME_NAME=Atha
 
+	echo "====> create directories"
     mkdir -p ~/data/alignment/gene-paralog/${GENOME_NAME}/data
     mkdir -p ~/data/alignment/gene-paralog/${GENOME_NAME}/feature
     mkdir -p ~/data/alignment/gene-paralog/${GENOME_NAME}/repeat
     mkdir -p ~/data/alignment/gene-paralog/${GENOME_NAME}/stat
 
-    # copy needed files here
+    echo "====> copy or download needed files here"
     cd ~/data/alignment/gene-paralog/${GENOME_NAME}/data
     cp ~/data/ensembl82/gff3/arabidopsis_thaliana/Arabidopsis_thaliana.TAIR10.29.gff3.gz gff3.gz
     cp ~/data/alignment/self/arabidopsis/Genomes/Atha/chr.sizes chr.sizes
     cp ~/data/alignment/self/arabidopsis/Results/Atha/Atha.chr.runlist.yml paralog.yml
     wget http://pmite.hzau.edu.cn/MITE/MITE-SEQ-V2/03_arabidopsis_mite_seq.fa -O mite.fa
+    ```
 
-    # genome
-    find ~/data/alignment/Ensembl/${GENOME_NAME} -type f -name "*.fa" \
-        | sort | xargs cat \
-        | perl -nl -e '/^>/ or $_ = uc; print' \
-        > genome.fa
+    ```bash
+    cd ~/data/alignment/gene-paralog/Atha/data
 
-    runlist stat paralog.yml -s chr.sizes
-    mv paralog.yml.csv ../stat
-
-    # Run RepeatMasker
-    RepeatMasker genome.fa -species Viridiplantae -xsmall --parallel 12
-    rm genome.fa.{cat.gz,masked}
-    rm -fr RM_*
-
-    # Convert gff3 to runlists
-    cd ~/data/alignment/gene-paralog/${GENOME_NAME}/feature
-
-    # real	0m41.121s
-    time perl ~/Scripts/withncbi/paralog/gff2runlist.pl \
-        --file ../data/gff3.gz \
-        --size ../data/chr.sizes \
-        --range 2000
-
-    # real	50m49.994s
-    # time perl ~/Scripts/withncbi/paralog/gff2runlist.pl \
-    #     --file Arabidopsis_thaliana.TAIR10.29.gff3.gz \
-    #     --size chr.sizes \
-    #     --range 2000 \
-    #     --clean
-
+    bash ~/data/alignment/gene-paralog/proc_prepare.sh Atha
     ```
 
 2. Gene-paralog stats
@@ -396,31 +424,23 @@ EOF
     ```bash
     GENOME_NAME=OsatJap
 
+	echo "====> create directories"
     mkdir -p ~/data/alignment/gene-paralog/${GENOME_NAME}/data
     mkdir -p ~/data/alignment/gene-paralog/${GENOME_NAME}/feature
     mkdir -p ~/data/alignment/gene-paralog/${GENOME_NAME}/stat
 
-    # copy needed files here
+    echo "====> copy or download needed files here"
     cd ~/data/alignment/gene-paralog/${GENOME_NAME}/data
     cp ~/data/ensembl82/gff3/oryza_sativa/Oryza_sativa.IRGSP-1.0.29.gff3.gz gff3.gz
     cp ~/data/alignment/self/rice/Genomes/OsatJap/chr.sizes chr.sizes
     cp ~/data/alignment/self/rice/Results/OsatJap/OsatJap.chr.runlist.yml paralog.yml
     wget http://pmite.hzau.edu.cn/MITE/MITE-SEQ-V2/26_nipponbare_mite_seq.fa -O mite.fa
+    ```
 
-    # genome
-    find ~/data/alignment/Ensembl/${GENOME_NAME} -type f -name "*.fa" \
-        | sort | xargs cat \
-        | perl -nl -e '/^>/ or $_ = uc; print' \
-        > genome.fa
+    ```bash
+    cd ~/data/alignment/gene-paralog/OsatJap/data
 
-    # Convert gff3 to runlists
-    cd ~/data/alignment/gene-paralog/${GENOME_NAME}/feature
-
-    # real	1m15.666s
-    time perl ~/Scripts/withncbi/paralog/gff2runlist.pl \
-        --file ../data/gff3.gz \
-        --size ../data/chr.sizes \
-        --range 2000
+    bash ~/data/alignment/gene-paralog/proc_prepare.sh OsatJap
     ```
 
 2. Gene-paralog stats
@@ -428,9 +448,9 @@ EOF
     ```bash
     cd ~/data/alignment/gene-paralog/OsatJap/stat
 
-    bash ~/data/alignment/gene-paralog/proc_all_gene.sh OsatJap paralog
+    bash ~/data/alignment/gene-paralog/proc_all_gene.sh OsatJap ../data/paralog.yml
 
-    bash ~/data/alignment/gene-paralog/proc_sep_gene.sh OsatJap paralog
+    bash ~/data/alignment/gene-paralog/proc_sep_gene.sh OsatJap ../data/paralog.yml
     ```
 
 3. MITE
@@ -444,7 +464,7 @@ EOF
     ```bash
     cd ~/data/alignment/gene-paralog/OsatJap/stat
 
-    bash ~/data/alignment/gene-paralog/proc_all_gene.sh OsatJap mite
+    bash ~/data/alignment/gene-paralog/proc_all_gene.sh OsatJap ../data/mite.yml
 
-    bash ~/data/alignment/gene-paralog/proc_sep_gene.sh OsatJap mite
+    bash ~/data/alignment/gene-paralog/proc_sep_gene.sh OsatJap ../data/mite.yml
     ```
