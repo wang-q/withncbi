@@ -159,7 +159,7 @@ for ftr in gene upstream downstream
 do
     cat stat.sep-${ftr}.${FEATURE_BASE}.csv.tmp
 done \
-    | grep -v "^key"
+    | grep -v "^key" \
     | perl ~/Scripts/withncbi/taxon/merge_csv.pl --concat -f 0 -o stdout \
     >> ${GENOME_NAME}.gene.${FEATURE_BASE}.csv
 
@@ -175,7 +175,7 @@ for ftr in exon CDS intron five_prime_UTR three_prime_UTR
 do
     cat stat.sep-${ftr}.${FEATURE_BASE}.csv.tmp
 done \
-    | grep -v "^key"
+    | grep -v "^key" \
     | perl ~/Scripts/withncbi/taxon/merge_csv.pl --concat -f 0 -o stdout \
     >> ${GENOME_NAME}.trans.${FEATURE_BASE}.csv
 
