@@ -8,14 +8,7 @@
 ## MITE
 
 * http://pmite.hzau.edu.cn/download_mite/
-* Downloaded files in `~/data/alignment/gene-paralog/download_mite/MITE/MITE-SEQ-V2/`.
-
-```bash
-mkdir -p ~/data/alignment/gene-paralog/
-cd ~/data/alignment/gene-paralog/
-perl ~/Scripts/download/list.pl --ncp -u http://pmite.hzau.edu.cn/download_mite/
-perl ~/Scripts/download/download.pl -i download_mite.yml
-```
+* http://pmite.hzau.edu.cn/MITE/MITE-SEQ-V2/
 
 ## Other repeats
 
@@ -23,6 +16,26 @@ Ensembl gff3 files contain correct descriptions for dust and trf, but repeatmask
 is not usable.
 
 So I rerun RepeatMasker on every genomes and get reports from `genome.fa.out`.
+
+### RepeatMasker
+
+Repeat families listed in `genome.fa.tbl`. Families with proportions less than 0.0005 were dropped.
+
+RepeatMasker runned with `-species Viridiplantae`.
+
+* DNA: DNA transposons
+* LINE
+* LTR
+* Low_complexity
+* RC: Rolling-circles
+* SINE
+* Satellite
+* Simple_repeat
+
+### Ensembl gff3 repeats
+
+* dust: Low-complexity regions
+* trf: Tandem repeats
 
 ## Scripts
 
@@ -38,8 +51,8 @@ cat <<'EOF' > ~/data/alignment/gene-paralog/proc_prepare.sh
 USAGE="Usage: $0 GENOME_NAME"
 
 if [ "$#" -lt 1 ]; then
-	echo "$USAGE"
-	exit 1
+    echo "$USAGE"
+    exit 1
 fi
 
 echo "====> parameters"
@@ -87,8 +100,8 @@ cat <<'EOF' > ~/data/alignment/gene-paralog/proc_all_gene.sh
 USAGE="Usage: $0 GENOME_NAME FEATURE_FILE"
 
 if [ "$#" -lt 2 ]; then
-	echo "$USAGE"
-	exit 1
+    echo "$USAGE"
+    exit 1
 fi
 
 echo "====> parameters"
@@ -118,8 +131,8 @@ cat <<'EOF' > ~/data/alignment/gene-paralog/proc_sep_gene.sh
 USAGE="Usage: $0 GENOME_NAME FEATURE_FILE"
 
 if [ "$#" -lt 2 ]; then
-	echo "$USAGE"
-	exit 1
+    echo "$USAGE"
+    exit 1
 fi
 
 echo "====> parameters"
@@ -197,8 +210,8 @@ cat <<'EOF' > ~/data/alignment/gene-paralog/proc_mite.sh
 USAGE="Usage: $0 GENOME_NAME"
 
 if [ "$#" -lt 1 ]; then
-	echo "$USAGE"
-	exit 1
+    echo "$USAGE"
+    exit 1
 fi
 
 echo "====> parameters"
@@ -221,7 +234,7 @@ faops size mite.fa \
             printf qq{Length\t#Seqs\n};
             %distrib = $stat->frequency_distribution(10);
             for (sort {$a <=> $b} keys %distrib) {
-            	printf qq{%.1f\t%d\n}, $_, $distrib{$_};
+                printf qq{%.1f\t%d\n}, $_, $distrib{$_};
             }
             printf qq{\n};
         }' \
@@ -275,8 +288,8 @@ cat <<'EOF' > ~/data/alignment/gene-paralog/proc_repeat.sh
 USAGE="Usage: $0 GENOME_NAME"
 
 if [ "$#" -lt 1 ]; then
-	echo "$USAGE"
-	exit 1
+    echo "$USAGE"
+    exit 1
 fi
 
 echo "====> parameters"
@@ -349,7 +362,7 @@ EOF
     ```bash
     GENOME_NAME=Atha
 
-	echo "====> create directories"
+    echo "====> create directories"
     mkdir -p ~/data/alignment/gene-paralog/${GENOME_NAME}/data
     mkdir -p ~/data/alignment/gene-paralog/${GENOME_NAME}/feature
     mkdir -p ~/data/alignment/gene-paralog/${GENOME_NAME}/repeat
@@ -417,54 +430,110 @@ EOF
         "
     ```
 
-## OsatJap
+## Plants aligned with full chromosomes
 
 1. Prepare
 
     ```bash
-    GENOME_NAME=OsatJap
+    for GENOME_NAME in OsatJap Alyr Sbic
+    do
+        echo "====> create directories"
+        mkdir -p ~/data/alignment/gene-paralog/${GENOME_NAME}/data
+        mkdir -p ~/data/alignment/gene-paralog/${GENOME_NAME}/feature
+        mkdir -p ~/data/alignment/gene-paralog/${GENOME_NAME}/stat
 
-	echo "====> create directories"
-    mkdir -p ~/data/alignment/gene-paralog/${GENOME_NAME}/data
-    mkdir -p ~/data/alignment/gene-paralog/${GENOME_NAME}/feature
-    mkdir -p ~/data/alignment/gene-paralog/${GENOME_NAME}/stat
+        echo "====> copy or download needed files here"
+        cd ~/data/alignment/gene-paralog/${GENOME_NAME}/data
+        cp ~/data/alignment/self/plants/Genomes/${GENOME_NAME}/chr.sizes chr.sizes
+        cp ~/data/alignment/self/plants/Results/${GENOME_NAME}/${GENOME_NAME}.chr.runlist.yml paralog.yml
+    done
 
-    echo "====> copy or download needed files here"
-    cd ~/data/alignment/gene-paralog/${GENOME_NAME}/data
-    cp ~/data/ensembl82/gff3/oryza_sativa/Oryza_sativa.IRGSP-1.0.29.gff3.gz gff3.gz
-    cp ~/data/alignment/self/rice/Genomes/OsatJap/chr.sizes chr.sizes
-    cp ~/data/alignment/self/rice/Results/OsatJap/OsatJap.chr.runlist.yml paralog.yml
-    wget http://pmite.hzau.edu.cn/MITE/MITE-SEQ-V2/26_nipponbare_mite_seq.fa -O mite.fa
+    # http://stackoverflow.com/questions/1494178/how-to-define-hash-tables-in-bash
+    # OSX has bash 3. So no easy hashmaps. Do it manually.
+    cd ~/data/alignment/gene-paralog
+
+    # OsatJap
+    cp ~/data/ensembl82/gff3/oryza_sativa/Oryza_sativa.IRGSP-1.0.29.gff3.gz \
+        ~/data/alignment/gene-paralog/OsatJap/data/gff3.gz
+    wget http://pmite.hzau.edu.cn/MITE/MITE-SEQ-V2/26_nipponbare_mite_seq.fa \
+        -O ~/data/alignment/gene-paralog/OsatJap/data/mite.fa
+
+    # Alyr
+    cp ~/data/ensembl82/gff3/arabidopsis_lyrata/Arabidopsis_lyrata.v.1.0.29.gff3.gz \
+        ~/data/alignment/gene-paralog/Alyr/data/gff3.gz
+    wget http://pmite.hzau.edu.cn/MITE/MITE-SEQ-V2/02_lyrata_mite_seq.fa \
+        -O ~/data/alignment/gene-paralog/Alyr/data/mite.fa
+
+    # Sbic
+    # Ensemblgenomes 82 didn't provide a full gff3
+    gt merge -gzip -force \
+        -o ~/data/alignment/gene-paralog/Sbic/data/gff3.gz \
+        ~/data/ensembl82/gff3/sorghum_bicolor/Sorghum_bicolor.Sorbi1.29.chromosome.*.gff3.gz
+    wget http://pmite.hzau.edu.cn/MITE/MITE-SEQ-V2/28_sorghum_mite_seq.fa \
+        -O ~/data/alignment/gene-paralog/Sbic/data/mite.fa
+
     ```
 
     ```bash
-    cd ~/data/alignment/gene-paralog/OsatJap/data
-
-    bash ~/data/alignment/gene-paralog/proc_prepare.sh OsatJap
+    for GENOME_NAME in OsatJap Alyr Sbic
+    do
+        cd ~/data/alignment/gene-paralog/${GENOME_NAME}/data
+        bash ~/data/alignment/gene-paralog/proc_prepare.sh ${GENOME_NAME}
+    done
     ```
 
 2. Gene-paralog stats
 
     ```bash
-    cd ~/data/alignment/gene-paralog/OsatJap/stat
-
-    bash ~/data/alignment/gene-paralog/proc_all_gene.sh OsatJap ../data/paralog.yml
-
-    bash ~/data/alignment/gene-paralog/proc_sep_gene.sh OsatJap ../data/paralog.yml
+    for GENOME_NAME in OsatJap Alyr Sbic
+    do
+        cd ~/data/alignment/gene-paralog/${GENOME_NAME}/stat
+        bash ~/data/alignment/gene-paralog/proc_all_gene.sh ${GENOME_NAME} ../data/paralog.yml
+        bash ~/data/alignment/gene-paralog/proc_sep_gene.sh ${GENOME_NAME} ../data/paralog.yml
+    done
     ```
 
 3. MITE
 
     ```bash
-    cd ~/data/alignment/gene-paralog/OsatJap/data
-
-    bash ~/data/alignment/gene-paralog/proc_mite.sh OsatJap
+    for GENOME_NAME in OsatJap Alyr Sbic
+    do
+        cd ~/data/alignment/gene-paralog/${GENOME_NAME}/data
+        bash ~/data/alignment/gene-paralog/proc_mite.sh ${GENOME_NAME}
+    done
     ```
 
     ```bash
-    cd ~/data/alignment/gene-paralog/OsatJap/stat
+    for GENOME_NAME in OsatJap Alyr Sbic
+    do
+        cd ~/data/alignment/gene-paralog/${GENOME_NAME}/stat
+        bash ~/data/alignment/gene-paralog/proc_all_gene.sh ${GENOME_NAME} ../data/mite.yml
+        bash ~/data/alignment/gene-paralog/proc_sep_gene.sh ${GENOME_NAME} ../data/mite.yml
+    done
+    ```
 
-    bash ~/data/alignment/gene-paralog/proc_all_gene.sh OsatJap ../data/mite.yml
+4. Other Repeats
 
-    bash ~/data/alignment/gene-paralog/proc_sep_gene.sh OsatJap ../data/mite.yml
+    ```bash
+    for GENOME_NAME in OsatJap Alyr Sbic
+    do
+        cd ~/data/alignment/gene-paralog/${GENOME_NAME}/repeat
+        bash ~/data/alignment/gene-paralog/proc_repeat.sh ${GENOME_NAME}
+    done
+    ```
+
+    ```bash
+    for GENOME_NAME in OsatJap Alyr Sbic
+    do
+        cd ~/data/alignment/gene-paralog/${GENOME_NAME}/stat
+	    cat ../repeat/repeat.family.txt \
+	        | parallel -j 8 --keep-order "
+	            bash ~/data/alignment/gene-paralog/proc_all_gene.sh ${GENOME_NAME} ../repeat/{}.yml
+	        "
+
+	    cat ../repeat/repeat.family.txt \
+	        | parallel -j 1 --keep-order "
+	            bash ~/data/alignment/gene-paralog/proc_sep_gene.sh ${GENOME_NAME} ../repeat/{}.yml
+	        "
+    done
     ```

@@ -360,7 +360,7 @@ time bash 4_proc_cmd.sh
 bash 5_circos_cmd.sh
 ```
 
-### Partitioned sequences
+### Partitioned chromosomes
 
 `Bole` contains exact matched pieces with copy number large than one thousand.
 
