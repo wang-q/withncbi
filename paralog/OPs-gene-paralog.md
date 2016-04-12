@@ -53,6 +53,8 @@ Same for each species.
 
 ### `proc_prepare.sh`
 
+Genome, RepeatMasker and gff3.
+
 ```bash
 
 cat <<'EOF' > ~/data/alignment/gene-paralog/proc_prepare.sh
@@ -97,6 +99,8 @@ EOF
 ```
 
 ### `proc_repeat.sh`
+
+Repeats from RepeatMasker and gff3.
 
 ```bash
 
@@ -178,6 +182,8 @@ EOF
 ```
 
 ### `proc_mite.sh`
+
+MITE.
 
 ```bash
 
@@ -395,7 +401,7 @@ do
     echo ${ftr}
 done \
     | parallel -j 8 --keep-order "
-        echo \"====> {} ${FEATURE_BASE}\";
+        echo \"==> {} ${FEATURE_BASE}\";
         sleep 1;
         runlist stat2 ../feature/sep-{}.yml ${FEATURE_FILE} -s ../data/chr.sizes \
             --op intersect --mk --all \
@@ -461,8 +467,8 @@ EOF
 
     echo "====> copy or download needed files here"
     cd ~/data/alignment/gene-paralog/${GENOME_NAME}/data
-    cp ~/data/alignment/self/arabidopsis/Genomes/Atha/chr.sizes chr.sizes
-    cp ~/data/alignment/self/arabidopsis/Results/Atha/Atha.chr.runlist.yml paralog.yml
+    cp ~/data/alignment/self/plants/Genomes/${GENOME_NAME}/chr.sizes chr.sizes
+    cp ~/data/alignment/self/plants/Results/${GENOME_NAME}/${GENOME_NAME}.chr.runlist.yml paralog.yml
 
     cp ~/data/ensembl82/gff3/arabidopsis_thaliana/Arabidopsis_thaliana.TAIR10.29.gff3.gz gff3.gz
     wget http://pmite.hzau.edu.cn/MITE/MITE-SEQ-V2/03_arabidopsis_mite_seq.fa -O mite.fa
