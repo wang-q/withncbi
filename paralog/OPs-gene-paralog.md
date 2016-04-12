@@ -117,7 +117,7 @@ EOF
 
 ### `proc_repeat.sh`
 
-Repeats from RepeatMasker and gff3.
+Repeats from RepeatMasker and gff3. Create `repeat.family.txt`.
 
 ```bash
 
@@ -200,7 +200,7 @@ EOF
 
 ### `proc_mite.sh`
 
-MITE.
+MITE. Append to `repeat.family.txt`.
 
 ```bash
 
@@ -312,7 +312,6 @@ runlist compare --op intersect paralog_adjacent.4.yml genome.yml -o paralog_adja
 mv paralog_adjacent.5.yml paralog_adjacent.yml
 rm paralog_adjacent.*.yml
 
-
 echo "==> paralog_gene"
 mkdir -p ~/data/alignment/gene-paralog/${GENOME_NAME}/yml/gene
 runlist split ../feature/all-gene.yml -o ~/data/alignment/gene-paralog/${GENOME_NAME}/yml/gene
@@ -325,7 +324,9 @@ rm paralog_gene.*.yml
 for ftr in paralog paralog_adjacent paralog_gene
 do
     echo "====> ${ftr} coverages"
-    runlist stat -s ../data/chr.sizes ${ftr}.yml -o ../stat/${ftr}.yml.csv
+    sleep 1;
+    runlist stat -s ../data/chr.sizes ../yml/${ftr}.yml -o ../stat/${ftr}.yml.csv
+
     echo "====> ${ftr} stats"
     cd ~/data/alignment/gene-paralog/${GENOME_NAME}/stat
     cat ../yml/repeat.family.txt \
