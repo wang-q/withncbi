@@ -75,15 +75,25 @@ GENOME_NAME=$1
 cd ~/data/alignment/gene-paralog/${GENOME_NAME}/data
 
 echo "====> get genome"
-find ~/data/alignment/Ensembl/${GENOME_NAME} -type f -name "*.fa" \
-    | sort | xargs cat \
-    | perl -nl -e '/^>/ or $_ = uc; print' \
-    > genome.fa
+if [ -f ~/data/alignment/gene-paralog/${GENOME_NAME}/data/genome.fa ];
+then
+    echo "genome.fa exists"
+else
+    find ~/data/alignment/Ensembl/${GENOME_NAME} -type f -name "*.fa" \
+        | sort | xargs cat \
+        | perl -nl -e '/^>/ or $_ = uc; print' \
+        > genome.fa
+fi
 
 echo "====> run RepeatMasker"
-RepeatMasker genome.fa -species Viridiplantae -xsmall --parallel 8
-rm genome.fa.{cat.gz,masked}
-rm -fr RM_*
+if [ -f ~/data/alignment/gene-paralog/${GENOME_NAME}/data/genome.fa.out ];
+then
+    echo "genome.fa.out exists"
+else
+    RepeatMasker genome.fa -species Viridiplantae -xsmall --parallel 8
+    rm genome.fa.{cat.gz,masked}
+    rm -fr RM_*
+fi
 
 echo "==> Convert gff3 to runlists"
 cd ~/data/alignment/gene-paralog/${GENOME_NAME}/feature
@@ -571,37 +581,36 @@ EOF
     for GENOME_NAME in OsatJap Alyr Sbic
     do
         cd ~/data/alignment/gene-paralog/${GENOME_NAME}/data
+
         bash ~/data/alignment/gene-paralog/proc_prepare.sh ${GENOME_NAME}
-    done
-    ```
 
-2. Gene-paralog stats
-
-    ```bash
-    for GENOME_NAME in OsatJap Alyr Sbic
-    do
-        cd ~/data/alignment/gene-paralog/${GENOME_NAME}/stat
-        bash ~/data/alignment/gene-paralog/proc_all_gene.sh ${GENOME_NAME} ../data/paralog.yml
-        bash ~/data/alignment/gene-paralog/proc_sep_gene.sh ${GENOME_NAME} ../data/paralog.yml
-    done
-    ```
-
-3. MITE
-
-    ```bash
-    for GENOME_NAME in OsatJap Alyr Sbic
-    do
-        cd ~/data/alignment/gene-paralog/${GENOME_NAME}/data
+        bash ~/data/alignment/gene-paralog/proc_repeat.sh ${GENOME_NAME}
         bash ~/data/alignment/gene-paralog/proc_mite.sh ${GENOME_NAME}
     done
     ```
 
+2. Paralog-repeats stats
+
     ```bash
     for GENOME_NAME in OsatJap Alyr Sbic
     do
         cd ~/data/alignment/gene-paralog/${GENOME_NAME}/stat
-        bash ~/data/alignment/gene-paralog/proc_all_gene.sh ${GENOME_NAME} ../data/mite.yml
-        bash ~/data/alignment/gene-paralog/proc_sep_gene.sh ${GENOME_NAME} ../data/mite.yml
+        bash ~/data/alignment/gene-paralog/proc_paralog.sh ${GENOME_NAME}
+    done
+    ```
+
+3. Gene-paralog stats
+
+    ```bash
+    for GENOME_NAME in OsatJap Alyr Sbic
+    do
+        cd ~/data/alignment/gene-paralog/${GENOME_NAME}/stat
+
+        bash ~/data/alignment/gene-paralog/proc_all_gene.sh ${GENOME_NAME} ../data/paralog.yml
+        bash ~/data/alignment/gene-paralog/proc_all_gene.sh ${GENOME_NAME} ../data/paralog_adjacent.yml
+
+        bash ~/data/alignment/gene-paralog/proc_sep_gene.sh ${GENOME_NAME} ../data/paralog.yml
+        bash ~/data/alignment/gene-paralog/proc_sep_gene.sh ${GENOME_NAME} ../data/paralog_adjacent.yml
     done
     ```
 
@@ -610,23 +619,15 @@ EOF
     ```bash
     for GENOME_NAME in OsatJap Alyr Sbic
     do
-        cd ~/data/alignment/gene-paralog/${GENOME_NAME}/repeat
-        bash ~/data/alignment/gene-paralog/proc_repeat.sh ${GENOME_NAME}
-    done
-    ```
-
-    ```bash
-    for GENOME_NAME in OsatJap Alyr Sbic
-    do
         cd ~/data/alignment/gene-paralog/${GENOME_NAME}/stat
-        cat ../repeat/repeat.family.txt \
+        cat ../yml/repeat.family.txt \
             | parallel -j 8 --keep-order "
-                bash ~/data/alignment/gene-paralog/proc_all_gene.sh ${GENOME_NAME} ../repeat/{}.yml
+                bash ~/data/alignment/gene-paralog/proc_all_gene.sh ${GENOME_NAME} ../yml/{}.yml
             "
 
-        cat ../repeat/repeat.family.txt \
+        cat ../yml/repeat.family.txt \
             | parallel -j 1 --keep-order "
-                bash ~/data/alignment/gene-paralog/proc_sep_gene.sh ${GENOME_NAME} ../repeat/{}.yml
+                bash ~/data/alignment/gene-paralog/proc_sep_gene.sh ${GENOME_NAME} ../yml/{}.yml
             "
     done
     ```
@@ -717,6 +718,10 @@ EOF
     for GENOME_NAME in Mtru Gmax Brap Vvin Slyc Stub Sita Bdis
     do
         cd ~/data/alignment/gene-paralog/${GENOME_NAME}/data
+
         bash ~/data/alignment/gene-paralog/proc_prepare.sh ${GENOME_NAME}
+
+        bash ~/data/alignment/gene-paralog/proc_repeat.sh ${GENOME_NAME}
+        bash ~/data/alignment/gene-paralog/proc_mite.sh ${GENOME_NAME}
     done
     ```
