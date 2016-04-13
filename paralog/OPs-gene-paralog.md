@@ -39,7 +39,7 @@ So I rerun RepeatMasker on every genomes and get reports from `genome.fa.out`.
 
     RepeatMasker runned with `-species Viridiplantae`.
 
-    Repeat families listed in `genome.fa.tbl`. Families with proportions less than 0.0005 were dropped.
+    Repeat families listed in `genome.fa.tbl`. Families with proportions less than **0.0005** were dropped.
 
     * DNA: DNA transposons
     * LINE
@@ -99,7 +99,7 @@ then
     echo "genome.fa.out exists"
 else
     RepeatMasker genome.fa -species Viridiplantae -xsmall --parallel 8
-    rm genome.fa.{cat.gz,masked}
+    rm genome.fa.cat.gz  genome.fa.masked
     rm -fr RM_*
 fi
 
@@ -301,7 +301,7 @@ echo "    " $@
 GENOME_NAME=$1
 
 cd ~/data/alignment/gene-paralog/${GENOME_NAME}/yml
-cp ../data/paralog.yml .
+cp ../data/paralog.yml ../yml
 
 echo "==> paralog_adjacent"
 runlist span    --op pad    -n 2000 paralog.yml               -o paralog_adjacent.1.yml
@@ -610,11 +610,11 @@ EOF
     do
         cd ~/data/alignment/gene-paralog/${GENOME_NAME}/stat
 
-        bash ~/data/alignment/gene-paralog/proc_all_gene.sh ${GENOME_NAME} ../data/paralog.yml
-        bash ~/data/alignment/gene-paralog/proc_all_gene.sh ${GENOME_NAME} ../data/paralog_adjacent.yml
+        bash ~/data/alignment/gene-paralog/proc_all_gene.sh ${GENOME_NAME} ../yml/paralog.yml
+        bash ~/data/alignment/gene-paralog/proc_all_gene.sh ${GENOME_NAME} ../yml/paralog_adjacent.yml
 
-        bash ~/data/alignment/gene-paralog/proc_sep_gene.sh ${GENOME_NAME} ../data/paralog.yml
-        bash ~/data/alignment/gene-paralog/proc_sep_gene.sh ${GENOME_NAME} ../data/paralog_adjacent.yml
+        bash ~/data/alignment/gene-paralog/proc_sep_gene.sh ${GENOME_NAME} ../yml/paralog.yml
+        bash ~/data/alignment/gene-paralog/proc_sep_gene.sh ${GENOME_NAME} ../yml/paralog_adjacent.yml
     done
     ```
 
