@@ -398,13 +398,13 @@ perl ~/Scripts/withncbi/taxon/strain_bz_self.pl \
     -q Vvin \
     -q Slyc \
     -q Stub \
-    -q Sita \
     -q OsatJap \
     -q Bdis \
     -t Atha \
     --parted
 
     # -q Macu \
+    # -q Sita \
 
 cd ~/data/alignment/self/plants_parted
 
