@@ -3,11 +3,12 @@
 ## Sources
 
 * Gene annotations from [gff3 files](https://github.com/wang-q/withncbi/blob/master/ensembl/ensembl.md#gff3)
-* Paralogs from [self-aligning](https://github.com/wang-q/withncbi/blob/master/pop/OPs-selfalign.md#arabidopsis)
+* Paralogs from [self-aligning](https://github.com/wang-q/withncbi/blob/master/paralog/OPs-selfalign.md#arabidopsis)
 
 ## TODO
 
 * Remove full transposons (Retro, DNA and RC transposons) from `paralog.yml`.
+* Subfamilies.
 
 ## Stats
 
@@ -544,7 +545,9 @@ EOF
         echo "====> create directories"
         mkdir -p ~/data/alignment/gene-paralog/${GENOME_NAME}/data
         mkdir -p ~/data/alignment/gene-paralog/${GENOME_NAME}/feature
+        mkdir -p ~/data/alignment/gene-paralog/${GENOME_NAME}/repeat
         mkdir -p ~/data/alignment/gene-paralog/${GENOME_NAME}/stat
+        mkdir -p ~/data/alignment/gene-paralog/${GENOME_NAME}/yml
 
         echo "====> copy or download needed files here"
         cd ~/data/alignment/gene-paralog/${GENOME_NAME}/data
@@ -654,7 +657,9 @@ EOF
         echo "====> create directories"
         mkdir -p ~/data/alignment/gene-paralog/${GENOME_NAME}/data
         mkdir -p ~/data/alignment/gene-paralog/${GENOME_NAME}/feature
+        mkdir -p ~/data/alignment/gene-paralog/${GENOME_NAME}/repeat
         mkdir -p ~/data/alignment/gene-paralog/${GENOME_NAME}/stat
+        mkdir -p ~/data/alignment/gene-paralog/${GENOME_NAME}/yml
 
         echo "====> copy or download needed files here"
         cd ~/data/alignment/gene-paralog/${GENOME_NAME}/data
@@ -662,8 +667,6 @@ EOF
         cp ~/data/alignment/self/plants_parted/Results/${GENOME_NAME}/${GENOME_NAME}.chr.runlist.yml paralog.yml
     done
 
-    # http://stackoverflow.com/questions/1494178/how-to-define-hash-tables-in-bash
-    # OSX has bash 3. So no easy hashmaps. Do it manually.
     cd ~/data/alignment/gene-paralog
 
     # Mtru
