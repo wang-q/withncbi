@@ -531,7 +531,7 @@ EOF
         "
     ```
 
-## Plants aligned with full chromosomes
+## Plants aligned with [full chromosomes](https://github.com/wang-q/withncbi/blob/master/paralog/OPs-selfalign.md#full-chromosomes)
 
 * OsatJap
 * Alyr
@@ -636,7 +636,7 @@ EOF
     done
     ```
 
-## Plants aligned with partitioned chromosomes
+## Plants aligned with [partitioned chromosomes](https://github.com/wang-q/withncbi/blob/master/paralog/OPs-selfalign.md#partitioned-chromosomes)
 
 * Mtru
 * Gmax
@@ -644,7 +644,6 @@ EOF
 * Vvin
 * Slyc
 * Stub
-* Sita
 * Bdis
 
 * Bole (no mite)
@@ -705,11 +704,11 @@ EOF
     wget http://pmite.hzau.edu.cn/MITE/MITE-SEQ-V2/38_potato_mite_seq.fa \
         -O ~/data/alignment/gene-paralog/Stub/data/mite.fa
 
-    # Sita
-    cp ~/data/ensembl82/gff3/setaria_italica/Setaria_italica.JGIv2.0.29.gff3.gz \
-        ~/data/alignment/gene-paralog/Sita/data/gff3.gz
-    wget http://pmite.hzau.edu.cn/MITE/MITE-SEQ-V2/27_foxtail_mite_seq.fa \
-        -O ~/data/alignment/gene-paralog/Sita/data/mite.fa
+    # # Sita
+    # cp ~/data/ensembl82/gff3/setaria_italica/Setaria_italica.JGIv2.0.29.gff3.gz \
+    #     ~/data/alignment/gene-paralog/Sita/data/gff3.gz
+    # wget http://pmite.hzau.edu.cn/MITE/MITE-SEQ-V2/27_foxtail_mite_seq.fa \
+    #     -O ~/data/alignment/gene-paralog/Sita/data/mite.fa
 
     # Bdis
     cp ~/data/ensembl82/gff3/brachypodium_distachyon/Brachypodium_distachyon.v1.0.29.gff3.gz \

@@ -389,7 +389,7 @@ perl ~/Scripts/withncbi/taxon/strain_bz_self.pl \
     --use_name \
     --norm \
     --name plants_parted \
-    --parallel 8 \
+    --parallel 12 \
     -q Mtru \
     -q Gmax \
     -q Bole \
@@ -403,6 +403,7 @@ perl ~/Scripts/withncbi/taxon/strain_bz_self.pl \
     -t Atha \
     --parted
 
+    # cost days
     # -q Macu \
     # -q Sita \
 
