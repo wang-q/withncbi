@@ -161,6 +161,7 @@ cat ../data/genome.fa.out \
     | sort | uniq -c \
     > rmout.family.txt
 cp ../data/genome.fa.out ../repeat
+cp ../data/genome.fa.tbl ../repeat
 
 echo "==> rmout results"
 perl ~/Scripts/withncbi/paralog/rmout2runlist.pl \
@@ -465,6 +466,8 @@ EOF
 ```
 
 ## Atha
+
+Full processing time is about 9 hours.
 
 1. [Data](https://github.com/wang-q/withncbi/blob/master/paralog/OPs-selfalign.md#arabidopsis)
 
