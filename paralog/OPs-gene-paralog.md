@@ -1,9 +1,9 @@
-# Gene with self-aligning information
+# Gene-paralog-repeats
 
 ## Sources
 
 * Gene annotations from [gff3 files](https://github.com/wang-q/withncbi/blob/master/ensembl/ensembl.md#gff3)
-* Paralogs from [self-aligning](https://github.com/wang-q/withncbi/blob/master/paralog/OPs-selfalign.md#arabidopsis)
+* Paralogs from [self-aligning](https://github.com/wang-q/withncbi/blob/master/paralog/OPs-selfalign.md)
 
 ## TODO
 
@@ -160,6 +160,7 @@ cat ../data/genome.fa.out \
     | perl -nla -e '/^\s*\d+/ or next; print $F[10]' \
     | sort | uniq -c \
     > rmout.family.txt
+cp ../data/genome.fa.out ../repeat
 
 echo "==> rmout results"
 perl ~/Scripts/withncbi/paralog/rmout2runlist.pl \
@@ -465,7 +466,9 @@ EOF
 
 ## Atha
 
-1. Prepare
+1. [Data](https://github.com/wang-q/withncbi/blob/master/paralog/OPs-selfalign.md#arabidopsis)
+
+2. Prepare
 
     ```bash
     GENOME_NAME=Atha
@@ -495,7 +498,7 @@ EOF
     bash ~/data/alignment/gene-paralog/proc_mite.sh Atha
     ```
 
-2. Paralog-repeats stats
+3. Paralog-repeats stats
 
     ```bash
     cd ~/data/alignment/gene-paralog/Atha/stat
@@ -503,7 +506,7 @@ EOF
     bash ~/data/alignment/gene-paralog/proc_paralog.sh Atha
     ```
 
-3. Gene-paralog stats
+4. Gene-paralog stats
 
     ```bash
     cd ~/data/alignment/gene-paralog/Atha/stat
@@ -515,7 +518,7 @@ EOF
     bash ~/data/alignment/gene-paralog/proc_sep_gene.sh Atha ../yml/paralog_adjacent.yml
     ```
 
-4. Gene-repeats stats
+5. Gene-repeats stats
 
     ```bash
     cd ~/data/alignment/gene-paralog/Atha/stat
@@ -531,13 +534,22 @@ EOF
         "
     ```
 
-## Plants aligned with [full chromosomes](https://github.com/wang-q/withncbi/blob/master/paralog/OPs-selfalign.md#full-chromosomes)
+6. Pack up
 
-* OsatJap
-* Alyr
-* Sbic
+    ```bash
+    cd ~/data/alignment/gene-paralog
+    find Atha -type f -not -path "*/data/*" -print | zip Atha.zip -9 -@
+    ```
 
-1. Prepare
+## Plants aligned with full chromosomes
+
+1. [Data](https://github.com/wang-q/withncbi/blob/master/paralog/OPs-selfalign.md#full-chromosomes)
+
+    * OsatJap
+    * Alyr
+    * Sbic
+
+2. Prepare
 
     ```bash
     for GENOME_NAME in OsatJap Alyr Sbic
@@ -593,7 +605,7 @@ EOF
     done
     ```
 
-2. Paralog-repeats stats
+3. Paralog-repeats stats
 
     ```bash
     for GENOME_NAME in OsatJap Alyr Sbic
@@ -603,7 +615,7 @@ EOF
     done
     ```
 
-3. Gene-paralog stats
+4. Gene-paralog stats
 
     ```bash
     for GENOME_NAME in OsatJap Alyr Sbic
@@ -618,7 +630,7 @@ EOF
     done
     ```
 
-4. Other Repeats
+5. Other Repeats
 
     ```bash
     for GENOME_NAME in OsatJap Alyr Sbic
@@ -636,19 +648,31 @@ EOF
     done
     ```
 
-## Plants aligned with [partitioned chromosomes](https://github.com/wang-q/withncbi/blob/master/paralog/OPs-selfalign.md#partitioned-chromosomes)
+6. Pack up
 
-* Mtru
-* Gmax
-* Brap
-* Vvin
-* Slyc
-* Stub
-* Bdis
+    ```bash
+    for GENOME_NAME in OsatJap Alyr Sbic
+    do
+        cd ~/data/alignment/gene-paralog
+        find ${GENOME_NAME} -type f -not -path "*/data/*" -print | zip ${GENOME_NAME}.zip -9 -@
+    done
+    ```
 
-* Bole (no mite)
+## Plants aligned with partitioned chromosomes
 
-1. Prepare
+1. [Data](https://github.com/wang-q/withncbi/blob/master/paralog/OPs-selfalign.md#partitioned-chromosomes)
+
+    * Mtru
+    * Gmax
+    * Brap
+    * Vvin
+    * Slyc
+    * Stub
+    * Bdis
+
+    * Bole (no mite)
+
+2. Prepare
 
     ```bash
     for GENOME_NAME in Mtru Gmax Brap Vvin Slyc Stub Sita Bdis
