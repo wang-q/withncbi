@@ -418,10 +418,7 @@ cd ~/data/alignment/self/plants_parted
 # perl ~/Scripts/withncbi/ensembl/chr_kary.pl -s mysql-eg-publicsql.ebi.ac.uk --port 4157 -u anonymous -p '' -e oryza_sativa_core_29_82_7
 
 bash 1_real_chr.sh
-time bash 3_self_cmd.sh
-time bash 4_proc_cmd.sh
-# real    611m4.351s
-# user    1484m10.343s
-# sys     37m34.269s
+bash 3_self_cmd.sh
+bash 4_proc_cmd.sh
 bash 5_circos_cmd.sh
 ```

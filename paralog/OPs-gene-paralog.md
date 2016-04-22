@@ -678,7 +678,7 @@ Full processing time is about 9 hours.
 2. Prepare
 
     ```bash
-    for GENOME_NAME in Mtru Gmax Brap Vvin Slyc Stub Sita Bdis
+    for GENOME_NAME in Mtru Gmax Brap Vvin Slyc Stub Bdis
     do
         echo "====> create directories"
         mkdir -p ~/data/alignment/gene-paralog/${GENOME_NAME}/data
