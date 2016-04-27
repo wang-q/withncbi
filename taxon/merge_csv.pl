@@ -7,9 +7,7 @@ use Getopt::Long qw(HelpMessage);
 use FindBin;
 use YAML qw(Dump Load DumpFile LoadFile);
 
-use List::MoreUtils qw(firstidx);
 use Path::Tiny;
-use Set::Scalar;
 
 #----------------------------------------------------------#
 # GetOpt section
@@ -47,33 +45,32 @@ if ( !scalar @fields ) {
 #----------------------------------------------------------#
 # apply
 #----------------------------------------------------------#
-my ( $count_all, $count_op ) = ( 0, 0 );
 
-my $id_set = Set::Scalar->new;
-my ( @ids, @lines );
+my $index_of = {};    # index of ids in @lines
+my @lines;
+my ( $count_all, $index ) = ( 0, 0 );
 
 while ( my $line = <> ) {
     chomp $line;
     next unless $line;
     $count_all++;
     my $id = join( "_", ( split ",", $line )[@fields] );
-    if ( $id_set->has($id) ) {
-        $count_op++;
+    if ( exists $index_of->{$id} ) {
         if ($concat) {
-            my $index = firstidx { $_ eq $id } @ids;
-            my $ori_line = $lines[$index];
+            my $ori_index = $index_of->{$id};
+            my $ori_line  = $lines[$ori_index];
 
             my @fs = split ",", $line;
             for my $f_idx ( reverse @fields ) {
                 splice @fs, $f_idx, 1;
             }
-            $lines[$index] = join ",", $ori_line, @fs;
+            $lines[$ori_index] = join ",", $ori_line, @fs;
         }
     }
     else {
-        $id_set->insert($id);
-        push @ids,   $id;
+        $index_of->{$id} = $index;
         push @lines, $line;
+        $index++;
     }
 }
 
@@ -108,8 +105,7 @@ for (@lines) {
 }
 close $out_fh;
 
-printf STDERR "Total lines [%d]; Result lines [%d]. ", $count_all, scalar @lines;
-printf STDERR "%s [%d] lines.\n", $concat ? "Concat" : "Merge", $count_op;
+printf STDERR "Total lines [%d]; Result lines [%d].\n", $count_all, scalar @lines;
 
 exit;
 
