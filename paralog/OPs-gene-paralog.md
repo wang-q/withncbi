@@ -262,7 +262,7 @@ cat mite.replace.tsv \
 
 echo "==> mite covers"
 wc -l mite.position.txt >> mite_stat.txt
-runlist covers mite.position.txt -o mite.yml
+runlist cover mite.position.txt -o mite.yml
 
 runlist span --op excise -n 10 mite.yml   -o mite.1.yml # remove small spans
 runlist span --op fill   -n 10 mite.1.yml -o mite.2.yml # fill small holes
@@ -465,6 +465,86 @@ EOF
 
 ```
 
+### `proc_sep_gene_jrunlist.sh`
+
+```bash
+
+cat <<'EOF' > ~/data/alignment/gene-paralog/proc_sep_gene_jrunlist.sh
+#!/bin/bash
+
+USAGE="Usage: $0 GENOME_NAME FEATURE_FILE"
+
+if [ "$#" -lt 2 ]; then
+    echo "$USAGE"
+    exit 1
+fi
+
+echo "====> parameters"
+echo "    " $@
+
+GENOME_NAME=$1
+FEATURE_FILE=$2
+FEATURE_BASE=`basename "${FEATURE_FILE%.*}"`
+
+cd ~/data/alignment/gene-paralog/${GENOME_NAME}/stat
+
+echo "====> intersect"
+for ftr in gene upstream downstream exon CDS intron five_prime_UTR three_prime_UTR
+do
+    echo ${ftr}
+done \
+    | parallel -j 8 --keep-order "
+        echo \"==> {} ${FEATURE_BASE}\";
+        sleep 1;
+        java -jar ~/share/jrunlist.jar statop \
+            ../data/chr.sizes ../feature/sep-{}.yml ${FEATURE_FILE}  \
+            --op intersect --all \
+            -o stat.sep-{}.${FEATURE_BASE}.csv;
+        cat stat.sep-{}.${FEATURE_BASE}.csv \
+            | cut -d ',' -f 1,3,5 \
+            > stat.sep-{}.${FEATURE_BASE}.csv.tmp;
+    "
+
+echo "====> concat gene"
+printf "gene_id," > ${GENOME_NAME}.gene.${FEATURE_BASE}.csv
+for ftr in gene upstream downstream
+do
+    printf "${ftr}_length,${ftr}_${FEATURE_BASE},"
+done >> ${GENOME_NAME}.gene.${FEATURE_BASE}.csv
+echo >> ${GENOME_NAME}.gene.${FEATURE_BASE}.csv
+
+for ftr in gene upstream downstream
+do
+    cat stat.sep-${ftr}.${FEATURE_BASE}.csv.tmp
+done \
+    | grep -v "^key" \
+    | perl ~/Scripts/withncbi/taxon/merge_csv.pl --concat -f 0 -o stdout \
+    >> ${GENOME_NAME}.gene.${FEATURE_BASE}.csv
+
+echo "====> concat trans"
+printf "trans_id," > ${GENOME_NAME}.trans.${FEATURE_BASE}.csv
+for ftr in exon CDS intron five_prime_UTR three_prime_UTR
+do
+    printf "${ftr}_length,${ftr}_${FEATURE_BASE},"
+done >> ${GENOME_NAME}.trans.${FEATURE_BASE}.csv
+echo >> ${GENOME_NAME}.trans.${FEATURE_BASE}.csv
+
+for ftr in exon CDS intron five_prime_UTR three_prime_UTR
+do
+    cat stat.sep-${ftr}.${FEATURE_BASE}.csv.tmp
+done \
+    | grep -v "^key" \
+    | perl ~/Scripts/withncbi/taxon/merge_csv.pl --concat -f 0 -o stdout \
+    >> ${GENOME_NAME}.trans.${FEATURE_BASE}.csv
+
+echo "====> clean"
+rm stat.sep-*.${FEATURE_BASE}.csv.tmp
+rm stat.sep-*.${FEATURE_BASE}.csv
+
+EOF
+
+```
+
 ## Atha
 
 Full processing time is about 9 hours.
@@ -517,7 +597,16 @@ Full processing time is about 9 hours.
     bash ~/data/alignment/gene-paralog/proc_all_gene.sh Atha ../yml/paralog.yml
     bash ~/data/alignment/gene-paralog/proc_all_gene.sh Atha ../yml/paralog_adjacent.yml
 
-    bash ~/data/alignment/gene-paralog/proc_sep_gene.sh Atha ../yml/paralog.yml
+    # real    8m45.668s
+    # user    57m58.984s
+    # sys     0m1.808s
+    time bash ~/data/alignment/gene-paralog/proc_sep_gene.sh Atha ../yml/paralog.yml
+
+    # real    0m29.519s
+    # user    3m10.226s
+    # sys     0m7.303s
+    time bash ~/data/alignment/gene-paralog/proc_sep_gene_jrunlist.sh Atha ../yml/paralog.yml
+
     bash ~/data/alignment/gene-paralog/proc_sep_gene.sh Atha ../yml/paralog_adjacent.yml
     ```
 
@@ -531,10 +620,17 @@ Full processing time is about 9 hours.
             bash ~/data/alignment/gene-paralog/proc_all_gene.sh Atha ../yml/{}.yml
         "
 
+    time \
     cat ../yml/repeat.family.txt \
         | parallel -j 1 --keep-order "
             bash ~/data/alignment/gene-paralog/proc_sep_gene.sh Atha ../yml/{}.yml
-        "
+        "    
+
+    time \
+        cat ../yml/repeat.family.txt \
+            | parallel -j 1 --keep-order "
+                bash ~/data/alignment/gene-paralog/proc_sep_gene_jrunlist.sh Atha ../yml/{}.yml
+            "
     ```
 
 6. Pack up
