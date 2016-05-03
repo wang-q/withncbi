@@ -178,7 +178,6 @@ while (1) {
         # initialize sets
         if ( !exists $all_repeat->{$f} ) {
             $all_repeat->{$f} = {};
-            $all_repeat->{$f} = {};
         }
         if ( !exists $all_repeat->{$f}{$chr} ) {
             $all_repeat->{$f}{$chr} = AlignDB::IntSpan->new;
