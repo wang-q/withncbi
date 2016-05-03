@@ -489,11 +489,12 @@ FEATURE_BASE=`basename "${FEATURE_FILE%.*}"`
 cd ~/data/alignment/gene-paralog/${GENOME_NAME}/stat
 
 echo "====> intersect"
+# parallel in 1 threads to save memory
 for ftr in gene upstream downstream exon CDS intron five_prime_UTR three_prime_UTR
 do
     echo ${ftr}
 done \
-    | parallel -j 8 --keep-order "
+    | parallel -j 1 --keep-order "
         echo \"==> {} ${FEATURE_BASE}\";
         sleep 1;
         java -jar ~/share/jrunlist.jar statop \
@@ -602,9 +603,14 @@ Full processing time is about 9 hours.
     # sys     0m1.808s
     time bash ~/data/alignment/gene-paralog/proc_sep_gene.sh Atha ../yml/paralog.yml
 
-    # real    0m29.519s
-    # user    3m10.226s
-    # sys     0m7.303s
+    # 4 threads
+    # real    0m18.428s
+    # user    1m27.138s
+    # sys     0m13.393s
+    # 1 thread
+    # real    1m10.045s
+    # user    1m26.523s
+    # sys     0m15.820s
     time bash ~/data/alignment/gene-paralog/proc_sep_gene_jrunlist.sh Atha ../yml/paralog.yml
 
     bash ~/data/alignment/gene-paralog/proc_sep_gene.sh Atha ../yml/paralog_adjacent.yml
@@ -620,12 +626,17 @@ Full processing time is about 9 hours.
             bash ~/data/alignment/gene-paralog/proc_all_gene.sh Atha ../yml/{}.yml
         "
 
+    # 12 hours?
     time \
     cat ../yml/repeat.family.txt \
         | parallel -j 1 --keep-order "
             bash ~/data/alignment/gene-paralog/proc_sep_gene.sh Atha ../yml/{}.yml
         "    
 
+    # 1 thread, up to 12g RAM
+    # real    15m38.056s
+    # user    24m37.981s
+    # sys     4m1.162s
     time \
         cat ../yml/repeat.family.txt \
             | parallel -j 1 --keep-order "
