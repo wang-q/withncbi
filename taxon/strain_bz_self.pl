@@ -851,61 +851,61 @@ cd [% working_dir %]/Processing/[% id %]
 perl -anl -e '
     /^#/ and next;
     $F[0] =~ s/\.\d+//;
-    $F[2] eq q{CDS} and print qq{$F[0]\t$F[3]\t$F[4]};
+    $F[2] eq q{CDS} and print qq{$F[0]:$F[3]-$F[4]};
     ' \
     [% working_dir %]/Genomes/[% id %]/*.gff \
-    > feature.coding.[% id %].bed
+    > feature.coding.[% id %].txt
 
 # repeats
 perl -anl -e '
     /^#/ and next;
     $F[0] =~ s/\.\d+//;
-    $F[2] eq q{region} and $F[8] =~ /mobile_element|Transposon/i and print qq{$F[0]\t$F[3]\t$F[4]};
+    $F[2] eq q{region} and $F[8] =~ /mobile_element|Transposon/i and print qq{$F[0]:$F[3]-$F[4]};
     ' \
     [% working_dir %]/Genomes/[% id %]/*.gff \
-    > feature.repeats.[% id %].bed
+    > feature.repeats.[% id %].txt
 perl -anl -e '
     /^#/ and next;
     $F[0] =~ s/\.\d+//;
-    $F[2] =~ /repeat/ and $F[8] !~ /RNA/ and print qq{$F[0]\t$F[3]\t$F[4]};
+    $F[2] =~ /repeat/ and $F[8] !~ /RNA/ and print qq{$F[0]:$F[3]-$F[4]};
     ' \
     [% working_dir %]/Genomes/[% id %]/*.gff \
-    >> feature.repeats.[% id %].bed
+    >> feature.repeats.[% id %].txt
 
 # others
 perl -anl -e '
     /^#/ and next;
     $F[0] =~ s/\.\d+//;
-    $F[2] eq q{ncRNA} and print qq{$F[0]\t$F[3]\t$F[4]};
+    $F[2] eq q{ncRNA} and print qq{$F[0]:$F[3]-$F[4]};
     ' \
     [% working_dir %]/Genomes/[% id %]/*.gff \
-    > feature.ncRNA.[% id %].bed
+    > feature.ncRNA.[% id %].txt
 perl -anl -e '
     /^#/ and next;
     $F[0] =~ s/\.\d+//;
-    $F[2] eq q{rRNA} and print qq{$F[0]\t$F[3]\t$F[4]};
+    $F[2] eq q{rRNA} and print qq{$F[0]:$F[3]-$F[4]};
     ' \
     [% working_dir %]/Genomes/[% id %]/*.gff \
-    > feature.rRNA.[% id %].bed
+    > feature.rRNA.[% id %].txt
 perl -anl -e '
     /^#/ and next;
     $F[0] =~ s/\.\d+//;
-    $F[2] eq q{tRNA} and print qq{$F[0]\t$F[3]\t$F[4]};
+    $F[2] eq q{tRNA} and print qq{$F[0]:$F[3]-$F[4]};
     ' \
     [% working_dir %]/Genomes/[% id %]/*.gff \
-    > feature.tRNA.[% id %].bed
+    > feature.tRNA.[% id %].txt
 
 #----------------------------#
-# merge bed and stat
+# merge txt and stat
 #----------------------------#
 for ftr in coding repeats ncRNA rRNA tRNA
 do
-    if [ -s feature.$ftr.[% id %].bed ]
+    if [ -s feature.$ftr.[% id %].txt ]
     then
-        # there are some data in .bed file
-        perl [% aligndb %]/ofg/bed_op.pl --op merge_to_runlist --file feature.$ftr.[% id %].bed --name feature.$ftr.[% id %].yml;
+        # there are some data in .txt file
+        runlist cover feature.$ftr.[% id %].txt -o feature.$ftr.[% id %].yml;
     else
-        # .bed file is empty
+        # .txt file is empty
         # create empty runlists from chr.sizes
         perl -ane'BEGIN { print qq{---\n} }; print qq{$F[0]: "-"\n}; END {print qq{\n}};' [% working_dir %]/Genomes/[% id %]/chr.sizes > feature.$ftr.[% id %].yml;
     fi;
@@ -936,7 +936,7 @@ done >> [% working_dir %]/Results/[% id %]/[% id %].feature.copies.csv
 
 for ftr in coding repeats ncRNA rRNA tRNA
 do
-    rm feature.$ftr.[% id %].bed;
+    rm feature.$ftr.[% id %].txt;
     rm feature.$ftr.[% id %].yml;
     rm feature.$ftr.[% id %].yml.csv;
     rm [% id %].cc.runlist.$ftr.yml;
