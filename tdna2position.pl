@@ -3,10 +3,10 @@ use strict;
 use warnings;
 use autodie;
 
-use Getopt::Long qw(HelpMessage);
+use Getopt::Long;
 use Config::Tiny;
 use FindBin;
-use YAML qw(Dump Load DumpFile LoadFile);
+use YAML::Syck;
 
 #----------------------------------------------------------#
 # GetOpt section
@@ -14,11 +14,11 @@ use YAML qw(Dump Load DumpFile LoadFile);
 
 =head1 NAME
 
-tdna2bed.pl - Convert tdna files from SALK to beds
+tdna2position.pl - Convert tdna files from SALK to beds
 
 =head1 SYNOPSIS
 
-    perl tdna2bed.pl -i <tdna> [options]
+    perl tdna2position.pl -i <tdna> [options]
       Options:
         --help      -?          brief help message
         --input     -i  STR     input file
@@ -27,13 +27,13 @@ tdna2bed.pl - Convert tdna files from SALK to beds
 =cut
 
 GetOptions(
-    'help|?'     => sub { HelpMessage(0) },
+    'help|?'     => sub { Getopt::Long::HelpMessage(0) },
     'input|i=s'  => \my $tdna_file,
     'output|o=s' => \my $output,
-) or HelpMessage(1);
+) or Getopt::Long::HelpMessage(1);
 
 unless ($output) {
-    $output = "$tdna_file.bed";
+    $output = "$tdna_file.txt";
 }
 
 #----------------------------------------------------------#
@@ -41,17 +41,18 @@ unless ($output) {
 #----------------------------------------------------------#
 open my $tdna_fh, '<', $tdna_file;
 open my $out_fh,  '>', $output;
-while ( my $string = <$tdna_fh> ) {
-    next unless defined $string;
-    chomp $string;
-    my $pos_str = ( split /\t/, $string )[1];
+while ( my $line = <$tdna_fh> ) {
+    next unless defined $line;
+    chomp $line;
+    my $pos_str = ( split /\t/, $line )[1];
     next unless $pos_str;
+
     my ( $chr, $pos ) = split /:/, $pos_str;
     $chr =~ s/chr0?//i;
     $pos =~ s/^0+//;
     next unless $chr =~ /^\d+$/;
 
-    print {$out_fh} "$chr\t$pos\t$pos\n";
+    print {$out_fh} "$chr:$pos\n";
 }
 close $tdna_fh;
 close $out_fh;
