@@ -3,28 +3,30 @@ use strict;
 use warnings;
 use autodie;
 
-use Getopt::Long qw(HelpMessage);
+use Getopt::Long;
 use Config::Tiny;
 use FindBin;
-use YAML qw(Dump Load DumpFile LoadFile);
+use YAML::Syck;
 
 use MCE;
 use MCE::Flow Sereal => 1;
 
-use List::MoreUtils qw(zip);
+use List::MoreUtils::PP;
 
 use AlignDB::IntSpan;
 use AlignDB::Stopwatch;
 use AlignDB::Window;
 
-use lib "$FindBin::Bin/../lib";
+use App::RL::Common;
+
+use lib "$FindBin::RealBin/../lib";
 use AlignDB;
 use AlignDB::Position;
 
 #----------------------------------------------------------#
 # GetOpt section
 #----------------------------------------------------------#
-my $Config = Config::Tiny->read("$FindBin::Bin/../alignDB.ini");
+my $Config = Config::Tiny->read("$FindBin::RealBin/../alignDB.ini");
 
 # record ARGV and Config
 my $stopwatch = AlignDB::Stopwatch->new(
@@ -35,11 +37,11 @@ my $stopwatch = AlignDB::Stopwatch->new(
 
 =head1 NAME
 
-insert_bed.pl - Insert beds to alignDB
+insert_position.pl - Insert positions to alignDB
 
 =head1 SYNOPSIS
 
-    perl insert_bed.pl [options]
+    perl insert_position.pl [options]
       Options:
         --help      -?          brief help message
         --server    -s  STR     MySQL server IP/Domain name
@@ -48,15 +50,13 @@ insert_bed.pl - Insert beds to alignDB
         --username  -u  STR     username
         --password  -p  STR     password
         --password  -p  STR     password
-        --file      -f  @STR    bed files
+        --file      -f  @STR    position files
         --tag           @STR    tags
         --type          @STR    types
         --style         STR     ofg style, default is [center_intact]
-        --batch         INT     number of beds in one child process, default is [500]
+        --batch         INT     number of positions in one child process, default is [500]
         --noclean               do not clean ofg tables
-        --dG                    calculate deltaG
 
-        
     Styles:
         edge
         ------+------------------------------------+--------
@@ -77,7 +77,7 @@ insert_bed.pl - Insert beds to alignDB
 =cut
 
 GetOptions(
-    'help|?' => sub { HelpMessage(0) },
+    'help|?' => sub { Getopt::Long::HelpMessage(0) },
     'server|s=s'   => \( my $server       = $Config->{database}{server} ),
     'port|P=i'     => \( my $port         = $Config->{database}{port} ),
     'db|d=s'       => \( my $db           = $Config->{database}{db} ),
@@ -90,8 +90,7 @@ GetOptions(
     'parallel=i'   => \( my $parallel     = $Config->{generate}{parallel} ),
     'batch=i'      => \( my $batch_number = 500 ),
     'noclean'      => \( my $noclean ),
-    'dG'           => \( my $insert_deltaG ),
-) or HelpMessage(1);
+) or Getopt::Long::HelpMessage(1);
 
 #----------------------------------------------------------#
 # Init objects
@@ -119,17 +118,16 @@ $stopwatch->start_message("Update data of $db...");
 # read data
 #----------------------------------------------------------#
 # prepare
-my @args = zip @files, @tags, @types;
+my @args = List::MoreUtils::PP::mesh @files, @tags, @types;
 
-$stopwatch->block_message("bed information");
-print Dump \@args;
+$stopwatch->block_message("position information");
+print YAML::Syck::Dump \@args;
 
 unless (@args) {
-    die "No bed to be processed\n";
+    die "No positions to be processed\n";
 }
 
 my @all_data;
-my %chr_data_set;
 while (@args) {
     my $file = shift @args;
     my $tag  = shift @args;
@@ -141,30 +139,21 @@ while (@args) {
     while ( my $string = <$data_fh> ) {
         next unless defined $string;
         chomp $string;
-        my ( $chr, $start, $end ) = ( split /\t/, $string )[ 0, 1, 2 ];
-        next unless $chr =~ /^\w+$/;
-        $chr =~ s/chr0?//i;
-        next unless $start =~ /^\d+$/;
-        next unless $end =~ /^\d+$/;
-        if ( $start > $end ) {
-            ( $start, $end ) = ( $end, $start );
-        }
-        push @all_data,
-            {
-            chr_name  => $chr,
-            chr_start => $start,
-            chr_end   => $end,
-            tag       => $tag,
-            type      => $type
-            };
+
+        my $info = App::RL::Common::decode_header($string);
+        next unless defined $info->{chr_name};
+        $info->{tag}  = $tag;
+        $info->{type} = $type;
+
+        push @all_data, $info;
     }
     close $data_fh;
 }
 
 #----------------------------#
-# Insert beds
+# Insert positions
 #----------------------------#
-$stopwatch->block_message("Insert beds");
+$stopwatch->block_message("Insert positions");
 
 my $worker_insert = sub {
     my ( $self, $chunk_ref, $chunk_id ) = @_;
@@ -178,11 +167,11 @@ my $worker_insert = sub {
         user   => $username,
         passwd => $password,
     );
-    my $dbh = $obj->dbh;
+    my DBI $dbh = $obj->dbh;
     my $pos_finder = AlignDB::Position->new( dbh => $dbh );
 
     # insert into ofg
-    my $ofg_insert_sth = $dbh->prepare(
+    my DBI $ofg_insert_sth = $dbh->prepare(
         q{
         INSERT INTO ofg (
             ofg_id, window_id, ofg_tag, ofg_type
@@ -198,13 +187,13 @@ my $worker_insert = sub {
         my ( $align_id, $dummy )
             = @{ $obj->find_align( $item->{chr_name}, $item->{chr_start}, $item->{chr_end} ) };
         if ( !defined $align_id ) {
-            warn " " x 4, "Can't find align for this bed\n";
-            warn Dump $item;
+            warn " " x 4, "Can't find align for this position\n";
+            warn YAML::Syck::Dump $item;
             next;
         }
         elsif ( defined $dummy ) {
-            warn " " x 4, "Overlapped alignment in this bed!\n";
-            warn Dump $item;
+            warn " " x 4, "Overlapped alignment in this position\n";
+            warn YAML::Syck::Dump $item;
         }
 
         my $target_info = $obj->get_target_info($align_id);
@@ -236,7 +225,7 @@ my $worker_insert = sub {
         };
     }
 
-    printf " " x 4 . "Insert %d beds\n", scalar keys %info_of;
+    printf " " x 4 . "Insert %d positions\n", scalar keys %info_of;
     MCE->gather(%info_of);
 };
 
@@ -264,7 +253,7 @@ my $worker_sw = sub {
         user   => $username,
         passwd => $password,
     );
-    my $dbh          = $obj->dbh;
+    my DBI $dbh = $obj->dbh;
     my $window_maker = AlignDB::Window->new(
         sw_size          => 100,
         max_out_distance => 20,
@@ -272,7 +261,7 @@ my $worker_sw = sub {
     );
 
     # prepare ofgsw_insert
-    my $ofgsw_insert = $dbh->prepare(
+    my DBI $ofgsw_insert = $dbh->prepare(
         q{
         INSERT INTO ofgsw (
             ofgsw_id, window_id, ofg_id,
@@ -287,7 +276,7 @@ my $worker_sw = sub {
 
     for my $ofg_id (@ofg_ids) {
         my $align_id = $ofg_info_of{$ofg_id}->{align_id};
-        my $ofg_set  = $ofg_info_of{$ofg_id}->{set};
+        my AlignDB::IntSpan $ofg_set = $ofg_info_of{$ofg_id}->{set};
 
         my $target_info = $obj->get_target_info($align_id);
 
@@ -391,17 +380,5 @@ END {
     )->add_meta_stopwatch($stopwatch);
 }
 exit;
-
-sub _calc_deltaG {
-    my $self     = shift;
-    my $align_id = shift;
-    my $set      = shift;
-
-    my $seqs_ref   = $self->get_seqs($align_id);
-    my @seq_slices = map { $set->substr_span($_) } @{$seqs_ref};
-    my @seq_dG     = map { $self->dG_calc->polymer_deltaG($_) } @seq_slices;
-
-    return mean(@seq_dG);
-}
 
 __END__
