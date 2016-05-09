@@ -12,9 +12,10 @@ use File::Find::Rule;
 use File::Basename;
 use Bio::AlignIO;
 
+use App::Fasops::Common;
+
 use AlignDB::IntSpan;
 use AlignDB::Stopwatch;
-use AlignDB::Util qw(:all);
 use AlignDB::Run;
 
 #----------------------------------------------------------#
@@ -296,7 +297,7 @@ sub insert_vars {
 
     # to keep the original indel positions
     my $seq_set
-        = AlignDB::IntSpan->new("1-$length")->diff( find_indel_set($seq) );
+        = AlignDB::IntSpan->new("1-$length")->diff( App::Fasops::Common::indel_intspan($seq) );
     print "seq set: ",    $seq_set->runlist, "\n" if $verbose;
     print "seq length: ", $seq_set->count,   "\n" if $verbose;
 
