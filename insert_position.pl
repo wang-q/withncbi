@@ -187,13 +187,13 @@ my $worker_insert = sub {
         my ( $align_id, $dummy )
             = @{ $obj->find_align( $item->{chr_name}, $item->{chr_start}, $item->{chr_end} ) };
         if ( !defined $align_id ) {
-            warn " " x 4, "Can't find align for this position\n";
-            warn YAML::Syck::Dump $item;
+            print " " x 4 . "Can't find align for this position\n";
+            printf " " x 8 . "%s\n", App::RL::Common::encode_header($item);
             next;
         }
         elsif ( defined $dummy ) {
-            warn " " x 4, "Overlapped alignment in this position\n";
-            warn YAML::Syck::Dump $item;
+            print " " x 4, "Overlapped alignment in this position\n";
+            printf " " x 8 . "%s\n", App::RL::Common::encode_header($item);
         }
 
         my $target_info = $obj->get_target_info($align_id);
