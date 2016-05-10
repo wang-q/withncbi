@@ -532,20 +532,22 @@ find [% working_dir %]/[% multi_name %]_mz -type f -name "*.maf" | parallel --no
 #----------------------------#
 echo "Convert maf to fas"
 find [% working_dir %]/[% multi_name %]_mz -name "*.maf" -or -name "*.maf.gz" \
-    | parallel --no-run-if-empty -j [% parallel %] fasops maf2fas {} -o [% working_dir %]/[% multi_name %]_fasta/{/}.fas
+    | parallel --no-run-if-empty -j [% parallel %] \
+        fasops maf2fas {} -o [% working_dir %]/[% multi_name %]_fasta/{/}.fas
 
 #----------------------------#
 # refine fasta
 #----------------------------#
 echo "Refine fasta"
-perl [% egaz %]/refine_fasta.pl \
-    --msa [% msa %] --block -p [% parallel %] \
-    --quick --expand 100 --join 100 \
+find [% working_dir %]/[% multi_name %]_fasta -name "*.fas" -or -name "*.fas.gz" \
+    | parallel --no-run-if-empty -j [% parallel %] \
+        fasops refine {} \
+        -msa [% msa %] \
+        --quick --expand 100 --join 100 \
 [% IF outgroup_id -%]
-    --outgroup \
+        --outgroup \
 [% END -%]
-    -i [% working_dir %]/[% multi_name %]_fasta \
-    -o [% working_dir %]/[% multi_name %]_refined
+        -o [% working_dir %]/[% multi_name %]_refined/{/}
 
 find [% working_dir %]/[% multi_name %]_refined -type f -name "*.fas" | parallel -j [% parallel %] gzip
 
