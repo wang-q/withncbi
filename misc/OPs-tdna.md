@@ -13,7 +13,7 @@ perl ~/Scripts/download/list.pl -u http://natural.salk.edu/database/ -r transcri
 perl ~/Scripts/download/download.pl -i database.yml -a
 ```
 
-## Convert to beds
+## Convert to positions
 
 ```bash
 mkdir -p ~/data/salk/Atha
@@ -33,11 +33,10 @@ done
 
 ```
 
-## Restore databases
+## Restore vsself databases
 
 ```bash
 perl ~/Scripts/alignDB/util/dup_db.pl -g Athavsself_tdna -f ~/data/dumps/mysql/Athavsself.sql.gz
-
 ```
 
 ## Use style 'center'
@@ -61,6 +60,6 @@ perl ~/Scripts/alignDB/init/update_sw_cv.pl -d Athavsself_tdna --batch 10 --para
 perl ~/Scripts/alignDB/init/update_feature.pl -d Athavsself_tdna \
     -e arabidopsis_thaliana_core_29_82_10 --batch 10 --parallel 8
 
-perl ~/Scripts/alignDB/stat/ofg_stat_factory.pl --by tt -d Athavsself_tdna -o Athavsself_tdna.ofg.xlsx
-
+perl ~/Scripts/alignDB/stat/ofg_stat_factory.pl --by tt --index --chart \
+    -d Athavsself_tdna -o ~/data/salk/Athavsself_tdna.ofg.xlsx
 ```

@@ -3,21 +3,20 @@ use strict;
 use warnings;
 use autodie;
 
-use Getopt::Long qw(HelpMessage);
+use Getopt::Long;
 use FindBin;
-use YAML::Syck qw(Dump Load DumpFile LoadFile);
+use YAML::Syck;
 
 use File::Find::Rule;
 use File::Basename;
 use String::Compare;
 use List::MoreUtils qw(zip);
+use MCE::Flow;
 use Set::Scalar;
 
-use MCE::Flow;
-
+use App::Fasops::Common;
 use AlignDB::IntSpan;
 use AlignDB::Stopwatch;
-use AlignDB::Util qw(read_fasta);
 
 #----------------------------------------------------------#
 # GetOpt section
@@ -56,18 +55,18 @@ masked_chr.pl - Soft-masking fa file.
 my $linelen = 60;
 
 GetOptions(
-    'help|?'   => sub { HelpMessage(0) },
+    'help|?'   => sub { Getopt::Long::HelpMessage(0) },
     'file|f=s' => \my $yaml_file,
     'dir|d=s'  => \my $dir_fa,
     'parallel=i' => \( my $parallel = 1 ),
-) or HelpMessage(1);
+) or Getopt::Long::HelpMessage(1);
 
 #----------------------------------------------------------#
 # Init objects
 #----------------------------------------------------------#
 $stopwatch->start_message("Write masked chr...");
 
-my $ftr_of = LoadFile($yaml_file);
+my $ftr_of = YAML::Syck::LoadFile($yaml_file);
 
 #----------------------------#
 # Soft mask
@@ -106,8 +105,8 @@ my $worker = sub {
     my $ftr_set = AlignDB::IntSpan->new( $ftr_of->{$ftr_chr} );
 
     # seq
-    my ( $seq_of, $seq_names ) = read_fasta( $file_of->{$file_chr} );
-    my $seq = $seq_of->{ $seq_names->[0] };
+    my $seq_of = App::Fasops::Common::read_fasta( $file_of->{$file_chr} );
+    my $seq = $seq_of->{ ( keys %{$seq_of} )[0] };
 
     my @sets = $ftr_set->sets;
     for my $set (@sets) {
