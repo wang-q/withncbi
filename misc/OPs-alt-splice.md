@@ -7,9 +7,9 @@
 ```
 $ perl ~/Scripts/tool/list_dirtree.pl ~/data/alt-splice/ase_flanking/
 +-[ase_flanking]
-    |-ASase.bed                                   |158522 lines |     3.16M
-    |-AScse.bed                                   | 49174 lines | 1,003.87K
-    |-nonAS.bed                                   | 20477 lines |   417.76K
+    |-ASase.pos.txt                               |158522 lines |     3.16M
+    |-AScse.pos.txt                               | 49174 lines | 1,003.87K
+    |-nonAS.pos.txt                               | 20477 lines |   417.76K
 ```
 
 ### Processing
@@ -22,13 +22,13 @@ perl ~/Scripts/alignDB/util/dup_db.pl -f ~/data/dumps/mysql/Human_n12_pop_basic.
 
 # Runtime 8 hours and 42 minutes.
 # ==> Ofg in files: [228173]      Ofg inserted: [212356]
-perl ~/Scripts/alignDB/ofg/insert_bed.pl \
+perl ~/Scripts/alignDB/ofg/insert_position.pl \
     -d Human_n12_ase_flanking \
     --style center_intact \
     --parallel 12 \
-    --tag intron --type ASase -f ~/data/alt-splice/ase_flanking/ASase.bed \
-    --tag intron --type AScse -f ~/data/alt-splice/ase_flanking/AScse.bed \
-    --tag intron --type nonAS -f ~/data/alt-splice/ase_flanking/nonAS.bed
+    --tag intron --type ASase -f ~/data/alt-splice/ase_flanking/ASase.pos.txt \
+    --tag intron --type AScse -f ~/data/alt-splice/ase_flanking/AScse.pos.txt \
+    --tag intron --type nonAS -f ~/data/alt-splice/ase_flanking/nonAS.pos.txt
 
 perl ~/Scripts/alignDB/init/update_sw_cv.pl \
     -d Human_n12_ase_flanking \
