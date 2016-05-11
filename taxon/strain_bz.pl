@@ -348,6 +348,7 @@ EOF
     ) or die Template->error;
 
     # rawphylo.sh
+    # TODO: join_dbs.pl has gone.
     if ( !$norawphylo and !defined $phylo_tree ) {
         $sh_name = "4_rawphylo.sh";
         print "Create $sh_name\n";
@@ -382,7 +383,7 @@ perl [% aligndb %]/extra/two_way_batch.pl \
 # join_dbs.pl
 #----------------------------#
 perl [% aligndb %]/extra/join_dbs.pl \
-    --no_insert --block --trimmed_fasta --length 1000 \
+    --no_insert --trimmed_fasta --length 1000 \
     --goal_db [% multi_name %]_raw --target 0target \
 [% IF outgroup_id -%]
     --outgroup [% query_ids.max %]query \
@@ -542,7 +543,7 @@ echo "Refine fasta"
 find [% working_dir %]/[% multi_name %]_fasta -name "*.fas" -or -name "*.fas.gz" \
     | parallel --no-run-if-empty -j [% parallel %] \
         fasops refine {} \
-        -msa [% msa %] \
+        --msa [% msa %] \
         --quick --expand 100 --join 100 \
 [% IF outgroup_id -%]
         --outgroup \
@@ -665,7 +666,6 @@ perl [% aligndb %]/extra/multi_way_batch.pl \
     -da [% working_dir %]/[% multi_name %]_refined \
     --gff_file [% FOREACH seq IN target_seqs %][% working_dir %]/[% target_id %]/[% seq %].gff,[% END %] \
     --rm_gff_file [% FOREACH seq IN target_seqs %][% working_dir %]/[% target_id %]/[% seq %].rm.gff,[% END %] \
-    --block \
 [% IF outgroup_id -%]
     --outgroup \
 [% END -%]

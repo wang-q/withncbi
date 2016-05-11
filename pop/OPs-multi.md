@@ -18,7 +18,6 @@ perl ~/Scripts/alignDB/util/multi_way_batch.pl \
     -d Scer_n8_pop \
     -da ~/data/alignment/Fungi/scer_wgs/Scer_n8_pop_refined \
     -e saccharomyces_cerevisiae_core_29_82_4 \
-    --block \
     -chr ~/data/alignment/Fungi/scer_wgs/chr_length.csv \
     -lt 5000 --parallel 8 --batch 5 \
     --run all
@@ -36,7 +35,6 @@ perl ~/Scripts/alignDB/util/multi_way_batch.pl \
     -d Ath_n19_pop \
     -da ~/data/alignment/arabidopsis82/Ath_n19_pop_refined \
     -e arabidopsis_thaliana_core_29_82_10 \
-    --block \
     -chr ~/data/alignment/arabidopsis82/chr_length.csv \
     -lt 5000 --parallel 8 --batch 5 \
     --run all
@@ -54,7 +52,6 @@ perl ~/Scripts/alignDB/util/multi_way_batch.pl \
     -d OsatJap_n24_pop \
     -da ~/data/alignment/rice82/OsatJap_n24_pop_refined \
     -e oryza_sativa_core_29_82_7 \
-    --block \
     -chr ~/data/alignment/rice82/chr_length.csv \
     -lt 5000 --parallel 8 --batch 5 \
     --run all
@@ -72,7 +69,6 @@ perl ~/Scripts/alignDB/util/multi_way_batch.pl \
     -d Dmel_n22_pop \
     -da ~/data/alignment/dpgp82/Dmel_n22_pop_refined \
     -e drosophila_melanogaster_core_82_602 \
-    --block \
     -chr ~/data/alignment/dpgp82/chr_length.csv \
     -lt 5000 --parallel 12 \
     --run all
@@ -90,7 +86,6 @@ perl ~/Scripts/alignDB/util/multi_way_batch.pl \
     -d Cele_n41_pop \
     -da ~/data/alignment/cele82/Cele_n41_pop_refined \
     -e caenorhabditis_elegans_core_82_245 \
-    --block \
     -chr ~/data/alignment/cele82/chr_length.csv \
     -lt 5000 --parallel 12 \
     --run all
@@ -107,7 +102,6 @@ perl ~/Scripts/alignDB/util/multi_way_batch.pl \
     -d Ddis_n18_pop \
     -da ~/data/alignment/Protists/Ddis/Ddis_n18_pop_refined \
     -e dictyostelium_discoideum_core_29_82_1 \
-    --block \
     --chr ~/data/alignment/Protists/Ddis/chr_length.csv \
     -lt 5000 --parallel 12 \
     --run all
@@ -125,7 +119,7 @@ perl ~/Scripts/alignDB/util/multi_way_batch.pl \
     -d Human_n11cg_chimp_basic \
     -da ~/data/alignment/human_cg/fas_mft  \
     -e homo_sapiens_core_82_37 \
-    --block --outgroup \
+    --outgroup \
     -chr ~/data/alignment/human_cg/chr_length.csv \
     -lt 5000 --parallel 12 \
     --run basic
@@ -138,7 +132,7 @@ perl ~/Scripts/alignDB/util/multi_way_batch.pl \
     -d Human_n11cg_chimp \
     -da ~/data/alignment/human_cg/fas_mft  \
     -e homo_sapiens_core_82_37 \
-    --block --outgroup \
+    --outgroup \
     -chr ~/data/alignment/human_cg/chr_length.csv \
     -lt 5000 --parallel 12 \
     --run all
@@ -157,7 +151,6 @@ perl ~/Scripts/alignDB/util/multi_way_batch.pl \
     -d Human_n12_pop_basic \
     -da ~/data/alignment/human_simons/Human_n12_pop_refined \
     -e homo_sapiens_core_82_37 \
-    --block \
     -chr ~/data/alignment/human_simons/chr_length.csv \
     -lt 5000 --parallel 12 \
     --run basic
@@ -170,7 +163,6 @@ perl ~/Scripts/alignDB/util/multi_way_batch.pl \
     -d Human_n12_pop \
     -da ~/data/alignment/human_simons/Human_n12_pop_refined \
     -e homo_sapiens_core_82_37 \
-    --block \
     -chr ~/data/alignment/human_simons/chr_length.csv \
     -lt 5000 --parallel 12 \
     --run all
@@ -188,7 +180,6 @@ perl ~/Scripts/alignDB/util/multi_way_batch.pl \
     -d Mouse_n11_pop \
     -da ~/data/alignment/mouse82/Mouse_n11_pop_refined  \
     -e mus_musculus_core_82_38 \
-    --block \
     --chr ~/data/alignment/mouse82/chr_length.csv \
     -lt 5000 --parallel 12 \
     --run all
@@ -206,7 +197,6 @@ perl ~/Scripts/alignDB/util/multi_way_batch.pl \
     -d Pfal_n7_pop \
     -da ~/data/alignment/Protists/pfal/Pfal_n7_pop_refined  \
     -e plasmodium_falciparum_core_29_82_3 \
-    --block \
     --chr ~/data/alignment/Protists/pfal/chr_length.csv \
     -lt 5000 --parallel 12 \
     --run all
