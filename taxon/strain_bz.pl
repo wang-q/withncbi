@@ -3,10 +3,10 @@ use strict;
 use warnings;
 use autodie;
 
-use Getopt::Long qw(HelpMessage);
+use Getopt::Long;
 use Config::Tiny;
 use FindBin;
-use YAML qw(Dump Load DumpFile LoadFile);
+use YAML::Syck;
 
 use DBI;
 use Text::CSV_XS;
@@ -69,7 +69,7 @@ my $egaz      = path( $Config->{run}{egaz} )->stringify;
 my $fig_table = path( $Config->{run}{fig_table} )->stringify;
 
 GetOptions(
-    'help|?' => sub { HelpMessage(0) },
+    'help|?' => sub { Getopt::Long::HelpMessage(0) },
     'file=s'          => \( my $taxon_file  = "strains_taxon_info.csv" ),
     'working_dir|w=s' => \( my $working_dir = "." ),
     'seq_dir|s=s'     => \my $seq_dir,
@@ -86,7 +86,7 @@ GetOptions(
     'nostat'          => \my $nostat,
     'norawphylo'      => \my $norawphylo,
     'parallel=i'      => \( my $parallel    = $Config->{run}{parallel} ),
-) or HelpMessage(1);
+) or Getopt::Long::HelpMessage(1);
 
 if ( defined $phylo_tree ) {
     if ( !-e $phylo_tree ) {
@@ -361,37 +361,92 @@ cd [% working_dir %]
 sleep 1;
 
 #----------------------------#
-# pair db
+# Clean previous directories
 #----------------------------#
+if [ -d [% working_dir %]/[% multi_name %]_raw ]; then
+    rm -fr [% working_dir %]/[% multi_name %]_raw;
+fi;
+mkdir -p [% working_dir %]/[% multi_name %]_raw;
+
+#----------------------------#
+# maf2fas
+#----------------------------#
+echo "==> Convert maf to fas"
+
 [% FOREACH q IN query_ids -%]
-perl [% aligndb %]/extra/two_way_batch.pl \
-    -t [% target_id %] -q [% q %] \
-    -d [% target_id %]vs[% q %] \
-    -da [% working_dir %]/Pairwise/[% target_id %]vs[% q %] \
-    -chr [% working_dir %]/chr_length.csv \
-    -lt 1000 \
-    --parallel [% parallel %] \
-[% IF nostat -%]
-    -r 1,2
-[% ELSE -%]
-    -r 1,2,40
-[% END -%]
+mkdir -p [% working_dir %]/[% multi_name %]_raw/[% target_id %]vs[% q %]
+find [% working_dir %]/Pairwise/[% target_id %]vs[% q %] -name "*.maf" -or -name "*.maf.gz" \
+    | parallel --no-run-if-empty -j 1 \
+        fasops maf2fas {} -o [% working_dir %]/[% multi_name %]_raw/[% target_id %]vs[% q %]/{/}.fas
+fasops covers \
+    [% working_dir %]/[% multi_name %]_raw/[% target_id %]vs[% q %]/*.fas \
+    -n [% target_id %] -l 1000 -t 10 \
+    -o [% working_dir %]/[% multi_name %]_raw/[% target_id %]vs[% q %].yml
 
 [% END -%]
 
 #----------------------------#
-# join_dbs.pl
+# intersect
 #----------------------------#
-perl [% aligndb %]/extra/join_dbs.pl \
-    --no_insert --trimmed_fasta --length 1000 \
-    --goal_db [% multi_name %]_raw --target 0target \
-[% IF outgroup_id -%]
-    --outgroup [% query_ids.max %]query \
-    --queries [% maxq = query_ids.max - 1 %][% FOREACH i IN [ 0 .. maxq ] %][% i %]query,[% END %] \
-[% ELSE -%]
-    --queries [% FOREACH i IN [ 0 .. query_ids.max ] %][% i %]query,[% END %] \
+echo "==> Intersect"
+
+runlist compare --op intersect \
+[% FOREACH q IN query_ids -%]
+    [% working_dir %]/[% multi_name %]_raw/[% target_id %]vs[% q %].yml \
 [% END -%]
-    --dbs [% FOREACH id IN query_ids %][% target_id %]vs[% id %],[% END %]
+    -o [% working_dir %]/[% multi_name %]_raw/intersect.raw.yml
+
+runlist span --op excise -n 1000 \
+    [% working_dir %]/[% multi_name %]_raw/intersect.raw.yml \
+    -o [% working_dir %]/[% multi_name %]_raw/intersect.filter.yml
+
+#----------------------------#
+# slicing
+#----------------------------#
+echo "==> Slicing with intersect"
+
+[% FOREACH q IN query_ids -%]
+if [ -e [% working_dir %]/[% multi_name %]_raw/[% target_id %]vs[% q %].slice.fas ];
+then
+    rm [% working_dir %]/[% multi_name %]_raw/[% target_id %]vs[% q %].slice.fas
+fi
+find [% working_dir %]/[% multi_name %]_raw/[% target_id %]vs[% q %]/ -name "*.fas" -or -name "*.fas.gz" \
+    | sort \
+    | parallel --no-run-if-empty --keep-order -j 1 " \
+        fasops slice {} \
+            [% working_dir %]/[% multi_name %]_raw/intersect.filter.yml \
+            -n [% target_id %] -l 1000 -o stdout \
+            >> [% working_dir %]/[% multi_name %]_raw/[% target_id %]vs[% q %].slice.fas
+    "
+
+[% END -%]
+
+#----------------------------#
+# join
+#----------------------------#
+echo "==> Join intersects"
+
+fasops join \
+[% FOREACH q IN query_ids -%]
+    [% working_dir %]/[% multi_name %]_raw/[% target_id %]vs[% q %].slice.fas \
+[% END -%]
+    -n [% target_id %] \
+    -o [% working_dir %]/[% multi_name %]_raw/join.raw.fas
+
+echo [% target_id %] > [% working_dir %]/[% multi_name %]_raw/names.list
+[% FOREACH q IN query_ids -%]
+echo [% q %] >> [% working_dir %]/[% multi_name %]_raw/names.list
+[% END -%]
+
+fasops subset \
+    [% working_dir %]/[% multi_name %]_raw/join.raw.fas \
+    [% working_dir %]/[% multi_name %]_raw/names.list \
+    --required \
+    -o [% working_dir %]/[% multi_name %]_raw/join.filter.fas
+
+fasops refine --msa mafft \
+    [% working_dir %]/[% multi_name %]_raw/join.filter.fas \
+    -o [% working_dir %]/[% multi_name %]_raw/join.refine.fas
 
 #----------------------------#
 # RAxML
@@ -399,18 +454,14 @@ perl [% aligndb %]/extra/join_dbs.pl \
 # raw phylo guiding tree
 if [ -d [% working_dir %]/[% multi_name %]_rawphylo ]; then
     rm -fr [% working_dir %]/[% multi_name %]_rawphylo;
-    mkdir -p [% working_dir %]/[% multi_name %]_rawphylo;
-else
-    mkdir -p [% working_dir %]/[% multi_name %]_rawphylo;
 fi;
+mkdir -p [% working_dir %]/[% multi_name %]_rawphylo;
 
 cd [% working_dir %]/[% multi_name %]_rawphylo
 
-find [% working_dir %]/[% multi_name %]_rawphylo -type f -name "RAxML*" | parallel --no-run-if-empty rm
-
 [% IF query_ids.size > 2 -%]
 perl [% egaz%]/concat_fasta.pl \
-    -i [% working_dir %]/[% multi_name %]_raw \
+    -i [% working_dir %]/[% multi_name %]_raw/join.refine.fas \
     -o [% working_dir %]/[% multi_name %]_rawphylo/[% multi_name %].phy \
     --sampling --total 10_000_000 --relaxed
 
@@ -483,11 +534,12 @@ mkdir -p [% working_dir %]/[% multi_name %]_mz;
 if [ -d [% working_dir %]/[% multi_name %]_fasta ]; then
     rm -fr [% working_dir %]/[% multi_name %]_fasta;
 fi;
-mkdir -p [% working_dir %]/[% multi_name %]_fasta
+mkdir -p [% working_dir %]/[% multi_name %]_fasta;
 
 if [ -d [% working_dir %]/[% multi_name %]_refined ]; then
     rm -fr [% working_dir %]/[% multi_name %]_refined;
 fi;
+mkdir -p [% working_dir %]/[% multi_name %]_refined;
 
 if [ -d [% working_dir %]/[% multi_name %]_phylo ]; then
     rm -fr [% working_dir %]/[% multi_name %]_phylo;
