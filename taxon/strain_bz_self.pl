@@ -3,10 +3,10 @@ use strict;
 use warnings;
 use autodie;
 
-use Getopt::Long qw(HelpMessage);
+use Getopt::Long;
 use Config::Tiny;
 use FindBin;
-use YAML qw(Dump Load DumpFile LoadFile);
+use YAML::Syck;
 
 use DBI;
 use Text::CSV_XS;
@@ -70,7 +70,7 @@ my $blast     = path( $Config->{run}{blast} )->stringify;
 my $circos    = path( $Config->{run}{circos} )->stringify;
 
 GetOptions(
-    'help|?' => sub { HelpMessage(0) },
+    'help|?' => sub { Getopt::Long::HelpMessage(0) },
     'file=s'          => \( my $taxon_file  = "strains_taxon_info.csv" ),
     'working_dir|w=s' => \( my $working_dir = "." ),
     'seq_dir|s=s'     => \my $seq_dir,
@@ -87,7 +87,7 @@ GetOptions(
     'nostat'          => \my $nostat,
     'norawphylo'      => \my $norawphylo,
     'parallel=i'      => \( my $parallel    = $Config->{run}{parallel} ),
-) or HelpMessage(1);
+) or Getopt::Long::HelpMessage(1);
 
 #----------------------------------------------------------#
 # init
