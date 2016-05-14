@@ -1,4 +1,4 @@
-package AlignDB::KaKs;
+package MyKaKs;
 use Moose;
 use Carp;
 
