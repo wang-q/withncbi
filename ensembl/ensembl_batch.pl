@@ -89,10 +89,13 @@ my \$pass = '$password';
 
 };
 
-my $build_str = q{#/bin/bash
+my $build_str = q{#!/usr/bin/env bash
 
 };
-my $fasta_str = q{#/bin/bash
+my $fasta_str = q{#!/usr/bin/env bash
+
+};
+my $anno_str = q{#!/usr/bin/env bash
 
 };
 
@@ -105,8 +108,9 @@ for my $sp ( sort keys %{$species_ref} ) {
     my $info = $species_ref->{$sp};
 
     my (@aliases);
+    my $core_dbname;
     {
-        my ( $genus, $species, $strain ) = split " ", $sp;
+        my ( $genus, $species, undef ) = split " ", $sp;
 
         if ($species) {
             my $str = lc( substr( $genus, 0, 1 ) . substr( $species, 0, 3 ) );
@@ -127,6 +131,7 @@ for my $sp ( sort keys %{$species_ref} ) {
     for my $group (qw{core funcgen otherfeatures variation compara}) {
         if ( $info->{$group} ) {
             my ( $ensembl_base, $cmd ) = build_cmd( $sp, $group, $mysql_dir );
+            $core_dbname = $ensembl_base if $group eq "core";
             $build_str .= $cmd;
             if ( $info->{initrc} ) {
 
@@ -162,6 +167,12 @@ for my $sp ( sort keys %{$species_ref} ) {
             }
         }
         $fasta_str .= build_fasta( $sp, $fasta_dir, $dest_dir, $alias, $pattern, $append );
+
+        # build anno
+        if ( $info->{core} ) {
+            $anno_str .= build_anno( $sp, $dest_dir, $core_dbname, $alias );
+
+        }
     }
 }
 
@@ -176,6 +187,7 @@ $initrc_str .= q{
     path( $dispatch->{meta}{initrc_file} )->spew($initrc_str);
     path( $dispatch->{meta}{build_file} )->spew($build_str);
     path( $dispatch->{meta}{fasta_file} )->spew($fasta_str);
+    path( $dispatch->{meta}{anno_file} )->spew($anno_str);
 }
 
 $stopwatch->end_message;
@@ -183,10 +195,62 @@ $stopwatch->end_message;
 #----------------------------------------------------------#
 # Subroutines
 #----------------------------------------------------------#
+sub build_anno {
+    my $sp          = shift;
+    my $dest_dir    = shift;
+    my $core_dbname = shift;
+    my $alias       = shift;
+
+    my $text = <<'EOF';
+# [% sp %]
+if [ -d [% dest %]/[% alias %] ];
+then
+    echo "==> [% sp %]"
+
+    if mysql -hlocalhost -ualignDB -palignDB -e 'use [% core_dbname %]';
+    then
+        cd [% dest %]/[% alias %]
+
+        perl ~/Scripts/withncbi/ensembl/feature_runlists.pl \
+            -e [% core_dbname %] \
+            -f repeat \
+            -o repeat.yml
+
+        perl ~/Scripts/withncbi/ensembl/feature_runlists.pl \
+            -e [% core_dbname %] \
+            -f cds \
+            -o cds.yml
+
+        runlist merge repeat.yml cds.yml -o anno.yml
+        rm repeat.yml cds.yml
+    else
+        echo "==> Database [% core_dbname %] does not exist"
+    fi
+else
+    echo "==> [% dest %]/[% alias %] does not exist"
+fi
+
+EOF
+
+    my $tt = Template->new;
+    my $output;
+    $tt->process(
+        \$text,
+        {   sp          => $sp,
+            dest        => $dest_dir,
+            core_dbname => $core_dbname,
+            alias       => $alias,
+        },
+        \$output
+    ) or die Template->error;
+
+    return $output;
+}
+
 sub build_fasta {
     my $sp        = shift;
     my $fasta_dir = shift;
-    my $dest_fir  = shift;
+    my $dest_dir  = shift;
     my $alias     = shift;
     my $pattern   = shift;
     my $append    = shift;
@@ -196,7 +260,7 @@ sub build_fasta {
     my $str = lc join "_", grep {$_} ( $genus, $species, $strain );
 
     my $iter = path($fasta_dir)->iterator( { recurse => 0, } );
-    while ( my $child = $iter->() ) {
+    while ( my Path::Tiny $child = $iter->() ) {
         next unless $child->is_dir;
         my $base_dir = $child->basename;
         my $score = String::Compare::char_by_char( $base_dir, $str );
@@ -279,7 +343,7 @@ sub build_cmd {
     }
 
     my $iter = path($mysql_dir)->iterator( { recurse => 0, } );
-    while ( my $child = $iter->() ) {
+    while ( my Path::Tiny $child = $iter->() ) {
         next unless $child->is_dir;
         my $base_dir = $child->basename;
         my $score = String::Compare::char_by_char( $base_dir, $str );

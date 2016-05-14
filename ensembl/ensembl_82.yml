@@ -239,3 +239,4 @@ meta:
   initrc_file: "ensembl.initrc.pm"
   build_file: "ensembl.build.sh"
   fasta_file: "ensembl.fasta.sh"
+  anno_file: "ensembl.anno.sh"

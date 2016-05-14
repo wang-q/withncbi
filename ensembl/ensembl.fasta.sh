@@ -1,4 +1,4 @@
-#/bin/bash
+#!/usr/bin/env bash
 
 # Arabidopsis lyrata
 if [ ! -d /home/wangq/data/alignment/Ensembl/Alyr ]

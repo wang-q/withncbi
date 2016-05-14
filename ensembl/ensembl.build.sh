@@ -1,4 +1,4 @@
-#/bin/bash
+#!/usr/bin/env bash
 
 # Arabidopsis thaliana
 perl /home/wangq/Scripts/withncbi/ensembl/build_ensembl.pl \
