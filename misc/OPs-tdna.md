@@ -43,8 +43,7 @@ perl ~/Scripts/alignDB/util/dup_db.pl -g Ath_n19_pop_tdna -f ~/data/dumps/mysql/
 ## Use style 'center'
 
 ```bash
-mkdir -p ~/data/salk/results
-cd ~/data/salk/results
+cd ~/data/salk/Atha
 
 perl ~/Scripts/alignDB/ofg/insert_position.pl \
     -d Athavsself_tdna  --style center --batch 50 --parallel 8 \
