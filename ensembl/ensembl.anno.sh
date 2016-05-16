@@ -5,8 +5,9 @@ if [ -d /home/wangq/data/alignment/Ensembl/Atha ];
 then
     echo "==> Arabidopsis thaliana"
 
-    if mysql -hlocalhost -ualignDB -palignDB -e 'use arabidopsis_thaliana_core_29_82_10';
-    then
+    if [ -f /home/wangq/data/alignment/Ensembl/Atha/anno.yml ]; then
+        echo "==> /home/wangq/data/alignment/Ensembl/Atha/anno.yml exists"
+    elif mysql -hlocalhost -ualignDB -palignDB -e 'use arabidopsis_thaliana_core_29_82_10'; then
         cd /home/wangq/data/alignment/Ensembl/Atha
 
         perl ~/Scripts/withncbi/ensembl/feature_runlists.pl \
@@ -28,13 +29,43 @@ else
     echo "==> /home/wangq/data/alignment/Ensembl/Atha does not exist"
 fi
 
+# Aspergillus fumigatus
+if [ -d /home/wangq/data/alignment/Ensembl/Afum ];
+then
+    echo "==> Aspergillus fumigatus"
+
+    if [ -f /home/wangq/data/alignment/Ensembl/Afum/anno.yml ]; then
+        echo "==> /home/wangq/data/alignment/Ensembl/Afum/anno.yml exists"
+    elif mysql -hlocalhost -ualignDB -palignDB -e 'use aspergillus_fumigatus_core_29_82_2'; then
+        cd /home/wangq/data/alignment/Ensembl/Afum
+
+        perl ~/Scripts/withncbi/ensembl/feature_runlists.pl \
+            -e aspergillus_fumigatus_core_29_82_2 \
+            -f repeat \
+            -o repeat.yml
+
+        perl ~/Scripts/withncbi/ensembl/feature_runlists.pl \
+            -e aspergillus_fumigatus_core_29_82_2 \
+            -f cds \
+            -o cds.yml
+
+        runlist merge repeat.yml cds.yml -o anno.yml
+        rm repeat.yml cds.yml
+    else
+        echo "==> Database aspergillus_fumigatus_core_29_82_2 does not exist"
+    fi
+else
+    echo "==> /home/wangq/data/alignment/Ensembl/Afum does not exist"
+fi
+
 # Brassica rapa
 if [ -d /home/wangq/data/alignment/Ensembl/Brap ];
 then
     echo "==> Brassica rapa"
 
-    if mysql -hlocalhost -ualignDB -palignDB -e 'use brassica_rapa_core_29_82_1';
-    then
+    if [ -f /home/wangq/data/alignment/Ensembl/Brap/anno.yml ]; then
+        echo "==> /home/wangq/data/alignment/Ensembl/Brap/anno.yml exists"
+    elif mysql -hlocalhost -ualignDB -palignDB -e 'use brassica_rapa_core_29_82_1'; then
         cd /home/wangq/data/alignment/Ensembl/Brap
 
         perl ~/Scripts/withncbi/ensembl/feature_runlists.pl \
@@ -61,8 +92,9 @@ if [ -d /home/wangq/data/alignment/Ensembl/Cele ];
 then
     echo "==> Caenorhabditis elegans"
 
-    if mysql -hlocalhost -ualignDB -palignDB -e 'use caenorhabditis_elegans_core_82_245';
-    then
+    if [ -f /home/wangq/data/alignment/Ensembl/Cele/anno.yml ]; then
+        echo "==> /home/wangq/data/alignment/Ensembl/Cele/anno.yml exists"
+    elif mysql -hlocalhost -ualignDB -palignDB -e 'use caenorhabditis_elegans_core_82_245'; then
         cd /home/wangq/data/alignment/Ensembl/Cele
 
         perl ~/Scripts/withncbi/ensembl/feature_runlists.pl \
@@ -84,13 +116,43 @@ else
     echo "==> /home/wangq/data/alignment/Ensembl/Cele does not exist"
 fi
 
+# Dictyostelium discoideum
+if [ -d /home/wangq/data/alignment/Ensembl/Ddis ];
+then
+    echo "==> Dictyostelium discoideum"
+
+    if [ -f /home/wangq/data/alignment/Ensembl/Ddis/anno.yml ]; then
+        echo "==> /home/wangq/data/alignment/Ensembl/Ddis/anno.yml exists"
+    elif mysql -hlocalhost -ualignDB -palignDB -e 'use dictyostelium_discoideum_core_29_82_1'; then
+        cd /home/wangq/data/alignment/Ensembl/Ddis
+
+        perl ~/Scripts/withncbi/ensembl/feature_runlists.pl \
+            -e dictyostelium_discoideum_core_29_82_1 \
+            -f repeat \
+            -o repeat.yml
+
+        perl ~/Scripts/withncbi/ensembl/feature_runlists.pl \
+            -e dictyostelium_discoideum_core_29_82_1 \
+            -f cds \
+            -o cds.yml
+
+        runlist merge repeat.yml cds.yml -o anno.yml
+        rm repeat.yml cds.yml
+    else
+        echo "==> Database dictyostelium_discoideum_core_29_82_1 does not exist"
+    fi
+else
+    echo "==> /home/wangq/data/alignment/Ensembl/Ddis does not exist"
+fi
+
 # Drosophila melanogaster
 if [ -d /home/wangq/data/alignment/Ensembl/Dmel ];
 then
     echo "==> Drosophila melanogaster"
 
-    if mysql -hlocalhost -ualignDB -palignDB -e 'use drosophila_melanogaster_core_82_602';
-    then
+    if [ -f /home/wangq/data/alignment/Ensembl/Dmel/anno.yml ]; then
+        echo "==> /home/wangq/data/alignment/Ensembl/Dmel/anno.yml exists"
+    elif mysql -hlocalhost -ualignDB -palignDB -e 'use drosophila_melanogaster_core_82_602'; then
         cd /home/wangq/data/alignment/Ensembl/Dmel
 
         perl ~/Scripts/withncbi/ensembl/feature_runlists.pl \
@@ -117,8 +179,9 @@ if [ -d /home/wangq/data/alignment/Ensembl/Dsim ];
 then
     echo "==> Drosophila simulans"
 
-    if mysql -hlocalhost -ualignDB -palignDB -e 'use drosophila_simulans_core_29_82_1';
-    then
+    if [ -f /home/wangq/data/alignment/Ensembl/Dsim/anno.yml ]; then
+        echo "==> /home/wangq/data/alignment/Ensembl/Dsim/anno.yml exists"
+    elif mysql -hlocalhost -ualignDB -palignDB -e 'use drosophila_simulans_core_29_82_1'; then
         cd /home/wangq/data/alignment/Ensembl/Dsim
 
         perl ~/Scripts/withncbi/ensembl/feature_runlists.pl \
@@ -145,8 +208,9 @@ if [ -d /home/wangq/data/alignment/Ensembl/Gorilla ];
 then
     echo "==> Gorilla gorilla"
 
-    if mysql -hlocalhost -ualignDB -palignDB -e 'use gorilla_gorilla_core_82_31';
-    then
+    if [ -f /home/wangq/data/alignment/Ensembl/Gorilla/anno.yml ]; then
+        echo "==> /home/wangq/data/alignment/Ensembl/Gorilla/anno.yml exists"
+    elif mysql -hlocalhost -ualignDB -palignDB -e 'use gorilla_gorilla_core_82_31'; then
         cd /home/wangq/data/alignment/Ensembl/Gorilla
 
         perl ~/Scripts/withncbi/ensembl/feature_runlists.pl \
@@ -173,8 +237,9 @@ if [ -d /home/wangq/data/alignment/Ensembl/Human ];
 then
     echo "==> Homo sapiens"
 
-    if mysql -hlocalhost -ualignDB -palignDB -e 'use homo_sapiens_core_82_37';
-    then
+    if [ -f /home/wangq/data/alignment/Ensembl/Human/anno.yml ]; then
+        echo "==> /home/wangq/data/alignment/Ensembl/Human/anno.yml exists"
+    elif mysql -hlocalhost -ualignDB -palignDB -e 'use homo_sapiens_core_82_37'; then
         cd /home/wangq/data/alignment/Ensembl/Human
 
         perl ~/Scripts/withncbi/ensembl/feature_runlists.pl \
@@ -201,8 +266,9 @@ if [ -d /home/wangq/data/alignment/Ensembl/Rhesus ];
 then
     echo "==> Macaca mulatta"
 
-    if mysql -hlocalhost -ualignDB -palignDB -e 'use macaca_mulatta_core_82_10';
-    then
+    if [ -f /home/wangq/data/alignment/Ensembl/Rhesus/anno.yml ]; then
+        echo "==> /home/wangq/data/alignment/Ensembl/Rhesus/anno.yml exists"
+    elif mysql -hlocalhost -ualignDB -palignDB -e 'use macaca_mulatta_core_82_10'; then
         cd /home/wangq/data/alignment/Ensembl/Rhesus
 
         perl ~/Scripts/withncbi/ensembl/feature_runlists.pl \
@@ -229,8 +295,9 @@ if [ -d /home/wangq/data/alignment/Ensembl/Mouse ];
 then
     echo "==> Mus musculus"
 
-    if mysql -hlocalhost -ualignDB -palignDB -e 'use mus_musculus_core_82_38';
-    then
+    if [ -f /home/wangq/data/alignment/Ensembl/Mouse/anno.yml ]; then
+        echo "==> /home/wangq/data/alignment/Ensembl/Mouse/anno.yml exists"
+    elif mysql -hlocalhost -ualignDB -palignDB -e 'use mus_musculus_core_82_38'; then
         cd /home/wangq/data/alignment/Ensembl/Mouse
 
         perl ~/Scripts/withncbi/ensembl/feature_runlists.pl \
@@ -257,8 +324,9 @@ if [ -d /home/wangq/data/alignment/Ensembl/OsatJap ];
 then
     echo "==> Oryza sativa"
 
-    if mysql -hlocalhost -ualignDB -palignDB -e 'use oryza_sativa_core_29_82_7';
-    then
+    if [ -f /home/wangq/data/alignment/Ensembl/OsatJap/anno.yml ]; then
+        echo "==> /home/wangq/data/alignment/Ensembl/OsatJap/anno.yml exists"
+    elif mysql -hlocalhost -ualignDB -palignDB -e 'use oryza_sativa_core_29_82_7'; then
         cd /home/wangq/data/alignment/Ensembl/OsatJap
 
         perl ~/Scripts/withncbi/ensembl/feature_runlists.pl \
@@ -285,8 +353,9 @@ if [ -d /home/wangq/data/alignment/Ensembl/Chimp ];
 then
     echo "==> Pan troglodytes"
 
-    if mysql -hlocalhost -ualignDB -palignDB -e 'use pan_troglodytes_core_82_214';
-    then
+    if [ -f /home/wangq/data/alignment/Ensembl/Chimp/anno.yml ]; then
+        echo "==> /home/wangq/data/alignment/Ensembl/Chimp/anno.yml exists"
+    elif mysql -hlocalhost -ualignDB -palignDB -e 'use pan_troglodytes_core_82_214'; then
         cd /home/wangq/data/alignment/Ensembl/Chimp
 
         perl ~/Scripts/withncbi/ensembl/feature_runlists.pl \
@@ -308,13 +377,43 @@ else
     echo "==> /home/wangq/data/alignment/Ensembl/Chimp does not exist"
 fi
 
+# Plasmodium falciparum
+if [ -d /home/wangq/data/alignment/Ensembl/Pfal ];
+then
+    echo "==> Plasmodium falciparum"
+
+    if [ -f /home/wangq/data/alignment/Ensembl/Pfal/anno.yml ]; then
+        echo "==> /home/wangq/data/alignment/Ensembl/Pfal/anno.yml exists"
+    elif mysql -hlocalhost -ualignDB -palignDB -e 'use plasmodium_falciparum_core_29_82_3'; then
+        cd /home/wangq/data/alignment/Ensembl/Pfal
+
+        perl ~/Scripts/withncbi/ensembl/feature_runlists.pl \
+            -e plasmodium_falciparum_core_29_82_3 \
+            -f repeat \
+            -o repeat.yml
+
+        perl ~/Scripts/withncbi/ensembl/feature_runlists.pl \
+            -e plasmodium_falciparum_core_29_82_3 \
+            -f cds \
+            -o cds.yml
+
+        runlist merge repeat.yml cds.yml -o anno.yml
+        rm repeat.yml cds.yml
+    else
+        echo "==> Database plasmodium_falciparum_core_29_82_3 does not exist"
+    fi
+else
+    echo "==> /home/wangq/data/alignment/Ensembl/Pfal does not exist"
+fi
+
 # Pongo abelii
 if [ -d /home/wangq/data/alignment/Ensembl/Orangutan ];
 then
     echo "==> Pongo abelii"
 
-    if mysql -hlocalhost -ualignDB -palignDB -e 'use pongo_abelii_core_82_1';
-    then
+    if [ -f /home/wangq/data/alignment/Ensembl/Orangutan/anno.yml ]; then
+        echo "==> /home/wangq/data/alignment/Ensembl/Orangutan/anno.yml exists"
+    elif mysql -hlocalhost -ualignDB -palignDB -e 'use pongo_abelii_core_82_1'; then
         cd /home/wangq/data/alignment/Ensembl/Orangutan
 
         perl ~/Scripts/withncbi/ensembl/feature_runlists.pl \
@@ -341,8 +440,9 @@ if [ -d /home/wangq/data/alignment/Ensembl/S288c ];
 then
     echo "==> Saccharomyces cerevisiae"
 
-    if mysql -hlocalhost -ualignDB -palignDB -e 'use saccharomyces_cerevisiae_core_29_82_4';
-    then
+    if [ -f /home/wangq/data/alignment/Ensembl/S288c/anno.yml ]; then
+        echo "==> /home/wangq/data/alignment/Ensembl/S288c/anno.yml exists"
+    elif mysql -hlocalhost -ualignDB -palignDB -e 'use saccharomyces_cerevisiae_core_29_82_4'; then
         cd /home/wangq/data/alignment/Ensembl/S288c
 
         perl ~/Scripts/withncbi/ensembl/feature_runlists.pl \
@@ -364,13 +464,43 @@ else
     echo "==> /home/wangq/data/alignment/Ensembl/S288c does not exist"
 fi
 
+# Schizosaccharomyces pombe
+if [ -d /home/wangq/data/alignment/Ensembl/Spom ];
+then
+    echo "==> Schizosaccharomyces pombe"
+
+    if [ -f /home/wangq/data/alignment/Ensembl/Spom/anno.yml ]; then
+        echo "==> /home/wangq/data/alignment/Ensembl/Spom/anno.yml exists"
+    elif mysql -hlocalhost -ualignDB -palignDB -e 'use schizosaccharomyces_pombe_core_29_82_2'; then
+        cd /home/wangq/data/alignment/Ensembl/Spom
+
+        perl ~/Scripts/withncbi/ensembl/feature_runlists.pl \
+            -e schizosaccharomyces_pombe_core_29_82_2 \
+            -f repeat \
+            -o repeat.yml
+
+        perl ~/Scripts/withncbi/ensembl/feature_runlists.pl \
+            -e schizosaccharomyces_pombe_core_29_82_2 \
+            -f cds \
+            -o cds.yml
+
+        runlist merge repeat.yml cds.yml -o anno.yml
+        rm repeat.yml cds.yml
+    else
+        echo "==> Database schizosaccharomyces_pombe_core_29_82_2 does not exist"
+    fi
+else
+    echo "==> /home/wangq/data/alignment/Ensembl/Spom does not exist"
+fi
+
 # Solanum lycopersicum
 if [ -d /home/wangq/data/alignment/Ensembl/Slyc ];
 then
     echo "==> Solanum lycopersicum"
 
-    if mysql -hlocalhost -ualignDB -palignDB -e 'use solanum_lycopersicum_core_29_82_250';
-    then
+    if [ -f /home/wangq/data/alignment/Ensembl/Slyc/anno.yml ]; then
+        echo "==> /home/wangq/data/alignment/Ensembl/Slyc/anno.yml exists"
+    elif mysql -hlocalhost -ualignDB -palignDB -e 'use solanum_lycopersicum_core_29_82_250'; then
         cd /home/wangq/data/alignment/Ensembl/Slyc
 
         perl ~/Scripts/withncbi/ensembl/feature_runlists.pl \
@@ -397,8 +527,9 @@ if [ -d /home/wangq/data/alignment/Ensembl/Stub ];
 then
     echo "==> Solanum tuberosum"
 
-    if mysql -hlocalhost -ualignDB -palignDB -e 'use solanum_tuberosum_core_29_82_4';
-    then
+    if [ -f /home/wangq/data/alignment/Ensembl/Stub/anno.yml ]; then
+        echo "==> /home/wangq/data/alignment/Ensembl/Stub/anno.yml exists"
+    elif mysql -hlocalhost -ualignDB -palignDB -e 'use solanum_tuberosum_core_29_82_4'; then
         cd /home/wangq/data/alignment/Ensembl/Stub
 
         perl ~/Scripts/withncbi/ensembl/feature_runlists.pl \

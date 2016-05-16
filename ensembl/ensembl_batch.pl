@@ -207,8 +207,9 @@ if [ -d [% dest %]/[% alias %] ];
 then
     echo "==> [% sp %]"
 
-    if mysql -hlocalhost -ualignDB -palignDB -e 'use [% core_dbname %]';
-    then
+    if [ -f [% dest %]/[% alias %]/anno.yml ]; then
+        echo "==> [% dest %]/[% alias %]/anno.yml exists"
+    elif mysql -hlocalhost -ualignDB -palignDB -e 'use [% core_dbname %]'; then
         cd [% dest %]/[% alias %]
 
         perl ~/Scripts/withncbi/ensembl/feature_runlists.pl \
