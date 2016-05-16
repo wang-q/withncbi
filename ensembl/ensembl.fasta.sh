@@ -57,6 +57,33 @@ else
     echo "==> /home/wangq/data/alignment/Ensembl/Atha exists"
 fi
 
+# Aspergillus fumigatus
+if [ ! -d /home/wangq/data/alignment/Ensembl/Afum ]
+then
+    echo "==> Aspergillus fumigatus"
+
+    mkdir -p /home/wangq/data/alignment/Ensembl/Afum
+    cd /home/wangq/data/alignment/Ensembl/Afum
+    
+    find /home/wangq/data/ensembl82/fasta/aspergillus_fumigatus/dna/ -name "*dna_sm.toplevel*" \
+        | xargs gzip -d -c > toplevel.fa
+    
+    faops count toplevel.fa \
+        | perl -aln -e '
+            next if $F[0] eq 'total';
+            print $F[0] if $F[1] > 50000;
+            print $F[0] if $F[1] > 5000  and $F[6]/$F[1] < 0.05;
+            ' \
+        | uniq > listFile
+    faops some toplevel.fa listFile toplevel.filtered.fa
+    faops split-name toplevel.filtered.fa .
+    rm toplevel.fa toplevel.filtered.fa listFile
+
+
+else
+    echo "==> /home/wangq/data/alignment/Ensembl/Afum exists"
+fi
+
 # Brachypodium distachyon
 if [ ! -d /home/wangq/data/alignment/Ensembl/Bdis ]
 then
@@ -169,6 +196,33 @@ then
     mv MtDNA.fa MtDNA.fa.skip
 else
     echo "==> /home/wangq/data/alignment/Ensembl/Cele exists"
+fi
+
+# Dictyostelium discoideum
+if [ ! -d /home/wangq/data/alignment/Ensembl/Ddis ]
+then
+    echo "==> Dictyostelium discoideum"
+
+    mkdir -p /home/wangq/data/alignment/Ensembl/Ddis
+    cd /home/wangq/data/alignment/Ensembl/Ddis
+    
+    find /home/wangq/data/ensembl82/fasta/dictyostelium_discoideum/dna/ -name "*dna_sm.toplevel*" \
+        | xargs gzip -d -c > toplevel.fa
+    
+    faops count toplevel.fa \
+        | perl -aln -e '
+            next if $F[0] eq 'total';
+            print $F[0] if $F[1] > 50000;
+            print $F[0] if $F[1] > 5000  and $F[6]/$F[1] < 0.05;
+            ' \
+        | uniq > listFile
+    faops some toplevel.fa listFile toplevel.filtered.fa
+    faops split-name toplevel.filtered.fa .
+    rm toplevel.fa toplevel.filtered.fa listFile
+
+
+else
+    echo "==> /home/wangq/data/alignment/Ensembl/Ddis exists"
 fi
 
 # Drosophila melanogaster
@@ -523,6 +577,33 @@ else
     echo "==> /home/wangq/data/alignment/Ensembl/Chimp exists"
 fi
 
+# Plasmodium falciparum
+if [ ! -d /home/wangq/data/alignment/Ensembl/Pfal ]
+then
+    echo "==> Plasmodium falciparum"
+
+    mkdir -p /home/wangq/data/alignment/Ensembl/Pfal
+    cd /home/wangq/data/alignment/Ensembl/Pfal
+    
+    find /home/wangq/data/ensembl82/fasta/plasmodium_falciparum/dna/ -name "*dna_sm.toplevel*" \
+        | xargs gzip -d -c > toplevel.fa
+    
+    faops count toplevel.fa \
+        | perl -aln -e '
+            next if $F[0] eq 'total';
+            print $F[0] if $F[1] > 50000;
+            print $F[0] if $F[1] > 5000  and $F[6]/$F[1] < 0.05;
+            ' \
+        | uniq > listFile
+    faops some toplevel.fa listFile toplevel.filtered.fa
+    faops split-name toplevel.filtered.fa .
+    rm toplevel.fa toplevel.filtered.fa listFile
+
+
+else
+    echo "==> /home/wangq/data/alignment/Ensembl/Pfal exists"
+fi
+
 # Pongo abelii
 if [ ! -d /home/wangq/data/alignment/Ensembl/Orangutan ]
 then
@@ -607,6 +688,33 @@ then
     mv Mito.fa Mito.fa.skip
 else
     echo "==> /home/wangq/data/alignment/Ensembl/S288c exists"
+fi
+
+# Schizosaccharomyces pombe
+if [ ! -d /home/wangq/data/alignment/Ensembl/Spom ]
+then
+    echo "==> Schizosaccharomyces pombe"
+
+    mkdir -p /home/wangq/data/alignment/Ensembl/Spom
+    cd /home/wangq/data/alignment/Ensembl/Spom
+    
+    find /home/wangq/data/ensembl82/fasta/schizosaccharomyces_pombe/dna/ -name "*dna_sm.toplevel*" \
+        | xargs gzip -d -c > toplevel.fa
+    
+    faops count toplevel.fa \
+        | perl -aln -e '
+            next if $F[0] eq 'total';
+            print $F[0] if $F[1] > 50000;
+            print $F[0] if $F[1] > 5000  and $F[6]/$F[1] < 0.05;
+            ' \
+        | uniq > listFile
+    faops some toplevel.fa listFile toplevel.filtered.fa
+    faops split-name toplevel.filtered.fa .
+    rm toplevel.fa toplevel.filtered.fa listFile
+
+
+else
+    echo "==> /home/wangq/data/alignment/Ensembl/Spom exists"
 fi
 
 # Setaria italica

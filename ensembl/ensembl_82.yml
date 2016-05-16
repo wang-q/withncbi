@@ -209,12 +209,15 @@ species:
   "Plasmodium falciparum":
     core: 1
     initrc: 1
+    fasta: 1
   "Dictyostelium discoideum":
     core: 1
     initrc: 1
+    fasta: 1
   "Aspergillus fumigatus":
     core: 1
     initrc: 1
+    fasta: 1
   "Saccharomyces cerevisiae":
     core:
       aliases:
@@ -228,6 +231,7 @@ species:
   "Schizosaccharomyces pombe":
     core: 1
     initrc: 1
+    fasta: 1
   "Fungi":
     skip: 1
     compara:
