@@ -20,7 +20,7 @@ cd ~/data/alt-splice/ase_flanking/
 # Runtime 20 minutes and 45 seconds.
 perl ~/Scripts/alignDB/util/dup_db.pl -f ~/data/dumps/mysql/Human_n12_pop_basic.sql.gz -g Human_n12_ase_flanking
 
-# Runtime 8 hours and 42 minutes.
+# Runtime 6 hours and 11 minutes.
 # ==> Ofg in files: [228173]      Ofg inserted: [212356]
 perl ~/Scripts/alignDB/ofg/insert_position.pl \
     -d Human_n12_ase_flanking \
@@ -34,14 +34,22 @@ perl ~/Scripts/alignDB/init/update_sw_cv.pl \
     -d Human_n12_ase_flanking \
     --parallel 12
 
-perl ~/Scripts/alignDB/init/update_feature.pl \
+perl ~/Scripts/alignDB/init/update_annotation.pl \
     -d Human_n12_ase_flanking \
-    -e homo_sapiens_core_82_37 \
+    -a ~/data/alignment/Ensembl/Human/anno.yml \
     --parallel 12
+
+perl ~/Scripts/alignDB/init/update_snp_ld.pl \
+    -d Human_n12_ase_flanking --parallel 12
 
 perl ~/Scripts/alignDB/stat/ofg_stat_factory.pl \
     --by type -d Human_n12_ase_flanking \
     --index --chart \
     -o Human_n12_ase_flanking.ofg.xlsx
+
+perl ~/Scripts/alignDB/stat/ld_stat_factory.pl \
+    -d Human_n12_ase_flanking \
+    --index --chart \
+    -o Human_n12_ase_flanking.ld.xlsx
 
 ```
