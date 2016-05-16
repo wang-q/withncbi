@@ -130,7 +130,7 @@ for my $sp ( sort keys %{$species_ref} ) {
     # build databases
     for my $group (qw{core funcgen otherfeatures variation compara}) {
         if ( $info->{$group} ) {
-            my ( $ensembl_base, $cmd ) = build_cmd( $sp, $group, $mysql_dir );
+            my ( $ensembl_base, $cmd ) = build_cmd( $sp, $group );
             $core_dbname = $ensembl_base if $group eq "core";
             $build_str .= $cmd;
             if ( $info->{initrc} ) {
@@ -166,11 +166,11 @@ for my $sp ( sort keys %{$species_ref} ) {
                 $append = $info->{fasta}{append} . "\n";
             }
         }
-        $fasta_str .= build_fasta( $sp, $fasta_dir, $dest_dir, $alias, $pattern, $append );
+        $fasta_str .= build_fasta( $sp, $alias, $pattern, $append );
 
         # build anno
         if ( $info->{core} ) {
-            $anno_str .= build_anno( $sp, $dest_dir, $core_dbname, $alias );
+            $anno_str .= build_anno( $sp, $core_dbname, $alias );
 
         }
     }
@@ -197,7 +197,6 @@ $stopwatch->end_message;
 #----------------------------------------------------------#
 sub build_anno {
     my $sp          = shift;
-    my $dest_dir    = shift;
     my $core_dbname = shift;
     my $alias       = shift;
 
@@ -249,12 +248,10 @@ EOF
 }
 
 sub build_fasta {
-    my $sp        = shift;
-    my $fasta_dir = shift;
-    my $dest_dir  = shift;
-    my $alias     = shift;
-    my $pattern   = shift;
-    my $append    = shift;
+    my $sp      = shift;
+    my $alias   = shift;
+    my $pattern = shift;
+    my $append  = shift;
 
     my %score_of;
     my ( $genus, $species, $strain ) = split " ", $sp;
@@ -328,9 +325,8 @@ EOF
 }
 
 sub build_cmd {
-    my $sp        = shift;
-    my $group     = shift;
-    my $mysql_dir = shift;
+    my $sp    = shift;
+    my $group = shift;
 
     my %score_of;
     my ( $genus, $species, $strain ) = split " ", $sp;
