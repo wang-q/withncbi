@@ -33,15 +33,19 @@ done
 
 ```
 
-## Restore vsself databases
+## Restore vsself and pop databases
 
 ```bash
 perl ~/Scripts/alignDB/util/dup_db.pl -g Athavsself_tdna -f ~/data/dumps/mysql/Athavsself.sql.gz
+perl ~/Scripts/alignDB/util/dup_db.pl -g Ath_n19_pop_tdna -f ~/data/dumps/mysql/Ath_n19_pop.sql.gz
 ```
 
 ## Use style 'center'
 
 ```bash
+mkdir -p ~/data/salk/results
+cd ~/data/salk/results
+
 perl ~/Scripts/alignDB/ofg/insert_position.pl \
     -d Athavsself_tdna  --style center --batch 50 --parallel 8 \
     --tag tdna --type CMT  -f ~/data/salk/Atha/T-DNA.CMT.pos.txt  \
@@ -56,10 +60,15 @@ perl ~/Scripts/alignDB/ofg/insert_position.pl \
     --tag tdna --type SK   -f ~/data/salk/Atha/T-DNA.SK.pos.txt   \
     --tag tdna --type WISC -f ~/data/salk/Atha/T-DNA.WISC.pos.txt
 
-perl ~/Scripts/alignDB/init/update_sw_cv.pl -d Athavsself_tdna --batch 10 --parallel 8
-perl ~/Scripts/alignDB/init/update_feature.pl -d Athavsself_tdna \
-    -e arabidopsis_thaliana_core_29_82_10 --batch 10 --parallel 8
+perl ~/Scripts/alignDB/init/update_sw_cv.pl \
+    -d Athavsself_tdna \
+    --batch 10 --parallel 8
+perl ~/Scripts/alignDB/init/update_annotation.pl \
+    -d Athavsself_tdna \
+    -a ~/data/alignment/Ensembl/Atha/anno.yml \
+    --batch 10 --parallel 8
 
-perl ~/Scripts/alignDB/stat/ofg_stat_factory.pl --by tt --index --chart \
+perl ~/Scripts/alignDB/stat/ofg_stat_factory.pl \
+    --by tt --index --chart \
     -d Athavsself_tdna -o ~/data/salk/Athavsself_tdna.ofg.xlsx
 ```

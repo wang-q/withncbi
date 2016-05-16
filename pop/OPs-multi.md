@@ -14,15 +14,17 @@ mkdir -p ~/data/dumps/mysql
 ```bash
 cd ~/data/alignment/xlsx
 
+# Runtime 12 minutes and 55 seconds.
 perl ~/Scripts/alignDB/util/multi_way_batch.pl \
     -d Scer_n8_pop \
     -da ~/data/alignment/Fungi/scer_wgs/Scer_n8_pop_refined \
+    -a ~/data/alignment/Ensembl/S288c/anno.yml \
     -e saccharomyces_cerevisiae_core_29_82_4 \
     -chr ~/data/alignment/Fungi/scer_wgs/chr_length.csv \
-    -lt 5000 --parallel 8 --batch 5 \
+    -lt 5000 --parallel 8 --batch 10 \
     --run all
 
-perl ~/Scripts/alignDB/util/dup_db.pl -d Scer_n8_pop -f ~/data/dumps/mysql/Scer_n8_pop.sql.gz
+perl ~/Scripts/alignDB/util/dup_db.pl --yes -d Scer_n8_pop -f ~/data/dumps/mysql/Scer_n8_pop.sql.gz
 
 ```
 
@@ -31,15 +33,17 @@ perl ~/Scripts/alignDB/util/dup_db.pl -d Scer_n8_pop -f ~/data/dumps/mysql/Scer_
 ```bash
 cd ~/data/alignment/xlsx
 
+# Runtime 5 hours and 29 minutes.
 perl ~/Scripts/alignDB/util/multi_way_batch.pl \
     -d Ath_n19_pop \
     -da ~/data/alignment/arabidopsis82/Ath_n19_pop_refined \
+    -a ~/data/alignment/Ensembl/Atha/anno.yml \
     -e arabidopsis_thaliana_core_29_82_10 \
     -chr ~/data/alignment/arabidopsis82/chr_length.csv \
-    -lt 5000 --parallel 8 --batch 5 \
+    -lt 5000 --parallel 12 \
     --run all
 
-perl ~/Scripts/alignDB/util/dup_db.pl -d Ath_n19_pop -f ~/data/dumps/mysql/Ath_n19_pop.sql.gz
+perl ~/Scripts/alignDB/util/dup_db.pl --yes -d Ath_n19_pop -f ~/data/dumps/mysql/Ath_n19_pop.sql.gz
 
 ```
 
@@ -48,15 +52,17 @@ perl ~/Scripts/alignDB/util/dup_db.pl -d Ath_n19_pop -f ~/data/dumps/mysql/Ath_n
 ```bash
 cd ~/data/alignment/xlsx
 
+# Runtime 9 hours and 20 minutes.
 perl ~/Scripts/alignDB/util/multi_way_batch.pl \
     -d OsatJap_n24_pop \
     -da ~/data/alignment/rice82/OsatJap_n24_pop_refined \
+    -a ~/data/alignment/Ensembl/OsatJap/anno.yml \
     -e oryza_sativa_core_29_82_7 \
     -chr ~/data/alignment/rice82/chr_length.csv \
-    -lt 5000 --parallel 8 --batch 5 \
+    -lt 5000 --parallel 12 \
     --run all
 
-perl ~/Scripts/alignDB/util/dup_db.pl -d OsatJap_n24_pop -f ~/data/dumps/mysql/OsatJap_n24_pop.sql.gz
+perl ~/Scripts/alignDB/util/dup_db.pl --yes -d OsatJap_n24_pop -f ~/data/dumps/mysql/OsatJap_n24_pop.sql.gz
 
 ```
 
@@ -68,12 +74,13 @@ cd ~/data/alignment/xlsx
 perl ~/Scripts/alignDB/util/multi_way_batch.pl \
     -d Dmel_n22_pop \
     -da ~/data/alignment/dpgp82/Dmel_n22_pop_refined \
+    -a ~/data/alignment/Ensembl/Dmel/anno.yml \
     -e drosophila_melanogaster_core_82_602 \
     -chr ~/data/alignment/dpgp82/chr_length.csv \
     -lt 5000 --parallel 12 \
     --run all
 
-perl ~/Scripts/alignDB/util/dup_db.pl -d Dmel_n22_pop -f ~/data/dumps/mysql/Dmel_n22_pop.sql.gz
+perl ~/Scripts/alignDB/util/dup_db.pl --yes -d Dmel_n22_pop -f ~/data/dumps/mysql/Dmel_n22_pop.sql.gz
 
 ```
 
@@ -85,6 +92,7 @@ cd ~/data/alignment/xlsx
 perl ~/Scripts/alignDB/util/multi_way_batch.pl \
     -d Cele_n41_pop \
     -da ~/data/alignment/cele82/Cele_n41_pop_refined \
+    -a ~/data/alignment/Ensembl/Cele/anno.yml \
     -e caenorhabditis_elegans_core_82_245 \
     -chr ~/data/alignment/cele82/chr_length.csv \
     -lt 5000 --parallel 12 \
@@ -101,6 +109,7 @@ cd ~/data/alignment/xlsx
 perl ~/Scripts/alignDB/util/multi_way_batch.pl \
     -d Ddis_n18_pop \
     -da ~/data/alignment/Protists/Ddis/Ddis_n18_pop_refined \
+    -a ~/data/alignment/Ensembl/Ddis/anno.yml \
     -e dictyostelium_discoideum_core_29_82_1 \
     --chr ~/data/alignment/Protists/Ddis/chr_length.csv \
     -lt 5000 --parallel 12 \
@@ -146,17 +155,18 @@ perl ~/Scripts/alignDB/util/dup_db.pl -d Human_n11cg_chimp -f ~/data/dumps/mysql
 ```bash
 cd ~/data/alignment/xlsx
 
-# Runtime 8 hours and 32 minutes.
+# Runtime 4 hours and 58 minutes.
 perl ~/Scripts/alignDB/util/multi_way_batch.pl \
     -d Human_n12_pop_basic \
     -da ~/data/alignment/human_simons/Human_n12_pop_refined \
+    -a ~/data/alignment/Ensembl/Human/anno.yml \
     -e homo_sapiens_core_82_37 \
     -chr ~/data/alignment/human_simons/chr_length.csv \
     -lt 5000 --parallel 12 \
     --run basic
 
-# Runtime 1 hour and 2 minutes.
-perl ~/Scripts/alignDB/util/dup_db.pl -d Human_n12_pop_basic -f ~/data/dumps/mysql/Human_n12_pop_basic.sql.gz
+# Runtime 58 minutes and 42 seconds.
+perl ~/Scripts/alignDB/util/dup_db.pl --yes -d Human_n12_pop_basic -f ~/data/dumps/mysql/Human_n12_pop_basic.sql.gz
 
 # Runtime 2 days and 11 hours
 perl ~/Scripts/alignDB/util/multi_way_batch.pl \
@@ -179,6 +189,7 @@ cd ~/data/alignment/xlsx
 perl ~/Scripts/alignDB/util/multi_way_batch.pl \
     -d Mouse_n11_pop \
     -da ~/data/alignment/mouse82/Mouse_n11_pop_refined  \
+    -a ~/data/alignment/Ensembl/Mouse/anno.yml \
     -e mus_musculus_core_82_38 \
     --chr ~/data/alignment/mouse82/chr_length.csv \
     -lt 5000 --parallel 12 \
@@ -196,6 +207,7 @@ cd ~/data/alignment/xlsx
 perl ~/Scripts/alignDB/util/multi_way_batch.pl \
     -d Pfal_n7_pop \
     -da ~/data/alignment/Protists/pfal/Pfal_n7_pop_refined  \
+    -a ~/data/alignment/Ensembl/Pfal/anno.yml \
     -e plasmodium_falciparum_core_29_82_3 \
     --chr ~/data/alignment/Protists/pfal/chr_length.csv \
     -lt 5000 --parallel 12 \

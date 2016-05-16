@@ -68,7 +68,7 @@ perl ~/Scripts/alignDB/init/gen_alignDB_genome.pl \
     --length 500000 \
     --parallel 8
 
-perl ~/Scripts/alignDB/util/dup_db.pl -d Athavsself -f ~/data/dumps/mysql/Athavsself.sql.gz
+perl ~/Scripts/alignDB/util/dup_db.pl --yes -d Athavsself -f ~/data/dumps/mysql/Athavsself.sql.gz
 ```
 
 ## OsatJap
@@ -85,7 +85,7 @@ perl ~/Scripts/alignDB/init/gen_alignDB_genome.pl \
     --length 500000 \
     --parallel 8
 
-perl ~/Scripts/alignDB/util/dup_db.pl -d OsatJapvsself -f ~/data/dumps/mysql/OsatJapvsself.sql.gz
+perl ~/Scripts/alignDB/util/dup_db.pl --yes -d OsatJapvsself -f ~/data/dumps/mysql/OsatJapvsself.sql.gz
 ```
 
 ## Dmel
@@ -102,7 +102,7 @@ perl ~/Scripts/alignDB/init/gen_alignDB_genome.pl \
     --length 500000 \
     --parallel 8
 
-perl ~/Scripts/alignDB/util/dup_db.pl -d Dmelvsself -f ~/data/dumps/mysql/Dmelvsself.sql.gz
+perl ~/Scripts/alignDB/util/dup_db.pl --yes -d Dmelvsself -f ~/data/dumps/mysql/Dmelvsself.sql.gz
 ```
 
 ## Mouse
@@ -119,7 +119,7 @@ perl ~/Scripts/alignDB/init/gen_alignDB_genome.pl \
     --length 500000 \
     --parallel 8
 
-perl ~/Scripts/alignDB/util/dup_db.pl -d Mousevsself -f ~/data/dumps/mysql/Mousevsself.sql.gz
+perl ~/Scripts/alignDB/util/dup_db.pl --yes -d Mousevsself -f ~/data/dumps/mysql/Mousevsself.sql.gz
 ```
 
 ## S288c
@@ -136,5 +136,5 @@ perl ~/Scripts/alignDB/init/gen_alignDB_genome.pl \
     --length 500000 \
     --parallel 8
 
-perl ~/Scripts/alignDB/util/dup_db.pl -d S288cvsself -f ~/data/dumps/mysql/S288cvsself.sql.gz
+perl ~/Scripts/alignDB/util/dup_db.pl --yes -d S288cvsself -f ~/data/dumps/mysql/S288cvsself.sql.gz
 ```

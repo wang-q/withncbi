@@ -17,7 +17,7 @@ $ perl ~/Scripts/tool/list_dirtree.pl ~/data/alt-splice/ase_flanking/
 ```bash
 cd ~/data/alt-splice/ase_flanking/
 
-# Runtime 19 minutes and 37 seconds.
+# Runtime 20 minutes and 45 seconds.
 perl ~/Scripts/alignDB/util/dup_db.pl -f ~/data/dumps/mysql/Human_n12_pop_basic.sql.gz -g Human_n12_ase_flanking
 
 # Runtime 8 hours and 42 minutes.
