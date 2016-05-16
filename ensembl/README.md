@@ -173,12 +173,16 @@ rsync -avP \
 mkdir -p ~/data/ensembl82/gff3
 cd ~/data/ensembl82/gff3
 
-# All plants
-wget -m ftp://ftp.ensemblgenomes.org/pub/plants/release-29/gff3 .
+# Plants
+rsync -avP \
+    --exclude='*_collection' \
+    --exclude='*.dna.*' \
+    --exclude='*.dna_rm.*' \
+    --exclude='*.chromosome.*' \
+    --exclude='*.nonchromosomal.*' \
+    rsync://ftp.ensemblgenomes.org/all/pub/plants/release-29/gff3/ \
+    ~/data/ensembl82/gff3
 
-mv ftp.ensemblgenomes.org/pub/plants/release-29/gff3/* .
-
-find . -name ".listing" | xargs rm
 ```
 
 ## Build local databases
