@@ -64,6 +64,7 @@ $stopwatch->block_message("Load ncbi taxdmp.");
 my $taxon_db = Bio::DB::Taxonomy->new(
     -source    => 'flatfile',
     -directory => $td_dir,
+    -force     => 0,
     -nodesfile => "$td_dir/nodes.dmp",
     -namesfile => "$td_dir/names.dmp",
 );
