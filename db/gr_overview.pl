@@ -3,11 +3,12 @@ use strict;
 use warnings;
 use autodie;
 
-use Getopt::Long qw(HelpMessage);
+use Getopt::Long;
 use Config::Tiny;
 use FindBin;
-use YAML qw(Dump Load DumpFile LoadFile);
+use YAML::Syck;
 
+use DBI;
 use AlignDB::Stopwatch;
 use AlignDB::ToXLSX;
 
@@ -34,14 +35,14 @@ gr_overview.pl - Overviews for NCBI GENOME_REPORTS
 =cut
 
 GetOptions(
-    'help|?' => sub { HelpMessage(0) },
+    'help|?' => sub { Getopt::Long::HelpMessage(0) },
     'server|s=s'   => \( my $server   = $Config->{database}{server} ),
     'port|P=i'     => \( my $port     = $Config->{database}{port} ),
     'db|d=s'       => \( my $db_name  = $Config->{database}{db} ),
     'username|u=s' => \( my $username = $Config->{database}{username} ),
     'password|p=s' => \( my $password = $Config->{database}{password} ),
     'output|o=s'   => \my $outfile,
-) or HelpMessage(1);
+) or Getopt::Long::HelpMessage(1);
 
 unless ($outfile) {
     $outfile = $db_name . "_overview.xlsx";
@@ -52,10 +53,10 @@ unless ($outfile) {
 #----------------------------------------------------------#
 $stopwatch->start_message("Overviews for $db_name...");
 
+my $dbh = DBI->connect( "dbi:mysql:$db_name:$server", $username, $password )
+    or die "Cannot connect to MySQL database at $db_name:$server";
 my $to_xlsx = AlignDB::ToXLSX->new(
-    mysql   => "$db_name:$server",
-    user    => $username,
-    passwd  => $password,
+    dbh     => $dbh,
     outfile => $outfile,
 );
 
@@ -65,39 +66,26 @@ my $to_xlsx = AlignDB::ToXLSX->new(
 my $strains = sub {
     my $sheet_name = 'strains';
     my $sheet;
-    my ( $sheet_row, $sheet_col );
+    $to_xlsx->row(0);
+    $to_xlsx->column(0);
 
-    {    # write header
-        my $sql_query = q{
-            SELECT  *
-            FROM gr
-            WHERE 1 = 1
-        };
-        ( $sheet_row, $sheet_col ) = ( 0, 0 );
-        my %option = (
-            sql_query => $sql_query,
-            sheet_row => $sheet_row,
-            sheet_col => $sheet_col,
-        );
-        ( $sheet, $sheet_row ) = $to_xlsx->write_header_sql( $sheet_name, \%option );
+    my $sql_query = q{
+        SELECT  *
+        FROM gr
+        WHERE 1 = 1
+    };
+
+    {    # header
+        my @names = $to_xlsx->sql2names($sql_query);
+        $sheet = $to_xlsx->write_header( $sheet_name, { header => \@names } );
     }
 
     {    # write contents
             # species' member, chr_number and genus_member
-        my $sql_query = q{
-            SELECT  *
-            FROM gr
-            WHERE 1 = 1
-        };
-        my %option = (
-            sql_query => $sql_query,
-            sheet_row => $sheet_row,
-            sheet_col => $sheet_col,
-        );
-        ($sheet_row) = $to_xlsx->write_content_direct( $sheet, \%option );
+        $to_xlsx->write_sql( $sheet, { sql_query => $sql_query, } );
     }
 
-    print "Sheet \"$sheet_name\" has been generated.\n";
+    print "Sheet [$sheet_name] has been generated.\n";
 };
 
 #----------------------------------------------------------#
@@ -106,19 +94,15 @@ my $strains = sub {
 my $species = sub {
     my $sheet_name = 'species';
     my $sheet;
-    my ( $sheet_row, $sheet_col );
+    $to_xlsx->row(0);
+    $to_xlsx->column(0);
 
     {    # write header
-        my @headers = qw{ genus_id genus species_id species
-            avg_genome_size avg_gc species_member genus_species_member
-            genus_strain_member code };
-        ( $sheet_row, $sheet_col ) = ( 0, 0 );
-        my %option = (
-            sheet_row => $sheet_row,
-            sheet_col => $sheet_col,
-            header    => \@headers,
-        );
-        ( $sheet, $sheet_row ) = $to_xlsx->write_header_direct( $sheet_name, \%option );
+        my @names = qw{
+            genus_id genus species_id species avg_genome_size avg_gc species_member
+            genus_species_member genus_strain_member code
+        };
+        $sheet = $to_xlsx->write_header( $sheet_name, { header => \@names } );
     }
 
     {    # write contents
@@ -137,15 +121,10 @@ my $species = sub {
             WHERE   1 = 1
             GROUP BY species
         };
-        my %option = (
-            sql_query => $sql_query,
-            sheet_row => $sheet_row,
-            sheet_col => $sheet_col,
-        );
-        ($sheet_row) = $to_xlsx->write_content_direct( $sheet, \%option );
+        $to_xlsx->write_sql( $sheet, { sql_query => $sql_query, } );
     }
 
-    print "Sheet \"$sheet_name\" has been generated.\n";
+    print "Sheet [$sheet_name] has been generated.\n";
 };
 
 #----------------------------------------------------------#
@@ -154,20 +133,15 @@ my $species = sub {
 my $gc_checklist = sub {
     my $sheet_name = 'gc_checklist';
     my $sheet;
-    my ( $sheet_row, $sheet_col );
+    $to_xlsx->row(0);
+    $to_xlsx->column(0);
 
     {    # write header
-        my @headers = qw{
+        my @names = qw{
             genus_id genus species_id species avg_genome_size avg_gc count code
             table tree align xlsx
         };
-        ( $sheet_row, $sheet_col ) = ( 0, 0 );
-        my %option = (
-            sheet_row => $sheet_row,
-            sheet_col => $sheet_col,
-            header    => \@headers,
-        );
-        ( $sheet, $sheet_row ) = $to_xlsx->write_header_direct( $sheet_name, \%option );
+        $sheet = $to_xlsx->write_header( $sheet_name, { header => \@names } );
     }
 
     {    # write contents
@@ -186,15 +160,10 @@ my $gc_checklist = sub {
             GROUP BY species_id
             ORDER BY species
         };
-        my %option = (
-            sql_query => $sql_query,
-            sheet_row => $sheet_row,
-            sheet_col => $sheet_col,
-        );
-        ($sheet_row) = $to_xlsx->write_content_direct( $sheet, \%option );
+        $to_xlsx->write_sql( $sheet, { sql_query => $sql_query, } );
     }
 
-    print "Sheet \"$sheet_name\" has been generated.\n";
+    print "Sheet [$sheet_name] has been generated.\n";
 };
 
 #----------------------------------------------------------#
@@ -203,20 +172,15 @@ my $gc_checklist = sub {
 my $gr_gc_checklist = sub {
     my $sheet_name = 'gr_gc_checklist';
     my $sheet;
-    my ( $sheet_row, $sheet_col );
+    $to_xlsx->row(0);
+    $to_xlsx->column(0);
 
     {    # write header
-        my @headers = qw{
+        my @names = qw{
             group genus_id species_id species avg_genome_size avg_gc count code
             table tree align xlsx
         };
-        ( $sheet_row, $sheet_col ) = ( 0, 0 );
-        my %option = (
-            sheet_row => $sheet_row,
-            sheet_col => $sheet_col,
-            header    => \@headers,
-        );
-        ( $sheet, $sheet_row ) = $to_xlsx->write_header_direct( $sheet_name, \%option );
+        $sheet = $to_xlsx->write_header( $sheet_name, { header => \@names } );
     }
 
     {    # write contents
@@ -238,15 +202,10 @@ my $gr_gc_checklist = sub {
             HAVING count > 2 AND species_code > 0
             ORDER BY group_name, species
         };
-        my %option = (
-            sql_query => $sql_query,
-            sheet_row => $sheet_row,
-            sheet_col => $sheet_col,
-        );
-        ($sheet_row) = $to_xlsx->write_content_direct( $sheet, \%option );
+        $to_xlsx->write_sql( $sheet, { sql_query => $sql_query, } );
     }
 
-    print "Sheet \"$sheet_name\" has been generated.\n";
+    print "Sheet [$sheet_name] has been generated.\n";
 };
 
 {
