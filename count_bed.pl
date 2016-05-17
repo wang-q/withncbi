@@ -277,36 +277,17 @@ __END__
 
 =head1 NAME
 
-    count_bed.pl - Add annotation info to alignDB
+count_bed.pl - Add annotation info to alignDB
 
 =head1 SYNOPSIS
 
-    insert_spo11.pl [options]
-     Options:
-       --help            brief help message
-       --man             full documentation
-       --server          MySQL server IP/Domain name
-       --db              database name
-       --username        username
-       --password        password
-
-=head1 OPTIONS
-
-=over 8
-
-=item B<-help>
-
-Print a brief help message and exits.
-
-=item B<-man>
-
-Prints the manual page and exits.
-
-=back
-
-=head1 DESCRIPTION
-
-B<This program> will read the given input file(s) and do someting
-useful with the contents thereof.
+    count_bed.pl [options]
+      Options:
+        --help            brief help message
+        --man             full documentation
+        --server          MySQL server IP/Domain name
+        --db              database name
+        --username        username
+        --password        password
 
 =cut

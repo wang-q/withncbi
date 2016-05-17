@@ -99,8 +99,9 @@ if ( !-e $term_yml_file ) {
 
 my @heads
     = qw{dataType cell cell_tag antibody antibody_tag view itemCount average_size filename};
-my $term_info_of = LoadFile($term_yml_file);
 if ( !-e $raw_stat_file ) {
+    my $term_info_of = LoadFile($term_yml_file);
+
     print "Gather raw stat\n";
 
     my @files_yml
