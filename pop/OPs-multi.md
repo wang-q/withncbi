@@ -89,6 +89,7 @@ perl ~/Scripts/alignDB/util/dup_db.pl --yes -d Dmel_n22_pop -f ~/data/dumps/mysq
 ```bash
 cd ~/data/alignment/xlsx
 
+# Runtime 12 hours and 25 minutes.
 perl ~/Scripts/alignDB/util/multi_way_batch.pl \
     -d Cele_n41_pop \
     -da ~/data/alignment/cele82/Cele_n41_pop_refined \
@@ -98,7 +99,7 @@ perl ~/Scripts/alignDB/util/multi_way_batch.pl \
     -lt 5000 --parallel 12 \
     --run all
 
-perl ~/Scripts/alignDB/util/dup_db.pl -d Cele_n41_pop -f ~/data/dumps/mysql/Cele_n41_pop.sql.gz
+perl ~/Scripts/alignDB/util/dup_db.pl --yes -d Cele_n41_pop -f ~/data/dumps/mysql/Cele_n41_pop.sql.gz
 ```
 
 ## Ddis
@@ -115,7 +116,7 @@ perl ~/Scripts/alignDB/util/multi_way_batch.pl \
     -lt 5000 --parallel 12 \
     --run all
 
-perl ~/Scripts/alignDB/util/dup_db.pl -d Ddis_n18_pop -f ~/data/dumps/mysql/Ddis_n18_pop.sql.gz
+perl ~/Scripts/alignDB/util/dup_db.pl --yes -d Ddis_n18_pop -f ~/data/dumps/mysql/Ddis_n18_pop.sql.gz
 ```
 
 ## Human (complete genomics data)
@@ -178,7 +179,7 @@ perl ~/Scripts/alignDB/util/multi_way_batch.pl \
     --run all
 
 # Runtime 1 hour and 8 minutes.
-perl ~/Scripts/alignDB/util/dup_db.pl -d Human_n12_pop -f ~/data/dumps/mysql/Human_n12_pop.sql.gz
+perl ~/Scripts/alignDB/util/dup_db.pl --yes -d Human_n12_pop -f ~/data/dumps/mysql/Human_n12_pop.sql.gz
 ```
 
 ## Mouse
@@ -213,6 +214,6 @@ perl ~/Scripts/alignDB/util/multi_way_batch.pl \
     -lt 5000 --parallel 12 \
     --run all
 
-perl ~/Scripts/alignDB/util/dup_db.pl -d Pfal_n7_pop -f ~/data/dumps/mysql/Pfal_n7_pop.sql.gz
+perl ~/Scripts/alignDB/util/dup_db.pl --yes -d Pfal_n7_pop -f ~/data/dumps/mysql/Pfal_n7_pop.sql.gz
 
 ```
