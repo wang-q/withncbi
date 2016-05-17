@@ -3,11 +3,12 @@ use strict;
 use warnings;
 use autodie;
 
-use Getopt::Long qw(HelpMessage);
+use Getopt::Long;
 use Config::Tiny;
 use FindBin;
-use YAML qw(Dump Load DumpFile LoadFile);
+use YAML::Syck;
 
+use DBI;
 use AlignDB::Stopwatch;
 use AlignDB::ToXLSX;
 
@@ -35,14 +36,14 @@ ar_overview_tx.pl - Overviews for NCBI ASSEMBLY_REPORTS
 =cut
 
 GetOptions(
-    'help|?' => sub { HelpMessage(0) },
+    'help|?' => sub { Getopt::Long::HelpMessage(0) },
     'server|s=s'   => \( my $server   = $Config->{database}{server} ),
     'port|P=i'     => \( my $port     = $Config->{database}{port} ),
     'db|d=s'       => \( my $db_name  = $Config->{database}{db} ),
     'username|u=s' => \( my $username = $Config->{database}{username} ),
     'password|p=s' => \( my $password = $Config->{database}{password} ),
     'output|o=s'   => \my $outfile,
-) or HelpMessage(1);
+) or Getopt::Long::HelpMessage(1);
 
 unless ($outfile) {
     $outfile = $db_name . "_overview.xlsx";
@@ -53,10 +54,10 @@ unless ($outfile) {
 #----------------------------------------------------------#
 $stopwatch->start_message("Overviews for $db_name...");
 
+my $dbh = DBI->connect( "dbi:mysql:$db_name:$server", $username, $password )
+    or die "Cannot connect to MySQL database at $db_name:$server";
 my $to_xlsx = AlignDB::ToXLSX->new(
-    mysql   => "$db_name:$server",
-    user    => $username,
-    passwd  => $password,
+    dbh     => $dbh,
     outfile => $outfile,
 );
 
@@ -66,39 +67,26 @@ my $to_xlsx = AlignDB::ToXLSX->new(
 my $strains = sub {
     my $sheet_name = 'strains';
     my $sheet;
-    my ( $sheet_row, $sheet_col );
+    $to_xlsx->row(0);
+    $to_xlsx->column(0);
 
-    {    # write header
-        my $sql_query = q{
-            SELECT  *
-            FROM ar
-            WHERE 1 = 1
-        };
-        ( $sheet_row, $sheet_col ) = ( 0, 0 );
-        my %option = (
-            sql_query => $sql_query,
-            sheet_row => $sheet_row,
-            sheet_col => $sheet_col,
-        );
-        ( $sheet, $sheet_row ) = $to_xlsx->write_header_sql( $sheet_name, \%option );
+    my $sql_query = q{
+        SELECT  *
+        FROM ar
+        WHERE 1 = 1
+    };
+
+    {    # header
+        my @names = $to_xlsx->sql2names($sql_query);
+        $sheet = $to_xlsx->write_header( $sheet_name, { header => \@names } );
     }
 
     {    # write contents
             # species' member, chr_number and genus_member
-        my $sql_query = q{
-            SELECT  *
-            FROM ar
-            WHERE 1 = 1
-        };
-        my %option = (
-            sql_query => $sql_query,
-            sheet_row => $sheet_row,
-            sheet_col => $sheet_col,
-        );
-        ($sheet_row) = $to_xlsx->write_content_direct( $sheet, \%option );
+        $to_xlsx->write_sql( $sheet, { sql_query => $sql_query, } );
     }
 
-    print "Sheet \"$sheet_name\" has been generated.\n";
+    print "Sheet [$sheet_name] has been generated.\n";
 };
 
 #----------------------------------------------------------#
@@ -107,18 +95,13 @@ my $strains = sub {
 my $species = sub {
     my $sheet_name = 'species';
     my $sheet;
-    my ( $sheet_row, $sheet_col );
+    $to_xlsx->row(0);
+    $to_xlsx->column(0);
 
     {    # write header
-        my @headers = qw{ genus_id genus species_id species species_member
+        my @names = qw{ genus_id genus species_id species species_member
             genus_species_member genus_strain_member code };
-        ( $sheet_row, $sheet_col ) = ( 0, 0 );
-        my %option = (
-            sheet_row => $sheet_row,
-            sheet_col => $sheet_col,
-            header    => \@headers,
-        );
-        ( $sheet, $sheet_row ) = $to_xlsx->write_header_direct( $sheet_name, \%option );
+        $sheet = $to_xlsx->write_header( $sheet_name, { header => \@names } );
     }
 
     {    # write contents
@@ -135,15 +118,10 @@ my $species = sub {
             WHERE   1 = 1
             GROUP BY species
         };
-        my %option = (
-            sql_query => $sql_query,
-            sheet_row => $sheet_row,
-            sheet_col => $sheet_col,
-        );
-        ($sheet_row) = $to_xlsx->write_content_direct( $sheet, \%option );
+        $to_xlsx->write_sql( $sheet, { sql_query => $sql_query, } );
     }
 
-    print "Sheet \"$sheet_name\" has been generated.\n";
+    print "Sheet [$sheet_name] has been generated.\n";
 };
 
 #----------------------------------------------------------#
@@ -152,23 +130,17 @@ my $species = sub {
 my $group = sub {
     my $sheet_name = 'group';
     my $sheet;
-    my ( $sheet_row, $sheet_col );
+    $to_xlsx->row(0);
+    $to_xlsx->column(1);
 
     {    # write header
-        my @headers = qw{ group_name genus_member species_member strain_member };
-        ( $sheet_row, $sheet_col ) = ( 0, 1 );
-        my %option = (
-            sheet_row => $sheet_row,
-            sheet_col => $sheet_col,
-            header    => \@headers,
-        );
-        ( $sheet, $sheet_row ) = $to_xlsx->write_header_direct( $sheet_name, \%option );
+        my @names = qw{ group_name genus_member species_member strain_member };
+        $sheet = $to_xlsx->write_header( $sheet_name, { header => \@names } );
     }
 
     {    # write contents
         my $query_name = 'superkingdom';
-        $sheet_row++;
-        my $sql_query = q{
+        my $sql_query  = q{
             SELECT 
                 superkingdom group_name,
                 COUNT(DISTINCT genus_id) genus_member,
@@ -178,19 +150,17 @@ my $group = sub {
                 ar
             GROUP BY group_name
         };
-        my %option = (
-            query_name => $query_name,
-            sql_query  => $sql_query,
-            sheet_row  => $sheet_row,
-            sheet_col  => $sheet_col,
+        $to_xlsx->write_sql(
+            $sheet,
+            {   query_name => $query_name,
+                sql_query  => $sql_query,
+            }
         );
-        ($sheet_row) = $to_xlsx->write_content_direct( $sheet, \%option );
     }
 
     {    # write contents
         my $query_name = 'Euk subgroup';
-        $sheet_row++;
-        my $sql_query = q{
+        my $sql_query  = q{
             SELECT 
                 (CONCAT(`group`, ', ', subgroup)) group_name,
                 COUNT(DISTINCT genus_id) genus_member,
@@ -200,19 +170,17 @@ my $group = sub {
             WHERE superkingdom = 'Eukaryota'
             GROUP BY group_name
         };
-        my %option = (
-            query_name => $query_name,
-            sql_query  => $sql_query,
-            sheet_row  => $sheet_row,
-            sheet_col  => $sheet_col,
+        $to_xlsx->write_sql(
+            $sheet,
+            {   query_name => $query_name,
+                sql_query  => $sql_query,
+            }
         );
-        ($sheet_row) = $to_xlsx->write_content_direct( $sheet, \%option );
     }
 
     {    # write contents
         my $query_name = 'Prok group';
-        $sheet_row++;
-        my $sql_query = q{
+        my $sql_query  = q{
             SELECT 
                 `group` group_name,
                 COUNT(DISTINCT genus_id) genus_member,
@@ -222,16 +190,15 @@ my $group = sub {
             WHERE superkingdom != 'Eukaryota'
             GROUP BY group_name
         };
-        my %option = (
-            query_name => $query_name,
-            sql_query  => $sql_query,
-            sheet_row  => $sheet_row,
-            sheet_col  => $sheet_col,
+        $to_xlsx->write_sql(
+            $sheet,
+            {   query_name => $query_name,
+                sql_query  => $sql_query,
+            }
         );
-        ($sheet_row) = $to_xlsx->write_content_direct( $sheet, \%option );
     }
 
-    print "Sheet \"$sheet_name\" has been generated.\n";
+    print "Sheet [$sheet_name] has been generated.\n";
 };
 
 #----------------------------------------------------------#
@@ -240,18 +207,13 @@ my $group = sub {
 my $euk_group = sub {
     my $sheet_name = 'euk_group';
     my $sheet;
-    my ( $sheet_row, $sheet_col );
+    $to_xlsx->row(0);
+    $to_xlsx->column(0);
 
     {    # write header
-        my @headers = qw{ group_name genus_member species_member strain_member
+        my @names = qw{ group_name genus_member species_member strain_member
             genome chromosome scaffold contig };
-        ( $sheet_row, $sheet_col ) = ( 0, 0 );
-        my %option = (
-            sheet_row => $sheet_row,
-            sheet_col => $sheet_col,
-            header    => \@headers,
-        );
-        ( $sheet, $sheet_row ) = $to_xlsx->write_header_direct( $sheet_name, \%option );
+        $sheet = $to_xlsx->write_header( $sheet_name, { header => \@names } );
     }
 
     {    # write contents
@@ -307,14 +269,9 @@ my $euk_group = sub {
                         AND assembly_level = 'Contig'
                 GROUP BY group_name) t4 ON t0.group_name = t4.group_name
         };
-        my %option = (
-            sql_query => $sql_query,
-            sheet_row => $sheet_row,
-            sheet_col => $sheet_col,
-        );
-        ($sheet_row) = $to_xlsx->write_content_direct( $sheet, \%option );
+        $to_xlsx->write_sql( $sheet, { sql_query => $sql_query, } );
     }
-    print "Sheet \"$sheet_name\" has been generated.\n";
+    print "Sheet [$sheet_name] has been generated.\n";
 };
 
 #----------------------------------------------------------#
@@ -324,18 +281,13 @@ my $subgroup_query = sub {
     my $subgroup   = shift;
     my $sheet_name = "subgroup_$subgroup";
     my $sheet;
-    my ( $sheet_row, $sheet_col );
+    $to_xlsx->row(0);
+    $to_xlsx->column(0);
 
     {    # write header
-        my @headers = qw{ genus species_member strain_member
+        my @names = qw{ genus species_member strain_member
             genome chromosome scaffold contig };
-        ( $sheet_row, $sheet_col ) = ( 0, 0 );
-        my %option = (
-            sheet_row => $sheet_row,
-            sheet_col => $sheet_col,
-            header    => \@headers,
-        );
-        ( $sheet, $sheet_row ) = $to_xlsx->write_header_direct( $sheet_name, \%option );
+        $sheet = $to_xlsx->write_header( $sheet_name, { header => \@names } );
     }
 
     {    # write contents
@@ -390,14 +342,9 @@ my $subgroup_query = sub {
                 GROUP BY genus) t4 ON t0.genus = t4.genus
             ORDER BY t0.strain_member DESC
         };
-        my %option = (
-            sql_query => $sql_query,
-            sheet_row => $sheet_row,
-            sheet_col => $sheet_col,
-        );
-        ($sheet_row) = $to_xlsx->write_content_direct( $sheet, \%option );
+        $to_xlsx->write_sql( $sheet, { sql_query => $sql_query, } );
     }
-    print "Sheet \"$sheet_name\" has been generated.\n";
+    print "Sheet [$sheet_name] has been generated.\n";
 };
 
 #----------------------------------------------------------#
@@ -407,18 +354,13 @@ my $genus_query = sub {
     my $genus      = shift;
     my $sheet_name = "genus_$genus";
     my $sheet;
-    my ( $sheet_row, $sheet_col );
+    $to_xlsx->row(0);
+    $to_xlsx->column(0);
 
     {    # write header
-        my @headers = qw{ species strain_member
+        my @names = qw{ species strain_member
             genome chromosome scaffold contig };
-        ( $sheet_row, $sheet_col ) = ( 0, 0 );
-        my %option = (
-            sheet_row => $sheet_row,
-            sheet_col => $sheet_col,
-            header    => \@headers,
-        );
-        ( $sheet, $sheet_row ) = $to_xlsx->write_header_direct( $sheet_name, \%option );
+        $sheet = $to_xlsx->write_header( $sheet_name, { header => \@names } );
     }
 
     {    # write contents
@@ -471,14 +413,9 @@ my $genus_query = sub {
                 GROUP BY species) t4 ON t0.species = t4.species
             ORDER BY t0.strain_member DESC
         };
-        my %option = (
-            sql_query => $sql_query,
-            sheet_row => $sheet_row,
-            sheet_col => $sheet_col,
-        );
-        ($sheet_row) = $to_xlsx->write_content_direct( $sheet, \%option );
+        $to_xlsx->write_sql( $sheet, { sql_query => $sql_query, } );
     }
-    print "Sheet \"$sheet_name\" has been generated.\n";
+    print "Sheet [$sheet_name] has been generated.\n";
 };
 
 {
