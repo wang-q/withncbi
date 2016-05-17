@@ -3,10 +3,10 @@ use strict;
 use warnings;
 use autodie;
 
-use Getopt::Long qw(HelpMessage);
+use Getopt::Long;
 use Config::Tiny;
 use FindBin;
-use YAML qw(Dump Load DumpFile LoadFile);
+use YAML::Syck;
 
 use DBI;
 use Path::Tiny;
@@ -50,10 +50,10 @@ my $gr_dir = path( $Config->{path}{gr} )->stringify;    # genome report
 my $td_dir = path( $Config->{path}{td} )->stringify;    # taxdmp
 
 GetOptions(
-    'help|?' => sub { HelpMessage(0) },
+    'help|?' => sub { Getopt::Long::HelpMessage(0) },
     'euk'    => \my $euk, # eukaryotes instead of prokaryotes
     'output|o=s' => \( my $strain_file = "prok_strains.csv" ),
-) or HelpMessage(1);
+) or Getopt::Long::HelpMessage(1);
 
 #----------------------------------------------------------#
 # init
@@ -72,7 +72,7 @@ my $taxon_db = Bio::DB::Taxonomy->new(
 # load tab sep. txt files
 #----------------------------#
 $stopwatch->block_message("Load ncbi genome report and bioproject summary.");
-my $dbh = DBI->connect("DBI:CSV:");
+my DBI $dbh = DBI->connect("DBI:CSV:");
 
 if ( !$euk ) {
 
@@ -112,8 +112,8 @@ else {
 {
     $stopwatch->block_message("Write summary");
 
-    my $query = qq{
-        SELECT 
+    my $query = q{
+        SELECT
             t0.TaxID,
             t0.Organism_Name,
             t0.BioProject_Accession,
@@ -130,7 +130,7 @@ else {
         WHERE 1 = 1
     };
 
-    my $header_sth = $dbh->prepare($query);
+    my DBI $header_sth = $dbh->prepare($query);
     $header_sth->execute;
     $header_sth->finish;
 
