@@ -39,6 +39,7 @@ perl ~/Scripts/alignDB/init/update_annotation.pl \
     -a ~/data/alignment/Ensembl/Human/anno.yml \
     --parallel 12
 
+# Runtime 57 minutes and 44 seconds.
 perl ~/Scripts/alignDB/init/update_snp_ld.pl \
     -d Human_n12_ase_flanking --parallel 12
 
