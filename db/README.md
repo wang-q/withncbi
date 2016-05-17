@@ -19,7 +19,7 @@ I use the following command lines on a linux box. For mac, aspera's path is diff
 
 ```bash
 # gr
-rsync --progress -av ftp.ncbi.nlm.nih.gov::genomes/GENOME_REPORTS/ \
+rsync -avP ftp.ncbi.nlm.nih.gov::genomes/GENOME_REPORTS/ \
     ~/data/NCBI/genomes/GENOME_REPORTS/
 
 # ar is huge
@@ -30,7 +30,7 @@ rsync --progress -av ftp.ncbi.nlm.nih.gov::genomes/GENOME_REPORTS/ \
    ~/data/NCBI/genomes/
 
 # there're hidden useless directories.
-rsync --progress -av ftp.ncbi.nlm.nih.gov::genomes/ASSEMBLY_REPORTS/All/ \
+rsync -avP ftp.ncbi.nlm.nih.gov::genomes/ASSEMBLY_REPORTS/All/ \
     ~/data/NCBI/genomes/ASSEMBLY_REPORTS/All/
 ```
 
@@ -38,30 +38,47 @@ NCBI bioproject and taxonomy is also needed.
 
 ```bash
 # bioproject
-rsync --progress -av ftp.ncbi.nlm.nih.gov::bioproject/ \
+rsync -avP ftp.ncbi.nlm.nih.gov::bioproject/ \
     ~/data/NCBI/bioproject/
 
 # taxonomy
-rsync --progress -av ftp.ncbi.nlm.nih.gov::pub/taxonomy/ \
+rsync -avP ftp.ncbi.nlm.nih.gov::pub/taxonomy/ \
+    --exclude=".tmp" \
+    --exclude=".old" \
+    --exclude="accession2taxid" \
     ~/data/NCBI/taxonomy/
 ```
 
-Bacteria genomes.
+Old Bacteria genomes.
+
+On 02 December 2015 these directories were moved to ftp://ftp.ncbi.nlm.nih.gov/genomes/archive/old_refseq/.
 
 ```bash
-rsync -av -P ftp.ncbi.nlm.nih.gov::genomes/Bacteria/ \
-    ~/data/NCBI/genomes/Bacteria/ \
-    --exclude="all.*"
+rsync -av -P ftp.ncbi.nlm.nih.gov::genomes/archive/old_refseq/Bacteria/ \
+    --exclude="all.*" \
+    --exclude=".tmp" \
+    --exclude=".old" \
+    ~/data/NCBI/genomes/Bacteria/
 
-rsync -av -P ftp.ncbi.nlm.nih.gov::genomes/Bacteria_DRAFT/ \
+rsync -av -P ftp.ncbi.nlm.nih.gov::genomes/archive/old_refseq/Bacteria_DRAFT/ \
+    --exclude=".tmp" \
+    --exclude=".old" \
     ~/data/NCBI/genomes/Bacteria_DRAFT/
 
-rsync -av -P ftp.ncbi.nlm.nih.gov::genbank/genomes/Bacteria/ \
+rsync -av -P ftp.ncbi.nlm.nih.gov::genomes/archive/old_genbank/Bacteria/ \
+    --exclude=".tmp" \
+    --exclude=".old" \
     ~/data/NCBI/genbank/genomes/Bacteria/
 
-rsync -av -P ftp.ncbi.nlm.nih.gov::genbank/genomes/Bacteria_DRAFT/ \
+rsync -av -P ftp.ncbi.nlm.nih.gov::genomes/archive/old_genbank/Bacteria_DRAFT/ \
+    --exclude=".tmp" \
+    --exclude=".old" \
     ~/data/NCBI/genbank/genomes/Bacteria_DRAFT/
 ```
+
+Newer genomes list in genomes/refseq/bacteria are just symlinks to genomes/all/*.
+
+So local mirrors are no longer needed.
 
 ## Databases
 
