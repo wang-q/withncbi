@@ -3,10 +3,10 @@ use strict;
 use warnings;
 use autodie;
 
-use Getopt::Long qw(HelpMessage);
+use Getopt::Long;
 use Config::Tiny;
 use FindBin;
-use YAML qw(Dump Load DumpFile LoadFile);
+use YAML::Syck;
 
 use File::Find::Rule;
 use Path::Tiny;
@@ -45,7 +45,6 @@ bac_prepare.pl
 =head1 SYNOPSIS
 
     perl bac_prepare.pl --base_dir d:/bacteria/bacteria_101015 --parent 562
-    perl d:/wq/Scripts/tool/replace.pl -d d:/wq/Scripts/alignDB/bac -p "cmd.bat" -f /home/wangq -r d:/wq
 
 =cut
 
@@ -56,9 +55,9 @@ my $nbd_dir  = path( $Config->{path}{nbd} )->stringify;     # NCBI genomes bac d
 my $ngbd_dir = path( $Config->{path}{ngbd} )->stringify;    # NCBI genbank genomes bac draft
 
 GetOptions(
-    'help|?' => sub { HelpMessage(0) },
+    'help|?' => sub { Getopt::Long::HelpMessage(0) },
     'server|s=s'    => \( my $server      = $Config->{database}{server} ),
-    'port|P=i'      => \( my $port        = $Config->{database}{port} ),
+    'port=i'        => \( my $port        = $Config->{database}{port} ),
     'db|d=s'        => \( my $db_name     = $Config->{database}{db} ),
     'username|u=s'  => \( my $username    = $Config->{database}{username} ),
     'password|p=s'  => \( my $password    = $Config->{database}{password} ),
@@ -76,7 +75,7 @@ GetOptions(
     'get_seq'  => \my $get_seq,     # download sequences via get_seq.pl if not existing
     'scaffold' => \my $scaffold,    # including scaffolds and contigs
     'parallel=i' => \( my $parallel = $Config->{run}{parallel} ),
-) or HelpMessage(1);
+) or Getopt::Long::HelpMessage(1);
 
 $seq_dir = path($seq_dir)->stringify;
 
@@ -373,7 +372,7 @@ perl [% findbin %]/strain_bz_self.pl \
 EOF
     $tt->process(
         \$text,
-        {   findbin     => $FindBin::Bin,
+        {   findbin     => $FindBin::RealBin,
             working_dir => $working_dir,
             seq_dir     => $seq_dir,
             name_str    => $name_str,
@@ -389,7 +388,7 @@ EOF
     print "Create redo_prepare.sh\n";
     $tt->process(
         \$text,
-        {   findbin     => $FindBin::Bin,
+        {   findbin     => $FindBin::RealBin,
             working_dir => $working_dir,
             seq_dir     => $seq_dir,
             name_str    => $name_str,

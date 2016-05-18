@@ -196,7 +196,7 @@ perl ~/Scripts/alignDB/util/multi_way_batch.pl \
     -lt 5000 --parallel 12 \
     --run all
 
-perl ~/Scripts/alignDB/util/dup_db.pl -d Mouse_n11_pop -f ~/data/dumps/mysql/Mouse_n11_pop.sql.gz
+perl ~/Scripts/alignDB/util/dup_db.pl --yes -d Mouse_n11_pop -f ~/data/dumps/mysql/Mouse_n11_pop.sql.gz
 
 ```
 
