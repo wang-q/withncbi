@@ -30,8 +30,10 @@ rsync -avP ftp.ncbi.nlm.nih.gov::genomes/GENOME_REPORTS/ \
    ~/data/NCBI/genomes/
 
 # there're hidden useless directories.
-rsync -avP ftp.ncbi.nlm.nih.gov::genomes/ASSEMBLY_REPORTS/All/ \
-    ~/data/NCBI/genomes/ASSEMBLY_REPORTS/All/
+rsync -avP ftp.ncbi.nlm.nih.gov::genomes/ASSEMBLY_REPORTS/ \
+    --exclude=".tmp" \
+    --exclude=".old" \
+    ~/data/NCBI/genomes/ASSEMBLY_REPORTS/
 ```
 
 NCBI bioproject and taxonomy is also needed.

@@ -185,7 +185,7 @@ my $gr_gc_checklist = sub {
 
     {    # write contents
         my $sql_query = q{
-            SELECT  `group` group_name,
+            SELECT  `subgroup` subgroup,
                     genus_id,
                     species_id,
                     species,
@@ -200,7 +200,7 @@ my $gr_gc_checklist = sub {
             AND species not like '%Candidatus%'
             GROUP BY species_id
             HAVING count > 2 AND species_code > 0
-            ORDER BY group_name, species
+            ORDER BY subgroup, species
         };
         $to_xlsx->write_sql( $sheet, { sql_query => $sql_query, } );
     }
