@@ -63,14 +63,15 @@ GetOptions(
     'password|p=s'  => \( my $password    = $Config->{database}{password} ),
     'seq_dir=s'     => \( my $seq_dir     = "~/data/bacteria/bac_seq_dir" ),
     'working_dir=s' => \( my $working_dir = "." ),
-    'parent_id|p=s' => \( my $parent_id = "562,585054" ),    # E.coli and E. fergusonii
+    'parent_id|p=s' => \( my $parent_id   = "562,585054" ),    # E.coli and E. fergusonii
     'target_id|t=i' => \my $target_id,
-    'r|outgroup|o=i' => \my $outgroup_id,
-    'exclude|e=s'    => \( my $exclude_ids = '0' ),
-    'name_str|n=s'   => \
+    'outgroup|o=i'  => \my $outgroup_id,
+    'exclude|e=s'   => \( my $exclude_ids = '0' ),
+    'name_str|n=s'  => \
         my $name_str
     ,    # use custom name_str, working dir and goal db name. mysql restrict db name length 64
-    'is_self' => \my $is_self,                       # is self alignment (paralog)
+    'strains'  => \my $require_strains,              # skip taxonomy_id == species_id
+    'is_self'  => \my $is_self,                      # is self alignment (paralog)
     'length=i' => \( my $paralog_length = 1000 ),    # paralog length
     'get_seq'  => \my $get_seq,     # download sequences via get_seq.pl if not existing
     'scaffold' => \my $scaffold,    # including scaffolds and contigs
@@ -113,8 +114,9 @@ my $id_str;
     {
         my $query
             = $scaffold
-            ? q{ SELECT taxonomy_id FROM gr WHERE 1 = 1 }
+            ? q{ SELECT taxonomy_id FROM gr WHERE 1 = 1  }
             : q{ SELECT taxonomy_id FROM gr WHERE status NOT IN ('Contig', 'Scaffold') };
+        $query .= "AND taxonomy_id != species_id" if $require_strains;
         my $sth = $dbh->prepare($query);
         $sth->execute;
         while ( my ($id) = $sth->fetchrow_array ) {
@@ -261,7 +263,7 @@ ID: for my $taxon_id ( $target_id, @query_ids ) {
         my ($acc) = $sth->fetchrow_array;
         push @accs, ( map { s/\.\d+$//; $_ } grep {defined} ( split /,/, $acc ) );
 
-        # for NZ_CM*** accessions, the following prep_fa() will find nothing
+        # for NZ_CM***, NZ_CP*** accessions, the following prep_fa() will find nothing
         # AND is $scaffold, prep_scaff() will find the scaffolds
         for my $acc ( grep {defined} @accs ) {
             my ($fna_file) = grep {/$acc/} @fna_files;
@@ -397,9 +399,9 @@ EOF
             outgroup_id => $outgroup_id,
             is_self     => $is_self,
             length      => $paralog_length,
-            redo        => 1,                 # If RepeatMasker has been executed
-                                              # don't pass $seq_dir
-                                              # don't gather taxon info
+            redo        => 1,                   # If RepeatMasker has been executed
+                                                # don't pass $seq_dir
+                                                # don't gather taxon info
         },
         path( $working_dir, "redo_prepare.sh" )->stringify
     ) or die Template->error;
