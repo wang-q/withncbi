@@ -141,7 +141,6 @@ my @data;
 }
 
 # if seqs is not in working dir, copy them from seq_dir
-my @target_seqs;    # for gff and rm-gff files
 if ($seq_dir) {
     print "Get seqs from [$seq_dir]\n";
 
@@ -170,9 +169,6 @@ if ($seq_dir) {
             }
             else {
                 $basename = prep_fa( $fa_file, $cur_dir );
-            }
-            if ( $id eq $target_id ) {
-                push @target_seqs, $basename;
             }
 
             my $gff_file = path( $original_dir, "$basename.gff" );
@@ -338,7 +334,6 @@ EOF
             parallel    => $parallel,
             working_dir => $working_dir,
             egaz        => $egaz,
-            use_name    => $use_name,
             nostat      => $nostat,
             target_id   => $target_id,
             outgroup_id => $outgroup_id,
@@ -378,6 +373,7 @@ mkdir -p [% working_dir %]/[% multi_name %]_raw/[% target_id %]vs[% q %]
 find [% working_dir %]/Pairwise/[% target_id %]vs[% q %] -name "*.maf" -or -name "*.maf.gz" \
     | parallel --no-run-if-empty -j 1 \
         fasops maf2fas {} -o [% working_dir %]/[% multi_name %]_raw/[% target_id %]vs[% q %]/{/}.fas
+sleep 1;
 fasops covers \
     [% working_dir %]/[% multi_name %]_raw/[% target_id %]vs[% q %]/*.fas \
     -n [% target_id %] -l 1000 -t 10 \
@@ -504,7 +500,6 @@ EOF
                 outgroup_id => $outgroup_id,
                 query_ids   => \@query_ids,
                 multi_name  => $multi_name,
-                use_name    => $use_name,
                 nostat      => $nostat,
                 avx         => can_run('raxmlHPC-PTHREADS-AVX'),
             },
@@ -649,7 +644,6 @@ EOF
             target_id   => $target_id,
             outgroup_id => $outgroup_id,
             query_ids   => \@query_ids,
-            target_seqs => \@target_seqs,
             phylo_tree  => $phylo_tree,
             multi_name  => $multi_name,
             msa         => $msa,
@@ -711,13 +705,28 @@ cd [% working_dir %]
 sleep 1;
 
 #----------------------------#
+# Create anno.yml
+#----------------------------#
+perl [% aligndb %]/util/gff2anno.pl \
+    --type CDS --remove \
+    [% working_dir %]/Genomes/[% target_id %]/*.gff \
+    > [% working_dir %]/cds.yml
+
+perl [% aligndb %]/util/gff2anno.pl \
+    --remove \
+    [% working_dir %]/Genomes/[% target_id %]/*.rm.gff \
+    > [% working_dir %]/repeat.yml
+
+runlist merge [% working_dir %]/repeat.yml [% working_dir %]/cds.yml -o [% working_dir %]/anno.yml
+rm [% working_dir %]/repeat.yml [% working_dir %]/cds.yml
+
+#----------------------------#
 # multi_way_batch
 #----------------------------#
-perl [% aligndb %]/extra/multi_way_batch.pl \
+perl [% aligndb %]/util/multi_way_batch.pl \
     -d [% multi_name %] \
     -da [% working_dir %]/[% multi_name %]_refined \
-    --gff_file [% FOREACH seq IN target_seqs %][% working_dir %]/[% target_id %]/[% seq %].gff,[% END %] \
-    --rm_gff_file [% FOREACH seq IN target_seqs %][% working_dir %]/[% target_id %]/[% seq %].rm.gff,[% END %] \
+    -a [% working_dir %]/anno.yml \
 [% IF outgroup_id -%]
     --outgroup \
 [% END -%]
@@ -735,7 +744,6 @@ EOF
                 target_id   => $target_id,
                 outgroup_id => $outgroup_id,
                 query_ids   => \@query_ids,
-                target_seqs => \@target_seqs,
                 multi_name  => $multi_name,
             },
             path( $working_dir, $sh_name )->stringify
