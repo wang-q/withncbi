@@ -26,15 +26,14 @@ abbr_name.pl - Abbreviate strain scientific names.
     cat <file> | perl abbr_name.pl [options]
       Options:
         --help              brief help message
-        --man               full documentation
-        -c, --column STR    Columns of strain, species, genus, default is 1,2,3.
+        --column    -c  STR Columns of strain, species, genus, default is 1,2,3.
                             If there's no strain, use 1,1,2.
                             Don't need the strain part, use 2,2,3
                             When there's only strain, use 1,1,1
-                            
-        -s, --seperator STR seperator of the line, default is "\s+"
-        -m, --min INT       mininal length for abbreviation of species
-        --tight             No underscore between Genus and species
+        --seperator -s  STR seperator of the line, default is "\s+"
+        --min INT           mininal length for abbreviation of species
+        --tight             no underscore between Genus and species
+        --shortsub          clean subspecies parts
 
 =head1 EXAMPLE
 
@@ -61,6 +60,7 @@ GetOptions(
     'seperator|s=s' => \( my $seperator   = '\s+' ),
     'min|m=i'       => \( my $min_species = 3 ),
     'tight'         => \my $tight,
+    'shortsub'      => \my $shortsub,
 ) or Getopt::Long::HelpMessage(1);
 
 #----------------------------------------------------------#
@@ -97,16 +97,18 @@ while ( my $line = <> ) {
         $species =~ s/^$genus //;
     }
 
-    if ( length $strain > 32 ) {
-        s/\bsubsp\b//g;
-        s/\bserovar\b//g;
-        s/\bstr\b//g;
-        s/\bstrain\b//g;
+    # Clean long subspecies names
+    if ($shortsub) {
+        $strain =~ s/\bsubsp\b//g;
+        $strain =~ s/\bserovar\b//g;
+        $strain =~ s/\bstr\b//g;
+        $strain =~ s/\bstrain\b//g;
     }
 
     s/\W+/_/g for ( $strain, $species, $genus );
     s/_+/_/g  for ( $strain, $species, $genus );
     s/_$//    for ( $strain, $species, $genus );
+    s/^_//    for ( $strain, $species, $genus );
 
     push @fields, [ $strain, $species, $genus ];
 
