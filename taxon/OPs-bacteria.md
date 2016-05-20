@@ -227,12 +227,12 @@ time bash ../bac.cmd.txt 2>&1 | tee log_cmd.txt
 #----------------------------#
 for d in `find . -mindepth 1 -maxdepth 1 -type d | sort `;do
     echo "echo \"====> Processing $d <====\""
-    echo sh $d/1_real_chr.sh ;
-    echo sh $d/2_file_rm.sh ;
-    echo sh $d/3_pair_cmd.sh ;
-    echo sh $d/4_rawphylo.sh ;
-    echo sh $d/5_multi_cmd.sh ;
-    echo sh $d/7_multi_db_only.sh ;
+    echo bash $d/1_real_chr.sh ;
+    echo bash $d/2_file_rm.sh ;
+    echo bash $d/3_pair_cmd.sh ;
+    echo bash $d/4_rawphylo.sh ;
+    echo bash $d/5_multi_cmd.sh ;
+    echo bash $d/7_multi_db_only.sh ;
     echo ;
 done  > runall.sh
 
@@ -243,59 +243,46 @@ sh runall.sh 2>&1 | tee log_runall.txt
 #----------------------------#
 # real_chr
 for f in `find . -mindepth 1 -maxdepth 2 -type f -name 1_real_chr.sh | sort `;do
-    echo sh $f ;
+    echo bash $f ;
     echo ;
 done  > run_1.sh
 
 # RepeatMasker
 for f in `find . -mindepth 1 -maxdepth 2 -type f -name 2_file_rm.sh | sort `;do
-    echo sh $f ;
+    echo bash $f ;
     echo ;
 done  > run_2.sh
 
 # pair
 for f in `find . -mindepth 1 -maxdepth 2 -type f -name 3_pair_cmd.sh | sort `;do
-    echo sh $f ;
+    echo bash $f ;
     echo ;
 done  > run_3.sh
 
 # rawphylo
 for f in `find . -mindepth 1 -maxdepth 2 -type f -name 4_rawphylo.sh | sort `;do
-    echo sh $f ;
+    echo bash $f ;
     echo ;
 done  > run_4.sh
 
 # multi cmd
 for f in `find . -mindepth 1 -maxdepth 2 -type f -name 5_multi_cmd.sh | sort `;do
-    echo sh $f ;
+    echo bash $f ;
     echo ;
 done  > run_5.sh
 
 # multi db
 for f in `find . -mindepth 1 -maxdepth 2 -type f -name 7_multi_db_only.sh | sort `;do
-    echo sh $f ;
+    echo bash $f ;
     echo ;
 done  > run_7.sh
 
-cat run_1.sh | grep . | parallel -j 8 2>&1 | tee log_1.txt
-cat run_2.sh | grep . | parallel -j 6 2>&1 | tee log_2.txt
-cat run_3.sh | grep . | parallel -j 6 2>&1 | tee log_3.txt
-cat run_4.sh | grep . | parallel -j 2 2>&1 | tee log_4.txt
-cat run_5.sh | grep . | parallel -j 2 2>&1 | tee log_5.txt
-cat run_7.sh | grep . | parallel -j 4 2>&1 | tee log_7.txt
-
-#----------------------------#
-# Charting on Windows
-#----------------------------#
-for d in `find . -mindepth 1 -maxdepth 1 -type d | sort `;do
-    export d_base=`basename $d` ;
-    echo "perl d:/Scripts/fig_table/collect_common_basic.pl    -d $d_base" ;
-    echo "perl d:/Scripts/alignDB/stat/common_chart_factory.pl --replace diversity=divergence -i $d_base/$d_base.common.xlsx" ;
-    echo "perl d:/Scripts/alignDB/stat/multi_chart_factory.pl  --replace diversity=divergence -i $d_base/$d_base.multi.xlsx" ;
-    echo "perl d:/Scripts/alignDB/stat/gc_chart_factory.pl     --replace diversity=divergence -i $d_base/$d_base.gc.xlsx" ;
-    echo ;
-done  > run_chart.bat
-perl -pi -e 's/\n/\r\n/g' run_chart.bat
+cat run_1.sh | grep . | parallel -j 16 2>&1 | tee log_1.txt
+cat run_2.sh | grep . | parallel -j 12 2>&1 | tee log_2.txt
+cat run_3.sh | grep . | parallel -j 12 2>&1 | tee log_3.txt
+cat run_4.sh | grep . | parallel -j 4 2>&1 | tee log_4.txt
+cat run_5.sh | grep . | parallel -j 4 2>&1 | tee log_5.txt
+cat run_7.sh | grep . | parallel -j 8 2>&1 | tee log_7.txt
 
 #----------------------------#
 # Clean
