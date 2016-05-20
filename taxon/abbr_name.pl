@@ -8,10 +8,10 @@ use Config::Tiny;
 use FindBin;
 use YAML::Syck;
 
-use List::MoreUtils qw(uniq);
+use List::MoreUtils::PP;
 
 use lib "$FindBin::RealBin/../lib";
-use MyUtil qw(abbr_most);
+use MyUtil;
 
 #----------------------------------------------------------#
 # GetOpt section
@@ -98,6 +98,8 @@ while ( my $line = <> ) {
     }
 
     s/\W+/_/g for ( $strain, $species, $genus );
+    s/_+/_/g  for ( $strain, $species, $genus );
+    s/_$//    for ( $strain, $species, $genus );
     push @fields, [ $strain, $species, $genus ];
 
     push @rows, \@row;
@@ -109,8 +111,8 @@ my @ge = map { $_->[2] } @fields;
 my @sp = map { $_->[1] } @fields;
 my @st = map { $_->[0] } @fields;
 
-my $ge_of = abbr_most( [ uniq(@ge) ], 1,            "Yes" );
-my $sp_of = abbr_most( [ uniq(@sp) ], $min_species, "Yes" );
+my $ge_of = MyUtil::abbr_most( [ List::MoreUtils::PP::uniq(@ge) ], 1,            "Yes" );
+my $sp_of = MyUtil::abbr_most( [ List::MoreUtils::PP::uniq(@sp) ], $min_species, "Yes" );
 
 for my $i ( 0 .. $count - 1 ) {
     my $spacer = $tight ? '' : '_';
