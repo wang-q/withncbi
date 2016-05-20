@@ -3,13 +3,14 @@ use strict;
 use warnings;
 use autodie;
 
-use Getopt::Long qw(HelpMessage);
+use Getopt::Long;
 use Config::Tiny;
 use FindBin;
-use YAML qw(Dump Load DumpFile LoadFile);
+use YAML::Syck;
 
+use File::Find::Rule;
+use Path::Tiny;
 use Text::CSV_XS;
-use File::Copy;
 
 #----------------------------------------------------------#
 # GetOpt section
@@ -25,6 +26,7 @@ batch_get_seq.pl - retrieve all sequences listed in a file
       Options:
         --help      -?          brief help message
         --file      -f  STR     input csv file
+        --local     -l  STR     find files from this local directory first
         --pure      -p          remove fasta sequences from generated gff files
 
 =head1 CSV file format
@@ -51,16 +53,26 @@ Columns:
 =cut
 
 GetOptions(
-    'help|?'   => sub { HelpMessage(0) },
-    'file|f=s' => \my $in_file,
-    'pure|p'   => \my $pure_gff,
-) or HelpMessage(1);
+    'help|?'    => sub { Getopt::Long::HelpMessage(0) },
+    'file|f=s'  => \my $in_file,
+    'local|l=s' => \my $local,
+    'pure|p'    => \my $pure_gff,
+) or Getopt::Long::HelpMessage(1);
 
 die "Provide a .csv file\n" unless defined $in_file and -e $in_file;
 
 #----------------------------------------------------------#
 # Init
 #----------------------------------------------------------#
+my ( @fna_files, @gff_files );
+if ($local) {
+    $local = path($local)->absolute->stringify;
+    print "Reading file list from [$local]\n";
+    @fna_files = File::Find::Rule->file->name('*.fna')->in($local);
+    @gff_files = File::Find::Rule->file->name('*.gff')->in($local);
+    printf "Get [%d] fna files\n", scalar @fna_files;
+}
+
 my $csv = Text::CSV_XS->new( { binary => 1, eol => "\n" } );
 open my $csv_fh, "<", $in_file or die "$in_file: $!";
 $csv->getline($csv_fh);    # bypass title line
@@ -70,44 +82,66 @@ $csv->getline($csv_fh);    # bypass title line
 #----------------------------------------------------------#
 while ( my $row = $csv->getline($csv_fh) ) {
     my $id  = $row->[0];
-    my $seq = $row->[1];
+    my $acc = $row->[1];
 
     # replace non-alphanumeric chars
     $id =~ s/[\W]+/_/g;
 
-    print "id: [$id]\tseq: [$seq]\n";
-    if ( -e "$id/$seq.gb" ) {
-        print "Sequence [$id/$seq.gb] exists, next\n";
+    print "==> id: [$id]\tseq: [$acc]\n";
+    if ( -e "$id/$acc.gb" or -e "$id/$acc.fasta" ) {
+        print "Sequence [$id/$acc] exists, next\n\n";
         next;
     }
 
-    # download
-    system "perl $FindBin::Bin/get_seq.pl $seq $id";
+    if ( !$local ) {
+        print "Fetch sequences from NCBI\n";
+        system "perl $FindBin::RealBin/get_seq.pl $acc $id";
+    }
+    else {
+        print "Try finding sequences from local disk\n";
+        my $id_dir = path($id);
+        if ( !-e $id_dir ) {
+            $id_dir->mkpath;
+        }
+
+        my ($fna_file) = grep {/$acc/} @fna_files;
+        if ( !defined $fna_file ) {
+            print "Fetch sequences from NCBI\n";
+            system "perl $FindBin::RealBin/get_seq.pl $acc $id";
+        }
+        else {
+            path($fna_file)->copy("$id/$acc.fasta");
+
+            my ($gff_file) = grep {/$acc/} @gff_files;
+            path($gff_file)->copy("$id/$acc.gff");
+        }
+    }
 
     # replace contents from .gb and .fasta
     if ( defined $row->[3] ) {
         my $seq_name = $row->[3];
-        print " " x 4 . "Replace locus $seq to $seq_name\n";
-
-        system "perl -i -nlp -e '/^(?:LOCUS)/ and s/$seq/$seq_name/' $id/$seq.gb";
-        system "perl -i -nlp -e '/^(?:>)/ and s/.+/>$seq_name/' $id/$seq.fasta";
+        if ( -e "$id/$acc.gb" ) {
+            system "perl -i -nlp -e '/^(?:LOCUS)/ and s/$acc/$seq_name/' $id/$acc.gb";
+        }
+        if ( -e "$id/$acc.fasta" ) {
+            system "perl -i -nlp -e '/^(?:>)/ and s/.+/>$seq_name/' $id/$acc.fasta";
+        }
     }
-    else {
-        print " " x 4 . "Keep original names.\n";
+
+    if ( -e "$id/$acc.gb" ) {
+        system "perl $FindBin::Bin/bp_genbank2gff3.pl $id/$acc.gb";
+        path("$acc.gb.gff")->move("$id/$acc.gff");
     }
 
-    system "perl $FindBin::Bin/bp_genbank2gff3.pl $id/$seq.gb";
-
-    move( "$seq.gb.gff", "$id/$seq.gff" );
     if ($pure_gff) {
-        system "perl -i -nlp -e '/^\#\#FASTA/ and last' $id/$seq.gff";
+        system "perl -i -nlp -e '/^\#\#FASTA/ and last' $id/$acc.gff";
     }
 
     if ( defined $row->[3] ) {
         my $seq_name = $row->[3];
         print " " x 4 . "Rename .fasta and .gff\n";
-        move( "$id/$seq.fasta", "$id/$seq_name.fasta" );
-        move( "$id/$seq.gff",   "$id/$seq_name.gff" );
+        path("$id/$acc.fasta")->move("$id/$seq_name.fasta");
+        path("$id/$acc.gff")->move("$id/$seq_name.gff");
     }
 
     print "\n\n";
