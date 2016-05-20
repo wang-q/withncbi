@@ -97,9 +97,17 @@ while ( my $line = <> ) {
         $species =~ s/^$genus //;
     }
 
+    if ( length $strain > 32 ) {
+        s/\bsubsp\b//g;
+        s/\bserovar\b//g;
+        s/\bstr\b//g;
+        s/\bstrain\b//g;
+    }
+
     s/\W+/_/g for ( $strain, $species, $genus );
     s/_+/_/g  for ( $strain, $species, $genus );
     s/_$//    for ( $strain, $species, $genus );
+
     push @fields, [ $strain, $species, $genus ];
 
     push @rows, \@row;
