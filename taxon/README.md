@@ -290,18 +290,6 @@ cat plastid.DOWNLOAD.csv \
     | perl ~/Scripts/withncbi/taxon/abbr_name.pl -c "3,4,5" -s "," -m 0 \
     | sort -t',' -k9,9 -k7,7 -k6,6 -k10,10 \
     >> plastid.ABBR.csv
-
-# # use Text::Abbrev
-# cat genus.txt \
-#     | perl -MText::Abbrev -nl -e \
-#     'push @list, $_; END{%hash = abbrev @list; @ks = sort keys %hash; for $i (reverse(0 .. $#ks)) {if (index($ks[$i], $ks[$i - 1]) != 0) { print $ks[$i], q{,}, $hash{$ks[$i]}; } } }' \
-#     | perl -e 'print reverse <>'
-#
-# # use MyUtil::abbr_most
-# cat genus.txt \
-#     | perl -I ~/Scripts/withncbi/lib -MMyUtil -MYAML -nl -e \
-#     'push @list, $_; END{$hashref = MyUtil::abbr_most( \@list); print Dump $hashref }'
-
 ```
 
 ## Download sequences and regenerate lineage information.
@@ -326,13 +314,16 @@ cat ../plastid_summary/plastid.ABBR.csv \
 # And which-can't-find is still which-can't-find.
 cat ../plastid_summary/plastid.ABBR.csv \
     | grep -v '^#' \
-    | perl -nl -a -F"," -e 'print qq{$F[0],$F[9]}' \
+    | perl -nla -F"," -e 'print qq{$F[0],$F[9]}' \
+    | uniq \
     | perl ~/Scripts/withncbi/taxon/strain_info.pl --stdin --withname --file plastid_ncbi.csv
 
 # some warnings from bioperl, normally just ignore them
-perl ~/Scripts/withncbi/taxon/batch_get_seq.pl -f plastid_name_acc_id.csv -p 2>&1 | tee plastid_seq.log
+perl ~/Scripts/withncbi/taxon/batch_get_seq.pl \
+    -f plastid_name_acc_id.csv \
+    -p 2>&1 \
+    | tee plastid_seq.log
 
-# rsync --progress -av wangq@45.79.80.100:/home/wangq/data/organelle/ ~/data/organelle/
 
 # count downloaded sequences
 find . -name "*.fasta" | wc -l
@@ -389,18 +380,68 @@ Create alignments without outgroups.
 ```bash
 cd ~/data/organelle/plastid_summary
 
-# tab-seperated
+# tab-separated
 # name  t   qs
 cat plastid.GENUS.csv \
     | grep -v "^#" \
-    | perl -n -a -F"," -e \
-    'BEGIN{ ($g, @s, %h) = (q{}); } chomp for @F; if ($F[4] ne $g) { if ($g) { @s = sort {$h{$a} <=> $h{$b}} @s; $t = shift @s; $qs = join(q{,}, @s); printf qq{%s\t%s\t%s\n}, $g, $t, $qs; } $g = $F[4]; @s = ();} push @s, $F[9]; $h{$F[9]} = $F[0]; END { @s = sort {$h{$a} <=> $h{$b}} @s; $t = shift @s; $qs = join(q{,}, @s); printf qq{%s\t%s\t%s\n}, $g, $t, $qs; }' \
-    > genus.tsv
+    | perl -na -F"," -e '
+        BEGIN{
+            $name = q{};
+            %id_of = ();
+        }
+
+        chomp for @F;
+        $F[4] =~ s/\W+/_/g;
+        if ($F[4] ne $name) {
+            if ($name) {
+                my @s = sort {$id_of{$a} <=> $id_of{$b}} keys %id_of;
+                my $t = shift @s;
+                my $qs = join(q{,}, @s);
+                printf qq{%s\t%s\t%s\n}, $name, $t, $qs;
+            }
+            $name = $F[4];
+            %id_of = ();
+        }
+        $id_of{$F[9]} = $F[0]; # multiple chromosomes collapsed here
+
+        END {
+            my @s = sort {$id_of{$a} <=> $id_of{$b}} keys %id_of;
+            my $t = shift @s;
+            my $qs = join(q{,}, @s);
+            printf qq{%s\t%s\t%s\n}, $name, $t, $qs;
+        }
+    ' \
+    > species.tsv
 
 cat plastid.ABBR.csv \
     | grep -v "^#" \
-    | perl -n -a -F"," -e \
-    'BEGIN{ ($g, @s, %h) = (q{}); } chomp for @F; if ($F[5] ne $g) { if ($g) { @s = sort {$h{$a} <=> $h{$b}} @s; $t = shift @s; $qs = join(q{,}, @s); printf qq{%s\t%s\t%s\n}, $g, $t, $qs; } $g = $F[5]; @s = ();} push @s, $F[9]; $h{$F[9]} = $F[0]; END { @s = sort {$h{$a} <=> $h{$b}} @s; $t = shift @s; $qs = join(q{,}, @s); printf qq{%s\t%s\t%s\n}, $g, $t, $qs; }' \
+    | perl -na -F"," -e '
+        BEGIN{
+            $name = q{};
+            %id_of = ();
+        }
+
+        chomp for @F;
+        $F[5] =~ s/\W+/_/g;
+        if ($F[5] ne $name) {
+            if ($name) {
+                my @s = sort {$id_of{$a} <=> $id_of{$b}} keys %id_of;
+                my $t = shift @s;
+                my $qs = join(q{,}, @s);
+                printf qq{%s\t%s\t%s\n}, $name, $t, $qs;
+            }
+            $name = $F[5];
+            %id_of = ();
+        }
+        $id_of{$F[9]} = $F[0]; # multiple chromosomes collapsed here
+
+        END {
+            my @s = sort {$id_of{$a} <=> $id_of{$b}} keys %id_of;
+            my $t = shift @s;
+            my $qs = join(q{,}, @s);
+            printf qq{%s\t%s\t%s\n}, $name, $t, $qs;
+        }
+    ' \
     > family.tsv
 
 # name  t   qs  o
@@ -431,7 +472,7 @@ cat genus_OG.tsv \
 
 ## Aligning
 
-### Batch running for genus
+### Batch running for groups
 
 The old prepare_run.sh
 
@@ -446,12 +487,12 @@ time sh ../plastid.cmd.txt 2>&1 | tee log_cmd.txt
 #----------------------------#
 for d in `find . -mindepth 1 -maxdepth 1 -type d | sort `;do
     echo "echo \"====> Processing $d <====\""
-    echo sh $d/1_real_chr.sh ;
-    echo sh $d/2_file_rm.sh ;
-    echo sh $d/3_pair_cmd.sh ;
-    echo sh $d/4_rawphylo.sh ;
-    echo sh $d/5_multi_cmd.sh ;
-    echo sh $d/7_multi_db_only.sh ;
+    echo bash $d/1_real_chr.sh ;
+    echo bash $d/2_file_rm.sh ;
+    echo bash $d/3_pair_cmd.sh ;
+    echo bash $d/4_rawphylo.sh ;
+    echo bash $d/5_multi_cmd.sh ;
+    echo bash $d/7_multi_db_only.sh ;
     echo ;
 done  > runall.sh
 
@@ -462,59 +503,46 @@ sh runall.sh 2>&1 | tee log_runall.txt
 #----------------------------#
 # real_chr
 for f in `find . -mindepth 1 -maxdepth 2 -type f -name 1_real_chr.sh | sort `;do
-    echo sh $f ;
+    echo bash $f ;
     echo ;
 done  > run_1.sh
 
 # RepeatMasker
 for f in `find . -mindepth 1 -maxdepth 2 -type f -name 2_file_rm.sh | sort `;do
-    echo sh $f ;
+    echo bash $f ;
     echo ;
 done  > run_2.sh
 
 # pair
 for f in `find . -mindepth 1 -maxdepth 2 -type f -name 3_pair_cmd.sh | sort `;do
-    echo sh $f ;
+    echo bash $f ;
     echo ;
 done  > run_3.sh
 
 # rawphylo
 for f in `find . -mindepth 1 -maxdepth 2 -type f -name 4_rawphylo.sh | sort `;do
-    echo sh $f ;
+    echo bash $f ;
     echo ;
 done  > run_4.sh
 
 # multi cmd
 for f in `find . -mindepth 1 -maxdepth 2 -type f -name 5_multi_cmd.sh | sort `;do
-    echo sh $f ;
+    echo bash $f ;
     echo ;
 done  > run_5.sh
 
 # multi db
 for f in `find . -mindepth 1 -maxdepth 2 -type f -name 7_multi_db_only.sh | sort `;do
-    echo sh $f ;
+    echo bash $f ;
     echo ;
 done  > run_7.sh
 
-cat run_1.sh | grep . | parallel -j 8 2>&1 | tee log_1.txt
-cat run_2.sh | grep . | parallel -j 6 2>&1 | tee log_2.txt
-cat run_3.sh | grep . | parallel -j 6 2>&1 | tee log_3.txt
-cat run_4.sh | grep . | parallel -j 2 2>&1 | tee log_4.txt
-cat run_5.sh | grep . | parallel -j 2 2>&1 | tee log_5.txt
-cat run_7.sh | grep . | parallel -j 4 2>&1 | tee log_7.txt
-
-#----------------------------#
-# Charting on Windows
-#----------------------------#
-for d in `find . -mindepth 1 -maxdepth 1 -type d | sort `;do
-    export d_base=`basename $d` ;
-    echo "perl d:/Scripts/fig_table/collect_common_basic.pl    -d $d_base" ;
-    echo "perl d:/Scripts/alignDB/stat/common_chart_factory.pl --replace diversity=divergence -i $d_base/$d_base.common.xlsx" ;
-    echo "perl d:/Scripts/alignDB/stat/multi_chart_factory.pl  --replace diversity=divergence -i $d_base/$d_base.multi.xlsx" ;
-    echo "perl d:/Scripts/alignDB/stat/gc_chart_factory.pl     --replace diversity=divergence -i $d_base/$d_base.gc.xlsx" ;
-    echo ;
-done  > run_chart.bat
-perl -pi -e 's/\n/\r\n/g' run_chart.bat
+cat run_1.sh | grep . | parallel --no-run-if-empty -j 16 2>&1 | tee log_1.txt
+cat run_2.sh | grep . | parallel --no-run-if-empty -j 4 2>&1  | tee log_2.txt
+cat run_3.sh | grep . | parallel --no-run-if-empty -j 8 2>&1  | tee log_3.txt
+cat run_4.sh | grep . | parallel --no-run-if-empty -j 4 2>&1  | tee log_4.txt
+cat run_5.sh | grep . | parallel --no-run-if-empty -j 4 2>&1  | tee log_5.txt
+cat run_7.sh | grep . | parallel --no-run-if-empty -j 8 2>&1  | tee log_7.txt
 
 #----------------------------#
 # Clean
@@ -807,27 +835,6 @@ find  ~/data/organelle/plastid_OG -type f -name "*.common.xlsx" \
     | grep -v "vs[A-Z]" \
     | parallel cp {} .
 
-cat <<EOF > cmd_common_chart.tt
-[% FOREACH item IN data -%]
-[% chart = 'common' -%]
-REM [% item.name %]
-if not exist [% item.name %].[% chart %].xlsx goto skip[% item.name %]
-perl d:/Scripts/alignDB/stat/[% chart %]_chart_factory.pl --replace diversity=divergence -i [% item.name %].[% chart %].xlsx
-if not exist [% item.name %]_OG.[% chart %].xlsx goto skip[% item.name %]
-perl d:/Scripts/alignDB/stat/[% chart %]_chart_factory.pl --replace diversity=divergence -i [% item.name %]_OG.[% chart %].xlsx
-:skip[% item.name %]
-
-[% END -%]
-EOF
-
-cat ~/data/organelle/plastid_summary/genus.tsv \
-    | cut -f 1 \
-    | TT_FILE=cmd_common_chart.tt perl -MTemplate -nl -e 'push @data, { name => $_, }; END{$tt = Template->new; $tt->process($ENV{TT_FILE}, { data => \@data, }) or die Template->error}' \
-    > cmd_common_chart.bat
-
-# Undre Windows
-cd /d D:/data/organelle/plastid_summary/xlsx
-cmd_common_chart.bat
 ```
 
 ### Genome list
