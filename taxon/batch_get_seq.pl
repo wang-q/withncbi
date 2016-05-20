@@ -88,7 +88,7 @@ while ( my $row = $csv->getline($csv_fh) ) {
     $id =~ s/[\W]+/_/g;
 
     print "==> id: [$id]\tseq: [$acc]\n";
-    if ( -e "$id/$acc.gb" or -e "$id/$acc.fasta" ) {
+    if ( -e "$id/$acc.gff" and -e "$id/$acc.fasta" ) {
         print "Sequence [$id/$acc] exists, next\n\n";
         next;
     }
