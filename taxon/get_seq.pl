@@ -4,7 +4,7 @@ use warnings;
 use autodie;
 
 use Path::Tiny;
-use Bio::DB::EUtilities;
+use LWP::Simple;
 
 my $id  = shift || "NC_001284";
 my $dir = shift || ".";
@@ -19,37 +19,30 @@ if ( !-d $dir ) {
 my @types = qw(gb fasta);
 
 for my $type (@types) {
-    my $factory = Bio::DB::EUtilities->new(
-        -eutil   => 'efetch',
-        -db      => 'nucleotide',
-        -rettype => $type,
-        -email   => 'mymail@foo.bar',
-        -id      => [$id],
-    );
+    my $url_template
+        = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?"
+        . "db=nucleotide"
+        . "&id=%s&rettype=%s"
+        . "&retmode=text";
+
+    my $url = sprintf $url_template, $id, $type;
     my $file = path( $dir, "$id.$type" )->absolute->stringify;
-    print "Saving file to [$file]\n";
 
-    # local shadowsocks proxy
-    if ( $ENV{SSPROXY} ) {
-        $factory->proxy( [ 'http', 'https' ], 'socks://127.0.0.1:1080' );
-    }
-
-    # dump HTTP::Response content to a file (not retained in memory)
-    $factory->get_Response( -file => $file );
-    print "Done.\n";
+    my $rc = LWP::Simple::mirror( $url, $file );
+    printf "* URL: %s\n" . "* LOCAL: %s\n", $url, $file;
+    printf "* RC: %s\n\n", $rc;
 }
 
 __END__
 
 =head1 NAME
 
-get_seq.pl - retrieve nucleotide sequences from NCBI via Bio::DB::EUtilities
+get_seq.pl - retrieve nucleotide sequences from NCBI via eutils
 
 =head1 SYNOPSIS
 
     perl get_seq.pl <Accession> [Output directory]
     
-    # export SSPROXY
     perl get_seq.pl NC_001284 .
 
 =cut
