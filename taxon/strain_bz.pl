@@ -41,18 +41,14 @@ strain_bz.pl - Full procedure for multiple genome alignments.
     perl strain_bz.pl [options]
       Options:
         --help          -?          brief help message
-        --file              STR     All taxons in this project (may also contain unused taxons)
         --working_dir   -w  STR     Default is [.]
         --seq_dir       -s  STR     Will do prep_fa() from this dir or use seqs store in $working_dir
         --keep              @STR    don't touch anything inside fasta files
-        --target_id     -t  STR
-        --query_ids     -q  @STR
+        --target        -t  STR
+        --queries       -q  @STR
         --outgroup      -o  STR
+        --csv_taxon     -c  STR     All taxons in this project (may also contain unused taxons)
         --name_str      -n  STR     Default is []
-        --use_name      -un         Use name instead of taxon_id as identifier. These names should only contain
-                                    alphanumeric value and match with sequence directory names.
-                                    For strains not recorded in NCBI taxonomy, you should assign them fake ids.
-                                    If this option set to be true, all $target_id, @query_ids are actually names.        
         --phylo_tree    -p  STR     Predefined phylogenetic tree
         --multi_name    -m  STR     Naming multiply alignment, the default value is $name_str
                                     This option is for more than one align combination.
@@ -70,15 +66,14 @@ my $fig_table = path( $Config->{run}{fig_table} )->stringify;
 
 GetOptions(
     'help|?' => sub { Getopt::Long::HelpMessage(0) },
-    'file=s'          => \( my $taxon_file  = "strains_taxon_info.csv" ),
     'working_dir|w=s' => \( my $working_dir = "." ),
     'seq_dir|s=s'     => \my $seq_dir,
     'keep=s'          => \my @keep,
-    'target_id|t=s'   => \my $target_id,
-    'query_ids|q=s'   => \my @query_ids,
-    'outgroup|o|r=s'  => \my $outgroup_id,
+    'target|t=s'      => \my $target,
+    'queries|q=s'     => \my @queries,
+    'outgroup|o|r=s'  => \my $outgroup,
+    'csv_taxon|c=s'   => \( my $csv_taxon   = "strains_taxon_info.csv" ),
     'name_str|n=s'    => \( my $name_str    = "working" ),
-    'use_name|un'     => \my $use_name,
     'phylo_tree|p=s'  => \my $phylo_tree,
     'multi_name|m=s'  => \my $multi_name,
     'msa=s'           => \( my $msa         = 'mafft' ),
@@ -104,8 +99,6 @@ if ( !defined $multi_name ) {
 #----------------------------------------------------------#
 $stopwatch->start_message("Writing strains summary...");
 
-die "$taxon_file doesn't exist\n" unless -e $taxon_file;
-
 # prepare working dir
 {
     print "Working on $name_str\n";
@@ -119,32 +112,41 @@ die "$taxon_file doesn't exist\n" unless -e $taxon_file;
 }
 
 # move $outgroup_id to last
-if ($outgroup_id) {
-    my ($exist) = grep { $_ eq $outgroup_id } @query_ids;
+if ($outgroup) {
+    my ($exist) = grep { $_ eq $outgroup } @queries;
     if ( !defined $exist ) {
         die "outgroup does not exist!\n";
     }
 
-    @query_ids = grep { $_ ne $outgroup_id } @query_ids;
-    push @query_ids, $outgroup_id;
+    @queries = grep { $_ ne $outgroup } @queries;
+    push @queries, $outgroup;
 }
 
+# build basic information
 my @data;
 {
-    if ( !$use_name ) {
-        @data
-            = map { taxon_info( $_, $working_dir ) } ( $target_id, @query_ids );
+    my %taxon_of;
+    if ($csv_taxon) {
+        for my $line ( path($csv_taxon)->lines ) {
+            my @fields = split /,/, $line;
+            if ( $#fields >= 2 ) {
+                $taxon_of{ $fields[0] } = $fields[1];
+            }
+        }
     }
-    else {
-        @data = map { taxon_info_name( $_, $working_dir ) } ( $target_id, @query_ids );
-    }
+    @data = map {
+        {   name  => $_,
+            taxon => exists $taxon_of{$_} ? $taxon_of{$_} : 0,
+            dir   => path( $working_dir, 'Genomes', $_ )->stringify,
+        }
+    } ( $target, @queries );
 }
 
 # if seqs is not in working dir, copy them from seq_dir
 if ($seq_dir) {
     print "Get seqs from [$seq_dir]\n";
 
-    for my $id ( $target_id, @query_ids ) {
+    for my $id ( $target, @queries ) {
         my ($keep) = grep { $_ eq $id } @keep;
         print " " x 4 . "Copy seq of [$id]\n";
         if ( defined $keep ) {
@@ -187,8 +189,8 @@ if ($seq_dir) {
 if ( !defined $phylo_tree ) {
     print "Create fake_tree.nwk\n";
     my $fh = path( $working_dir, "fake_tree.nwk" )->openw;
-    print {$fh} "(" x scalar(@query_ids) . "$target_id";
-    for my $id (@query_ids) {
+    print {$fh} "(" x scalar(@queries) . "$target";
+    for my $id (@queries) {
         print {$fh} ",$id)";
     }
     print {$fh} ";\n";
@@ -294,8 +296,8 @@ EOF
             {   data        => \@data,
                 parallel    => $parallel,
                 working_dir => $working_dir,
-                target_id   => $target_id,
-                query_ids   => \@query_ids,
+                target_id   => $target,
+                query_ids   => \@queries,
             },
             path( $working_dir, $sh_name )->stringify
         ) or die Template->error;
@@ -335,9 +337,9 @@ EOF
             working_dir => $working_dir,
             egaz        => $egaz,
             nostat      => $nostat,
-            target_id   => $target_id,
-            outgroup_id => $outgroup_id,
-            query_ids   => \@query_ids,
+            target_id   => $target,
+            outgroup_id => $outgroup,
+            query_ids   => \@queries,
         },
         path( $working_dir, $sh_name )->stringify
     ) or die Template->error;
@@ -496,9 +498,9 @@ EOF
                 working_dir => $working_dir,
                 aligndb     => $aligndb,
                 egaz        => $egaz,
-                target_id   => $target_id,
-                outgroup_id => $outgroup_id,
-                query_ids   => \@query_ids,
+                target_id   => $target,
+                outgroup_id => $outgroup,
+                query_ids   => \@queries,
                 multi_name  => $multi_name,
                 nostat      => $nostat,
                 avx         => can_run('raxmlHPC-PTHREADS-AVX'),
@@ -641,9 +643,9 @@ EOF
             parallel    => $parallel,
             working_dir => $working_dir,
             egaz        => $egaz,
-            target_id   => $target_id,
-            outgroup_id => $outgroup_id,
-            query_ids   => \@query_ids,
+            target_id   => $target,
+            outgroup_id => $outgroup,
+            query_ids   => \@queries,
             phylo_tree  => $phylo_tree,
             multi_name  => $multi_name,
             msa         => $msa,
@@ -687,7 +689,7 @@ EOF
             parallel    => $parallel,
             working_dir => $working_dir,
             egaz        => $egaz,
-            target_id   => $target_id,
+            target_id   => $target,
             multi_name  => $multi_name,
         },
         path( $working_dir, $sh_name )->stringify
@@ -741,9 +743,9 @@ EOF
                 parallel    => $parallel,
                 working_dir => $working_dir,
                 aligndb     => $aligndb,
-                target_id   => $target_id,
-                outgroup_id => $outgroup_id,
-                query_ids   => \@query_ids,
+                target_id   => $target,
+                outgroup_id => $outgroup,
+                query_ids   => \@queries,
                 multi_name  => $multi_name,
             },
             path( $working_dir, $sh_name )->stringify
@@ -779,7 +781,7 @@ sleep 1;
 
 find . -type f \
     | grep -v -E "\.(sh|2bit|bat)$" \
-    | grep -v -E "(chr_length|id2name|taxon|fake_taxon)\.csv$" \
+    | grep -v -E "(chr_length|id2name)\.csv$" \
     | grep -v -F "fake_tree.nwk" \
     > file_list.txt
 
@@ -792,7 +794,7 @@ EOF
             parallel    => $parallel,
             working_dir => $working_dir,
             egaz        => $egaz,
-            target_id   => $target_id,
+            target_id   => $target,
             multi_name  => $multi_name,
         },
         path( $working_dir, $sh_name )->stringify
@@ -811,72 +813,6 @@ exit;
 #----------------------------------------------------------#
 # Subroutines
 #----------------------------------------------------------#
-sub taxon_info {
-    my $taxon_id = shift;
-    my $dir      = shift;
-
-    my $dbh = DBI->connect("DBI:CSV:");
-
-    $dbh->{csv_tables}->{t0} = {
-        eol       => "\n",
-        sep_char  => ",",
-        file      => $taxon_file,
-        col_names => [ map { ( $_, $_ . "_id" ) } qw{strain species genus family order} ],
-    };
-
-    my $query = qq{ SELECT strain_id, strain, genus, species FROM t0 WHERE strain_id = ? };
-    my $sth   = $dbh->prepare($query);
-    $sth->execute($taxon_id);
-    my ( $taxonomy_id, $organism_name, $genus, $species ) = $sth->fetchrow_array;
-    $species =~ s/^$genus\s+//;
-    my $sub_name = $organism_name;
-    $sub_name =~ s/^$genus\s+//;
-    $sub_name =~ s/^$species\s*//;
-    $organism_name =~ s/\W/_/g;
-    $organism_name =~ s/_+/_/g;
-
-    return {
-        taxon   => $taxonomy_id,
-        name    => $organism_name,
-        genus   => $genus,
-        species => $species,
-        subname => $sub_name,
-        dir     => path( $working_dir, 'Genomes', $taxon_id )->stringify,
-    };
-}
-
-sub taxon_info_name {
-    my $name = shift;
-    my $dir  = shift;
-
-    my $dbh = DBI->connect("DBI:CSV:");
-
-    $dbh->{csv_tables}->{t0} = {
-        eol       => "\n",
-        sep_char  => ",",
-        file      => $taxon_file,
-        col_names => [ map { ( $_, $_ . "_id" ) } qw{strain species genus family order} ],
-    };
-
-    my $query = qq{ SELECT strain_id, strain, genus, species FROM t0 WHERE strain = ? };
-    my $sth   = $dbh->prepare($query);
-    $sth->execute($name);
-    my ( $taxonomy_id, $organism_name, $genus, $species ) = $sth->fetchrow_array;
-    $species =~ s/^$genus\s+//;
-    my $sub_name = $organism_name;
-    $sub_name =~ s/^$genus[\s_]+//;
-    $sub_name =~ s/^$species[\s_]*//;
-
-    return {
-        taxon   => $taxonomy_id,
-        name    => $name,
-        genus   => $genus,
-        species => $species,
-        subname => $sub_name,
-        dir     => path( $working_dir, 'Genomes', $name )->stringify,
-    };
-}
-
 sub prep_fa {
     my $infile = shift;
     my $dir    = shift;
