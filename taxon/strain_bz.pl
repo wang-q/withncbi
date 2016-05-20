@@ -43,7 +43,7 @@ strain_bz.pl - Full procedure for multiple genome alignments.
         --help          -?          brief help message
         --working_dir   -w  STR     Default is [.]
         --seq_dir       -s  STR     Will do prep_fa() from this dir or use seqs store in $working_dir
-        --keep              @STR    don't touch anything inside fasta files
+        --keep              @STR    don't touch anything inside these fasta files
         --target        -t  STR
         --queries       -q  @STR
         --outgroup      -o  STR
@@ -111,7 +111,7 @@ $stopwatch->start_message("Writing strains summary...");
     path( $working_dir, 'Pairwise' )->mkpath;
 }
 
-# move $outgroup_id to last
+# move $outgroup to last
 if ($outgroup) {
     my ($exist) = grep { $_ eq $outgroup } @queries;
     if ( !defined $exist ) {
@@ -296,8 +296,8 @@ EOF
             {   data        => \@data,
                 parallel    => $parallel,
                 working_dir => $working_dir,
-                target_id   => $target,
-                query_ids   => \@queries,
+                target      => $target,
+                queries     => \@queries,
             },
             path( $working_dir, $sh_name )->stringify
         ) or die Template->error;
@@ -318,9 +318,9 @@ sleep 1;
 #----------------------------#
 # z_batch
 #----------------------------#
-[% FOREACH q IN query_ids -%]
+[% FOREACH q IN queries -%]
 perl [% egaz %]/z_batch.pl \
-    -dt [% working_dir %]/Genomes/[% target_id %] \
+    -dt [% working_dir %]/Genomes/[% target %] \
     -dq [% working_dir %]/Genomes/[% q %] \
     -dw [% working_dir %]/Pairwise \
     -r 2-4 \
@@ -337,9 +337,9 @@ EOF
             working_dir => $working_dir,
             egaz        => $egaz,
             nostat      => $nostat,
-            target_id   => $target,
-            outgroup_id => $outgroup,
-            query_ids   => \@queries,
+            target      => $target,
+            outgroup    => $outgroup,
+            queries     => \@queries,
         },
         path( $working_dir, $sh_name )->stringify
     ) or die Template->error;
@@ -370,16 +370,16 @@ mkdir -p [% working_dir %]/[% multi_name %]_raw;
 #----------------------------#
 echo "==> Convert maf to fas"
 
-[% FOREACH q IN query_ids -%]
-mkdir -p [% working_dir %]/[% multi_name %]_raw/[% target_id %]vs[% q %]
-find [% working_dir %]/Pairwise/[% target_id %]vs[% q %] -name "*.maf" -or -name "*.maf.gz" \
+[% FOREACH q IN queries -%]
+mkdir -p [% working_dir %]/[% multi_name %]_raw/[% target %]vs[% q %]
+find [% working_dir %]/Pairwise/[% target %]vs[% q %] -name "*.maf" -or -name "*.maf.gz" \
     | parallel --no-run-if-empty -j 1 \
-        fasops maf2fas {} -o [% working_dir %]/[% multi_name %]_raw/[% target_id %]vs[% q %]/{/}.fas
+        fasops maf2fas {} -o [% working_dir %]/[% multi_name %]_raw/[% target %]vs[% q %]/{/}.fas
 sleep 1;
 fasops covers \
-    [% working_dir %]/[% multi_name %]_raw/[% target_id %]vs[% q %]/*.fas \
-    -n [% target_id %] -l 1000 -t 10 \
-    -o [% working_dir %]/[% multi_name %]_raw/[% target_id %]vs[% q %].yml
+    [% working_dir %]/[% multi_name %]_raw/[% target %]vs[% q %]/*.fas \
+    -n [% target %] -l 1000 -t 10 \
+    -o [% working_dir %]/[% multi_name %]_raw/[% target %]vs[% q %].yml
 
 [% END -%]
 
@@ -389,8 +389,8 @@ fasops covers \
 echo "==> Intersect"
 
 runlist compare --op intersect \
-[% FOREACH q IN query_ids -%]
-    [% working_dir %]/[% multi_name %]_raw/[% target_id %]vs[% q %].yml \
+[% FOREACH q IN queries -%]
+    [% working_dir %]/[% multi_name %]_raw/[% target %]vs[% q %].yml \
 [% END -%]
     -o [% working_dir %]/[% multi_name %]_raw/intersect.raw.yml
 
@@ -403,18 +403,18 @@ runlist span --op excise -n 1000 \
 #----------------------------#
 echo "==> Slicing with intersect"
 
-[% FOREACH q IN query_ids -%]
-if [ -e [% working_dir %]/[% multi_name %]_raw/[% target_id %]vs[% q %].slice.fas ];
+[% FOREACH q IN queries -%]
+if [ -e [% working_dir %]/[% multi_name %]_raw/[% target %]vs[% q %].slice.fas ];
 then
-    rm [% working_dir %]/[% multi_name %]_raw/[% target_id %]vs[% q %].slice.fas
+    rm [% working_dir %]/[% multi_name %]_raw/[% target %]vs[% q %].slice.fas
 fi
-find [% working_dir %]/[% multi_name %]_raw/[% target_id %]vs[% q %]/ -name "*.fas" -or -name "*.fas.gz" \
+find [% working_dir %]/[% multi_name %]_raw/[% target %]vs[% q %]/ -name "*.fas" -or -name "*.fas.gz" \
     | sort \
     | parallel --no-run-if-empty --keep-order -j 1 " \
         fasops slice {} \
             [% working_dir %]/[% multi_name %]_raw/intersect.filter.yml \
-            -n [% target_id %] -l 1000 -o stdout \
-            >> [% working_dir %]/[% multi_name %]_raw/[% target_id %]vs[% q %].slice.fas
+            -n [% target %] -l 1000 -o stdout \
+            >> [% working_dir %]/[% multi_name %]_raw/[% target %]vs[% q %].slice.fas
     "
 
 [% END -%]
@@ -425,14 +425,14 @@ find [% working_dir %]/[% multi_name %]_raw/[% target_id %]vs[% q %]/ -name "*.f
 echo "==> Join intersects"
 
 fasops join \
-[% FOREACH q IN query_ids -%]
-    [% working_dir %]/[% multi_name %]_raw/[% target_id %]vs[% q %].slice.fas \
+[% FOREACH q IN queries -%]
+    [% working_dir %]/[% multi_name %]_raw/[% target %]vs[% q %].slice.fas \
 [% END -%]
-    -n [% target_id %] \
+    -n [% target %] \
     -o [% working_dir %]/[% multi_name %]_raw/join.raw.fas
 
-echo [% target_id %] > [% working_dir %]/[% multi_name %]_raw/names.list
-[% FOREACH q IN query_ids -%]
+echo [% target %] > [% working_dir %]/[% multi_name %]_raw/names.list
+[% FOREACH q IN queries -%]
 echo [% q %] >> [% working_dir %]/[% multi_name %]_raw/names.list
 [% END -%]
 
@@ -457,7 +457,7 @@ mkdir -p [% working_dir %]/[% multi_name %]_rawphylo;
 
 cd [% working_dir %]/[% multi_name %]_rawphylo
 
-[% IF query_ids.size > 2 -%]
+[% IF queries.size > 2 -%]
 perl [% egaz%]/concat_fasta.pl \
     -i [% working_dir %]/[% multi_name %]_raw/join.refine.fas \
     -o [% working_dir %]/[% multi_name %]_rawphylo/[% multi_name %].phy \
@@ -466,27 +466,27 @@ perl [% egaz%]/concat_fasta.pl \
 [% IF avx -%]
 raxmlHPC-PTHREADS-AVX -T [% IF parallel > 8 %] 8 [% ELSIF parallel > 3 %] [% parallel - 1 %] [% ELSE %] 2 [% END %] \
     -f a -m GTRGAMMA -p $(openssl rand 3 | od -DAn) -N 100 -x $(openssl rand 3 | od -DAn) \
-[% IF outgroup_id -%]
-    -o [% outgroup_id %] \
+[% IF outgroup -%]
+    -o [% outgroup %] \
 [% END -%]
     --no-bfgs -n [% multi_name %] -s [% working_dir %]/[% multi_name %]_rawphylo/[% multi_name %].phy
 [% ELSE -%]
 raxmlHPC-PTHREADS -T [% IF parallel > 8 %] 8 [% ELSIF parallel > 3 %] [% parallel - 1 %] [% ELSE %] 2 [% END %] \
     -f a -m GTRGAMMA -p $(openssl rand 3 | od -DAn) -N 100 -x $(openssl rand 3 | od -DAn) \
-[% IF outgroup_id -%]
-    -o [% outgroup_id %] \
+[% IF outgroup -%]
+    -o [% outgroup %] \
 [% END -%]
     --no-bfgs -n [% multi_name %] -s [% working_dir %]/[% multi_name %]_rawphylo/[% multi_name %].phy
 [% END -%]
 
 cp [% working_dir %]/[% multi_name %]_rawphylo/RAxML_best* [% working_dir %]/[% multi_name %]_rawphylo/[% multi_name %].nwk
 
-[% ELSIF query_ids.size == 2 -%]
-echo "(([% target_id %],[% query_ids.0 %]),[% query_ids.1 %]);" > [% working_dir %]/[% multi_name %]_rawphylo/[% multi_name %].nwk
+[% ELSIF queries.size == 2 -%]
+echo "(([% target %],[% queries.0 %]),[% queries.1 %]);" > [% working_dir %]/[% multi_name %]_rawphylo/[% multi_name %].nwk
 
 [% ELSE -%]
 
-echo "([% target_id %],[% query_ids.0 %]);" > [% working_dir %]/[% multi_name %]_rawphylo/[% multi_name %].nwk
+echo "([% target %],[% queries.0 %]);" > [% working_dir %]/[% multi_name %]_rawphylo/[% multi_name %].nwk
 
 [% END -%]
 
@@ -498,9 +498,9 @@ EOF
                 working_dir => $working_dir,
                 aligndb     => $aligndb,
                 egaz        => $egaz,
-                target_id   => $target,
-                outgroup_id => $outgroup,
-                query_ids   => \@queries,
+                target      => $target,
+                outgroup    => $outgroup,
+                queries     => \@queries,
                 multi_name  => $multi_name,
                 nostat      => $nostat,
                 avx         => can_run('raxmlHPC-PTHREADS-AVX'),
@@ -548,8 +548,8 @@ mkdir -p [% working_dir %]/[% multi_name %]_phylo;
 #----------------------------#
 [% IF phylo_tree -%]
 perl [% egaz %]/mz.pl \
-    [% FOREACH id IN query_ids -%]
-    -d [% working_dir %]/Pairwise/[% target_id %]vs[% id %] \
+    [% FOREACH id IN queries -%]
+    -d [% working_dir %]/Pairwise/[% target %]vs[% id %] \
     [% END -%]
     --tree [% phylo_tree %] \
     --out [% working_dir %]/[% multi_name %]_mz \
@@ -558,16 +558,16 @@ perl [% egaz %]/mz.pl \
 if [ -f [% working_dir %]/[% multi_name %]_rawphylo/[% multi_name %].nwk ]
 then
     perl [% egaz %]/mz.pl \
-        [% FOREACH id IN query_ids -%]
-        -d [% working_dir %]/Pairwise/[% target_id %]vs[% id %] \
+        [% FOREACH id IN queries -%]
+        -d [% working_dir %]/Pairwise/[% target %]vs[% id %] \
         [% END -%]
         --tree [% working_dir %]/[% multi_name %]_rawphylo/[% multi_name %].nwk \
         --out [% working_dir %]/[% multi_name %]_mz \
         -p [% parallel %]
 else
     perl [% egaz %]/mz.pl \
-        [% FOREACH id IN query_ids -%]
-        -d [% working_dir %]/Pairwise/[% target_id %]vs[% id %] \
+        [% FOREACH id IN queries -%]
+        -d [% working_dir %]/Pairwise/[% target %]vs[% id %] \
         [% END -%]
         --tree [% working_dir %]/fake_tree.nwk \
         --out [% working_dir %]/[% multi_name %]_mz \
@@ -594,7 +594,7 @@ find [% working_dir %]/[% multi_name %]_fasta -name "*.fas" -or -name "*.fas.gz"
         fasops refine {} \
         --msa [% msa %] \
         --quick --expand 100 --join 100 \
-[% IF outgroup_id -%]
+[% IF outgroup -%]
         --outgroup \
 [% END -%]
         -o [% working_dir %]/[% multi_name %]_refined/{/}
@@ -604,7 +604,7 @@ find [% working_dir %]/[% multi_name %]_refined -type f -name "*.fas" | parallel
 #----------------------------#
 # RAxML
 #----------------------------#
-[% IF query_ids.size > 2 -%]
+[% IF queries.size > 2 -%]
 cd [% working_dir %]/[% multi_name %]_phylo
 
 perl [% egaz %]/concat_fasta.pl \
@@ -617,15 +617,15 @@ find [% working_dir %]/[% multi_name %]_phylo -type f -name "RAxML*" | parallel 
 [% IF avx -%]
 raxmlHPC-PTHREADS-AVX -T [% IF parallel > 8 %] 8 [% ELSIF parallel > 3 %] [% parallel - 1 %] [% ELSE %] 2 [% END %] \
     -f a -m GTRGAMMA -p $(openssl rand 3 | od -DAn) -N 100 -x $(openssl rand 3 | od -DAn) \
-[% IF outgroup_id -%]
-    -o [% outgroup_id %] \
+[% IF outgroup -%]
+    -o [% outgroup %] \
 [% END -%]
     --no-bfgs -n [% multi_name %] -s [% working_dir %]/[% multi_name %]_phylo/[% multi_name %].phy
 [% ELSE -%]
 raxmlHPC-PTHREADS -T [% IF parallel > 8 %] 8 [% ELSIF parallel > 3 %] [% parallel - 1 %] [% ELSE %] 2 [% END %] \
     -f a -m GTRGAMMA -p $(openssl rand 3 | od -DAn) -N 100 -x $(openssl rand 3 | od -DAn) \
-[% IF outgroup_id -%]
-    -o [% outgroup_id %] \
+[% IF outgroup -%]
+    -o [% outgroup %] \
 [% END -%]
     --no-bfgs -n [% multi_name %] -s [% working_dir %]/[% multi_name %]_phylo/[% multi_name %].phy
 [% END -%]
@@ -643,9 +643,9 @@ EOF
             parallel    => $parallel,
             working_dir => $working_dir,
             egaz        => $egaz,
-            target_id   => $target,
-            outgroup_id => $outgroup,
-            query_ids   => \@queries,
+            target      => $target,
+            outgroup    => $outgroup,
+            queries     => \@queries,
             phylo_tree  => $phylo_tree,
             multi_name  => $multi_name,
             msa         => $msa,
@@ -678,7 +678,7 @@ find [% working_dir %]/[% multi_name %]_refined -type f -name "*.fas" -or -name 
     | parallel --no-run-if-empty basename {} \
     | parallel --no-run-if-empty -j [% parallel %] \
         perl [% egaz %]/fas2vcf.pl \
-            -s [% working_dir %]/Genomes/[% target_id %]/chr.sizes \
+            -s [% working_dir %]/Genomes/[% target %]/chr.sizes \
             -i [% working_dir %]/[% multi_name %]_refined/{} \
             -o [% working_dir %]/[% multi_name %]_vcf/{}.vcf
 
@@ -689,7 +689,7 @@ EOF
             parallel    => $parallel,
             working_dir => $working_dir,
             egaz        => $egaz,
-            target_id   => $target,
+            target      => $target,
             multi_name  => $multi_name,
         },
         path( $working_dir, $sh_name )->stringify
@@ -711,12 +711,12 @@ sleep 1;
 #----------------------------#
 perl [% aligndb %]/util/gff2anno.pl \
     --type CDS --remove \
-    [% working_dir %]/Genomes/[% target_id %]/*.gff \
+    [% working_dir %]/Genomes/[% target %]/*.gff \
     > [% working_dir %]/cds.yml
 
 perl [% aligndb %]/util/gff2anno.pl \
     --remove \
-    [% working_dir %]/Genomes/[% target_id %]/*.rm.gff \
+    [% working_dir %]/Genomes/[% target %]/*.rm.gff \
     > [% working_dir %]/repeat.yml
 
 runlist merge [% working_dir %]/repeat.yml [% working_dir %]/cds.yml -o [% working_dir %]/anno.yml
@@ -729,7 +729,7 @@ perl [% aligndb %]/util/multi_way_batch.pl \
     -d [% multi_name %] \
     -da [% working_dir %]/[% multi_name %]_refined \
     -a [% working_dir %]/anno.yml \
-[% IF outgroup_id -%]
+[% IF outgroup -%]
     --outgroup \
 [% END -%]
     -chr [% working_dir %]/chr_length.csv \
@@ -743,9 +743,9 @@ EOF
                 parallel    => $parallel,
                 working_dir => $working_dir,
                 aligndb     => $aligndb,
-                target_id   => $target,
-                outgroup_id => $outgroup,
-                query_ids   => \@queries,
+                target      => $target,
+                outgroup    => $outgroup,
+                queries     => \@queries,
                 multi_name  => $multi_name,
             },
             path( $working_dir, $sh_name )->stringify
@@ -793,8 +793,6 @@ EOF
         {   stopwatch   => $stopwatch,
             parallel    => $parallel,
             working_dir => $working_dir,
-            egaz        => $egaz,
-            target_id   => $target,
             multi_name  => $multi_name,
         },
         path( $working_dir, $sh_name )->stringify
