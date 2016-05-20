@@ -345,7 +345,7 @@ EOF
     ) or die Template->error;
 
     # rawphylo.sh
-    # TODO: join_dbs.pl has gone.
+    # TODO: wait parallelizing `fasops refine`
     if ( !$norawphylo and !defined $phylo_tree ) {
         $sh_name = "4_rawphylo.sh";
         print "Create $sh_name\n";
