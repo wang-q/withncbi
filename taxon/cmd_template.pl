@@ -26,7 +26,7 @@ cmd_template.pl - Simple template for strain_bz.pl
       Options:
         --help              brief help message
         --seq_dir           ~/data/organelle/plastid_genomes
-        --taxon_file        ~/data/organelle/plastid_genomes/plastid_ncbi.csv
+        --csv_taxon         ~/data/organelle/plastid_genomes/plastid_ncbi.csv
         --parallel          number of child processes
 
 =cut
@@ -36,7 +36,7 @@ my $withncbi = path( $Config->{run}{withncbi} )->stringify;    # withncbi path
 GetOptions(
     'help|?'       => sub { Getopt::Long::HelpMessage(0) },
     'seq_dir=s'    => \my $seq_dir,
-    'taxon_file=s' => \my $taxon_file,
+    'csv_taxon=s' => \my $taxon_file,
     'parallel=i' => \( my $parallel = 4 ),
 ) or Getopt::Long::HelpMessage(1);
 
@@ -48,11 +48,10 @@ my $tt = Template->new;
 my $text = <<'EOF';
 # [% name %]
 perl [% withncbi %]/taxon/strain_bz.pl \
-    --file [% taxon_file %] \
+    --csv_taxon [% taxon_file %] \
 [% IF seq_dir -%]
     --seq_dir [% seq_dir %] \
 [% END -%]
-    --use_name \
     --name [% name %] \
     --parallel [% parallel %] \
 [% IF o -%]
