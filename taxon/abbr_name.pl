@@ -3,10 +3,10 @@ use strict;
 use warnings;
 use autodie;
 
-use Getopt::Long qw(HelpMessage);
+use Getopt::Long;
 use Config::Tiny;
 use FindBin;
-use YAML qw(Dump Load DumpFile LoadFile);
+use YAML::Syck;
 
 use List::MoreUtils qw(uniq);
 
@@ -23,7 +23,7 @@ abbr_name.pl - Abbreviate strain scientific names.
 
 =head1 SYNOPSIS
 
-    cat <file> | perl id_project_to.pl [options]
+    cat <file> | perl abbr_name.pl [options]
       Options:
         --help              brief help message
         --man               full documentation
@@ -38,11 +38,13 @@ abbr_name.pl - Abbreviate strain scientific names.
 
 =head1 EXAMPLE
 
-    $ echo -e 'Homo sapiens,Homo\nHomo erectus,Homo\n' | perl abbr_name.pl -s ',' -c "1,1,2"
+    $ echo -e 'Homo sapiens,Homo\nHomo erectus,Homo\n' \
+        | perl abbr_name.pl -s ',' -c "1,1,2"
     H_sap
     H_ere
     
-    $ echo -e 'Homo sapiens,Homo\nHomo erectus,Homo\n' | perl abbr_name.pl -s ',' -c "1,1,2" --tight
+    $ echo -e 'Homo sapiens,Homo\nHomo erectus,Homo\n' \
+        | perl abbr_name.pl -s ',' -c "1,1,2" --tight
     Hsap
     Here
     
@@ -54,12 +56,12 @@ abbr_name.pl - Abbreviate strain scientific names.
 =cut
 
 GetOptions(
-    'help|?' => sub { HelpMessage(0) },
+    'help|?' => sub { Getopt::Long::HelpMessage(0) },
     'column|c=s'    => \( my $column      = '1,2,3' ),
     'seperator|s=s' => \( my $seperator   = '\s+' ),
     'min|m=i'       => \( my $min_species = 3 ),
     'tight'         => \my $tight,
-) or HelpMessage(1);
+) or Getopt::Long::HelpMessage(1);
 
 #----------------------------------------------------------#
 # init

@@ -3,11 +3,12 @@ use strict;
 use warnings;
 use autodie;
 
-use Getopt::Long qw(HelpMessage);
+use Getopt::Long;
 use Config::Tiny;
 use FindBin;
-use YAML qw(Dump Load DumpFile LoadFile);
+use YAML::Syck;
 
+use Path::Tiny;
 use Template;
 
 #----------------------------------------------------------#
@@ -24,7 +25,6 @@ cmd_template.pl - Simple template for strain_bz.pl
     cat <file> | perl cmd_template.pl [options]
       Options:
         --help              brief help message
-        --man               full documentation
         --seq_dir           ~/data/organelle/plastid_genomes
         --taxon_file        ~/data/organelle/plastid_genomes/plastid_ncbi.csv
         --parallel          number of child processes
@@ -34,11 +34,11 @@ cmd_template.pl - Simple template for strain_bz.pl
 my $withncbi = path( $Config->{run}{withncbi} )->stringify;    # withncbi path
 
 GetOptions(
-    'help|?'       => sub { HelpMessage(0) },
+    'help|?'       => sub { Getopt::Long::HelpMessage(0) },
     'seq_dir=s'    => \my $seq_dir,
     'taxon_file=s' => \my $taxon_file,
     'parallel=i' => \( my $parallel = 4 ),
-) or HelpMessage(1);
+) or Getopt::Long::HelpMessage(1);
 
 #----------------------------------------------------------#
 # start
