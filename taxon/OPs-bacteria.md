@@ -3,16 +3,6 @@
 The following command lines are about how I processed the plastid genomes of green plants.
 Many tools of `taxon/` are used here, which makes a good example for users.
 
-## Work flow.
-
-```text
-id ---> lineage ---> filtering ---> naming ---> strain_info.pl   ---> strain_bz.pl
-                                      |                                 ^
-                                      |-------> batch_get_seq.pl -------|
-```
-
-I'm sure there are no commas in names. So for convenient, don't use Text::CSV_XS.
-
 ## Init genome report database.
 
 `db/README.md`
@@ -111,7 +101,7 @@ cd ~/data/bacteria/bac_summary
 echo '#strain_taxonomy_id,strain,species,genus,subgroup,accession,abbr' > bac.ABBR.csv
 cat bac.ACC.csv \
     | grep -v '^#' \
-    | perl ~/Scripts/withncbi/taxon/abbr_name.pl -c "2,3,4" -s "," -m 0 \
+    | perl ~/Scripts/withncbi/taxon/abbr_name.pl -c "2,3,4" -s "," -m 0 --shortsub \
     | sort -t',' -k5,5 -k4,4 -k3,3 -k7,7 \
     >> bac.ABBR.csv
 ```
@@ -151,106 +141,86 @@ find . -name "*.fasta" | wc -l
 
 ## Create alignment plans
 
-We got **476** accessions.
-
 Numbers for higher ranks are: 49 orders, 61 families, 119 genera and 467 species.
 
 ```bash
-cd ~/data/organelle/plastid_summary
+cd ~/data/bacteria/bac_summary/
 
-# valid genera
-cat plastid.ABBR.csv \
-    | grep -v "^#" \
-    | perl -nl -a -F"," -e \
-    '$seen{$F[4]}++; END {for $k (sort keys %seen) {printf qq{,%s,\n}, $k if $seen{$k} > 1}}' \
-    > genus.tmp
+# count every ranks
+#  17 subgroup.list.tmp
+#  81 genus.list.tmp
+# 161 species.list.tmp
+cut -d',' -f 3 bac.ABBR.csv | grep -v '^#'| sort | uniq > species.list.tmp
+cut -d',' -f 4 bac.ABBR.csv | grep -v '^#'| sort | uniq > genus.list.tmp
+cut -d',' -f 5 bac.ABBR.csv | grep -v '^#'| sort | uniq > subgroup.list.tmp
+wc -l subgroup.list.tmp genus.list.tmp species.list.tmp
 
-# intersect between two files
-grep -F -f genus.tmp plastid.ABBR.csv > plastid.GENUS.csv
-
-# 476
-wc -l plastid.GENUS.csv
-
-#   count every ranks
-#   49 order.list.tmp
-#   61 family.list.tmp
-#  119 genus.list.tmp
-#  467 species.list.tmp
-cut -d',' -f 4 plastid.GENUS.csv | sort | uniq > species.list.tmp
-cut -d',' -f 5 plastid.GENUS.csv | sort | uniq > genus.list.tmp
-cut -d',' -f 6 plastid.GENUS.csv | sort | uniq > family.list.tmp
-cut -d',' -f 7 plastid.GENUS.csv | sort | uniq > order.list.tmp
-wc -l order.list.tmp family.list.tmp genus.list.tmp species.list.tmp
-
-# create again with headers
-grep -F -f genus.tmp plastid.ABBR.csv > plastid.GENUS.tmp
-
-# sort by multiply columns, phylum, order, family, abbr
-head -n 1 plastid.ABBR.csv > plastid.GENUS.csv
-cat plastid.GENUS.tmp \
-    | sort -t',' -k9,9 -k7,7 -k6,6 -k10,10 \
-    >> plastid.GENUS.csv
-
-# clean
 rm *.tmp *.bak
 ```
 
 Create alignments without outgroups.
 
 ```bash
-cd ~/data/organelle/plastid_summary
+cd ~/data/bacteria/bac_summary
 
-# tab-seperated
+# tab-separated
 # name  t   qs
-cat plastid.GENUS.csv \
+cat bac.ABBR.csv \
     | grep -v "^#" \
-    | perl -n -a -F"," -e \
-    'BEGIN{ ($g, @s, %h) = (q{}); } chomp for @F; if ($F[4] ne $g) { if ($g) { @s = sort {$h{$a} <=> $h{$b}} @s; $t = shift @s; $qs = join(q{,}, @s); printf qq{%s\t%s\t%s\n}, $g, $t, $qs; } $g = $F[4]; @s = ();} push @s, $F[9]; $h{$F[9]} = $F[0]; END { @s = sort {$h{$a} <=> $h{$b}} @s; $t = shift @s; $qs = join(q{,}, @s); printf qq{%s\t%s\t%s\n}, $g, $t, $qs; }' \
-    > genus.tsv
+    | perl -na -F"," -e '
+        BEGIN{
+            $name = q{};
+            %id_of = ();
+        }
 
-cat plastid.ABBR.csv \
-    | grep -v "^#" \
-    | perl -n -a -F"," -e \
-    'BEGIN{ ($g, @s, %h) = (q{}); } chomp for @F; if ($F[5] ne $g) { if ($g) { @s = sort {$h{$a} <=> $h{$b}} @s; $t = shift @s; $qs = join(q{,}, @s); printf qq{%s\t%s\t%s\n}, $g, $t, $qs; } $g = $F[5]; @s = ();} push @s, $F[9]; $h{$F[9]} = $F[0]; END { @s = sort {$h{$a} <=> $h{$b}} @s; $t = shift @s; $qs = join(q{,}, @s); printf qq{%s\t%s\t%s\n}, $g, $t, $qs; }' \
-    > family.tsv
+        chomp for @F;
+        $F[2] =~ s/\W+/_/g;
+        if ($F[2] ne $name) {
+            if ($name) {
+                my @s = sort {$id_of{$a} <=> $id_of{$b}} keys %id_of;
+                my $t = shift @s;
+                my $qs = join(q{,}, @s);
+                printf qq{%s\t%s\t%s\n}, $name, $t, $qs;
+            }
+            $name = $F[2];
+            %id_of = ();
+        }
+        $id_of{$F[6]} = $F[0]; # multiple chromosomes collapsed here
 
-# name  t   qs  o
-cat genus.tsv \
-    | perl -nl -a -F"\t" -MPath::Tiny -e \
-    'BEGIN{ @ls = grep {/\S/} grep {!/^#/} path(q{~/Scripts/withncbi/doc/plastid_OG.md})->lines( { chomp => 1}); for (@ls) {@fs = split(/,/); $h{$fs[0]}= $fs[1];}  } if (exists $h{$F[0]}) { printf qq{%s\t%s\t%s\t%s\n}, $F[0] . q{_OG}, $F[1], $F[2], $h{$F[0]}; }' \
-    > genus_OG.tsv
+        END {
+            my @s = sort {$id_of{$a} <=> $id_of{$b}} keys %id_of;
+            my $t = shift @s;
+            my $qs = join(q{,}, @s);
+            printf qq{%s\t%s\t%s\n}, $name, $t, $qs;
+        }
+    ' \
+    > species.tsv
 
-# every genera
-echo -e "mkdir -p ~/data/organelle/plastid.working\ncd ~/data/organelle/plastid.working\n" > ../plastid.cmd.txt
-cat genus.tsv \
-    | perl ~/Scripts/withncbi/taxon/cmd_template.pl --seq_dir ~/data/organelle/plastid_genomes --taxon_file ~/data/organelle/plastid_genomes/plastid_ncbi.csv --parallel 8 \
-    >> ../plastid.cmd.txt
+# every species
+echo "mkdir -p ~/data/bacteria/bac.working" > ../bac.cmd.txt
+echo "cd ~/data/bacteria/bac.working" >> ../bac.cmd.txt
+echo >> ../bac.cmd.txt
 
-# this is for finding outgroups
-echo -e "mkdir -p ~/data/organelle/plastid_families\ncd ~/data/organelle/plastid_families\n" > ../plastid_families.cmd.txt
-cat family.tsv \
-    | perl -n -e '/,\w+,/ and print' \
-    | perl ~/Scripts/withncbi/taxon/cmd_template.pl --seq_dir ~/data/organelle/plastid_genomes --taxon_file ~/data/organelle/plastid_genomes/plastid_ncbi.csv --parallel 8 \
-    >> ../plastid_families.cmd.txt
+cat species.tsv \
+    | perl ~/Scripts/withncbi/taxon/cmd_template.pl \
+        --seq_dir ~/data/bacteria/bac_genomes/ \
+        --csv_taxon ~/data/bacteria/bac_genomes/bac_ncbi.csv \
+        --parallel 8 \
+    >> ../bac.cmd.txt
 
-# genera with outgroups
-echo -e "mkdir -p ~/data/organelle/plastid_OG\ncd ~/data/organelle/plastid_OG\n" > ../plastid_OG.cmd.txt
-cat genus_OG.tsv \
-    | perl ~/Scripts/withncbi/taxon/cmd_template.pl --seq_dir ~/data/organelle/plastid_genomes --taxon_file ~/data/organelle/plastid_genomes/plastid_ncbi.csv --parallel 8 \
-    >> ../plastid_OG.cmd.txt
 ```
 
 ## Aligning
 
-### Batch running for genus
+### Batch running for groups
 
 The old prepare_run.sh
 
 ```bash
-mkdir -p ~/data/organelle/plastid.working
-cd ~/data/organelle/plastid.working
+mkdir -p ~/data/bacteria/bac.working
+cd ~/data/bacteria/bac.working
 
-time sh ../plastid.cmd.txt 2>&1 | tee log_cmd.txt
+time bash ../bac.cmd.txt 2>&1 | tee log_cmd.txt
 
 #----------------------------#
 # Approach 1: one by one
