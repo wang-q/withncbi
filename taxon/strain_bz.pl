@@ -159,8 +159,8 @@ if ($seq_dir) {
         $cur_dir = $cur_dir->stringify;
 
         my @fa_files
-            = File::Find::Rule->file->name( '*.fna', '*.fa', '*.fas', '*.fasta' )
-            ->in($original_dir);
+            = File::Find::Rule->file->name( '*.fna', '*.fa', '*.fas',
+            '*.fasta' )->in($original_dir);
 
         printf " " x 8 . "Total %d fasta file(s)\n", scalar @fa_files;
 
@@ -345,7 +345,6 @@ EOF
     ) or die Template->error;
 
     # rawphylo.sh
-    # TODO: wait parallelizing `fasops refine`
     if ( !$norawphylo and !defined $phylo_tree ) {
         $sh_name = "4_rawphylo.sh";
         print "Create $sh_name\n";
@@ -442,7 +441,8 @@ fasops subset \
     --required \
     -o [% working_dir %]/[% multi_name %]_raw/join.filter.fas
 
-fasops refine --msa mafft \
+fasops refine \
+    --msa mafft --parallel [% parallel %] \
     [% working_dir %]/[% multi_name %]_raw/join.filter.fas \
     -o [% working_dir %]/[% multi_name %]_raw/join.refine.fas
 
@@ -592,7 +592,7 @@ echo "Refine fasta"
 find [% working_dir %]/[% multi_name %]_fasta -name "*.fas" -or -name "*.fas.gz" \
     | parallel --no-run-if-empty -j [% parallel %] \
         fasops refine {} \
-        --msa [% msa %] \
+        --msa [% msa %] --parallel [% parallel %] \
         --quick --expand 100 --join 100 \
 [% IF outgroup -%]
         --outgroup \
