@@ -277,12 +277,12 @@ for f in `find . -mindepth 1 -maxdepth 2 -type f -name 7_multi_db_only.sh | sort
     echo ;
 done  > run_7.sh
 
-cat run_1.sh | grep . | parallel -j 16 2>&1 | tee log_1.txt
-cat run_2.sh | grep . | parallel -j 8 2>&1 | tee log_2.txt
-cat run_3.sh | grep . | parallel -j 8 2>&1 | tee log_3.txt
-cat run_4.sh | grep . | parallel -j 4 2>&1 | tee log_4.txt
-cat run_5.sh | grep . | parallel -j 4 2>&1 | tee log_5.txt
-cat run_7.sh | grep . | parallel -j 8 2>&1 | tee log_7.txt
+cat run_1.sh | grep . | parallel --no-run-if-empty -j 16 2>&1 | tee log_1.txt
+cat run_2.sh | grep . | parallel --no-run-if-empty -j 4 2>&1  | tee log_2.txt
+cat run_3.sh | grep . | parallel --no-run-if-empty -j 8 2>&1  | tee log_3.txt
+cat run_4.sh | grep . | parallel --no-run-if-empty -j 8 2>&1  | tee log_4.txt
+cat run_5.sh | grep . | parallel --no-run-if-empty -j 8 2>&1  | tee log_5.txt
+cat run_7.sh | grep . | parallel --no-run-if-empty -j 12 2>&1 | tee log_7.txt
 
 #----------------------------#
 # Clean
@@ -310,14 +310,6 @@ find  ~/data/organelle/plastid_OG -type f -name "*.common.xlsx" \
     | grep -v "vs[A-Z]" \
     | parallel cp {} .
 
-cat ~/data/organelle/plastid_summary/genus.tsv \
-    | cut -f 1 \
-    | TT_FILE=cmd_common_chart.tt perl -MTemplate -nl -e 'push @data, { name => $_, }; END{$tt = Template->new; $tt->process($ENV{TT_FILE}, { data => \@data, }) or die Template->error}' \
-    > cmd_common_chart.bat
-
-# Undre Windows
-cd /d D:/data/organelle/plastid_summary/xlsx
-cmd_common_chart.bat
 ```
 
 ### Genome list
