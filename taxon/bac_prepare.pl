@@ -49,10 +49,11 @@ bac_prepare.pl
 =cut
 
 # paths
-my $td_dir   = path( $Config->{path}{td} )->stringify;      # taxdmp
-my $nb_dir   = path( $Config->{path}{nb} )->stringify;      # NCBI genomes bac
-my $nbd_dir  = path( $Config->{path}{nbd} )->stringify;     # NCBI genomes bac draft
-my $ngbd_dir = path( $Config->{path}{ngbd} )->stringify;    # NCBI genbank genomes bac draft
+my $td_dir  = path( $Config->{path}{td} )->stringify;   # taxdmp
+my $nb_dir  = path( $Config->{path}{nb} )->stringify;   # NCBI genomes bac
+my $nbd_dir = path( $Config->{path}{nbd} )->stringify;  # NCBI genomes bac draft
+my $ngbd_dir
+    = path( $Config->{path}{ngbd} )->stringify; # NCBI genbank genomes bac draft
 
 GetOptions(
     'help|?' => sub { Getopt::Long::HelpMessage(0) },
@@ -63,17 +64,19 @@ GetOptions(
     'password|p=s'  => \( my $password    = $Config->{database}{password} ),
     'seq_dir=s'     => \( my $seq_dir     = "~/data/bacteria/bac_seq_dir" ),
     'working_dir=s' => \( my $working_dir = "." ),
-    'parent_id|p=s' => \( my $parent_id   = "562,585054" ),    # E.coli and E. fergusonii
+    'parent_id|p=s' => \( my $parent_id   = "562,585054" )
+    ,                                           # E.coli and E. fergusonii
     'target_id|t=i' => \my $target_id,
     'outgroup|o=i'  => \my $outgroup_id,
     'exclude|e=s'   => \( my $exclude_ids = '0' ),
     'name_str|n=s'  => \
         my $name_str
-    ,    # use custom name_str, working dir and goal db name. mysql restrict db name length 64
-    'strains'  => \my $require_strains,              # skip taxonomy_id == species_id
-    'is_self'  => \my $is_self,                      # is self alignment (paralog)
+    , # use custom name_str, working dir and goal db name. mysql restrict db name length 64
+    'strains' => \my $require_strains,    # skip taxonomy_id == species_id
+    'is_self' => \my $is_self,            # is self alignment (paralog)
     'length=i' => \( my $paralog_length = 1000 ),    # paralog length
-    'get_seq'  => \my $get_seq,     # download sequences via get_seq.pl if not existing
+    'get_seq'  => \
+        my $get_seq,    # download sequences via get_seq.pl if not existing
     'scaffold' => \my $scaffold,    # including scaffolds and contigs
     'parallel=i' => \( my $parallel = $Config->{run}{parallel} ),
 ) or Getopt::Long::HelpMessage(1);
@@ -85,7 +88,17 @@ $seq_dir = path($seq_dir)->stringify;
 #----------------------------------------------------------#
 $stopwatch->start_message("Preparing whole group...");
 
-my $dbh = DBI->connect( "dbi:mysql:$db_name:$server", $username, $password );
+# Database handler
+my $dsn
+    = "dbi:mysql:"
+    . "database="
+    . $db_name
+    . ";host="
+    . $server
+    . ";port="
+    . $port;
+my DBI $dbh = DBI->connect( $dsn, $username, $password )
+    or die $DBI::errstr;
 
 my $id_str;
 {
@@ -117,7 +130,7 @@ my $id_str;
             ? q{ SELECT taxonomy_id FROM gr WHERE 1 = 1  }
             : q{ SELECT taxonomy_id FROM gr WHERE status NOT IN ('Contig', 'Scaffold') };
         $query .= "AND taxonomy_id != species_id" if $require_strains;
-        my $sth = $dbh->prepare($query);
+        my DBI $sth = $dbh->prepare($query);
         $sth->execute;
         while ( my ($id) = $sth->fetchrow_array ) {
             $db_id_set->add($id);
@@ -140,7 +153,7 @@ my $id_str;
             FROM gr
             WHERE taxonomy_id IN $id_str
         };
-        my $sth = $dbh->prepare($query);
+        my DBI $sth = $dbh->prepare($query);
         $sth->execute;
 
         while ( my ($name) = $sth->fetchrow_array ) {
@@ -171,7 +184,7 @@ my @query_ids;
         WHERE taxonomy_id IN $id_str
         ORDER BY released_date, status, code
     };
-    my $sth = $dbh->prepare($query);
+    my DBI $sth = $dbh->prepare($query);
     $sth->execute;
 
     # header line
@@ -195,7 +208,8 @@ my @query_ids;
     if ($target_id) {
         my ($exist) = grep { $_->[0] == $target_id } @strains;
         if ( defined $exist ) {
-            my $message = "Use [$exist->[1] ($exist->[0])] as target, as you wish.\n";
+            my $message
+                = "Use [$exist->[1] ($exist->[0])] as target, as you wish.\n";
             print {$fh} $message;
             print $message;
         }
@@ -243,8 +257,10 @@ my @ids_missing;
     my @gff_files = File::Find::Rule->file->name('*.gff')->in($nb_dir);
     my ( @scaff_files, @contig_files );
     if ($scaffold) {
-        @scaff_files  = File::Find::Rule->file->name('*.scaffold.fna.tgz')->in($nbd_dir);
-        @contig_files = File::Find::Rule->file->name('*.contig.fna.tgz')->in($ngbd_dir);
+        @scaff_files
+            = File::Find::Rule->file->name('*.scaffold.fna.tgz')->in($nbd_dir);
+        @contig_files
+            = File::Find::Rule->file->name('*.contig.fna.tgz')->in($ngbd_dir);
     }
 
     print "Rewrite seqs for every strains\n";
@@ -256,20 +272,25 @@ ID: for my $taxon_id ( $target_id, @query_ids ) {
         }
 
         my @accs;    # complete accessions
+        {
+            my DBI $sth = $dbh->prepare(
+                q{
+                SELECT chr FROM gr WHERE taxonomy_id = ?
+                }
+            );
+            $sth->execute($taxon_id);
+            my ($acc) = $sth->fetchrow_array;
+            push @accs,
+                ( map { s/\.\d+$//; $_ } grep {defined} ( split /,/, $acc ) );
+        }
 
-        my $query = qq{ SELECT chr FROM gr WHERE taxonomy_id = ? };
-        my $sth   = $dbh->prepare($query);
-        $sth->execute($taxon_id);
-        my ($acc) = $sth->fetchrow_array;
-        push @accs, ( map { s/\.\d+$//; $_ } grep {defined} ( split /,/, $acc ) );
-
-        # for NZ_CM***, NZ_CP*** accessions, the following prep_fa() will find nothing
-        # AND is $scaffold, prep_scaff() will find the scaffolds
+        # for NZ_CM***, NZ_CP*** accessions, the following codes will find nothing
         for my $acc ( grep {defined} @accs ) {
             my ($fna_file) = grep {/$acc/} @fna_files;
             if ( !defined $fna_file ) {
                 if ($get_seq) {
-                    print "Download from entrez. id: [$taxon_id]\tseq: [$acc]\n";
+                    print
+                        "Download from entrez. id: [$taxon_id]\tseq: [$acc]\n";
                     if ( -e "$id_dir/$acc.gb" ) {
                         print "Sequence [$id_dir/$acc.gb] exists, next\n";
                         next;
@@ -293,6 +314,7 @@ ID: for my $taxon_id ( $target_id, @query_ids ) {
             }
         }
 
+        # prep_scaff() will find the scaffolds for NZ_CM***, NZ_CP***
         if ($scaffold) {
             my ($wgs) = get_taxon_wgs( $dbh, $taxon_id );
 
@@ -347,6 +369,7 @@ perl [% findbin %]/strain_bz.pl \
     --seq_dir [% seq_dir %] \
 [% END -%]
     --name [% name_str %] \
+    --parallel [% parallel %] \
 [% IF outgroup_id -%]
     -o [% outgroup_id %] \
 [% END -%]
@@ -363,6 +386,7 @@ perl [% findbin %]/strain_bz_self.pl \
     --seq_dir [% seq_dir %] \
 [% END -%]
     --name [% name_str %] \
+    --parallel [% parallel %] \
     --length [% length %] \
 [% FOREACH id IN query_ids -%]
     -q [% id %] \
@@ -378,6 +402,7 @@ EOF
             working_dir => $working_dir,
             seq_dir     => $seq_dir,
             name_str    => $name_str,
+            parallel    => $parallel,
             target_id   => $target_id,
             query_ids   => \@query_ids,
             outgroup_id => $outgroup_id,
@@ -394,14 +419,15 @@ EOF
             working_dir => $working_dir,
             seq_dir     => $seq_dir,
             name_str    => $name_str,
+            parallel    => $parallel,
             target_id   => $target_id,
             query_ids   => \@query_ids,
             outgroup_id => $outgroup_id,
             is_self     => $is_self,
             length      => $paralog_length,
-            redo        => 1,                   # If RepeatMasker has been executed
-                                                # don't pass $seq_dir
-                                                # don't gather taxon info
+            redo        => 1,                # If RepeatMasker has been executed
+                                             # don't pass $seq_dir
+                                             # don't gather taxon info
         },
         path( $working_dir, "redo_prepare.sh" )->stringify
     ) or die Template->error;
@@ -409,32 +435,6 @@ EOF
 
 $stopwatch->end_message;
 exit;
-
-sub prep_fa {
-    my $all_files = shift;
-    my $acc       = shift;
-    my $dir       = shift;
-
-    my ($fna_file) = grep {/$acc/} @{$all_files};
-    if ( !$fna_file ) {
-        return "Can't find fasta file for $acc\n";
-    }
-
-    open my $in_fh, '<', $fna_file;
-    open my $out_fh, '>', path( $dir, "$acc.fa" )->openw;
-    while (<$in_fh>) {
-        if (/>/) {
-            print {$out_fh} ">$acc\n";
-        }
-        else {
-            print {$out_fh} $_;
-        }
-    }
-    close $out_fh;
-    close $in_fh;
-
-    return;
-}
 
 sub get_taxon_wgs {
     my $dbh      = shift;
