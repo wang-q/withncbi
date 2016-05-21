@@ -200,13 +200,21 @@ cat bac.ABBR.csv \
 echo "mkdir -p ~/data/bacteria/bac.working" > ../bac.cmd.txt
 echo "cd ~/data/bacteria/bac.working" >> ../bac.cmd.txt
 echo >> ../bac.cmd.txt
-
 cat species.tsv \
     | perl ~/Scripts/withncbi/taxon/cmd_template.pl \
         --seq_dir ~/data/bacteria/bac_genomes/ \
         --csv_taxon ~/data/bacteria/bac_genomes/bac_ncbi.csv \
         --parallel 8 \
     >> ../bac.cmd.txt
+
+echo "mkdir -p ~/data/bacteria/bac.working" > ../bac.redo.cmd.txt
+echo "cd ~/data/bacteria/bac.working" >> ../bac.redo.cmd.txt
+echo >> ../bac.redo.cmd.txt
+cat species.tsv \
+    | perl ~/Scripts/withncbi/taxon/cmd_template.pl \
+        --csv_taxon ~/data/bacteria/bac_genomes/bac_ncbi.csv \
+        --parallel 8 \
+    >> ../bac.redo.cmd.txt
 
 ```
 
@@ -221,6 +229,7 @@ mkdir -p ~/data/bacteria/bac.working
 cd ~/data/bacteria/bac.working
 
 time bash ../bac.cmd.txt 2>&1 | tee log_cmd.txt
+#time bash ../bac.redo.cmd.txt 2>&1 | tee log_redo_cmd.txt
 
 #----------------------------#
 # Approach 1: one by one
@@ -278,10 +287,10 @@ for f in `find . -mindepth 1 -maxdepth 2 -type f -name 7_multi_db_only.sh | sort
 done  > run_7.sh
 
 cat run_1.sh | grep . | parallel --no-run-if-empty -j 16 2>&1 | tee log_1.txt
-cat run_2.sh | grep . | parallel --no-run-if-empty -j 4 2>&1  | tee log_2.txt
-cat run_3.sh | grep . | parallel --no-run-if-empty -j 8 2>&1  | tee log_3.txt
-cat run_4.sh | grep . | parallel --no-run-if-empty -j 8 2>&1  | tee log_4.txt
-cat run_5.sh | grep . | parallel --no-run-if-empty -j 8 2>&1  | tee log_5.txt
+cat run_2.sh | grep . | parallel --no-run-if-empty -j 4  2>&1 | tee log_2.txt
+cat run_3.sh | grep . | parallel --no-run-if-empty -j 8  2>&1 | tee log_3.txt
+cat run_4.sh | grep . | parallel --no-run-if-empty -j 4  2>&1 | tee log_4.txt
+cat run_5.sh | grep . | parallel --no-run-if-empty -j 4  2>&1 | tee log_5.txt
 cat run_7.sh | grep . | parallel --no-run-if-empty -j 12 2>&1 | tee log_7.txt
 
 #----------------------------#
