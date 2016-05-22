@@ -19,7 +19,7 @@ use List::MoreUtils qw(any all uniq);
 use AlignDB::Stopwatch;
 
 use lib "$FindBin::RealBin/../lib";
-use MyUtil qw(find_ancestor);
+use MyUtil;
 
 #----------------------------------------------------------#
 # GetOpt section
@@ -161,11 +161,14 @@ else {
     );
     my @taxon_ids;
     for my $str (@strs) {
-        my $join_sth = $dbh->prepare( $query . $str );
+        my DBI $join_sth = $dbh->prepare( $query . $str );
         $join_sth->execute;
         while ( my @row = $join_sth->fetchrow_array ) {
             for my $item (@row) {
                 $item = undef if ( $item eq '-' );
+
+                # replace commas
+                $item =~ s/\,/\|/g if $item;
             }
 
             # find each strains' species and genus
@@ -175,13 +178,13 @@ else {
             # dedup, make taxon_id unique
             next if grep { $_ == $row[0] } @taxon_ids;
 
-            my $node = $taxon_db->get_taxon( -taxonid => $taxon_id );
+            my Bio::Taxon $node = $taxon_db->get_taxon( -taxonid => $taxon_id );
             if ( !$node ) {
                 warn "Can't find taxon for $name\n";
                 next;
             }
 
-            my $species = find_ancestor( $node, 'species' );
+            my $species = MyUtil::find_ancestor( $node, 'species' );
             if ($species) {
                 push @row, ( $species->scientific_name, $species->id );
             }
@@ -190,7 +193,7 @@ else {
                 next;
             }
 
-            my $genus = find_ancestor( $node, 'genus' );
+            my $genus = MyUtil::find_ancestor( $node, 'genus' );
             if ($genus) {
                 push @row, ( $genus->scientific_name, $genus->id );
             }
@@ -212,7 +215,8 @@ else {
 
 if ( $^O ne "Win32" ) {
     print "\n";
-    system "wc -l $_" for "$gr_dir/prokaryotes.txt", "$gr_dir/eukaryotes.txt", $strain_file;
+    system "wc -l $_"
+        for "$gr_dir/prokaryotes.txt", "$gr_dir/eukaryotes.txt", $strain_file;
 }
 
 #----------------------------#
