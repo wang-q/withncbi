@@ -411,7 +411,7 @@ cat plastid.GENUS.csv \
             printf qq{%s\t%s\t%s\n}, $name, $t, $qs;
         }
     ' \
-    > species.tsv
+    > genus.tsv
 
 cat plastid.ABBR.csv \
     | grep -v "^#" \
@@ -621,13 +621,6 @@ for d in `find . -mindepth 1 -maxdepth 1 -type d | sort `;do
 done  > runall.sh
 
 sh runall.sh 2>&1 | tee log_runall.txt
-
-for d in `find . -mindepth 1 -maxdepth 1 -type d | sort `;do
-    export d_base=`basename $d` ;
-    echo "perl d:/Scripts/fig_table/collect_common_basic.pl    -d $d_base" ;
-    echo ;
-done  > run_chart.bat
-perl -pi -e 's/\n/\r\n/g' run_chart.bat
 
 # for d in `find . -mindepth 1 -maxdepth 1 -type d | sort `;do
 #     export d_base=`basename $d` ;
