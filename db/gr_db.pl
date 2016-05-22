@@ -3,15 +3,15 @@ use strict;
 use warnings;
 use autodie;
 
-use Getopt::Long qw(HelpMessage);
+use Getopt::Long;
 use Config::Tiny;
 use FindBin;
-use YAML qw(Dump Load DumpFile LoadFile);
+use YAML::Syck;
 
 use DBI;
 use Path::Tiny;
 use Text::CSV_XS;
-use List::MoreUtils qw(uniq);
+use List::MoreUtils::PP;
 
 use AlignDB::Stopwatch;
 
@@ -46,7 +46,7 @@ gr_db.pl
 =cut
 
 GetOptions(
-    'help|?' => sub { HelpMessage(0) },
+    'help|?' => sub { Getopt::Long::HelpMessage(0) },
     'server|s=s'   => \( my $server      = $Config->{database}{server} ),
     'port|P=i'     => \( my $port        = $Config->{database}{port} ),
     'db|d=s'       => \( my $db_name     = $Config->{database}{db} ),
@@ -54,14 +54,23 @@ GetOptions(
     'password|p=s' => \( my $password    = $Config->{database}{password} ),
     'init_sql=s'   => \( my $init_sql    = "$FindBin::RealBin/../init.sql" ),
     'file=s'       => \( my $strain_file = "prok_strains.csv" ),
-    'gr=s'         => \( my $gr_dir      = path( $Config->{path}{gr} )->stringify ),
+    'gr=s' => \( my $gr_dir = path( $Config->{path}{gr} )->stringify ),
     'append' => \my $append,    # append euk
-) or HelpMessage(1);
+) or Getopt::Long::HelpMessage(1);
 
 #----------------------------------------------------------#
 # init
 #----------------------------------------------------------#
 $stopwatch->start_message("Init genome report DB...");
+
+my $dsn
+    = "dbi:mysql:"
+    . "database="
+    . $db_name
+    . ";host="
+    . $server
+    . ";port="
+    . $port;
 
 #----------------------------#
 # call mysql
@@ -76,15 +85,15 @@ if ( !$append ) {
     # don't need this and crash under win32
     #$drh->func( 'reload',   $db_name, $server, $username, $password, 'admin' );
 
-    my $dbh        = DBI->connect( "dbi:mysql:$db_name:$server", $username, $password );
-    my $content    = path($init_sql)->slurp;
+    my DBI $dbh = DBI->connect( $dsn, $username, $password );
+    my $content = path($init_sql)->slurp;
     my @statements = grep {/\w/} split /;/, $content;
     for (@statements) {
         $dbh->do($_) or die $dbh->errstr;
     }
 }
 
-my $dbh = DBI->connect( "dbi:mysql:$db_name:$server", $username, $password );
+my DBI $dbh = DBI->connect( $dsn, $username, $password );
 
 #----------------------------#
 # Filling table strain
@@ -92,7 +101,7 @@ my $dbh = DBI->connect( "dbi:mysql:$db_name:$server", $username, $password );
 {
     $stopwatch->block_message("Loading $strain_file");
 
-    my $load_sth = $dbh->prepare(
+    my DBI $load_sth = $dbh->prepare(
         qq{
         LOAD DATA LOCAL INFILE '$strain_file'
         INTO TABLE gr
@@ -115,32 +124,51 @@ if ( !$append ) {
     $dbh->do(q{ ALTER TABLE gr ADD COLUMN code text });
 
     my @references;
-    for my $file ( "$gr_dir/prok_reference_genomes.txt", "$gr_dir/prok_representative_genomes.txt" )
+    for my $file (
+        "$gr_dir/prok_reference_genomes.txt",
+        "$gr_dir/prok_representative_genomes.txt"
+        )
     {
         my @lines = path($file)->lines( { chomp => 1, } );
         push @references, @lines;
     }
 
+    # MOD = Model organism
+    # COM = Community selected reference
     my %code_of;
-    for my $line ( uniq(@references) ) {
+    for my $line ( List::MoreUtils::PP::uniq(@references) ) {
         my ( $name, $code ) = ( split /\t/, $line )[ 2, 7 ];
+
+        my @codes = split /\//, $code;
         if ( exists $code_of{$name} ) {
-            $code_of{$name} .= "/$code";
+            push @codes, split( /\//, $code_of{$name} );
+        }
+        @codes = grep { !/^(CLI|PHY)$/ } List::MoreUtils::PP::uniq(@codes);
+        if ( grep { $_ eq 'MOD' } @codes ) {
+            $code_of{$name} = 'MOD';
+        }
+        elsif ( grep { $_ eq 'COM' } @codes ) {
+            $code_of{$name} = 'COM';
+        }
+        elsif ( grep { $_ eq 'FGS' } @codes ) {
+            $code_of{$name} = 'FGS';
         }
         else {
-            $code_of{$name} = $code;
+            $code_of{$name} = join "/", @codes;
         }
     }
 
-    my $update_sth = $dbh->prepare(
-        qq{
+    my DBI $update_sth = $dbh->prepare(
+        q{
         UPDATE  gr
         SET     code = ?
         WHERE   organism_name = ?
         }
     );
     for my $name ( sort keys %code_of ) {
-        $update_sth->execute( $code_of{$name}, $name );
+        if ( length $code_of{$name} ) {
+            $update_sth->execute( $code_of{$name}, $name );
+        }
     }
     $update_sth->finish;
 }
@@ -153,8 +181,8 @@ if ( !$append ) {
 
     # find species contains multiply strains
     my %species_member_of;
-    my $species_sth = $dbh->prepare(
-        qq{
+    my DBI $species_sth = $dbh->prepare(
+        q{
         SELECT species, count(taxonomy_id)
         FROM   gr
         WHERE 1 = 1
@@ -170,8 +198,8 @@ if ( !$append ) {
 
     # find genus contains multiply species
     my %genus_member_of;
-    my $genus_sth = $dbh->prepare(
-        qq{
+    my DBI $genus_sth = $dbh->prepare(
+        q{
         SELECT genus, count(distinct species), count(taxonomy_id)
         FROM   gr
         WHERE 1 = 1
@@ -185,8 +213,8 @@ if ( !$append ) {
     }
     $genus_sth->finish;
 
-    my $update_sth = $dbh->prepare(
-        qq{
+    my DBI $update_sth = $dbh->prepare(
+        q{
         UPDATE  gr
         SET     species_member = ?,
                 genus_species_member = ?,
@@ -194,8 +222,8 @@ if ( !$append ) {
         WHERE   taxonomy_id = ?
         }
     );
-    my $id_sth = $dbh->prepare(
-        qq{
+    my DBI $id_sth = $dbh->prepare(
+        q{
         SELECT taxonomy_id, species, genus
         FROM   gr
         }
