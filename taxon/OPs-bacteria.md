@@ -388,10 +388,10 @@ done  > run_7.sh
 # 24 cores
 cat run_1.sh | grep . | parallel --no-run-if-empty -j 16 2>&1 | tee log_1.txt
 cat run_2.sh | grep . | parallel --no-run-if-empty -j 8  2>&1 | tee log_2.txt
-cat run_3.sh | grep . | parallel --no-run-if-empty -j 8  2>&1 | tee log_3.txt
-cat run_4.sh | grep . | parallel --no-run-if-empty -j 8  2>&1 | tee log_4.txt
-cat run_5.sh | grep . | parallel --no-run-if-empty -j 8  2>&1 | tee log_5.txt
-cat run_7.sh | grep . | parallel --no-run-if-empty -j 12 2>&1 | tee log_7.txt
+cat run_3.sh | grep . | parallel --no-run-if-empty -j 16 2>&1 | tee log_3.txt
+cat run_4.sh | grep . | parallel --no-run-if-empty -j 4  2>&1 | tee log_4.txt
+cat run_5.sh | grep . | parallel --no-run-if-empty -j 4  2>&1 | tee log_5.txt
+cat run_7.sh | grep . | parallel --no-run-if-empty -j 16 2>&1 | tee log_7.txt
 
 #----------------------------#
 # Clean
