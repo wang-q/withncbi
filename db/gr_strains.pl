@@ -167,9 +167,9 @@ else {
             for my $item (@row) {
                 $item = undef if ( $item eq '-' );
 
-                # replace commas
-                $item =~ s/\,/\|/g if $item;
             }
+            # replace commas
+            $row[7] =~ s/\,/\|/g if $row[7];
 
             # find each strains' species and genus
             my $taxon_id = $row[0];

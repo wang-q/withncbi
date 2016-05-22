@@ -281,7 +281,7 @@ ID: for my $taxon_id ( $target_id, @query_ids ) {
             $sth->execute($taxon_id);
             my ($acc) = $sth->fetchrow_array;
             push @accs,
-                ( map { s/\.\d+$//; $_ } grep {defined} ( split /,/, $acc ) );
+                ( map { s/\.\d+$//; $_ } grep {defined} ( split /\|/, $acc ) );
         }
 
         # for NZ_CM***, NZ_CP*** accessions, the following codes will find nothing
