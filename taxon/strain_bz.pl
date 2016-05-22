@@ -259,7 +259,7 @@ cd [% working_dir %]
 sleep 1;
 
 #----------------------------#
-# repeatmasker on all fasta
+# Masking all fasta files
 #----------------------------#
 [% FOREACH item IN data -%]
 
@@ -364,6 +364,11 @@ if [ -d [% working_dir %]/[% multi_name %]_raw ]; then
 fi;
 mkdir -p [% working_dir %]/[% multi_name %]_raw;
 
+if [ -d [% working_dir %]/[% multi_name %]_rawphylo ]; then
+    rm -fr [% working_dir %]/[% multi_name %]_rawphylo;
+fi;
+mkdir -p [% working_dir %]/[% multi_name %]_rawphylo;
+
 #----------------------------#
 # maf2fas
 #----------------------------#
@@ -447,14 +452,8 @@ fasops refine \
     -o [% working_dir %]/[% multi_name %]_raw/join.refine.fas
 
 #----------------------------#
-# RAxML
+# RAxML: raw phylo guiding tree
 #----------------------------#
-# raw phylo guiding tree
-if [ -d [% working_dir %]/[% multi_name %]_rawphylo ]; then
-    rm -fr [% working_dir %]/[% multi_name %]_rawphylo;
-fi;
-mkdir -p [% working_dir %]/[% multi_name %]_rawphylo;
-
 cd [% working_dir %]/[% multi_name %]_rawphylo
 
 [% IF queries.size > 2 -%]
@@ -780,8 +779,7 @@ cd [% working_dir %]
 sleep 1;
 
 find . -type f \
-    | grep -v -E "\.(sh|2bit|bat)$" \
-    | grep -v -E "(chr_length|id2name)\.csv$" \
+    | grep -v -E "\.(sh|2bit)$" \
     | grep -v -F "fake_tree.nwk" \
     > file_list.txt
 
