@@ -14,6 +14,7 @@ use HTML::TableExtract;
 use Regexp::Common qw(balanced);
 
 use Bio::DB::Taxonomy;
+use Bio::Taxon;
 use Bio::TreeIO;
 
 use base 'Exporter';
