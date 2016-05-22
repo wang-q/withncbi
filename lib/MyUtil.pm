@@ -62,7 +62,8 @@ sub wgs_worker {
 
         for my $table (@tables) {
             print " " x 4 . "Extract from table ", $table, "\n";
-            my $te = HTML::TableExtract->new( attribs => { class => $table, }, );
+            my $te
+                = HTML::TableExtract->new( attribs => { class => $table, }, );
             $te->parse($page);
 
             my %srr_info;
@@ -125,8 +126,9 @@ sub wgs_worker {
     return $info;
 }
 
+#@returns Bio::Taxon
 sub find_ancestor {
-    my $node = shift;
+    my Bio::Taxon $node = shift;
     my $rank = shift || 'species';
 
     return $node if $node->rank eq $rank;
@@ -228,7 +230,9 @@ sub find_group {
                             }
                         }
                         elsif ( $phylum eq 'Chordata' ) {
-                            if ( grep {/^(Testudines|Lepidosauria|Crocodylia)$/} @names ) {
+                            if ( grep {/^(Testudines|Lepidosauria|Crocodylia)$/}
+                                @names )
+                            {
                                 $subgroup = 'Reptiles';
                             }
                             elsif (
@@ -344,7 +348,7 @@ WORD: for my $word ( @{$list} ) {
 sub abbr_most {
     my $list  = shift;
     my $min   = shift;
-    my $creat = shift;    # don't abbreviate 1 letter. "I'd spell creat with an e."
+    my $creat = shift; # don't abbreviate 1 letter. "I'd spell creat with an e."
     return {} unless @{$list};
 
     # don't abbreviate
