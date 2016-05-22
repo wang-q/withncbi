@@ -446,27 +446,48 @@ cat plastid.ABBR.csv \
 
 # name  t   qs  o
 cat genus.tsv \
-    | perl -nl -a -F"\t" -MPath::Tiny -e \
-    'BEGIN{ @ls = grep {/\S/} grep {!/^#/} path(q{~/Scripts/withncbi/doc/plastid_OG.md})->lines( { chomp => 1}); for (@ls) {@fs = split(/,/); $h{$fs[0]}= $fs[1];}  } if (exists $h{$F[0]}) { printf qq{%s\t%s\t%s\t%s\n}, $F[0] . q{_OG}, $F[1], $F[2], $h{$F[0]}; }' \
+    | perl -nl -a -F"\t" -MPath::Tiny -e '
+        BEGIN{
+            @ls = grep {/\S/}
+                  grep {!/^#/}
+                  path(q{~/Scripts/withncbi/doc/plastid_OG.md})->lines( { chomp => 1});
+            for (@ls) {
+                @fs = split(/,/);
+                $h{$fs[0]}= $fs[1];
+            }
+        }
+
+        if (exists $h{$F[0]}) {
+            printf qq{%s\t%s\t%s\t%s\n}, $F[0] . q{_OG}, $F[1], $F[2], $h{$F[0]};
+        }' \
     > genus_OG.tsv
 
 # every genera
 echo -e "mkdir -p ~/data/organelle/plastid.working\ncd ~/data/organelle/plastid.working\n" > ../plastid.cmd.txt
 cat genus.tsv \
-    | perl ~/Scripts/withncbi/taxon/cmd_template.pl --seq_dir ~/data/organelle/plastid_genomes --taxon_file ~/data/organelle/plastid_genomes/plastid_ncbi.csv --parallel 8 \
+    | perl ~/Scripts/withncbi/taxon/cmd_template.pl \
+        --seq_dir ~/data/organelle/plastid_genomes \
+        --taxon_file ~/data/organelle/plastid_genomes/plastid_ncbi.csv \
+        --parallel 8 \
     >> ../plastid.cmd.txt
 
 # this is for finding outgroups
 echo -e "mkdir -p ~/data/organelle/plastid_families\ncd ~/data/organelle/plastid_families\n" > ../plastid_families.cmd.txt
 cat family.tsv \
     | perl -n -e '/,\w+,/ and print' \
-    | perl ~/Scripts/withncbi/taxon/cmd_template.pl --seq_dir ~/data/organelle/plastid_genomes --taxon_file ~/data/organelle/plastid_genomes/plastid_ncbi.csv --parallel 8 \
+    | perl ~/Scripts/withncbi/taxon/cmd_template.pl \
+        --seq_dir ~/data/organelle/plastid_genomes \
+        --taxon_file ~/data/organelle/plastid_genomes/plastid_ncbi.csv \
+        --parallel 8 \
     >> ../plastid_families.cmd.txt
 
 # genera with outgroups
 echo -e "mkdir -p ~/data/organelle/plastid_OG\ncd ~/data/organelle/plastid_OG\n" > ../plastid_OG.cmd.txt
 cat genus_OG.tsv \
-    | perl ~/Scripts/withncbi/taxon/cmd_template.pl --seq_dir ~/data/organelle/plastid_genomes --taxon_file ~/data/organelle/plastid_genomes/plastid_ncbi.csv --parallel 8 \
+    | perl ~/Scripts/withncbi/taxon/cmd_template.pl \
+        --seq_dir ~/data/organelle/plastid_genomes \
+        --taxon_file ~/data/organelle/plastid_genomes/plastid_ncbi.csv \
+        --parallel 8 \
     >> ../plastid_OG.cmd.txt
 ```
 
@@ -480,7 +501,7 @@ The old prepare_run.sh
 mkdir -p ~/data/organelle/plastid.working
 cd ~/data/organelle/plastid.working
 
-time sh ../plastid.cmd.txt 2>&1 | tee log_cmd.txt
+time bash ../plastid.cmd.txt 2>&1 | tee log_cmd.txt
 
 #----------------------------#
 # Approach 1: one by one
@@ -564,33 +585,21 @@ perl -p -e 's/plastid\.working/plastid_self.working/g; s/strain_bz/strain_bz_sel
 mkdir -p ~/data/organelle/plastid_self.working
 cd ~/data/organelle/plastid_self.working
 
-time sh ../plastid_self.cmd.txt 2>&1 | tee log_cmd.txt
+time bash ../plastid_self.cmd.txt 2>&1 | tee log_cmd.txt
 
 # Don't need 6_feature_cmd.sh
 for d in `find . -mindepth 1 -maxdepth 1 -type d | sort `;do
     echo "echo \"====> Processing $d <====\""
-    echo sh $d/1_real_chr.sh ;
-    echo sh $d/2_file_rm.sh ;
-    echo sh $d/3_self_cmd.sh ;
-    echo sh $d/4_proc_cmd.sh ;
-    echo sh $d/5_circos_cmd ;
-    echo sh $d/7_pair_stat.sh ;
+    echo bash $d/1_real_chr.sh ;
+    echo bash $d/2_file_rm.sh ;
+    echo bash $d/3_self_cmd.sh ;
+    echo bash $d/4_proc_cmd.sh ;
+    echo bash $d/5_circos_cmd ;
+    echo bash $d/7_pair_stat.sh ;
     echo ;
 done  > runall.sh
 
 sh runall.sh 2>&1 | tee log_runall.txt
-
-#----------------------------#
-# Charting on Windows
-#----------------------------#
-for d in `find . -mindepth 1 -maxdepth 1 -type d | sort `;do
-    export d_base=`basename $d` ;
-    echo "perl d:/Scripts/fig_table/collect_common_basic.pl    -d $d_base" ;
-    echo "perl d:/Scripts/alignDB/stat/common_chart_factory.pl --replace diversity=divergence -i $d_base/${d_base}_paralog.common.xlsx" ;
-    echo "perl d:/Scripts/alignDB/stat/gc_chart_factory.pl     --replace diversity=divergence -i $d_base/${d_base}_paralog.gc.xlsx" ;
-    echo ;
-done  > run_chart.bat
-perl -pi -e 's/\n/\r\n/g' run_chart.bat
 
 # clean
 find . -mindepth 1 -maxdepth 2 -type d -name "*_raw" | parallel --no-run-if-empty rm -fr
@@ -608,29 +617,19 @@ The old prepare_run.sh
 mkdir -p ~/data/organelle/plastid_families
 cd ~/data/organelle/plastid_families
 
-time sh ../plastid_families.cmd.txt 2>&1 | tee log_cmd.txt
+time bash ../plastid_families.cmd.txt 2>&1 | tee log_cmd.txt
 
 for d in `find . -mindepth 1 -maxdepth 1 -type d | sort `;do
     echo "echo \"====> Processing $d <====\""
-    echo sh $d/1_real_chr.sh ;
-    echo sh $d/2_file_rm.sh ;
-    echo sh $d/3_pair_cmd.sh ;
-    echo sh $d/4_rawphylo.sh ;
-    echo sh $d/5_multi_cmd.sh ;
+    echo bash $d/1_real_chr.sh ;
+    echo bash $d/2_file_rm.sh ;
+    echo bash $d/3_pair_cmd.sh ;
+    echo bash $d/4_rawphylo.sh ;
+    echo bash $d/5_multi_cmd.sh ;
     echo ;
 done  > runall.sh
 
 sh runall.sh 2>&1 | tee log_runall.txt
-
-# for d in `find . -mindepth 1 -maxdepth 1 -type d | sort `;do
-#     export d_base=`basename $d` ;
-#     export f_base="${d_base}/${d_base}_phylo/${d_base}" ;
-#     if [ -f $f_base.nwk ]
-#     then
-#         echo $f_base ;  
-#         nw_display -s -b 'visibility:hidden' $f_base.nwk > $f_base.svg ;
-#     fi
-# done
 
 find . -type f -path "*_phylo*" -name "*.nwk"
 ```
@@ -643,30 +642,20 @@ Manually editing `~/Scripts/withncbi/doc/plastid_OG.md` and generate `genus_OG.t
 mkdir -p ~/data/organelle/plastid_OG
 cd ~/data/organelle/plastid_OG
 
-time sh ../plastid_OG.cmd.txt 2>&1 | tee log_cmd.txt
+time bash ../plastid_OG.cmd.txt 2>&1 | tee log_cmd.txt
 
 for d in `find . -mindepth 1 -maxdepth 1 -type d | sort `; do
     echo "echo \"====> Processing $d <====\""
-    echo sh $d/1_real_chr.sh ;
-    echo sh $d/2_file_rm.sh ;
-    echo sh $d/3_pair_cmd.sh ;
-    echo sh $d/4_rawphylo.sh ;
-    echo sh $d/5_multi_cmd.sh ;
-    echo sh $d/7_multi_db_only.sh ;
+    echo bash $d/1_real_chr.sh ;
+    echo bash $d/2_file_rm.sh ;
+    echo bash $d/3_pair_cmd.sh ;
+    echo bash $d/4_rawphylo.sh ;
+    echo bash $d/5_multi_cmd.sh ;
+    echo bash $d/7_multi_db_only.sh ;
     echo ;
 done  > runall.sh
 
 sh runall.sh 2>&1 | tee log_runall.txt
-
-for d in `find . -mindepth 1 -maxdepth 1 -type d | sort `;do
-    export d_base=`basename $d` ;
-    echo "perl d:/Scripts/fig_table/collect_common_basic.pl    -d $d_base" ;
-    echo "perl d:/Scripts/alignDB/stat/common_chart_factory.pl --replace diversity=divergence -i $d_base/$d_base.common.xlsx" ;
-    echo "perl d:/Scripts/alignDB/stat/multi_chart_factory.pl  --replace diversity=divergence -i $d_base/$d_base.multi.xlsx" ;
-    echo "perl d:/Scripts/alignDB/stat/gc_chart_factory.pl     --replace diversity=divergence -i $d_base/$d_base.gc.xlsx" ;
-    echo ;
-done  > run_chart.bat
-perl -pi -e 's/\n/\r\n/g' run_chart.bat
 
 find . -mindepth 1 -maxdepth 3 -type d -name "*_raw" | parallel --no-run-if-empty rm -fr
 find . -mindepth 1 -maxdepth 3 -type d -name "*_fasta" | parallel --no-run-if-empty rm -fr
@@ -795,12 +784,12 @@ sh Synechocystis_sp_PCC_6803/prepare.sh
 sh Synechocystis_sp_PCC_6803_OG/prepare.sh
 
 for d in `find $PWD -mindepth 1 -maxdepth 1 -type d -not -path "*bac_seq_dir" | sort `;do \
-    echo sh $d/1_real_chr.sh ; \
-    echo sh $d/2_file_rm.sh ; \
-    echo sh $d/3_pair_cmd.sh ; \
-    echo sh $d/4_rawphylo.sh ; \
-    echo sh $d/5_multi_cmd.sh ; \
-    echo sh $d/7_multi_db_only.sh ; \
+    echo bash $d/1_real_chr.sh ; \
+    echo bash $d/2_file_rm.sh ; \
+    echo bash $d/3_pair_cmd.sh ; \
+    echo bash $d/4_rawphylo.sh ; \
+    echo bash $d/5_multi_cmd.sh ; \
+    echo bash $d/7_multi_db_only.sh ; \
     echo ; \
 done  > runall.sh
 
