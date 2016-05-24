@@ -43,11 +43,11 @@ strain_bz.pl - Full procedure for multiple genome alignments.
         --help          -?          brief help message
         --working_dir   -w  STR     Default is [.]
         --seq_dir       -s  STR     Will do prep_fa() from this dir or use seqs store in $working_dir
-        --keep              @STR    don't touch anything inside these fasta files
         --target        -t  STR
         --queries       -q  @STR
         --outgroup      -o  STR
         --csv_taxon     -c  STR     All taxons in this project (may also contain unused taxons)
+        --length            INT     Minimal length of orthologous fragments
         --name_str      -n  STR     Default is []
         --phylo_tree    -p  STR     Predefined phylogenetic tree
         --multi_name    -m  STR     Naming multiply alignment, the default value is $name_str
@@ -60,19 +60,18 @@ strain_bz.pl - Full procedure for multiple genome alignments.
 
 =cut
 
-my $aligndb   = path( $Config->{run}{aligndb} )->stringify;
-my $egaz      = path( $Config->{run}{egaz} )->stringify;
-my $fig_table = path( $Config->{run}{fig_table} )->stringify;
+my $aligndb = path( $Config->{run}{aligndb} )->stringify;
+my $egaz    = path( $Config->{run}{egaz} )->stringify;
 
 GetOptions(
     'help|?' => sub { Getopt::Long::HelpMessage(0) },
     'working_dir|w=s' => \( my $working_dir = "." ),
     'seq_dir|s=s'     => \my $seq_dir,
-    'keep=s'          => \my @keep,
     'target|t=s'      => \my $target,
     'queries|q=s'     => \my @queries,
     'outgroup|o|r=s'  => \my $outgroup,
-    'csv_taxon|c=s'   => \( my $csv_taxon   = "strains_taxon_info.csv" ),
+    'csv_taxon|c=s'   => \my $csv_taxon,
+    'length=i'        => \( my $length      = 1000 ),
     'name_str|n=s'    => \( my $name_str    = "working" ),
     'phylo_tree|p=s'  => \my $phylo_tree,
     'multi_name|m=s'  => \my $multi_name,
@@ -109,6 +108,7 @@ $stopwatch->start_message("Writing strains summary...");
 
     path( $working_dir, 'Genomes' )->mkpath;
     path( $working_dir, 'Pairwise' )->mkpath;
+    path( $working_dir, 'Stats' )->mkpath;
 }
 
 # move $outgroup to last
@@ -147,11 +147,7 @@ if ($seq_dir) {
     print "Get seqs from [$seq_dir]\n";
 
     for my $id ( $target, @queries ) {
-        my ($keep) = grep { $_ eq $id } @keep;
         print " " x 4 . "Copy seq of [$id]\n";
-        if ( defined $keep ) {
-            print " " x 8 . "Don't change fasta header for [$id]\n";
-        }
 
         my $original_dir = path( $seq_dir, $id )->stringify;
         my $cur_dir = path( $working_dir, 'Genomes', $id );
@@ -165,13 +161,7 @@ if ($seq_dir) {
         printf " " x 8 . "Total %d fasta file(s)\n", scalar @fa_files;
 
         for my $fa_file (@fa_files) {
-            my $basename;
-            if ( defined $keep ) {
-                $basename = prep_fa( $fa_file, $cur_dir, 1 );
-            }
-            else {
-                $basename = prep_fa( $fa_file, $cur_dir );
-            }
+            my $basename = prep_fa( $fa_file, $cur_dir );
 
             my $gff_file = path( $original_dir, "$basename.gff" );
             if ( $gff_file->is_file ) {
@@ -296,8 +286,6 @@ EOF
             {   data        => \@data,
                 parallel    => $parallel,
                 working_dir => $working_dir,
-                target      => $target,
-                queries     => \@queries,
             },
             path( $working_dir, $sh_name )->stringify
         ) or die Template->error;
@@ -338,7 +326,6 @@ EOF
             egaz        => $egaz,
             nostat      => $nostat,
             target      => $target,
-            outgroup    => $outgroup,
             queries     => \@queries,
         },
         path( $working_dir, $sh_name )->stringify
@@ -382,7 +369,7 @@ find [% working_dir %]/Pairwise/[% target %]vs[% q %] -name "*.maf" -or -name "*
 sleep 1;
 fasops covers \
     [% working_dir %]/[% multi_name %]_raw/[% target %]vs[% q %]/*.fas \
-    -n [% target %] -l 1000 -t 10 \
+    -n [% target %] -l [% length %] -t 10 \
     -o [% working_dir %]/[% multi_name %]_raw/[% target %]vs[% q %].yml
 
 [% END -%]
@@ -396,11 +383,17 @@ runlist compare --op intersect \
 [% FOREACH q IN queries -%]
     [% working_dir %]/[% multi_name %]_raw/[% target %]vs[% q %].yml \
 [% END -%]
-    -o [% working_dir %]/[% multi_name %]_raw/intersect.raw.yml
+    -o stdout \
+    | runlist span stdin \
+        --op excise -n [% length %] \
+        -o [% working_dir %]/[% multi_name %]_raw/intersect.yml
 
-runlist span --op excise -n 1000 \
-    [% working_dir %]/[% multi_name %]_raw/intersect.raw.yml \
-    -o [% working_dir %]/[% multi_name %]_raw/intersect.filter.yml
+runlist merge [% working_dir %]/[% multi_name %]_raw/*.yml \
+    -o stdout \
+    | runlist stat stdin \
+        -s [% working_dir %]/Genomes/[% target %]/chr.sizes \
+        --all --mk \
+        -o [% working_dir %]/Stats/pairwise.coverage.csv
 
 #----------------------------#
 # slicing
@@ -416,8 +409,8 @@ find [% working_dir %]/[% multi_name %]_raw/[% target %]vs[% q %]/ -name "*.fas"
     | sort \
     | parallel --no-run-if-empty --keep-order -j 1 " \
         fasops slice {} \
-            [% working_dir %]/[% multi_name %]_raw/intersect.filter.yml \
-            -n [% target %] -l 1000 -o stdout \
+            [% working_dir %]/[% multi_name %]_raw/intersect.yml \
+            -n [% target %] -l [% length %] -o stdout \
             >> [% working_dir %]/[% multi_name %]_raw/[% target %]vs[% q %].slice.fas
     "
 
@@ -500,6 +493,7 @@ EOF
                 target      => $target,
                 outgroup    => $outgroup,
                 queries     => \@queries,
+                length      => $length,
                 multi_name  => $multi_name,
                 nostat      => $nostat,
                 avx         => can_run('raxmlHPC-PTHREADS-AVX'),
@@ -701,7 +695,11 @@ EOF
 #!/bin/bash
 # perl [% stopwatch.cmd_line %]
 
-cd [% working_dir %]
+if [ !-d [% working_dir %]/Stats ]; then
+    mkdir -p [% working_dir %]/Stats;
+fi;
+
+cd [% working_dir %]/Stats
 
 sleep 1;
 
@@ -711,15 +709,18 @@ sleep 1;
 perl [% aligndb %]/util/gff2anno.pl \
     --type CDS --remove \
     [% working_dir %]/Genomes/[% target %]/*.gff \
-    > [% working_dir %]/cds.yml
+    > [% working_dir %]/Stats/cds.yml
 
 perl [% aligndb %]/util/gff2anno.pl \
     --remove \
     [% working_dir %]/Genomes/[% target %]/*.rm.gff \
-    > [% working_dir %]/repeat.yml
+    > [% working_dir %]/Stats/repeat.yml
 
-runlist merge [% working_dir %]/repeat.yml [% working_dir %]/cds.yml -o [% working_dir %]/anno.yml
-rm [% working_dir %]/repeat.yml [% working_dir %]/cds.yml
+runlist merge \
+    [% working_dir %]/Stats/repeat.yml \
+    [% working_dir %]/Stats/cds.yml \
+    -o [% working_dir %]/anno.yml
+rm [% working_dir %]/Stats/repeat.yml [% working_dir %]/Stats/cds.yml
 
 #----------------------------#
 # multi_way_batch
@@ -727,12 +728,12 @@ rm [% working_dir %]/repeat.yml [% working_dir %]/cds.yml
 perl [% aligndb %]/util/multi_way_batch.pl \
     -d [% multi_name %] \
     -da [% working_dir %]/[% multi_name %]_refined \
-    -a [% working_dir %]/anno.yml \
+    -a [% working_dir %]/Stats/anno.yml \
 [% IF outgroup -%]
     --outgroup \
 [% END -%]
     -chr [% working_dir %]/chr_length.csv \
-    -lt 1000 --parallel [% parallel %] --batch 5 \
+    -lt [% length %] --parallel [% parallel %] --batch 5 \
     --run 1,2,5,10,21,30-32,40-42,44
 
 EOF
@@ -743,27 +744,10 @@ EOF
                 working_dir => $working_dir,
                 aligndb     => $aligndb,
                 target      => $target,
-                outgroup    => $outgroup,
-                queries     => \@queries,
+                length      => $length,
                 multi_name  => $multi_name,
             },
             path( $working_dir, $sh_name )->stringify
-        ) or die Template->error;
-
-        # chart.sh
-        print "Create chart.sh\n";
-        $text = <<'EOF';
-# basicstat
-perl [% fig_table %]/collect_common_basic.pl -d .
-
-EOF
-        $tt->process(
-            \$text,
-            {   stopwatch   => $stopwatch,
-                working_dir => $working_dir,
-                fig_table   => $fig_table,
-            },
-            path( $working_dir, "chart.sh" )->stringify
         ) or die Template->error;
     }
 
@@ -812,22 +796,16 @@ exit;
 sub prep_fa {
     my $infile = shift;
     my $dir    = shift;
-    my $keep   = shift;
 
     my $basename = path($infile)->basename( '.fna', '.fa', '.fas', '.fasta' );
     my $in_fh    = path($infile)->openr;
     my $out_fh   = path( $dir, "$basename.fa" )->openw;
     while (<$in_fh>) {
-        if ($keep) {
-            print {$out_fh} $_;
+        if (/>/) {
+            print {$out_fh} ">$basename\n";
         }
         else {
-            if (/>/) {
-                print {$out_fh} ">$basename\n";
-            }
-            else {
-                print {$out_fh} $_;
-            }
+            print {$out_fh} $_;
         }
     }
     close $out_fh;
