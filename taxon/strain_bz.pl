@@ -583,14 +583,16 @@ find [% working_dir %]/[% multi_name %]_mz -name "*.maf" -or -name "*.maf.gz" \
 #----------------------------#
 echo "Refine fasta"
 find [% working_dir %]/[% multi_name %]_fasta -name "*.fas" -or -name "*.fas.gz" \
-    | parallel --no-run-if-empty -j [% parallel %] \
-        fasops refine {} \
+    | parallel --no-run-if-empty -j [% parallel %] '
+        fasops refine \
         --msa [% msa %] --parallel [% parallel %] \
-        --quick --expand 100 --join 100 \
+        --quick --pad 100 --fill 100 \
 [% IF outgroup -%]
         --outgroup \
 [% END -%]
+        {} \
         -o [% working_dir %]/[% multi_name %]_refined/{/}
+    '
 
 find [% working_dir %]/[% multi_name %]_refined -type f -name "*.fas" | parallel -j [% parallel %] gzip
 
@@ -648,6 +650,7 @@ EOF
     ) or die Template->error;
 
     # var_list.sh
+    # Fixme: The column names do not match; the column "Ace_pasteurianus_386B.NC_021991(+):63873-133498" no present in [/tmp/fas_vVWwMHt4/Ace_pasteurianus_IFO_3283_01.NC_013209.+.2789416-2790912.fas.vcf].
     $sh_name = "6_var_list.sh";
     print "Create $sh_name\n";
     $text = <<'EOF';
@@ -695,7 +698,7 @@ EOF
 #!/bin/bash
 # perl [% stopwatch.cmd_line %]
 
-if [ !-d [% working_dir %]/Stats ]; then
+if [ ! -d [% working_dir %]/Stats ]; then
     mkdir -p [% working_dir %]/Stats;
 fi;
 
@@ -719,7 +722,7 @@ perl [% aligndb %]/util/gff2anno.pl \
 runlist merge \
     [% working_dir %]/Stats/repeat.yml \
     [% working_dir %]/Stats/cds.yml \
-    -o [% working_dir %]/anno.yml
+    -o [% working_dir %]/Stats/anno.yml
 rm [% working_dir %]/Stats/repeat.yml [% working_dir %]/Stats/cds.yml
 
 #----------------------------#
