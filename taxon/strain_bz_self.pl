@@ -40,18 +40,13 @@ strain_bz_self.pl - Full procedure for self genome alignments.
     perl strain_bz_self.pl [options]
       Options:
         --help          -?          brief help message
-        --file              STR     All taxons in this project (may also contain unused taxons)
         --working_dir   -w  STR     Default is [.]
         --seq_dir       -s  STR     Will do prep_fa() from this dir or use seqs store in $working_dir
-        --keep              @STR    don't touch anything inside fasta files
-        --target_id     -t  STR
-        --query_ids     -q  @STR
+        --target        -t  STR
+        --queries       -q  @STR
+        --csv_taxon     -c  STR     All taxons in this project (may also contain unused taxons)
         --length            INT     Minimal length of paralogous fragments
         --name_str      -n  STR     Default is []
-        --use_name      -un         Use name instead of taxon_id as identifier. These names should only contain
-                                    alphanumeric value and match with sequence directory names.
-                                    For strains not recorded in NCBI taxonomy, you should assign them fake ids.
-                                    If this option set to be true, all $target_id, @query_ids are actually names.
         --parted                    Sequences are partitioned
         --noblast                   Don't blast against genomes
         --msa               STR     Aligning program for refine. Default is [mafft]
@@ -71,15 +66,14 @@ my $circos    = path( $Config->{run}{circos} )->stringify;
 
 GetOptions(
     'help|?' => sub { Getopt::Long::HelpMessage(0) },
-    'file=s'          => \( my $taxon_file  = "strains_taxon_info.csv" ),
     'working_dir|w=s' => \( my $working_dir = "." ),
     'seq_dir|s=s'     => \my $seq_dir,
-    'keep=s'          => \my @keep,
-    'target_id|t=s'   => \my $target_id,
-    'query_ids|q=s'   => \my @query_ids,
+    'target|t=s'      => \my $target,
+    'queries|q=s'     => \my @queries,
+    'outgroup|o|r=s'  => \my $outgroup,
+    'csv_taxon|c=s'   => \my $csv_taxon,
     'length=i'        => \( my $length      = 1000 ),
     'name_str|n=s'    => \( my $name_str    = "working" ),
-    'use_name|un'     => \my $use_name,
     'parted'          => \my $parted,
     'noblast'         => \my $noblast,
     'msa=s'           => \( my $msa         = 'mafft' ),
@@ -93,8 +87,6 @@ GetOptions(
 # init
 #----------------------------------------------------------#
 $stopwatch->start_message("Writing strains summary...");
-
-die "$taxon_file doesn't exist\n" unless -e $taxon_file;
 
 # prepare working dir
 {
@@ -110,28 +102,32 @@ die "$taxon_file doesn't exist\n" unless -e $taxon_file;
     path( $working_dir, 'Results' )->mkpath;
 }
 
+# build basic information
 my @data;
 {
-    if ( !$use_name ) {
-        @data
-            = map { taxon_info( $_, $working_dir ) } ( $target_id, @query_ids );
+    my %taxon_of;
+    if ($csv_taxon) {
+        for my $line ( path($csv_taxon)->lines ) {
+            my @fields = split /,/, $line;
+            if ( $#fields >= 2 ) {
+                $taxon_of{ $fields[0] } = $fields[1];
+            }
+        }
     }
-    else {
-        @data = map { taxon_info_name( $_, $working_dir ) } ( $target_id, @query_ids );
-    }
+    @data = map {
+        {   name  => $_,
+            taxon => exists $taxon_of{$_} ? $taxon_of{$_} : 0,
+            dir   => path( $working_dir, 'Genomes', $_ )->stringify,
+        }
+    } ( $target, @queries );
 }
 
 # if seqs is not in working dir, copy them from seq_dir
-my @target_seqs;    # for gff and rm-gff files
 if ($seq_dir) {
     print "Get seqs from [$seq_dir]\n";
 
-    for my $id ( $target_id, @query_ids ) {
-        my ($keep) = grep { $_ eq $id } @keep;
+    for my $id ( $target, @queries ) {
         print " " x 4 . "Copy seq of [$id]\n";
-        if ( defined $keep ) {
-            print " " x 8 . "Don't change fasta header for [$id]\n";
-        }
 
         my $original_dir = path( $seq_dir, $id )->stringify;
         my $cur_dir = path( $working_dir, 'Genomes', $id );
@@ -139,22 +135,13 @@ if ($seq_dir) {
         $cur_dir = $cur_dir->stringify;
 
         my @fa_files
-            = File::Find::Rule->file->name( '*.fna', '*.fa', '*.fas', '*.fasta' )
-            ->in($original_dir);
+            = File::Find::Rule->file->name( '*.fna', '*.fa', '*.fas',
+            '*.fasta' )->in($original_dir);
 
         printf " " x 8 . "Total %d fasta file(s)\n", scalar @fa_files;
 
         for my $fa_file (@fa_files) {
-            my $basename;
-            if ( defined $keep ) {
-                $basename = prep_fa( $fa_file, $cur_dir, 1 );
-            }
-            else {
-                $basename = prep_fa( $fa_file, $cur_dir );
-            }
-            if ( $id eq $target_id ) {
-                push @target_seqs, $basename;
-            }
+            my $basename = prep_fa( $fa_file, $cur_dir );
 
             my $gff_file = path( $original_dir, "$basename.gff" );
             if ( $gff_file->is_file ) {
@@ -245,7 +232,7 @@ cd [% working_dir %]
 sleep 1;
 
 #----------------------------#
-# repeatmasker on all fasta
+# Masking all fasta files
 #----------------------------#
 [% FOREACH item IN data -%]
 
@@ -282,8 +269,6 @@ EOF
             {   data        => \@data,
                 parallel    => $parallel,
                 working_dir => $working_dir,
-                target_id   => $target_id,
-                query_ids   => \@query_ids,
             },
             path( $working_dir, $sh_name )->stringify
         ) or die Template->error;
