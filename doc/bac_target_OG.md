@@ -3,7 +3,7 @@
 Amycolatopsis_mediterranei,Am_mediterranei_U32
 ## Bifidobacterium 比菲德氏菌
 Bifidobacterium_animalis,Bi_animalis_lactis_AD011
-Bifidobacterium_bifidum,Bi_bifidum_PRL2010,Reference genome
+Bifidobacterium_bifidum,Bi_bifidum_PRL2010
 Bifidobacterium_breve,Bi_breve_ACS_071_V_Sch8b
 Bifidobacterium_longum,Bi_longum_DJO10A
 ## Clavibacter 棍状杆菌属

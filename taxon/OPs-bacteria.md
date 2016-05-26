@@ -513,7 +513,8 @@ cat list.tmp \
             @ls = path(q{species_all.lst})->lines({ chomp => 1}); 
             $o{$ls[$_]} = $_ for (0 .. $#ls); 
         } 
-        print qq{$_,$o{$F[0]}};
+        $F[2] =~ s/\s+/_/g;
+        print qq{$_,$o{$F[2]}};
     ' \
     | sort -n -t, -k8,8 \
     | cut -d',' -f 1-7 \
