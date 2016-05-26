@@ -1,3 +1,40 @@
+#!/usr/bin/env Rscript
+library("getopt");
+
+print_usage <- function(file = stderr())
+{
+    cat(
+        "
+    Usage: demo.R [options] --in data.txt
+      Options:
+        -f|--filter
+        -h|--help
+        -o|--out: FILE
+        -s|--strand: INT
+        -w|--weight: REAL
+        "
+    )
+}
+
+spec = matrix(
+    c(
+        "filter", "f", 0, "logical",
+        "help",   "h", 0, "logical",
+        "in",     "i", 1, "character",
+        "out",    "o", 1, "character",
+        "strand", "s", 1, "integer",
+        "weight", "w", 1, "double"
+    ),
+    byrow = TRUE, ncol = 4
+);
+
+opt = getopt(spec);
+if (!is.null(opt$help))
+{
+    print_usage(file = stdout());
+    q(status = 1);
+}
+
 # read data and convert to data frame
 readMatrix <- function(heatmapData) {
     if (is.matrix(heatmapData)) {
@@ -15,8 +52,8 @@ readMatrix <- function(heatmapData) {
 
 getLayout <-
     function(infoFile, infoCols, heatmapData, barData, doBlocks, treeWidth = 10,
-            infoWidth = 10, dataWidth = 30, edgeWidth = 1, labelHeight = 10,
-            mainHeight = 100, barDataWidth = 10, blockPlotWidth = 10) {
+             infoWidth = 10, dataWidth = 30, edgeWidth = 1, labelHeight = 10,
+             mainHeight = 100, barDataWidth = 10, blockPlotWidth = 10) {
         # m = layout matrix
         # w = layout widths vector
         # h = layout height vector
@@ -86,21 +123,21 @@ getLayout <-
 
 plotTree <-
     function(tree, ladderise = NULL, heatmapData = NULL, barData = NULL,
-            infoFile = NULL, blockFile = NULL, snpFile = NULL, gapChar = "?",
-            genome_size = 5E6, blwd = 5, block_colour = "black", snp_colour = "red",
-            genome_offset = 0, colourNodesBy = NULL, infoCols = NULL,
-            outputPDF = NULL, outputPNG = NULL, w, h,
-            heatmap.colours = rev(gray(seq(0, 1, 0.1))),
-            tip.labels = F, tipLabelSize = 1, offset = 0,
-            tip.colour.cex = 0.5, legend = T, legend.pos = "bottomleft",
-            ancestral.reconstruction = F, cluster = NULL, tipColours = NULL,
-            lwd = 1.5, axis = F, axisPos = 3, edge.color = "black",
-            infoCex = 0.8, colLabelCex = 0.8, treeWidth = 10, infoWidth = 10,
-            dataWidth = 30, edgeWidth = 1, labelHeight = 10, mainHeight = 100,
-            barDataWidth = 10, blockPlotWidth = 10, barDataCol = 2,
-            heatmapBreaks = NULL, heatmapDecimalPlaces = 1,
-            vlines.heatmap = NULL, vlines.heatmap.col = 2,
-            heatmap.blocks = NULL, pie.cex = 0.5) {
+             infoFile = NULL, blockFile = NULL, snpFile = NULL, gapChar = "?",
+             genome_size = 5E6, blwd = 5, block_colour = "black", snp_colour = "red",
+             genome_offset = 0, colourNodesBy = NULL, infoCols = NULL,
+             outputPDF = NULL, outputPNG = NULL, w, h,
+             heatmap.colours = rev(gray(seq(0, 1, 0.1))),
+             tip.labels = F, tipLabelSize = 1, offset = 0,
+             tip.colour.cex = 0.5, legend = T, legend.pos = "bottomleft",
+             ancestral.reconstruction = F, cluster = NULL, tipColours = NULL,
+             lwd = 1.5, axis = F, axisPos = 3, edge.color = "black",
+             infoCex = 0.8, colLabelCex = 0.8, treeWidth = 10, infoWidth = 10,
+             dataWidth = 30, edgeWidth = 1, labelHeight = 10, mainHeight = 100,
+             barDataWidth = 10, blockPlotWidth = 10, barDataCol = 2,
+             heatmapBreaks = NULL, heatmapDecimalPlaces = 1,
+             vlines.heatmap = NULL, vlines.heatmap.col = 2,
+             heatmap.blocks = NULL, pie.cex = 0.5) {
         require(ape)
         
         # PREPARE TREE, CHOOSE LADDERISATION OR NOT, AND GET TIP ORDER

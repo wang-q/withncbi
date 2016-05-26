@@ -201,13 +201,13 @@ cd ~/data/bacteria/bac_summary
 # 159, same as previous count
 cat ~/Scripts/withncbi/doc/bac_target_OG.md \
     | grep -v '^#' \
-    | egrep '\S+' \
+    | grep -E '\S+' \
     | wc -l
 
 # tab-separated
 # name  t   qs
 cat bac.ABBR.csv \
-    | perl -nl -a -F"," -MPath::Tiny -MYAML::Syck -e '
+    | perl -nl -a -F"," -MPath::Tiny -e '
         BEGIN{
             $name = q{};
             %id_of = ();
@@ -247,19 +247,21 @@ cat bac.ABBR.csv \
     > species.tsv
 
 # every species
+cd ~/data/bacteria/bac_summary
+
 echo -e "mkdir -p ~/data/bacteria/bac.working \ncd ~/data/bacteria/bac.working\n" > ../bac.cmd.txt
 cat species.tsv \
     | perl ~/Scripts/withncbi/taxon/cmd_template.pl \
         --seq_dir ~/data/bacteria/bac_genomes/ \
         --csv_taxon ~/data/bacteria/bac_genomes/bac_ncbi.csv \
-        --parallel 12 \
+        --parallel 8 \
     >> ../bac.cmd.txt
 
 echo -e "mkdir -p ~/data/bacteria/bac.working \ncd ~/data/bacteria/bac.working\n" > ../bac.redo.cmd.txt
 cat species.tsv \
     | perl ~/Scripts/withncbi/taxon/cmd_template.pl \
         --csv_taxon ~/data/bacteria/bac_genomes/bac_ncbi.csv \
-        --parallel 12 \
+        --parallel 8 \
     >> ../bac.redo.cmd.txt
 ```
 
@@ -312,7 +314,7 @@ cat genus.tsv \
     | perl ~/Scripts/withncbi/taxon/cmd_template.pl \
         --seq_dir ~/data/bacteria/bac_genomes/ \
         --csv_taxon ~/data/bacteria/bac_genomes/bac_ncbi.csv \
-        --parallel 12 \
+        --parallel 8 \
     >> ../bac.genus.cmd.txt
 ```
 
@@ -327,8 +329,8 @@ The old prepare_run.sh
 mkdir -p ~/data/bacteria/bac.working
 cd ~/data/bacteria/bac.working
 
-time bash ../bac.cmd.txt 2>&1 | tee log_cmd.txt
-#time bash ../bac.redo.cmd.txt 2>&1 | tee log_redo_cmd.txt
+bash ../bac.cmd.txt 2>&1 | tee log_cmd.txt
+# bash ../bac.redo.cmd.txt 2>&1 | tee log_redo_cmd.txt # skip real_chr and repeatmasker
 
 #----------------------------#
 # Approach 1: one by one
@@ -423,7 +425,7 @@ done  > runall.sh
 
 sh runall.sh 2>&1 | tee log_runall.txt
 
-find . -type f -path "*_phylo*" -name "*.nwk"
+# Clean
 ```
 
 ## Summary
@@ -431,14 +433,10 @@ find . -type f -path "*_phylo*" -name "*.nwk"
 ### Copy xlsx files
 
 ```bash
-mkdir -p ~/data/organelle/plastid_summary/xlsx
-cd ~/data/organelle/plastid_summary/xlsx
+mkdir -p ~/data/bacteria/bac_summary/xlsx
+cd ~/data/bacteria/bac_summary/xlsx
 
-find  ~/data/organelle/plastid.working -type f -name "*.common.xlsx" \
-    | grep -v "vs[A-Z]" \
-    | parallel cp {} .
-
-find  ~/data/organelle/plastid_OG -type f -name "*.common.xlsx" \
+find  ~/data/bacteria/bac.working -type f -name "*.common.xlsx" \
     | grep -v "vs[A-Z]" \
     | parallel cp {} .
 
@@ -446,35 +444,55 @@ find  ~/data/organelle/plastid_OG -type f -name "*.common.xlsx" \
 
 ### Genome list
 
-Create `plastid.list.csv` from `plastid.GENUS.csv` with sequence lengths.
+Create `bac.list.csv` from `bac.ABBR.csv` with sequence lengths.
 
 ```bash
-mkdir -p ~/data/organelle/plastid_summary/table
-cd ~/data/organelle/plastid_summary/table
+mkdir -p ~/data/bacteria/bac_summary/table
+cd ~/data/bacteria/bac_summary/table
 
-# manually set orders in `plastid_OG.md`
-echo "genus" > genus_all.lst
-perl -l -MPath::Tiny -e \
-    'BEGIN{ @ls = map {/^#/ and s/^(#+\s*\w+).*/\1/; $_} map {s/,\w+//; $_} map {s/^###\s*//; $_} path(q{~/Scripts/withncbi/doc/plastid_OG.md})->lines( { chomp => 1}); } $fh; for (@ls) { (/^\s*$/ or /^##\s+/ or /^#\s+(\w+)/) and next; print $_}' \
-    >> genus_all.lst
+# manually set orders in `bac_target_OG.md`
+echo "#species" > species_all.lst
+perl -l -MPath::Tiny -e '
+    BEGIN {
+        @ls = map {/^#/ and s/^(#+\s*\w+).*/\1/; $_} 
+            map {s/,\w+//; $_} 
+            map {s/^###\s*//; $_} 
+            path(q{~/Scripts/withncbi/doc/bac_target_OG.md})->lines({chomp => 1});
+    }
+    
+    for (@ls) { 
+        (/^\s*$/ or /^##\s+/ or /^#\s+(\w+)/) and next; 
+        print $_;
+    }
+    ' \
+    >> species_all.lst
 
-echo "genus,strain_abbr,accession,length" > length.tmp
-find ~/data/organelle/plastid.working -type f -name "chr.sizes" \
-    | xargs perl -nl -e \
-    '$_ =~ s/\t/\,/; $ARGV =~ /working\/(\w+)\/(\w+)\//; print qq{$1,$2,$_}' \
+echo "#species,strain_abbr,accession,length" > length.tmp
+find ~/data/bacteria/bac.working -type f -name "chr.sizes" \
+    | xargs perl -nl -e '
+        $_ =~ s/\t/\,/; 
+        $ARGV =~ /working\/(\w+)\/(\w+)\/(\w+)/; 
+        print qq{$1,$3,$_}
+    ' \
     >> length.tmp
 
 cat length.tmp \
-    | perl -nl -a -F',' -MPath::Tiny -e \
-    'BEGIN{ @ls = path(q{genus_all.lst})->lines( { chomp => 1}); $o{$ls[$_]} = $_ for (0 .. $#ls); } print qq{$_,$o{$F[0]}};' \
+    | perl -nl -a -F',' -MPath::Tiny -e '
+        BEGIN{ 
+            @ls = path(q{species_all.lst})->lines({ chomp => 1}); 
+            $o{$ls[$_]} = $_ for (0 .. $#ls); 
+        } 
+        print qq{$_,$o{$F[0]}};
+    ' \
     | sort -n -t, -k5,5 \
     | cut -d',' -f 1-4 \
     > length_ordered.tmp
 
 perl ~/Scripts/alignDB/util/merge_csv.pl \
-    -t length_ordered.tmp -m ~/data/organelle/plastid_summary/plastid.GENUS.csv -f 2 -f2 1 --concat --stdout \
+    -t length_ordered.tmp -m ~/data/bacteria/bac_summary/bac.ABBR.csv \
+    -f 2 -f2 1 --concat --stdout \
     | perl -nl -a -F"," -e 'print qq{$F[12],$F[10],$F[8],$F[6],$F[4],$F[5],$F[3]}' \
-    >  plastid.list.csv
+    >  bac.list.csv
 
 rm *.tmp
 ```
