@@ -555,14 +555,14 @@ Criteria:
 * Genome D < 0.2
 
 ```bash
-mkdir -p ~/data/organelle/plastid_summary/table
+mkdir -p ~/data/bacteria/bac_summary/table
 
-cd ~/data/organelle/plastid_summary/xlsx
+cd ~/data/bacteria/bac_summary/xlsx
 cat <<EOF > Table_alignment.tt
 ---
 autofit: A:F
 texts:
-  - text: "Genus"
+  - text: "Species"
     pos: A1
   - text: "No. of genomes"
     pos: B1
@@ -600,83 +600,109 @@ ranges:
 [% END -%]
 EOF
 
-cat ~/data/organelle/plastid_summary/table/genus_all.lst \
-    | grep -v "^genus" \
-    | TT_FILE=Table_alignment.tt perl -MTemplate -nl -e 'push @data, { name => $_, file => qq{$_.common.xlsx}, }; END{$tt = Template->new; $tt->process($ENV{TT_FILE}, { data => \@data, }) or die Template->error}' \
+cat ~/data/bacteria/bac_summary/table/species_all.lst \
+    | grep -v "^#" \
+    | TT_FILE=Table_alignment.tt perl -MTemplate -nl -e '
+        my $species = $_;
+        $species =~ s/ /_/g;
+        push @data, { name => $_, file => qq{$species.common.xlsx}, }; 
+        END{
+            $tt = Template->new;
+            $tt->process($ENV{TT_FILE}, { data => \@data, })
+                or die Template->error;
+        }
+    ' \
     > Table_alignment_all.yml
 
-# Under Windows
-cd /d D:/data/organelle/plastid_summary/xlsx
-perl d:/Scripts/fig_table/excel_table.pl -i Table_alignment_all.yml
-perl d:/Scripts/fig_table/xlsx2xls.pl -d Table_alignment_all.xlsx --csv
+perl ~/Scripts/fig_table/xlsx_table.pl -i Table_alignment_all.yml
+perl ~/Scripts/fig_table/xlsx2csv.pl -f Table_alignment_all.xlsx > Table_alignment_all.csv
+cp -f Table_alignment_all.xlsx ~/data/bacteria/bac_summary/table
+cp -f Table_alignment_all.csv ~/data/bacteria/bac_summary/table
 
-# Back to Mac
-cd ~/data/organelle/plastid_summary/xlsx
-cp -f Table_alignment_all.xlsx ~/data/organelle/plastid_summary/table
-perl -pi -e 's/\r\n/\n/g' Table_alignment_all.csv
-cp -f Table_alignment_all.csv ~/data/organelle/plastid_summary/table
+cd ~/data/bacteria/bac_summary/table
 
-cd ~/data/organelle/plastid_summary/table
-
-echo "Genus,avg_size" > genus_avg_size.csv
-cat plastid.list.csv \
+echo "Species,avg_size" > group_avg_size.csv
+cat bac.list.csv \
     | grep -v "#" \
-    | perl -nl -a -F"," -e \
-    '$count{$F[2]}++; $sum{$F[2]} += $F[6]; END {for $k (sort keys %count) { printf qq{%s,%d\n}, $k, $sum{$k}/$count{$k}; } }' \
-    >> genus_avg_size.csv
+    | perl -nla -F"," -e '
+        $count{$F[2]}++;
+        $sum{$F[2]} += $F[6];
+        END {
+            for $k (sort keys %count) {
+                printf qq{"%s",%d\n}, $k, $sum{$k} / $count{$k};
+            } 
+        }
+    ' \
+    >> group_avg_size.csv
 
-perl ~/Scripts/alignDB/util/merge_csv.pl \
-    -t Table_alignment_all.csv -m genus_avg_size.csv -f 0 -f2 0 --concat --stdout \
+cat Table_alignment_all.csv group_avg_size.csv \
+    | perl ~/Scripts/withncbi/util/merge_csv.pl \
+    -f 0 --concat -o stdout \
     > Table_alignment_all.1.csv
 
-echo "Genus,coverage" > genus_coverage.csv
+echo "Species,coverage" > group_coverage.csv
 cat Table_alignment_all.1.csv \
-    | perl -nl -a -F',' -e '$F[7] =~ /\D+/ and next; $c = $F[2] * 1000 * 1000 / $F[7]; print qq{$F[0],$c};' \
-    >> genus_coverage.csv
+    | perl -nla -F',' -e '
+        $F[2] =~ /[\.\d]+/ or next;
+        $F[6] =~ /[\.\d]+/ or next;
+        $c = $F[2] * 1000 * 1000 / $F[6];
+        print qq{$F[0],$c};
+    ' \
+    >> group_coverage.csv
 
-perl ~/Scripts/alignDB/util/merge_csv.pl \
-    -t Table_alignment_all.1.csv -m genus_coverage.csv -f 0 -f2 0 --concat --stdout \
+cat Table_alignment_all.1.csv group_coverage.csv \
+    | perl ~/Scripts/withncbi/util/merge_csv.pl \
+    -f 0 --concat -o stdout \
     > Table_alignment_all.2.csv
 
-echo "Genus,indels" > genus_indels.csv
+echo "Species,indels" > group_indels.csv
 cat Table_alignment_all.2.csv \
-    | perl -nl -a -F',' -e '$F[7] =~ /\D+/ and next; $c = $F[3] / 100 * $F[2] * 1000 * 1000; print qq{$F[0],$c};' \
-    >> genus_indels.csv
+    | perl -nla -F',' -e '
+        $F[6] =~ /[\.\d]+/ or next;
+        $c = $F[3] / 100 * $F[2] * 1000 * 1000;
+        print qq{$F[0],$c};
+    ' \
+    >> group_indels.csv
 
-perl ~/Scripts/alignDB/util/merge_csv.pl \
-    -t Table_alignment_all.2.csv -m genus_indels.csv -f 0 -f2 0 --concat --stdout \
-    > Table_alignment_all.3.csv
-
-cat Table_alignment_all.3.csv \
-    | cut -d',' -f 1-6,8,10,12 \
+cat Table_alignment_all.2.csv group_indels.csv \
+    | perl ~/Scripts/withncbi/util/merge_csv.pl \
+    -f 0 --concat -o stdout \
     > Table_alignment_for_filter.csv
 
 # real filter
 cat Table_alignment_for_filter.csv \
-    | perl -nl -a -F',' -e '$F[6] =~ /\D+/ and next; print $F[0] if ($F[7] < 0.4 or $F[8] < 100 or $F[4] > 0.2);' \
-    > genus_exclude.lst
+    | perl -nla -F',' -e '
+        $F[6] =~ /[\.\d]+/ or next;
+        $F[0] =~ s/"//g;
+        print $F[0] if ($F[7] < 0.4 or $F[8] < 100 or $F[4] > 0.2);
+    ' \
+    > species_exclude.lst
 
-grep -v -Fx -f genus_exclude.lst genus_all.lst > genus.lst
+grep -v -Fx -f species_exclude.lst species_all.lst > species.lst
 
-rm ~/data/organelle/plastid_summary/table/Table_alignment_all.[0-9].csv
-rm ~/data/organelle/plastid_summary/table/genus*csv
+rm ~/data/bacteria/bac_summary/table/Table_alignment_all.[0-9].csv
+rm ~/data/bacteria/bac_summary/table/group_*.csv
 
 #
-cd ~/data/organelle/plastid_summary/xlsx
-cat ~/data/organelle/plastid_summary/table/genus.lst \
-    | grep -v "^genus" \
-    | TT_FILE=Table_alignment.tt perl -MTemplate -nl -e 'push @data, { name => $_, file => qq{$_.common.xlsx}, }; END{$tt = Template->new; $tt->process($ENV{TT_FILE}, { data => \@data, }) or die Template->error}' \
+cd ~/data/bacteria/bac_summary/xlsx
+cat ~/data/bacteria/bac_summary/table/species.lst \
+    | grep -v "^#" \
+    | TT_FILE=Table_alignment.tt perl -MTemplate -nl -e '
+        my $species = $_;
+        $species =~ s/ /_/g;
+        push @data, { name => $_, file => qq{$species.common.xlsx}, }; 
+        END {
+            $tt = Template->new;
+            $tt->process($ENV{TT_FILE}, { data => \@data, }) 
+                or die Template->error;
+        }
+    ' \
     > Table_alignment.yml
 
-# Under Windows
-cd /d D:/data/organelle/plastid_summary/xlsx
-perl d:/Scripts/fig_table/excel_table.pl -i Table_alignment.yml
-perl d:/Scripts/fig_table/xlsx2xls.pl -d Table_alignment.xlsx --csv
-
-# Mac
-cp -f ~/data/organelle/plastid_summary/xlsx/Table_alignment.xlsx ~/data/organelle/plastid_summary/table
-perl -pi -e 's/\r\n/\n/g' ~/data/organelle/plastid_summary/xlsx/Table_alignment.csv
-cp -f ~/data/organelle/plastid_summary/xlsx/Table_alignment.csv ~/data/organelle/plastid_summary/table
+perl ~/Scripts/fig_table/xlsx_table.pl -i Table_alignment.yml
+perl ~/Scripts/fig_table/xlsx2csv.pl -f Table_alignment.xlsx > Table_alignment.csv
+cp -f Table_alignment.xlsx ~/data/bacteria/bac_summary/table
+cp -f Table_alignment.csv ~/data/bacteria/bac_summary/table
 ```
 
 ### Groups
