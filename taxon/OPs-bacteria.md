@@ -467,16 +467,47 @@ perl -l -MPath::Tiny -e '
     ' \
     >> species_all.lst
 
-echo "#species,strain_abbr,accession,length" > length.tmp
+echo "#abbr,species,accession,length" > length.tmp
 find ~/data/bacteria/bac.working -type f -name "chr.sizes" \
-    | xargs perl -nl -e '
-        $_ =~ s/\t/\,/; 
-        $ARGV =~ /working\/(\w+)\/(\w+)\/(\w+)/; 
-        print qq{$1,$3,$_}
+    | parallel --jobs 1 --keep-order --no-run-if-empty '
+        perl -nl -e '\''
+            BEGIN {
+                my %l = ();
+            }
+            
+            next unless /\w+\t\d+/;
+            my ($key, $value) = split /\t/;
+            $l{$key} = $value;
+            
+            END {
+                my $chrs = join "|", sort keys %l;
+                my $length = 0;
+                $length += $_ for values %l;
+                
+                $ARGV =~ /working\/(\w+)\/(\w+)\/(\w+)/;
+                print qq{$3,$1,$chrs,$length}
+            }
+        '\'' \
+        {}
     ' \
     >> length.tmp
 
-cat length.tmp \
+echo "#abbr,subgroup,genus,species,taxon_id" > abbr.tmp
+cat ~/data/bacteria/bac_summary/bac.ABBR.csv \
+    | grep -v "^#" \
+    | perl -nla -F"," -e 'print qq{$F[7],$F[4],$F[3],$F[2],$F[0]}' \
+    >> abbr.tmp
+
+# #abbr,species,accession,length,subgroup,genus,species,taxon_id
+cat length.tmp abbr.tmp \
+    | perl ~/Scripts/withncbi/util/merge_csv.pl \
+    -f 0 --concat -o stdout \
+    | perl -nl -a -F"," -e 'print qq{$F[4],$F[5],$F[6],$F[0],$F[7],$F[2],$F[3]}' \
+    > list.tmp
+
+echo "#subgroup,genus,species,abbr,taxon_id,accession,length" > bac.list.csv
+cat list.tmp \
+    | grep -v "#" \
     | perl -nl -a -F',' -MPath::Tiny -e '
         BEGIN{ 
             @ls = path(q{species_all.lst})->lines({ chomp => 1}); 
@@ -484,15 +515,9 @@ cat length.tmp \
         } 
         print qq{$_,$o{$F[0]}};
     ' \
-    | sort -n -t, -k5,5 \
-    | cut -d',' -f 1-4 \
-    > length_ordered.tmp
-
-perl ~/Scripts/alignDB/util/merge_csv.pl \
-    -t length_ordered.tmp -m ~/data/bacteria/bac_summary/bac.ABBR.csv \
-    -f 2 -f2 1 --concat --stdout \
-    | perl -nl -a -F"," -e 'print qq{$F[12],$F[10],$F[8],$F[6],$F[4],$F[5],$F[3]}' \
-    >  bac.list.csv
+    | sort -n -t, -k8,8 \
+    | cut -d',' -f 1-7 \
+    >> bac.list.csv
 
 rm *.tmp
 ```
