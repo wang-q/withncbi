@@ -462,17 +462,34 @@ perl -l -MPath::Tiny -e '
     
     for (@ls) { 
         (/^\s*$/ or /^##\s+/ or /^#\s+(\w+)/) and next; 
+        s/_/ /;
         print $_;
     }
     ' \
     >> species_all.lst
+    
+echo "#target" > target_all.lst
+perl -l -MPath::Tiny -e '
+    BEGIN {
+        @ls = map {/^#/ and s/^(#+\s*\w+).*/\1/; $_} 
+            map {s/\w+,//; $_} 
+            map {s/^###\s*//; $_} 
+            path(q{~/Scripts/withncbi/doc/bac_target_OG.md})->lines({chomp => 1});
+    }
+    
+    for (@ls) { 
+        (/^\s*$/ or /^##\s+/ or /^#\s+(\w+)/) and next; 
+        print $_;
+    }
+    ' \
+    >> target_all.lst
 
 echo "#abbr,species,accession,length" > length.tmp
 find ~/data/bacteria/bac.working -type f -name "chr.sizes" \
     | parallel --jobs 1 --keep-order --no-run-if-empty '
         perl -nl -e '\''
             BEGIN {
-                my %l = ();
+                %l = ();
             }
             
             next unless /\w+\t\d+/;
@@ -509,14 +526,19 @@ echo "#subgroup,genus,species,abbr,taxon_id,accession,length" > bac.list.csv
 cat list.tmp \
     | grep -v "#" \
     | perl -nl -a -F',' -MPath::Tiny -e '
-        BEGIN{ 
-            @ls = path(q{species_all.lst})->lines({ chomp => 1}); 
-            $o{$ls[$_]} = $_ for (0 .. $#ls); 
-        } 
-        $F[2] =~ s/\s+/_/g;
-        print qq{$_,$o{$F[2]}};
+        BEGIN{
+            %species, %target;
+            my @l1 = path(q{species_all.lst})->lines({ chomp => 1});
+            $species{$l1[$_]} = $_ for (0 .. $#l1);
+            my @l2 = path(q{target_all.lst})->lines({ chomp => 1});
+            $target{$l2[$_]} = $_ for (0 .. $#l2);
+        }
+        my $idx_s = $species{$F[2]};
+        die qq{$_\n} unless defined $idx_s;
+        my $idx_t = exists $target{$F[3]} ? $target{$F[3]} : 999_999;
+        print qq{$_,$idx_s,$idx_t};
     ' \
-    | sort -n -t, -k8,8 \
+    | sort -n -t',' -k8,8 -k9,9 \
     | cut -d',' -f 1-7 \
     >> bac.list.csv
 
