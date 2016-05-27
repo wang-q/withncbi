@@ -705,70 +705,27 @@ cp -f Table_alignment.xlsx ~/data/bacteria/bac_summary/table
 cp -f Table_alignment.csv ~/data/bacteria/bac_summary/table
 ```
 
-### Groups
-
-```bash
-mkdir -p ~/data/organelle/plastid_summary/group
-cd ~/data/organelle/plastid_summary/group
-
-perl -l -MPath::Tiny -e \
-'BEGIN{ @ls = map {/^#/ and s/^(#+\s*\w+).*/\1/; $_} map {s/,\w+//; $_} map {s/^###\s*//; $_} path(q{~/Scripts/withncbi/doc/plastid_OG.md})->lines( { chomp => 1}); } $fh; for (@ls) { (/^\s*$/ or /^##\s+/) and next; if (/^#\s+(\w+)/) {$fh = path("$1.txt")->openw; next;} else {print {$fh} $_}}'
-
-grep -Fx -f ~/data/organelle/plastid_summary/table/genus.lst Angiosperm.txt > Angiosperm.lst
-grep -Fx -f ~/data/organelle/plastid_summary/table/genus.lst Gymnosperm.txt > Gymnosperm.lst
-
-find . -type f -name "*.txt" \
-    | xargs cat \
-    | grep -Fx -f ~/data/organelle/plastid_summary/table/genus.lst \
-    > Others.lst
-
-cat ~/data/organelle/plastid_summary/table/Table_alignment.csv \
-    | cut -d, -f 1,5 \
-    | perl -nl -a -F',' -e '$F[1] > 0.05 and print $F[0];' \
-    > group_4.lst
-
-cat ~/data/organelle/plastid_summary/table/Table_alignment.csv \
-    | cut -d, -f 1,5 \
-    | perl -nl -a -F',' -e '$F[1] > 0.02 and $F[1] <= 0.05 and print $F[0];' \
-    > group_3.lst
-
-cat ~/data/organelle/plastid_summary/table/Table_alignment.csv \
-    | cut -d, -f 1,5 \
-    | perl -nl -a -F',' -e '$F[1] > 0.005 and $F[1] <= 0.02 and print $F[0];' \
-    > group_2.lst
-
-cat ~/data/organelle/plastid_summary/table/Table_alignment.csv \
-    | cut -d, -f 1,5 \
-    | perl -nl -a -F',' -e '$F[1] <= 0.005 and print $F[0];' \
-    > group_1.lst
-
-rm *.txt
-```
-
 NCBI Taxonomy tree
 
 ```bash
-cd ~/data/organelle/plastid_summary/group
+mkdir -p ~/data/bacteria/bac_summary/group
+cd ~/data/bacteria/bac_summary/group
 
-cat ~/data/organelle/plastid_summary/table/genus.lst \
-    | perl -e '@ls = <>; $str = qq{bp_taxonomy2tree.pl \\\n}; for (@ls) {chomp;$str .= qq{-s $_ \\\n}}  $str .= qq{-e \n}; print $str' \
-    > genera_tree.sh
-sh genera_tree.sh > genera.tree
+cat ~/data/bacteria/bac_summary/table/species.lst \
+    | grep -v "^#" \
+    | perl -e '
+        @ls = <>;
+        $str = qq{bp_taxonomy2tree.pl \\\n}; 
+        for (@ls) {
+            chomp;
+            $str .= qq{    -s "$_" \\\n};
+        }
+        $str .= qq{    -e \n}; 
+        print $str
+    ' \
+    > species_tree.sh
 
-```
-
-### Phylogenic trees of each genus with outgroup
-
-```bash
-mkdir -p ~/data/organelle/plastid_summary/trees
-
-cat ~/Scripts/withncbi/doc/plastid_OG.md \
-    | grep -v "^#" | grep . \
-    | cut -d',' -f 1 \
-    > ~/data/organelle/plastid_summary/trees/list.txt
-
-find ~/data/organelle/plastid_OG -type f -path "*_phylo*" -name "*.nwk" \
-    | parallel -j 1 cp {} ~/data/organelle/plastid_summary/trees
+bash species_tree.sh > species.tree
 ```
 
 ### d1, d2
