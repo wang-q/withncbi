@@ -730,29 +730,62 @@ bash species_tree.sh > species.tree
 
 ### d1, d2
 
-`collect_excel.pl`
+`collect_xlsx.pl`
 
 ```bash
-cd ~/data/organelle/plastid_summary/xlsx
+cd ~/data/bacteria/bac_summary/xlsx
 
-cat <<EOF > cmd_collect_d1_d2.tt
-perl d:/Scripts/fig_table/collect_excel.pl [% FOREACH item IN data -%] -f [% item.name %].common.xlsx -s d1_pi_gc_cv -n [% item.name %] [% END -%] -o cmd_plastid_d1.xlsx
+cat <<'EOF' > cmd_collect_d1_d2.tt
+perl ~/Scripts/fig_table/collect_xlsx.pl \
+[% FOREACH item IN data -%]
+    -f [% item.name %].common.xlsx \
+    -s d1_pi_gc_cv \
+    -n [% item.name %] \
+[% END -%]
+    -o cmd_bac_d1.xlsx
 
-perl d:/Scripts/fig_table/collect_excel.pl [% FOREACH item IN data -%] -f [% item.name %].common.xlsx -s d2_pi_gc_cv -n [% item.name %] [% END -%] -o cmd_plastid_d2.xlsx
+perl ~/Scripts/fig_table/collect_xlsx.pl \
+[% FOREACH item IN data -%]
+    -f [% item.name %].common.xlsx \
+    -s d2_pi_gc_cv \
+    -n [% item.name %] \
+[% END -%]
+    -o cmd_bac_d2.xlsx
 
-perl d:/Scripts/fig_table/collect_excel.pl [% FOREACH item IN data -%] -f [% item.name %].common.xlsx -s d1_comb_pi_gc_cv -n [% item.name %] [% END -%] -o cmd_plastid_d1_comb.xlsx
+perl ~/Scripts/fig_table/collect_xlsx.pl \
+[% FOREACH item IN data -%]
+    -f [% item.name %].common.xlsx \
+    -s d1_comb_pi_gc_cv \
+    -n [% item.name %] \
+[% END -%] 
+    -o cmd_bac_d1_comb.xlsx
 
-perl d:/Scripts/fig_table/collect_excel.pl [% FOREACH item IN data -%] -f [% item.name %].common.xlsx -s d2_comb_pi_gc_cv -n [% item.name %] [% END -%] -o cmd_plastid_d2_comb.xlsx
+perl ~/Scripts/fig_table/collect_xlsx.pl \
+[% FOREACH item IN data -%]
+    -f [% item.name %].common.xlsx \
+    -s d2_comb_pi_gc_cv \
+    -n [% item.name %] \
+[% END -%] 
+    -o cmd_bac_d2_comb.xlsx
 
 EOF
 
-cat ~/data/organelle/plastid_summary/table/genus.lst \
-    | TT_FILE=cmd_collect_d1_d2.tt perl -MTemplate -nl -e 'push @data, { name => $_, }; END{$tt = Template->new; $tt->process($ENV{TT_FILE}, { data => \@data, }) or die Template->error}' \
-    > cmd_collect_d1_d2.bat
+cat ~/data/bacteria/bac_summary/table/species.lst \
+    | grep -v "^#" \
+    | TT_FILE=cmd_collect_d1_d2.tt perl -MTemplate -nl -e '
+        my $species = $_;
+        $species =~ s/ /_/g;
+        push @data, { name => $species, }; 
+        END {
+            $tt = Template->new;
+            $tt->process($ENV{TT_FILE}, { data => \@data, }) 
+                or die Template->error;
+        }
+    ' \
+    > cmd_collect_d1_d2.sh
 
-# Undre Windows
-cd /d D:/data/organelle/plastid_summary/xlsx
-cmd_collect_d1_d2.bat
+cd ~/data/bacteria/bac_summary/xlsx
+bash cmd_collect_d1_d2.sh
 ```
 
 `ofg_chart.pl`
