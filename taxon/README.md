@@ -16,17 +16,17 @@ I'm sure there are no commas in names. So for convenient, don't use Text::CSV_XS
 ## Scrap id and acc from NCBI
 
 Open browser and visit [NCBI plastid page](http://www.ncbi.nlm.nih.gov/genomes/GenomesGroup.cgi?taxid=33090&opt=plastid).
-Save page to a local file, html only. In this case, it's `doc/green_plants_plastid_150805.html`.
+Save page to a local file, html only. In this case, it's `doc/green_plants_plastid_160531.html`.
 
-All [Eukaryota](http://www.ncbi.nlm.nih.gov/genomes/GenomesGroup.cgi?opt=plastid&taxid=2759), `doc/eukaryota_plastid_150826.html`.
+All [Eukaryota](http://www.ncbi.nlm.nih.gov/genomes/GenomesGroup.cgi?opt=plastid&taxid=2759), `doc/eukaryota_plastid_160531.html`.
 
 Or [this link](http://www.ncbi.nlm.nih.gov/genome/browse/?report=5).
 
 ```text
-Eukaryota (2759)                908
-    Viridiplantae (33090)       828
-        Chlorophyta (3041)      58
-        Streptophyta (35493)    770
+Eukaryota (2759)                1228
+    Viridiplantae (33090)       1128
+        Chlorophyta (3041)      82
+        Streptophyta (35493)    1048
 ```
 
 Use `taxon/id_seq_dom_select.pl` to extract Taxonomy ids and genbank accessions from all history pages.
@@ -36,36 +36,53 @@ id,acc
 996148,NC_017006
 ```
 
-Got **921** accessions.
+Got **1237** accessions.
 
 ```bash
 mkdir -p ~/data/organelle/plastid_genomes
 cd ~/data/organelle/plastid_genomes
 
-perl ~/Scripts/withncbi/taxon/id_seq_dom_select.pl ~/Scripts/withncbi/doc/eukaryota_plastid_150826.html > webpage_id_seq.csv
-perl ~/Scripts/withncbi/taxon/id_seq_dom_select.pl ~/Scripts/withncbi/doc/eukaryota_plastid_150806.html >> webpage_id_seq.csv
-perl ~/Scripts/withncbi/taxon/id_seq_dom_select.pl ~/Scripts/withncbi/doc/green_plants_plastid_150725.html >> webpage_id_seq.csv
-perl ~/Scripts/withncbi/taxon/id_seq_dom_select.pl ~/Scripts/withncbi/doc/plant_plastid_141130.html >> webpage_id_seq.csv
+rm webpage_id_seq.csv
+perl ~/Scripts/withncbi/taxon/id_seq_dom_select.pl \
+    ~/Scripts/withncbi/doc/eukaryota_plastid_160531.html \
+    >> webpage_id_seq.csv
+perl ~/Scripts/withncbi/taxon/id_seq_dom_select.pl \
+    ~/Scripts/withncbi/doc/eukaryota_plastid_150826.html \
+    >> webpage_id_seq.csv
+perl ~/Scripts/withncbi/taxon/id_seq_dom_select.pl \
+    ~/Scripts/withncbi/doc/eukaryota_plastid_150806.html \
+    >> webpage_id_seq.csv
+perl ~/Scripts/withncbi/taxon/id_seq_dom_select.pl \
+    ~/Scripts/withncbi/doc/green_plants_plastid_160531.html \
+    >> webpage_id_seq.csv
+perl ~/Scripts/withncbi/taxon/id_seq_dom_select.pl \
+    ~/Scripts/withncbi/doc/green_plants_plastid_150725.html \
+    >> webpage_id_seq.csv
+perl ~/Scripts/withncbi/taxon/id_seq_dom_select.pl \
+    ~/Scripts/withncbi/doc/plant_plastid_141130.html \
+    >> webpage_id_seq.csv
 ```
 
 Use `taxon/gb_taxon_locus.pl` to extract information from refseq plastid file.
 
 ```bash
-wget -N ftp://ftp.ncbi.nlm.nih.gov/genomes/refseq/organelle/plastid/plastid.1.genomic.gbff.gz
+cd ~/data/organelle/plastid_genomes
+
+wget -N ftp://ftp.ncbi.nlm.nih.gov/genomes/refseq/plastid/plastid.1.genomic.gbff.gz
 gzip -c -d plastid.1.genomic.gbff.gz > plastid.1.genomic.gbff
 
 perl ~/Scripts/withncbi/taxon/gb_taxon_locus.pl plastid.1.genomic.gbff > refseq_id_seq.csv
 
 rm plastid.1.genomic.gbff
 
-# 805
+# 1159
 cat refseq_id_seq.csv | grep -v "^#" | wc -l
 
 # combine
 cat webpage_id_seq.csv refseq_id_seq.csv \
     | sort -u -t, -k1,1 > plastid_id_seq.csv
 
-# 921
+# 1237
 cat plastid_id_seq.csv | grep -v "^#" | wc -l
 ```
 
