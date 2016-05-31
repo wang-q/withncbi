@@ -374,6 +374,7 @@ fasops covers \
 
 [% END -%]
 
+[% IF queries.size > 1 -%]
 #----------------------------#
 # intersect
 #----------------------------#
@@ -387,7 +388,11 @@ runlist compare --op intersect \
     | runlist span stdin \
         --op excise -n [% length %] \
         -o [% working_dir %]/[% multi_name %]_raw/intersect.yml
+[% END -%]
 
+#----------------------------#
+# coverage
+#----------------------------#
 runlist merge [% working_dir %]/[% multi_name %]_raw/*.yml \
     -o stdout \
     | runlist stat stdin \
@@ -395,6 +400,7 @@ runlist merge [% working_dir %]/[% multi_name %]_raw/*.yml \
         --all --mk \
         -o [% working_dir %]/Stats/pairwise.coverage.csv
 
+[% IF queries.size > 1 -%]
 #----------------------------#
 # slicing
 #----------------------------#
@@ -443,6 +449,8 @@ fasops refine \
     --msa mafft --parallel [% parallel %] \
     [% working_dir %]/[% multi_name %]_raw/join.filter.fas \
     -o [% working_dir %]/[% multi_name %]_raw/join.refine.fas
+
+[% END -%]
 
 #----------------------------#
 # RAxML: raw phylo guiding tree
