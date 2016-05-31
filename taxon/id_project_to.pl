@@ -3,10 +3,10 @@ use strict;
 use warnings;
 use autodie;
 
-use Getopt::Long qw(HelpMessage);
+use Getopt::Long;
 use Config::Tiny;
 use FindBin;
-use YAML qw(Dump Load DumpFile LoadFile);
+use YAML::Syck;
 
 use Path::Tiny;
 use Scalar::Util::Numeric qw(isint);
@@ -51,12 +51,12 @@ id_project_to.pl - Project taxonomy ids to names, sepcies, genus or higher ranks
 my $td_dir = path( $Config->{path}{td} )->stringify;    # taxdmp
 
 GetOptions(
-    'help|?' => sub { HelpMessage(0) },
-    'column|c=i'    => \(my $column    = 1),
-    'separator=s|s' => \(my $separator = '\s+'),
+    'help|?' => sub { Getopt::Long::HelpMessage(0) },
+    'column|c=i'    => \( my $column    = 1 ),
+    'separator|s=s' => \( my $separator = '\s+' ),
     'rank=s'        => \my $rank,
     'rankid'        => \my $rankid,
-) or HelpMessage(1);
+) or Getopt::Long::HelpMessage(1);
 
 #----------------------------------------------------------#
 # init
