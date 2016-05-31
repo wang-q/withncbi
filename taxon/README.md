@@ -1278,7 +1278,8 @@ bash genera_tree.sh > genera.tree
 mkdir -p ~/data/organelle/plastid_summary/trees
 
 cat ~/Scripts/withncbi/doc/plastid_OG.md \
-    | grep -v "^#" | grep . \
+    | grep -v "^#" \
+    | grep . \
     | cut -d',' -f 1 \
     > ~/data/organelle/plastid_summary/trees/list.txt
 
@@ -1329,6 +1330,7 @@ perl ~/Scripts/fig_table/collect_xlsx.pl \
 EOF
 
 cat ~/data/organelle/plastid_summary/table/genus.lst \
+    | grep -v "^#" \
     | TT_FILE=cmd_collect_d1_d2.tt perl -MTemplate -nl -e '
         push @data, { name => $_, };
         END {
