@@ -458,7 +458,6 @@ perl -l -MPath::Tiny -e '
             map {s/^###\s*//; $_} 
             path(q{~/Scripts/withncbi/doc/bac_target_OG.md})->lines({chomp => 1});
     }
-    
     for (@ls) { 
         (/^\s*$/ or /^##\s+/ or /^#\s+(\w+)/) and next; 
         s/_/ /;
@@ -517,7 +516,7 @@ cat ~/data/bacteria/bac_summary/bac.ABBR.csv \
 # #abbr,species,accession,length,subgroup,genus,species,taxon_id
 cat length.tmp abbr.tmp \
     | perl ~/Scripts/withncbi/util/merge_csv.pl \
-    -f 0 --concat -o stdout \
+        -f 0 --concat -o stdout \
     | perl -nl -a -F"," -e 'print qq{$F[4],$F[5],$F[6],$F[0],$F[7],$F[2],$F[3]}' \
     > list.tmp
 
@@ -714,12 +713,12 @@ cat ~/data/bacteria/bac_summary/table/species.lst \
     | grep -v "^#" \
     | perl -e '
         @ls = <>;
-        $str = qq{bp_taxonomy2tree.pl \\\n}; 
+        $str = qq{bp_taxonomy2tree.pl \\\n};
         for (@ls) {
             chomp;
             $str .= qq{    -s "$_" \\\n};
         }
-        $str .= qq{    -e \n}; 
+        $str .= qq{    -e \n};
         print $str
     ' \
     > species_tree.sh
@@ -741,7 +740,7 @@ perl ~/Scripts/fig_table/collect_xlsx.pl \
     -s d1_pi_gc_cv \
     -n [% item.name %] \
 [% END -%]
-    -o cmd_bac_d1.xlsx
+    -o cmd_d1.xlsx
 
 perl ~/Scripts/fig_table/collect_xlsx.pl \
 [% FOREACH item IN data -%]
@@ -749,7 +748,7 @@ perl ~/Scripts/fig_table/collect_xlsx.pl \
     -s d2_pi_gc_cv \
     -n [% item.name %] \
 [% END -%]
-    -o cmd_bac_d2.xlsx
+    -o cmd_d2.xlsx
 
 perl ~/Scripts/fig_table/collect_xlsx.pl \
 [% FOREACH item IN data -%]
@@ -757,7 +756,7 @@ perl ~/Scripts/fig_table/collect_xlsx.pl \
     -s d1_comb_pi_gc_cv \
     -n [% item.name %] \
 [% END -%] 
-    -o cmd_bac_d1_comb.xlsx
+    -o cmd_d1_comb.xlsx
 
 perl ~/Scripts/fig_table/collect_xlsx.pl \
 [% FOREACH item IN data -%]
@@ -765,7 +764,7 @@ perl ~/Scripts/fig_table/collect_xlsx.pl \
     -s d2_comb_pi_gc_cv \
     -n [% item.name %] \
 [% END -%] 
-    -o cmd_bac_d2_comb.xlsx
+    -o cmd_d2_comb.xlsx
 
 EOF
 
@@ -796,7 +795,7 @@ cd ~/data/bacteria/bac_summary/xlsx
 
 cat <<'EOF' > cmd_chart_d1_d2.tt
 perl ~/Scripts/fig_table/sep_chart.pl \
-    -i cmd_bac_d1.xlsx \
+    -i cmd_d1.xlsx \
     -xl "Distance to indels ({italic(d)[1]})" \
     -yl "Nucleotide diversity ({italic(D)})" \
     -xr "A2:A8" -yr "B2:B8" \
@@ -807,7 +806,7 @@ perl ~/Scripts/fig_table/sep_chart.pl \
     --postfix [% postfix %] --style_dot -ms
 
 perl ~/Scripts/fig_table/sep_chart.pl \
-    -i cmd_bac_d1_comb.xlsx \
+    -i cmd_d1_comb.xlsx \
     -xl "Distance to indels ({italic(d)[1]})" \
     -yl "Nucleotide diversity ({italic(D)})" \
     -xr "A2:A8" -yr "B2:B8" \
@@ -818,7 +817,7 @@ perl ~/Scripts/fig_table/sep_chart.pl \
     --postfix [% postfix %] --style_dot
 
 perl ~/Scripts/fig_table/sep_chart.pl \
-    -i cmd_bac_d2.xlsx \
+    -i cmd_d2.xlsx \
     -xl "Reciprocal of indel density ({italic(d)[2]})" \
     -yl "Nucleotide diversity ({italic(D)})" \
     -xr "A2:A23" -yr "B2:B23" \
@@ -829,7 +828,7 @@ perl ~/Scripts/fig_table/sep_chart.pl \
     --postfix [% postfix %] --style_dot -ms
 
 perl ~/Scripts/fig_table/sep_chart.pl \
-    -i cmd_bac_d2_comb.xlsx \
+    -i cmd_d2_comb.xlsx \
     -xl "Reciprocal of indel density ({italic(d)[2]})" \
     -yl "Nucleotide diversity ({italic(D)})" \
     -xr "A2:A23" -yr "B2:B23" \
@@ -848,19 +847,17 @@ cat ~/data/bacteria/bac_summary/table/species.lst \
         push @data, { name => $species, }; 
         END {
             $tt = Template->new;
-            $tt->process($ENV{TT_FILE}, 
-                { data => \@data, 
-                y_max => 0.15, 
-                y_max2 => 0.15, 
+            $tt->process($ENV{TT_FILE},
+                { data => \@data,
+                y_max => 0.15,
+                y_max2 => 0.15,
                 postfix => all, }) 
-                or die Template->error}' \
+                or die Template->error;
+        }
+    ' \
     > cmd_chart.sh
 
 bash cmd_chart.sh
 rm ~/data/bacteria/bac_summary/xlsx/*.csv
 cp ~/data/bacteria/bac_summary/xlsx/*.pdf ~/data/bacteria/bac_summary/fig
-
-# Coreldraw doesn't play well with computer modern fonts (latex math).
-# perl ~/Scripts/fig_table/tikz_chart.pl -i cmd_bac_d1_A2A8_B2B8.all.csv -xl 'Distance to indels ($d_1$)' -yl 'Nucleotide divergence ($D$)' --y_min 0.0 --y_max 0.01 -x_min 0 -x_max 5 --style_dot --pdf
-
 ```
