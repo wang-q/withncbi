@@ -474,8 +474,6 @@ Manually edit it then move to `~/Scripts/withncbi/doc/plastid_OG.md`.
 ```bash
 cd ~/data/organelle/plastid_summary
 
-curl http://www.theplantlist.org/browse/A/#statistics
-
 cat plastid.GENUS.csv \
     | grep -v "^#" \
     | perl -na -F"," -e '
@@ -502,7 +500,7 @@ cat plastid.GENUS.csv \
     > plastid_OG.md
 ```
 
-Create alignments without outgroups.
+Create alignments without/with outgroups.
 
 ```bash
 cd ~/data/organelle/plastid_summary
@@ -1052,7 +1050,7 @@ Criteria:
 mkdir -p ~/data/organelle/plastid_summary/table
 
 cd ~/data/organelle/plastid_summary/xlsx
-cat <<EOF > Table_alignment.tt
+cat <<'EOF' > Table_alignment.tt
 ---
 autofit: A:F
 texts:
@@ -1095,7 +1093,7 @@ ranges:
 EOF
 
 cat ~/data/organelle/plastid_summary/table/genus_all.lst \
-    | grep -v "^genus" \
+    | grep -v "^#" \
     | TT_FILE=Table_alignment.tt perl -MTemplate -nl -e '
         push @data, { name => $_, file => qq{$_.common.xlsx}, }; 
         END {
@@ -1114,7 +1112,7 @@ cp -f Table_alignment_all.csv ~/data/organelle/plastid_summary/table
 
 cd ~/data/organelle/plastid_summary/table
 
-echo "Genus,avg_size" > genus_avg_size.csv
+echo "Genus,avg_size" > group_avg_size.csv
 cat plastid.list.csv \
     | grep -v "#" \
     | perl -nla -F"," -e '
@@ -1126,46 +1124,47 @@ cat plastid.list.csv \
             }
         }
     ' \
-    >> genus_avg_size.csv
+    >> group_avg_size.csv
 
-perl ~/Scripts/alignDB/util/merge_csv.pl \
-    -t Table_alignment_all.csv -m genus_avg_size.csv -f 0 -f2 0 --concat --stdout \
+cat Table_alignment_all.csv group_avg_size.csv \
+    | perl ~/Scripts/withncbi/util/merge_csv.pl \
+    -f 0 --concat -o stdout \
     > Table_alignment_all.1.csv
 
-echo "Genus,coverage" > genus_coverage.csv
+echo "Genus,coverage" > group_coverage.csv
 cat Table_alignment_all.1.csv \
     | perl -nla -F',' -e '
-        $F[7] =~ /\D+/ and next;
-        $c = $F[2] * 1000 * 1000 / $F[7];
+        $F[2] =~ /[\.\d]+/ or next;
+        $F[6] =~ /[\.\d]+/ or next;
+        $c = $F[2] * 1000 * 1000 / $F[6];
         print qq{$F[0],$c};
     ' \
-    >> genus_coverage.csv
+    >> group_coverage.csv
 
-perl ~/Scripts/alignDB/util/merge_csv.pl \
-    -t Table_alignment_all.1.csv -m genus_coverage.csv -f 0 -f2 0 --concat --stdout \
+cat Table_alignment_all.1.csv group_coverage.csv \
+    | perl ~/Scripts/withncbi/util/merge_csv.pl \
+    -f 0 --concat -o stdout \
     > Table_alignment_all.2.csv
 
-echo "Genus,indels" > genus_indels.csv
+echo "Genus,indels" > group_indels.csv
 cat Table_alignment_all.2.csv \
     | perl -nla -F',' -e '
-        $F[7] =~ /\D+/ and next;
+        $F[6] =~ /[\.\d]+/ or next;
         $c = $F[3] / 100 * $F[2] * 1000 * 1000;
         print qq{$F[0],$c};
     ' \
-    >> genus_indels.csv
+    >> group_indels.csv
 
-perl ~/Scripts/alignDB/util/merge_csv.pl \
-    -t Table_alignment_all.2.csv -m genus_indels.csv -f 0 -f2 0 --concat --stdout \
-    > Table_alignment_all.3.csv
-
-cat Table_alignment_all.3.csv \
-    | cut -d',' -f 1-6,8,10,12 \
+cat Table_alignment_all.2.csv group_indels.csv \
+    | perl ~/Scripts/withncbi/util/merge_csv.pl \
+    -f 0 --concat -o stdout \
     > Table_alignment_for_filter.csv
 
 # real filter
 cat Table_alignment_for_filter.csv \
     | perl -nla -F',' -e '
-        $F[6] =~ /\D+/ and next;
+        $F[6] =~ /[\.\d]+/ or next;
+        $F[0] =~ s/"//g;
         print $F[0] if ($F[7] < 0.4 or $F[8] < 100 or $F[4] > 0.2);
     ' \
     > genus_exclude.lst
@@ -1173,12 +1172,12 @@ cat Table_alignment_for_filter.csv \
 grep -v -Fx -f genus_exclude.lst genus_all.lst > genus.lst
 
 rm ~/data/organelle/plastid_summary/table/Table_alignment_all.[0-9].csv
-rm ~/data/organelle/plastid_summary/table/genus*csv
+rm ~/data/organelle/plastid_summary/table/group_*csv
 
 #
 cd ~/data/organelle/plastid_summary/xlsx
 cat ~/data/organelle/plastid_summary/table/genus.lst \
-    | grep -v "^genus" \
+    | grep -v "^#" \
     | TT_FILE=Table_alignment.tt perl -MTemplate -nl -e '
         push @data, { name => $_, file => qq{$_.common.xlsx}, };
         END {
@@ -1189,10 +1188,8 @@ cat ~/data/organelle/plastid_summary/table/genus.lst \
     ' \
     > Table_alignment.yml
 
-# Under Windows
-cd /d D:/data/organelle/plastid_summary/xlsx
-perl d:/Scripts/fig_table/excel_table.pl -i Table_alignment.yml
-perl d:/Scripts/fig_table/xlsx2xls.pl -d Table_alignment.xlsx --csv
+perl ~/Scripts/fig_table/xlsx_table.pl -i Table_alignment.yml
+perl ~/Scripts/fig_table/xlsx2csv.pl -f Table_alignment.xlsx > Table_alignment.csv
 
 cp -f ~/data/organelle/plastid_summary/xlsx/Table_alignment.xlsx ~/data/organelle/plastid_summary/table
 cp -f ~/data/organelle/plastid_summary/xlsx/Table_alignment.csv ~/data/organelle/plastid_summary/table
@@ -1222,8 +1219,8 @@ perl -l -MPath::Tiny -e '
     }
     '
 
-grep -Fx -f ~/data/organelle/plastid_summary/table/genus.lst Angiosperm.txt > Angiosperm.lst
-grep -Fx -f ~/data/organelle/plastid_summary/table/genus.lst Gymnosperm.txt > Gymnosperm.lst
+grep -Fx -f ~/data/organelle/plastid_summary/table/genus.lst Angiosperms.txt > Angiosperms.lst
+grep -Fx -f ~/data/organelle/plastid_summary/table/genus.lst Gymnosperms.txt > Gymnosperms.lst
 
 find . -type f -name "*.txt" \
     | xargs cat \
@@ -1232,22 +1229,22 @@ find . -type f -name "*.txt" \
 
 cat ~/data/organelle/plastid_summary/table/Table_alignment.csv \
     | cut -d, -f 1,5 \
-    | perl -nl -a -F',' -e '$F[1] > 0.05 and print $F[0];' \
+    | perl -nla -F',' -e '$F[1] > 0.05 and print $F[0];' \
     > group_4.lst
 
 cat ~/data/organelle/plastid_summary/table/Table_alignment.csv \
     | cut -d, -f 1,5 \
-    | perl -nl -a -F',' -e '$F[1] > 0.02 and $F[1] <= 0.05 and print $F[0];' \
+    | perl -nla -F',' -e '$F[1] > 0.02 and $F[1] <= 0.05 and print $F[0];' \
     > group_3.lst
 
 cat ~/data/organelle/plastid_summary/table/Table_alignment.csv \
     | cut -d, -f 1,5 \
-    | perl -nl -a -F',' -e '$F[1] > 0.005 and $F[1] <= 0.02 and print $F[0];' \
+    | perl -nla -F',' -e '$F[1] > 0.005 and $F[1] <= 0.02 and print $F[0];' \
     > group_2.lst
 
 cat ~/data/organelle/plastid_summary/table/Table_alignment.csv \
     | cut -d, -f 1,5 \
-    | perl -nl -a -F',' -e '$F[1] <= 0.005 and print $F[0];' \
+    | perl -nla -F',' -e '$F[1] <= 0.005 and print $F[0];' \
     > group_1.lst
 
 rm *.txt
