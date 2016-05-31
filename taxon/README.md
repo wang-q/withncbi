@@ -107,6 +107,7 @@ cat ../plastid_genomes/plastid_id_seq.csv \
     | perl ~/Scripts/withncbi/taxon/id_project_to.pl -s "," --rank order \
     | perl ~/Scripts/withncbi/taxon/id_project_to.pl -s "," --rank class \
     | perl ~/Scripts/withncbi/taxon/id_project_to.pl -s "," --rank phylum \
+    | sort -t',' -k9,9 -k8,8 -k7,7 -k6,6 -k5,5 \
     >> plastid.CHECKME.csv
 
 # correct 'Chlorella' mirabilis  
@@ -165,6 +166,14 @@ sed -i".bak" "s/Glaucocystophyceae,NA/Glaucocystophyceae,Glaucophyta/" plastid.C
 
 sed -i".bak" "s/Chlorellales,NA/Chlorellales,Trebouxiophyceae/" plastid.CHECKME.csv
 
+sed -i".bak" "s/,Dinophyceae,NA/,Dinophyceae,Dinoflagellata/" plastid.CHECKME.csv
+sed -i".bak" "s/,Cryptophyta,NA/,Cryptophyta,Cryptophyta/" plastid.CHECKME.csv
+
+sed -i".bak" "s/,Pelagophyceae,NA/,Pelagophyceae,Heterokontophyta/" plastid.CHECKME.csv
+sed -i".bak" "s/,Raphidophyceae,NA/,Raphidophyceae,Heterokontophyta/" plastid.CHECKME.csv
+sed -i".bak" "s/,Synurophyceae,NA/,Synurophyceae,Heterokontophyta/" plastid.CHECKME.csv
+sed -i".bak" "s/,NA,Phaeophyceae/,Phaeophyceae,Heterokontophyta/" plastid.CHECKME.csv
+
 ```
 
 ### Can't get clear taxon information
@@ -185,8 +194,8 @@ sed -i".bak" "s/Chlorellales,NA/Chlorellales,Trebouxiophyceae/" plastid.CHECKME.
 Species and genus should not be "NA" and genus has 2 or more members.
 
 ```text
-921 ---------> 916 ---------> 476 ---------> 686
-        NA           genus          family
+1237 ---------> 1233 ---------> 678 ---------> 1075
+        NA             genus          family
 ```
 
 ```bash
@@ -196,10 +205,10 @@ cd ~/data/organelle/plastid_summary
 # filter out accessions without linage information
 cat plastid.CHECKME.csv \
     | perl -nl -a -F"," -e \
-    '/^#/ and next; ($F[3] eq q{NA} or $F[4] eq q{NA} ) and next; print' \
+    '/^#/ and next; ($F[2] eq q{NA} or $F[3] eq q{NA} or $F[4] eq q{NA} ) and next; print' \
     > plastid.tmp
 
-# 916
+# 1233
 wc -l plastid.tmp
 
 #----------------------------#
@@ -214,7 +223,7 @@ cat plastid.tmp \
 # intersect between two files
 grep -F -f genus.tmp plastid.tmp > plastid.genus.tmp
 
-# 476
+# 678
 wc -l plastid.genus.tmp
 
 #----------------------------#
@@ -228,7 +237,7 @@ cat plastid.genus.tmp \
 # intersect between two files
 grep -F -f family.tmp plastid.tmp > plastid.family.tmp
 
-# 686
+# 1075
 wc -l plastid.family.tmp
 
 #----------------------------#
@@ -253,12 +262,12 @@ cat plastid.DOWNLOAD.csv \
     '/^#/i and next; $seen{$F[3]}++; END {for $k (keys %seen){printf qq{%s,%d\n}, $k, $seen{$k} if $seen{$k} > 1}};' \
     | sort
 
-# Fragaria vesca,2
-# Gossypium herbaceum,2
-# Magnolia officinalis,2
-# Olea europaea,4
-# Oryza sativa,3
-# Saccharum hybrid cultivar,2
+#Fragaria vesca,2
+#Gossypium herbaceum,2
+#Magnolia officinalis,2
+#Olea europaea,4
+#Oryza sativa,3
+#Saccharum hybrid cultivar,3
 
 # strain name not equal to species
 cat plastid.DOWNLOAD.csv \
@@ -266,34 +275,38 @@ cat plastid.DOWNLOAD.csv \
     | perl -nl -a -F"," -e '$F[2] ne $F[3] and print $F[2]' \
     | sort
 
-# Brassica rapa subsp. pekinensis
-# Cucumis melo subsp. melo
-# Eucalyptus globulus subsp. globulus
-# Fagopyrum esculentum subsp. ancestrale
-# Fragaria vesca subsp. bracteata
-# Fragaria vesca subsp. vesca
-# Gossypium herbaceum subsp. africanum
-# Gracilaria tenuistipitata var. liui
-# Hordeum vulgare subsp. vulgare
-# Magnolia officinalis subsp. biloba
-# Micromonas pusilla CCMP1545
-# Oenothera elata subsp. hookeri
-# Olea europaea subsp. cuspidata
-# Olea europaea subsp. europaea
-# Olea europaea subsp. maroccana
-# Olea woodiana subsp. woodiana
-# Oryza sativa Indica Group
-# Oryza sativa Japonica Group
-# Phalaenopsis aphrodite subsp. formosana
-# Phyllostachys nigra var. henonis
-# Plasmodium chabaudi chabaudi
-# Plasmodium falciparum HB3
-# Pseudotsuga sinensis var. wilsoniana
-# Saccharum hybrid cultivar NCo 310
-# Saccharum hybrid cultivar SP80-3280
-# Thalassiosira oceanica CCMP1005
-# Theileria orientalis strain Shintoku
-# Theileria parva strain Muguga
+#Babesia bovis T2Bo
+#Brassica rapa subsp. pekinensis
+#Calycanthus floridus var. glaucus
+#Coccomyxa subellipsoidea C-169
+#Cucumis melo subsp. melo
+#Dioscorea cayennensis subsp. rotundata
+#Eucalyptus globulus subsp. globulus
+#Fagopyrum esculentum subsp. ancestrale
+#Fragaria vesca subsp. bracteata
+#Fragaria vesca subsp. vesca
+#Gossypium herbaceum subsp. africanum
+#Gracilaria tenuistipitata var. liui
+#Hordeum vulgare subsp. vulgare
+#Magnolia officinalis subsp. biloba
+#Micromonas pusilla CCMP1545
+#Oenothera elata subsp. hookeri
+#Olea europaea subsp. cuspidata
+#Olea europaea subsp. europaea
+#Olea europaea subsp. maroccana
+#Olea woodiana subsp. woodiana
+#Oryza sativa Indica Group
+#Oryza sativa Japonica Group
+#Phalaenopsis aphrodite subsp. formosana
+#Phyllostachys nigra var. henonis
+#Plasmodium chabaudi chabaudi
+#Plasmodium falciparum HB3
+#Pseudotsuga sinensis var. wilsoniana
+#Pteridium aquilinum subsp. aquilinum
+#Saccharum hybrid cultivar NCo 310
+#Saccharum hybrid cultivar SP80-3280
+#Thalassiosira oceanica CCMP1005
+#Theileria parva strain Muguga
 ```
 
 Create abbreviations.

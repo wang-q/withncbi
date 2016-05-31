@@ -80,9 +80,9 @@ Salix,Pop_trichocarpa
 ## Malvaceae 锦葵科
 Gossypium,Theo_cacao
 ## Myrtaceae 桃金娘科
-Angophora,Al_ternata
-Corymbia,Al_ternata
-Eucalyptus,Al_ternata
+Angophora,Allos_ternata
+Corymbia,Allos_ternata
+Eucalyptus,Allos_ternata
 ## Onagraceae 柳叶菜科
 ### Oenothera
 ## Nymphaeaceae 睡莲科
