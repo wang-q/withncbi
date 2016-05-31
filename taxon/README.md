@@ -113,19 +113,22 @@ cat ../plastid_genomes/plastid_id_seq.csv \
     | sort -t',' -k9,9 -k8,8 -k7,7 -k6,6 -k5,5 \
     >> plastid.CHECKME.csv
 
-# correct 'Chlorella' mirabilis  
 # darwin (bsd) need "" for -i
 sed -i".bak" "s/\'//g" plastid.CHECKME.csv
-sed -i".bak" "s/Chlorella,NA,NA/Chlorella,Chlorellaceae,Chlorellales/" plastid.CHECKME.csv
 
 # Koliella corcontica (a green algae) was grouped to Streptophyta.
 # Koliella longiseta
 perl -pi -e 's/Koliella,\w+,\w+,\w+,\w+/Koliella,Klebsormidiaceae,Klebsormidiales,Klebsormidiophyceae,Chlorophyta/g' plastid.CHECKME.csv
 sed -i".bak" "s/Klebsormidiophyceae,Streptophyta/Klebsormidiophyceae,Chlorophyta/" plastid.CHECKME.csv
 
+sed -i".bak" "s/Charophyceae,Streptophyta/Charophyceae,Charophyta/" plastid.CHECKME.csv
+sed -i".bak" "s/Chlorokybophyceae,Streptophyta/Chlorokybophyceae,Charophyta/" plastid.CHECKME.csv
+sed -i".bak" "s/Coleochaetophyceae,Streptophyta/Coleochaetophyceae,Charophyta/" plastid.CHECKME.csv
+sed -i".bak" "s/Zygnemophyceae,Streptophyta/Zygnemophyceae,Charophyta/" plastid.CHECKME.csv
+
 # Chrysanthemum x morifolium and Pelargonium x hortorum are also weird, but they can be googled.
 
-# various missing families
+# missing families
 # queried from http://www.algaebase.org/
 sed -i".bak" "s/Aureococcus,NA/Aureococcus,Pelagomonadaceae/" plastid.CHECKME.csv
 sed -i".bak" "s/Aureoumbra,NA/Aureoumbra,Sarcinochrysidaceae/" plastid.CHECKME.csv
@@ -161,22 +164,80 @@ sed -i".bak" "s/Stigeoclonium,NA/Stigeoclonium,Chaetophoraceae/" plastid.CHECKME
 sed -i".bak" "s/Trachydiscus,NA/Trachydiscus,Pleurochloridaceae/" plastid.CHECKME.csv
 sed -i".bak" "s/Watanabea,NA/Watanabea,Trebouxiaceae/" plastid.CHECKME.csv
 
+sed -i".bak" "s/Chlorellales,NA/Chlorellales,Trebouxiophyceae/" plastid.CHECKME.csv
+
+# missing classes and phylums
 sed -i".bak" "s/Bangiophyceae,NA/Bangiophyceae,Rhodophyta/" plastid.CHECKME.csv
 sed -i".bak" "s/Florideophyceae,NA/Florideophyceae,Rhodophyta/" plastid.CHECKME.csv
 sed -i".bak" "s/Phaeocystales,NA,NA/Phaeocystales,Coccolithophyceae,Haptophyta/" plastid.CHECKME.csv
-
 sed -i".bak" "s/Glaucocystophyceae,NA/Glaucocystophyceae,Glaucophyta/" plastid.CHECKME.csv
+sed -i".bak" "s/Dinophyceae,NA/Dinophyceae,Dinoflagellata/" plastid.CHECKME.csv
+sed -i".bak" "s/Cryptophyta,NA/Cryptophyta,Cryptophyta/" plastid.CHECKME.csv
+sed -i".bak" "s/Pelagophyceae,NA/Pelagophyceae,Ochrophyta/" plastid.CHECKME.csv
+sed -i".bak" "s/Raphidophyceae,NA/Raphidophyceae,Ochrophyta/" plastid.CHECKME.csv
+sed -i".bak" "s/Synurophyceae,NA/Synurophyceae,Ochrophyta/" plastid.CHECKME.csv
+sed -i".bak" "s/NA,Phaeophyceae/Phaeophyceae,Ochrophyta/" plastid.CHECKME.csv
 
-sed -i".bak" "s/Chlorellales,NA/Chlorellales,Trebouxiophyceae/" plastid.CHECKME.csv
+# Split Streptophyta according to http://www.theplantlist.org/
+# Angiosperms
+perl -Mojo -e '
+    g(q{http://www.theplantlist.org/browse/A/})->dom
+    ->find(q{li > a > i[class=family]})
+    ->each( sub { print shift->text . "\n" } );
+' > Angiosperms.tmp
+echo Aceraceae >> Angiosperms.tmp
+echo Asteraceae >> Angiosperms.tmp
+echo Campynemataceae >> Angiosperms.tmp
+echo Chenopodiaceae >> Angiosperms.tmp
+echo Fabaceae >> Angiosperms.tmp
+echo Viscaceae >> Angiosperms.tmp
 
-sed -i".bak" "s/,Dinophyceae,NA/,Dinophyceae,Dinoflagellata/" plastid.CHECKME.csv
-sed -i".bak" "s/,Cryptophyta,NA/,Cryptophyta,Cryptophyta/" plastid.CHECKME.csv
+cat Angiosperms.tmp \
+    | parallel -r -j 1 '
+        perl -pi -e '\''
+            s/({},\w+,\w+),Streptophyta/\1,Angiosperms/g
+        '\'' plastid.CHECKME.csv
+    '
 
-sed -i".bak" "s/,Pelagophyceae,NA/,Pelagophyceae,Heterokontophyta/" plastid.CHECKME.csv
-sed -i".bak" "s/,Raphidophyceae,NA/,Raphidophyceae,Heterokontophyta/" plastid.CHECKME.csv
-sed -i".bak" "s/,Synurophyceae,NA/,Synurophyceae,Heterokontophyta/" plastid.CHECKME.csv
-sed -i".bak" "s/,NA,Phaeophyceae/,Phaeophyceae,Heterokontophyta/" plastid.CHECKME.csv
+# Gymnosperms
+perl -Mojo -e '
+    g(q{http://www.theplantlist.org/browse/G/})->dom
+    ->find(q{li > a > i[class=family]})
+    ->each( sub { print shift->text . "\n" } );
+' \
+    | (echo Sciadopityaceae && cat) \
+    | parallel -r -j 1 '
+        perl -pi -e '\''
+            s/({},\w+,\w+),Streptophyta/\1,Gymnosperms/g
+        '\'' plastid.CHECKME.csv
+    '
 
+# Pteridophytes
+perl -Mojo -e '
+    g(q{http://www.theplantlist.org/browse/P/})->dom
+    ->find(q{li > a > i[class=family]})
+    ->each( sub { print shift->text . "\n" } );
+' \
+    | (echo Lygodiaceae && cat) \
+    | parallel -r -j 1 '
+        perl -pi -e '\''
+            s/({},\w+,\w+),Streptophyta/\1,Pteridophytes/g
+        '\'' plastid.CHECKME.csv
+    '
+
+# Bryophytes
+perl -Mojo -e '
+    g(q{http://www.theplantlist.org/browse/B/})->dom
+    ->find(q{li > a > i[class=family]})
+    ->each( sub { print shift->text . "\n" } );
+' \
+    | parallel -r -j 1 '
+        perl -pi -e '\''
+            s/({},\w+,\w+),Streptophyta/\1,Bryophytes/g
+        '\'' plastid.CHECKME.csv
+    '
+
+rm *.tmp *.bak
 ```
 
 ### Can't get clear taxon information
@@ -251,7 +312,6 @@ cat plastid.family.tmp >> plastid.DOWNLOAD.csv
 
 # clean
 rm *.tmp *.bak
-
 ```
 
 ## Find a way to name these.
@@ -365,7 +425,7 @@ find . -name "*.fasta" | wc -l
 
 We got **676** accessions.
 
-Numbers for higher ranks are: 59 orders, 81 families, 171 genera and 666 species.
+Numbers for higher ranks are: 59 orders, 81 families, 177 genera and 666 species.
 
 ```bash
 cd ~/data/organelle/plastid_summary
@@ -386,7 +446,7 @@ wc -l plastid.GENUS.csv
 #   count every ranks
 #      59 order.list.tmp
 #      81 family.list.tmp
-#     171 genus.list.tmp
+#     177 genus.list.tmp
 #     666 species.list.tmp
 cut -d',' -f 4 plastid.GENUS.csv | sort | uniq > species.list.tmp
 cut -d',' -f 5 plastid.GENUS.csv | sort | uniq > genus.list.tmp
@@ -413,6 +473,8 @@ Manually edit it then move to `~/Scripts/withncbi/doc/plastid_OG.md`.
 
 ```bash
 cd ~/data/organelle/plastid_summary
+
+curl http://www.theplantlist.org/browse/A/#statistics
 
 cat plastid.GENUS.csv \
     | grep -v "^#" \
@@ -467,7 +529,7 @@ cat plastid.GENUS.csv \
             $name = $F[4];
             %id_of = ();
         }
-        $id_of{$F[9]} = $F[0]; # multiple chromosomes collapsed here
+        $id_of{$F[9]} = $F[0];
 
         END {
             my @s = sort {$id_of{$a} <=> $id_of{$b}} keys %id_of;
@@ -528,30 +590,37 @@ cat genus.tsv \
     > genus_OG.tsv
 
 # every genera
-echo -e "mkdir -p ~/data/organelle/plastid.working\ncd ~/data/organelle/plastid.working\n" > ../plastid.cmd.txt
+echo -e "mkdir -p ~/data/organelle/plastid.working \ncd ~/data/organelle/plastid.working\n" > ../plastid.cmd.txt
 cat genus.tsv \
     | perl ~/Scripts/withncbi/taxon/cmd_template.pl \
         --seq_dir ~/data/organelle/plastid_genomes \
-        --taxon_file ~/data/organelle/plastid_genomes/plastid_ncbi.csv \
+        --csv_taxon ~/data/organelle/plastid_genomes/plastid_ncbi.csv \
         --parallel 8 \
     >> ../plastid.cmd.txt
 
+echo -e "mkdir -p ~/data/organelle/plastid.working \ncd ~/data/organelle/plastid.working\n" > ../plastid.redo.cmd.txt
+cat genus.tsv \
+    | perl ~/Scripts/withncbi/taxon/cmd_template.pl \
+        --csv_taxon ~/data/organelle/plastid_genomes/plastid_ncbi.csv \
+        --parallel 8 \
+    >> ../plastid.redo.cmd.txt
+
 # this is for finding outgroups
-echo -e "mkdir -p ~/data/organelle/plastid_families\ncd ~/data/organelle/plastid_families\n" > ../plastid_families.cmd.txt
+echo -e "mkdir -p ~/data/organelle/plastid_families \ncd ~/data/organelle/plastid_families\n" > ../plastid_families.cmd.txt
 cat family.tsv \
     | perl -n -e '/,\w+,/ and print' \
     | perl ~/Scripts/withncbi/taxon/cmd_template.pl \
         --seq_dir ~/data/organelle/plastid_genomes \
-        --taxon_file ~/data/organelle/plastid_genomes/plastid_ncbi.csv \
+        --csv_taxon ~/data/organelle/plastid_genomes/plastid_ncbi.csv \
         --parallel 8 \
     >> ../plastid_families.cmd.txt
 
 # genera with outgroups
-echo -e "mkdir -p ~/data/organelle/plastid_OG\ncd ~/data/organelle/plastid_OG\n" > ../plastid_OG.cmd.txt
+echo -e "mkdir -p ~/data/organelle/plastid_OG \ncd ~/data/organelle/plastid_OG\n" > ../plastid_OG.cmd.txt
 cat genus_OG.tsv \
     | perl ~/Scripts/withncbi/taxon/cmd_template.pl \
         --seq_dir ~/data/organelle/plastid_genomes \
-        --taxon_file ~/data/organelle/plastid_genomes/plastid_ncbi.csv \
+        --csv_taxon ~/data/organelle/plastid_genomes/plastid_ncbi.csv \
         --parallel 8 \
     >> ../plastid_OG.cmd.txt
 ```
@@ -566,7 +635,8 @@ The old prepare_run.sh
 mkdir -p ~/data/organelle/plastid.working
 cd ~/data/organelle/plastid.working
 
-time bash ../plastid.cmd.txt 2>&1 | tee log_cmd.txt
+bash ../plastid.cmd.txt 2>&1 | tee log_cmd.txt
+# bash ../plastid.redo.cmd.txt 2>&1 | tee log_redo_cmd.txt # skip real_chr and repeatmasker
 
 #----------------------------#
 # Approach 1: one by one
@@ -623,12 +693,13 @@ for f in `find . -mindepth 1 -maxdepth 2 -type f -name 7_multi_db_only.sh | sort
     echo ;
 done  > run_7.sh
 
+# 24 cores
 cat run_1.sh | grep . | parallel --no-run-if-empty -j 16 2>&1 | tee log_1.txt
-cat run_2.sh | grep . | parallel --no-run-if-empty -j 4 2>&1  | tee log_2.txt
-cat run_3.sh | grep . | parallel --no-run-if-empty -j 8 2>&1  | tee log_3.txt
-cat run_4.sh | grep . | parallel --no-run-if-empty -j 4 2>&1  | tee log_4.txt
-cat run_5.sh | grep . | parallel --no-run-if-empty -j 4 2>&1  | tee log_5.txt
-cat run_7.sh | grep . | parallel --no-run-if-empty -j 8 2>&1  | tee log_7.txt
+cat run_2.sh | grep . | parallel --no-run-if-empty -j 8  2>&1 | tee log_2.txt
+cat run_3.sh | grep . | parallel --no-run-if-empty -j 16 2>&1 | tee log_3.txt
+cat run_4.sh | grep . | parallel --no-run-if-empty -j 4  2>&1 | tee log_4.txt
+cat run_5.sh | grep . | parallel --no-run-if-empty -j 4  2>&1 | tee log_5.txt
+cat run_7.sh | grep . | parallel --no-run-if-empty -j 16 2>&1 | tee log_7.txt
 
 #----------------------------#
 # Clean
@@ -645,7 +716,11 @@ find . -mindepth 1 -maxdepth 4 -type f -name "*.phy.reduced" | parallel --no-run
 ```bash
 cd ~/data/organelle/
 
-perl -p -e 's/plastid\.working/plastid_self.working/g; s/strain_bz/strain_bz_self/g; s/(\-\-use_name)/\1 --length 1000 /g;' plastid.cmd.txt > plastid_self.cmd.txt
+perl -p -e '
+    s/plastid\.working/plastid_self.working/g;
+    s/strain_bz/strain_bz_self/g;
+    s/(\-\-parallel)/--length 1000 \1/g;
+' plastid.cmd.txt > plastid_self.cmd.txt
 
 mkdir -p ~/data/organelle/plastid_self.working
 cd ~/data/organelle/plastid_self.working
@@ -676,8 +751,6 @@ find  /usr/local/var/mysql -type d -name "[A-Z]*" | parallel --no-run-if-empty r
 
 ### Alignments of families for outgroups.
 
-The old prepare_run.sh
-
 ```bash
 mkdir -p ~/data/organelle/plastid_families
 cd ~/data/organelle/plastid_families
@@ -701,7 +774,7 @@ find . -type f -path "*_phylo*" -name "*.nwk"
 
 Manually editing `~/Scripts/withncbi/doc/plastid_OG.md` and generate `genus_OG.tsv`.
 
-*D* of outgroups should be around 0.05.
+*D* between target and outgroup should be around **0.05**.
 
 ```bash
 mkdir -p ~/data/organelle/plastid_OG
@@ -893,28 +966,75 @@ mkdir -p ~/data/organelle/plastid_summary/table
 cd ~/data/organelle/plastid_summary/table
 
 # manually set orders in `plastid_OG.md`
-echo "genus" > genus_all.lst
-perl -l -MPath::Tiny -e \
-    'BEGIN{ @ls = map {/^#/ and s/^(#+\s*\w+).*/\1/; $_} map {s/,\w+//; $_} map {s/^###\s*//; $_} path(q{~/Scripts/withncbi/doc/plastid_OG.md})->lines( { chomp => 1}); } $fh; for (@ls) { (/^\s*$/ or /^##\s+/ or /^#\s+(\w+)/) and next; print $_}' \
+echo "#genus" > genus_all.lst
+perl -l -MPath::Tiny -e '
+    BEGIN {
+        @ls = map {/^#/ and s/^(#+\s*\w+).*/\1/; $_} 
+            map {s/,\w+//; $_} 
+            map {s/^###\s*//; $_} 
+            path(q{~/Scripts/withncbi/doc/plastid_OG.md})->lines( { chomp => 1}); 
+    }
+    for (@ls) { 
+        (/^\s*$/ or /^##\s+/ or /^#\s+(\w+)/) and next; 
+        print $_
+    }
+    ' \
     >> genus_all.lst
 
-echo "genus,strain_abbr,accession,length" > length.tmp
+echo "#abbr,genus,accession,length" > length.tmp
 find ~/data/organelle/plastid.working -type f -name "chr.sizes" \
-    | xargs perl -nl -e \
-    '$_ =~ s/\t/\,/; $ARGV =~ /working\/(\w+)\/(\w+)\//; print qq{$1,$2,$_}' \
+    | parallel --jobs 1 --keep-order --no-run-if-empty '
+        perl -nl -e '\''
+            BEGIN {
+                %l = ();
+            }
+            
+            next unless /\w+\t\d+/;
+            my ($key, $value) = split /\t/;
+            $l{$key} = $value;
+            
+            END {
+                my $chrs = join "|", sort keys %l;
+                my $length = 0;
+                $length += $_ for values %l;
+                
+                $ARGV =~ /working\/(\w+)\/(\w+)\/(\w+)/;
+                print qq{$3,$1,$chrs,$length}
+            }
+        '\'' \
+        {}
+    ' \
     >> length.tmp
 
-cat length.tmp \
-    | perl -nl -a -F',' -MPath::Tiny -e \
-    'BEGIN{ @ls = path(q{genus_all.lst})->lines( { chomp => 1}); $o{$ls[$_]} = $_ for (0 .. $#ls); } print qq{$_,$o{$F[0]}};' \
-    | sort -n -t, -k5,5 \
-    | cut -d',' -f 1-4 \
-    > length_ordered.tmp
+echo "#abbr,phylum,family,genus,taxon_id" > abbr.tmp
+cat ~/data/organelle/plastid_summary/plastid.GENUS.csv \
+    | grep -v "^#" \
+    | perl -nla -F"," -e 'print qq{$F[9],$F[8],$F[5],$F[4],$F[0]}' \
+    >> abbr.tmp
 
-perl ~/Scripts/alignDB/util/merge_csv.pl \
-    -t length_ordered.tmp -m ~/data/organelle/plastid_summary/plastid.GENUS.csv -f 2 -f2 1 --concat --stdout \
-    | perl -nl -a -F"," -e 'print qq{$F[12],$F[10],$F[8],$F[6],$F[4],$F[5],$F[3]}' \
-    >  plastid.list.csv
+# #abbr,genus,accession,length,phylum,family,genus,taxon_id
+cat length.tmp abbr.tmp \
+    | perl ~/Scripts/withncbi/util/merge_csv.pl \
+        -f 0 --concat -o stdout \
+    | perl -nl -a -F"," -e 'print qq{$F[4],$F[5],$F[6],$F[0],$F[7],$F[2],$F[3]}' \
+    > list.tmp
+
+echo "#phylum,family,genus,abbr,taxon_id,accession,length" > plastid.list.csv
+cat list.tmp \
+    | grep -v "#" \
+    | perl -nl -a -F',' -MPath::Tiny -e '
+        BEGIN{
+            %genus, %target;
+            my @l1 = path(q{genus_all.lst})->lines({ chomp => 1});
+            $genus{$l1[$_]} = $_ for (0 .. $#l1);
+        }
+        my $idx = $genus{$F[2]};
+        die qq{$_\n} unless defined $idx;
+        print qq{$_,$idx};
+    ' \
+    | sort -n -t',' -k8,8 \
+    | cut -d',' -f 1-7 \
+    >> plastid.list.csv
 
 rm *.tmp
 ```
@@ -976,18 +1096,20 @@ EOF
 
 cat ~/data/organelle/plastid_summary/table/genus_all.lst \
     | grep -v "^genus" \
-    | TT_FILE=Table_alignment.tt perl -MTemplate -nl -e 'push @data, { name => $_, file => qq{$_.common.xlsx}, }; END{$tt = Template->new; $tt->process($ENV{TT_FILE}, { data => \@data, }) or die Template->error}' \
+    | TT_FILE=Table_alignment.tt perl -MTemplate -nl -e '
+        push @data, { name => $_, file => qq{$_.common.xlsx}, }; 
+        END {
+            $tt = Template->new;
+            $tt->process($ENV{TT_FILE}, { data => \@data, })
+                or die Template->error;
+        }
+    ' \
     > Table_alignment_all.yml
 
-# Under Windows
-cd /d D:/data/organelle/plastid_summary/xlsx
-perl d:/Scripts/fig_table/excel_table.pl -i Table_alignment_all.yml
-perl d:/Scripts/fig_table/xlsx2xls.pl -d Table_alignment_all.xlsx --csv
+perl ~/Scripts/fig_table/xlsx_table.pl -i Table_alignment_all.yml
+perl ~/Scripts/fig_table/xlsx2csv.pl -f Table_alignment_all.xlsx > Table_alignment_all.csv
 
-# Back to Mac
-cd ~/data/organelle/plastid_summary/xlsx
 cp -f Table_alignment_all.xlsx ~/data/organelle/plastid_summary/table
-perl -pi -e 's/\r\n/\n/g' Table_alignment_all.csv
 cp -f Table_alignment_all.csv ~/data/organelle/plastid_summary/table
 
 cd ~/data/organelle/plastid_summary/table
@@ -995,8 +1117,15 @@ cd ~/data/organelle/plastid_summary/table
 echo "Genus,avg_size" > genus_avg_size.csv
 cat plastid.list.csv \
     | grep -v "#" \
-    | perl -nl -a -F"," -e \
-    '$count{$F[2]}++; $sum{$F[2]} += $F[6]; END {for $k (sort keys %count) { printf qq{%s,%d\n}, $k, $sum{$k}/$count{$k}; } }' \
+    | perl -nla -F"," -e '
+        $count{$F[2]}++;
+        $sum{$F[2]} += $F[6];
+        END {
+            for $k (sort keys %count) {
+                printf qq{%s,%d\n}, $k, $sum{$k}/$count{$k};
+            }
+        }
+    ' \
     >> genus_avg_size.csv
 
 perl ~/Scripts/alignDB/util/merge_csv.pl \
@@ -1005,7 +1134,11 @@ perl ~/Scripts/alignDB/util/merge_csv.pl \
 
 echo "Genus,coverage" > genus_coverage.csv
 cat Table_alignment_all.1.csv \
-    | perl -nl -a -F',' -e '$F[7] =~ /\D+/ and next; $c = $F[2] * 1000 * 1000 / $F[7]; print qq{$F[0],$c};' \
+    | perl -nla -F',' -e '
+        $F[7] =~ /\D+/ and next;
+        $c = $F[2] * 1000 * 1000 / $F[7];
+        print qq{$F[0],$c};
+    ' \
     >> genus_coverage.csv
 
 perl ~/Scripts/alignDB/util/merge_csv.pl \
@@ -1014,7 +1147,11 @@ perl ~/Scripts/alignDB/util/merge_csv.pl \
 
 echo "Genus,indels" > genus_indels.csv
 cat Table_alignment_all.2.csv \
-    | perl -nl -a -F',' -e '$F[7] =~ /\D+/ and next; $c = $F[3] / 100 * $F[2] * 1000 * 1000; print qq{$F[0],$c};' \
+    | perl -nla -F',' -e '
+        $F[7] =~ /\D+/ and next;
+        $c = $F[3] / 100 * $F[2] * 1000 * 1000;
+        print qq{$F[0],$c};
+    ' \
     >> genus_indels.csv
 
 perl ~/Scripts/alignDB/util/merge_csv.pl \
@@ -1027,7 +1164,10 @@ cat Table_alignment_all.3.csv \
 
 # real filter
 cat Table_alignment_for_filter.csv \
-    | perl -nl -a -F',' -e '$F[6] =~ /\D+/ and next; print $F[0] if ($F[7] < 0.4 or $F[8] < 100 or $F[4] > 0.2);' \
+    | perl -nla -F',' -e '
+        $F[6] =~ /\D+/ and next;
+        print $F[0] if ($F[7] < 0.4 or $F[8] < 100 or $F[4] > 0.2);
+    ' \
     > genus_exclude.lst
 
 grep -v -Fx -f genus_exclude.lst genus_all.lst > genus.lst
@@ -1039,7 +1179,14 @@ rm ~/data/organelle/plastid_summary/table/genus*csv
 cd ~/data/organelle/plastid_summary/xlsx
 cat ~/data/organelle/plastid_summary/table/genus.lst \
     | grep -v "^genus" \
-    | TT_FILE=Table_alignment.tt perl -MTemplate -nl -e 'push @data, { name => $_, file => qq{$_.common.xlsx}, }; END{$tt = Template->new; $tt->process($ENV{TT_FILE}, { data => \@data, }) or die Template->error}' \
+    | TT_FILE=Table_alignment.tt perl -MTemplate -nl -e '
+        push @data, { name => $_, file => qq{$_.common.xlsx}, };
+        END {
+            $tt = Template->new;
+            $tt->process($ENV{TT_FILE}, { data => \@data, })
+                or die Template->error;
+        }
+    ' \
     > Table_alignment.yml
 
 # Under Windows
@@ -1047,9 +1194,7 @@ cd /d D:/data/organelle/plastid_summary/xlsx
 perl d:/Scripts/fig_table/excel_table.pl -i Table_alignment.yml
 perl d:/Scripts/fig_table/xlsx2xls.pl -d Table_alignment.xlsx --csv
 
-# Mac
 cp -f ~/data/organelle/plastid_summary/xlsx/Table_alignment.xlsx ~/data/organelle/plastid_summary/table
-perl -pi -e 's/\r\n/\n/g' ~/data/organelle/plastid_summary/xlsx/Table_alignment.csv
 cp -f ~/data/organelle/plastid_summary/xlsx/Table_alignment.csv ~/data/organelle/plastid_summary/table
 ```
 
@@ -1059,8 +1204,23 @@ cp -f ~/data/organelle/plastid_summary/xlsx/Table_alignment.csv ~/data/organelle
 mkdir -p ~/data/organelle/plastid_summary/group
 cd ~/data/organelle/plastid_summary/group
 
-perl -l -MPath::Tiny -e \
-'BEGIN{ @ls = map {/^#/ and s/^(#+\s*\w+).*/\1/; $_} map {s/,\w+//; $_} map {s/^###\s*//; $_} path(q{~/Scripts/withncbi/doc/plastid_OG.md})->lines( { chomp => 1}); } $fh; for (@ls) { (/^\s*$/ or /^##\s+/) and next; if (/^#\s+(\w+)/) {$fh = path("$1.txt")->openw; next;} else {print {$fh} $_}}'
+perl -l -MPath::Tiny -e '
+    BEGIN {
+        @ls = map {/^#/ and s/^(#+\s*\w+).*/\1/; $_}
+            map {s/,\w+//; $_}
+            map {s/^###\s*//; $_}
+            path(q{~/Scripts/withncbi/doc/plastid_OG.md})->lines( { chomp => 1});
+    }
+    for (@ls) {
+        (/^\s*$/ or /^##\s+/) and next;
+        if (/^#\s+(\w+)/) {
+            $fh = path("$1.txt")->openw;
+            next;
+        } else {
+            print {$fh} $_;
+        }
+    }
+    '
 
 grep -Fx -f ~/data/organelle/plastid_summary/table/genus.lst Angiosperm.txt > Angiosperm.lst
 grep -Fx -f ~/data/organelle/plastid_summary/table/genus.lst Gymnosperm.txt > Gymnosperm.lst
@@ -1099,10 +1259,20 @@ NCBI Taxonomy tree
 cd ~/data/organelle/plastid_summary/group
 
 cat ~/data/organelle/plastid_summary/table/genus.lst \
-    | perl -e '@ls = <>; $str = qq{bp_taxonomy2tree.pl \\\n}; for (@ls) {chomp;$str .= qq{-s $_ \\\n}}  $str .= qq{-e \n}; print $str' \
+    | grep -v "^#" \
+    | perl -e '
+        @ls = <>;
+        $str = qq{bp_taxonomy2tree.pl \\\n};
+        for (@ls) {
+            chomp;
+            $str .= qq{    -s "$_" \\\n};
+        }
+        $str .= qq{    -e \n};
+        print $str
+    ' \
     > genera_tree.sh
-sh genera_tree.sh > genera.tree
 
+bash genera_tree.sh > genera.tree
 ```
 
 ### Phylogenic trees of each genus with outgroup
@@ -1121,77 +1291,183 @@ find ~/data/organelle/plastid_OG -type f -path "*_phylo*" -name "*.nwk" \
 
 ### d1, d2
 
-`collect_excel.pl`
+`collect_xlsx.pl`
 
 ```bash
 cd ~/data/organelle/plastid_summary/xlsx
 
-cat <<EOF > cmd_collect_d1_d2.tt
-perl d:/Scripts/fig_table/collect_excel.pl [% FOREACH item IN data -%] -f [% item.name %].common.xlsx -s d1_pi_gc_cv -n [% item.name %] [% END -%] -o cmd_plastid_d1.xlsx
+cat <<'EOF' > cmd_collect_d1_d2.tt
+perl ~/Scripts/fig_table/collect_xlsx.pl \
+[% FOREACH item IN data -%]
+    -f [% item.name %].common.xlsx \
+    -s d1_pi_gc_cv \
+    -n [% item.name %] \
+[% END -%]
+    -o cmd_d1.xlsx
 
-perl d:/Scripts/fig_table/collect_excel.pl [% FOREACH item IN data -%] -f [% item.name %].common.xlsx -s d2_pi_gc_cv -n [% item.name %] [% END -%] -o cmd_plastid_d2.xlsx
+perl ~/Scripts/fig_table/collect_xlsx.pl \
+[% FOREACH item IN data -%]
+    -f [% item.name %].common.xlsx \
+    -s d2_pi_gc_cv \
+    -n [% item.name %] \
+[% END -%]
+    -o cmd_d2.xlsx
 
-perl d:/Scripts/fig_table/collect_excel.pl [% FOREACH item IN data -%] -f [% item.name %].common.xlsx -s d1_comb_pi_gc_cv -n [% item.name %] [% END -%] -o cmd_plastid_d1_comb.xlsx
+perl ~/Scripts/fig_table/collect_xlsx.pl \
+[% FOREACH item IN data -%]
+    -f [% item.name %].common.xlsx \
+    -s d1_comb_pi_gc_cv \
+    -n [% item.name %] \
+[% END -%] 
+    -o cmd_d1_comb.xlsx
 
-perl d:/Scripts/fig_table/collect_excel.pl [% FOREACH item IN data -%] -f [% item.name %].common.xlsx -s d2_comb_pi_gc_cv -n [% item.name %] [% END -%] -o cmd_plastid_d2_comb.xlsx
+perl ~/Scripts/fig_table/collect_xlsx.pl \
+[% FOREACH item IN data -%]
+    -f [% item.name %].common.xlsx \
+    -s d2_comb_pi_gc_cv \
+    -n [% item.name %] \
+[% END -%] 
+    -o cmd_d2_comb.xlsx
 
 EOF
 
 cat ~/data/organelle/plastid_summary/table/genus.lst \
-    | TT_FILE=cmd_collect_d1_d2.tt perl -MTemplate -nl -e 'push @data, { name => $_, }; END{$tt = Template->new; $tt->process($ENV{TT_FILE}, { data => \@data, }) or die Template->error}' \
-    > cmd_collect_d1_d2.bat
+    | TT_FILE=cmd_collect_d1_d2.tt perl -MTemplate -nl -e '
+        push @data, { name => $_, };
+        END {
+            $tt = Template->new;
+            $tt->process($ENV{TT_FILE}, { data => \@data, }) 
+                or die Template->error;
+        }
+    ' \
+    > cmd_collect_d1_d2.sh
 
-# Undre Windows
-cd /d D:/data/organelle/plastid_summary/xlsx
-cmd_collect_d1_d2.bat
+cd ~/data/organelle/plastid_summary/xlsx
+bash cmd_collect_d1_d2.sh
 ```
 
-`ofg_chart.pl`
+`sep_chart.pl`
 
 ```bash
 mkdir -p ~/data/organelle/plastid_summary/fig
 
 cd ~/data/organelle/plastid_summary/xlsx
 
-cat <<EOF > cmd_chart_d1_d2.tt
-perl d:/Scripts/fig_table/ofg_chart.pl -i cmd_plastid_d1.xlsx -xl "Distance to indels ({italic(d)[1]})" -yl "Nucleotide divergence ({italic(D)})" -xr "A2:A8" -yr "B2:B8"  --y_min 0.0 --y_max [% y_max %] -x_min 0 -x_max 5 -rb "^([% FOREACH item IN data %][% item.name %]|[% END %]NON_EXIST)$" -rs "NON_EXIST" --postfix [% postfix %] --style_dot -ms
+cat <<'EOF' > cmd_chart_d1_d2.tt
+perl ~/Scripts/fig_table/sep_chart.pl \
+    -i cmd_d1.xlsx \
+    -xl "Distance to indels ({italic(d)[1]})" \
+    -yl "Nucleotide divergence ({italic(D)})" \
+    -xr "A2:A8" -yr "B2:B8" \
+    --y_min 0.0 --y_max [% y_max %] \
+    -x_min 0 -x_max 5 \
+    -rb "^([% FOREACH item IN data %][% item.name %]|[% END %]NON_EXIST)$" \
+    -rs "NON_EXIST" \
+    --postfix [% postfix %] --style_dot -ms
 
-perl d:/Scripts/fig_table/ofg_chart.pl -i cmd_plastid_d1_comb.xlsx -xl "Distance to indels ({italic(d)[1]})" -yl "Nucleotide divergence ({italic(D)})" -xr "A2:A8" -yr "B2:B8"  --y_min 0.0 --y_max [% y_max %] -x_min 0 -x_max 5 -rb "^([% FOREACH item IN data %][% item.name %]|[% END %]NON_EXIST)$" -rs "NON_EXIST" --postfix [% postfix %] --style_dot
+perl ~/Scripts/fig_table/sep_chart.pl \
+    -i cmd_d1_comb.xlsx \
+    -xl "Distance to indels ({italic(d)[1]})" \
+    -yl "Nucleotide divergence ({italic(D)})" \
+    -xr "A2:A8" -yr "B2:B8" \
+    --y_min 0.0 --y_max [% y_max %] \
+    -x_min 0 -x_max 5 \
+    -rb "^([% FOREACH item IN data %][% item.name %]|[% END %]NON_EXIST)$" \
+    -rs "NON_EXIST" \
+    --postfix [% postfix %] --style_dot
 
-perl d:/Scripts/fig_table/ofg_chart.pl -i cmd_plastid_d2.xlsx -xl "Reciprocal of indel density ({italic(d)[2]})" -yl "Nucleotide divergence ({italic(D)})" -xr "A2:A23" -yr "B2:B23"  --y_min 0.0 --y_max [% y_max2 %] -x_min 0 -x_max 20 -rb "^([% FOREACH item IN data %][% item.name %]|[% END %]NON_EXIST)$" -rs "NON_EXIST" --postfix [% postfix %] --style_dot  -ms
+perl ~/Scripts/fig_table/sep_chart.pl \
+    -i cmd_d2.xlsx \
+    -xl "Reciprocal of indel density ({italic(d)[2]})" \
+    -yl "Nucleotide divergence ({italic(D)})" \
+    -xr "A2:A23" -yr "B2:B23" \
+    --y_min 0.0 --y_max [% y_max2 %] \
+    -x_min 0 -x_max 20 \
+    -rb "^([% FOREACH item IN data %][% item.name %]|[% END %]NON_EXIST)$" \
+    -rs "NON_EXIST" \
+    --postfix [% postfix %] --style_dot -ms
 
-perl d:/Scripts/fig_table/ofg_chart.pl -i cmd_plastid_d2_comb.xlsx -xl "Reciprocal of indel density ({italic(d)[2]})" -yl "Nucleotide divergence ({italic(D)})" -xr "A2:A23" -yr "B2:B23"  --y_min 0.0 --y_max [% y_max2 %] -x_min 0 -x_max 20 -rb "^([% FOREACH item IN data %][% item.name %]|[% END %]NON_EXIST)$" -rs "NON_EXIST" --postfix [% postfix %] --style_dot
+perl ~/Scripts/fig_table/sep_chart.pl \
+    -i cmd_d2_comb.xlsx \
+    -xl "Reciprocal of indel density ({italic(d)[2]})" \
+    -yl "Nucleotide divergence ({italic(D)})" \
+    -xr "A2:A23" -yr "B2:B23" \
+    --y_min 0.0 --y_max [% y_max2 %] \
+    -x_min 0 -x_max 20 \
+    -rb "^([% FOREACH item IN data %][% item.name %]|[% END %]NON_EXIST)$" \
+    -rs "NON_EXIST" \
+    --postfix [% postfix %] --style_dot
 
 EOF
 
 cat ~/data/organelle/plastid_summary/group/group_1.lst \
-    | TT_FILE=cmd_chart_d1_d2.tt perl -MTemplate -nl -e 'push @data, { name => $_, }; END{$tt = Template->new; $tt->process($ENV{TT_FILE}, { data => \@data, y_max => 0.01, y_max2 => 0.01, postfix => q{group_1}, }) or die Template->error}' \
-    > cmd_chart_group_1.bat
+    | TT_FILE=cmd_chart_d1_d2.tt perl -MTemplate -nl -e '
+        push @data, { name => $_, };
+        END {
+            $tt = Template->new;
+            $tt->process($ENV{TT_FILE},
+                { data => \@data,
+                y_max => 0.01,
+                y_max2 => 0.01,
+                postfix => q{group_1}, }) 
+                or die Template->error;
+        }
+    ' \
+    > cmd_chart_group_1.sh
 
-cat ~/data/organelle/plastid_summary/group/group_2.lst \
-    | TT_FILE=cmd_chart_d1_d2.tt perl -MTemplate -nl -e 'push @data, { name => $_, }; END{$tt = Template->new; $tt->process($ENV{TT_FILE}, { data => \@data, y_max => 0.03, y_max2 => 0.04, postfix => q{group_2}, }) or die Template->error}' \
-    > cmd_chart_group_2.bat
+cat ~/data/organelle/plastid_summary/group/group_1.lst \
+    | TT_FILE=cmd_chart_d1_d2.tt perl -MTemplate -nl -e '
+        push @data, { name => $_, };
+        END {
+            $tt = Template->new;
+            $tt->process($ENV{TT_FILE},
+                { data => \@data,
+                y_max => 0.03,
+                y_max2 => 0.04,
+                postfix => q{group_2}, }) 
+                or die Template->error;
+        }
+    ' \
+    > cmd_chart_group_2.sh
 
-cat ~/data/organelle/plastid_summary/group/group_3.lst \
-    | TT_FILE=cmd_chart_d1_d2.tt perl -MTemplate -nl -e 'push @data, { name => $_, }; END{$tt = Template->new; $tt->process($ENV{TT_FILE}, { data => \@data, y_max => 0.05, y_max2 => 0.05, postfix => q{group_3}, }) or die Template->error}' \
-    > cmd_chart_group_3.bat
+cat ~/data/organelle/plastid_summary/group/group_1.lst \
+    | TT_FILE=cmd_chart_d1_d2.tt perl -MTemplate -nl -e '
+        push @data, { name => $_, };
+        END {
+            $tt = Template->new;
+            $tt->process($ENV{TT_FILE},
+                { data => \@data,
+                y_max => 0.05,
+                y_max2 => 0.05,
+                postfix => q{group_3}, }) 
+                or die Template->error;
+        }
+    ' \
+    > cmd_chart_group_3.sh
 
-cat ~/data/organelle/plastid_summary/group/group_4.lst \
-    | TT_FILE=cmd_chart_d1_d2.tt perl -MTemplate -nl -e 'push @data, { name => $_, }; END{$tt = Template->new; $tt->process($ENV{TT_FILE}, { data => \@data, y_max => 0.15, y_max2 => 0.15, postfix => q{group_4}, }) or die Template->error}' \
-    > cmd_chart_group_4.bat
+cat ~/data/organelle/plastid_summary/group/group_1.lst \
+    | TT_FILE=cmd_chart_d1_d2.tt perl -MTemplate -nl -e '
+        push @data, { name => $_, };
+        END {
+            $tt = Template->new;
+            $tt->process($ENV{TT_FILE},
+                { data => \@data,
+                y_max => 0.15,
+                y_max2 => 0.15,
+                postfix => q{group_4}, }) 
+                or die Template->error;
+        }
+    ' \
+    > cmd_chart_group_4.sh
 
-# Undre Windows
-cd /d D:/data/organelle/plastid_summary/xlsx
-cmd_chart_group_1.bat
-cmd_chart_group_2.bat
-cmd_chart_group_3.bat
-cmd_chart_group_4.bat
+bash cmd_chart_group_1.sh
+bash cmd_chart_group_2.sh
+bash cmd_chart_group_3.sh
+bash cmd_chart_group_4.sh
 
-# Mac
 rm ~/data/organelle/plastid_summary/xlsx/*.csv
 cp ~/data/organelle/plastid_summary/xlsx/*.pdf ~/data/organelle/plastid_summary/fig
 
 # Coreldraw doesn't play well with computer modern fonts (latex math).
 # perl ~/Scripts/fig_table/tikz_chart.pl -i cmd_plastid_d1_A2A8_B2B8.group_1.csv -xl 'Distance to indels ($d_1$)' -yl 'Nucleotide divergence ($D$)' --y_min 0.0 --y_max 0.01 -x_min 0 -x_max 5 --style_dot --pdf
-
 ```
