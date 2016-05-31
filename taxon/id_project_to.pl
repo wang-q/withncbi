@@ -27,7 +27,7 @@ id_project_to.pl - Project taxonomy ids to names, sepcies, genus or higher ranks
       Options:
         --help      -?          brief help message
         --column    -c  INT     column order where ids are, start from 1
-        --seperator -s  STR     seperator of the line, default is "\s+"
+        --separator -s  STR     separator of the line, default is "\s+"
         --rank          STR     Project to which rank, default is scientific name.
         --rankid                Also append rank id
 
@@ -53,7 +53,7 @@ my $td_dir = path( $Config->{path}{td} )->stringify;    # taxdmp
 GetOptions(
     'help|?' => sub { HelpMessage(0) },
     'column|c=i'    => \(my $column    = 1),
-    'seperator=|ss' => \(my $seperator = '\s+'),
+    'separator=s|s' => \(my $separator = '\s+'),
     'rank=s'        => \my $rank,
     'rankid'        => \my $rankid,
 ) or HelpMessage(1);
@@ -89,7 +89,7 @@ else {
 #----------------------------------------------------------#
 while ( my $line = <> ) {
     chomp $line;
-    my @row = split /$seperator/, $line;
+    my @row = split /$separator/, $line;
 
     my $taxon_id = $row[ $column - 1 ];
 
