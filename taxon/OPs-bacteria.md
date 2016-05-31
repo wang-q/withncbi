@@ -788,52 +788,80 @@ cd ~/data/bacteria/bac_summary/xlsx
 bash cmd_collect_d1_d2.sh
 ```
 
-`ofg_chart.pl`
+`sep_chart.pl`
 
 ```bash
-mkdir -p ~/data/organelle/plastid_summary/fig
+mkdir -p ~/data/bacteria/bac_summary/fig
 
-cd ~/data/organelle/plastid_summary/xlsx
+cd ~/data/bacteria/bac_summary/xlsx
 
-cat <<EOF > cmd_chart_d1_d2.tt
-perl d:/Scripts/fig_table/ofg_chart.pl -i cmd_plastid_d1.xlsx -xl "Distance to indels ({italic(d)[1]})" -yl "Nucleotide divergence ({italic(D)})" -xr "A2:A8" -yr "B2:B8"  --y_min 0.0 --y_max [% y_max %] -x_min 0 -x_max 5 -rb "^([% FOREACH item IN data %][% item.name %]|[% END %]NON_EXIST)$" -rs "NON_EXIST" --postfix [% postfix %] --style_dot -ms
+cat <<'EOF' > cmd_chart_d1_d2.tt
+perl ~/Scripts/fig_table/sep_chart.pl \
+    -i cmd_bac_d1.xlsx \
+    -xl "Distance to indels ({italic(d)[1]})" \
+    -yl "Nucleotide diversity ({italic(D)})" \
+    -xr "A2:A8" -yr "B2:B8" \
+    --y_min 0.0 --y_max [% y_max %] \
+    -x_min 0 -x_max 5 \
+    -rb "^([% FOREACH item IN data %][% item.name %]|[% END %]NON_EXIST)$" \
+    -rs "NON_EXIST" \
+    --postfix [% postfix %] --style_dot -ms
 
-perl d:/Scripts/fig_table/ofg_chart.pl -i cmd_plastid_d1_comb.xlsx -xl "Distance to indels ({italic(d)[1]})" -yl "Nucleotide divergence ({italic(D)})" -xr "A2:A8" -yr "B2:B8"  --y_min 0.0 --y_max [% y_max %] -x_min 0 -x_max 5 -rb "^([% FOREACH item IN data %][% item.name %]|[% END %]NON_EXIST)$" -rs "NON_EXIST" --postfix [% postfix %] --style_dot
+perl ~/Scripts/fig_table/sep_chart.pl \
+    -i cmd_bac_d1_comb.xlsx \
+    -xl "Distance to indels ({italic(d)[1]})" \
+    -yl "Nucleotide diversity ({italic(D)})" \
+    -xr "A2:A8" -yr "B2:B8" \
+    --y_min 0.0 --y_max [% y_max %] \
+    -x_min 0 -x_max 5 \
+    -rb "^([% FOREACH item IN data %][% item.name %]|[% END %]NON_EXIST)$" \
+    -rs "NON_EXIST" \
+    --postfix [% postfix %] --style_dot
 
-perl d:/Scripts/fig_table/ofg_chart.pl -i cmd_plastid_d2.xlsx -xl "Reciprocal of indel density ({italic(d)[2]})" -yl "Nucleotide divergence ({italic(D)})" -xr "A2:A23" -yr "B2:B23"  --y_min 0.0 --y_max [% y_max2 %] -x_min 0 -x_max 20 -rb "^([% FOREACH item IN data %][% item.name %]|[% END %]NON_EXIST)$" -rs "NON_EXIST" --postfix [% postfix %] --style_dot  -ms
+perl ~/Scripts/fig_table/sep_chart.pl \
+    -i cmd_bac_d2.xlsx \
+    -xl "Reciprocal of indel density ({italic(d)[2]})" \
+    -yl "Nucleotide diversity ({italic(D)})" \
+    -xr "A2:A23" -yr "B2:B23" \
+    --y_min 0.0 --y_max [% y_max2 %] \
+    -x_min 0 -x_max 20 \
+    -rb "^([% FOREACH item IN data %][% item.name %]|[% END %]NON_EXIST)$" \
+    -rs "NON_EXIST" \
+    --postfix [% postfix %] --style_dot -ms
 
-perl d:/Scripts/fig_table/ofg_chart.pl -i cmd_plastid_d2_comb.xlsx -xl "Reciprocal of indel density ({italic(d)[2]})" -yl "Nucleotide divergence ({italic(D)})" -xr "A2:A23" -yr "B2:B23"  --y_min 0.0 --y_max [% y_max2 %] -x_min 0 -x_max 20 -rb "^([% FOREACH item IN data %][% item.name %]|[% END %]NON_EXIST)$" -rs "NON_EXIST" --postfix [% postfix %] --style_dot
+perl ~/Scripts/fig_table/sep_chart.pl \
+    -i cmd_bac_d2_comb.xlsx \
+    -xl "Reciprocal of indel density ({italic(d)[2]})" \
+    -yl "Nucleotide diversity ({italic(D)})" \
+    -xr "A2:A23" -yr "B2:B23" \
+    --y_min 0.0 --y_max [% y_max2 %] \
+    -x_min 0 -x_max 20 \
+    -rb "^([% FOREACH item IN data %][% item.name %]|[% END %]NON_EXIST)$" \
+    -rs "NON_EXIST" \
+    --postfix [% postfix %] --style_dot
 
 EOF
 
-cat ~/data/organelle/plastid_summary/group/group_1.lst \
-    | TT_FILE=cmd_chart_d1_d2.tt perl -MTemplate -nl -e 'push @data, { name => $_, }; END{$tt = Template->new; $tt->process($ENV{TT_FILE}, { data => \@data, y_max => 0.01, y_max2 => 0.01, postfix => q{group_1}, }) or die Template->error}' \
-    > cmd_chart_group_1.bat
+cat ~/data/bacteria/bac_summary/table/species.lst \
+    | TT_FILE=cmd_chart_d1_d2.tt perl -MTemplate -nl -e '
+        my $species = $_;
+        $species =~ s/ /_/g;
+        push @data, { name => $species, }; 
+        END {
+            $tt = Template->new;
+            $tt->process($ENV{TT_FILE}, 
+                { data => \@data, 
+                y_max => 0.15, 
+                y_max2 => 0.15, 
+                postfix => all, }) 
+                or die Template->error}' \
+    > cmd_chart.sh
 
-cat ~/data/organelle/plastid_summary/group/group_2.lst \
-    | TT_FILE=cmd_chart_d1_d2.tt perl -MTemplate -nl -e 'push @data, { name => $_, }; END{$tt = Template->new; $tt->process($ENV{TT_FILE}, { data => \@data, y_max => 0.03, y_max2 => 0.04, postfix => q{group_2}, }) or die Template->error}' \
-    > cmd_chart_group_2.bat
-
-cat ~/data/organelle/plastid_summary/group/group_3.lst \
-    | TT_FILE=cmd_chart_d1_d2.tt perl -MTemplate -nl -e 'push @data, { name => $_, }; END{$tt = Template->new; $tt->process($ENV{TT_FILE}, { data => \@data, y_max => 0.05, y_max2 => 0.05, postfix => q{group_3}, }) or die Template->error}' \
-    > cmd_chart_group_3.bat
-
-cat ~/data/organelle/plastid_summary/group/group_4.lst \
-    | TT_FILE=cmd_chart_d1_d2.tt perl -MTemplate -nl -e 'push @data, { name => $_, }; END{$tt = Template->new; $tt->process($ENV{TT_FILE}, { data => \@data, y_max => 0.15, y_max2 => 0.15, postfix => q{group_4}, }) or die Template->error}' \
-    > cmd_chart_group_4.bat
-
-# Undre Windows
-cd /d D:/data/organelle/plastid_summary/xlsx
-cmd_chart_group_1.bat
-cmd_chart_group_2.bat
-cmd_chart_group_3.bat
-cmd_chart_group_4.bat
-
-# Mac
-rm ~/data/organelle/plastid_summary/xlsx/*.csv
-cp ~/data/organelle/plastid_summary/xlsx/*.pdf ~/data/organelle/plastid_summary/fig
+bash cmd_chart.sh
+rm ~/data/bacteria/bac_summary/xlsx/*.csv
+cp ~/data/bacteria/bac_summary/xlsx/*.pdf ~/data/bacteria/bac_summary/fig
 
 # Coreldraw doesn't play well with computer modern fonts (latex math).
-# perl ~/Scripts/fig_table/tikz_chart.pl -i cmd_plastid_d1_A2A8_B2B8.group_1.csv -xl 'Distance to indels ($d_1$)' -yl 'Nucleotide divergence ($D$)' --y_min 0.0 --y_max 0.01 -x_min 0 -x_max 5 --style_dot --pdf
+# perl ~/Scripts/fig_table/tikz_chart.pl -i cmd_bac_d1_A2A8_B2B8.all.csv -xl 'Distance to indels ($d_1$)' -yl 'Nucleotide divergence ($D$)' --y_min 0.0 --y_max 0.01 -x_min 0 -x_max 5 --style_dot --pdf
 
 ```
