@@ -57,12 +57,10 @@ strain_bz_self.pl - Full procedure for self genome alignments.
 
 =cut
 
-my $aligndb   = path( $Config->{run}{aligndb} )->stringify;
-my $egaz      = path( $Config->{run}{egaz} )->stringify;
-my $egas      = path( $Config->{run}{egas} )->stringify;
-my $fig_table = path( $Config->{run}{fig_table} )->stringify;
-my $blast     = path( $Config->{run}{blast} )->stringify;
-my $circos    = path( $Config->{run}{circos} )->stringify;
+my $aligndb = path( $Config->{run}{aligndb} )->stringify;
+my $egaz    = path( $Config->{run}{egaz} )->stringify;
+my $egas    = path( $Config->{run}{egas} )->stringify;
+my $circos  = path( $Config->{run}{circos} )->stringify;
 
 GetOptions(
     'help|?' => sub { Getopt::Long::HelpMessage(0) },
@@ -70,7 +68,6 @@ GetOptions(
     'seq_dir|s=s'     => \my $seq_dir,
     'target|t=s'      => \my $target,
     'queries|q=s'     => \my @queries,
-    'outgroup|o|r=s'  => \my $outgroup,
     'csv_taxon|c=s'   => \my $csv_taxon,
     'length=i'        => \( my $length      = 1000 ),
     'name_str|n=s'    => \( my $name_str    = "working" ),
@@ -79,7 +76,6 @@ GetOptions(
     'msa=s'           => \( my $msa         = 'mafft' ),
     'norm'            => \my $norm,
     'nostat'          => \my $nostat,
-    'norawphylo'      => \my $norawphylo,
     'parallel=i'      => \( my $parallel    = $Config->{run}{parallel} ),
 ) or Getopt::Long::HelpMessage(1);
 
@@ -151,21 +147,6 @@ if ($seq_dir) {
             if ( $rm_gff_file->is_file ) {
                 $rm_gff_file->copy($cur_dir);
             }
-        }
-    }
-}
-
-my $acc_of = {};
-{
-    for my $id ( $target_id, @query_ids ) {
-        my $cur_dir = path( $working_dir, $id )->stringify;
-        my @fa_files
-            = File::Find::Rule->file->name( '*.fna', '*.fa', '*.fas', '*.fasta' )->in($cur_dir);
-
-        $acc_of->{$id} = [];
-        for my $fa_file (@fa_files) {
-            my $basename = basename( $fa_file, '.fna', '.fa', '.fas', '.fasta' );
-            push @{ $acc_of->{$id} }, $basename;
         }
     }
 }
@@ -326,7 +307,7 @@ EOF
             egaz        => $egaz,
             parted      => $parted,
             name_str    => $name_str,
-            all_ids     => [ $target_id, @query_ids ],
+            all_ids     => [ $target, @queries ],
         },
         path( $working_dir, $sh_name )->stringify
     ) or die Template->error;
@@ -508,11 +489,10 @@ EOF
             working_dir => $working_dir,
             egaz        => $egaz,
             egas        => $egas,
-            blast       => $blast,
             msa         => $msa,
             noblast     => $noblast,
             name_str    => $name_str,
-            all_ids     => [ $target_id, @query_ids ],
+            all_ids     => [ $target, @queries ],
             data        => \@data,
             length      => $length,
         },
@@ -522,8 +502,8 @@ EOF
     # circos.conf
     $text = <<'EOF';
 <image>
-dir*   = [% working_dir %]/Results/[% taxon_id %]
-file*  = [% taxon_id %].circos.png
+dir*   = [% working_dir %]/Results/[% id %]
+file*  = [% id %].circos.png
 background*     = white
 
 # radius of inscribed circle in image
@@ -538,7 +518,7 @@ auto_alpha_colors = yes
 auto_alpha_steps  = 5
 </image>
 
-karyotype = karyotype.[% taxon_id %].txt
+karyotype = karyotype.[% id %].txt
 chromosomes_units = 1000
 
 chromosomes_display_default = yes
@@ -546,7 +526,7 @@ chromosomes_display_default = yes
 <links>
 
 <link>
-file          = [% taxon_id %].cc.link4.txt
+file          = [% id %].cc.link4.txt
 radius        = 0.88r
 bezier_radius = 0.2r
 color         = purple
@@ -557,7 +537,7 @@ stroke_thickness = 2
 </link>
 
 <link>
-file          = [% taxon_id %].cc.link3.txt
+file          = [% id %].cc.link3.txt
 radius        = 0.88r
 bezier_radius = 0.1r
 color         = dgreen
@@ -568,7 +548,7 @@ stroke_thickness = 2
 </link>
 
 <link>
-file          = [% taxon_id %].cc.link2.txt
+file          = [% id %].cc.link2.txt
 radius        = 0.88r
 bezier_radius = 0r
 color         = dorange
@@ -583,19 +563,19 @@ stroke_thickness = 2
 <highlights>
 
 <highlight>
-file = highlight.features.[% taxon_id %].txt
+file = highlight.features.[% id %].txt
 r0 = 0.95r
 r1 = 0.98r
 </highlight>
 
 <highlight>
-file = highlight.repeats.[% taxon_id %].txt
+file = highlight.repeats.[% id %].txt
 r0 = 0.93r
 r1 = 0.98r
 </highlight>
 
 <highlight>
-file = [% taxon_id %].cc.linkN.txt
+file = [% id %].cc.linkN.txt
 r0 = 0.89r
 r1 = 0.92r
 stroke_thickness = 2
@@ -686,17 +666,18 @@ grid_end         = dims(ideogram,radius_inner)
 <<include etc/housekeeping.conf>>
 
 EOF
-    for my $taxon_id ( $target_id, @query_ids ) {
-        print "    Create circos.conf for $taxon_id\n";
+    for my $id ( $target, @queries ) {
+        print "    Create circos.conf for $id\n";
         $tt->process(
             \$text,
             {   stopwatch   => $stopwatch,
                 parallel    => $parallel,
                 working_dir => $working_dir,
                 name_str    => $name_str,
-                taxon_id    => $taxon_id,
+                id          => $id,
             },
-            path( $working_dir, 'Processing', "${taxon_id}", "circos.conf" )->stringify
+            path( $working_dir, 'Processing', "${id}", "circos.conf" )
+                ->stringify
         ) or die Template->error;
     }
 
@@ -806,7 +787,7 @@ EOF
             working_dir => $working_dir,
             circos      => $circos,
             name_str    => $name_str,
-            all_ids     => [ $target_id, @query_ids ],
+            all_ids     => [ $target, @queries ],
             data        => \@data,
         },
         path( $working_dir, $sh_name )->stringify
@@ -937,7 +918,7 @@ EOF
             working_dir => $working_dir,
             egas        => $egas,
             name_str    => $name_str,
-            all_ids     => [ $target_id, @query_ids ],
+            all_ids     => [ $target, @queries ],
             data        => \@data,
         },
         path( $working_dir, $sh_name )->stringify
@@ -957,11 +938,9 @@ cd [% working_dir %]
 # [% id %]
 #----------------------------------------------------------#
 # gen_alignDB
-perl [% aligndb %]/extra/multi_way_batch.pl \
+perl [% aligndb %]/util/multi_way_batch.pl \
     -d [% id %]vs[% id %] \
     -da [% working_dir %]/Results/[% id %] \
-    --gff_files [% FOREACH acc IN acc_of.${id} %][% working_dir %]/Genomes/[% item.taxon %]/[% acc %].gff,[% END %] \
-    --rm_gff_files [% FOREACH acc IN acc_of.${id} %][% working_dir %]/Genomes/[% item.taxon %]/[% acc %].rm.gff,[% END %] \
     -chr [% working_dir %]/chr_length.csv \
     -lt 1000 --parallel [% parallel %] --run 1-5,21,40
 
@@ -971,7 +950,7 @@ perl [% aligndb %]/extra/multi_way_batch.pl \
 # [% name_str %]
 #----------------------------------------------------------#
 # init db
-perl [% aligndb %]/extra/multi_way_batch.pl \
+perl [% aligndb %]/util/multi_way_batch.pl \
     -d [% name_str %]_paralog \
     -chr [% working_dir %]/chr_length.csv \
     -r 1
@@ -983,7 +962,7 @@ perl [% aligndb %]/extra/multi_way_batch.pl \
 [% FOREACH id IN all_ids -%]
 # [% id %]
 # gen_alignDB to existing database
-perl [% aligndb %]/extra/multi_way_batch.pl \
+perl [% aligndb %]/util/multi_way_batch.pl \
     -d [% name_str %]_paralog \
     -da [% working_dir %]/Results/[% id %] \
     -lt 1000 --parallel [% parallel %] --run 2
@@ -993,12 +972,8 @@ perl [% aligndb %]/extra/multi_way_batch.pl \
 #----------------------------#
 # rest steps
 #----------------------------#
-perl [% aligndb %]/extra/two_way_batch.pl \
+perl [% aligndb %]/util/two_way_batch.pl \
     -d [% name_str %]_paralog \
-[% FOREACH id IN all_ids -%]
-    --gff_files [% FOREACH acc IN acc_of.${id} %][% working_dir %]/[% item.taxon %]/[% acc %].gff,[% END %] \
-    --rm_gff_files [% FOREACH acc IN acc_of.${id} %][% working_dir %]/[% item.taxon %]/[% acc %].rm.gff,[% END %] \
-[% END -%]
     -lt 1000 --parallel [% parallel %] --batch 5 \
     --run 5,10,21,30-32,40-42,44
 
@@ -1010,27 +985,10 @@ EOF
                 working_dir => $working_dir,
                 aligndb     => $aligndb,
                 name_str    => $name_str,
-                all_ids     => [ $target_id, @query_ids ],
+                all_ids     => [ $target, @queries ],
                 data        => \@data,
-                acc_of      => $acc_of,
             },
             path( $working_dir, $sh_name )->stringify
-        ) or die Template->error;
-
-        # chart.sh
-        print "Create chart.sh\n";
-        $text = <<'EOF';
-# basicstat
-perl [% fig_table %]/collect_common_basic.pl -d .
-
-EOF
-        $tt->process(
-            \$text,
-            {   stopwatch   => $stopwatch,
-                working_dir => $working_dir,
-                fig_table   => $fig_table,
-            },
-            path( $working_dir, "chart.sh" )->stringify
         ) or die Template->error;
     }
 
@@ -1046,8 +1004,7 @@ cd [% working_dir %]
 sleep 1;
 
 find . -type f \
-    | grep -v -E "\.(sh|2bit|bat)$" \
-    | grep -v -E "(chr_length|id2name|taxon|fake_taxon)\.csv$" \
+    | grep -v -E "\.(sh|2bit)$" \
     | grep -v -F "fake_tree.nwk" \
     > file_list.txt
 
@@ -1059,8 +1016,6 @@ EOF
         {   stopwatch   => $stopwatch,
             parallel    => $parallel,
             working_dir => $working_dir,
-            egaz        => $egaz,
-            target_id   => $target_id,
             name_str    => $name_str,
         },
         path( $working_dir, $sh_name )->stringify
@@ -1079,91 +1034,19 @@ exit;
 #----------------------------------------------------------#
 # Subroutines
 #----------------------------------------------------------#
-sub taxon_info {
-    my $taxon_id = shift;
-    my $dir      = shift;
-
-    my $dbh = DBI->connect("DBI:CSV:");
-
-    $dbh->{csv_tables}->{t0} = {
-        eol       => "\n",
-        sep_char  => ",",
-        file      => $taxon_file,
-        col_names => [ map { ( $_, $_ . "_id" ) } qw{strain species genus family order} ],
-    };
-
-    my $query = qq{ SELECT strain_id, strain, genus, species FROM t0 WHERE strain_id = ? };
-    my $sth   = $dbh->prepare($query);
-    $sth->execute($taxon_id);
-    my ( $taxonomy_id, $organism_name, $genus, $species ) = $sth->fetchrow_array;
-    $species =~ s/^$genus\s+//;
-    my $sub_name = $organism_name;
-    $sub_name =~ s/^$genus\s+//;
-    $sub_name =~ s/^$species\s*//;
-    $organism_name =~ s/\W/_/g;
-    $organism_name =~ s/_+/_/g;
-
-    return {
-        taxon   => $taxonomy_id,
-        name    => $organism_name,
-        genus   => $genus,
-        species => $species,
-        subname => $sub_name,
-        dir     => path( $working_dir, 'Genomes', $taxon_id )->stringify,
-    };
-}
-
-sub taxon_info_name {
-    my $name = shift;
-    my $dir  = shift;
-
-    my $dbh = DBI->connect("DBI:CSV:");
-
-    $dbh->{csv_tables}->{t0} = {
-        eol       => "\n",
-        sep_char  => ",",
-        file      => $taxon_file,
-        col_names => [ map { ( $_, $_ . "_id" ) } qw{strain species genus family order} ],
-    };
-
-    my $query = qq{ SELECT strain_id, strain, genus, species FROM t0 WHERE strain = ? };
-    my $sth   = $dbh->prepare($query);
-    $sth->execute($name);
-    my ( $taxonomy_id, $organism_name, $genus, $species ) = $sth->fetchrow_array;
-    $species =~ s/^$genus\s+//;
-    my $sub_name = $organism_name;
-    $sub_name =~ s/^$genus[\s_]+//;
-    $sub_name =~ s/^$species[\s_]*//;
-
-    return {
-        taxon   => $taxonomy_id,
-        name    => $name,
-        genus   => $genus,
-        species => $species,
-        subname => $sub_name,
-        dir     => path( $working_dir, 'Genomes', $name )->stringify,
-    };
-}
-
 sub prep_fa {
     my $infile = shift;
     my $dir    = shift;
-    my $keep   = shift;
 
     my $basename = path($infile)->basename( '.fna', '.fa', '.fas', '.fasta' );
     my $in_fh    = path($infile)->openr;
     my $out_fh   = path( $dir, "$basename.fa" )->openw;
     while (<$in_fh>) {
-        if ($keep) {
-            print {$out_fh} $_;
+        if (/>/) {
+            print {$out_fh} ">$basename\n";
         }
         else {
-            if (/>/) {
-                print {$out_fh} ">$basename\n";
-            }
-            else {
-                print {$out_fh} $_;
-            }
+            print {$out_fh} $_;
         }
     }
     close $out_fh;
