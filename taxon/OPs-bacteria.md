@@ -318,7 +318,6 @@ cat genus.tsv \
     >> ../bac.genus.cmd.txt
 ```
 
-
 ## Aligning
 
 ### Batch running for groups
@@ -606,7 +605,7 @@ cat ~/data/bacteria/bac_summary/table/species_all.lst \
         my $species = $_;
         $species =~ s/ /_/g;
         push @data, { name => $_, file => qq{$species.common.xlsx}, }; 
-        END{
+        END {
             $tt = Template->new;
             $tt->process($ENV{TT_FILE}, { data => \@data, })
                 or die Template->error;
@@ -693,7 +692,7 @@ cat ~/data/bacteria/bac_summary/table/species.lst \
         push @data, { name => $_, file => qq{$species.common.xlsx}, }; 
         END {
             $tt = Template->new;
-            $tt->process($ENV{TT_FILE}, { data => \@data, }) 
+            $tt->process($ENV{TT_FILE}, { data => \@data, })
                 or die Template->error;
         }
     ' \

@@ -34,8 +34,8 @@ cmd_template.pl - Simple template for strain_bz.pl
 my $withncbi = path( $Config->{run}{withncbi} )->stringify;    # withncbi path
 
 GetOptions(
-    'help|?'       => sub { Getopt::Long::HelpMessage(0) },
-    'seq_dir=s'    => \my $seq_dir,
+    'help|?'      => sub { Getopt::Long::HelpMessage(0) },
+    'seq_dir=s'   => \my $seq_dir,
     'csv_taxon=s' => \my $taxon_file,
     'parallel=i' => \( my $parallel = 4 ),
 ) or Getopt::Long::HelpMessage(1);
