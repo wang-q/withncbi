@@ -1,14 +1,14 @@
-# Angiosperm 被子植物
+# Angiosperms 被子植物
 ## Acoraceae 菖蒲科
 ### Acorus
 ## Apiaceae 伞形科
-### Angelica
+Angelica,Bup_falcatum
 ## Araliaceae 五加科
 Dendropanax,Aral_undulata
 Panax,Aral_undulata
 ### Schefflera
 ## Asparagaceae 天门冬科
-### Polygonatum
+Polygonatum,Eus_latifolius
 ## Iridaceae 鸢尾科
 ### Iris
 ## Orchidaceae 兰科
@@ -46,8 +46,6 @@ Salicornia,Spi_oleracea
 ### Cucumis
 ## Dioscoreaceae 薯蓣科
 ### Dioscorea
-## Ephedraceae 麻黄科
-### Ephedra
 ## Actinidiaceae 猕猴桃科
 ### Actinidia
 ## Theaceae 山茶科
@@ -111,6 +109,8 @@ Eucalyptus,Allos_ternata
 ### Oenothera
 ## Nymphaeaceae 睡莲科
 Nymphaea,Nu_advena
+## Piperaceae 胡椒科
+### Piper
 ## Poaceae 禾本科
 Aegilops,Zea_mays
 Anthoxanthum,Zea_mays
@@ -164,7 +164,7 @@ Solanum,Dat_stramonium
 ## Zingiberaceae 姜科
 ### Curcuma
 
-# Gymnosperm 裸子植物
+# Gymnosperms 裸子植物
 ## Podocarpaceae 罗汉松科
 Podocarpus,Re_piresii
 ## Cupressaceae 柏科
@@ -177,13 +177,15 @@ Amentotaxus,Cep_wilsoniana
 Cephalotaxus,Ame_argotaenia
 ## Cycadaceae 苏铁科
 Cycas,Bow_serrulata
+## Ephedraceae 麻黄科
+### Ephedra
 ## Gnetaceae 买麻藤科
 ### Gnetum
 ## Pinaceae 松科
 Picea,Ced_deodara
 Pinus,Ced_deodara
 
-# Fern 蕨类植物
+# Pteridophytes 蕨类植物 (Fern)
 ## Equisetaceae 木贼科
 ### Equisetum
 ## Marattiaceae 合囊蕨科
@@ -218,7 +220,7 @@ Pyropia,Por_purpurea
 ## Gracilariaceae 江蓠科
 ### Gracilaria
 
-# Phaeophyceae 褐藻纲
+# Ochrophyta 淡色藻总门 (褐藻纲)
 ## Sargassaceae 马尾藻科
 ### Sargassum
 
