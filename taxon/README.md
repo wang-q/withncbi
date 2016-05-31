@@ -92,6 +92,9 @@ Give ids better shapes for manually checking and automatic filtering.
 
 If you sure, you can add or delete lines and contents in `plastid.CHECKME.csv`.
 
+Taxonomy information from [AlgaeBase](http://www.algaebase.org), [Wikipedia](https://www.wikipedia.org/)
+and [Encyclopedia of Life](http://eol.org/).
+
 ```bash
 mkdir -p ~/data/organelle/plastid_summary
 cd ~/data/organelle/plastid_summary
@@ -194,7 +197,7 @@ sed -i".bak" "s/,NA,Phaeophyceae/,Phaeophyceae,Heterokontophyta/" plastid.CHECKM
 Species and genus should not be "NA" and genus has 2 or more members.
 
 ```text
-1237 ---------> 1233 ---------> 678 ---------> 1075
+1237 ---------> 1220 ---------> 676 ---------> 928
         NA             genus          family
 ```
 
@@ -202,13 +205,13 @@ Species and genus should not be "NA" and genus has 2 or more members.
 mkdir -p ~/data/organelle/plastid_summary
 cd ~/data/organelle/plastid_summary
 
-# filter out accessions without linage information
+# filter out accessions without linage information (strain, species, genus and family)
 cat plastid.CHECKME.csv \
-    | perl -nl -a -F"," -e \
-    '/^#/ and next; ($F[2] eq q{NA} or $F[3] eq q{NA} or $F[4] eq q{NA} ) and next; print' \
+    | perl -nla -F"," -e \
+    '/^#/ and next; ($F[2] eq q{NA} or $F[3] eq q{NA} or $F[4] eq q{NA} or $F[5] eq q{NA} ) and next; print' \
     > plastid.tmp
 
-# 1233
+# 1220
 wc -l plastid.tmp
 
 #----------------------------#
@@ -216,14 +219,14 @@ wc -l plastid.tmp
 #----------------------------#
 # valid genera
 cat plastid.tmp \
-    | perl -nl -a -F"," -e \
+    | perl -nla -F"," -e \
     '$seen{$F[4]}++; END {for $k (sort keys %seen) {printf qq{,%s,\n}, $k if $seen{$k} > 1}}' \
     > genus.tmp
 
 # intersect between two files
 grep -F -f genus.tmp plastid.tmp > plastid.genus.tmp
 
-# 678
+# 676
 wc -l plastid.genus.tmp
 
 #----------------------------#
@@ -231,13 +234,13 @@ wc -l plastid.genus.tmp
 #----------------------------#
 # get some genera back as candidates for outgroup
 cat plastid.genus.tmp \
-    | perl -nl -a -F"," -e 'printf qq{,$F[5],\n}' \
+    | perl -nla -F"," -e 'printf qq{,$F[5],\n}' \
     > family.tmp
 
 # intersect between two files
 grep -F -f family.tmp plastid.tmp > plastid.family.tmp
 
-# 1075
+# 928
 wc -l plastid.family.tmp
 
 #----------------------------#
@@ -348,12 +351,11 @@ cat ../plastid_summary/plastid.ABBR.csv \
     | uniq \
     | perl ~/Scripts/withncbi/taxon/strain_info.pl --stdin --withname --file plastid_ncbi.csv
 
-# some warnings from bioperl, normally just ignore them
+# some warnings from bioperl, just ignore them
 perl ~/Scripts/withncbi/taxon/batch_get_seq.pl \
     -f plastid_name_acc_id.csv \
     -p 2>&1 \
     | tee plastid_seq.log
-
 
 # count downloaded sequences
 find . -name "*.fasta" | wc -l
@@ -361,9 +363,9 @@ find . -name "*.fasta" | wc -l
 
 ## Create alignment plans
 
-We got **476** accessions.
+We got **676** accessions.
 
-Numbers for higher ranks are: 49 orders, 61 families, 119 genera and 467 species.
+Numbers for higher ranks are: 59 orders, 81 families, 171 genera and 666 species.
 
 ```bash
 cd ~/data/organelle/plastid_summary
@@ -378,14 +380,14 @@ cat plastid.ABBR.csv \
 # intersect between two files
 grep -F -f genus.tmp plastid.ABBR.csv > plastid.GENUS.csv
 
-# 476
+# 676
 wc -l plastid.GENUS.csv
 
 #   count every ranks
-#   49 order.list.tmp
-#   61 family.list.tmp
-#  119 genus.list.tmp
-#  467 species.list.tmp
+#      59 order.list.tmp
+#      81 family.list.tmp
+#     171 genus.list.tmp
+#     666 species.list.tmp
 cut -d',' -f 4 plastid.GENUS.csv | sort | uniq > species.list.tmp
 cut -d',' -f 5 plastid.GENUS.csv | sort | uniq > genus.list.tmp
 cut -d',' -f 6 plastid.GENUS.csv | sort | uniq > family.list.tmp
@@ -403,6 +405,39 @@ cat plastid.GENUS.tmp \
 
 # clean
 rm *.tmp *.bak
+```
+
+Create `plastid_OG.md` for picking outgroups.
+
+Manually edit it then move to `~/Scripts/withncbi/doc/plastid_OG.md`.
+
+```bash
+cd ~/data/organelle/plastid_summary
+
+cat plastid.GENUS.csv \
+    | grep -v "^#" \
+    | perl -na -F"," -e '
+        BEGIN{
+            ($phylum, $family, $genus, ) = (q{}, q{}, q{});
+        }
+
+        chomp for @F;
+
+        if ($F[8] ne $phylum) {
+            $phylum = $F[8];
+            printf qq{\n# %s\n}, $phylum;
+        }
+        if ($F[5] ne $family) {
+            $family = $F[5];
+            printf qq{## %s\n}, $family;
+        }
+        $F[4] =~ s/\W+/_/g;
+        if ($F[4] ne $genus) {
+            $genus = $F[4];
+            printf qq{%s\n}, $genus;
+        }
+    ' \
+    > plastid_OG.md
 ```
 
 Create alignments without outgroups.
