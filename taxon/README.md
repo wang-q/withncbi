@@ -692,21 +692,21 @@ for f in `find . -mindepth 1 -maxdepth 2 -type f -name 7_multi_db_only.sh | sort
 done  > run_7.sh
 
 # 24 cores
-cat run_1.sh | grep . | parallel --no-run-if-empty -j 16 2>&1 | tee log_1.txt
-cat run_2.sh | grep . | parallel --no-run-if-empty -j 8  2>&1 | tee log_2.txt
-cat run_3.sh | grep . | parallel --no-run-if-empty -j 16 2>&1 | tee log_3.txt
-cat run_4.sh | grep . | parallel --no-run-if-empty -j 4  2>&1 | tee log_4.txt
-cat run_5.sh | grep . | parallel --no-run-if-empty -j 4  2>&1 | tee log_5.txt
-cat run_7.sh | grep . | parallel --no-run-if-empty -j 16 2>&1 | tee log_7.txt
+cat run_1.sh | grep . | parallel -r -j 16 2>&1 | tee log_1.txt
+cat run_2.sh | grep . | parallel -r -j 8  2>&1 | tee log_2.txt
+cat run_3.sh | grep . | parallel -r -j 16 2>&1 | tee log_3.txt
+cat run_4.sh | grep . | parallel -r -j 4  2>&1 | tee log_4.txt
+cat run_5.sh | grep . | parallel -r -j 4  2>&1 | tee log_5.txt
+cat run_7.sh | grep . | parallel -r -j 16 2>&1 | tee log_7.txt
 
 #----------------------------#
 # Clean
 #----------------------------#
-find . -mindepth 1 -maxdepth 3 -type d -name "*_raw" | parallel --no-run-if-empty rm -fr
-find . -mindepth 1 -maxdepth 3 -type d -name "*_fasta" | parallel --no-run-if-empty rm -fr
+find . -mindepth 1 -maxdepth 3 -type d -name "*_raw" | parallel -r rm -fr
+find . -mindepth 1 -maxdepth 3 -type d -name "*_fasta" | parallel -r rm -fr
 
-find . -mindepth 1 -maxdepth 4 -type f -name "*.phy" | parallel --no-run-if-empty rm
-find . -mindepth 1 -maxdepth 4 -type f -name "*.phy.reduced" | parallel --no-run-if-empty rm
+find . -mindepth 1 -maxdepth 4 -type f -name "*.phy" | parallel -r rm
+find . -mindepth 1 -maxdepth 4 -type f -name "*.phy.reduced" | parallel -r rm
 ```
 
 ### Self alignments.
@@ -740,11 +740,11 @@ done  > runall.sh
 sh runall.sh 2>&1 | tee log_runall.txt
 
 # clean
-find . -mindepth 1 -maxdepth 2 -type d -name "*_raw" | parallel --no-run-if-empty rm -fr
-find . -mindepth 1 -maxdepth 2 -type d -name "*_fasta" | parallel --no-run-if-empty rm -fr
+find . -mindepth 1 -maxdepth 2 -type d -name "*_raw" | parallel -r rm -fr
+find . -mindepth 1 -maxdepth 2 -type d -name "*_fasta" | parallel -r rm -fr
 
 # clean mysql
-find  /usr/local/var/mysql -type d -name "[A-Z]*" | parallel --no-run-if-empty rm -fr
+find  /usr/local/var/mysql -type d -name "[A-Z]*" | parallel -r rm -fr
 ```
 
 ### Alignments of families for outgroups.
@@ -767,7 +767,7 @@ done  > runall.sh
 
 sh runall.sh 2>&1 | tee log_runall.txt
 
-find . -type f -path "*_phylo*" -name "*.nwk"
+find ~/data/organelle/plastid_families -type f -path "*_phylo*" -name "*.nwk"
 ```
 
 Manually editing `~/Scripts/withncbi/doc/plastid_OG.md` and generate `genus_OG.tsv`.
@@ -793,11 +793,11 @@ done  > runall.sh
 
 sh runall.sh 2>&1 | tee log_runall.txt
 
-find . -mindepth 1 -maxdepth 3 -type d -name "*_raw" | parallel --no-run-if-empty rm -fr
-find . -mindepth 1 -maxdepth 3 -type d -name "*_fasta" | parallel --no-run-if-empty rm -fr
+find . -mindepth 1 -maxdepth 3 -type d -name "*_raw" | parallel -r rm -fr
+find . -mindepth 1 -maxdepth 3 -type d -name "*_fasta" | parallel -r rm -fr
 
-find . -mindepth 1 -maxdepth 4 -type f -name "*.phy" | parallel --no-run-if-empty rm
-find . -mindepth 1 -maxdepth 4 -type f -name "*.phy.reduced" | parallel --no-run-if-empty rm
+find . -mindepth 1 -maxdepth 4 -type f -name "*.phy" | parallel -r rm
+find . -mindepth 1 -maxdepth 4 -type f -name "*.phy.reduced" | parallel -r rm
 
 ```
 
@@ -930,11 +930,11 @@ for d in `find $PWD -mindepth 1 -maxdepth 1 -type d -not -path "*bac_seq_dir" | 
 done  > runall.sh
 
 
-find . -mindepth 1 -maxdepth 3 -type d -name "*_raw" | parallel --no-run-if-empty rm -fr
-find . -mindepth 1 -maxdepth 3 -type d -name "*_fasta" | parallel --no-run-if-empty rm -fr
+find . -mindepth 1 -maxdepth 3 -type d -name "*_raw" | parallel -r rm -fr
+find . -mindepth 1 -maxdepth 3 -type d -name "*_fasta" | parallel -r rm -fr
 
-find . -mindepth 1 -maxdepth 4 -type f -name "*.phy" | parallel --no-run-if-empty rm
-find . -mindepth 1 -maxdepth 4 -type f -name "*.phy.reduced" | parallel --no-run-if-empty rm
+find . -mindepth 1 -maxdepth 4 -type f -name "*.phy" | parallel -r rm
+find . -mindepth 1 -maxdepth 4 -type f -name "*.phy.reduced" | parallel -r rm
 ```
 
 ## Summary
@@ -981,7 +981,7 @@ perl -l -MPath::Tiny -e '
 
 echo "#abbr,genus,accession,length" > length.tmp
 find ~/data/organelle/plastid.working -type f -name "chr.sizes" \
-    | parallel --jobs 1 --keep-order --no-run-if-empty '
+    | parallel --jobs 1 --keep-order -r '
         perl -nl -e '\''
             BEGIN {
                 %l = ();
@@ -1414,7 +1414,7 @@ cat ~/data/organelle/plastid_summary/group/group_1.lst \
     ' \
     > cmd_chart_group_1.sh
 
-cat ~/data/organelle/plastid_summary/group/group_1.lst \
+cat ~/data/organelle/plastid_summary/group/group_2.lst \
     | TT_FILE=cmd_chart_d1_d2.tt perl -MTemplate -nl -e '
         push @data, { name => $_, };
         END {
@@ -1429,7 +1429,7 @@ cat ~/data/organelle/plastid_summary/group/group_1.lst \
     ' \
     > cmd_chart_group_2.sh
 
-cat ~/data/organelle/plastid_summary/group/group_1.lst \
+cat ~/data/organelle/plastid_summary/group/group_3.lst \
     | TT_FILE=cmd_chart_d1_d2.tt perl -MTemplate -nl -e '
         push @data, { name => $_, };
         END {
@@ -1444,7 +1444,7 @@ cat ~/data/organelle/plastid_summary/group/group_1.lst \
     ' \
     > cmd_chart_group_3.sh
 
-cat ~/data/organelle/plastid_summary/group/group_1.lst \
+cat ~/data/organelle/plastid_summary/group/group_4.lst \
     | TT_FILE=cmd_chart_d1_d2.tt perl -MTemplate -nl -e '
         push @data, { name => $_, };
         END {
