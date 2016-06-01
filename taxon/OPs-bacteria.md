@@ -56,7 +56,7 @@ cd ~/data/bacteria/bac_summary
 
 rm bac.STRAIN.csv
 cat bac.SPECIES.csv \
-    | parallel --keep-order --no-run-if-empty -j 8 '
+    | parallel --keep-order -r -j 8 '
         perl ~/Scripts/alignDB/util/query_sql.pl --db gr_prok -q '\''
             SELECT  taxonomy_id `#strain_taxonomy_id`,
                     organism_name `strain`,
@@ -387,21 +387,21 @@ for f in `find . -mindepth 1 -maxdepth 2 -type f -name 7_multi_db_only.sh | sort
 done  > run_7.sh
 
 # 24 cores
-cat run_1.sh | grep . | parallel --no-run-if-empty -j 16 2>&1 | tee log_1.txt
-cat run_2.sh | grep . | parallel --no-run-if-empty -j 8  2>&1 | tee log_2.txt
-cat run_3.sh | grep . | parallel --no-run-if-empty -j 16 2>&1 | tee log_3.txt
-cat run_4.sh | grep . | parallel --no-run-if-empty -j 4  2>&1 | tee log_4.txt
-cat run_5.sh | grep . | parallel --no-run-if-empty -j 4  2>&1 | tee log_5.txt
-cat run_7.sh | grep . | parallel --no-run-if-empty -j 16 2>&1 | tee log_7.txt
+cat run_1.sh | grep . | parallel -r -j 16 2>&1 | tee log_1.txt
+cat run_2.sh | grep . | parallel -r -j 8  2>&1 | tee log_2.txt
+cat run_3.sh | grep . | parallel -r -j 16 2>&1 | tee log_3.txt
+cat run_4.sh | grep . | parallel -r -j 4  2>&1 | tee log_4.txt
+cat run_5.sh | grep . | parallel -r -j 4  2>&1 | tee log_5.txt
+cat run_7.sh | grep . | parallel -r -j 16 2>&1 | tee log_7.txt
 
 #----------------------------#
 # Clean
 #----------------------------#
-find . -mindepth 1 -maxdepth 3 -type d -name "*_raw" | parallel --no-run-if-empty rm -fr
-find . -mindepth 1 -maxdepth 3 -type d -name "*_fasta" | parallel --no-run-if-empty rm -fr
+find . -mindepth 1 -maxdepth 3 -type d -name "*_raw" | parallel -r rm -fr
+find . -mindepth 1 -maxdepth 3 -type d -name "*_fasta" | parallel -r rm -fr
 
-find . -mindepth 1 -maxdepth 4 -type f -name "*.phy" | parallel --no-run-if-empty rm
-find . -mindepth 1 -maxdepth 4 -type f -name "*.phy.reduced" | parallel --no-run-if-empty rm
+find . -mindepth 1 -maxdepth 4 -type f -name "*.phy" | parallel -r rm
+find . -mindepth 1 -maxdepth 4 -type f -name "*.phy.reduced" | parallel -r rm
 ```
 
 ### Alignments of genera for outgroups.
@@ -436,6 +436,10 @@ mkdir -p ~/data/bacteria/bac_summary/xlsx
 cd ~/data/bacteria/bac_summary/xlsx
 
 find  ~/data/bacteria/bac.working -type f -name "*.common.xlsx" \
+    | grep -v "vs[A-Z]" \
+    | parallel cp {} .
+
+find  ~/data/bacteria/bac.working -type f -name "*.gc.xlsx" \
     | grep -v "vs[A-Z]" \
     | parallel cp {} .
 
@@ -484,7 +488,7 @@ perl -l -MPath::Tiny -e '
 
 echo "#abbr,species,accession,length" > length.tmp
 find ~/data/bacteria/bac.working -type f -name "chr.sizes" \
-    | parallel --jobs 1 --keep-order --no-run-if-empty '
+    | parallel --jobs 1 --keep-order -r '
         perl -nl -e '\''
             BEGIN {
                 %l = ();
@@ -545,7 +549,7 @@ rm *.tmp
 
 ### Genome alignment statistics
 
-Some genera will be filtered out here.
+Some species will be filtered out here.
 
 Criteria:
 * Coverage >= 0.4
@@ -701,6 +705,173 @@ perl ~/Scripts/fig_table/xlsx_table.pl -i Table_alignment.yml
 perl ~/Scripts/fig_table/xlsx2csv.pl -f Table_alignment.xlsx > Table_alignment.csv
 cp -f Table_alignment.xlsx ~/data/bacteria/bac_summary/table
 cp -f Table_alignment.csv ~/data/bacteria/bac_summary/table
+```
+
+Table_S_bac for GC
+
+```bash
+cd ~/data/bacteria/bac_summary/xlsx
+
+cat <<'EOF' > Table_S_bac.tt
+---
+autofit: A:J
+texts:
+  - text: "Species"
+    pos: A2:A3
+    merge: 1
+  - text: "No. of genomes"
+    pos: B2:B3
+    merge: 1
+  - text: "GC-content"
+    pos: C2:C3
+    merge: 1
+  - text: "Aligned length (Mb)"
+    pos: D2:D3
+    merge: 1
+  - text: "Indels per 100 bp"
+    pos: E2:E3
+    merge: 1
+  - text: "SNPs per 100 bp"
+    pos: F2:F3
+    merge: 1
+  - text: "Correlation coefficients (r) between"
+    pos: G2:J2
+    merge: 1
+  - text: "GC & D"
+    pos: G3
+  - text: "GC & Indel"
+    pos: H3
+  - text: "CV & D"
+    pos: I3
+  - text: "CV & Indel"
+    pos: J3
+  - text: "r_squared"
+    pos: K2:N2
+    merge: 1
+  - text: "GC & D"
+    pos: K3
+  - text: "GC & Indel"
+    pos: L3
+  - text: "CV & D"
+    pos: M3
+  - text: "CV & Indel"
+    pos: N3
+  - text: "p_value"
+    pos: O2:R2
+    merge: 1
+  - text: "GC & D"
+    pos: O3
+  - text: "GC & Indel"
+    pos: P3
+  - text: "CV & D"
+    pos: Q3
+  - text: "CV & Indel"
+    pos: R3
+  - text: "slope"
+    pos: S2:V2
+    merge: 1
+  - text: "GC & D"
+    pos: S3
+  - text: "GC & Indel"
+    pos: T3
+  - text: "CV & D"
+    pos: U3
+  - text: "CV & Indel"
+    pos: V3
+  - text: =CONCATENATE(IF(S4<0,"-",""),ROUND(SQRT(K4),3),IF(O4<0.01,"**",IF(O4<0.05,"*","")))
+    pos: G4
+[% FOREACH item IN data -%]
+  - text: [% item.name %]
+    pos: A[% loop.index + 4 %]
+[% END -%]
+borders:
+  - range: A2:J2
+    top: 1
+  - range: A3:J3
+    bottom: 1
+ranges:
+[% FOREACH item IN data -%]
+  [% item.common_file %]:
+    basic:
+      - copy: B2
+        paste: B[% loop.index + 4 %]
+      - copy: B8
+        paste: C[% loop.index + 4 %]
+      - copy: B4
+        paste: D[% loop.index + 4 %]
+      - copy: B5
+        paste: E[% loop.index + 4 %]
+      - copy: B6
+        paste: F[% loop.index + 4 %]
+  [% item.gc_file %]:
+    segment_gc_indel_3:
+      - copy: R2
+        paste: K[% loop.index + 4 %]
+      - copy: R3
+        paste: O[% loop.index + 4 %]
+      - copy: R5
+        paste: S[% loop.index + 4 %]
+      - copy: R20
+        paste: L[% loop.index + 4 %]
+      - copy: R21
+        paste: P[% loop.index + 4 %]
+      - copy: R23
+        paste: T[% loop.index + 4 %]
+    segment_cv_indel_3:
+      - copy: R2
+        paste: M[% loop.index + 4 %]
+      - copy: R3
+        paste: Q[% loop.index + 4 %]
+      - copy: R5
+        paste: U[% loop.index + 4 %]
+      - copy: R20
+        paste: N[% loop.index + 4 %]
+      - copy: R21
+        paste: R[% loop.index + 4 %]
+      - copy: R23
+        paste: V[% loop.index + 4 %]
+[% END -%]
+EOF
+
+cat ~/data/bacteria/bac_summary/table/species_all.lst \
+    | grep -v "^#" \
+    | TT_FILE=Table_S_bac.tt perl -MTemplate -nl -e '
+        my $species = $_;
+        $species =~ s/ /_/g;
+        push @data, {
+            name        => $_,
+            common_file => qq{$species.common.xlsx},
+            gc_file     => qq{$species.gc.xlsx},
+        };
+        END {
+            $tt = Template->new;
+            $tt->process($ENV{TT_FILE}, { data => \@data, })
+                or die Template->error;
+        }
+    ' \
+    > Table_S_bac_all.yml
+
+perl ~/Scripts/fig_table/xlsx_table.pl -i Table_S_bac_all.yml
+
+cat ~/data/bacteria/bac_summary/table/species.lst \
+    | grep -v "^#" \
+    | TT_FILE=Table_S_bac.tt perl -MTemplate -nl -e '
+        my $species = $_;
+        $species =~ s/ /_/g;
+        push @data, {
+            name        => $_,
+            common_file => qq{$species.common.xlsx},
+            gc_file     => qq{$species.gc.xlsx},
+        };
+        END {
+            $tt = Template->new;
+            $tt->process($ENV{TT_FILE}, { data => \@data, })
+                or die Template->error;
+        }
+    ' \
+    > Table_S_bac.yml
+
+perl ~/Scripts/fig_table/xlsx_table.pl -i Table_S_bac.yml
 ```
 
 NCBI Taxonomy tree
