@@ -154,6 +154,50 @@ wc -l subgroup.list.tmp genus.list.tmp species.list.tmp
 rm *.tmp
 ```
 
+Exclude diverged strains.
+
+* 391904, Bifidobacterium longum subsp. infantis ATCC 15697 = JCM 1222 = DSM 20088, 2008-11-20, Complete Genome, 
+* 553190, Gardnerella vaginalis 409-05, 2010-01-07, Complete Genome, COM
+* 1386087, Neisseria meningitidis LNP21362, 2015-01-07, Complete Genome, 
+* 935590, Neisseria meningitidis M0579, 2015-06-19, Complete Genome, 
+* 1415774, Clostridium botulinum 202F, 2014-12-04, Complete Genome, 
+* 508767, Clostridium botulinum E3 str. Alaska E43, 2008-05-16, Complete Genome, 
+* 929506, Clostridium botulinum BKT015925, 2011-04-18, Complete Genome, 
+* 935198, Clostridium botulinum B str. Eklund 17B (NRP), 2008-05-07, Complete Genome, 
+* 869303, Streptococcus pneumoniae SPN034156, 2010-07-29, Complete Genome, 
+* 869311, Streptococcus pneumoniae SPN032672, 2010-07-29, Complete Genome, 
+* 869312, Streptococcus pneumoniae SPN033038, 2010-07-29, Complete Genome, 
+* 261317, Buchnera aphidicola (Cinara tujafilina), 2011-06-09, Complete Genome, 
+* 372461, Buchnera aphidicola BCc, 2006-10-18, Complete Genome, 
+
+```sql
+SELECT taxonomy_id, organism_name, released_date, status, code
+FROM gr_prok.gr
+WHERE species = "Gluconobacter oxydans" 
+and status NOT IN ('Contig', 'Scaffold')
+ORDER BY released_date, status, code
+```
+
+```bash
+cd ~/data/bacteria/bac_summary
+
+cat bac.ABBR.csv \
+    | grep -v "391904," \
+    | grep -v "553190," \
+    | grep -v "1386087," \
+    | grep -v "935590," \
+    | grep -v "1415774," \
+    | grep -v "508767," \
+    | grep -v "929506," \
+    | grep -v "935198," \
+    | grep -v "869303," \
+    | grep -v "869311," \
+    | grep -v "869312," \
+    | grep -v "261317," \
+    | grep -v "372461," \
+    > bac.WORKING.csv
+```
+
 Create `bac_target_OG.md` for picking target and outgroup.
 
 Manually edit it then move to `~/Scripts/withncbi/doc/bac_target_OG.md`.
@@ -191,7 +235,7 @@ cat bac.ABBR.csv \
 Create alignments without outgroups.
 
 ```text
-ABBR.csv
+bac.WORKING.csv
 #strain_taxonomy_id,strain,species,genus,subgroup,code,accession,abbr
 ```
 
@@ -206,7 +250,7 @@ cat ~/Scripts/withncbi/doc/bac_target_OG.md \
 
 # tab-separated
 # name  t   qs
-cat bac.ABBR.csv \
+cat bac.WORKING.csv \
     | perl -nl -a -F"," -MPath::Tiny -e '
         BEGIN{
             $name = q{};
@@ -272,7 +316,7 @@ Align all representative strains of every genera.
 ```bash
 cd ~/data/bacteria/bac_summary
 
-cat bac.ABBR.csv \
+cat bac.WORKING.csv \
     | grep -v "^#" \
     | perl -na -F"," -e '
         BEGIN{
@@ -447,7 +491,7 @@ find  ~/data/bacteria/bac.working -type f -name "*.gc.xlsx" \
 
 ### Genome list
 
-Create `bac.list.csv` from `bac.ABBR.csv` with sequence lengths.
+Create `bac.list.csv` from `bac.WORKING.csv` with sequence lengths.
 
 ```bash
 mkdir -p ~/data/bacteria/bac_summary/table
@@ -512,7 +556,7 @@ find ~/data/bacteria/bac.working -type f -name "chr.sizes" \
     >> length.tmp
 
 echo "#abbr,subgroup,genus,species,taxon_id" > abbr.tmp
-cat ~/data/bacteria/bac_summary/bac.ABBR.csv \
+cat ~/data/bacteria/bac_summary/bac.WORKING.csv \
     | grep -v "^#" \
     | perl -nla -F"," -e 'print qq{$F[7],$F[4],$F[3],$F[2],$F[0]}' \
     >> abbr.tmp
