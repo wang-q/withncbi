@@ -64,12 +64,11 @@ GetOptions(
     'password|p=s'  => \( my $password    = $Config->{database}{password} ),
     'seq_dir=s'     => \( my $seq_dir     = "~/data/bacteria/bac_seq_dir" ),
     'working_dir=s' => \( my $working_dir = "." ),
-    'parent_id|p=s' => \( my $parent_id   = "562,585054" )
-    ,                                           # E.coli and E. fergusonii
-    'target_id|t=i' => \my $target_id,
-    'outgroup|o=i'  => \my $outgroup_id,
-    'exclude|e=s'   => \( my $exclude_ids = '0' ),
-    'name_str|n=s'  => \
+    'parent|p=s' => \( my $parent = "562,585054" ),   # E.coli and E. fergusonii
+    'target|t=i' => \my $target,
+    'outgroup|o=i' => \my $outgroup,
+    'exclude|e=s'  => \( my $exclude = '0' ),
+    'name_str|n=s' => \
         my $name_str
     , # use custom name_str, working dir and goal db name. mysql restrict db name length 64
     'strains' => \my $require_strains,    # skip taxonomy_id == species_id
@@ -102,7 +101,7 @@ my DBI $dbh = DBI->connect( $dsn, $username, $password )
 
 my $id_str;
 {
-    $stopwatch->block_message("Load taxdmp and expand --parent_id");
+    $stopwatch->block_message("Load taxdmp and expand --parent");
 
     my $taxon_db = Bio::DB::Taxonomy->new(
         -source    => 'flatfile',
@@ -110,14 +109,14 @@ my $id_str;
         -nodesfile => "$td_dir/nodes.dmp",
         -namesfile => "$td_dir/names.dmp",
     );
-    my @parent_ids = split /,/, $parent_id;
+    my @parents = split /,/, $parent;
 
     my $sub_id_set = AlignDB::IntSpan->new;
-    for my $p_id (@parent_ids) {
+    for my $p_id (@parents) {
         $sub_id_set->add($p_id);
-        my $parent = $taxon_db->get_taxon( -taxonid => $p_id );
+        my $p_ids = $taxon_db->get_taxon( -taxonid => $p_id );
 
-        my @taxa = $taxon_db->get_all_Descendents($parent);
+        my @taxa = $taxon_db->get_all_Descendents($p_ids);
         for my $taxon (@taxa) {
             $sub_id_set->add( $taxon->id );
         }
@@ -138,7 +137,7 @@ my $id_str;
     }
 
     my $id_set = $sub_id_set->intersect($db_id_set);
-    $id_set->remove( split /,/, $exclude_ids );
+    $id_set->remove( split /,/, $exclude );
     $id_str = '(' . ( join ",", $id_set->as_array ) . ')';
 
     die "Wrong id_str $id_str\n" unless $id_str =~ /\d+/;
@@ -205,8 +204,8 @@ my @query_ids;
         print $message;
     }
 
-    if ($target_id) {
-        my ($exist) = grep { $_->[0] == $target_id } @strains;
+    if ($target) {
+        my ($exist) = grep { $_->[0] == $target } @strains;
         if ( defined $exist ) {
             my $message
                 = "Use [$exist->[1] ($exist->[0])] as target, as you wish.\n";
@@ -214,29 +213,29 @@ my @query_ids;
             print $message;
         }
         else {
-            print "Taxon [$target_id] doesn't exist, please check.\n";
+            print "Taxon [$target] doesn't exist, please check.\n";
             exit;
         }
     }
     else {
-        $target_id = $strains[0]->[0];
+        $target = $strains[0]->[0];
         my $message
             = "Use [$strains[0]->[1] ($strains[0]->[0])] as target, the oldest strain on NCBI.\n";
         print {$fh} $message;
         print $message;
     }
 
-    @query_ids = map { $_->[0] == $target_id ? () : $_->[0] } @strains;
+    @query_ids = map { $_->[0] == $target ? () : $_->[0] } @strains;
 
-    if ($outgroup_id) {
-        my ($exist) = grep { $_ == $outgroup_id } @query_ids;
+    if ($outgroup) {
+        my ($exist) = grep { $_ == $outgroup } @query_ids;
         if ( defined $exist ) {
             my $message = "Use [$exist] as outgroup, as you wish.\n";
             print {$fh} $message;
             print $message;
         }
         else {
-            print "Taxon [$outgroup_id] doesn't exist, please check.\n";
+            print "Taxon [$outgroup] doesn't exist, please check.\n";
         }
     }
 
@@ -264,7 +263,7 @@ my @ids_missing;
     }
 
     print "Rewrite seqs for every strains\n";
-ID: for my $taxon_id ( $target_id, @query_ids ) {
+ID: for my $taxon_id ( $target, @query_ids ) {
         print "taxon_id $taxon_id\n";
         my $id_dir = path( $seq_dir, $taxon_id );
         if ( !-e $id_dir ) {
@@ -284,7 +283,7 @@ ID: for my $taxon_id ( $target_id, @query_ids ) {
                 ( map { s/\.\d+$//; $_ } grep {defined} ( split /\|/, $acc ) );
         }
 
-        # for NZ_CM***, NZ_CP*** accessions, the following codes will find nothing
+      # for NZ_CM***, NZ_CP*** accessions, the following codes will find nothing
         for my $acc ( grep {defined} @accs ) {
             my ($fna_file) = grep {/$acc/} @fna_files;
             if ( !defined $fna_file ) {
@@ -316,7 +315,7 @@ ID: for my $taxon_id ( $target_id, @query_ids ) {
 
         # prep_scaff() will find the scaffolds for NZ_CM***, NZ_CP***
         if ($scaffold) {
-            my ($wgs) = get_taxon_wgs( $dbh, $taxon_id );
+            my ($wgs) = get_taxon_wgs($taxon_id);
 
             next unless $wgs;
 
@@ -358,7 +357,7 @@ perl [% findbin %]/strain_info.pl \
 [% FOREACH id IN query_ids -%]
     --id [% id %] \
 [% END -%]
-    --id [% target_id %]
+    --id [% target %]
 [% END -%]
 
 [% IF ! is_self -%]
@@ -370,13 +369,13 @@ perl [% findbin %]/strain_bz.pl \
 [% END -%]
     --name [% name_str %] \
     --parallel [% parallel %] \
-[% IF outgroup_id -%]
-    -o [% outgroup_id %] \
+[% IF outgroup -%]
+    -o [% outgroup %] \
 [% END -%]
 [% FOREACH id IN query_ids -%]
     -q [% id %] \
 [% END -%]
-    -t [% target_id %]
+    -t [% target %]
 
 [% ELSE -%]
 perl [% findbin %]/strain_bz_self.pl \
@@ -391,7 +390,7 @@ perl [% findbin %]/strain_bz_self.pl \
 [% FOREACH id IN query_ids -%]
     -q [% id %] \
 [% END -%]
-    -t [% target_id %]
+    -t [% target %]
 
 [% END -%]
 
@@ -403,9 +402,9 @@ EOF
             seq_dir     => $seq_dir,
             name_str    => $name_str,
             parallel    => $parallel,
-            target_id   => $target_id,
+            target      => $target,
             query_ids   => \@query_ids,
-            outgroup_id => $outgroup_id,
+            outgroup    => $outgroup,
             is_self     => $is_self,
             length      => $paralog_length,
         },
@@ -420,9 +419,9 @@ EOF
             seq_dir     => $seq_dir,
             name_str    => $name_str,
             parallel    => $parallel,
-            target_id   => $target_id,
+            target      => $target,
             query_ids   => \@query_ids,
-            outgroup_id => $outgroup_id,
+            outgroup    => $outgroup,
             is_self     => $is_self,
             length      => $paralog_length,
             redo        => 1,                # If RepeatMasker has been executed
@@ -437,11 +436,13 @@ $stopwatch->end_message;
 exit;
 
 sub get_taxon_wgs {
-    my $dbh      = shift;
     my $taxon_id = shift;
 
-    my $query = qq{ SELECT wgs FROM gr WHERE taxonomy_id = ? };
-    my $sth   = $dbh->prepare($query);
+    my DBI $sth = $dbh->prepare(
+        q{
+        SELECT wgs FROM gr WHERE taxonomy_id = ?
+        }
+    );
     $sth->execute($taxon_id);
     my ($wgs) = $sth->fetchrow_array;
 
