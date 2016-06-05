@@ -513,7 +513,7 @@ perl -l -MPath::Tiny -e '
     }
     ' \
     >> species_all.lst
-    
+
 echo "#target" > target_all.lst
 perl -l -MPath::Tiny -e '
     BEGIN {
@@ -532,6 +532,7 @@ perl -l -MPath::Tiny -e '
 
 echo "#abbr,species,accession,length" > length.tmp
 find ~/data/bacteria/bac.working -type f -name "chr.sizes" \
+    | sort \
     | parallel --jobs 1 --keep-order -r '
         perl -nl -e '\''
             BEGIN {
@@ -598,7 +599,7 @@ Some species will be filtered out here.
 Criteria:
 * Coverage >= 0.4
 * Total number of indels >= 100
-* Genome D < 0.2
+* D of multiple alignments < 0.2
 
 ```bash
 mkdir -p ~/data/bacteria/bac_summary/table
