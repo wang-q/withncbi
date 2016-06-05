@@ -8,30 +8,18 @@ cd ~/data/alignment/Ensembl
 cat << 'EOF' > temp.tt
 #!/bin/bash
 
-cat << DELIMITER > chrUn.csv
-common_name,taxon_id,chr,length,assembly
-[% FOREACH item IN data -%]
-[% item.name %],[% item.taxon %],chrUn,999999999,
-[% END -%]
-DELIMITER
-
-if [ -f real_chr.csv ]; then
-    rm real_chr.csv;
-fi;
+echo "common_name,taxon_id,chr,length,assembly" > chr_length.csv
 
 [% FOREACH item IN data -%]
 # [% item.name %]
 echo "==> [% item.name %]"
 faops size [% item.name %]/*.fa > [% item.name %]/chr.sizes;
-perl -aln -F"\t" -e 'print qq{[% item.name %],[% item.taxon %],$F[0],$F[1],}' [% item.name %]/chr.sizes >> real_chr.csv;
+perl -aln -F"\t" -e 'print qq{[% item.name %],[% item.taxon %],$F[0],$F[1],}' [% item.name %]/chr.sizes >> chr_length.csv;
 
 [% END -%]
 
-cat chrUn.csv real_chr.csv > chr_length.csv
 echo "==> chr_length.csv generated <=="
 
-rm chrUn.csv
-rm real_chr.csv
 EOF
 
 perl -MTemplate -e '

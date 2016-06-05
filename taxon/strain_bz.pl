@@ -205,29 +205,16 @@ cd [% working_dir %]
 
 sleep 1;
 
-cat << DELIMITER > chrUn.csv
-common_name,taxon_id,chr,length,assembly
-[% FOREACH item IN data -%]
-[% item.name %],[% item.taxon %],chrUn,999999999,
-[% END -%]
-DELIMITER
-
-if [ -f real_chr.csv ]; then
-    rm real_chr.csv;
-fi;
+echo "common_name,taxon_id,chr,length,assembly" > chr_length.csv
 
 [% FOREACH item IN data -%]
 # [% item.name %]
 faops size [% item.dir %]/*.fa > [% item.dir %]/chr.sizes;
-perl -aln -F"\t" -e 'print qq{[% item.name %],[% item.taxon %],$F[0],$F[1],}' [% item.dir %]/chr.sizes >> real_chr.csv;
+perl -aln -F"\t" -e 'print qq{[% item.name %],[% item.taxon %],$F[0],$F[1],}' [% item.dir %]/chr.sizes >> chr_length.csv;
 
 [% END -%]
 
-cat chrUn.csv real_chr.csv > chr_length.csv
-echo "chr_length.csv generated."
-
-rm chrUn.csv
-rm real_chr.csv
+echo "==> chr_length.csv generated <=="
 
 EOF
     $tt->process(
