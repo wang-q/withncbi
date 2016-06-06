@@ -436,7 +436,7 @@ cat run_2.sh | grep . | parallel -r -j 8  2>&1 | tee log_2.txt
 cat run_3.sh | grep . | parallel -r -j 16 2>&1 | tee log_3.txt
 cat run_4.sh | grep . | parallel -r -j 4  2>&1 | tee log_4.txt
 cat run_5.sh | grep . | parallel -r -j 4  2>&1 | tee log_5.txt
-cat run_7.sh | grep . | parallel -r -j 16 2>&1 | tee log_7.txt
+cat run_7.sh | grep . | parallel -r -j 8  2>&1 | tee log_7.txt
 
 #----------------------------#
 # Clean
@@ -613,22 +613,33 @@ texts:
     pos: A1
   - text: "No. of genomes"
     pos: B1
-  - text: "Aligned length (Mb)"
+  - text: "Genome size on average (Mb)"
     pos: C1
-  - text: "Indels Per 100 bp"
+  - text: "Aligned length (Mb)"
     pos: D1
-  - text: "D on average"
+  - text: "Indels per 100 bp"
     pos: E1
-  - text: "GC-content"
+  - text: "Substitutions per 100 bp"
     pos: F1
+  - text: "D on average"
+    pos: G1
+  - text: "GC-content"
+    pos: H1
+  - text: "Coverage on average"
+    pos: I1
+  - text: "Indels"
+    pos: J1
 [% FOREACH item IN data -%]
   - text: [% item.name %]
     pos: A[% loop.index + 2 %]
+  - text: =D[% loop.index + 2 %]/C[% loop.index + 2 %]
+    pos: I[% loop.index + 2 %]
+  - text: =E[% loop.index + 2 %]/100*D[% loop.index + 2 %]*1000*1000
+    pos: J[% loop.index + 2 %]
 [% END -%]
 borders:
-  - range: A1:F1
+  - range: A1:J1
     top: 1
-  - range: A1:F1
     bottom: 1
 ranges:
 [% FOREACH item IN data -%]
@@ -636,14 +647,18 @@ ranges:
     basic:
       - copy: B2
         paste: B[% loop.index + 2 %]
-      - copy: B4
+      - copy: B3
         paste: C[% loop.index + 2 %]
-      - copy: B5
+      - copy: B4
         paste: D[% loop.index + 2 %]
-      - copy: B7
+      - copy: B5
         paste: E[% loop.index + 2 %]
-      - copy: B8
+      - copy: B6
         paste: F[% loop.index + 2 %]
+      - copy: B7
+        paste: G[% loop.index + 2 %]
+      - copy: B8
+        paste: H[% loop.index + 2 %]
 [% END -%]
 EOF
 
@@ -662,73 +677,25 @@ cat ~/data/bacteria/bac_summary/table/species_all.lst \
     > Table_alignment_all.yml
 
 perl ~/Scripts/fig_table/xlsx_table.pl -i Table_alignment_all.yml
-perl ~/Scripts/fig_table/xlsx2csv.pl -f Table_alignment_all.xlsx > Table_alignment_all.csv
+
+# Under Windows for Excel formula
+perl d:/Scripts/fig_table/xlsx2xls.pl --csv -d d:/data/bacteria/bac_summary/xlsx/Table_alignment_all.xlsx
+
+# Back to Mac
+perl -pi -e 's/\r\n/\n/g;' Table_alignment_all.csv
 cp -f Table_alignment_all.xlsx ~/data/bacteria/bac_summary/table
 cp -f Table_alignment_all.csv ~/data/bacteria/bac_summary/table
 
-cd ~/data/bacteria/bac_summary/table
-
-echo "Species,avg_size" > group_avg_size.csv
-cat bac.list.csv \
-    | grep -v "#" \
-    | perl -nla -F"," -e '
-        $count{$F[2]}++;
-        $sum{$F[2]} += $F[6];
-        END {
-            for $k (sort keys %count) {
-                printf qq{"%s",%d\n}, $k, $sum{$k} / $count{$k};
-            } 
-        }
-    ' \
-    >> group_avg_size.csv
-
-cat Table_alignment_all.csv group_avg_size.csv \
-    | perl ~/Scripts/withncbi/util/merge_csv.pl \
-    -f 0 --concat -o stdout \
-    > Table_alignment_all.1.csv
-
-echo "Species,coverage" > group_coverage.csv
-cat Table_alignment_all.1.csv \
-    | perl -nla -F',' -e '
-        $F[2] =~ /[\.\d]+/ or next;
-        $F[6] =~ /[\.\d]+/ or next;
-        $c = $F[2] * 1000 * 1000 / $F[6];
-        print qq{$F[0],$c};
-    ' \
-    >> group_coverage.csv
-
-cat Table_alignment_all.1.csv group_coverage.csv \
-    | perl ~/Scripts/withncbi/util/merge_csv.pl \
-    -f 0 --concat -o stdout \
-    > Table_alignment_all.2.csv
-
-echo "Species,indels" > group_indels.csv
-cat Table_alignment_all.2.csv \
-    | perl -nla -F',' -e '
-        $F[6] =~ /[\.\d]+/ or next;
-        $c = $F[3] / 100 * $F[2] * 1000 * 1000;
-        print qq{$F[0],$c};
-    ' \
-    >> group_indels.csv
-
-cat Table_alignment_all.2.csv group_indels.csv \
-    | perl ~/Scripts/withncbi/util/merge_csv.pl \
-    -f 0 --concat -o stdout \
-    > Table_alignment_for_filter.csv
-
 # real filter
-cat Table_alignment_for_filter.csv \
+cd ~/data/bacteria/bac_summary/table
+cat Table_alignment_all.csv \
     | perl -nla -F',' -e '
-        $F[6] =~ /[\.\d]+/ or next;
         $F[0] =~ s/"//g;
-        print $F[0] if ($F[7] < 0.4 or $F[8] < 100 or $F[4] > 0.2);
+        print $F[0] if ($F[1] !~ /[\.\d]+/ or $F[8] < 0.4 or $F[9] < 100 or $F[6] > 0.2);
     ' \
     > species_exclude.lst
 
 grep -v -Fx -f species_exclude.lst species_all.lst > species.lst
-
-rm ~/data/bacteria/bac_summary/table/Table_alignment_all.[0-9].csv
-rm ~/data/bacteria/bac_summary/table/group_*.csv
 
 #
 cd ~/data/bacteria/bac_summary/xlsx
@@ -747,9 +714,8 @@ cat ~/data/bacteria/bac_summary/table/species.lst \
     > Table_alignment.yml
 
 perl ~/Scripts/fig_table/xlsx_table.pl -i Table_alignment.yml
-perl ~/Scripts/fig_table/xlsx2csv.pl -f Table_alignment.xlsx > Table_alignment.csv
+
 cp -f Table_alignment.xlsx ~/data/bacteria/bac_summary/table
-cp -f Table_alignment.csv ~/data/bacteria/bac_summary/table
 ```
 
 Table_S_bac for GC
