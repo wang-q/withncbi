@@ -694,8 +694,16 @@ cat Table_alignment_all.csv \
         print $F[0] if ($F[1] !~ /[\.\d]+/ or $F[8] < 0.4 or $F[9] < 100 or $F[6] > 0.2);
     ' \
     > species_exclude.lst
+    
+cat Table_alignment_all.csv \
+    | perl -nla -F',' -e '
+        $F[0] =~ s/"//g;
+        print $F[0] if ($F[1] =~ /[\.\d]+/ and $F[7] >= 0.4 and $F[7] <= 0.5);
+    ' \
+    > species_all_demo.lst
 
 grep -v -Fx -f species_exclude.lst species_all.lst > species.lst
+grep -Fx -f species_all_demo.lst species.lst > species_demo.lst
 
 #
 cd ~/data/bacteria/bac_summary/xlsx
@@ -861,7 +869,6 @@ cat ~/data/bacteria/bac_summary/table/species_all.lst \
         }
     ' \
     > Table_S_bac_all.yml
-
 perl ~/Scripts/fig_table/xlsx_table.pl -i Table_S_bac_all.yml
 
 cat ~/data/bacteria/bac_summary/table/species.lst \
@@ -881,7 +888,6 @@ cat ~/data/bacteria/bac_summary/table/species.lst \
         }
     ' \
     > Table_S_bac.yml
-
 perl ~/Scripts/fig_table/xlsx_table.pl -i Table_S_bac.yml
 ```
 
@@ -908,7 +914,7 @@ cat ~/data/bacteria/bac_summary/table/species.lst \
 bash species_tree.sh > species.tree
 ```
 
-### d1, d2
+### sep_chart of d1, d2
 
 `collect_xlsx.pl`
 
@@ -1042,4 +1048,158 @@ cat ~/data/bacteria/bac_summary/table/species.lst \
 bash cmd_chart.sh
 rm ~/data/bacteria/bac_summary/xlsx/*.csv
 cp ~/data/bacteria/bac_summary/xlsx/*.pdf ~/data/bacteria/bac_summary/fig
+```
+
+### CorelDRAW GC charts
+
+```bash
+cd ~/data/bacteria/bac_summary/xlsx
+
+# Fig_S_bac_d1_gc_cv
+cat <<'EOF' > Fig_S_bac_d1_gc_cv.tt
+[% USE Math -%]
+---
+charts:
+[% FOREACH item IN data -%]
+  [% item.common_file %]:
+    d1_comb_pi_gc_cv:
+      4:
+        - [% loop.index % 8 %]
+        - [% Math.int(loop.index / 8) %]
+[% END -%]
+texts:
+[% FOREACH item IN data -%]
+  - text: [% item.name %]
+    size: 8
+    bold: 1
+    italic: 1
+    pos:
+      - [% loop.index % 8 %]
+      - [% Math.int(loop.index / 8) - 0.05 %]
+[% END -%]
+EOF
+
+cat ~/data/bacteria/bac_summary/table/species.lst \
+    | grep -v "^#" \
+    | TT_FILE=Fig_S_bac_d1_gc_cv.tt perl -MTemplate -nl -e '
+        my $species = $_;
+        $species =~ s/ /_/g;
+        push @data, {
+            name        => $_,
+            common_file => qq{$species.common.xlsx},
+            gc_file     => qq{$species.gc.xlsx},
+        };
+        END {
+            $tt = Template->new;
+            $tt->process($ENV{TT_FILE}, { data => \@data, }) 
+                or die Template->error;
+        }
+    ' \
+    > Fig_S_bac_d1_gc_cv.yml
+
+# Under Windows
+perl d:/Scripts/fig_table/corel_fig.pl -i d:/data/bacteria/bac_summary/xlsx/Fig_S_bac_d1_gc_cv.yml
+
+# Back to Mac
+# Fig_S_bac_gc_indel
+cat <<'EOF' > Fig_S_bac_gc_indel.tt
+[% USE Math -%]
+---
+charts:
+[% FOREACH item IN data -%]
+  [% item.gc_file %]:
+    segment_gc_indel_3:
+      2:
+        - [% loop.index % 8 %]
+        - [% Math.int(loop.index / 8) %]
+[% END -%]
+texts:
+[% FOREACH item IN data -%]
+  - text: [% item.name %]
+    size: 8
+    bold: 1
+    italic: 1
+    pos:
+      - [% loop.index % 8 %]
+      - [% Math.int(loop.index / 8) - 0.05 %]
+[% END -%]
+EOF
+
+cat ~/data/bacteria/bac_summary/table/species.lst \
+    | grep -v "^#" \
+    | TT_FILE=Fig_S_bac_gc_indel.tt perl -MTemplate -nl -e '
+        my $species = $_;
+        $species =~ s/ /_/g;
+        push @data, {
+            name        => $_,
+            common_file => qq{$species.common.xlsx},
+            gc_file     => qq{$species.gc.xlsx},
+        };
+        END {
+            $tt = Template->new;
+            $tt->process($ENV{TT_FILE}, { data => \@data, }) 
+                or die Template->error;
+        }
+    ' \
+    > Fig_S_bac_gc_indel.yml
+
+# Under Windows
+perl d:/Scripts/fig_table/corel_fig.pl -i d:/data/bacteria/bac_summary/xlsx/Fig_S_bac_gc_indel.yml
+
+# Back to Mac
+# Fig_S_bac_gc_indel_demo
+cat <<'EOF' > Fig_S_bac_gc_indel_demo.tt
+[% USE Math -%]
+---
+charts:
+[% FOREACH item IN data -%]
+  [% item.gc_file %]:
+    segment_gc_indel_3:
+      2:
+        - 0
+        - [% loop.index %]
+    segment_cv_indel_3:
+      2:
+        - 1
+        - [% loop.index %]
+[% END -%]
+texts:
+[% FOREACH item IN data -%]
+  - text: [% item.name %]
+    size: 8
+    bold: 1
+    italic: 1
+    pos:
+      - 0
+      - [% loop.index - 0.05 %]
+[% END -%]
+EOF
+
+cat ~/data/bacteria/bac_summary/table/species_demo.lst \
+    | grep -v "^#" \
+    | sort \
+    | TT_FILE=Fig_S_bac_gc_indel_demo.tt perl -MTemplate -nl -e '
+        my $species = $_;
+        $species =~ s/ /_/g;
+        push @data, {
+            name        => $_,
+            common_file => qq{$species.common.xlsx},
+            gc_file     => qq{$species.gc.xlsx},
+        };
+        END {
+            $tt = Template->new;
+            $tt->process($ENV{TT_FILE}, { data => \@data, }) 
+                or die Template->error;
+        }
+    ' \
+    > Fig_S_bac_gc_indel_demo.yml
+
+# Under Windows
+perl d:/Scripts/fig_table/corel_fig.pl -i d:/data/bacteria/bac_summary/xlsx/Fig_S_bac_gc_indel_demo.yml
+
+# Back to Mac
+cp -f Fig_S_bac_d1_gc_cv.cdr ~/data/bacteria/bac_summary/fig
+cp -f Fig_S_bac_gc_indel.cdr ~/data/bacteria/bac_summary/fig
+cp -f Fig_S_bac_gc_indel_demo.cdr ~/data/bacteria/bac_summary/fig
+
 ```
