@@ -60,8 +60,9 @@ strain_bz.pl - Full procedure for multiple genome alignments.
 
 =cut
 
-my $aligndb = path( $Config->{run}{aligndb} )->stringify;
-my $egaz    = path( $Config->{run}{egaz} )->stringify;
+my $aligndb  = path( $Config->{run}{aligndb} )->stringify;
+my $egaz     = path( $Config->{run}{egaz} )->stringify;
+my $withncbi = path( $Config->{run}{withncbi} )->stringify;
 
 GetOptions(
     'help|?' => sub { Getopt::Long::HelpMessage(0) },
@@ -622,7 +623,7 @@ raxmlHPC-PTHREADS -T [% IF parallel > 8 %] 8 [% ELSIF parallel > 3 %] [% paralle
 
 cp [% working_dir %]/[% multi_name %]_phylo/RAxML_bipartitions.* [% working_dir %]/[% multi_name %]_phylo/[% multi_name %].nwk
 
-nw_display -s -b 'visibility:hidden' [% working_dir %]/[% multi_name %]_phylo/[% multi_name %].nwk > [% working_dir %]/[% multi_name %]_phylo/[% multi_name %].svg
+Rscript [% withncbi %]/util/plot_tree.R -i [% working_dir %]/[% multi_name %]_phylo/[% multi_name %].nwk
 
 [% END -%]
 
@@ -633,6 +634,7 @@ EOF
             parallel    => $parallel,
             working_dir => $working_dir,
             egaz        => $egaz,
+            withncbi        => $withncbi,
             target      => $target,
             outgroup    => $outgroup,
             queries     => \@queries,
@@ -644,8 +646,8 @@ EOF
         path( $working_dir, $sh_name )->stringify
     ) or die Template->error;
 
-    # var_list.sh
-    # Fixme: The column names do not match; the column "Ace_pasteurianus_386B.NC_021991(+):63873-133498" no present in [/tmp/fas_vVWwMHt4/Ace_pasteurianus_IFO_3283_01.NC_013209.+.2789416-2790912.fas.vcf].
+# var_list.sh
+# Fixme: The column names do not match; the column "Ace_pasteurianus_386B.NC_021991(+):63873-133498" no present in [/tmp/fas_vVWwMHt4/Ace_pasteurianus_IFO_3283_01.NC_013209.+.2789416-2790912.fas.vcf].
     $sh_name = "6_var_list.sh";
     print "Create $sh_name\n";
     $text = <<'EOF';
