@@ -24,7 +24,7 @@ use vars qw(@ISA @EXPORT_OK %EXPORT_TAGS);
 %EXPORT_TAGS = (
     all => [
         qw{
-            wgs_worker find_ancestor find_group abbr abbr_most read_sizes
+            wgs_worker find_ancestor find_group abbr abbr_most
             },
     ],
 );
@@ -44,7 +44,7 @@ sub wgs_worker {
 
     my $url_part = "http://www.ncbi.nlm.nih.gov/Traces/wgs/";
     my $url      = $url_part . '?val=' . $term;
-    print " " x 4 . $url . "\n";
+    warn " " x 4 . $url . "\n";
 
     my $info = { prefix => $term, };
     $mech->get($url);
@@ -67,7 +67,6 @@ sub wgs_worker {
                 = HTML::TableExtract->new( attribs => { class => $table, }, );
             $te->parse($page);
 
-            my %srr_info;
             for my $ts ( $te->table_states ) {
                 for my $row ( $ts->rows ) {
                     for my $cell (@$row) {
@@ -382,21 +381,6 @@ sub abbr_most {
 
         return \%abbr_of;
     }
-}
-
-sub read_sizes {
-    my $file       = shift;
-    my $remove_chr = shift;
-
-    my @lines = path($file)->lines( { chomp => 1 } );
-    my %length_of;
-    for (@lines) {
-        my ( $key, $value ) = split /\t/;
-        $key =~ s/chr0?// if $remove_chr;
-        $length_of{$key} = $value;
-    }
-
-    return \%length_of;
 }
 
 1;

@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use autodie;
 
-use Getopt::Long qw(HelpMessage);
+use Getopt::Long;
 use FindBin;
 use YAML::Syck qw(Dump Load DumpFile LoadFile);
 
@@ -12,9 +12,7 @@ use IO::Zlib;
 use Set::Scalar;
 use Tie::IxHash;
 use AlignDB::IntSpan;
-
-use lib "$FindBin::RealBin/../lib";
-use MyUtil qw(read_sizes);
+use App::RL::Common;
 
 #----------------------------------------------------------#
 # GetOpt section
@@ -35,10 +33,10 @@ rmout2runlist.pl - Convert RepeatMasker .out file to chromosome runlists
 =cut
 
 GetOptions(
-    'help|?'   => sub { HelpMessage(0) },
+    'help|?'   => sub { Getopt::Long::HelpMessage(0) },
     'file|f=s' => \my $infile,
     'size|s=s' => \my $size,
-) or HelpMessage(1);
+) or Getopt::Long::HelpMessage(1);
 
 #----------------------------------------------------------#
 # Processing
@@ -48,7 +46,7 @@ my $chr_set_of = {};
 if ( defined $size ) {
     if ( path($size)->is_file ) {
         printf "==> Load chr.sizes\n";
-        my $length_of = read_sizes($size);
+        my $length_of = App::RL::Common::read_sizes($size);
         for my $chr ( keys %{$length_of} ) {
             my $set = AlignDB::IntSpan->new;
             $set->add_pair( 1, $length_of->{$chr} );
