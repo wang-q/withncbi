@@ -3,10 +3,10 @@ use strict;
 use warnings;
 use autodie;
 
-use Getopt::Long qw(HelpMessage);
+use Getopt::Long;
 use Config::Tiny;
 use FindBin;
-use YAML qw(Dump Load DumpFile LoadFile);
+use YAML::Syck;
 
 use Template;
 use Path::Tiny;
@@ -40,12 +40,13 @@ pop_prep.pl - prepare pop: file, rm and info.
 =cut
 
 my $withncbi = path( $Config->{run}{withncbi} )->stringify;
+my $egaz     = path( $Config->{run}{egaz} )->stringify;
 
 GetOptions(
-    'help|?' => sub { HelpMessage(0) },
+    'help|?'     => sub { Getopt::Long::HelpMessage(0) },
     'file|i=s'   => \my $file_yaml,
     'parallel=i' => \my $parallel,
-) or HelpMessage(1);
+) or Getopt::Long::HelpMessage(1);
 
 die "Need a YAML file" unless $file_yaml;
 
@@ -305,7 +306,7 @@ cd [% data_dir %]
 
 # plan_ALL
 cd [% data_dir %]
-perl [% withncbi %]/taxon/strain_bz.pl \
+perl [% egaz %]/multi_batch.pl \
     --file [% data_dir %]/[% group_name %].taxon.csv \
     -w     [% base_dir %] \
     --name [% group_name %] \
@@ -335,6 +336,7 @@ EOF
             base_dir   => $base_dir,
             phylo_tree => $phylo_tree,
             withncbi   => $withncbi,
+            egaz       => $egaz,
             parallel   => $parallel,
         },
         path( $data_dir, $sh_name )->stringify
@@ -355,7 +357,7 @@ cd [% data_dir %]
 #----------------------------------------------------------#
 # alignment plan for [% plan_name %]
 #----------------------------------------------------------#
-perl [% withncbi %]/taxon/strain_bz.pl \
+perl [% egaz %]/multi_batch.pl \
     --file [% data_dir %]/[% group_name %].taxon.csv \
     -w     [% base_dir %] \
     --name [% group_name %] \
@@ -382,6 +384,7 @@ EOF
                     data_dir   => $data_dir,
                     base_dir   => $base_dir,
                     withncbi   => $withncbi,
+                    egaz       => $egaz,
                     parallel   => $parallel,
                     plan_name  => $plan_name,
                     plan       => $plan,

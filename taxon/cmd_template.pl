@@ -31,7 +31,7 @@ cmd_template.pl - Simple template for strain_bz.pl
 
 =cut
 
-my $withncbi = path( $Config->{run}{withncbi} )->stringify;    # withncbi path
+my $egaz = path( $Config->{run}{egaz} )->stringify;    # egaz path
 
 GetOptions(
     'help|?'      => sub { Getopt::Long::HelpMessage(0) },
@@ -47,7 +47,7 @@ my $tt = Template->new;
 
 my $text = <<'EOF';
 # [% name %]
-perl [% withncbi %]/taxon/strain_bz.pl \
+perl [% egaz %]/multi_batch.pl \
     --csv_taxon [% taxon_file %] \
 [% IF seq_dir -%]
     --seq_dir [% seq_dir %] \
@@ -76,7 +76,7 @@ while (<>) {
         \$text,
         {   seq_dir    => $seq_dir,
             taxon_file => $taxon_file,
-            withncbi   => $withncbi,
+            egaz       => $egaz,
             parallel   => $parallel,
             name       => $fields[0],
             t          => $fields[1],
