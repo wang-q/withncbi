@@ -6,7 +6,7 @@ Many tools of `taxon/` are used here, which makes a good example for users.
 ## Work flow.
 
 ```text
-id ---> lineage ---> filtering ---> naming ---> strain_info.pl   ---> strain_bz.pl
+id ---> lineage ---> filtering ---> naming ---> strain_info.pl   ---> egaz/multi_batch.pl
                                       |                                 ^
                                       |-------> batch_get_seq.pl -------|
 ```
@@ -716,7 +716,7 @@ cd ~/data/organelle/
 
 perl -p -e '
     s/plastid\.working/plastid_self.working/g;
-    s/strain_bz/strain_bz_self/g;
+    s/multi_batch/self_batch/g;
     s/(\-\-parallel)/--length 1000 \1/g;
 ' plastid.cmd.txt > plastid_self.cmd.txt
 

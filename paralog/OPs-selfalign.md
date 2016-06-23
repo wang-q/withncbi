@@ -81,7 +81,7 @@ perl        ~/Scripts/withncbi/taxon/strain_info.pl \
 ```bash
 cd ~/data/alignment/self
 
-perl ~/Scripts/withncbi/taxon/strain_bz_self.pl \
+perl ~/Scripts/egaz/self_batch.pl \
     --file ~/data/alignment/self/ensembl_taxon.csv \
     --working_dir ~/data/alignment/self \
     --seq_dir ~/data/alignment/Ensembl \
@@ -110,7 +110,7 @@ bash 5_circos_cmd.sh
 ```bash
 cd ~/data/alignment/self
 
-perl ~/Scripts/withncbi/taxon/strain_bz_self.pl \
+perl ~/Scripts/egaz/self_batch.pl \
     --file ~/data/alignment/self/ensembl_taxon.csv \
     --working_dir ~/data/alignment/self \
     --seq_dir ~/data/alignment/Ensembl \
@@ -176,7 +176,7 @@ perl ~/Scripts/egaz/part_seq.pl \
     -o ~/data/alignment/self/arabidopsis_parted/Genomes/Atha \
     --chunk 10010000 --overlap 10000
 
-perl ~/Scripts/withncbi/taxon/strain_bz_self.pl \
+perl ~/Scripts/egaz/self_batch.pl \
     --file ~/data/alignment/self/ensembl_taxon.csv \
     --working_dir ~/data/alignment/self \
     --parted \
@@ -210,7 +210,7 @@ bash 5_circos_cmd.sh
 ```bash
 cd ~/data/alignment/self
 
-perl ~/Scripts/withncbi/taxon/strain_bz_self.pl \
+perl ~/Scripts/egaz/self_batch.pl \
     --file ~/data/alignment/self/ensembl_taxon.csv \
     --working_dir ~/data/alignment/self \
     --seq_dir ~/data/alignment/Ensembl \
@@ -240,7 +240,7 @@ bash 5_circos_cmd.sh
 ```bash
 cd ~/data/alignment/self
 
-perl ~/Scripts/withncbi/taxon/strain_bz_self.pl \
+perl ~/Scripts/egaz/self_batch.pl \
     --file ~/data/alignment/self/ensembl_taxon.csv \
     --working_dir ~/data/alignment/self \
     --seq_dir ~/data/alignment/Ensembl \
@@ -270,7 +270,7 @@ bash 5_circos_cmd.sh
 ```bash
 cd ~/data/alignment/self
 
-perl ~/Scripts/withncbi/taxon/strain_bz_self.pl \
+perl ~/Scripts/egaz/self_batch.pl \
     --file ~/data/alignment/self/ensembl_taxon.csv \
     --working_dir ~/data/alignment/self \
     --seq_dir ~/data/alignment/Ensembl \
@@ -300,7 +300,7 @@ bash 5_circos_cmd.sh
 ```bash
 cd ~/data/alignment/self
 
-perl ~/Scripts/withncbi/taxon/strain_bz_self.pl \
+perl ~/Scripts/egaz/self_batch.pl \
     --file ~/data/alignment/self/ensembl_taxon.csv \
     --working_dir ~/data/alignment/self \
     --seq_dir ~/data/alignment/Ensembl \
@@ -332,7 +332,7 @@ bash 5_circos_cmd.sh
 ```bash
 cd ~/data/alignment/self
 
-perl ~/Scripts/withncbi/taxon/strain_bz_self.pl \
+perl ~/Scripts/egaz/self_batch.pl \
     --file ~/data/alignment/self/ensembl_taxon.csv \
     --working_dir ~/data/alignment/self \
     --seq_dir ~/data/alignment/Ensembl \
@@ -382,7 +382,7 @@ do
         --chunk 10010000 --overlap 10000
 done
 
-perl ~/Scripts/withncbi/taxon/strain_bz_self.pl \
+perl ~/Scripts/egaz/self_batch.pl \
     --file ~/data/alignment/self/ensembl_taxon.csv \
     --working_dir ~/data/alignment/self \
     --length 1000  \

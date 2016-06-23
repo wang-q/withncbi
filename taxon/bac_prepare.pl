@@ -55,6 +55,8 @@ my $nbd_dir = path( $Config->{path}{nbd} )->stringify;  # NCBI genomes bac draft
 my $ngbd_dir
     = path( $Config->{path}{ngbd} )->stringify; # NCBI genbank genomes bac draft
 
+my $egaz = path( $Config->{run}{egaz} )->stringify;    # egaz path
+
 GetOptions(
     'help|?' => sub { Getopt::Long::HelpMessage(0) },
     'server|s=s'    => \( my $server      = $Config->{database}{server} ),
@@ -361,7 +363,7 @@ perl [% findbin %]/strain_info.pl \
 [% END -%]
 
 [% IF ! is_self -%]
-perl [% findbin %]/strain_bz.pl \
+perl [% egaz %]/multi_batch.pl \
     --file [% working_dir %]/info.csv \
     -w [% working_dir %]/.. \
 [% IF ! redo -%]
@@ -378,7 +380,7 @@ perl [% findbin %]/strain_bz.pl \
     -t [% target %]
 
 [% ELSE -%]
-perl [% findbin %]/strain_bz_self.pl \
+perl [% egaz %]/self_batch.pl \
     --file [% working_dir %]/info.csv \
     -w [% working_dir %]/.. \
 [% IF ! redo -%]
@@ -398,6 +400,7 @@ EOF
     $tt->process(
         \$text,
         {   findbin     => $FindBin::RealBin,
+            egaz        => $egaz,
             working_dir => $working_dir,
             seq_dir     => $seq_dir,
             name_str    => $name_str,
@@ -415,6 +418,7 @@ EOF
     $tt->process(
         \$text,
         {   findbin     => $FindBin::RealBin,
+            egaz        => $egaz,
             working_dir => $working_dir,
             seq_dir     => $seq_dir,
             name_str    => $name_str,

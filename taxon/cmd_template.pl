@@ -18,7 +18,7 @@ my $Config = Config::Tiny->read("$FindBin::RealBin/../config.ini");
 
 =head1 NAME
 
-cmd_template.pl - Simple template for strain_bz.pl
+cmd_template.pl - Simple template for egaz/multi_batch.pl
 
 =head1 SYNOPSIS
 
