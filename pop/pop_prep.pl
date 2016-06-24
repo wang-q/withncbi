@@ -307,11 +307,10 @@ cd [% data_dir %]
 # plan_ALL
 cd [% data_dir %]
 perl [% egaz %]/multi_batch.pl \
-    --file [% data_dir %]/[% group_name %].taxon.csv \
+    -c     [% data_dir %]/[% group_name %].taxon.csv \
     -w     [% base_dir %] \
     --name [% group_name %] \
     --multi_name plan_ALL \
-    --use_name \
     --parallel [% parallel %] \
     --norm \
 [% IF phylo_tree -%]
@@ -358,11 +357,10 @@ cd [% data_dir %]
 # alignment plan for [% plan_name %]
 #----------------------------------------------------------#
 perl [% egaz %]/multi_batch.pl \
-    --file [% data_dir %]/[% group_name %].taxon.csv \
+    -c     [% data_dir %]/[% group_name %].taxon.csv \
     -w     [% base_dir %] \
     --name [% group_name %] \
     --multi_name [% plan_name %] \
-    --use_name \
     --parallel [% parallel %] \
     --norm \
 [% IF phylo_tree -%]
