@@ -82,11 +82,10 @@ perl        ~/Scripts/withncbi/taxon/strain_info.pl \
 cd ~/data/alignment/self
 
 perl ~/Scripts/egaz/self_batch.pl \
-    --file ~/data/alignment/self/ensembl_taxon.csv \
     --working_dir ~/data/alignment/self \
     --seq_dir ~/data/alignment/Ensembl \
+    -c ~/data/alignment/self/ensembl_taxon.csv \
     --length 1000  \
-    --use_name \
     --norm \
     --name yeast \
     --parallel 8 \
@@ -111,11 +110,10 @@ bash 5_circos_cmd.sh
 cd ~/data/alignment/self
 
 perl ~/Scripts/egaz/self_batch.pl \
-    --file ~/data/alignment/self/ensembl_taxon.csv \
     --working_dir ~/data/alignment/self \
     --seq_dir ~/data/alignment/Ensembl \
+    -c ~/data/alignment/self/ensembl_taxon.csv \
     --length 1000  \
-    --use_name \
     --norm \
     --name arabidopsis \
     --parallel 8 \
@@ -151,6 +149,8 @@ cat <<EOF > Atha.kary.tsv
 5${TAB}11100000${TAB}12575502${TAB}p5${TAB}acen
 5${TAB}12575502${TAB}26975502${TAB}q5${TAB}gpos50${TAB}#14.4M
 EOF
+
+mkdir -p Processing/Atha
 bash ~/share/circos/data/karyotype/parse.karyotype Atha.kary.tsv > Processing/Atha/karyotype.Atha.txt
 
 bash 1_real_chr.sh
@@ -177,11 +177,10 @@ perl ~/Scripts/egaz/part_seq.pl \
     --chunk 10010000 --overlap 10000
 
 perl ~/Scripts/egaz/self_batch.pl \
-    --file ~/data/alignment/self/ensembl_taxon.csv \
     --working_dir ~/data/alignment/self \
+    -c ~/data/alignment/self/ensembl_taxon.csv \
     --parted \
     --length 1000  \
-    --use_name \
     --norm \
     --name arabidopsis_parted \
     --parallel 8 \
@@ -211,11 +210,10 @@ bash 5_circos_cmd.sh
 cd ~/data/alignment/self
 
 perl ~/Scripts/egaz/self_batch.pl \
-    --file ~/data/alignment/self/ensembl_taxon.csv \
     --working_dir ~/data/alignment/self \
     --seq_dir ~/data/alignment/Ensembl \
+    -c ~/data/alignment/self/ensembl_taxon.csv \
     --length 1000  \
-    --use_name \
     --norm \
     --name worm \
     --parallel 8 \
