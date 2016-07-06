@@ -186,18 +186,16 @@ perl ~/Scripts/egaz/self_batch.pl \
     --parallel 8 \
     -t Atha
 
-cd ~/data/alignment/self/arabidopsis_parted
-
-bash 1_real_chr.sh
-time bash 3_self_cmd.sh
+bash arabidopsis_parted/1_real_chr.sh
+time bash arabidopsis_parted/3_self_cmd.sh
 # real    21m10.875s
 # user    156m48.601s
 # sys     1m54.846s
-time bash 4_proc_cmd.sh
+time bash arabidopsis_parted/4_proc_cmd.sh
 # real    9m33.086s
 # user    24m56.361s
 # sys     11m21.288s
-bash 5_circos_cmd.sh
+bash arabidopsis_parted/5_circos_cmd.sh
 ```
 
 ### 3. Comparison
@@ -239,11 +237,10 @@ bash 5_circos_cmd.sh
 cd ~/data/alignment/self
 
 perl ~/Scripts/egaz/self_batch.pl \
-    --file ~/data/alignment/self/ensembl_taxon.csv \
     --working_dir ~/data/alignment/self \
     --seq_dir ~/data/alignment/Ensembl \
+    -c ~/data/alignment/self/ensembl_taxon.csv \
     --length 1000  \
-    --use_name \
     --norm \
     --name dicty \
     --parallel 8 \
@@ -269,11 +266,10 @@ bash 5_circos_cmd.sh
 cd ~/data/alignment/self
 
 perl ~/Scripts/egaz/self_batch.pl \
-    --file ~/data/alignment/self/ensembl_taxon.csv \
     --working_dir ~/data/alignment/self \
     --seq_dir ~/data/alignment/Ensembl \
+    -c ~/data/alignment/self/ensembl_taxon.csv \
     --length 1000  \
-    --use_name \
     --norm \
     --name human \
     --parallel 8 \
@@ -299,11 +295,10 @@ bash 5_circos_cmd.sh
 cd ~/data/alignment/self
 
 perl ~/Scripts/egaz/self_batch.pl \
-    --file ~/data/alignment/self/ensembl_taxon.csv \
     --working_dir ~/data/alignment/self \
     --seq_dir ~/data/alignment/Ensembl \
+    -c ~/data/alignment/self/ensembl_taxon.csv \
     --length 1000  \
-    --use_name \
     --norm \
     --name mouse \
     --parallel 8 \
@@ -331,11 +326,10 @@ bash 5_circos_cmd.sh
 cd ~/data/alignment/self
 
 perl ~/Scripts/egaz/self_batch.pl \
-    --file ~/data/alignment/self/ensembl_taxon.csv \
     --working_dir ~/data/alignment/self \
     --seq_dir ~/data/alignment/Ensembl \
+    -c ~/data/alignment/self/ensembl_taxon.csv \
     --length 1000  \
-    --use_name \
     --norm \
     --name plants \
     --parallel 12 \
@@ -381,10 +375,9 @@ do
 done
 
 perl ~/Scripts/egaz/self_batch.pl \
-    --file ~/data/alignment/self/ensembl_taxon.csv \
     --working_dir ~/data/alignment/self \
+    -c ~/data/alignment/self/ensembl_taxon.csv \
     --length 1000  \
-    --use_name \
     --norm \
     --name plants_parted \
     --parallel 12 \
