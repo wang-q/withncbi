@@ -91,15 +91,13 @@ perl ~/Scripts/egaz/self_batch.pl \
     --parallel 8 \
     -t S288c
 
-cd ~/data/alignment/self/yeast
-
-bash 1_real_chr.sh
-bash 3_self_cmd.sh
-time bash 4_proc_cmd.sh
+bash yeast/1_real_chr.sh
+bash yeast/3_self_cmd.sh
+time bash yeast/4_proc_cmd.sh
 # real    0m46.075s
 # user    1m19.171s
 # sys     0m42.335s
-bash 5_circos_cmd.sh
+bash yeast/5_circos_cmd.sh
 ```
 
 ## Arabidopsis
@@ -217,18 +215,16 @@ perl ~/Scripts/egaz/self_batch.pl \
     --parallel 8 \
     -t Cele
 
-cd ~/data/alignment/self/worm
-
-bash 1_real_chr.sh
-time bash 3_self_cmd.sh
+bash worm/1_real_chr.sh
+time bash worm/3_self_cmd.sh
 # real    26m9.090s
 # user    150m18.730s
 # sys     0m49.323s
-time bash 4_proc_cmd.sh
+time bash worm/4_proc_cmd.sh
 # real    3m24.714s
 # user    6m42.150s
 # sys     4m1.954s
-bash 5_circos_cmd.sh
+bash worm/5_circos_cmd.sh
 ```
 
 ## Ddis
@@ -246,18 +242,16 @@ perl ~/Scripts/egaz/self_batch.pl \
     --parallel 8 \
     -t Ddis
 
-cd ~/data/alignment/self/dicty
-
-bash 1_real_chr.sh
-time bash 3_self_cmd.sh
+bash dicty/1_real_chr.sh
+time bash dicty/3_self_cmd.sh
 # real    1m53.391s
 # user    13m25.636s
 # sys     0m7.271s
-time bash 4_proc_cmd.sh
+time bash dicty/4_proc_cmd.sh
 # real    353m10.864s
 # user    364m44.545s
 # sys     2m29.146s
-bash 5_circos_cmd.sh
+bash dicty/5_circos_cmd.sh
 ```
 
 ## Human
