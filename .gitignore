@@ -19,6 +19,7 @@ doc/pop/
 .komodotools
 .idea
 
+*.tmp
 *.xls
 *.xlsx
 *.csv
