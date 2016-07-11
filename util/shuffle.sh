@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-USAGE="Usage: $0 FASTA_FILE MINIMAL_LENGTH SEQ_NUMBER"
+USAGE="Usage: $0 FASTA_FILE SEQ_NUMBER MINIMAL_LENGTH MAXIMAL_LENGTH"
 
-# bash shuffle.sh ~/data/rna-seq/medfood/process/Arabidopsis_thaliana/result/Trinity.fasta 1000 100
+# bash shuffle.sh ~/data/rna-seq/medfood/process/Arabidopsis_thaliana/result/Trinity.fasta 100 1000 2000
 
 if [ "$#" -lt 1 ]; then
     echo "$USAGE"
@@ -18,16 +18,18 @@ hash faops 2>/dev/null || {
 
 # set default parameters
 FASTA_FILE=$1
-MINIMAL_LENGTH=${2:-1000}
-SEQ_NUMBER=${3:-100}
+SEQ_NUMBER=${2:-100}
+MINIMAL_LENGTH=${3:-1000}
+MAXIMAL_LENGTH=${4:-2000}
 
 echo "==> Parameters <=="
 echo "    FASTA_FILE=${FASTA_FILE}"
-echo "    MINIMAL_LENGTH=${MINIMAL_LENGTH}"
 echo "    SEQ_NUMBER=${SEQ_NUMBER}"
+echo "    MINIMAL_LENGTH=${MINIMAL_LENGTH}"
+echo "    MAXIMAL_LENGTH=${MAXIMAL_LENGTH}"
 
 echo "==> Getting list of sequences"
-faops filter -a ${MINIMAL_LENGTH} ${FASTA_FILE} stdout \
+faops filter -a ${MINIMAL_LENGTH} -z ${MAXIMAL_LENGTH} ${FASTA_FILE} stdout \
     | perl -nl -e '/^>(\S+)/ or next; print $1' \
     | perl -MList::Util=shuffle -wne 'print shuffle <>;' \
     | head -n ${SEQ_NUMBER} \
