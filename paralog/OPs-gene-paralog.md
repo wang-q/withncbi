@@ -2,8 +2,9 @@
 
 ## Sources
 
-* Gene annotations from [gff3 files](https://github.com/wang-q/withncbi/blob/master/ensembl/ensembl.md#gff3)
-* Paralogs from [self-aligning](https://github.com/wang-q/withncbi/blob/master/paralog/OPs-selfalign.md)
+* Gene annotations from [gff3 files](https://github.com/wang-q/withncbi/blob/master/ensembl/README.md#gff3)
+* Paralogs from
+  [self-aligning](https://github.com/wang-q/withncbi/blob/master/paralog/OPs-selfalign.md)
 
 ## TODO
 
@@ -75,14 +76,14 @@ if [ "$#" -lt 1 ]; then
     exit 1
 fi
 
-echo "====> parameters"
+echo "==> parameters <=="
 echo "    " $@
 
 GENOME_NAME=$1
 
 cd ~/data/alignment/gene-paralog/${GENOME_NAME}/data
 
-echo "====> get genome"
+echo "==> get genome"
 if [ -f ~/data/alignment/gene-paralog/${GENOME_NAME}/data/genome.fa ];
 then
     echo "genome.fa exists"
@@ -93,7 +94,7 @@ else
         > genome.fa
 fi
 
-echo "====> run RepeatMasker"
+echo "==> run RepeatMasker"
 if [ -f ~/data/alignment/gene-paralog/${GENOME_NAME}/data/genome.fa.out ];
 then
     echo "genome.fa.out exists"
@@ -107,7 +108,7 @@ echo "==> Convert gff3 to runlists"
 cd ~/data/alignment/gene-paralog/${GENOME_NAME}/feature
 
 # For Atha, 0m41.121s. With --clean, 50m49.994s
-time perl ~/Scripts/withncbi/paralog/gff2runlist.pl \
+time perl ~/Scripts/withncbi/util/gff2runlist.pl \
     --file ../data/gff3.gz \
     --size ../data/chr.sizes \
     --range 2000
@@ -132,7 +133,7 @@ if [ "$#" -lt 1 ]; then
     exit 1
 fi
 
-echo "====> parameters"
+echo "==> parameters <=="
 echo "    " $@
 
 GENOME_NAME=$1
@@ -164,7 +165,7 @@ cp ../data/genome.fa.out ../repeat
 cp ../data/genome.fa.tbl ../repeat
 
 echo "==> rmout results"
-perl ~/Scripts/withncbi/paralog/rmout2runlist.pl \
+perl ~/Scripts/withncbi/util/rmout2runlist.pl \
     --file ../data/genome.fa.out \
     --size ../data/chr.sizes
 
@@ -217,7 +218,7 @@ if [ "$#" -lt 1 ]; then
     exit 1
 fi
 
-echo "====> parameters"
+echo "==> parameters <=="
 echo "    " $@
 
 GENOME_NAME=$1
@@ -245,15 +246,15 @@ faops size mite.fa \
 
 echo "==> genome blast"
 faops filter -a 40  mite.fa mite.filter.fa
-perl ~/Scripts/egas/fasta_blastn.pl -f mite.filter.fa -g genome.fa -o mite.bg.blast --parallel 8
-perl ~/Scripts/egas/blastn_genome.pl -f mite.bg.blast -g genome.fa -o mite.bg.fasta -c 0.95 --parallel 8
+perl ~/Scripts/egaz/fasta_blastn.pl -f mite.filter.fa -g genome.fa -o mite.bg.blast --parallel 8
+perl ~/Scripts/egaz/blastn_genome.pl -f mite.bg.blast -g genome.fa -o mite.bg.fasta -c 0.95 --parallel 8
 cat mite.fa mite.bg.fasta \
     | faops filter -u stdin stdout \
     | faops filter -a 40 stdin stdout \
     > mite.all.fasta
 
 echo "==> sparsemem_exact"
-perl ~/Scripts/egas/sparsemem_exact.pl -f mite.all.fasta -l 40 -g genome.fa -o mite.replace.tsv
+perl ~/Scripts/egaz/sparsemem_exact.pl -f mite.all.fasta -l 40 -g genome.fa -o mite.replace.tsv
 cat mite.replace.tsv \
     | perl -nla -F"\t" -e ' print for @F' \
     | grep ':' \
@@ -297,7 +298,7 @@ if [ "$#" -lt 1 ]; then
     exit 1
 fi
 
-echo "====> parameters"
+echo "==> parameters <=="
 echo "    " $@
 
 GENOME_NAME=$1
@@ -326,11 +327,11 @@ rm paralog_gene.*.yml
 
 for ftr in paralog paralog_adjacent paralog_gene
 do
-    echo "====> ${ftr} coverages"
+    echo "==> ${ftr} coverages"
     sleep 1;
     runlist stat -s ../data/chr.sizes ../yml/${ftr}.yml -o ../stat/${ftr}.yml.csv
 
-    echo "====> ${ftr} stats"
+    echo "==> ${ftr} stats"
     cd ~/data/alignment/gene-paralog/${GENOME_NAME}/stat
     cat ../yml/repeat.family.txt \
         | parallel -j 1 --keep-order "
@@ -368,7 +369,7 @@ if [ "$#" -lt 2 ]; then
     exit 1
 fi
 
-echo "====> parameters"
+echo "==> parameters <=="
 echo "    " $@
 
 GENOME_NAME=$1
@@ -400,7 +401,7 @@ if [ "$#" -lt 2 ]; then
     exit 1
 fi
 
-echo "====> parameters"
+echo "==> parameters <=="
 echo "    " $@
 
 GENOME_NAME=$1
@@ -409,7 +410,7 @@ FEATURE_BASE=`basename "${FEATURE_FILE%.*}"`
 
 cd ~/data/alignment/gene-paralog/${GENOME_NAME}/stat
 
-echo "====> intersect"
+echo "==> intersect"
 for ftr in gene upstream downstream exon CDS intron five_prime_UTR three_prime_UTR
 do
     echo ${ftr}
@@ -425,7 +426,7 @@ done \
             > stat.sep-{}.${FEATURE_BASE}.csv.tmp;
     "
 
-echo "====> concat gene"
+echo "==> concat gene"
 printf "gene_id," > ${GENOME_NAME}.gene.${FEATURE_BASE}.csv
 for ftr in gene upstream downstream
 do
@@ -438,10 +439,10 @@ do
     cat stat.sep-${ftr}.${FEATURE_BASE}.csv.tmp
 done \
     | grep -v "^key" \
-    | perl ~/Scripts/withncbi/taxon/merge_csv.pl --concat -f 0 -o stdout \
+    | perl ~/Scripts/withncbi/util/merge_csv.pl --concat -f 0 -o stdout \
     >> ${GENOME_NAME}.gene.${FEATURE_BASE}.csv
 
-echo "====> concat trans"
+echo "==> concat trans"
 printf "trans_id," > ${GENOME_NAME}.trans.${FEATURE_BASE}.csv
 for ftr in exon CDS intron five_prime_UTR three_prime_UTR
 do
@@ -454,10 +455,10 @@ do
     cat stat.sep-${ftr}.${FEATURE_BASE}.csv.tmp
 done \
     | grep -v "^key" \
-    | perl ~/Scripts/withncbi/taxon/merge_csv.pl --concat -f 0 -o stdout \
+    | perl ~/Scripts/withncbi/util/merge_csv.pl --concat -f 0 -o stdout \
     >> ${GENOME_NAME}.trans.${FEATURE_BASE}.csv
 
-echo "====> clean"
+echo "==> clean"
 rm stat.sep-*.${FEATURE_BASE}.csv.tmp
 rm stat.sep-*.${FEATURE_BASE}.csv
 
@@ -479,7 +480,7 @@ if [ "$#" -lt 2 ]; then
     exit 1
 fi
 
-echo "====> parameters"
+echo "==> parameters <=="
 echo "    " $@
 
 GENOME_NAME=$1
@@ -488,7 +489,7 @@ FEATURE_BASE=`basename "${FEATURE_FILE%.*}"`
 
 cd ~/data/alignment/gene-paralog/${GENOME_NAME}/stat
 
-echo "====> intersect"
+echo "==> intersect"
 # parallel in 1 threads to save memory
 for ftr in gene upstream downstream exon CDS intron five_prime_UTR three_prime_UTR
 do
@@ -497,7 +498,7 @@ done \
     | parallel -j 1 --keep-order "
         echo \"==> {} ${FEATURE_BASE}\";
         sleep 1;
-        java -jar ~/share/jrunlist.jar statop \
+        java -jar ~/Scripts/egaz/jar/jrunlist.jar statop \
             ../data/chr.sizes ../feature/sep-{}.yml ${FEATURE_FILE}  \
             --op intersect --all \
             -o stat.sep-{}.${FEATURE_BASE}.csv;
@@ -506,7 +507,7 @@ done \
             > stat.sep-{}.${FEATURE_BASE}.csv.tmp;
     "
 
-echo "====> concat gene"
+echo "==> concat gene"
 printf "gene_id," > ${GENOME_NAME}.gene.${FEATURE_BASE}.csv
 for ftr in gene upstream downstream
 do
@@ -519,10 +520,10 @@ do
     cat stat.sep-${ftr}.${FEATURE_BASE}.csv.tmp
 done \
     | grep -v "^key" \
-    | perl ~/Scripts/withncbi/taxon/merge_csv.pl --concat -f 0 -o stdout \
+    | perl ~/Scripts/withncbi/util/merge_csv.pl --concat -f 0 -o stdout \
     >> ${GENOME_NAME}.gene.${FEATURE_BASE}.csv
 
-echo "====> concat trans"
+echo "==> concat trans"
 printf "trans_id," > ${GENOME_NAME}.trans.${FEATURE_BASE}.csv
 for ftr in exon CDS intron five_prime_UTR three_prime_UTR
 do
@@ -535,10 +536,10 @@ do
     cat stat.sep-${ftr}.${FEATURE_BASE}.csv.tmp
 done \
     | grep -v "^key" \
-    | perl ~/Scripts/withncbi/taxon/merge_csv.pl --concat -f 0 -o stdout \
+    | perl ~/Scripts/withncbi/util/merge_csv.pl --concat -f 0 -o stdout \
     >> ${GENOME_NAME}.trans.${FEATURE_BASE}.csv
 
-echo "====> clean"
+echo "==> clean"
 rm stat.sep-*.${FEATURE_BASE}.csv.tmp
 rm stat.sep-*.${FEATURE_BASE}.csv
 
@@ -548,7 +549,7 @@ EOF
 
 ## Atha
 
-Full processing time is about 9 hours.
+Full processing time is about 1 hour.
 
 1. [Data](https://github.com/wang-q/withncbi/blob/master/paralog/OPs-selfalign.md#arabidopsis)
 
@@ -576,44 +577,47 @@ Full processing time is about 9 hours.
     ```bash
     cd ~/data/alignment/gene-paralog/Atha/data
 
-    bash ~/data/alignment/gene-paralog/proc_prepare.sh Atha
-
-    bash ~/data/alignment/gene-paralog/proc_repeat.sh Atha
-    bash ~/data/alignment/gene-paralog/proc_mite.sh Atha
+    # 0m44.430s
+    time bash ~/data/alignment/gene-paralog/proc_prepare.sh Atha
+    # 0m46.052s
+    time bash ~/data/alignment/gene-paralog/proc_repeat.sh Atha
+    # 0m43.666s
+    time bash ~/data/alignment/gene-paralog/proc_mite.sh Atha
     ```
 
 3. Paralog-repeats stats
 
     ```bash
     cd ~/data/alignment/gene-paralog/Atha/stat
-
-    bash ~/data/alignment/gene-paralog/proc_paralog.sh Atha
+    # 0m28.356s
+    time bash ~/data/alignment/gene-paralog/proc_paralog.sh Atha
     ```
 
 4. Gene-paralog stats
 
     ```bash
     cd ~/data/alignment/gene-paralog/Atha/stat
+    # 0m6.888s
+    time bash ~/data/alignment/gene-paralog/proc_all_gene.sh Atha ../yml/paralog.yml
+    # 0m7.283s
+    time bash ~/data/alignment/gene-paralog/proc_all_gene.sh Atha ../yml/paralog_adjacent.yml
 
-    bash ~/data/alignment/gene-paralog/proc_all_gene.sh Atha ../yml/paralog.yml
-    bash ~/data/alignment/gene-paralog/proc_all_gene.sh Atha ../yml/paralog_adjacent.yml
-
+    # E5-2690 v3
     # real    8m45.668s
     # user    57m58.984s
     # sys     0m1.808s
+    # i7-6700k
+    # real	15m18.045s
+    # user	104m21.728s
+    # sys	0m13.363s
     time bash ~/data/alignment/gene-paralog/proc_sep_gene.sh Atha ../yml/paralog.yml
 
-    # 4 threads
-    # real    0m18.428s
-    # user    1m27.138s
-    # sys     0m13.393s
-    # 1 thread
-    # real    1m10.045s
-    # user    1m26.523s
-    # sys     0m15.820s
+    # real	0m35.566s
+    # user	1m12.613s
+    # sys	0m7.601s
     time bash ~/data/alignment/gene-paralog/proc_sep_gene_jrunlist.sh Atha ../yml/paralog.yml
 
-    bash ~/data/alignment/gene-paralog/proc_sep_gene.sh Atha ../yml/paralog_adjacent.yml
+    bash ~/data/alignment/gene-paralog/proc_sep_gene_jrunlist.sh Atha ../yml/paralog_adjacent.yml
     ```
 
 5. Gene-repeats stats
@@ -627,16 +631,15 @@ Full processing time is about 9 hours.
         "
 
     # 12 hours?
-    time \
-    cat ../yml/repeat.family.txt \
-        | parallel -j 1 --keep-order "
-            bash ~/data/alignment/gene-paralog/proc_sep_gene.sh Atha ../yml/{}.yml
-        "    
+    # time \
+    # cat ../yml/repeat.family.txt \
+    #     | parallel -j 1 --keep-order "
+    #         bash ~/data/alignment/gene-paralog/proc_sep_gene.sh Atha ../yml/{}.yml
+    #     "    
 
-    # 1 thread, up to 12g RAM
-    # real    15m38.056s
-    # user    24m37.981s
-    # sys     4m1.162s
+    # real	10m34.669s
+    # user	17m27.433s
+    # sys	3m20.765s
     time \
         cat ../yml/repeat.family.txt \
             | parallel -j 1 --keep-order "
