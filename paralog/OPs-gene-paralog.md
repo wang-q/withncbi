@@ -2,7 +2,9 @@
 
 ## Sources
 
-* Gene annotations from [gff3 files](https://github.com/wang-q/withncbi/blob/master/ensembl/README.md#gff3)
+* Annotations from
+  [Ensembl gff3 files](https://github.com/wang-q/withncbi/blob/master/ensembl/README.md#gff3)
+* Annotations from JGI PhytozomeV11
 * Paralogs from
   [self-aligning](https://github.com/wang-q/withncbi/blob/master/paralog/OPs-selfalign.md)
 
@@ -69,10 +71,10 @@ Genome, RepeatMasker and gff3.
 cat <<'EOF' > ~/data/alignment/gene-paralog/proc_prepare.sh
 #!/bin/bash
 
-USAGE="Usage: $0 GENOME_NAME"
+USAGE="Usage: $0 GENOME_NAME BASE_DIR"
 
 if [ "$#" -lt 1 ]; then
-    echo "$USAGE"
+    echo >&2 "$USAGE"
     exit 1
 fi
 
@@ -80,6 +82,7 @@ echo "==> parameters <=="
 echo "    " $@
 
 GENOME_NAME=$1
+BASE_DIR=${2:-~/data/alignment/Ensembl}
 
 cd ~/data/alignment/gene-paralog/${GENOME_NAME}/data
 
@@ -88,7 +91,7 @@ if [ -f ~/data/alignment/gene-paralog/${GENOME_NAME}/data/genome.fa ];
 then
     echo "genome.fa exists"
 else
-    find ~/data/alignment/Ensembl/${GENOME_NAME} -type f -name "*.fa" \
+    find ${BASE_DIR}/${GENOME_NAME} -type f -name "*.fa" \
         | sort | xargs cat \
         | perl -nl -e '/^>/ or $_ = uc; print' \
         > genome.fa
@@ -103,6 +106,19 @@ else
     rm genome.fa.cat.gz  genome.fa.masked
     rm -fr RM_*
 fi
+
+echo "==> run dustmasker"
+dustmasker -in genome.fa -infmt fasta -out - -outfmt interval \
+    | perl -nl -e '
+        BEGIN { $name = qq{}}
+        if ( /^>(\S+)/ ) {
+            $name = $1;
+        } elsif ( /(\d+)\s+\-\s+(\d+)/ ) {
+            print qq{$name:$1-$2};
+        }
+    ' \
+    > dustmasker.output.txt
+runlist cover dustmasker.output.txt -o dustmasker.yml
 
 echo "==> Convert gff3 to runlists"
 cd ~/data/alignment/gene-paralog/${GENOME_NAME}/feature
@@ -652,6 +668,106 @@ Full processing time is about 1 hour.
     ```bash
     cd ~/data/alignment/gene-paralog
     find Atha -type f -not -path "*/data/*" -print | zip Atha.zip -9 -@
+    ```
+
+## Athaliana from JGI
+
+Full processing time is about 1 hour.
+
+1. [Data](https://github.com/wang-q/withncbi/blob/master/paralog/OPs-selfalign.md#arabidopsis)
+
+2. Prepare
+
+    ```bash
+    GENOME_NAME=Atha
+
+    echo "====> create directories"
+    mkdir -p ~/data/alignment/gene-paralog/${GENOME_NAME}/data
+    mkdir -p ~/data/alignment/gene-paralog/${GENOME_NAME}/feature
+    mkdir -p ~/data/alignment/gene-paralog/${GENOME_NAME}/repeat
+    mkdir -p ~/data/alignment/gene-paralog/${GENOME_NAME}/stat
+    mkdir -p ~/data/alignment/gene-paralog/${GENOME_NAME}/yml
+
+    echo "====> copy or download needed files here"
+    cd ~/data/alignment/gene-paralog/${GENOME_NAME}/data
+    cp ~/data/alignment/self/plants/Genomes/${GENOME_NAME}/chr.sizes chr.sizes
+    cp ~/data/alignment/self/plants/Results/${GENOME_NAME}/${GENOME_NAME}.chr.runlist.yml paralog.yml
+
+    cp ~/data/ensembl82/gff3/arabidopsis_thaliana/Arabidopsis_thaliana.TAIR10.29.gff3.gz gff3.gz
+    wget http://pmite.hzau.edu.cn/MITE/MITE-SEQ-V2/03_arabidopsis_mite_seq.fa -O mite.fa
+    ```
+
+    ```bash
+    cd ~/data/alignment/gene-paralog/Atha/data
+
+    # 0m44.430s
+    time bash ~/data/alignment/gene-paralog/proc_prepare.sh Atha
+    # 0m46.052s
+    time bash ~/data/alignment/gene-paralog/proc_repeat.sh Atha
+    # 0m43.666s
+    time bash ~/data/alignment/gene-paralog/proc_mite.sh Atha
+    ```
+
+3. Paralog-repeats stats
+
+    ```bash
+    cd ~/data/alignment/gene-paralog/Atha/stat
+    # 0m28.356s
+    time bash ~/data/alignment/gene-paralog/proc_paralog.sh Atha
+    ```
+
+4. Gene-paralog stats
+
+    ```bash
+    cd ~/data/alignment/gene-paralog/Atha/stat
+    # 0m6.888s
+    time bash ~/data/alignment/gene-paralog/proc_all_gene.sh Atha ../yml/paralog.yml
+    # 0m7.283s
+    time bash ~/data/alignment/gene-paralog/proc_all_gene.sh Atha ../yml/paralog_adjacent.yml
+
+    # E5-2690 v3
+    # real    8m45.668s
+    # user    57m58.984s
+    # sys     0m1.808s
+    # i7-6700k
+    # real	15m18.045s
+    # user	104m21.728s
+    # sys	0m13.363s
+    time bash ~/data/alignment/gene-paralog/proc_sep_gene.sh Atha ../yml/paralog.yml
+
+    # real	0m35.566s
+    # user	1m12.613s
+    # sys	0m7.601s
+    time bash ~/data/alignment/gene-paralog/proc_sep_gene_jrunlist.sh Atha ../yml/paralog.yml
+
+    bash ~/data/alignment/gene-paralog/proc_sep_gene_jrunlist.sh Atha ../yml/paralog_adjacent.yml
+    ```
+
+5. Gene-repeats stats
+
+    ```bash
+    cd ~/data/alignment/gene-paralog/Atha/stat
+
+    cat ../yml/repeat.family.txt \
+        | parallel -j 8 --keep-order "
+            bash ~/data/alignment/gene-paralog/proc_all_gene.sh Atha ../yml/{}.yml
+        "
+
+    # 12 hours?
+    # time \
+    # cat ../yml/repeat.family.txt \
+    #     | parallel -j 1 --keep-order "
+    #         bash ~/data/alignment/gene-paralog/proc_sep_gene.sh Atha ../yml/{}.yml
+    #     "    
+
+    # real	10m34.669s
+    # user	17m27.433s
+    # sys	3m20.765s
+    time \
+        cat ../yml/repeat.family.txt \
+            | parallel -j 1 --keep-order "
+                bash ~/data/alignment/gene-paralog/proc_sep_gene_jrunlist.sh Atha ../yml/{}.yml
+            "
     ```
 
 ## Plants aligned with full chromosomes

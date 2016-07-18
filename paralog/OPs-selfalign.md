@@ -7,27 +7,33 @@ mkdir -p ~/data/alignment/self
 cd ~/data/alignment/self
 
 perl        ~/Scripts/withncbi/taxon/strain_info.pl \
-    --id    559292                                  --name 559292=S288c  \
-    --id    7227                                    --name 7227=Dmel     \
-    --id    9606                                    --name 9606=Human    \
-    --id    6239                                    --name 6239=Cele     \
-    --id    352472                                  --name 352472=Ddis   \
-    --id    10090                                   --name 10090=Mouse   \
-    --id    3880                                    --name 3880=Mtru     \
-    --id    3847                                    --name 3847=Gmax     \
-    --id    3712                                    --name 3712=Bole     \
-    --id    3711                                    --name 3711=Brap     \
-    --id    3702                                    --name 3702=Atha     \
-    --id    59689                                   --name 59689=Alyr    \
-    --id    29760                                   --name 29760=Vvin    \
-    --id    4081                                    --name 4081=Slyc     \
-    --id    4113                                    --name 4113=Stub     \
-    --id    4641                                    --name 4641=Macu     \
-    --id    4555                                    --name 4555=Sita     \
-    --id    4558                                    --name 4558=Sbic     \
-    --id    39947                                   --name 39947=OsatJap \
-    --id    15368                                   --name 15368=Bdis    \
-    --file ensembl_taxon.csv                        \
+    --id    559292 --name 559292=S288c  \
+    --id    7227   --name 7227=Dmel     \
+    --id    9606   --name 9606=Human    \
+    --id    6239   --name 6239=Cele     \
+    --id    352472 --name 352472=Ddis   \
+    --id    10090  --name 10090=Mouse   \
+    --id    3880   --name 3880=Mtru     \
+    --id    3847   --name 3847=Gmax     \
+    --id    3712   --name 3712=Bole     \
+    --id    3711   --name 3711=Brap     \
+    --id    3702   --name 3702=Atha     \
+    --id    59689  --name 59689=Alyr    \
+    --id    29760  --name 29760=Vvin    \
+    --id    4081   --name 4081=Slyc     \
+    --id    4113   --name 4113=Stub     \
+    --id    4641   --name 4641=Macu     \
+    --id    4555   --name 4555=Sita     \
+    --id    4558   --name 4558=Sbic     \
+    --id    39947  --name 39947=OsatJap \
+    --id    15368  --name 15368=Bdis    \
+    --file ensembl_taxon.csv            \
+    --entrez
+
+perl        ~/Scripts/withncbi/taxon/strain_info.pl \
+    --id    3702   --name 3702=Athaliana \
+    --id    39947  --name 39947=Osativa  \
+    --file jgi_taxon.csv                 \
     --entrez
 
 ```
@@ -93,10 +99,8 @@ perl ~/Scripts/egaz/self_batch.pl \
 
 bash yeast/1_real_chr.sh
 bash yeast/3_self_cmd.sh
-time bash yeast/4_proc_cmd.sh
 # real    0m46.075s
-# user    1m19.171s
-# sys     0m42.335s
+time bash yeast/4_proc_cmd.sh
 bash yeast/5_circos_cmd.sh
 ```
 
@@ -152,14 +156,10 @@ mkdir -p Processing/Atha
 bash ~/share/circos/data/karyotype/parse.karyotype Atha.kary.tsv > Processing/Atha/karyotype.Atha.txt
 
 bash 1_real_chr.sh
-time bash 3_self_cmd.sh
 # real    25m15.804s
-# user    161m4.543s
-# sys     1m10.534s
-time bash 4_proc_cmd.sh
+time bash 3_self_cmd.sh
 # real    10m21.329s
-# user    27m48.637s
-# sys     12m24.249s
+time bash 4_proc_cmd.sh
 bash 5_circos_cmd.sh
 ```
 
@@ -185,20 +185,40 @@ perl ~/Scripts/egaz/self_batch.pl \
     -t Atha
 
 bash arabidopsis_parted/1_real_chr.sh
-time bash arabidopsis_parted/3_self_cmd.sh
 # real    21m10.875s
-# user    156m48.601s
-# sys     1m54.846s
-time bash arabidopsis_parted/4_proc_cmd.sh
+time bash arabidopsis_parted/3_self_cmd.sh
 # real    9m33.086s
-# user    24m56.361s
-# sys     11m21.288s
+time bash arabidopsis_parted/4_proc_cmd.sh
 bash arabidopsis_parted/5_circos_cmd.sh
 ```
 
 ### 3. Comparison
 
 **11.50% vs 9.96%. Use full chromosomes if the running time is acceptable.**
+
+## Athaliana from JGI
+
+```bash
+cd ~/data/alignment/self
+
+perl ~/Scripts/egaz/self_batch.pl \
+    --working_dir ~/data/alignment/self \
+    --seq_dir ~/data/alignment/JGI \
+    -c ~/data/alignment/self/jgi_taxon.csv \
+    --jar \
+    --length 1000  \
+    --name Athaliana \
+    --parallel 8 \
+    -t Athaliana
+
+bash Athaliana/1_real_chr.sh
+bash Athaliana/2_file_rm.sh
+# real    26m9.090s
+time bash Athaliana/3_self_cmd.sh
+# real    3m24.714s
+time bash Athaliana/4_proc_cmd.sh
+bash Athaliana/5_circos_cmd.sh
+```
 
 ## Cele
 
@@ -216,14 +236,10 @@ perl ~/Scripts/egaz/self_batch.pl \
     -t Cele
 
 bash worm/1_real_chr.sh
-time bash worm/3_self_cmd.sh
 # real    26m9.090s
-# user    150m18.730s
-# sys     0m49.323s
-time bash worm/4_proc_cmd.sh
+time bash worm/3_self_cmd.sh
 # real    3m24.714s
-# user    6m42.150s
-# sys     4m1.954s
+time bash worm/4_proc_cmd.sh
 bash worm/5_circos_cmd.sh
 ```
 
@@ -243,14 +259,10 @@ perl ~/Scripts/egaz/self_batch.pl \
     -t Ddis
 
 bash dicty/1_real_chr.sh
-time bash dicty/3_self_cmd.sh
 # real    1m53.391s
-# user    13m25.636s
-# sys     0m7.271s
-time bash dicty/4_proc_cmd.sh
+time bash dicty/3_self_cmd.sh
 # real    353m10.864s
-# user    364m44.545s
-# sys     2m29.146s
+time bash dicty/4_proc_cmd.sh
 bash dicty/5_circos_cmd.sh
 ```
 
@@ -272,14 +284,10 @@ perl ~/Scripts/egaz/self_batch.pl \
 cd ~/data/alignment/self/human
 
 bash 1_real_chr.sh
-time bash 3_self_cmd.sh
 # real    4156m4.259s
-# user    32775m39.086s
-# sys     227m18.093s
-time bash 4_proc_cmd.sh
+time bash 3_self_cmd.sh
 # real    940m13.950s
-# user    3947m24.734s
-# sys     248m12.852s
+time bash 4_proc_cmd.sh
 bash 5_circos_cmd.sh
 ```
 
@@ -301,14 +309,10 @@ perl ~/Scripts/egaz/self_batch.pl \
 cd ~/data/alignment/self/mouse
 
 bash 1_real_chr.sh
-time bash 3_self_cmd.sh
 # real    3801m39.031s
-# user    29792m18.127s
-# sys     133m41.809s
-time bash 4_proc_cmd.sh
+time bash 3_self_cmd.sh
 # real    1750m33.958s
-# user    5020m19.404s
-# sys     365m30.568s
+time bash 4_proc_cmd.sh
 bash 5_circos_cmd.sh
 ```
 
@@ -335,14 +339,10 @@ perl ~/Scripts/egaz/self_batch.pl \
 cd ~/data/alignment/self/plants
 
 bash 1_real_chr.sh
-time bash 3_self_cmd.sh
 # real    658m10.559s
-# user    5623m25.407s
-# sys     74m46.390s
-time bash 4_proc_cmd.sh
+time bash 3_self_cmd.sh
 # real    971m49.779s
-# user    2130m57.202s
-# sys     435m29.950s
+time bash 4_proc_cmd.sh
 bash 5_circos_cmd.sh
 ```
 

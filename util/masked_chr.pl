@@ -109,7 +109,7 @@ my $worker = sub {
     my $seq = $seq_of->{ ( keys %{$seq_of} )[0] };
 
     my @sets = $ftr_set->sets;
-    for my $set (@sets) {
+    for my AlignDB::IntSpan $set (@sets) {
         my $offset = $set->min - 1;
         my $length = $set->size;
 
