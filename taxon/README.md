@@ -732,7 +732,7 @@ for d in `find . -mindepth 1 -maxdepth 1 -type d | sort `;do
     echo bash $d/2_file_rm.sh ;
     echo bash $d/3_self_cmd.sh ;
     echo bash $d/4_proc_cmd.sh ;
-    echo bash $d/5_circos_cmd ;
+    echo bash $d/5_circos_cmd.sh ;
     echo bash $d/7_pair_stat.sh ;
     echo ;
 done  > runall.sh
