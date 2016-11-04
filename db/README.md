@@ -1,6 +1,7 @@
 # `db/`
 
-Turn NCBI genome reports and assembly reports into query-able MySQL databases.
+Turn NCBI genome reports and assembly reports into query-able MySQL
+databases.
 
 Also, taxonomy information are added to all items.
 
@@ -11,11 +12,12 @@ Download paths from NCBI ftp:
 * ftp://ftp.ncbi.nlm.nih.gov/genomes/GENOME_REPORTS
 * ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS
 
-Local paths listed in `config.ini`.  
+Local paths listed in `config.ini`.
 
 NCBI also provides other download methods including rsync and aspera.
 
-I use the following command lines on a linux box. For mac, aspera's path is different.
+I use the following command lines on a linux box. For mac, aspera's path
+is different.
 
 ```bash
 # gr
@@ -53,7 +55,8 @@ rsync -avP ftp.ncbi.nlm.nih.gov::pub/taxonomy/ \
 
 Old Bacteria genomes.
 
-On 02 December 2015 these directories were moved to ftp://ftp.ncbi.nlm.nih.gov/genomes/archive/old_refseq/.
+On 02 December 2015 these directories were moved to
+`ftp://ftp.ncbi.nlm.nih.gov/genomes/archive/old_refseq/`.
 
 ```bash
 rsync -av -P ftp.ncbi.nlm.nih.gov::genomes/archive/old_refseq/Bacteria/ \
@@ -78,7 +81,8 @@ rsync -av -P ftp.ncbi.nlm.nih.gov::genomes/archive/old_genbank/Bacteria_DRAFT/ \
     ~/data/NCBI/genbank/genomes/Bacteria_DRAFT/
 ```
 
-Newer genomes list in genomes/refseq/bacteria are just symlinks to genomes/all/*.
+Newer genomes list in genomes/refseq/bacteria are just symlinks to
+genomes/all/*.
 
 So local mirrors are no longer needed.
 
@@ -128,3 +132,4 @@ perl ar_overview.pl --db ar_genbank
 cp -f *.xlsx ../doc
 rm *.xlsx *.csv
 ```
+
