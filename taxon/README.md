@@ -29,10 +29,10 @@ All
 Or [this link](http://www.ncbi.nlm.nih.gov/genome/browse/?report=5).
 
 ```text
-Eukaryota (2759)                1228
-    Viridiplantae (33090)       1128
-        Chlorophyta (3041)      82
-        Streptophyta (35493)    1048
+Eukaryota (2759)                1486
+    Viridiplantae (33090)       1362
+        Chlorophyta (3041)      134
+        Streptophyta (35493)    1472
 ```
 
 Use `taxon/id_seq_dom_select.pl` to extract Taxonomy ids and genbank
