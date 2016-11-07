@@ -112,7 +112,7 @@ Licania,Chrysob_icaco
 Populus,Salix_interior
 Salix,Pop_trichocarpa
 ## Malvaceae 锦葵科
-Gossypium,Theo_cacao
+Gossypium,The_cacao
 ### Tilia
 ## Lythraceae 千屈菜科
 ### Lagerstroemia
@@ -170,9 +170,9 @@ Zizania,Zea_mays
 ## Moraceae 桑科
 ### Morus
 ## Rosaceae 蔷薇科
-Fragaria,Pri_utilis
-Prunus,Pri_utilis
-Pyrus,Pri_utilis
+Fragaria,Prin_utilis
+Prunus,Prin_utilis
+Pyrus,Prin_utilis
 ## Viscaceae 槲寄生科
 ### Viscum
 ## Rutaceae 芸香料
@@ -204,7 +204,7 @@ Callitropsis,Calo_formosana
 Juniperus,Calo_formosana
 Taiwania,Cun_lanceolata
 ## Taxaceae 红豆杉科
-Amentotaxus,Cep_wilsoniana
+Amentotaxus,Cephalo_wilsoniana
 Cephalotaxus,Ame_argotaenia
 ## Cycadaceae 苏铁科
 Cycas,Bow_serrulata
@@ -228,7 +228,7 @@ Pinus,Ced_deodara
 ## Bryopsidaceae 羽藻科
 ### Bryopsis
 ## Chlorellaceae 小球藻科
-Chlorella,Para_kessleri
+Chlorella,Parac_kessleri
 ## Klebsormidiaceae 克里藻科
 Koliella,Int_terricola
 ## Mamiellaceae 溪藻科
