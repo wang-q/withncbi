@@ -43,13 +43,16 @@ id,acc
 996148,NC_017006
 ```
 
-Got **1237** accessions.
+Got **1491** accessions.
 
 ```bash
 mkdir -p ~/data/organelle/plastid_genomes
 cd ~/data/organelle/plastid_genomes
 
 rm webpage_id_seq.csv
+perl ~/Scripts/withncbi/taxon/id_seq_dom_select.pl \
+    ~/Scripts/withncbi/doc/eukaryota_plastid_161106.html \
+    >> webpage_id_seq.csv
 perl ~/Scripts/withncbi/taxon/id_seq_dom_select.pl \
     ~/Scripts/withncbi/doc/eukaryota_plastid_160531.html \
     >> webpage_id_seq.csv
@@ -59,6 +62,9 @@ perl ~/Scripts/withncbi/taxon/id_seq_dom_select.pl \
 perl ~/Scripts/withncbi/taxon/id_seq_dom_select.pl \
     ~/Scripts/withncbi/doc/eukaryota_plastid_150806.html \
     >> webpage_id_seq.csv
+perl ~/Scripts/withncbi/taxon/id_seq_dom_select.pl \
+    ~/Scripts/withncbi/doc/green_plants_plastid_161106.html \
+    >> webpage_id_seq.csv    
 perl ~/Scripts/withncbi/taxon/id_seq_dom_select.pl \
     ~/Scripts/withncbi/doc/green_plants_plastid_160531.html \
     >> webpage_id_seq.csv
@@ -83,14 +89,14 @@ perl ~/Scripts/withncbi/taxon/gb_taxon_locus.pl plastid.1.genomic.gbff > refseq_
 
 rm plastid.1.genomic.gbff
 
-# 1159
+# 1330
 cat refseq_id_seq.csv | grep -v "^#" | wc -l
 
 # combine
 cat webpage_id_seq.csv refseq_id_seq.csv \
     | sort -u -t, -k1,1 > plastid_id_seq.csv
 
-# 1237
+# 1491
 cat plastid_id_seq.csv | grep -v "^#" | wc -l
 ```
 
@@ -268,7 +274,7 @@ rm *.tmp *.bak
 Species and genus should not be "NA" and genus has 2 or more members.
 
 ```text
-1237 ---------> 1220 ---------> 676 ---------> 928
+1491 ---------> 1472 ---------> 844 ---------> 832
         NA             genus          family
 ```
 
@@ -282,7 +288,7 @@ cat plastid.CHECKME.csv \
     '/^#/ and next; ($F[2] eq q{NA} or $F[3] eq q{NA} or $F[4] eq q{NA} or $F[5] eq q{NA} ) and next; print' \
     > plastid.tmp
 
-# 1220
+# 1472
 wc -l plastid.tmp
 
 #----------------------------#
@@ -297,7 +303,7 @@ cat plastid.tmp \
 # intersect between two files
 grep -F -f genus.tmp plastid.tmp > plastid.genus.tmp
 
-# 676
+# 844
 wc -l plastid.genus.tmp
 
 #----------------------------#
@@ -311,7 +317,7 @@ cat plastid.genus.tmp \
 # intersect between two files
 grep -F -f family.tmp plastid.tmp > plastid.family.tmp
 
-# 928
+# 1157
 wc -l plastid.family.tmp
 
 #----------------------------#
@@ -335,11 +341,13 @@ cat plastid.DOWNLOAD.csv \
     '/^#/i and next; $seen{$F[3]}++; END {for $k (keys %seen){printf qq{%s,%d\n}, $k, $seen{$k} if $seen{$k} > 1}};' \
     | sort
 
+#Cattleya crispata,2
 #Fragaria vesca,2
 #Gossypium herbaceum,2
 #Magnolia officinalis,2
 #Olea europaea,4
 #Oryza sativa,3
+#Plasmodium falciparum,2
 #Saccharum hybrid cultivar,3
 
 # strain name not equal to species
@@ -350,10 +358,7 @@ cat plastid.DOWNLOAD.csv \
 
 #Babesia bovis T2Bo
 #Brassica rapa subsp. pekinensis
-#Calycanthus floridus var. glaucus
-#Coccomyxa subellipsoidea C-169
 #Cucumis melo subsp. melo
-#Dioscorea cayennensis subsp. rotundata
 #Eucalyptus globulus subsp. globulus
 #Fagopyrum esculentum subsp. ancestrale
 #Fragaria vesca subsp. bracteata
@@ -375,11 +380,9 @@ cat plastid.DOWNLOAD.csv \
 #Plasmodium chabaudi chabaudi
 #Plasmodium falciparum HB3
 #Pseudotsuga sinensis var. wilsoniana
-#Pteridium aquilinum subsp. aquilinum
 #Saccharum hybrid cultivar NCo 310
 #Saccharum hybrid cultivar SP80-3280
 #Thalassiosira oceanica CCMP1005
-#Theileria parva strain Muguga
 ```
 
 Create abbreviations.
@@ -433,9 +436,9 @@ find . -name "*.fasta" | wc -l
 
 ## Create alignment plans
 
-We got **676** accessions.
+We got **832** accessions.
 
-Numbers for higher ranks are: 59 orders, 81 families, 177 genera and 666
+Numbers for higher ranks are: 65 orders, 95 families, 211 genera and 832
 species.
 
 ```bash
@@ -451,14 +454,14 @@ cat plastid.ABBR.csv \
 # intersect between two files
 grep -F -f genus.tmp plastid.ABBR.csv > plastid.GENUS.csv
 
-# 676
+# 1156
 wc -l plastid.GENUS.csv
 
 #   count every ranks
-#      59 order.list.tmp
-#      81 family.list.tmp
-#     177 genus.list.tmp
-#     666 species.list.tmp
+#      65 order.list.tmp
+#      95 family.list.tmp
+#     211 genus.list.tmp
+#     832 species.list.tmp
 cut -d',' -f 4 plastid.GENUS.csv | sort | uniq > species.list.tmp
 cut -d',' -f 5 plastid.GENUS.csv | sort | uniq > genus.list.tmp
 cut -d',' -f 6 plastid.GENUS.csv | sort | uniq > family.list.tmp
