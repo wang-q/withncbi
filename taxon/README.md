@@ -89,27 +89,25 @@ perl ~/Scripts/withncbi/taxon/gb_taxon_locus.pl plastid.1.genomic.gbff > refseq_
 
 rm plastid.1.genomic.gbff
 
-# 1330
+# 1446
 cat refseq_id_seq.csv | grep -v "^#" | wc -l
 
 # combine
 cat webpage_id_seq.csv refseq_id_seq.csv \
     | sort -u -t, -k1,1 > plastid_id_seq.csv
 
-# 1491
+# 1510
 cat plastid_id_seq.csv | grep -v "^#" | wc -l
 ```
 
-## Add linage information
+## Add lineage information
 
 Give ids better shapes for manually checking and automatic filtering.
 
+*Update `~/data/NCBI/taxdmp` before running `id_project_to.pl`*.
+
 If you sure, you can add or delete lines and contents in
 `plastid.CHECKME.csv`.
-
-Taxonomy information from [AlgaeBase](http://www.algaebase.org),
-[Wikipedia](https://www.wikipedia.org/) and
-[Encyclopedia of Life](http://eol.org/).
 
 ```bash
 mkdir -p ~/data/organelle/plastid_summary
@@ -128,6 +126,16 @@ cat ../plastid_genomes/plastid_id_seq.csv \
     | perl ~/Scripts/withncbi/taxon/id_project_to.pl -s "," --rank phylum \
     | sort -t',' -k9,9 -k8,8 -k7,7 -k6,6 -k5,5 \
     >> plastid.CHECKME.csv
+```
+
+Manually correct lineages.
+
+Taxonomy information from [AlgaeBase](http://www.algaebase.org),
+[Wikipedia](https://www.wikipedia.org/) and
+[Encyclopedia of Life](http://eol.org/).
+
+```bash
+cd ~/data/organelle/plastid_summary
 
 # darwin (bsd) need "" for -i
 sed -i".bak" "s/\'//g" plastid.CHECKME.csv
@@ -193,8 +201,13 @@ sed -i".bak" "s/Pelagophyceae,NA/Pelagophyceae,Ochrophyta/" plastid.CHECKME.csv
 sed -i".bak" "s/Raphidophyceae,NA/Raphidophyceae,Ochrophyta/" plastid.CHECKME.csv
 sed -i".bak" "s/Synurophyceae,NA/Synurophyceae,Ochrophyta/" plastid.CHECKME.csv
 sed -i".bak" "s/NA,Phaeophyceae/Phaeophyceae,Ochrophyta/" plastid.CHECKME.csv
+```
 
-# Split Streptophyta according to http://www.theplantlist.org/
+Split Streptophyta according to http://www.theplantlist.org/
+
+```bash
+cd ~/data/organelle/plastid_summary
+
 # Angiosperms
 perl -Mojo -e '
     g(q{http://www.theplantlist.org/browse/A/})->dom
@@ -288,7 +301,7 @@ cat plastid.CHECKME.csv \
     '/^#/ and next; ($F[2] eq q{NA} or $F[3] eq q{NA} or $F[4] eq q{NA} or $F[5] eq q{NA} ) and next; print' \
     > plastid.tmp
 
-# 1472
+# 1490
 wc -l plastid.tmp
 
 #----------------------------#
@@ -303,7 +316,7 @@ cat plastid.tmp \
 # intersect between two files
 grep -F -f genus.tmp plastid.tmp > plastid.genus.tmp
 
-# 844
+# 847
 wc -l plastid.genus.tmp
 
 #----------------------------#
@@ -317,7 +330,7 @@ cat plastid.genus.tmp \
 # intersect between two files
 grep -F -f family.tmp plastid.tmp > plastid.family.tmp
 
-# 1157
+# 1171
 wc -l plastid.family.tmp
 
 #----------------------------#
@@ -341,7 +354,6 @@ cat plastid.DOWNLOAD.csv \
     '/^#/i and next; $seen{$F[3]}++; END {for $k (keys %seen){printf qq{%s,%d\n}, $k, $seen{$k} if $seen{$k} > 1}};' \
     | sort
 
-#Cattleya crispata,2
 #Fragaria vesca,2
 #Gossypium herbaceum,2
 #Magnolia officinalis,2
@@ -359,6 +371,7 @@ cat plastid.DOWNLOAD.csv \
 #Babesia bovis T2Bo
 #Brassica rapa subsp. pekinensis
 #Cucumis melo subsp. melo
+#Dioscorea cayennensis subsp. rotundata
 #Eucalyptus globulus subsp. globulus
 #Fagopyrum esculentum subsp. ancestrale
 #Fragaria vesca subsp. bracteata
