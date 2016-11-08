@@ -63,8 +63,8 @@ perl ~/Scripts/withncbi/taxon/id_seq_dom_select.pl \
     ~/Scripts/withncbi/doc/eukaryota_plastid_150806.html \
     >> webpage_id_seq.csv
 perl ~/Scripts/withncbi/taxon/id_seq_dom_select.pl \
-    ~/Scripts/withncbi/doc/green_plants_plastid_161106.html \
-    >> webpage_id_seq.csv    
+     ~/Scripts/withncbi/doc/green_plants_plastid_161106.html \
+     >> webpage_id_seq.csv   
 perl ~/Scripts/withncbi/taxon/id_seq_dom_select.pl \
     ~/Scripts/withncbi/doc/green_plants_plastid_160531.html \
     >> webpage_id_seq.csv
@@ -454,7 +454,7 @@ cat plastid.ABBR.csv \
 # intersect between two files
 grep -F -f genus.tmp plastid.ABBR.csv > plastid.GENUS.csv
 
-# 1156
+# 844
 wc -l plastid.GENUS.csv
 
 #   count every ranks
