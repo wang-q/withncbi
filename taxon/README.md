@@ -497,14 +497,14 @@ cat plastid.ABBR.csv \
 # intersect between two files
 grep -F -f genus.tmp plastid.ABBR.csv > plastid.GENUS.csv
 
-# 1156
+# 847
 wc -l plastid.GENUS.csv
 
 #   count every ranks
-#      65 order.list.tmp
-#      95 family.list.tmp
+#      66 order.list.tmp
+#      96 family.list.tmp
 #     211 genus.list.tmp
-#     832 species.list.tmp
+#     836 species.list.tmp
 cut -d',' -f 4 plastid.GENUS.csv | sort | uniq > species.list.tmp
 cut -d',' -f 5 plastid.GENUS.csv | sort | uniq > genus.list.tmp
 cut -d',' -f 6 plastid.GENUS.csv | sort | uniq > family.list.tmp
