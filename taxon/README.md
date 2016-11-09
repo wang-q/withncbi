@@ -158,7 +158,9 @@ sed -i".bak" "s/Aureococcus,NA/Aureococcus,Pelagomonadaceae/" plastid.CHECKME.cs
 sed -i".bak" "s/Aureoumbra,NA/Aureoumbra,Sarcinochrysidaceae/" plastid.CHECKME.csv
 sed -i".bak" "s/Bigelowiella,NA/Bigelowiella,Chlorarachniaceae/" plastid.CHECKME.csv
 sed -i".bak" "s/Choricystis,NA/Choricystis,Coccomyxaceae/" plastid.CHECKME.csv
+sed -i".bak" "s/Carteria,NA,NA/Carteria,Chlamydomonadaceae,Chlamydomonadales/" plastid.CHECKME.csv
 sed -i".bak" "s/Cryptoglena,NA,NA/Cryptoglena,Euglenaceae,Euglenales/" plastid.CHECKME.csv
+sed -i".bak" "s/Cymbomonas,NA/Cymbomonas,Pyramimonadaceae/" plastid.CHECKME.csv
 sed -i".bak" "s/Dicloster,NA,NA/Dicloster,Chlorellaceae,Chlorellales/" plastid.CHECKME.csv
 sed -i".bak" "s/Dictyochloropsis,NA/Dictyochloropsis,Trebouxiaceae/" plastid.CHECKME.csv
 sed -i".bak" "s/Euglenaformis,NA/Euglenaformis,Euglenaceae/" plastid.CHECKME.csv
@@ -174,6 +176,7 @@ sed -i".bak" "s/Myrmecia,NA/Myrmecia,Trebouxiaceae/" plastid.CHECKME.csv
 sed -i".bak" "s/Neocystis,NA/Neocystis,Radiococcaceae/" plastid.CHECKME.csv
 sed -i".bak" "s/Nephroselmis,NA,NA/Nephroselmis,Nephroselmidaceae,Nephroselmidales/" plastid.CHECKME.csv
 sed -i".bak" "s/Oedogonium,NA/Oedogonium,Oedogoniaceae/" plastid.CHECKME.csv
+sed -i".bak" "s/Oedocladium,NA/Oedocladium,Oedogoniaceae/" plastid.CHECKME.csv
 sed -i".bak" "s/Oltmannsiellopsis,NA/Oltmannsiellopsis,Oltmannsiellopsidaceae/" plastid.CHECKME.csv
 sed -i".bak" "s/Pabia,NA/Pabia,Trebouxiaceae/" plastid.CHECKME.csv
 sed -i".bak" "s/Parachlorella,NA/Parachlorella,Chlorellaceae/" plastid.CHECKME.csv
@@ -186,12 +189,25 @@ sed -i".bak" "s/Pyramimonas,NA/Pyramimonas,Pyramimonadaceae/" plastid.CHECKME.cs
 sed -i".bak" "s/Stichococcus,NA/Stichococcus,Prasiolaceae/" plastid.CHECKME.csv
 sed -i".bak" "s/Stigeoclonium,NA/Stigeoclonium,Chaetophoraceae/" plastid.CHECKME.csv
 sed -i".bak" "s/Trachydiscus,NA/Trachydiscus,Pleurochloridaceae/" plastid.CHECKME.csv
+sed -i".bak" "s/Verdigellas,NA/Verdigellas,Palmophyllaceae/" plastid.CHECKME.csv
 sed -i".bak" "s/Watanabea,NA/Watanabea,Trebouxiaceae/" plastid.CHECKME.csv
 
 sed -i".bak" "s/Chlorellales,NA/Chlorellales,Trebouxiophyceae/" plastid.CHECKME.csv
 
+# Chlorophyceae, incertae sedis
+#sed -i".bak" "s/Jenufa,NA,NA/Jenufa,NA,NA/" plastid.CHECKME.csv
+# Chlorophyta incertae sedis
+#sed -i".bak" "s/Picocystis,NA,NA/Picocystis,NA,NA/" plastid.CHECKME.csv
+sed -i".bak" "s/Pleurastrum,NA,NA/Pleurastrum,NA,Chlamydomonadales/" plastid.CHECKME.csv
+
+# missing orders
+sed -i".bak" "s/Leptocylindraceae,NA/Leptocylindraceae,Chaetocerotales/" plastid.CHECKME.csv
+sed -i".bak" "s/Rhizosoleniaceae,NA/Rhizosoleniaceae,Rhizosoleniales/" plastid.CHECKME.csv
+
 # missing classes and phylums
 sed -i".bak" "s/Bangiophyceae,NA/Bangiophyceae,Rhodophyta/" plastid.CHECKME.csv
+sed -i".bak" "s/Stylonematophyceae,NA/Stylonematophyceae,Rhodophyta/" plastid.CHECKME.csv
+sed -i".bak" "s/Compsopogonophyceae,NA/Compsopogonophyceae,Rhodophyta/" plastid.CHECKME.csv
 sed -i".bak" "s/Florideophyceae,NA/Florideophyceae,Rhodophyta/" plastid.CHECKME.csv
 sed -i".bak" "s/Phaeocystales,NA,NA/Phaeocystales,Coccolithophyceae,Haptophyta/" plastid.CHECKME.csv
 sed -i".bak" "s/Glaucocystophyceae,NA/Glaucocystophyceae,Glaucophyta/" plastid.CHECKME.csv
@@ -201,6 +217,20 @@ sed -i".bak" "s/Pelagophyceae,NA/Pelagophyceae,Ochrophyta/" plastid.CHECKME.csv
 sed -i".bak" "s/Raphidophyceae,NA/Raphidophyceae,Ochrophyta/" plastid.CHECKME.csv
 sed -i".bak" "s/Synurophyceae,NA/Synurophyceae,Ochrophyta/" plastid.CHECKME.csv
 sed -i".bak" "s/NA,Phaeophyceae/Phaeophyceae,Ochrophyta/" plastid.CHECKME.csv
+
+sed -i".bak" "s/Isochrysidales,NA,NA/Isochrysidales,Coccolithophyceae,Haptophyta/" plastid.CHECKME.csv
+sed -i".bak" "s/Pavlovales,NA,NA/Pavlovales,Pavlovophyceae,Haptophyta/" plastid.CHECKME.csv
+
+# Cercozoa
+sed -i".bak" "s/Euglyphida,NA,NA/Euglyphida,Filosa,Cercozoa/" plastid.CHECKME.csv
+sed -i".bak" "s/Gymnochlora,NA,NA,NA,NA/Gymnochlora,Chlorarachniaceae,Chlorarachniales,Chlorarachniophyceae,Cercozoa/" plastid.CHECKME.csv
+sed -i".bak" "s/Lotharella,NA,NA,NA,NA/Lotharella,Chlorarachniaceae,Chlorarachniales,Chlorarachniophyceae,Cercozoa/" plastid.CHECKME.csv
+sed -i".bak" "s/Partenskyella,NA,NA,NA,NA/Partenskyella,Chlorarachniaceae,Chlorarachniales,Chlorarachniophyceae,Cercozoa/" plastid.CHECKME.csv
+sed -i".bak" "s/Bigelowiella,Chlorarachniaceae,NA,NA,NA/Bigelowiella,Chlorarachniaceae,Chlorarachniales,Chlorarachniophyceae,Cercozoa/" plastid.CHECKME.csv
+
+#Entry Merged. Taxid 1605147 was merged into taxid 142389 on October 16, 2015.
+sed -i".bak" "/1605147,/d" plastid.CHECKME.csv
+
 ```
 
 Split Streptophyta according to http://www.theplantlist.org/
@@ -301,7 +331,7 @@ cat plastid.CHECKME.csv \
     '/^#/ and next; ($F[2] eq q{NA} or $F[3] eq q{NA} or $F[4] eq q{NA} or $F[5] eq q{NA} ) and next; print' \
     > plastid.tmp
 
-# 1490
+# 1497
 wc -l plastid.tmp
 
 #----------------------------#
