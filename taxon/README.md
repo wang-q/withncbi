@@ -43,7 +43,7 @@ id,acc
 996148,NC_017006
 ```
 
-Got **1491** accessions.
+Got **1510** accessions.
 
 ```bash
 mkdir -p ~/data/organelle/plastid_genomes
@@ -193,6 +193,7 @@ sed -i".bak" "s/Verdigellas,NA/Verdigellas,Palmophyllaceae/" plastid.CHECKME.csv
 sed -i".bak" "s/Watanabea,NA/Watanabea,Trebouxiaceae/" plastid.CHECKME.csv
 
 sed -i".bak" "s/Chlorellales,NA/Chlorellales,Trebouxiophyceae/" plastid.CHECKME.csv
+sed -i".bak" "s/Ettlia,NA/Ettlia,Chlorococcaceae/" plastid.CHECKME.csv
 
 # Chlorophyceae, incertae sedis
 #sed -i".bak" "s/Jenufa,NA,NA/Jenufa,NA,NA/" plastid.CHECKME.csv
@@ -203,6 +204,12 @@ sed -i".bak" "s/Pleurastrum,NA,NA/Pleurastrum,NA,Chlamydomonadales/" plastid.CHE
 # missing orders
 sed -i".bak" "s/Leptocylindraceae,NA/Leptocylindraceae,Chaetocerotales/" plastid.CHECKME.csv
 sed -i".bak" "s/Rhizosoleniaceae,NA/Rhizosoleniaceae,Rhizosoleniales/" plastid.CHECKME.csv
+sed -i".bak" "s/Babesiidae,NA/Babesiidae,Piroplasmida/" plastid.CHECKME.csv
+sed -i".bak" "s/Theileriidae,NA/Theileriidae,Piroplasmida/" plastid.CHECKME.csv 	
+sed -i".bak" "s/Treubariaceae,NA/Treubariaceae,Chlorococcales/" plastid.CHECKME.csv 
+sed -i".bak" "s/Oltmannsiellopsidaceae,NA/Oltmannsiellopsidaceae,Oltmannsiellopsidales/" plastid.CHECKME.csv 
+sed -i".bak" "s/Pycnococcaceae,NA/Pycnococcaceae,Pseudoscourfieldiales/" plastid.CHECKME.csv 
+sed -i".bak" "s/Coccomyxaceae,NA/Coccomyxaceae,Chlorococcales/" plastid.CHECKME.csv 	
 
 # missing classes and phylums
 sed -i".bak" "s/Bangiophyceae,NA/Bangiophyceae,Rhodophyta/" plastid.CHECKME.csv
@@ -220,6 +227,49 @@ sed -i".bak" "s/NA,Phaeophyceae/Phaeophyceae,Ochrophyta/" plastid.CHECKME.csv
 
 sed -i".bak" "s/Isochrysidales,NA,NA/Isochrysidales,Coccolithophyceae,Haptophyta/" plastid.CHECKME.csv
 sed -i".bak" "s/Pavlovales,NA,NA/Pavlovales,Pavlovophyceae,Haptophyta/" plastid.CHECKME.csv
+sed -i".bak" "s/Apiales,NA/Apiales,Magnoliopsida/" plastid.CHECKME.csv
+sed -i".bak" "s/Aquifoliales,NA/Aquifoliales,Magnoliopsida/" plastid.CHECKME.csv
+sed -i".bak" "s/Asterales,NA/Asterales,Magnoliopsida/" plastid.CHECKME.csv
+sed -i".bak" "s/Austrobaileyales,NA/Austrobaileyales,Magnoliopsida/" plastid.CHECKME.csv
+sed -i".bak" "s/Brassicales,NA/Brassicales,Magnoliopsida/" plastid.CHECKME.csv
+sed -i".bak" "s/Buxales,NA/Buxales,Magnoliopsida/" plastid.CHECKME.csv
+sed -i".bak" "s/Canellales,NA/Canellales,Magnoliopsida/" plastid.CHECKME.csv
+sed -i".bak" "s/Caryophyllales,NA/Caryophyllales,Magnoliopsida/" plastid.CHECKME.csv
+sed -i".bak" "s/Celastrales,NA/Celastrales,Magnoliopsida/" plastid.CHECKME.csv
+sed -i".bak" "s/Cornales,NA/Cornales,Magnoliopsida/" plastid.CHECKME.csv
+sed -i".bak" "s/Cucurbitales,NA/Cucurbitales,Magnoliopsida/" plastid.CHECKME.csv
+sed -i".bak" "s/Dipsacales,NA/Dipsacales,Magnoliopsida/" plastid.CHECKME.csv
+sed -i".bak" "s/Ericales,NA/Ericales,Magnoliopsida/" plastid.CHECKME.csv
+sed -i".bak" "s/Fabales,NA/Fabales,Magnoliopsida/" plastid.CHECKME.csv
+sed -i".bak" "s/Gentianales,NA/Gentianales,Magnoliopsida/" plastid.CHECKME.csv
+sed -i".bak" "s/Geraniales,NA/Geraniales,Magnoliopsida/" plastid.CHECKME.csv
+sed -i".bak" "s/Ginkgoales,NA/Ginkgoales,Ginkgoopsida/" plastid.CHECKME.csv
+sed -i".bak" "s/Gnetales,NA/Gnetales,Gnetopsida/" plastid.CHECKME.csv
+sed -i".bak" "s/Gleicheniales,NA/Gleicheniales,Gleicheniales/" plastid.CHECKME.csv
+sed -i".bak" "s/Isoetales,NA/Isoetales,Isoetopsida/" plastid.CHECKME.csv
+sed -i".bak" "s/Lamiales,NA/Lamiales,Magnoliopsida/" plastid.CHECKME.csv
+sed -i".bak" "s/Lycopodiales,NA/Lycopodiales,Lycopodiopsida/" plastid.CHECKME.csv
+sed -i".bak" "s/Magnoliales,NA/Magnoliales,Magnoliopsida/" plastid.CHECKME.csv
+sed -i".bak" "s/Malpighiales,NA/Malpighiales,Magnoliopsida/" plastid.CHECKME.csv
+sed -i".bak" "s/Malvales,NA/Malvales,Magnoliopsida/" plastid.CHECKME.csv
+sed -i".bak" "s/Marattiales,NA/Marattiales,Marattiopsida/" plastid.CHECKME.csv
+sed -i".bak" "s/Myrtales,NA/Myrtales,Magnoliopsida/" plastid.CHECKME.csv
+sed -i".bak" "s/Ophioglossales,NA/Ophioglossales,Ophioglossales/" plastid.CHECKME.csv
+sed -i".bak" "s/Osmundales,NA/Osmundales,Polypodiopsida/" plastid.CHECKME.csv
+sed -i".bak" "s/Pinales,NA/Pinales,Pinopsida/" plastid.CHECKME.csv
+sed -i".bak" "s/Polypodiales,NA/Polypodiales,Polypodiopsida/" plastid.CHECKME.csv
+sed -i".bak" "s/Proteales,NA/Proteales,Magnoliopsida/" plastid.CHECKME.csv
+sed -i".bak" "s/Ranunculales,NA/Ranunculales,Magnoliopsida/" plastid.CHECKME.csv
+sed -i".bak" "s/Rosales,NA/Rosales,Magnoliopsida/" plastid.CHECKME.csv
+sed -i".bak" "s/Salviniales,NA/Salviniales,Polypodiopsida/" plastid.CHECKME.csv
+sed -i".bak" "s/Saxifragales,NA/Saxifragales,Magnoliopsida/" plastid.CHECKME.csv
+sed -i".bak" "s/Schizaeales,NA/Schizaeales,Polypodiopsida/" plastid.CHECKME.csv
+sed -i".bak" "s/Selaginellales,NA/Selaginellales,Isoetopsida/" plastid.CHECKME.csv
+sed -i".bak" "s/Solanales,NA/Solanales,Magnoliopsida/" plastid.CHECKME.csv
+sed -i".bak" "s/Trochodendrales,NA/Trochodendrales,Magnoliopsida/" plastid.CHECKME.csv
+sed -i".bak" "s/Vitales,NA/Vitales,Magnoliopsida/" plastid.CHECKME.csv
+sed -i".bak" "s/Welwitschiales,NA/Welwitschiales,Gnetopsida/" plastid.CHECKME.csv
+sed -i".bak" "s/Zygophyllales,NA/Zygophyllales,Magnoliopsida/" plastid.CHECKME.csv
 
 # Cercozoa
 sed -i".bak" "s/Euglyphida,NA,NA/Euglyphida,Filosa,Cercozoa/" plastid.CHECKME.csv
