@@ -50,6 +50,7 @@ rsync -avP ftp.ncbi.nlm.nih.gov::pub/taxonomy/ \
     --exclude=".tmp" \
     --exclude=".old" \
     --exclude="accession2taxid" \
+    --exclude="gi_taxid_*" \
     ~/data/NCBI/taxonomy/
 ```
 
