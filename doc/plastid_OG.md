@@ -6,7 +6,7 @@ Angelica,Bup_falcatum
 ## Araliaceae 五加科
 Dendropanax,Aral_undulata
 Panax,Aral_undulata
-### Schefflera
+### Schefflera 冬青科
 ## Aquifoliaceae
 ###Ilex
 ## Asparagaceae 天门冬科
@@ -63,9 +63,9 @@ Salicornia,Spi_oleracea
 ### Dioscorea
 ## Actinidiaceae 猕猴桃科
 ### Actinidia
-## Ebenaceae
+## Ebenaceae 柿树科
 ###Diospyros
-## Primulaceae
+## Primulaceae 报春花科
 ###Primula
 ## Theaceae 山茶科
 ### Camellia
@@ -80,7 +80,7 @@ Vigna,Phas_vulgaris
 ### Wisteria
 ## Fagaceae 壳斗科
 Quercus,Trig_doichangensis
-## Juglandaceae
+## Juglandaceae 胡桃科
 ###Juglans
 ## Apocynaceae 夹竹桃科
 Asclepias,Cathar_roseus
@@ -114,7 +114,7 @@ Orobanche,Lin_philippensis
 ## Plantaginaceae 车前草科
 ### Plantago
 ###Veronica
-## Scrophulariaceae
+## Scrophulariaceae 玄参科
 ###Scrophularia
 ## Lauraceae 樟科
 ### Machilus
@@ -197,7 +197,7 @@ Zizania,Zea_mays
 ## Berberidaceae 小檗科
 ### Berberis
 ### Epimedium
-## Ranunculaceae
+## Ranunculaceae 毛茛科
 ###Aconitum
 ###Ranunculus
 ## Moraceae 桑科
@@ -208,9 +208,9 @@ Prunus,Prin_utilis
 Pyrus,Prin_utilis
 ## Viscaceae 槲寄生科
 ### Viscum
-## Aceraceae
+## Aceraceae 槭树科
 ###Acer
-## Anacardiaceae
+## Anacardiaceae 漆树科
 ###Spondias
 ## Rutaceae 芸香料
 ### Citrus
@@ -290,17 +290,17 @@ Koliella,Int_terricola
 ## Bangiaceae 红毛菜科
 ### Porphyra
 ###Pyropia,Por_purpurea
-## Ceramiaceae
+## Ceramiaceae 仙菜科
 ### Ceramium
 ## Gelidiaceae 石花菜科
 ### Gelidium
 ## Gracilariaceae 江蓠科
 ### Gracilaria
-## Hildenbrandiaceae
+## Hildenbrandiaceae 胭脂藻科
 ### Hildenbrandia
-## Liagoraceae
+## Liagoraceae 粉枝藻科
 ### Liagora
-## Porphyridiaceae
+## Porphyridiaceae 紫球藻科
 ### Porphyridium
 
 # Ochrophyta 淡色藻总门 (褐藻纲)
