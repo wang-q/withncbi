@@ -1,51 +1,33 @@
-# Process plastid genomes
+Process plastid genomes
 
-The following command lines are about how I processed the plastid
-genomes of green plants. Many tools of `taxon/` are used here, which
-makes a good example for users.
+The following command lines are about how I processed the plastid genomes of green plants. Many tools of taxon/ are used here, which makes a good example for users.
+Work flow.
 
-## Work flow.
-
-```text
 id ---> lineage ---> filtering ---> naming ---> strain_info.pl   ---> egaz/multi_batch.pl
                                       |                                 ^
                                       |-------> batch_get_seq.pl -------|
-```
 
-I'm sure there are no commas in names. So for convenient, don't use
-Text::CSV_XS.
+I'm sure there are no commas in names. So for convenient, don't use Text::CSV_XS.
+Scrap id and acc from NCBI
 
-## Scrap id and acc from NCBI
+Open browser and visit NCBI plastid page. Save page to a local file, html only. In this case, it's doc/green_plants_plastid_160531.html.
 
-Open browser and visit
-[NCBI plastid page](http://www.ncbi.nlm.nih.gov/genomes/GenomesGroup.cgi?taxid=33090&opt=plastid).
-Save page to a local file, html only. In this case, it's
-`doc/green_plants_plastid_160531.html`.
+All Eukaryota, doc/eukaryota_plastid_160531.html.
 
-All
-[Eukaryota](http://www.ncbi.nlm.nih.gov/genomes/GenomesGroup.cgi?opt=plastid&taxid=2759),
-`doc/eukaryota_plastid_160531.html`.
+Or this link.
 
-Or [this link](http://www.ncbi.nlm.nih.gov/genome/browse/?report=5).
-
-```text
 Eukaryota (2759)                1486
     Viridiplantae (33090)       1362
         Chlorophyta (3041)      134
         Streptophyta (35493)    1472
-```
 
-Use `taxon/id_seq_dom_select.pl` to extract Taxonomy ids and genbank
-accessions from all history pages.
+Use taxon/id_seq_dom_select.pl to extract Taxonomy ids and genbank accessions from all history pages.
 
-```csv
 id,acc
 996148,NC_017006
-```
 
-Got **1491** accessions.
+Got 1491 accessions.
 
-```bash
 mkdir -p ~/data/organelle/plastid_genomes
 cd ~/data/organelle/plastid_genomes
 
@@ -63,8 +45,8 @@ perl ~/Scripts/withncbi/taxon/id_seq_dom_select.pl \
     ~/Scripts/withncbi/doc/eukaryota_plastid_150806.html \
     >> webpage_id_seq.csv
 perl ~/Scripts/withncbi/taxon/id_seq_dom_select.pl \
-     ~/Scripts/withncbi/doc/green_plants_plastid_161106.html \
-     >> webpage_id_seq.csv   
+    ~/Scripts/withncbi/doc/green_plants_plastid_161106.html \
+    >> webpage_id_seq.csv    
 perl ~/Scripts/withncbi/taxon/id_seq_dom_select.pl \
     ~/Scripts/withncbi/doc/green_plants_plastid_160531.html \
     >> webpage_id_seq.csv
@@ -74,12 +56,9 @@ perl ~/Scripts/withncbi/taxon/id_seq_dom_select.pl \
 perl ~/Scripts/withncbi/taxon/id_seq_dom_select.pl \
     ~/Scripts/withncbi/doc/plant_plastid_141130.html \
     >> webpage_id_seq.csv
-```
 
-Use `taxon/gb_taxon_locus.pl` to extract information from refseq plastid
-file.
+Use taxon/gb_taxon_locus.pl to extract information from refseq plastid file.
 
-```bash
 cd ~/data/organelle/plastid_genomes
 
 wget -N ftp://ftp.ncbi.nlm.nih.gov/genomes/refseq/plastid/plastid.1.genomic.gbff.gz
@@ -89,29 +68,24 @@ perl ~/Scripts/withncbi/taxon/gb_taxon_locus.pl plastid.1.genomic.gbff > refseq_
 
 rm plastid.1.genomic.gbff
 
-# 1330
+# 1446
 cat refseq_id_seq.csv | grep -v "^#" | wc -l
 
 # combine
 cat webpage_id_seq.csv refseq_id_seq.csv \
     | sort -u -t, -k1,1 > plastid_id_seq.csv
 
-# 1491
+# 1510
 cat plastid_id_seq.csv | grep -v "^#" | wc -l
-```
 
-## Add linage information
+Add lineage information
 
 Give ids better shapes for manually checking and automatic filtering.
 
-If you sure, you can add or delete lines and contents in
-`plastid.CHECKME.csv`.
+Update ~/data/NCBI/taxdmp before running id_project_to.pl.
 
-Taxonomy information from [AlgaeBase](http://www.algaebase.org),
-[Wikipedia](https://www.wikipedia.org/) and
-[Encyclopedia of Life](http://eol.org/).
+If you sure, you can add or delete lines and contents in plastid.CHECKME.csv.
 
-```bash
 mkdir -p ~/data/organelle/plastid_summary
 cd ~/data/organelle/plastid_summary
 
@@ -128,6 +102,12 @@ cat ../plastid_genomes/plastid_id_seq.csv \
     | perl ~/Scripts/withncbi/taxon/id_project_to.pl -s "," --rank phylum \
     | sort -t',' -k9,9 -k8,8 -k7,7 -k6,6 -k5,5 \
     >> plastid.CHECKME.csv
+
+Manually correct lineages.
+
+Taxonomy information from AlgaeBase, Wikipedia and Encyclopedia of Life.
+
+cd ~/data/organelle/plastid_summary
 
 # darwin (bsd) need "" for -i
 sed -i".bak" "s/\'//g" plastid.CHECKME.csv
@@ -150,7 +130,9 @@ sed -i".bak" "s/Aureococcus,NA/Aureococcus,Pelagomonadaceae/" plastid.CHECKME.cs
 sed -i".bak" "s/Aureoumbra,NA/Aureoumbra,Sarcinochrysidaceae/" plastid.CHECKME.csv
 sed -i".bak" "s/Bigelowiella,NA/Bigelowiella,Chlorarachniaceae/" plastid.CHECKME.csv
 sed -i".bak" "s/Choricystis,NA/Choricystis,Coccomyxaceae/" plastid.CHECKME.csv
+sed -i".bak" "s/Carteria,NA,NA/Carteria,Chlamydomonadaceae,Chlamydomonadales/" plastid.CHECKME.csv
 sed -i".bak" "s/Cryptoglena,NA,NA/Cryptoglena,Euglenaceae,Euglenales/" plastid.CHECKME.csv
+sed -i".bak" "s/Cymbomonas,NA/Cymbomonas,Pyramimonadaceae/" plastid.CHECKME.csv
 sed -i".bak" "s/Dicloster,NA,NA/Dicloster,Chlorellaceae,Chlorellales/" plastid.CHECKME.csv
 sed -i".bak" "s/Dictyochloropsis,NA/Dictyochloropsis,Trebouxiaceae/" plastid.CHECKME.csv
 sed -i".bak" "s/Euglenaformis,NA/Euglenaformis,Euglenaceae/" plastid.CHECKME.csv
@@ -166,6 +148,7 @@ sed -i".bak" "s/Myrmecia,NA/Myrmecia,Trebouxiaceae/" plastid.CHECKME.csv
 sed -i".bak" "s/Neocystis,NA/Neocystis,Radiococcaceae/" plastid.CHECKME.csv
 sed -i".bak" "s/Nephroselmis,NA,NA/Nephroselmis,Nephroselmidaceae,Nephroselmidales/" plastid.CHECKME.csv
 sed -i".bak" "s/Oedogonium,NA/Oedogonium,Oedogoniaceae/" plastid.CHECKME.csv
+sed -i".bak" "s/Oedocladium,NA/Oedocladium,Oedogoniaceae/" plastid.CHECKME.csv
 sed -i".bak" "s/Oltmannsiellopsis,NA/Oltmannsiellopsis,Oltmannsiellopsidaceae/" plastid.CHECKME.csv
 sed -i".bak" "s/Pabia,NA/Pabia,Trebouxiaceae/" plastid.CHECKME.csv
 sed -i".bak" "s/Parachlorella,NA/Parachlorella,Chlorellaceae/" plastid.CHECKME.csv
@@ -178,12 +161,25 @@ sed -i".bak" "s/Pyramimonas,NA/Pyramimonas,Pyramimonadaceae/" plastid.CHECKME.cs
 sed -i".bak" "s/Stichococcus,NA/Stichococcus,Prasiolaceae/" plastid.CHECKME.csv
 sed -i".bak" "s/Stigeoclonium,NA/Stigeoclonium,Chaetophoraceae/" plastid.CHECKME.csv
 sed -i".bak" "s/Trachydiscus,NA/Trachydiscus,Pleurochloridaceae/" plastid.CHECKME.csv
+sed -i".bak" "s/Verdigellas,NA/Verdigellas,Palmophyllaceae/" plastid.CHECKME.csv
 sed -i".bak" "s/Watanabea,NA/Watanabea,Trebouxiaceae/" plastid.CHECKME.csv
 
 sed -i".bak" "s/Chlorellales,NA/Chlorellales,Trebouxiophyceae/" plastid.CHECKME.csv
 
+# Chlorophyceae, incertae sedis
+#sed -i".bak" "s/Jenufa,NA,NA/Jenufa,NA,NA/" plastid.CHECKME.csv
+# Chlorophyta incertae sedis
+#sed -i".bak" "s/Picocystis,NA,NA/Picocystis,NA,NA/" plastid.CHECKME.csv
+sed -i".bak" "s/Pleurastrum,NA,NA/Pleurastrum,NA,Chlamydomonadales/" plastid.CHECKME.csv
+
+# missing orders
+sed -i".bak" "s/Leptocylindraceae,NA/Leptocylindraceae,Chaetocerotales/" plastid.CHECKME.csv
+sed -i".bak" "s/Rhizosoleniaceae,NA/Rhizosoleniaceae,Rhizosoleniales/" plastid.CHECKME.csv
+
 # missing classes and phylums
 sed -i".bak" "s/Bangiophyceae,NA/Bangiophyceae,Rhodophyta/" plastid.CHECKME.csv
+sed -i".bak" "s/Stylonematophyceae,NA/Stylonematophyceae,Rhodophyta/" plastid.CHECKME.csv
+sed -i".bak" "s/Compsopogonophyceae,NA/Compsopogonophyceae,Rhodophyta/" plastid.CHECKME.csv
 sed -i".bak" "s/Florideophyceae,NA/Florideophyceae,Rhodophyta/" plastid.CHECKME.csv
 sed -i".bak" "s/Phaeocystales,NA,NA/Phaeocystales,Coccolithophyceae,Haptophyta/" plastid.CHECKME.csv
 sed -i".bak" "s/Glaucocystophyceae,NA/Glaucocystophyceae,Glaucophyta/" plastid.CHECKME.csv
@@ -194,7 +190,23 @@ sed -i".bak" "s/Raphidophyceae,NA/Raphidophyceae,Ochrophyta/" plastid.CHECKME.cs
 sed -i".bak" "s/Synurophyceae,NA/Synurophyceae,Ochrophyta/" plastid.CHECKME.csv
 sed -i".bak" "s/NA,Phaeophyceae/Phaeophyceae,Ochrophyta/" plastid.CHECKME.csv
 
-# Split Streptophyta according to http://www.theplantlist.org/
+sed -i".bak" "s/Isochrysidales,NA,NA/Isochrysidales,Coccolithophyceae,Haptophyta/" plastid.CHECKME.csv
+sed -i".bak" "s/Pavlovales,NA,NA/Pavlovales,Pavlovophyceae,Haptophyta/" plastid.CHECKME.csv
+
+# Cercozoa
+sed -i".bak" "s/Euglyphida,NA,NA/Euglyphida,Filosa,Cercozoa/" plastid.CHECKME.csv
+sed -i".bak" "s/Gymnochlora,NA,NA,NA,NA/Gymnochlora,Chlorarachniaceae,Chlorarachniales,Chlorarachniophyceae,Cercozoa/" plastid.CHECKME.csv
+sed -i".bak" "s/Lotharella,NA,NA,NA,NA/Lotharella,Chlorarachniaceae,Chlorarachniales,Chlorarachniophyceae,Cercozoa/" plastid.CHECKME.csv
+sed -i".bak" "s/Partenskyella,NA,NA,NA,NA/Partenskyella,Chlorarachniaceae,Chlorarachniales,Chlorarachniophyceae,Cercozoa/" plastid.CHECKME.csv
+sed -i".bak" "s/Bigelowiella,Chlorarachniaceae,NA,NA,NA/Bigelowiella,Chlorarachniaceae,Chlorarachniales,Chlorarachniophyceae,Cercozoa/" plastid.CHECKME.csv
+
+#Entry Merged. Taxid 1605147 was merged into taxid 142389 on October 16, 2015.
+sed -i".bak" "/1605147,/d" plastid.CHECKME.csv
+
+Split Streptophyta according to http://www.theplantlist.org/
+
+cd ~/data/organelle/plastid_summary
+
 # Angiosperms
 perl -Mojo -e '
     g(q{http://www.theplantlist.org/browse/A/})->dom
@@ -254,31 +266,27 @@ perl -Mojo -e '
     '
 
 rm *.tmp *.bak
-```
 
-### Can't get clear taxon information
+Can't get clear taxon information
 
-* Genus
-    + Chromera
-    + Elliptochloris
-    + Ettlia
-    + Picocystis
-    + Xylochloris
+    Genus
+        Chromera
+        Elliptochloris
+        Ettlia
+        Picocystis
+        Xylochloris
 
-* Species
-    + Chromerida sp. RM11
-    + Trebouxiophyceae sp. MX-AZ01
+    Species
+        Chromerida sp. RM11
+        Trebouxiophyceae sp. MX-AZ01
 
-## Filtering based on valid families and genera
+Filtering based on valid families and genera
 
 Species and genus should not be "NA" and genus has 2 or more members.
 
-```text
 1491 ---------> 1472 ---------> 844 ---------> 832
         NA             genus          family
-```
 
-```bash
 mkdir -p ~/data/organelle/plastid_summary
 cd ~/data/organelle/plastid_summary
 
@@ -288,7 +296,7 @@ cat plastid.CHECKME.csv \
     '/^#/ and next; ($F[2] eq q{NA} or $F[3] eq q{NA} or $F[4] eq q{NA} or $F[5] eq q{NA} ) and next; print' \
     > plastid.tmp
 
-# 1472
+# 1497
 wc -l plastid.tmp
 
 #----------------------------#
@@ -303,7 +311,7 @@ cat plastid.tmp \
 # intersect between two files
 grep -F -f genus.tmp plastid.tmp > plastid.genus.tmp
 
-# 844
+# 847
 wc -l plastid.genus.tmp
 
 #----------------------------#
@@ -317,7 +325,7 @@ cat plastid.genus.tmp \
 # intersect between two files
 grep -F -f family.tmp plastid.tmp > plastid.family.tmp
 
-# 1157
+# 1171
 wc -l plastid.family.tmp
 
 #----------------------------#
@@ -328,20 +336,17 @@ cat plastid.family.tmp >> plastid.DOWNLOAD.csv
 
 # clean
 rm *.tmp *.bak
-```
 
-## Find a way to name these.
+Find a way to name these.
 
 Seems it's OK to use species as names.
 
-```bash
 # sub-species
 cat plastid.DOWNLOAD.csv \
     | perl -nl -a -F"," -e \
     '/^#/i and next; $seen{$F[3]}++; END {for $k (keys %seen){printf qq{%s,%d\n}, $k, $seen{$k} if $seen{$k} > 1}};' \
     | sort
 
-#Cattleya crispata,2
 #Fragaria vesca,2
 #Gossypium herbaceum,2
 #Magnolia officinalis,2
@@ -359,6 +364,7 @@ cat plastid.DOWNLOAD.csv \
 #Babesia bovis T2Bo
 #Brassica rapa subsp. pekinensis
 #Cucumis melo subsp. melo
+#Dioscorea cayennensis subsp. rotundata
 #Eucalyptus globulus subsp. globulus
 #Fagopyrum esculentum subsp. ancestrale
 #Fragaria vesca subsp. bracteata
@@ -383,11 +389,9 @@ cat plastid.DOWNLOAD.csv \
 #Saccharum hybrid cultivar NCo 310
 #Saccharum hybrid cultivar SP80-3280
 #Thalassiosira oceanica CCMP1005
-```
 
 Create abbreviations.
 
-```bash
 cd ~/data/organelle/plastid_summary
 
 echo '#strain_taxon_id,accession,strain,species,genus,family,order,class,phylum,abbr' > plastid.ABBR.csv
@@ -396,15 +400,13 @@ cat plastid.DOWNLOAD.csv \
     | perl ~/Scripts/withncbi/taxon/abbr_name.pl -c "3,4,5" -s "," -m 0 \
     | sort -t',' -k9,9 -k7,7 -k6,6 -k10,10 \
     >> plastid.ABBR.csv
-```
 
-## Download sequences and regenerate lineage information.
+Download sequences and regenerate lineage information.
 
 We don't rename sequences here, so the file has three columns.
 
-And create `plastid_ncbi.csv` with abbr names as taxon file.
+And create plastid_ncbi.csv with abbr names as taxon file.
 
-```bash
 mkdir -p ~/data/organelle/plastid_genomes
 cd ~/data/organelle/plastid_genomes
 
@@ -432,16 +434,13 @@ perl ~/Scripts/withncbi/taxon/batch_get_seq.pl \
 
 # count downloaded sequences
 find . -name "*.fasta" | wc -l
-```
 
-## Create alignment plans
+Create alignment plans
 
-We got **832** accessions.
+We got 832 accessions.
 
-Numbers for higher ranks are: 65 orders, 95 families, 211 genera and 832
-species.
+Numbers for higher ranks are: 65 orders, 95 families, 211 genera and 832 species.
 
-```bash
 cd ~/data/organelle/plastid_summary
 
 # valid genera
@@ -454,14 +453,14 @@ cat plastid.ABBR.csv \
 # intersect between two files
 grep -F -f genus.tmp plastid.ABBR.csv > plastid.GENUS.csv
 
-# 844
+# 847
 wc -l plastid.GENUS.csv
 
 #   count every ranks
-#      65 order.list.tmp
-#      95 family.list.tmp
+#      66 order.list.tmp
+#      96 family.list.tmp
 #     211 genus.list.tmp
-#     832 species.list.tmp
+#     836 species.list.tmp
 cut -d',' -f 4 plastid.GENUS.csv | sort | uniq > species.list.tmp
 cut -d',' -f 5 plastid.GENUS.csv | sort | uniq > genus.list.tmp
 cut -d',' -f 6 plastid.GENUS.csv | sort | uniq > family.list.tmp
@@ -479,13 +478,11 @@ cat plastid.GENUS.tmp \
 
 # clean
 rm *.tmp *.bak
-```
 
-Create `plastid_OG.md` for picking outgroups.
+Create plastid_OG.md for picking outgroups.
 
-Manually edit it then move to `~/Scripts/withncbi/doc/plastid_OG.md`.
+Manually edit it then move to ~/Scripts/withncbi/doc/plastid_OG.md.
 
-```bash
 cd ~/data/organelle/plastid_summary
 
 cat plastid.GENUS.csv \
@@ -512,11 +509,9 @@ cat plastid.GENUS.csv \
         }
     ' \
     > plastid_OG.md
-```
 
 Create alignments without/with outgroups.
 
-```bash
 cd ~/data/organelle/plastid_summary
 
 # tab-separated
@@ -635,15 +630,12 @@ cat genus_OG.tsv \
         --csv_taxon ~/data/organelle/plastid_genomes/plastid_ncbi.csv \
         --parallel 8 \
     >> ../plastid_OG.cmd.txt
-```
 
-## Aligning
-
-### Batch running for groups
+Aligning
+Batch running for groups
 
 The old prepare_run.sh
 
-```bash
 mkdir -p ~/data/organelle/plastid.working
 cd ~/data/organelle/plastid.working
 
@@ -721,11 +713,9 @@ find . -mindepth 1 -maxdepth 3 -type d -name "*_fasta" | parallel -r rm -fr
 
 find . -mindepth 1 -maxdepth 4 -type f -name "*.phy" | parallel -r rm
 find . -mindepth 1 -maxdepth 4 -type f -name "*.phy.reduced" | parallel -r rm
-```
 
-### Self alignments.
+Self alignments.
 
-```bash
 cd ~/data/organelle/
 
 perl -p -e '
@@ -759,11 +749,9 @@ find . -mindepth 1 -maxdepth 2 -type d -name "*_fasta" | parallel -r rm -fr
 
 # clean mysql
 find  /usr/local/var/mysql -type d -name "[A-Z]*" | parallel -r rm -fr
-```
 
-### Alignments of families for outgroups.
+Alignments of families for outgroups.
 
-```bash
 mkdir -p ~/data/organelle/plastid_families
 cd ~/data/organelle/plastid_families
 
@@ -782,14 +770,11 @@ done  > runall.sh
 sh runall.sh 2>&1 | tee log_runall.txt
 
 find ~/data/organelle/plastid_families -type f -path "*_phylo*" -name "*.nwk"
-```
 
-Manually editing `~/Scripts/withncbi/doc/plastid_OG.md` and generate
-`genus_OG.tsv`.
+Manually editing ~/Scripts/withncbi/doc/plastid_OG.md and generate genus_OG.tsv.
 
-*D* between target and outgroup should be around **0.05**.
+D between target and outgroup should be around 0.05.
 
-```bash
 mkdir -p ~/data/organelle/plastid_OG
 cd ~/data/organelle/plastid_OG
 
@@ -814,11 +799,8 @@ find . -mindepth 1 -maxdepth 3 -type d -name "*_fasta" | parallel -r rm -fr
 find . -mindepth 1 -maxdepth 4 -type f -name "*.phy" | parallel -r rm
 find . -mindepth 1 -maxdepth 4 -type f -name "*.phy.reduced" | parallel -r rm
 
-```
-
 SNP t-test
 
-```bash
 mkdir -p ~/data/organelle/plastid_summary/ttest
 cd ~/data/organelle/plastid_summary/ttest
 
@@ -829,13 +811,10 @@ cat ~/Scripts/withncbi/doc/plastid_OG.md \
     > plastid_og_ttest.cmd.txt
 
 sh plastid_og_ttest.cmd.txt
-```
 
-## Cyanobacteria
+Cyanobacteria
+Genus and Species counts
 
-### Genus and Species counts
-
-```sql
 # Genus
 SELECT
     genus_id, genus, COUNT(*) strain_count
@@ -847,25 +826,22 @@ WHERE
 GROUP BY genus_id
 HAVING strain_count > 1
 ORDER BY genus
-```
 
-| genus_id | genus               | strain_count |
-|---------:|:--------------------|-------------:|
-|     1163 | Anabaena            |            3 |
-|    35823 | Arthrospira         |            2 |
-|     1186 | Calothrix           |            3 |
-|   102234 | Cyanobacterium      |            2 |
-|    43988 | Cyanothece          |            6 |
-|    33071 | Gloeobacter         |            2 |
-|     1125 | Microcystis         |            2 |
-|     1177 | Nostoc              |            4 |
-|     1158 | Oscillatoria        |            2 |
-|     1218 | Prochlorococcus     |           14 |
-|     1129 | Synechococcus       |           20 |
-|     1142 | Synechocystis       |            5 |
-|   146785 | Thermosynechococcus |            2 |
+genus_id 	genus 	strain_count
+1163 	Anabaena 	3
+35823 	Arthrospira 	2
+1186 	Calothrix 	3
+102234 	Cyanobacterium 	2
+43988 	Cyanothece 	6
+33071 	Gloeobacter 	2
+1125 	Microcystis 	2
+1177 	Nostoc 	4
+1158 	Oscillatoria 	2
+1218 	Prochlorococcus 	14
+1129 	Synechococcus 	20
+1142 	Synechocystis 	5
+146785 	Thermosynechococcus 	2
 
-```sql
 # Species
 SELECT
     species_id, species, COUNT(*) strain_count
@@ -877,19 +853,15 @@ WHERE
 GROUP BY species_id
 HAVING strain_count > 1
 ORDER BY species
-```
 
-| species_id | species                    | strain_count |
-|-----------:|:---------------------------|-------------:|
-|     118562 | Arthrospira platensis      |            2 |
-|       1126 | Microcystis aeruginosa     |            2 |
-|       1219 | Prochlorococcus marinus    |           12 |
-|      32046 | Synechococcus elongatus    |            2 |
-|       1148 | Synechocystis sp. PCC 6803 |            4 |
+species_id 	species 	strain_count
+118562 	Arthrospira platensis 	2
+1126 	Microcystis aeruginosa 	2
+1219 	Prochlorococcus marinus 	12
+32046 	Synechococcus elongatus 	2
+1148 	Synechocystis sp. PCC 6803 	4
+Use bac_prepare.pl
 
-### Use `bac_prepare.pl`
-
-```bash
 mkdir -p ~/data/organelle/cyanobacteria
 cd ~/data/organelle/cyanobacteria
 
@@ -950,13 +922,10 @@ find . -mindepth 1 -maxdepth 3 -type d -name "*_fasta" | parallel -r rm -fr
 
 find . -mindepth 1 -maxdepth 4 -type f -name "*.phy" | parallel -r rm
 find . -mindepth 1 -maxdepth 4 -type f -name "*.phy.reduced" | parallel -r rm
-```
 
-## Summary
+Summary
+Copy xlsx files
 
-### Copy xlsx files
-
-```bash
 mkdir -p ~/data/organelle/plastid_summary/xlsx
 cd ~/data/organelle/plastid_summary/xlsx
 
@@ -968,14 +937,10 @@ find  ~/data/organelle/plastid_OG -type f -name "*.common.xlsx" \
     | grep -v "vs[A-Z]" \
     | parallel cp {} .
 
-```
+Genome list
 
-### Genome list
+Create plastid.list.csv from plastid.GENUS.csv with sequence lengths.
 
-Create `plastid.list.csv` from `plastid.GENUS.csv` with sequence
-lengths.
-
-```bash
 mkdir -p ~/data/organelle/plastid_summary/table
 cd ~/data/organelle/plastid_summary/table
 
@@ -1002,16 +967,16 @@ find ~/data/organelle/plastid.working -type f -name "chr.sizes" \
             BEGIN {
                 %l = ();
             }
-            
+
             next unless /\w+\t\d+/;
             my ($key, $value) = split /\t/;
             $l{$key} = $value;
-            
+
             END {
                 my $chrs = join "|", sort keys %l;
                 my $length = 0;
                 $length += $_ for values %l;
-                
+
                 $ARGV =~ /working\/(\w+)\/(\w+)\/(\w+)/;
                 print qq{$3,$1,$chrs,$length}
             }
@@ -1051,19 +1016,17 @@ cat list.tmp \
     >> plastid.list.csv
 
 rm *.tmp
-```
 
-### Genome alignment statistics
+Genome alignment statistics
 
 Some genera will be filtered out here.
 
 Criteria:
 
-* Coverage >= 0.4
-* Total number of indels >= 100
-* Genome D < 0.2
+    Coverage >= 0.4
+    Total number of indels >= 100
+    Genome D < 0.2
 
-```bash
 mkdir -p ~/data/organelle/plastid_summary/table
 
 cd ~/data/organelle/plastid_summary/xlsx
@@ -1210,11 +1173,9 @@ perl ~/Scripts/fig_table/xlsx2csv.pl -f Table_alignment.xlsx > Table_alignment.c
 
 cp -f ~/data/organelle/plastid_summary/xlsx/Table_alignment.xlsx ~/data/organelle/plastid_summary/table
 cp -f ~/data/organelle/plastid_summary/xlsx/Table_alignment.csv ~/data/organelle/plastid_summary/table
-```
 
-### Groups
+Groups
 
-```bash
 mkdir -p ~/data/organelle/plastid_summary/group
 cd ~/data/organelle/plastid_summary/group
 
@@ -1265,11 +1226,9 @@ cat ~/data/organelle/plastid_summary/table/Table_alignment.csv \
     > group_1.lst
 
 rm *.txt
-```
 
 NCBI Taxonomy tree
 
-```bash
 cd ~/data/organelle/plastid_summary/group
 
 cat ~/data/organelle/plastid_summary/table/genus.lst \
@@ -1287,11 +1246,9 @@ cat ~/data/organelle/plastid_summary/table/genus.lst \
     > genera_tree.sh
 
 bash genera_tree.sh > genera.tree
-```
 
-### Phylogenic trees of each genus with outgroup
+Phylogenic trees of each genus with outgroup
 
-```bash
 mkdir -p ~/data/organelle/plastid_summary/trees
 
 cat ~/Scripts/withncbi/doc/plastid_OG.md \
@@ -1302,13 +1259,11 @@ cat ~/Scripts/withncbi/doc/plastid_OG.md \
 
 find ~/data/organelle/plastid_OG -type f -path "*_phylo*" -name "*.nwk" \
     | parallel -j 1 cp {} ~/data/organelle/plastid_summary/trees
-```
 
-### d1, d2
+d1, d2
 
-`collect_xlsx.pl`
+collect_xlsx.pl
 
-```bash
 cd ~/data/organelle/plastid_summary/xlsx
 
 cat <<'EOF' > cmd_collect_d1_d2.tt
@@ -1360,11 +1315,9 @@ cat ~/data/organelle/plastid_summary/table/genus.lst \
 
 cd ~/data/organelle/plastid_summary/xlsx
 bash cmd_collect_d1_d2.sh
-```
 
-`sep_chart.pl`
+sep_chart.pl
 
-```bash
 mkdir -p ~/data/organelle/plastid_summary/fig
 
 cd ~/data/organelle/plastid_summary/xlsx
@@ -1486,5 +1439,3 @@ cp ~/data/organelle/plastid_summary/xlsx/*.pdf ~/data/organelle/plastid_summary/
 
 # Coreldraw doesn't play well with computer modern fonts (latex math).
 # perl ~/Scripts/fig_table/tikz_chart.pl -i cmd_plastid_d1_A2A8_B2B8.group_1.csv -xl 'Distance to indels ($d_1$)' -yl 'Nucleotide divergence ($D$)' --y_min 0.0 --y_max 0.01 -x_min 0 -x_max 5 --style_dot --pdf
-```
-
