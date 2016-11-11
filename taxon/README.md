@@ -367,7 +367,7 @@ rm *.tmp *.bak
 Species and genus should not be "NA" and genus has 2 or more members.
 
 ```text
-1491 ---------> 1472 ---------> 844 ---------> 832
+1510 ---------> 1496 ---------> 847 ---------> 1171
         NA             genus          family
 ```
 
@@ -381,7 +381,7 @@ cat plastid.CHECKME.csv \
     '/^#/ and next; ($F[2] eq q{NA} or $F[3] eq q{NA} or $F[4] eq q{NA} or $F[5] eq q{NA} ) and next; print' \
     > plastid.tmp
 
-# 1497
+# 1496
 wc -l plastid.tmp
 
 #----------------------------#
@@ -529,9 +529,9 @@ find . -name "*.fasta" | wc -l
 
 ## Create alignment plans
 
-We got **832** accessions.
+We got **847** accessions.
 
-Numbers for higher ranks are: 65 orders, 95 families, 211 genera and 832
+Numbers for higher ranks are: 66 orders, 96 families, 211 genera and 836
 species.
 
 ```bash
