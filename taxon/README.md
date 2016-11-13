@@ -357,10 +357,14 @@ rm *.tmp *.bak
     + Ettlia
     + Picocystis
     + Xylochloris
+    + Jenufa
+    + Pleurastrum
 
 * Species
     + Chromerida sp. RM11
     + Trebouxiophyceae sp. MX-AZ01
+    + Trebouxiophyceae sp. TP-2016a
+
 
 ## Filtering based on valid families and genera
 
@@ -529,7 +533,7 @@ find . -name "*.fasta" | wc -l
 
 ## Create alignment plans
 
-We got **847** accessions.
+We got **836** accessions.
 
 Numbers for higher ranks are: 66 orders, 96 families, 211 genera and 836
 species.
