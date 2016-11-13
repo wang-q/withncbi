@@ -4,15 +4,13 @@ withncbi - batch operations according to various NCBI/EBI databases.
 
 ## Purpose
 
-Fetch sequences, generate reports and build alignments according to
-various NCBI databases.
+Fetch sequences, generate reports and build alignments according to various NCBI databases.
 
 For more detailed, check `README.md` in each sub-directories.
 
 ## Directory organization
 
-* [`db/`](db/): turn NCBI genome reports and assembly reports into a
-  query-able MySQL database.
+* [`db/`](db/): turn NCBI genome reports and assembly reports into a query-able MySQL database.
 
 * [`ensembl/`](ensembl/): Ensembl related scripts.
 
@@ -28,13 +26,16 @@ For more detailed, check `README.md` in each sub-directories.
 
 ### IntSpans
 
-[AlignDB::IntSpan](https://github.com/wang-q/AlignDB-IntSpan) 
+An IntSpan represents sets of integers as a number of inclusive ranges, for example
+'1-10,19-23,45-48'.
 
-[jintspan](https://github.com/egateam/jintspan) 
+[AlignDB::IntSpan](https://github.com/wang-q/AlignDB-IntSpan) and
+[jintspan](https://github.com/egateam/jintspan) are implements of IntSpan objects in Perl and Java,
+respectively.
 
 ### Positions
 
-[`S288c.txt`](https://github.com/wang-q/App-RL/blob/master/t/S288c.txt) 
+Examples in [`S288c.txt`](https://github.com/wang-q/App-RL/blob/master/t/S288c.txt)
 
 ```text
 I:1-100
@@ -44,21 +45,36 @@ II:21294-22075
 II:23537-24097
 ```
 
+Simple rules:
+
+* `chromosome` and `start` are required
+* `species`, `strand` and `end` are optional
+* `.` to separate `species` and `chromosome`
+* `strand` is one of `+` and `-` and surround by round brackets
+* `:` to separate names and digits
+* `-` to separate `start` and `end`
+* names should be alphanumeric and without spaces
+
+```text
+species.chromosome(strand):start-end
+======= ^^^^^^^^^^ ======  ^^^^^ ===
+```
+
 ### Runlists in YAML
 
-[App::RL](https://github.com/wang-q/App-RL) 
+[App::RL](https://github.com/wang-q/App-RL)
 
-[jrunlist](https://github.com/egateam/jrunlist) 
+[jrunlist](https://github.com/egateam/jrunlist)
 
 ### Blocked fasta files
 
-[App::Fasops](https://github.com/wang-q/App-Fasops) 
+[App::Fasops](https://github.com/wang-q/App-Fasops)
 
 ### Ranges and links of ranges
 
-[App::Rangeops](https://github.com/wang-q/App-Rangeops) 
+[App::Rangeops](https://github.com/wang-q/App-Rangeops)
 
-[jrange](https://github.com/egateam/jrange) 
+[jrange](https://github.com/egateam/jrange)
 
 ## Author
 
@@ -68,5 +84,5 @@ Qiang Wang &lt;wang-q@outlook.com&gt;
 
 This software is copyright (c) 2015 by Qiang Wang.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5
+programming language system itself.
