@@ -20,8 +20,7 @@ Corallorhiza,Catt_crispata
 Cymbidium,Catt_crispata
 Cypripedium,Catt_crispata
 Dendrobium,Catt_crispata
-###Epipogium,Catt_crispata
-###Epipogium
+Epipogium,Catt_crispata
 Goodyera,Catt_crispata
 Masdevallia,Catt_crispata
 ###Neottia
@@ -42,10 +41,10 @@ Arabis,Lep_virginicum
 Brassica,Lep_virginicum
 Capsella,Lep_virginicum
 Cardamine,Lep_virginicum
-Cochlearia,Lon_acaule
+Cochlearia,Lep_virginicum
 Eutrema,Lep_virginicum
 Pachycladon,Lep_virginicum
-Pugionium,Cru_wallichii
+Pugionium,Lep_virginicum
 ## Caryophyllaceae 石竹科
 Silene,Agroste_githago
 ## Chenopodiaceae 藜科
@@ -58,7 +57,7 @@ Salicornia,Spi_oleracea
 ## Apodanthaceae 离花科
 ### Pilostyles
 ## Cucurbitaceae 葫芦科
- Cucumis Gynos_pentaphyllum
+Cucumis,Gynos_pentaphyllum
 ## Dioscoreaceae 薯蓣科
 ### Dioscorea
 ## Actinidiaceae 猕猴桃科
@@ -83,8 +82,8 @@ Quercus,Trig_doichangensis
 ## Juglandaceae 胡桃科
 ###Juglans
 ## Apocynaceae 夹竹桃科
-Asclepias,Cathar_roseus
-### Cynanchum
+Asclepias,Oncin_tenuiloba
+Cynanchum,Oncin_tenuiloba
 ## Gentianaceae 龙胆科
 Gentiana,Sw_mussotii
 ## Rubiaceae 茜草科
@@ -93,7 +92,7 @@ Gynochthodes,Cof_arabicu
 ## Geraniaceae 牻牛儿苗科
 Erodium,Ger_palmatum
 Geranium,Ero_gruinum
-Monsonia,Hyps_bilobata
+Monsonia,Ero_gruinum
 Pelargonium,Ger_palmatum
 ## Lamiaceae 唇形科
 ###Perilla
@@ -108,7 +107,7 @@ Olea,Jas_nudiflorum
 ## Orobanchaceae 列当科
 Cistanche,Lin_philippensis
 Orobanche,Lin_philippensis
-Phelipanche,Epif_virginina
+Phelipanche,Lin_philippensis
 ## Paulowniaceae
 ###Paulownia
 ## Plantaginaceae 车前草科
@@ -128,12 +127,12 @@ Trillium,Paris_verticillata
 Liriodendron,Magno_pyramidata
 Magnolia,Lir_tulipifera
 ## Chrysobalanaceae 金壳果科
-###Couepia
-###Dactyladenia
+Couepia,Chrysob_icaco
+Dactyladenia,Chrysob_icaco
 Hirtella,Chrysob_icaco
 Licania,Chrysob_icaco
-###Maranthes
-###Parinari
+Maranthes,Chrysob_icaco
+Parinari,Chrysob_icaco
 ## Salicaceae 杨柳科
 Populus,Salix_interior
 Salix,Pop_trichocarpa
@@ -153,52 +152,52 @@ Nymphaea,Nu_advena
 ## Piperaceae 胡椒科
 ### Piper
 ## Poaceae 禾本科
-Aegilops,Zea_mays
-Alloteropsis,Zea_mays
+Aegilops,Pue_olyriformis
+Alloteropsis,Pue_olyriformis
 ###Ampelocalamus
-Anthoxanthum,Zea_mays
-Arundinaria,Zea_mays
+Anthoxanthum,Pue_olyriformis
+Arundinaria,Pue_olyriformis
 ###Avena
-Bambusa,Zea_mays
-Bouteloua,Zea_mays
-Chusquea,Zea_mays
-Distichlis,Zea_mays
-Echinochloa,Zea_mays
-Eragrostis,Zea_mays
-Eriochrysis,Zea_mays
-Fargesia,Zea_mays
-Festuca,Zea_mays
-Guadua,Zea_mays
-Hilaria,Zea_mays
-Hordeum,Zea_mays
-Indocalamus,Zea_mays
-Lolium,Zea_mays
-Melica,Zea_mays
-Miscanthus,Zea_mays
-Oryza,Zea_mays
-Otatea,Zea_mays
-Panicum,Zea_mays
-Pariana,Zea_mays
+Bambusa,Pue_olyriformis
+Bouteloua,Pue_olyriformis
+Chusquea,Pue_olyriformis
+Distichlis,Pue_olyriformis
+Echinochloa,Pue_olyriformis
+Eragrostis,Pue_olyriformis
+Eriochrysis,Pue_olyriformis
+Fargesia,Pue_olyriformis
+Festuca,Pue_olyriformis
+Guadua,Pue_olyriformis
+Hilaria,Pue_olyriformis
+Hordeum,Pue_olyriformis
+Indocalamus,Pue_olyriformis
+Lolium,Pue_olyriformis
+Melica,Pue_olyriformis
+Miscanthus,Pue_olyriformis
+Oryza,Pue_olyriformis
+Otatea,Pue_olyriformis
+Panicum,Pue_olyriformis
+Pariana,Pue_olyriformis
 ###Paspalum
-Pharus,Zea_mays
-Phyllostachys,Zea_mays
-Saccharum,Zea_mays
-Sartidia,Zea_mays
-Setaria,Zea_mays
-Sorghum,Zea_mays
-Sporobolus,Zea_mays
-Stipa,Zea_mays
-Triticum,Zea_mays
-Urochloa,Zea_mays
-###Zea
-Zizania,Zea_mays
+Pharus,Pue_olyriformis
+Phyllostachys,Pue_olyriformis
+Saccharum,Pue_olyriformis
+Sartidia,Pue_olyriformis
+Setaria,Pue_olyriformis
+Sorghum,Pue_olyriformis
+Sporobolus,Pue_olyriformis
+Stipa,Pue_olyriformis
+Triticum,Pue_olyriformis
+Urochloa,Pue_olyriformis
+Zea,Pue_olyriformis
+Zizania,Pue_olyriformis
 ## Nelumbonaceae 莲科
 ### Nelumbo
 ## Berberidaceae 小檗科
 ### Berberis
 ### Epimedium
 ## Ranunculaceae 毛茛科
-Aconitum,Megal_saniculifolia
+Aconitum,Cl_terniflora
 Ranunculus,Cl_terniflora
 ## Moraceae 桑科
 Morus,Fi_racemosa 
@@ -238,7 +237,7 @@ Vitis,Tet_hemsleyanum
 Podocarpus,Re_piresii
 ## Cupressaceae 柏科
 Callitropsis,Calo_formosana
-Cupressus,Call_nootkatensis
+Cupressus,Calo_formosana
 Juniperus,Calo_formosana
 Taiwania,Cun_lanceolata
 ## Taxaceae 红豆杉科
@@ -288,7 +287,7 @@ Koliella,Int_terricola
 
 # Rhodophyta 红藻 (Red Algae)
 ## Bangiaceae 红毛菜科
-Porphyra,Ban_atropurpurea
+### Porphyra
 Pyropia,Will_schizophylla
 ## Ceramiaceae 仙菜科
 ### Ceramium
