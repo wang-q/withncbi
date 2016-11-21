@@ -45,6 +45,8 @@ II:21294-22075
 II:23537-24097
 ```
 
+![positions](doc/positions.png) 
+
 Simple rules:
 
 * `chromosome` and `start` are required
@@ -57,7 +59,7 @@ Simple rules:
 
 ```text
 species.chromosome(strand):start-end
-======= ^^^^^^^^^^ ======  ^^^^^ ===
+--------^^^^^^^^^^--------^^^^^^----
 ```
 
 ### Runlists in YAML
