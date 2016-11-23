@@ -141,7 +141,7 @@ while (@args) {
         chomp $string;
 
         my $info = App::RL::Common::decode_header($string);
-        next unless defined $info->{chr_name};
+        next unless defined $info->{chr};
         $info->{tag}  = $tag;
         $info->{type} = $type;
 
@@ -185,7 +185,7 @@ my $worker_insert = sub {
     my %info_of;
     for my $item (@data) {
         my ( $align_id, $dummy )
-            = @{ $obj->find_align( $item->{chr_name}, $item->{chr_start}, $item->{chr_end} ) };
+            = @{ $obj->find_align( $item->{chr}, $item->{start}, $item->{end} ) };
         if ( !defined $align_id ) {
             print " " x 4 . "Can't find align for this position\n";
             printf " " x 8 . "%s\n", App::RL::Common::encode_header($item);
@@ -205,8 +205,8 @@ my $worker_insert = sub {
         # indels in query_set is equal to spans of target_set minus one
         my $internal_indel_flag = 1;
 
-        my $item_start = $pos_finder->at_align( $align_id, $item->{chr_start} );
-        my $item_end   = $pos_finder->at_align( $align_id, $item->{chr_end} );
+        my $item_start = $pos_finder->at_align( $align_id, $item->{start} );
+        my $item_end   = $pos_finder->at_align( $align_id, $item->{end} );
         next if $item_start > $item_end;
 
         my $item_set = AlignDB::IntSpan->new;
