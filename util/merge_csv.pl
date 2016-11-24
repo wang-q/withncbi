@@ -3,9 +3,8 @@ use strict;
 use warnings;
 use autodie;
 
-use Getopt::Long qw(HelpMessage);
-use FindBin;
-use YAML qw(Dump Load DumpFile LoadFile);
+use Getopt::Long;
+use YAML::Syck;
 
 use Path::Tiny;
 
@@ -31,11 +30,11 @@ merge_csv.pl - Merge csv files based on @fields
 =cut
 
 GetOptions(
-    'help|?' => sub { HelpMessage(0) },
+    'help|?' => sub { Getopt::Long::HelpMessage(0) },
     'outfile|o=s' => \( my $outfile = 'stdout' ),
     'fields|f=s'  => \my @fields,
     'concat|c'    => \my $concat,
-) or HelpMessage(1);
+) or Getopt::Long::HelpMessage(1);
 
 if ( !scalar @fields ) {
     @fields = (0);
@@ -85,7 +84,7 @@ while ( my $line = <> ) {
     }
     if ( keys(%seen) > 1 ) {
         warn "*** Fields not identical, be careful.\n";
-        warn Dump { fields => \%seen, };
+        warn YAML::Syck::Dump { fields => \%seen, };
     }
 }
 
