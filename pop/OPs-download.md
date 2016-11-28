@@ -768,7 +768,7 @@ WGS, which usually in better assembling levels.
 
     perl ~/Scripts/download/list.pl -u http://mus.well.ox.ac.uk/19genomes/fasta/
     perl ~/Scripts/download/download.pl -i 19genomes_fasta.yml -a
-    aria2c -x 12 -s 4 -i /home/wangq/data/alignment/others/19genomes_fasta.yml.txt
+    aria2c -x 9 -s 3 -c -i /home/wangq/data/alignment/others/19genomes_fasta.yml.txt
     ```
 
 3. *A. thaliana* and *A. lyrata* from ensembl genomes.
