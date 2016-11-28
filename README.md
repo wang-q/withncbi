@@ -75,6 +75,22 @@ species.chromosome(strand):start-end
 
 ### Blocked fasta files
 
+Examples in [`example.fas`](https://github.com/wang-q/App-Fasops/blob/master/t/example.fas)
+
+```text
+>S288c.I(+):13267-13287|species=S288c
+TCGTCAGTTGGTTGACCATTA
+>YJM789.gi_151941327(-):5668-5688|species=YJM789
+TCGTCAGTTGGTTGACCATTA
+>RM11.gi_61385832(-):5590-5610|species=RM11
+TCGTCAGTTGGTTGACCATTA
+>Spar.gi_29362400(+):2477-2497|species=Spar
+TCATCAGTTGGCAAACCGTTA
+
+```
+
+![blocked-fasta-files](doc/blocked-fasta-files.png)
+
 [App::Fasops](https://github.com/wang-q/App-Fasops)
 
 ### Ranges and links of ranges
