@@ -36,36 +36,34 @@
 %--------^^^^^^^^^^--------^^^^^^----
 
 \begin{tikzpicture}
-\graph[grow right sep, branch down=7mm, simple]{
-    / --
-    p1 ->
-    species [nonterminal] ->
-    "." [terminal] --
-    p2 ->
-    chromosome [nonterminal] --
-    p4 ->
-    "(" [terminal] --
-    q1 -> [vh path]
-    {[nodes={yshift=3.5mm}]
-        strand_positive[as={+}, terminal], strand_negative[as={-}, terminal]
-    } -- [hv path]
-    q3 ->
-    ")" [terminal] --
-    p5 ->
-    ":" [terminal] ->
-    start [nonterminal] --
-    p6 ->
-    "-" [terminal] ->
-    end [nonterminal] --
-    p7 --
-    / [coordinate];
+    \graph[grow right sep, branch down=7mm, simple]{
+        / --
+        p1 ->
+        species [nonterminal] ->
+        "." [terminal] --
+        p2 ->
+        chromosome [nonterminal] --
+        p4 ->
+        "(" [terminal] --
+        q1 -> [vh path]
+        {[nodes={yshift=3.5mm}]
+            strand_positive[as={+}, terminal], strand_negative[as={-}, terminal]
+        } -- [hv path]
+        q3 ->
+        ")" [terminal] --
+        p5 ->
+        ":" [terminal] ->
+        start [nonterminal] --
+        p6 ->
+        "-" [terminal] ->
+        end [nonterminal] --
+        p7 --
+        / [coordinate];
 
-    p1 -- [skip loop=5mm] p2;
-    p4 -- [skip loop=-9mm] p5;
-    p6 -- [skip loop=5mm] p7;
-
-%    q1 -- q2 -- q3; % make these edges plain
-};
+        p1 -- [skip loop=5mm] p2;
+        p4 -- [skip loop=9mm] p5;
+        p6 -- [skip loop=5mm] p7;
+    };
 \end{tikzpicture}
 
 \end{document}
