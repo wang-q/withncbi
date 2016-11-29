@@ -1,12 +1,24 @@
 # JGI data
 
+Login [phytozome portal](https://phytozome.jgi.doe.gov/pz/portal.html).
+
+Select needed species in *PhytozomeV11*
+[download page](http://genome.jgi.doe.gov/pages/dynamicOrganismDownload.jsf?organism=PhytozomeV11),
+then click the `Download Selected Files` button. A file named `PhytozomeV11_download.zip` would be
+created on the fly. Extract compressed file to `~/data/PhytozomeV11/SpeciesName`.
+
+JGI recommends using Globus, but it's blocked by GFW.
+
+Check identities between Ensembl and JGI assemblies. Then use gff3 files from JGI to replace ones
+from Ensembl.
+
 ## Scripts
 
 Same for each species.
 
 ### `jgi_fasta.sh`
 
-Genome, RepeatMasker and gff3.
+Genome and gff3.
 
 ```bash
 
@@ -65,4 +77,18 @@ cd ~/data/alignment/JGI
 
 bash ~/data/alignment/JGI/jgi_fasta.sh Athaliana
 ```
+
+Check assemblies with Ensembl version. Set `-l 100000` to avoid reverse matches.
+
+**Assemblies matched.**
+
+```bash
+for chr in 1 2 3 4 5 ; do
+    sparsemem -maxmatch -F -l 100000 -b -n -k 3 -threads 3 \
+        ~/data/alignment/JGI/Athaliana/Chr${chr}.fa \
+        ~/data/alignment/Ensembl/Atha/${chr}.fa
+done
+
+```
+
 
