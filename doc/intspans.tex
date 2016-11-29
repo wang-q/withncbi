@@ -46,26 +46,29 @@
         p3 --
         p4 ->
         start_digit[as={digit}, terminal] --
-        p5 ->
-        hyphen[as={-}, terminal] --
+        p5 --
         p6 ->
+        hyphen[as={-}, terminal] --
+        p7 ->
         end_negative[as={-}, terminal] --
-        p7 --
-        p8 ->
+        p8 --
+        p9 ->
         end_digit[as={digit}, terminal] --
-        p9 --
-        p10 ->
+        p10 --
+        p11 --
+        p12 ->
         "," [terminal] --
-        p11 -!-
-        p12 --
+        p13 -!-
+        p14 --
         / [coordinate];
 
         p2 -- [skip loop=5mm] p3;
-        p6 -- [skip loop=5mm] p7;
-        p10 -- [skip loop=5mm] p12;
+        p6 -- [skip loop=9mm] p11;
+        p7 -- [skip loop=5mm] p8;
+        p12 -- [skip loop=5mm] p14;
         p5 -> [skip loop=-5mm] p4;
-        p9 -> [skip loop=-5mm] p8;
-        p11 -> [skip loop=-9mm] p1;
+        p10 -> [skip loop=-5mm] p9;
+        p13 -> [skip loop=-9mm] p1;
     };
 \end{tikzpicture}
 
