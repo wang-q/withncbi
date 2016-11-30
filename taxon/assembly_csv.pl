@@ -3,12 +3,12 @@ use strict;
 use warnings;
 use autodie;
 
-use Getopt::Long qw(HelpMessage);
+use Getopt::Long;
 use Config::Tiny;
 use FindBin;
 use YAML qw(Dump Load DumpFile LoadFile);
 
-use IO::All;
+use IO::All;    # simplify ftp retrieving
 use Text::CSV_XS;
 
 #----------------------------------------------------------#
@@ -26,8 +26,8 @@ assemble_csv.pl - convert NCBI assemble report to a .csv file for batch_get_seq.
         --help      -?          brief help message
 
         --file      -f  STR     input assemble report file
-                                GCA_000149445.2.assembly.txt
-                                ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/All/GCF_000146045.2.assembly.txt
+                                local  - GCA_000149445.2.assembly.txt
+                                remote - ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/All/GCF_000146045.2.assembly.txt
         --name      -n  STR     name of the strain, optional
         --taxon     -t  INT     taxonomy id of the strain, optional
         --genbank               genbank instead of refseq
@@ -44,7 +44,7 @@ assemble_csv.pl - convert NCBI assemble report to a .csv file for batch_get_seq.
 =cut
 
 GetOptions(
-    'help|?'     => sub { HelpMessage(0) },
+    'help|?'     => sub { Getopt::Long::HelpMessage(0) },
     'file|f=s'   => \my $in_file,
     'name|n=s'   => \my $strain_name,
     'taxon|t=i'  => \my $taxon_id,
@@ -54,7 +54,7 @@ GetOptions(
     'nuclear'    => \my $nuclear,
     'chromosome' => \my $chromosome,
     'length=i'   => \my $length,
-) or HelpMessage(1);
+) or Getopt::Long::HelpMessage(1);
 
 die "Provide a input file (like GCA_000146045.2.assembly.txt) or a remote url.\n"
     unless defined $in_file;
@@ -70,10 +70,10 @@ die "Provide a input file (like GCA_000146045.2.assembly.txt) or a remote url.\n
 # 8 Sequence-Length
 # 9 UCSC-style-name
 
-# IO::All
+#@type IO::All
 my $handle = io($in_file);
 
-# Text::CSV_XS
+#@type Text::CSV_XS
 my $csv = Text::CSV_XS->new( { binary => 1, eol => "\n" } );
 
 # Header line
