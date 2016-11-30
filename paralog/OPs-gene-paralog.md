@@ -64,7 +64,7 @@ Same for each species.
 
 ### `proc_prepare.sh`
 
-Genome, RepeatMasker and gff3.
+Genome, RepeatMasker, dustmasker and gff3.
 
 ```bash
 
@@ -682,30 +682,34 @@ Full processing time is about 1 hour.
     GENOME_NAME=Atha
 
     echo "====> create directories"
-    mkdir -p ~/data/alignment/gene-paralog/${GENOME_NAME}/data
-    mkdir -p ~/data/alignment/gene-paralog/${GENOME_NAME}/feature
-    mkdir -p ~/data/alignment/gene-paralog/${GENOME_NAME}/repeat
-    mkdir -p ~/data/alignment/gene-paralog/${GENOME_NAME}/stat
-    mkdir -p ~/data/alignment/gene-paralog/${GENOME_NAME}/yml
+    mkdir -p ~/data/alignment/gene-paralog/AthaJGI/data
+    mkdir -p ~/data/alignment/gene-paralog/AthaJGI/feature
+    mkdir -p ~/data/alignment/gene-paralog/AthaJGI/repeat
+    mkdir -p ~/data/alignment/gene-paralog/AthaJGI/stat
+    mkdir -p ~/data/alignment/gene-paralog/AthaJGI/yml
 
     echo "====> copy or download needed files here"
-    cd ~/data/alignment/gene-paralog/${GENOME_NAME}/data
-    cp ~/data/alignment/self/plants/Genomes/${GENOME_NAME}/chr.sizes chr.sizes
-    cp ~/data/alignment/self/plants/Results/${GENOME_NAME}/${GENOME_NAME}.chr.runlist.yml paralog.yml
+    cd ~/data/alignment/gene-paralog/AthaJGI/data
+    cp ~/data/alignment/gene-paralog/Atha/data/* .
 
-    cp ~/data/ensembl82/gff3/arabidopsis_thaliana/Arabidopsis_thaliana.TAIR10.29.gff3.gz gff3.gz
-    wget http://pmite.hzau.edu.cn/MITE/MITE-SEQ-V2/03_arabidopsis_mite_seq.fa -O mite.fa
+    cp -f ~/data/PhytozomeV11/Athaliana/annotation/Athaliana_167_TAIR10.gene_exons.gff3.gz gff3.gz
     ```
 
     ```bash
-    cd ~/data/alignment/gene-paralog/Atha/data
 
-    # 0m44.430s
-    time bash ~/data/alignment/gene-paralog/proc_prepare.sh Atha
-    # 0m46.052s
-    time bash ~/data/alignment/gene-paralog/proc_repeat.sh Atha
-    # 0m43.666s
-    time bash ~/data/alignment/gene-paralog/proc_mite.sh Atha
+    echo "==> Convert gff3 to runlists"
+    cd ~/data/alignment/gene-paralog/AthaJGI/feature
+
+    perl ~/Scripts/withncbi/util/gff2runlist.pl \
+        --file ../data/gff3.gz \
+        --size ../data/chr.sizes \
+        --range 2000 --remove
+
+    cd ~/data/alignment/gene-paralog/AthaJGI/data
+
+    #bash ~/data/alignment/gene-paralog/proc_prepare.sh Atha
+    bash ~/data/alignment/gene-paralog/proc_repeat.sh AthaJGI
+    bash ~/data/alignment/gene-paralog/proc_mite.sh AthaJGI
     ```
 
 3. Paralog-repeats stats

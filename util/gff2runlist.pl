@@ -30,15 +30,17 @@ gff2runlist.pl - Convert gff3 file to chromosome runlists
         --size          -s  STR     chr.sizes
         --range         -r  INT     range of up/down-stream. Default is [1000]
         --clean         -c          up/down-stream don't contain any regions of other genes
+        --remove        -r          remove 'chr0' from chromosome names
 
 =cut
 
 GetOptions(
     'help|?'   => sub { Getopt::Long::HelpMessage(0) },
-    'file|f=s' => \my $infile,
-    'size|s=s' => \my $size,
+    'file|f=s' => \( my $infile ),
+    'size|s=s' => \( my $size ),
     'range|r=i' => \( my $range = 1000 ),
-    'clean|c' => \my $clean,
+    'clean|c'   => \( my $clean ),
+    'remove|r'  => \( my $remove_chr ),
 ) or Getopt::Long::HelpMessage(1);
 
 #----------------------------------------------------------#
@@ -62,7 +64,7 @@ if ( defined $size ) {
     }
 }
 
-printf "==> Load file\n";
+printf "==> Load gff3 file\n";
 my $in_fh = IO::Zlib->new( $infile, "rb" );
 
 # runlists
@@ -73,7 +75,7 @@ my $all_repeat = {};    # dust and trf, repeatmasker in rmout2runlist.pl
 # chromosome names
 my $all_name_set = Set::Scalar->new;
 
-# current transcript
+# current transcript in Ensembl gff3 or current mrna in JGI gff3
 my $cur_transcript;
 my $cache = {
     exon            => [],
@@ -91,7 +93,9 @@ while (1) {
     my @array = split( "\t", $line );
     my $type = $array[2];
 
-    my $chr    = $array[0];
+    my $chr = $array[0];
+    $chr =~ s/chr0?//i if $remove_chr;
+
     my $start  = $array[3];
     my $end    = $array[4];
     my $strand = $array[6];    # strand may be "."
@@ -115,8 +119,11 @@ while (1) {
 
     if ( $type eq 'gene' ) {
         my $gene_id;
-        if ( exists $attr_of{gene_id} ) {
+        if ( exists $attr_of{gene_id} ) {    # Ensembl
             $gene_id = $attr_of{gene_id};
+        }
+        elsif ( exists $attr_of{Name} ) {    # JGI
+            $gene_id = $attr_of{Name};
         }
         else {
             $gene_id = $attr_of{ID};
@@ -186,15 +193,20 @@ while (1) {
         $all_repeat->{$f}{$chr}->add_pair( $start, $end );
     }
 
-    if ( ( defined $cur_transcript ) and ( $type eq "transcript" ) ) {
+    if (    ( defined $cur_transcript )
+        and ( $type =~ /transcript|mrna/i ) )
+    {
         printf "transcript: %s\n", $cur_transcript;
 
         process_transcript( $all_gene, $sep_gene, $cur_transcript, $cache );
 
         # initialize the next transcript
         my $transcript_id;
-        if ( exists $attr_of{transcript_id} ) {
+        if ( exists $attr_of{transcript_id} ) {    # Ensembl
             $transcript_id = $attr_of{transcript_id};
+        }
+        elsif ( exists $attr_of{Name} ) {          # JGI
+            $transcript_id = $attr_of{Name};
         }
         else {
             $transcript_id = $attr_of{ID};
@@ -211,10 +223,13 @@ while (1) {
             CDS             => [],
         };
     }
-    elsif ( $type eq "transcript" ) {    # First transcript
+    elsif ( $type =~ /transcript|mrna/i ) {    # First transcript
         my $transcript_id;
         if ( exists $attr_of{transcript_id} ) {
             $transcript_id = $attr_of{transcript_id};
+        }
+        elsif ( exists $attr_of{Name} ) {      # JGI
+            $transcript_id = $attr_of{Name};
         }
         else {
             $transcript_id = $attr_of{ID};
