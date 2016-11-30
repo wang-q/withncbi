@@ -29,13 +29,6 @@ perl        ~/Scripts/withncbi/taxon/strain_info.pl \
     --id    15368  --name 15368=Bdis    \
     --file ensembl_taxon.csv            \
     --entrez
-
-perl        ~/Scripts/withncbi/taxon/strain_info.pl \
-    --id    3702   --name 3702=Athaliana \
-    --id    39947  --name 39947=Osativa  \
-    --file jgi_taxon.csv                 \
-    --entrez
-
 ```
 
 ### Plants
@@ -195,30 +188,6 @@ bash arabidopsis_parted/5_circos_cmd.sh
 ### 3. Comparison
 
 **11.50% vs 9.96%. Use full chromosomes if the running time is acceptable.**
-
-## Athaliana from JGI
-
-```bash
-cd ~/data/alignment/self
-
-perl ~/Scripts/egaz/self_batch.pl \
-    --working_dir ~/data/alignment/self \
-    --seq_dir ~/data/alignment/JGI \
-    -c ~/data/alignment/self/jgi_taxon.csv \
-    --jar \
-    --length 1000  \
-    --name Athaliana \
-    --parallel 8 \
-    -t Athaliana
-
-bash Athaliana/1_real_chr.sh
-bash Athaliana/2_file_rm.sh
-# real    26m9.090s
-time bash Athaliana/3_self_cmd.sh
-# real    3m24.714s
-time bash Athaliana/4_proc_cmd.sh
-bash Athaliana/5_circos_cmd.sh
-```
 
 ## Cele
 
