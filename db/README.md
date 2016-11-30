@@ -1,7 +1,6 @@
 # `db/`
 
-Turn NCBI genome reports and assembly reports into query-able MySQL
-databases.
+Turn NCBI genome reports and assembly reports into query-able MySQL databases.
 
 Also, taxonomy information are added to all items.
 
@@ -16,8 +15,7 @@ Local paths listed in `config.ini`.
 
 NCBI also provides other download methods including rsync and aspera.
 
-I use the following command lines on a linux box. For mac, aspera's path
-is different.
+I use the following command lines on a linux box. For mac, aspera's path is different.
 
 ```bash
 # gr
@@ -82,8 +80,7 @@ rsync -av -P ftp.ncbi.nlm.nih.gov::genomes/archive/old_genbank/Bacteria_DRAFT/ \
     ~/data/NCBI/genbank/genomes/Bacteria_DRAFT/
 ```
 
-Newer genomes list in genomes/refseq/bacteria are just symlinks to
-genomes/all/*.
+Newer genomes list in genomes/refseq/bacteria are just symlinks to genomes/all/*.
 
 So local mirrors are no longer needed.
 
