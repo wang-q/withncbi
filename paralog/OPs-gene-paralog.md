@@ -670,110 +670,6 @@ Full processing time is about 1 hour.
     find Atha -type f -not -path "*/data/*" -print | zip Atha.zip -9 -@
     ```
 
-## Athaliana from JGI
-
-Full processing time is about 1 hour.
-
-1. [Data](https://github.com/wang-q/withncbi/blob/master/paralog/OPs-selfalign.md#arabidopsis)
-
-2. Prepare
-
-    ```bash
-    GENOME_NAME=Atha
-
-    echo "====> create directories"
-    mkdir -p ~/data/alignment/gene-paralog/AthaJGI/data
-    mkdir -p ~/data/alignment/gene-paralog/AthaJGI/feature
-    mkdir -p ~/data/alignment/gene-paralog/AthaJGI/repeat
-    mkdir -p ~/data/alignment/gene-paralog/AthaJGI/stat
-    mkdir -p ~/data/alignment/gene-paralog/AthaJGI/yml
-
-    echo "====> copy or download needed files here"
-    cd ~/data/alignment/gene-paralog/AthaJGI/data
-    cp ~/data/alignment/gene-paralog/Atha/data/* .
-
-    cp -f ~/data/PhytozomeV11/Athaliana/annotation/Athaliana_167_TAIR10.gene_exons.gff3.gz gff3.gz
-    ```
-
-    ```bash
-
-    echo "==> Convert gff3 to runlists"
-    cd ~/data/alignment/gene-paralog/AthaJGI/feature
-
-    perl ~/Scripts/withncbi/util/gff2runlist.pl \
-        --file ../data/gff3.gz \
-        --size ../data/chr.sizes \
-        --range 2000 --remove
-
-    cd ~/data/alignment/gene-paralog/AthaJGI/data
-
-    #bash ~/data/alignment/gene-paralog/proc_prepare.sh Atha
-    bash ~/data/alignment/gene-paralog/proc_repeat.sh AthaJGI
-    bash ~/data/alignment/gene-paralog/proc_mite.sh AthaJGI
-    ```
-
-3. Paralog-repeats stats
-
-    ```bash
-    cd ~/data/alignment/gene-paralog/Atha/stat
-    # 0m28.356s
-    time bash ~/data/alignment/gene-paralog/proc_paralog.sh Atha
-    ```
-
-4. Gene-paralog stats
-
-    ```bash
-    cd ~/data/alignment/gene-paralog/Atha/stat
-    # 0m6.888s
-    time bash ~/data/alignment/gene-paralog/proc_all_gene.sh Atha ../yml/paralog.yml
-    # 0m7.283s
-    time bash ~/data/alignment/gene-paralog/proc_all_gene.sh Atha ../yml/paralog_adjacent.yml
-
-    # E5-2690 v3
-    # real    8m45.668s
-    # user    57m58.984s
-    # sys     0m1.808s
-    # i7-6700k
-    # real	15m18.045s
-    # user	104m21.728s
-    # sys	0m13.363s
-    time bash ~/data/alignment/gene-paralog/proc_sep_gene.sh Atha ../yml/paralog.yml
-
-    # real	0m35.566s
-    # user	1m12.613s
-    # sys	0m7.601s
-    time bash ~/data/alignment/gene-paralog/proc_sep_gene_jrunlist.sh Atha ../yml/paralog.yml
-
-    bash ~/data/alignment/gene-paralog/proc_sep_gene_jrunlist.sh Atha ../yml/paralog_adjacent.yml
-    ```
-
-5. Gene-repeats stats
-
-    ```bash
-    cd ~/data/alignment/gene-paralog/Atha/stat
-
-    cat ../yml/repeat.family.txt \
-        | parallel -j 8 --keep-order "
-            bash ~/data/alignment/gene-paralog/proc_all_gene.sh Atha ../yml/{}.yml
-        "
-
-    # 12 hours?
-    # time \
-    # cat ../yml/repeat.family.txt \
-    #     | parallel -j 1 --keep-order "
-    #         bash ~/data/alignment/gene-paralog/proc_sep_gene.sh Atha ../yml/{}.yml
-    #     "    
-
-    # real	10m34.669s
-    # user	17m27.433s
-    # sys	3m20.765s
-    time \
-        cat ../yml/repeat.family.txt \
-            | parallel -j 1 --keep-order "
-                bash ~/data/alignment/gene-paralog/proc_sep_gene_jrunlist.sh Atha ../yml/{}.yml
-            "
-    ```
-
 ## Plants aligned with full chromosomes
 
 1. [Data](https://github.com/wang-q/withncbi/blob/master/paralog/OPs-selfalign.md#full-chromosomes)
@@ -863,7 +759,7 @@ Full processing time is about 1 hour.
     done
     ```
 
-5. Other Repeats
+5. Gene-repeats stats
 
     ```bash
     for GENOME_NAME in OsatJap Alyr Sbic
@@ -983,5 +879,111 @@ Full processing time is about 1 hour.
 
         bash ~/data/alignment/gene-paralog/proc_repeat.sh ${GENOME_NAME}
         bash ~/data/alignment/gene-paralog/proc_mite.sh ${GENOME_NAME}
+    done
+    ```
+
+## Plants with annotations from JGI
+
+1. [Data](https://github.com/wang-q/withncbi/blob/master/paralog/OPs-selfalign.md#full-chromosomes)
+
+    * AthaJGI
+    * OsatJapJGI
+
+2. Prepare
+
+    ```bash
+    for GENOME_NAME in Atha OsatJap
+    do
+        echo "====> create directories"
+        mkdir -p ~/data/alignment/gene-paralog/${GENOME_NAME}JGI/data
+        mkdir -p ~/data/alignment/gene-paralog/${GENOME_NAME}JGI/feature
+        mkdir -p ~/data/alignment/gene-paralog/${GENOME_NAME}JGI/repeat
+        mkdir -p ~/data/alignment/gene-paralog/${GENOME_NAME}JGI/stat
+        mkdir -p ~/data/alignment/gene-paralog/${GENOME_NAME}JGI/yml
+
+        echo "====> copy or download needed files here"
+        cd ~/data/alignment/gene-paralog/${GENOME_NAME}JGI/data
+        cp ~/data/alignment/gene-paralog/${GENOME_NAME}/data/* .
+    done
+
+    cd ~/data/alignment/gene-paralog
+
+    # Atha
+    cp -f ~/data/PhytozomeV11/Athaliana/annotation/Athaliana_167_TAIR10.gene_exons.gff3.gz \
+        ~/data/alignment/gene-paralog/AthaJGI/data/gff3.gz
+
+    # OsatJap
+    cp ~/data/PhytozomeV11/Osativa/annotation/Osativa_323_v7.0.gene_exons.gff3.gz \
+        ~/data/alignment/gene-paralog/OsatJapJGI/data/gff3.gz
+    ```
+
+    ```bash
+    for GENOME_NAME in AthaJGI OsatJapJGI
+    do
+        cd ~/data/alignment/gene-paralog/${GENOME_NAME}/feature
+        perl ~/Scripts/withncbi/util/gff2runlist.pl \
+            --file ../data/gff3.gz \
+            --size ../data/chr.sizes \
+            --range 2000 --remove
+
+        cd ~/data/alignment/gene-paralog/${GENOME_NAME}/data
+
+        #bash ~/data/alignment/gene-paralog/proc_prepare.sh ${GENOME_NAME}
+
+        bash ~/data/alignment/gene-paralog/proc_repeat.sh ${GENOME_NAME}
+        bash ~/data/alignment/gene-paralog/proc_mite.sh ${GENOME_NAME}
+    done
+    ```
+
+3. Paralog-repeats stats
+
+    ```bash
+    for GENOME_NAME in AthaJGI OsatJapJGI
+    do
+        cd ~/data/alignment/gene-paralog/${GENOME_NAME}/stat
+        bash ~/data/alignment/gene-paralog/proc_paralog.sh ${GENOME_NAME}
+    done
+    ```
+
+4. Gene-paralog stats
+
+    ```bash
+    for GENOME_NAME in AthaJGI OsatJapJGI
+    do
+        cd ~/data/alignment/gene-paralog/${GENOME_NAME}/stat
+
+        bash ~/data/alignment/gene-paralog/proc_all_gene.sh ${GENOME_NAME} ../yml/paralog.yml
+        bash ~/data/alignment/gene-paralog/proc_all_gene.sh ${GENOME_NAME} ../yml/paralog_adjacent.yml
+
+        bash ~/data/alignment/gene-paralog/proc_sep_gene.sh ${GENOME_NAME} ../yml/paralog.yml
+        bash ~/data/alignment/gene-paralog/proc_sep_gene.sh ${GENOME_NAME} ../yml/paralog_adjacent.yml
+    done
+    ```
+
+5. Gene-repeats stats
+
+    ```bash
+    for GENOME_NAME in AthaJGI OsatJapJGI
+    do
+        cd ~/data/alignment/gene-paralog/${GENOME_NAME}/stat
+        cat ../yml/repeat.family.txt \
+            | parallel -j 8 --keep-order "
+                bash ~/data/alignment/gene-paralog/proc_all_gene.sh ${GENOME_NAME} ../yml/{}.yml
+            "
+
+        cat ../yml/repeat.family.txt \
+            | parallel -j 1 --keep-order "
+                bash ~/data/alignment/gene-paralog/proc_sep_gene_jrunlist.sh ${GENOME_NAME} ../yml/{}.yml
+            "
+    done
+    ```
+
+6. Pack up
+
+    ```bash
+    for GENOME_NAME in AthaJGI OsatJapJGI
+    do
+        cd ~/data/alignment/gene-paralog
+        find ${GENOME_NAME} -type f -not -path "*/data/*" -print | zip ${GENOME_NAME}.zip -9 -@
     done
     ```
