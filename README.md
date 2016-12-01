@@ -1,3 +1,18 @@
+[TOC levels=1-3]: #
+
+# Table of Contents
+- [withncbi](#withncbi)
+    - [Purpose](#purpose)
+    - [Directory organization](#directory-organization)
+    - [Concepts](#concepts)
+        - [IntSpans](#intspans)
+        - [Positions](#positions)
+        - [Runlists in YAML](#runlists-in-yaml)
+        - [Blocked fasta files](#blocked-fasta-files)
+        - [Ranges and links of ranges](#ranges-and-links-of-ranges)
+    - [Author](#author)
+    - [Copyright and license](#copyright-and-license)
+
 # withncbi
 
 withncbi - batch operations according to various NCBI/EBI databases.
