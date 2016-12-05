@@ -858,6 +858,69 @@ find . -mindepth 1 -maxdepth 2 -type d -name "*_fasta" | parallel -r rm -fr
 find  /usr/local/var/mysql -type d -name "[A-Z]*" | parallel -r rm -fr
 ```
 
+### LSC and SSC
+
+```bash
+cd ~/data/organelle/plastid_self.working
+
+cat <<'EOF' > genus_strain.csv
+Arabidopsis,Arabid_thaliana
+Plasmodium,Plas_malariae
+Stipa,Sti_lipskyi
+EOF
+
+perl -MAlignDB::IntSpan -nla -F"," \
+    -e '
+    warn qq{$F[0],$F[1]\n};
+    my $chr_size = `cat ~/data/organelle/plastid_self.working/$F[0]/Genomes/$F[1]/chr.sizes | cut -f 2 | xargs echo`;
+    warn $chr_size;
+    my $line = `cat ~/data/organelle/plastid_self.working/$F[0]/Results/$F[1]/$F[1].links.tsv | xargs echo`;
+    warn $line;
+    if ($line !~ m{:(\d+\-\d+)\s+.+:(\d+\-\d+)$}) {
+        die qq{Not matched\n};
+    }
+
+    my $ira = AlignDB::IntSpan->new($1);
+    my $irb = AlignDB::IntSpan->new($2);
+    warn $ira->runlist, "\n";
+    warn $irb->runlist, "\n";
+
+    if ($ira->trim(1)->contains(1) or $irb->trim(1)->contains(1)
+    or $ira->trim(1)->contains($chr_size) or $irb->trim(1)->contains($chr_size) ) {
+        die qq{Wrong start point\n};
+    }
+
+    my $d_s_a = $ira->distance(AlignDB::IntSpan->new(1));
+    my $d_b_e = $irb->distance(AlignDB::IntSpan->new($chr_size));
+    my $d_a_b = $ira->distance($irb);
+    $d_s_a = 0 if $d_s_a < 0;
+    $d_b_e = 0 if $d_b_e < 0;
+    warn qq{$d_s_a, $d_b_e, $d_a_b\n};
+
+    my $CHR = AlignDB::IntSpan->new->add_pair(1, $chr_size);
+    my $csc = AlignDB::IntSpan->new->add_pair($ira->max + 1, $irb->min - 1);
+
+    if ($d_s_a + $d_b_e > $d_a_b) {
+        warn qq{Start point in LSC\n};
+        my $ssc = $csc->copy;
+        my $lsc = $CHR->diff($ira)->diff($irb)->diff($ssc);
+        print qq{LSC:}, $lsc->runlist, qq{ size:}, $lsc->size;
+        print qq{SSC:}, $ssc->runlist, qq{ size:}, $lsc->size;
+    }
+    else  {
+        warn qq{Start point in SSC\n};
+        my $lsc = $csc->copy;
+        my $ssc = $CHR->diff($ira)->diff($irb)->diff($lsc);
+        print qq{LSC:}, $lsc->runlist, qq{ size:}, $lsc->size;
+        print qq{SSC:}, $ssc->runlist, qq{ size:}, $lsc->size;
+    }
+' \
+    genus_strain.csv
+
+
+
+```
+
 ### Alignments of families for outgroups.
 
 ```bash
