@@ -899,20 +899,40 @@ perl -MAlignDB::IntSpan -nla -F"," \
 
     my $CHR = AlignDB::IntSpan->new->add_pair(1, $chr_size);
     my $csc = AlignDB::IntSpan->new->add_pair($ira->max + 1, $irb->min - 1);
+    my $segment = 10000;
+    my $lsc = AlignDB::IntSpan->new;
+    my $ssc = AlignDB::IntSpan->new;
 
     if ($d_s_a + $d_b_e > $d_a_b) {
         warn qq{Start point in LSC\n};
-        my $ssc = $csc->copy;
-        my $lsc = $CHR->diff($ira)->diff($irb)->diff($ssc);
-        print qq{LSC:}, $lsc->runlist, qq{ size:}, $lsc->size;
-        print qq{SSC:}, $ssc->runlist, qq{ size:}, $lsc->size;
+        $ssc = $csc->copy;
+        $lsc = $CHR->diff($ira)->diff($irb)->diff($ssc);
+
     }
     else  {
         warn qq{Start point in SSC\n};
-        my $lsc = $csc->copy;
-        my $ssc = $CHR->diff($ira)->diff($irb)->diff($lsc);
-        print qq{LSC:}, $lsc->runlist, qq{ size:}, $lsc->size;
-        print qq{SSC:}, $ssc->runlist, qq{ size:}, $lsc->size;
+        $lsc = $csc->copy;
+        $ssc = $CHR->diff($ira)->diff($irb)->diff($lsc);
+    }
+
+    print qq{LSC:}, $lsc->runlist, qq{ size:}, $lsc->size;
+    print qq{SSC:}, $ssc->runlist, qq{ size:}, $ssc->size;
+
+    my $max_seg = int($lsc->size / $segment / 2);
+    if ($lsc->span_size == 1) {
+        for my $i (1 .. $max_seg) {
+            my $slice = AlignDB::IntSpan->new;
+            $slice->add($lsc->slice($segment * ($i - 1) + 1, $segment * $i));
+            $slice->add($lsc->slice($lsc->size - $segment * $i + 1 , $lsc->size - $segment * ($i - 1)));
+            print qq{LSC_s$i:}, $slice;
+        }
+    }
+    elsif ($lsc->span_size == 2) {
+        my ($lsc1, $lsc2) = $lsc->sets;
+
+    }
+    else {
+        warn qq{LSC wrong\n};
     }
 ' \
     genus_strain.csv
