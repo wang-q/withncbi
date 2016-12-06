@@ -890,14 +890,24 @@ Create `ir_lsc_ssc.tsv` for slicing alignments.
 
 Manually edit it then move to `~/Scripts/withncbi/doc/ir_lsc_ssc.tsv`.
 
-`#genus abbr    chr_size    IR  LSC SSC`
+`#genus abbr    used    chr_size    IR  LSC SSC`
 
 ```bash
 cd ~/data/organelle/plastid_summary
 
 cat plastid.ABBR.csv \
     | grep -v "^#" \
-    | perl -nla -F"," -MAlignDB::IntSpan -e '
+    | perl -nla -F"," -MAlignDB::IntSpan -MPath::Tiny -e '
+        BEGIN{
+            %seen = ();
+            @ls = grep {/\S/}
+                  grep {!/^#/}
+                  path(q{genus.tsv})->lines( { chomp => 1});
+            for (@ls) {
+                $seen{$_}++ for split(/,|\s+/);
+            }
+        }
+
         chomp for @F;
 
         my $genus = $F[4];
@@ -907,21 +917,23 @@ cat plastid.ABBR.csv \
         my $link_file = qq{$ENV{HOME}/data/organelle/plastid_self.working/$genus/Results/$abbr/$abbr.links.tsv};
 
         if (! -e $size_file or ! -e $link_file) {
-            print q{#} . join(qq{\t}, $genus, $abbr, (q{NA}) x 4 );
+            print q{#} . join(qq{\t}, $genus, $abbr, (q{NA}) x 5 );
             next;
         }
+
+        my $used = $seen{$abbr} ? 1 : 0;
 
         my $chr_size = `cat $size_file | cut -f 2 | xargs echo`;
         my $link = `cat $link_file | xargs echo`;
         chomp $chr_size; chomp $link;
 
         if (split(q{ }, $chr_size) > 2 or split(q{ }, $link) > 2) {
-            print q{#} . join(qq{\t}, $genus, $abbr, $chr_size, (q{MULTI}) x 3 );
+            print q{#} . join(qq{\t}, $genus, $abbr, $used, $chr_size, (q{MULTI}) x 3 );
             next;
         }
 
         if ($link !~ m{:(\d+\-\d+)\s+.+:(\d+\-\d+)$}) {
-            print q{#} . join(qq{\t}, $genus, $abbr, $chr_size, (q{NONE}) x 3 );
+            print q{#} . join(qq{\t}, $genus, $abbr, $used, $chr_size, (q{NONE}) x 3 );
             next;
         }
 
@@ -934,7 +946,7 @@ cat plastid.ABBR.csv \
             or $ira->trim(1)->contains($chr_size)
             or $irb->trim(1)->contains($chr_size)
             or ($ira->max + 1 > $irb->min - 1)) {
-            print q{#} . join(qq{\t}, $genus, $abbr, $chr_size, (q{WRONG}) x 3 );
+            print q{#} . join(qq{\t}, $genus, $abbr, $used, $chr_size, (q{WRONG}) x 3 );
             next;
         }
 
@@ -961,7 +973,7 @@ cat plastid.ABBR.csv \
             $ssc = $chr->diff($ir)->diff($lsc);
         }
 
-        print join(qq{\t}, $genus, $abbr, $chr_size, $ir, $lsc, $ssc );
+        print join(qq{\t}, $genus, $abbr, $used, $chr_size, $ir, $lsc, $ssc );
     ' \
     > ir_lsc_ssc.tsv
 
