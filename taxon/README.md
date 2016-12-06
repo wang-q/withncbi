@@ -686,7 +686,7 @@ cat genus.tsv \
         BEGIN{
             @ls = grep {/\S/}
                   grep {!/^#/}
-                  path(q{~/Scripts/withncbi/doc/plastid_OG.md})->lines( { chomp => 1});
+                  path(q{~/Scripts/withncbi/doc/plastid_OG.md})->lines({ chomp => 1});
             for (@ls) {
                 @fs = split(/,/);
                 $h{$fs[0]}= $fs[1];
@@ -858,156 +858,6 @@ find . -mindepth 1 -maxdepth 2 -type d -name "*_fasta" | parallel -r rm -fr
 find  /usr/local/var/mysql -type d -name "[A-Z]*" | parallel -r rm -fr
 ```
 
-### LSC and SSC
-
-IRA and IRB are presented by `plastid_self.working/${GENUS}/Results/${STRAIN}/${STRAIN}.links.tsv`.
-
-```bash
-find ~/data/organelle/plastid_self.working -type f -name "*.links.tsv" \
-    | xargs wc -l | sort \
-    | grep -v "total" \
-    | perl -nl -e 's/^\s*//g; /^(\d+)\s/ and print $1' \
-    | uniq -c
-
-```
-
-Manually check strains not containing singular link.
-
-| count | lines |
-|------:|------:|
-|   223 |     0 |
-|   561 |     1 |
-|    39 |     2 |
-|     8 |     3 |
-|     8 |     4 |
-|     2 |     5 |
-|     2 |     6 |
-|     2 |     7 |
-|     1 |     9 |
-|     1 |    10 |
-
-Create `ir_lsc_ssc.tsv` for slicing alignments.
-
-Manually edit it then move to `~/Scripts/withncbi/doc/ir_lsc_ssc.tsv`.
-
-`#genus abbr    chr_size    IR  LSC SSC`
-
-* `NA` - not self-aligned
-* `MULTI` - multiply link records
-* `NONE` - no link records
-* `WRONG` - unexpected link records
-
-```bash
-cd ~/data/organelle/plastid_summary
-
-cat plastid.ABBR.csv \
-    | grep -v "^#" \
-    | perl -nla -F"," -MAlignDB::IntSpan -MPath::Tiny -e '
-        BEGIN{
-            %seen = ();
-            @ls = grep {/\S/}
-                  grep {!/^#/}
-                  path(q{family.tsv})->lines( { chomp => 1});
-            for (@ls) {
-                $seen{$_}++ for split(/,|\s+/);
-            }
-        }
-
-        chomp for @F;
-
-        my $genus = $F[4];
-        my $abbr = $F[9];
-
-        next unless $seen{$abbr};
-
-        my $size_file = qq{$ENV{HOME}/data/organelle/plastid_self.working/$genus/Genomes/$abbr/chr.sizes};
-        my $link_file = qq{$ENV{HOME}/data/organelle/plastid_self.working/$genus/Results/$abbr/$abbr.links.tsv};
-
-        if (! -e $size_file or ! -e $link_file) {
-            print q{#} . join(qq{\t}, $genus, $abbr, (q{NA}) x 4 );
-            next;
-        }
-
-
-        my $chr_size = `cat $size_file | cut -f 2 | xargs echo`;
-        my $link = `cat $link_file | xargs echo`;
-        chomp $chr_size; chomp $link;
-
-        if (split(q{ }, $chr_size) > 2 or split(q{ }, $link) > 2) {
-            print q{#} . join(qq{\t}, $genus, $abbr, $chr_size, (q{MULTI}) x 3 );
-            next;
-        }
-
-        if ($link !~ m{:(\d+\-\d+)\s+.+:(\d+\-\d+)$}) {
-            print q{#} . join(qq{\t}, $genus, $abbr, $chr_size, (q{NONE}) x 3 );
-            next;
-        }
-
-        my $ira = AlignDB::IntSpan->new($1);
-        my $irb = AlignDB::IntSpan->new($2);
-        my $ir = AlignDB::IntSpan->new->add($ira)->add($irb);
-
-        if ($ira->trim(1)->contains(1)
-            or $irb->trim(1)->contains(1)
-            or $ira->trim(1)->contains($chr_size)
-            or $irb->trim(1)->contains($chr_size)
-            or ($ira->max + 1 > $irb->min - 1)) {
-            print q{#} . join(qq{\t}, $genus, $abbr, $chr_size, (q{WRONG}) x 3 );
-            next;
-        }
-
-        my $chr = AlignDB::IntSpan->new->add_pair(1, $chr_size);
-        my $interval = AlignDB::IntSpan->new->add_pair($ira->max + 1, $irb->min - 1);
-
-        my $d_s_a = $ira->distance(AlignDB::IntSpan->new(1));
-        my $d_b_e = $irb->distance(AlignDB::IntSpan->new($chr_size));
-        my $d_a_b = $ira->distance($irb);
-        $d_s_a = 0 if $d_s_a < 0;
-        $d_b_e = 0 if $d_b_e < 0;
-
-        my $lsc = AlignDB::IntSpan->new;
-        my $ssc = AlignDB::IntSpan->new;
-
-        if ($d_s_a + $d_b_e > $d_a_b) {
-            $position_1 = q{LSC};
-            $ssc = $interval->copy;
-            $lsc = $chr->diff($ir)->diff($ssc);
-        }
-        else  {
-            $position_1 = q{SSC};
-            $lsc = $interval->copy;
-            $ssc = $chr->diff($ir)->diff($lsc);
-        }
-
-        print join(qq{\t}, $genus, $abbr, $chr_size, $ir, $lsc, $ssc );
-    ' \
-    > ir_lsc_ssc.tsv
-
-```
-
-```perl5
-    my $segment = 10000;
-    my $max_seg = int($lsc->size / $segment / 2);
-    if ($lsc->span_size == 1) {
-        for my $i (1 .. $max_seg) {
-            my $slice = AlignDB::IntSpan->new;
-            $slice->add($lsc->slice($segment * ($i - 1) + 1, $segment * $i));
-            $slice->add($lsc->slice($lsc->size - $segment * $i + 1 , $lsc->size - $segment * ($i - 1)));
-            print qq{LSC_s$i:}, $slice;
-        }
-    }
-    elsif ($lsc->span_size == 2) {
-        my ($lsc1, $lsc2) = $lsc->sets;
-
-    }
-    else {
-        warn qq{LSC wrong\n};
-    }
-
-
-
-```
-
 ### Alignments of families for outgroups.
 
 ```bash
@@ -1060,6 +910,192 @@ find . -mindepth 1 -maxdepth 3 -type d -name "*_fasta" | parallel -r rm -fr
 
 find . -mindepth 1 -maxdepth 4 -type f -name "*.phy" | parallel -r rm
 find . -mindepth 1 -maxdepth 4 -type f -name "*.phy.reduced" | parallel -r rm
+
+```
+
+### LSC and SSC
+
+IRA and IRB are presented by `plastid_self.working/${GENUS}/Results/${STRAIN}/${STRAIN}.links.tsv`.
+
+```bash
+find ~/data/organelle/plastid_self.working -type f -name "*.links.tsv" \
+    | xargs wc -l | sort \
+    | grep -v "total" \
+    | perl -nl -e 's/^\s*//g; /^(\d+)\s/ and print $1' \
+    | uniq -c
+
+```
+
+Manually check strains not containing singular link.
+
+| count | lines |
+|------:|------:|
+|   223 |     0 |
+|   561 |     1 |
+|    39 |     2 |
+|     8 |     3 |
+|     8 |     4 |
+|     2 |     5 |
+|     2 |     6 |
+|     2 |     7 |
+|     1 |     9 |
+|     1 |    10 |
+
+Create `ir_lsc_ssc.tsv` for slicing alignments.
+
+Manually edit it then move to `~/Scripts/withncbi/doc/ir_lsc_ssc.tsv`.
+
+`#genus abbr    role    accession   chr_size    IR  LSC SSC`
+
+* `NA` - not self-aligned
+* `MULTI` - multiply link records
+* `NONE` - no link records
+* `WRONG` - unexpected link records
+
+```bash
+cd ~/data/organelle/plastid_summary
+
+cat plastid.ABBR.csv \
+    | grep -v "^#" \
+    | perl -nla -F"," -MAlignDB::IntSpan -MPath::Tiny -e '
+        BEGIN {
+            %seen = ();
+            @ls = grep {/\S/}
+                  grep {!/^#/}
+                  path(q{family.tsv})->lines({ chomp => 1});
+            for (@ls) {
+                $seen{$_}++ for split(/,|\s+/);
+            }
+
+            %target = ();
+            %queries = ();
+            @ls = grep {/\S/}
+                  grep {!/^#/}
+                  path(q{genus.tsv})->lines({ chomp => 1});
+            for (@ls) {
+                $target{(split /\t/)[1]}++;
+                $queries{$_}++ for split(/,/, (split /\t/)[2]);
+            }
+
+            %outgroup = ();
+            @ls = grep {/\S/}
+                  grep {!/^#/}
+                  path(q{genus_OG.tsv})->lines({ chomp => 1});
+            for (@ls) {
+                $outgroup{(split /\t/)[3]}++;
+            }
+        }
+
+        chomp for @F;
+
+        my $genus = $F[4];
+        my $abbr = $F[9];
+
+        next unless $seen{$abbr};
+
+        my $role = "UNKNOWN";
+        if ($target{$abbr}) {
+            $role = "Target";
+        }
+        elsif ($queries{$abbr}) {
+            $role = "Queries";
+        }
+        elsif ($outgroup{$abbr}) {
+            $role = "Outgroup";
+        }
+
+        my $size_file = qq{$ENV{HOME}/data/organelle/plastid_self.working/$genus/Genomes/$abbr/chr.sizes};
+        my $link_file = qq{$ENV{HOME}/data/organelle/plastid_self.working/$genus/Results/$abbr/$abbr.links.tsv};
+
+        if (! -e $size_file or ! -e $link_file) {
+            if ($outgroup{$abbr}) {
+                print q{#} . join(qq{\t}, $genus, $abbr, $role, (q{NA}) x 5 );
+            }
+            next;
+        }
+
+        my $accession = `cat $size_file | cut -f 1 | xargs echo`;
+        my $chr_size = `cat $size_file | cut -f 2 | xargs echo`;
+        my $link = `cat $link_file | xargs echo`;
+        chomp $accession; chomp $chr_size; chomp $link;
+
+        if (split(q{ }, $chr_size) > 2 or split(q{ }, $link) > 2) {
+            print q{#} . join(qq{\t}, $genus, $abbr, $role, $accession, $chr_size, (q{MULTI}) x 3 );
+            next;
+        }
+
+        if ($link !~ m{:(\d+\-\d+)\s+.+:(\d+\-\d+)$}) {
+            print q{#} . join(qq{\t}, $genus, $abbr, $role, $accession, $chr_size, (q{NONE}) x 3 );
+            next;
+        }
+
+        my $ira = AlignDB::IntSpan->new($1);
+        my $irb = AlignDB::IntSpan->new($2);
+        my $ir = AlignDB::IntSpan->new->add($ira)->add($irb);
+
+        if ($ira->trim(1)->contains(1)
+            or $irb->trim(1)->contains(1)
+            or $ira->trim(1)->contains($chr_size)
+            or $irb->trim(1)->contains($chr_size)
+            or ($ira->max + 1 > $irb->min - 1)) {
+            print q{#} . join(qq{\t}, $genus, $abbr, $role, $accession, $chr_size, (q{WRONG}) x 3 );
+            next;
+        }
+
+        my $chr = AlignDB::IntSpan->new->add_pair(1, $chr_size);
+        my $interval = AlignDB::IntSpan->new->add_pair($ira->max + 1, $irb->min - 1);
+
+        my $d_s_a = $ira->distance(AlignDB::IntSpan->new(1));
+        my $d_b_e = $irb->distance(AlignDB::IntSpan->new($chr_size));
+        my $d_a_b = $ira->distance($irb);
+        $d_s_a = 0 if $d_s_a < 0;
+        $d_b_e = 0 if $d_b_e < 0;
+
+        my $lsc = AlignDB::IntSpan->new;
+        my $ssc = AlignDB::IntSpan->new;
+
+        if ($d_s_a + $d_b_e > $d_a_b) { # LSC
+            $ssc = $interval->copy;
+            $lsc = $chr->diff($ir)->diff($ssc);
+        }
+        else  { # SSC
+            $lsc = $interval->copy;
+            $ssc = $chr->diff($ir)->diff($lsc);
+        }
+
+        print join(qq{\t}, $genus, $abbr, $role, $accession, $chr_size, $ir, $lsc, $ssc );
+    ' \
+    > ir_lsc_ssc.tsv
+
+```
+
+### Slices of IR, LSC and SSC
+
+```bash
+
+
+```
+
+```perl5
+    my $segment = 10000;
+    my $max_seg = int($lsc->size / $segment / 2);
+    if ($lsc->span_size == 1) {
+        for my $i (1 .. $max_seg) {
+            my $slice = AlignDB::IntSpan->new;
+            $slice->add($lsc->slice($segment * ($i - 1) + 1, $segment * $i));
+            $slice->add($lsc->slice($lsc->size - $segment * $i + 1 , $lsc->size - $segment * ($i - 1)));
+            print qq{LSC_s$i:}, $slice;
+        }
+    }
+    elsif ($lsc->span_size == 2) {
+        my ($lsc1, $lsc2) = $lsc->sets;
+
+    }
+    else {
+        warn qq{LSC wrong\n};
+    }
+
+
 
 ```
 
