@@ -1114,6 +1114,16 @@ cat ~/Scripts/withncbi/doc/ir_lsc_ssc.tsv \
 
 ```
 
+Run the generated bash file.
+
+```bash
+cd ~/data/organelle/plastid_slices
+
+bash slices.sh
+perl ~/Scripts/fig_table/collect_common_basic.pl -d .
+```
+
+
 ```perl5
     my $segment = 10000;
     my $max_seg = int($lsc->size / $segment / 2);
