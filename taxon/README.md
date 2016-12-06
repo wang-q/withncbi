@@ -855,7 +855,7 @@ find . -mindepth 1 -maxdepth 2 -type d -name "*_raw" | parallel -r rm -fr
 find . -mindepth 1 -maxdepth 2 -type d -name "*_fasta" | parallel -r rm -fr
 
 # clean mysql
-find  /usr/local/var/mysql -type d -name "[A-Z]*" | parallel -r rm -fr
+#find  /usr/local/var/mysql -type d -name "[A-Z]*" | parallel -r rm -fr
 ```
 
 ### Alignments of families for outgroups.
@@ -881,7 +881,7 @@ sh runall.sh 2>&1 | tee log_runall.txt
 find ~/data/organelle/plastid_families -type f -path "*_phylo*" -name "*.nwk"
 ```
 
-Manually editing `~/Scripts/withncbi/doc/plastid_OG.md` and generate
+In previous steps, we have manually edited `~/Scripts/withncbi/doc/plastid_OG.md` and generated
 `genus_OG.tsv`.
 
 *D* between target and outgroup should be around **0.05**.
@@ -1071,8 +1071,46 @@ cat plastid.ABBR.csv \
 
 ### Slices of IR, LSC and SSC
 
-```bash
+Without outgroups.
 
+```bash
+mkdir -p ~/data/organelle/plastid_slices
+cd ~/data/organelle/plastid_slices
+
+cat ~/Scripts/withncbi/doc/ir_lsc_ssc.tsv \
+    | perl -nla -F"\t" -e '
+        /^#/ and next;
+        $F[2] eq q{Target} or next;
+        $F[5] =~ /\d+/ or next;
+
+        print qq{# $F[0]};
+
+        next unless -e "$ENV{HOME}/data/organelle/plastid.working/$F[0]/$F[0]_refined/$F[3].synNet.maf.gz.fas.gz";
+
+        my %field_of = (
+            IR  => 5,
+            LSC => 6,
+            SSC => 7,
+        );
+
+        for my $key (sort keys %field_of) {
+            print qq{jrunlist cover <(echo $F[3]:$F[$field_of{$key}]) -o $F[0].$key.yml};
+            print qq{fasops slice -n $F[1] -o $F[0].$key.fas \\};
+            print qq{    ~/data/organelle/plastid.working/$F[0]/$F[0]_refined/$F[3].synNet.maf.gz.fas.gz \\};
+            print qq{    $F[0].$key.yml};
+            print qq{perl ~/Scripts/alignDB/util/multi_way_batch.pl \\};
+            print qq{    -d $F[0]_$key \\};
+            print qq{    -da ~/data/organelle/plastid_slices/$F[0].$key.fas \\};
+            print qq{    -a ~/data/organelle/plastid.working/$F[0]/Stats/anno.yml \\};
+            print qq{    -chr ~/data/organelle/plastid.working/$F[0]/chr_length.csv \\};
+            print qq{    -lt 1000 --parallel 8 --batch 5 \\};
+            print qq{    --run common};
+            print qq{};
+        }
+
+        print qq{};
+    ' \
+    > slices.sh
 
 ```
 
