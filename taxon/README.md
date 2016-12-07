@@ -1073,6 +1073,8 @@ cat plastid.ABBR.csv \
 
 Without outgroups.
 
+Be cautious to alignments with low coverage.
+
 ```bash
 mkdir -p ~/data/organelle/plastid_slices
 cd ~/data/organelle/plastid_slices
@@ -1174,7 +1176,7 @@ bash slices.sh
 perl ~/Scripts/fig_table/collect_common_basic.pl -d .
 ```
 
-SNP t-test
+#### SNP t-test
 
 ```bash
 mkdir -p ~/data/organelle/plastid_summary/ttest
