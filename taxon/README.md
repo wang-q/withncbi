@@ -1078,7 +1078,7 @@ mkdir -p ~/data/organelle/plastid_slices
 cd ~/data/organelle/plastid_slices
 
 cat ~/Scripts/withncbi/doc/ir_lsc_ssc.tsv \
-    | perl -nla -F"\t" -e '
+    | perl -nla -F"\t" -MAlignDB::IntSpan -Mstrict -Mwarnings -e '
         /^#/ and next;
         $F[2] eq q{Target} or next;
         $F[5] =~ /\d+/ or next;
@@ -1087,14 +1087,65 @@ cat ~/Scripts/withncbi/doc/ir_lsc_ssc.tsv \
 
         next unless -e "$ENV{HOME}/data/organelle/plastid.working/$F[0]/$F[0]_refined/$F[3].synNet.maf.gz.fas.gz";
 
-        my %field_of = (
-            IR  => 5,
-            LSC => 6,
-            SSC => 7,
+        my %rl_of = (
+            IR  => $F[5],
+            LSC => $F[6],
+            SSC => $F[7],
         );
 
-        for my $key (sort keys %field_of) {
-            print qq{jrunlist cover <(echo $F[3]:$F[$field_of{$key}]) -o $F[0].$key.yml};
+        my $lsc = AlignDB::IntSpan->new($F[6]);
+        # next unless $lsc->span_size == 2; # for testing
+
+        my $max_seg = 3;
+        my $segment = int($lsc->size / $max_seg /2);
+        for my $i (1 .. $max_seg) {
+            my $slice_5 = AlignDB::IntSpan->new;
+            my $slice_3 = AlignDB::IntSpan->new;
+
+            # these are all indexes of LCS
+            my $seg_5_start = $segment * ($i - 1) + 1;
+            my $seg_5_end = $segment * $i;
+            my $seg_3_start = $lsc->size - $segment * $i + 1;
+            my $seg_3_end = $lsc->size - $segment * ($i - 1);
+
+            if ($lsc->span_size == 1) {
+                $slice_5 = $lsc->slice($seg_5_start, $seg_5_end);
+                $slice_3 = $lsc->slice($seg_3_start, $seg_3_end);
+            }
+            elsif ($lsc->span_size == 2) { # start point inside LSC
+                my ($lsc1, $lsc2) = $lsc->sets;
+
+                if ($lsc2->size >= $seg_5_end) {
+                    $slice_5 = $lsc2->slice($seg_5_start, $seg_5_end);
+                }
+                elsif ($lsc2->size >= $seg_5_start) {
+                    $slice_5 = $lsc2->slice($seg_5_start, $lsc2->size);
+                    $slice_5->add( $lsc1->slice(1, $segment - ($lsc2->size - $seg_5_start + 1) ) );
+                }
+                else {
+                    $slice_5 = $lsc1->slice($seg_5_start - $lsc2->size, $seg_5_end - $lsc2->size);
+                }
+
+                if ($lsc1->size >= $lsc->size - $seg_3_start) {
+                    $slice_3 = $lsc1->slice($seg_3_start - $lsc2->size, $seg_3_end - $lsc2->size);
+                }
+                elsif ($lsc1->size >= $lsc->size - $seg_3_end) {
+                    $slice_3 = $lsc1->slice(1, $seg_3_end - $lsc2->size);
+                    $slice_3->add( $lsc2->slice( $seg_3_start - ($seg_3_end - $lsc2->size), $lsc2->size ) );
+                }
+                else {
+                    $slice_3 = $lsc2->slice($seg_3_start, $seg_3_end);
+                }
+            }
+
+            my $slice = AlignDB::IntSpan->new;
+            $slice->add($slice_5)->add($slice_3);
+            $slice = $slice->fill(10); # fill small gaps in LSC3
+            $rl_of{"LSC$i"} = $slice->as_string;
+        }
+
+        for my $key (sort keys %rl_of) {
+            print qq{jrunlist cover <(echo $F[3]:$rl_of{$key}) -o $F[0].$key.yml};
             print qq{fasops slice -n $F[1] -o $F[0].$key.fas \\};
             print qq{    ~/data/organelle/plastid.working/$F[0]/$F[0]_refined/$F[3].synNet.maf.gz.fas.gz \\};
             print qq{    $F[0].$key.yml};
@@ -1121,30 +1172,6 @@ cd ~/data/organelle/plastid_slices
 
 bash slices.sh
 perl ~/Scripts/fig_table/collect_common_basic.pl -d .
-```
-
-
-```perl5
-    my $segment = 10000;
-    my $max_seg = int($lsc->size / $segment / 2);
-    if ($lsc->span_size == 1) {
-        for my $i (1 .. $max_seg) {
-            my $slice = AlignDB::IntSpan->new;
-            $slice->add($lsc->slice($segment * ($i - 1) + 1, $segment * $i));
-            $slice->add($lsc->slice($lsc->size - $segment * $i + 1 , $lsc->size - $segment * ($i - 1)));
-            print qq{LSC_s$i:}, $slice;
-        }
-    }
-    elsif ($lsc->span_size == 2) {
-        my ($lsc1, $lsc2) = $lsc->sets;
-
-    }
-    else {
-        warn qq{LSC wrong\n};
-    }
-
-
-
 ```
 
 SNP t-test
