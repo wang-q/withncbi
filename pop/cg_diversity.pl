@@ -394,10 +394,10 @@ EOF
 cd [% data_dir %]
     
 #----------------------------#
-# multi_way_batch
+# alignDB
 #----------------------------#
 # mafft
-perl [% pl_dir %]/alignDB/extra/multi_way_batch.pl \
+perl [% pl_dir %]/alignDB/alignDB.pl \
     -d HumanvsXI -e human_65 \
     --block --outgroup \
     --id [% data_dir %]/id2name.csv \

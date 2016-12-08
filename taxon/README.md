@@ -1398,7 +1398,7 @@ cat ~/Scripts/withncbi/doc/ir_lsc_ssc.tsv \
             print qq{fasops slice -n $F[1] -o $F[0].$key.fas \\};
             print qq{    ~/data/organelle/plastid.working/$F[0]/$F[0]_refined/$F[3].synNet.maf.gz.fas.gz \\};
             print qq{    $F[0].$key.yml};
-            print qq{perl ~/Scripts/alignDB/util/multi_way_batch.pl \\};
+            print qq{perl ~/Scripts/alignDB/alignDB.pl \\};
             print qq{    -d $F[0]_$key \\};
             print qq{    -da ~/data/organelle/plastid_slices/$F[0].$key.fas \\};
             print qq{    -a ~/data/organelle/plastid.working/$F[0]/Stats/anno.yml \\};
