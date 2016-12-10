@@ -4,6 +4,9 @@
 - [withncbi](#withncbi)
     - [Purpose](#purpose)
     - [Directory organization](#directory-organization)
+    - [Conventions](#conventions)
+        - [fasta](#fasta)
+        - [fastq](#fastq)
     - [Concepts](#concepts)
         - [IntSpans](#intspans)
         - [Positions](#positions)
@@ -36,6 +39,18 @@ For more detailed, check `README.md` in each sub-directories.
 * [`taxon/`](taxon/): process (small) genomes according to NCBI Taxonomy.
 
 * [`util/`](util/): miscellaneous utilities.
+
+## Conventions
+
+### fasta
+
+* `.fa` - genomic sequences
+* `.fas` - blocked fasta files
+* `.fasta` - normal/miscellaneous fasta files
+
+### fastq
+
+Use `.fq` over `.fastq`
 
 ## Concepts
 
