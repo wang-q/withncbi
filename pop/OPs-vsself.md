@@ -52,8 +52,8 @@ perl ~/Scripts/alignDB/init/init_alignDB.pl \
 perl ~/Scripts/alignDB/init/gen_alignDB_genome.pl \
     -d Athavsself \
     -t Atha \
-    --dir ~/data/alignment/Ensembl/Atha \
-    --length 500000 \
+    --da ~/data/alignment/Ensembl/Atha \
+    --truncate 500000 \
     --parallel 8
 
 perl ~/Scripts/alignDB/util/dup_db.pl --yes -d Athavsself -f ~/data/dumps/mysql/Athavsself.sql.gz
@@ -69,8 +69,8 @@ perl ~/Scripts/alignDB/init/init_alignDB.pl \
 perl ~/Scripts/alignDB/init/gen_alignDB_genome.pl \
     -d OsatJapvsself \
     -t OsatJap \
-    --dir ~/data/alignment/Ensembl/OsatJap \
-    --length 500000 \
+    --da ~/data/alignment/Ensembl/OsatJap \
+    --truncate 500000 \
     --parallel 8
 
 perl ~/Scripts/alignDB/util/dup_db.pl --yes -d OsatJapvsself -f ~/data/dumps/mysql/OsatJapvsself.sql.gz
@@ -86,8 +86,8 @@ perl ~/Scripts/alignDB/init/init_alignDB.pl \
 perl ~/Scripts/alignDB/init/gen_alignDB_genome.pl \
     -d Dmelvsself \
     -t Dmel \
-    --dir ~/data/alignment/Ensembl/Dmel \
-    --length 500000 \
+    --da ~/data/alignment/Ensembl/Dmel \
+    --truncate 500000 \
     --parallel 8
 
 perl ~/Scripts/alignDB/util/dup_db.pl --yes -d Dmelvsself -f ~/data/dumps/mysql/Dmelvsself.sql.gz
@@ -103,8 +103,8 @@ perl ~/Scripts/alignDB/init/init_alignDB.pl \
 perl ~/Scripts/alignDB/init/gen_alignDB_genome.pl \
     -d Mousevsself \
     -t Mouse \
-    --dir ~/data/alignment/Ensembl/Mouse \
-    --length 500000 \
+    --da ~/data/alignment/Ensembl/Mouse \
+    --truncate 500000 \
     --parallel 8
 
 perl ~/Scripts/alignDB/util/dup_db.pl --yes -d Mousevsself -f ~/data/dumps/mysql/Mousevsself.sql.gz
@@ -120,8 +120,8 @@ perl ~/Scripts/alignDB/init/init_alignDB.pl \
 perl ~/Scripts/alignDB/init/gen_alignDB_genome.pl \
     -d S288cvsself \
     -t S288c \
-    --dir ~/data/alignment/Ensembl/S288c \
-    --length 500000 \
+    --da ~/data/alignment/Ensembl/S288c \
+    --truncate 500000 \
     --parallel 8
 
 perl ~/Scripts/alignDB/util/dup_db.pl --yes -d S288cvsself -f ~/data/dumps/mysql/S288cvsself.sql.gz

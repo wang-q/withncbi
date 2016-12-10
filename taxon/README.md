@@ -1403,7 +1403,7 @@ cat ~/Scripts/withncbi/doc/ir_lsc_ssc.tsv \
             print qq{    -da ~/data/organelle/plastid_slices/$F[0].$key.fas \\};
             print qq{    -a ~/data/organelle/plastid.working/$F[0]/Stats/anno.yml \\};
             print qq{    -chr ~/data/organelle/plastid.working/$F[0]/chr_length.csv \\};
-            print qq{    -lt 1000 --parallel 8 --batch 5 \\};
+            print qq{    --lt 1000 --parallel 8 --batch 5 \\};
             print qq{    --run common};
             print qq{};
         }
