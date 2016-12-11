@@ -302,7 +302,7 @@ sub insert_vars {
     print "seq length: ", $seq_set->count,   "\n" if $verbose;
 
     # get variations belong to this region
-    my @region_vars = grep { $chr_set->member( $_->[1] ) } @{$vars};
+    my @region_vars = grep { $chr_set->contains( $_->[1] ) } @{$vars};
 
     # reverse order, so inserted indel will not affair posterior variations
     @region_vars = sort { $b->[1] <=> $a->[1] } @region_vars;
