@@ -879,6 +879,16 @@ done  > runall.sh
 sh runall.sh 2>&1 | tee log_runall.txt
 
 find ~/data/organelle/plastid_families -type f -path "*_phylo*" -name "*.nwk"
+
+#----------------------------#
+# Clean
+#----------------------------#
+find . -mindepth 1 -maxdepth 3 -type d -name "*_raw" | parallel -r rm -fr
+find . -mindepth 1 -maxdepth 3 -type d -name "*_fasta" | parallel -r rm -fr
+
+find . -mindepth 1 -maxdepth 4 -type f -name "*.phy" | parallel -r rm
+find . -mindepth 1 -maxdepth 4 -type f -name "*.phy.reduced" | parallel -r rm
+
 ```
 
 In previous steps, we have manually edited `~/Scripts/withncbi/doc/plastid_OG.md` and generated
