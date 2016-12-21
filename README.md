@@ -1,32 +1,34 @@
 [TOC levels=1-3]: #
 
 # Table of Contents
-- [withncbi](#withncbi)
-    - [Purpose](#purpose)
-    - [Directory organization](#directory-organization)
-    - [Conventions](#conventions)
-        - [fasta](#fasta)
-        - [fastq](#fastq)
-    - [Concepts](#concepts)
-        - [IntSpans](#intspans)
-        - [Positions](#positions)
-        - [Runlists in YAML](#runlists-in-yaml)
-        - [Blocked fasta files](#blocked-fasta-files)
-        - [Ranges and links of ranges](#ranges-and-links-of-ranges)
-    - [Author](#author)
-    - [Copyright and license](#copyright-and-license)
+- [Name](#name)
+- [Purpose](#purpose)
+- [Directory organization](#directory-organization)
+- [Conventions](#conventions)
+    - [fasta](#fasta)
+    - [fastq](#fastq)
+- [Concepts](#concepts)
+    - [IntSpans](#intspans)
+    - [Positions](#positions)
+    - [Runlists in YAML](#runlists-in-yaml)
+    - [Blocked fasta files](#blocked-fasta-files)
+    - [Ranges and links of ranges](#ranges-and-links-of-ranges)
+- [Author](#author)
+- [Copyright and license](#copyright-and-license)
 
-# withncbi
 
-withncbi - batch operations according to various NCBI/EBI databases.
+# Name
 
-## Purpose
+withncbi - [egaz](https://github.com/wang-q/egaz) and [alignDB](https://github.com/wang-q/alignDB)
+work with external (NCBI/EBI) data.
+
+# Purpose
 
 Fetch sequences, generate reports and build alignments according to various NCBI databases.
 
 For more detailed, check `README.md` in each sub-directories.
 
-## Directory organization
+# Directory organization
 
 * [`db/`](db/): turn NCBI genome reports and assembly reports into a query-able MySQL database.
 
@@ -40,24 +42,23 @@ For more detailed, check `README.md` in each sub-directories.
 
 * [`util/`](util/): miscellaneous utilities.
 
-## Conventions
+# Conventions
 
-### fasta
+## fasta
 
 * `.fa` - genomic sequences
 * `.fas` - blocked fasta files
 * `.fasta` - normal/miscellaneous fasta files
 
-### fastq
+## fastq
 
 Use `.fq` over `.fastq`
 
-## Concepts
+# Concepts
 
-### IntSpans
+## IntSpans
 
-An IntSpan represents sets of integers as a number of inclusive ranges, for example
-'1-10,19,45-48'.
+An IntSpan represents sets of integers as a number of inclusive ranges, for example '1-10,19,45-48'.
 
 The following picture is the schema of an IntSpan object. Jump lines are above the baseline; loop
 lines are below it.
@@ -68,7 +69,7 @@ lines are below it.
 [jintspan](https://github.com/egateam/jintspan) are implements of IntSpan objects in Perl and Java,
 respectively.
 
-### Positions
+## Positions
 
 Examples in [`S288c.txt`](https://github.com/wang-q/App-RL/blob/master/t/S288c.txt)
 
@@ -80,7 +81,7 @@ II:21294-22075
 II:23537-24097
 ```
 
-![positions](doc/positions.png) 
+![positions](doc/positions.png)
 
 Simple rules:
 
@@ -97,13 +98,13 @@ species.chromosome(strand):start-end
 --------^^^^^^^^^^--------^^^^^^----
 ```
 
-### Runlists in YAML
+## Runlists in YAML
 
 [App::RL](https://github.com/wang-q/App-RL)
 
 [jrunlist](https://github.com/egateam/jrunlist)
 
-### Blocked fasta files
+## Blocked fasta files
 
 Examples in [`example.fas`](https://github.com/wang-q/App-Fasops/blob/master/t/example.fas)
 
@@ -123,17 +124,17 @@ TCATCAGTTGGCAAACCGTTA
 
 [App::Fasops](https://github.com/wang-q/App-Fasops)
 
-### Ranges and links of ranges
+## Ranges and links of ranges
 
 [App::Rangeops](https://github.com/wang-q/App-Rangeops)
 
 [jrange](https://github.com/egateam/jrange)
 
-## Author
+# Author
 
 Qiang Wang &lt;wang-q@outlook.com&gt;
 
-## Copyright and license
+# Copyright and license
 
 This software is copyright (c) 2015 by Qiang Wang.
 
