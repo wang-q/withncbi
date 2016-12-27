@@ -940,15 +940,11 @@ Manually check strains not containing singular link.
 
 | count | lines |
 |------:|------:|
-|   223 |     0 |
-|   561 |     1 |
-|    39 |     2 |
-|     8 |     3 |
-|     8 |     4 |
-|     2 |     5 |
-|     2 |     6 |
-|     2 |     7 |
-|     1 |     9 |
+|   122 |     0 |
+|   701 |     1 |
+|    15 |     2 |
+|     7 |     3 |
+|     1 |     8 |
 |     1 |    10 |
 
 Create `ir_lsc_ssc.tsv` for slicing alignments.
@@ -1081,43 +1077,22 @@ cat plastid.ABBR.csv \
 
 ### Can't get clear ir information
 
-
   * Aegilops
       * Aeg_cylindrica 
       * Aeg_geniculata 
-      * Aeg_geniculata 
       * Aeg_speltoides 
       * Aeg_tauschii 
-  * Agrostemma
-      * Agroste_githago 
-  * Allosyncarpia
-      * Allos_ternata 
   * Amentotaxus
       * Ame_argotaenia 
       * Ame_formosana 
-  * Aralia
-      * Aral_undulata 
   * Astragalus
       * Astra_mongholicus 
       * Astra_nakaianus 
   * Babesia
       * Bab_orientalis 
-  * Bowenia
-      * Bow_serrulata 
-  * Bryopsis
-      * Bry_hypnoides 
-  * Bupleurum
-      * Bup_falcatum 
   * Callitropsis
       * Call_nootkatensis 
-      * Call_vietnamensis 
-      * Calo_formosana 
-  * Catharanthus
-      * Cathar_roseus 
-  * Cattleya
-      * Catt_crispata 
-  * Cedrus
-      * Ced_deodara 
+      * Call_vietnamensis  
   * Cephalotaxus
       * Cephalo_oliveri 
       * Cephalo_wilsoniana 
@@ -1127,30 +1102,10 @@ cat plastid.ABBR.csv \
   * Chlorella
       * Chlore_sorokiniana 
       * Chlore_variabilis 
-      * Chlore_vulgaris 
-  * Chrysobalanus
-      * Chrysob_icaco 
-  * Cicer
-      * Cic_arietinum 
-  * Cistanche
-      * Cis_phelypaea 
-  * Cunninghamia
-      * Cun_lanceolata 
+      * Chlore_vulgaris  
   * Cupressus
       * Cup_gigantea 
       * Cup_sempervirens 
-  * Cymbidium
-      * Cym_aloifolium 
-      * Cym_mannii 
-      * Cym_faberi 
-      * Cym_tortisepalum 
-  * Datura
-      * Dat_stramonium 
-  * Dendrobium
-      * Dendrob_nobile 
-      * Dendrob_pendulum 
-  * Dioscorea
-      * Diosc_cayennensis_subsp_rotundata 
   * Epipogium
       * Epipo_aphyllum 
       * Epipo_roseum 
@@ -1160,12 +1115,9 @@ cat plastid.ABBR.csv \
       * Ero_manescavi 
       * Ero_rupestre 
       * Ero_texanum 
-      * Ero_trifolium 
   * Euglena
       * Euglena_viridis 
       * Euglena_gracilis 
-  * Eustrephus
-      * Eus_latifolius 
   * Fragaria
       * Fra_mandshurica 
       * Fra_vesca_subsp_bracteata 
@@ -1174,27 +1126,14 @@ cat plastid.ABBR.csv \
       * Gelidi_vagum 
   * Geranium
       * Ger_incanum 
-  * Glycyrrhiza
-      * Glycy_glabra 
-  * Goodyera
-      * Goo_procera 
-      * Goo_velutina 
   * Gracilaria
       * Gracilaria_chilensis 
       * Gracilaria_chorda 
       * Gracilaria_salicornia 
       * Gracilaria_tenuistipitata_var_liui 
-  * Guizotia
-      * Gui_abyssinica 
   * Hildenbrandia
       * Hild_rivularis 
       * Hild_rubra 
-  * Hordeum
-      * Hor_jubatum 
-  * Interfilum
-      * Int_terricola 
-  * Jasminum
-      * Jas_nudiflorum 
   * Juniperus
       * Jun_bermudiana 
       * Jun_cedrus 
@@ -1214,13 +1153,9 @@ cat plastid.ABBR.csv \
       * Lathy_sativus 
       * Lathy_tingitanus 
       * Lathy_venosus 
-  * Lepidium
-      * Lep_virginicum 
   * Liagora
       * Liagora_brachyclada 
       * Liagora_harveyana 
-  * Lindenbergia
-      * Lin_philippensis 
   * Medicago
       * Med_hybrida 
       * Med_papillosa 
@@ -1229,26 +1164,10 @@ cat plastid.ABBR.csv \
       * Mono_parapyrum 
   * Monsonia
       * Mons_marlothii 
-  * Neottia
-      * Neot_acuminata 
-  * Nuphar
-      * Nu_advena 
+      * Mons_emarginata
+      * Mons_marlothii
   * Oryza
       * Oryza_glaberrima 
-  * Panax
-      * Panax_vietnamensis 
-  * Paphiopedilum
-      * Pap_niveum 
-  * Parachlorella
-      * Parac_kessleri 
-  * Paris
-      * Paris_verticillata 
-  * Phalaenopsis
-      * Phalae_aphrodite_subsp_formosana 
-  * Phalaenopsis
-      * Phalae_hybrid_cultivar 
-  * Phaseolus
-      * Phas_vulgaris
   * Picea
       * Pic_abies
       * Pic_glauca
@@ -1257,9 +1176,7 @@ cat plastid.ABBR.csv \
       * Pic_sitchensis 
   * Pilostyles
       * Pil_aethiopica 
-      * Pil_hamiltonii 
-  * Pinguicula
-      * Ping_ehlersiae 
+      * Pil_hamiltonii  
   * Pinus
       * Pinus_bungeana 
       * Pinus_contorta 
@@ -1282,31 +1199,12 @@ cat plastid.ABBR.csv \
       * Plas_falciparum_HB3 
       * Plas_ovale 
   * Podocarpus
-      * Pod_totara 
-  * Prinsepia
-      * Prin_utilis 
-  * Prunus
-      * Pru_pseudocerasus 
+      * Pod_totara  
   * Pyropia
-      * Pyro_haitanensis 
       * Pyro_perforata 
-      * Pyro_pulchra 
-      * Pyro_yezoensis 
-  * Retrophyllum
-      * Re_piresii 
-  * Roundia
-      * Rou_cardiophora 
-  * Schefflera
-      * Sche_delavayi 
-  * Spinacia
-      * Spi_oleracea 
   * Taiwania
       * Tai_cryptomerioides 
       * Tai_flousiana 
-  * Theobroma
-      * The_cacao 
-  * Trachelomonas
-      * Tra_volvocina 
   * Trifolium
       * Trif_subterraneum 
       * Trif_aureum 
@@ -1315,8 +1213,6 @@ cat plastid.ABBR.csv \
       * Trif_grandiflorum 
       * Trif_meduseum 
       * Trif_strictum 
-  * Trigonobalanus
-      * Trig_doichangensis 
   * Triticum
       * Trit_urartu 
   * Ulva
@@ -1324,7 +1220,7 @@ cat plastid.ABBR.csv \
       * Ul_linza 
   * Wisteria
       * Wis_floribunda 
-      * Wis_sinensis 
+      * Wis_sinensis   
 
 ### Slices of IR, LSC and SSC
 
