@@ -2,7 +2,7 @@
 
 ## Download
 
-Wed Jan 20 15:03:28 2016
+`Wed Jan 20 15:03:28 2016`
 
 ```bash
 mkdir -p ~/data/salk
