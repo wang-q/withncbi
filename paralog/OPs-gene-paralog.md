@@ -675,13 +675,14 @@ Full processing time is about 1 hour.
 1. [Data](https://github.com/wang-q/withncbi/blob/master/paralog/OPs-selfalign.md#full-chromosomes)
 
     * OsatJap
+    * Bdis
     * Alyr
     * Sbic
 
 2. Prepare
 
     ```bash
-    for GENOME_NAME in OsatJap Alyr Sbic
+    for GENOME_NAME in OsatJap Bdis Alyr Sbic
     do
         echo "====> create directories"
         mkdir -p ~/data/alignment/gene-paralog/${GENOME_NAME}/data
@@ -705,6 +706,12 @@ Full processing time is about 1 hour.
         ~/data/alignment/gene-paralog/OsatJap/data/gff3.gz
     wget http://pmite.hzau.edu.cn/MITE/MITE-SEQ-V2/26_nipponbare_mite_seq.fa \
         -O ~/data/alignment/gene-paralog/OsatJap/data/mite.fa
+
+    # Bdis
+    cp ~/data/ensembl82/gff3/brachypodium_distachyon/Brachypodium_distachyon.v1.0.29.gff3.gz \
+        ~/data/alignment/gene-paralog/Bdis/data/gff3.gz
+    wget http://pmite.hzau.edu.cn/MITE/MITE-SEQ-V2/25_brachypodium_mite_seq.fa \
+        -O ~/data/alignment/gene-paralog/Bdis/data/mite.fa
 
     # Alyr
     cp ~/data/ensembl82/gff3/arabidopsis_lyrata/Arabidopsis_lyrata.v.1.0.29.gff3.gz \
@@ -797,14 +804,13 @@ Full processing time is about 1 hour.
     * Vvin
     * Slyc
     * Stub
-    * Bdis
 
     * Bole (no mite)
 
 2. Prepare
 
     ```bash
-    for GENOME_NAME in Mtru Gmax Brap Vvin Slyc Stub Bdis
+    for GENOME_NAME in Mtru Gmax Brap Vvin Slyc Stub
     do
         echo "====> create directories"
         mkdir -p ~/data/alignment/gene-paralog/${GENOME_NAME}/data
@@ -862,16 +868,10 @@ Full processing time is about 1 hour.
     #     ~/data/alignment/gene-paralog/Sita/data/gff3.gz
     # wget http://pmite.hzau.edu.cn/MITE/MITE-SEQ-V2/27_foxtail_mite_seq.fa \
     #     -O ~/data/alignment/gene-paralog/Sita/data/mite.fa
-
-    # Bdis
-    cp ~/data/ensembl82/gff3/brachypodium_distachyon/Brachypodium_distachyon.v1.0.29.gff3.gz \
-        ~/data/alignment/gene-paralog/Bdis/data/gff3.gz
-    wget http://pmite.hzau.edu.cn/MITE/MITE-SEQ-V2/25_brachypodium_mite_seq.fa \
-        -O ~/data/alignment/gene-paralog/Bdis/data/mite.fa
     ```
 
     ```bash
-    for GENOME_NAME in Mtru Gmax Brap Vvin Slyc Stub Sita Bdis
+    for GENOME_NAME in Mtru Gmax Brap Vvin Slyc Stub Sita
     do
         cd ~/data/alignment/gene-paralog/${GENOME_NAME}/data
 
