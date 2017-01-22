@@ -1,6 +1,29 @@
-# Self-aligning steps for each groups
+[TOC levels=1-3]: #
 
-## Taxonomy for Ensembl species
+# Table of Contents
+- [Purpose](#purpose)
+- [Taxonomy for Ensembl species](#taxonomy-for-ensembl-species)
+    - [Plants](#plants)
+- [Model organisms](#model-organisms)
+    - [Yeast S288c](#yeast-s288c)
+    - [Dmel](#dmel)
+    - [Cele](#cele)
+    - [Ddis](#ddis)
+    - [Human](#human)
+    - [Mouse](#mouse)
+    - [Arabidopsis](#arabidopsis)
+        - [Atha: full chromosomes](#atha-full-chromosomes)
+        - [Atha: partition sequences](#atha-partition-sequences)
+- [All plants](#all-plants)
+    - [Plants: full chromosomes](#plants-full-chromosomes)
+    - [Plants: partitioned chromosomes](#plants-partitioned-chromosomes)
+
+
+# Purpose
+
+Self-aligning steps for each groups
+
+# Taxonomy for Ensembl species
 
 ```bash
 mkdir -p ~/data/alignment/self
@@ -31,9 +54,7 @@ perl        ~/Scripts/withncbi/taxon/strain_info.pl \
     --entrez
 ```
 
-### Model organisms
-
-### Plants
+## Plants
 
 | Name                       | Classification | Taxon ID | Used |
 |:---------------------------|:---------------|:---------|:----:|
@@ -76,6 +97,8 @@ perl        ~/Scripts/withncbi/taxon/strain_info.pl \
 | Triticum urartu            | Liliopsida     | 4572     |      |
 | Vitis vinifera             | eudicotyledons | 29760    |  -   |
 | Zea mays                   | Liliopsida     | 4577     |      |
+
+# Model organisms
 
 ## Yeast S288c
 
@@ -228,7 +251,9 @@ bash 5_circos_cmd.sh
 
 ## Arabidopsis
 
-1. full chromosomes
+Comparison: **11.50% vs 9.96%**. Use full chromosomes if the running time is acceptable.
+
+### Atha: full chromosomes
 
 ```bash
 cd ~/data/alignment/self
@@ -285,7 +310,7 @@ time bash 4_proc_cmd.sh
 bash 5_circos_cmd.sh
 ```
 
-2. partition sequences
+### Atha: partition sequences
 
 ```bash
 cd ~/data/alignment/self
@@ -314,13 +339,9 @@ time bash arabidopsis_parted/4_proc_cmd.sh
 bash arabidopsis_parted/5_circos_cmd.sh
 ```
 
-3. Comparison
+# All plants
 
-**11.50% vs 9.96%**. Use full chromosomes if the running time is acceptable.
-
-## All plants
-
-### Full chromosomes
+## Plants: full chromosomes
 
 ```bash
 cd ~/data/alignment/self
@@ -348,7 +369,7 @@ time bash 4_proc_cmd.sh
 bash 5_circos_cmd.sh
 ```
 
-### Partitioned chromosomes
+## Plants: partitioned chromosomes
 
 `Bole` contains exact matched pieces with copy number large than one thousand.
 
