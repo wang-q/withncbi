@@ -1,10 +1,14 @@
+# Self-aligning steps for each groups
+
+
 [TOC levels=1-3]: #
 
 # Table of Contents
-- [Purpose](#purpose)
+- [Self-aligning steps for each groups](#self-aligning-steps-for-each-groups)
 - [Taxonomy for Ensembl species](#taxonomy-for-ensembl-species)
     - [Plants](#plants)
 - [Model organisms](#model-organisms)
+    - [Ecoli K-12 MG1655](#ecoli-k-12-mg1655)
     - [Yeast S288c](#yeast-s288c)
     - [Dmel](#dmel)
     - [Cele](#cele)
@@ -19,10 +23,6 @@
     - [Plants: partitioned chromosomes](#plants-partitioned-chromosomes)
 
 
-# Purpose
-
-Self-aligning steps for each groups
-
 # Taxonomy for Ensembl species
 
 ```bash
@@ -30,6 +30,7 @@ mkdir -p ~/data/alignment/self
 cd ~/data/alignment/self
 
 perl        ~/Scripts/withncbi/taxon/strain_info.pl \
+    --id    511145 --name 511145=MG1655 \
     --id    559292 --name 559292=S288c  \
     --id    7227   --name 7227=Dmel     \
     --id    9606   --name 9606=Human    \
@@ -98,7 +99,83 @@ perl        ~/Scripts/withncbi/taxon/strain_info.pl \
 | Vitis vinifera             | eudicotyledons | 29760    |  -   |
 | Zea mays                   | Liliopsida     | 4577     |      |
 
+TODO:
+
+* Sequencing strategy and coverage: BAC, WGS, Illumina
+    * N50 of contigs and scaffolds
+
 # Model organisms
+
+## Ecoli K-12 MG1655
+
+Pretend to be an Ensembl project.
+
+Use GenBank accessions instead of RefSeq accessions.
+
+```bash
+mkdir -p ~/data/alignment/Ensembl/MG1655
+cd ~/data/alignment/Ensembl/MG1655
+
+#curl -s "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=nucleotide&id=NC_000913.3&rettype=fasta&retmode=txt" \
+#    > NC_000913.fa
+
+cat <<EOF > name_seq.csv
+strain_name,accession,strain_taxon_id,seq_name # This line is needed
+MG1655,U00096,
+EOF
+
+perl ~/Scripts/withncbi/taxon/batch_get_seq.pl -p -f name_seq.csv
+
+mv MG1655/* .
+rm -fr MG1655
+
+# simplify header
+perl -pi -e 's/^>(\w+).+/>$1/' U00096.fasta
+
+RepeatMasker U00096.fasta -xsmall -gff -parallel 8
+
+mv U00096.fasta.masked U00096.fa
+mv U00096.fasta.out.gff U00096.rm.gff
+rm U00096.fasta*
+
+# create anno.yml
+perl ~/Scripts/alignDB/util/gff2anno.pl \
+    --type CDS --remove \
+    U00096.gff \
+    > cds.yml
+
+perl ~/Scripts/alignDB/util/gff2anno.pl \
+    --remove \
+    U00096.rm.gff \
+    > repeat.yml
+
+runlist merge \
+    repeat.yml \
+    cds.yml \
+    -o anno.yml
+
+rm repeat.yml cds.yml
+
+```
+
+```bash
+cd ~/data/alignment/self
+
+perl ~/Scripts/egaz/self_batch.pl \
+    --working_dir ~/data/alignment/self \
+    --seq_dir ~/data/alignment/Ensembl \
+    -c ~/data/alignment/self/ensembl_taxon.csv \
+    --length 1000  \
+    --norm \
+    --name ecoli \
+    --parallel 8 \
+    -t MG1655
+
+bash ecoli/1_real_chr.sh
+bash ecoli/3_self_cmd.sh
+bash ecoli/4_proc_cmd.sh
+bash ecoli/5_circos_cmd.sh
+```
 
 ## Yeast S288c
 
@@ -355,6 +432,7 @@ perl ~/Scripts/egaz/self_batch.pl \
     --name plants \
     --parallel 12 \
     -q Alyr \
+    -q Bdis \
     -q OsatJap \
     -q Sbic \
     -t Atha
@@ -408,7 +486,6 @@ perl ~/Scripts/egaz/self_batch.pl \
     -q Slyc \
     -q Stub \
     -q OsatJap \
-    -q Bdis \
     -t Atha \
     --parted
 
