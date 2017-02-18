@@ -1,9 +1,8 @@
 # Self-aligning steps for each groups
 
 
-[TOC levels=1-3]: #
+[TOC levels=1-3]: # " "
 
-# Table of Contents
 - [Self-aligning steps for each groups](#self-aligning-steps-for-each-groups)
 - [Taxonomy for Ensembl species](#taxonomy-for-ensembl-species)
     - [Plants](#plants)
