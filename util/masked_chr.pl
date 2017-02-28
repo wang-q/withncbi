@@ -75,7 +75,7 @@ my @files = sort File::Find::Rule->file->name('*.fa')->in($dir_fa);
 
 my @chrs = map { basename $_ , ".fa" } @files;    # strip dir and suffix
 while (1) {
-    my $lcss = lcss(@chrs);
+    my $lcss = lcp(@chrs);
     last unless $lcss;
     print "LCSS [$lcss]\n";
     my $rx = quotemeta $lcss;
@@ -152,9 +152,10 @@ MCE::Flow::finish;
 
 $stopwatch->end_message;
 
+# Longest common prefix
 # comes from
 # http://stackoverflow.com/questions/499967/how-do-i-determine-the-longest-similar-portion-of-several-strings
-sub lcss {
+sub lcp {
     return '' unless @_;
     return $_[0] if @_ == 1;
     my $i          = 0;
