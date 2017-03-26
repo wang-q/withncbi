@@ -57,8 +57,6 @@ WGS, which usually in better assembling levels.
 
 3. Create a summary xlsx.
 
-Run `chart.bat` under Windows.
-
 Manually combine `~/data/alignment/Fungi/GENOMES/saccharomyces/WGS/saccharomyces.csv` and
 `~/data/alignment/Fungi/saccharomyces/basicstat.xlsx`.
 
@@ -141,8 +139,6 @@ Manually combine `~/data/alignment/Fungi/GENOMES/saccharomyces/WGS/saccharomyces
     ```
 
 3. Create a summary xlsx.
-
-Run `chart.bat` under Windows.
 
 Manually combine `~/data/alignment/Fungi/GENOMES/scer_wgs/WGS/scer_wgs.csv` and
 `~/data/alignment/Fungi/scer_wgs/basicstat.xlsx`.
@@ -670,11 +666,11 @@ Manually combine `~/data/alignment/Fungi/GENOMES/scer_wgs/WGS/scer_wgs.csv` and
 
 0. Create data.yml manually.
 
-    ```bash
-    mkdir -p ~/data/alignment/arabidopsis82
-    cd ~/data/alignment/arabidopsis82
+```bash
+mkdir -p ~/data/alignment/arabidopsis82
+cd ~/data/alignment/arabidopsis82
 
-    cat <<EOF > arabidopsis82_data.yml
+cat <<EOF > arabidopsis82_data.yml
 ---
 data:
   - coverage: 25
@@ -750,7 +746,7 @@ data:
     origin: Germany
     original_id: 3702
 EOF
-    ```
+```
 
 1. `gen_pop_conf.pl`
 
@@ -809,11 +805,11 @@ EOF
 
 0. Create data.yml manually.
 
-    ```bash
-    mkdir -p ~/data/alignment/rice82
-    cd ~/data/alignment/rice82
+```bash
+mkdir -p ~/data/alignment/rice82
+cd ~/data/alignment/rice82
 
-    cat <<EOF > rice82_data.yml
+cat <<EOF > rice82_data.yml
 ---
 data:
   - coverage: 11.33
@@ -909,7 +905,7 @@ data:
     original_id: 4530
     subgroup: ARO
 EOF
-    ```
+```
 
 1. `gen_pop_conf.pl`
 
@@ -971,11 +967,11 @@ EOF
 
 0. Create data.yml manually.
 
-    ```bash
-    mkdir -p ~/data/alignment/dpgp82
-    cd ~/data/alignment/dpgp82
+```bash
+mkdir -p ~/data/alignment/dpgp82
+cd ~/data/alignment/dpgp82
 
-    cat <<EOF > dpgp82_data.yml
+cat <<EOF > dpgp82_data.yml
 ---
 data:
   - coverage: 37.8
@@ -1042,7 +1038,7 @@ data:
     name: ZS37
     original_id: 7227
 EOF
-    ```
+```
 
 1. `gen_pop_conf.pl`
 
@@ -1099,15 +1095,15 @@ EOF
 
 0. Create an empty data.yml.
 
-    ```bash
-    mkdir -p ~/data/alignment/primates82
-    cd ~/data/alignment/primates82
+```bash
+mkdir -p ~/data/alignment/primates82
+cd ~/data/alignment/primates82
 
-    cat <<EOF > primates82_data.yml
+cat <<EOF > primates82_data.yml
 ---
 data: []
 EOF
-    ```
+```
 
 1. `gen_pop_conf.pl`
 
@@ -1162,11 +1158,11 @@ EOF
 
 0. Create data.yml manually.
 
-    ```bash
-    mkdir -p ~/data/alignment/human_simons
-    cd ~/data/alignment/human_simons
+```bash
+mkdir -p ~/data/alignment/human_simons
+cd ~/data/alignment/human_simons
 
-    cat <<EOF > human_simons_data.yml
+cat <<EOF > human_simons_data.yml
 ---
 data:
   - name: HGDP00456
@@ -1214,7 +1210,7 @@ data:
     gender: F
     original_id: 9606
 EOF
-    ```
+```
 
 1. `gen_pop_conf.pl`
 
@@ -1271,11 +1267,11 @@ EOF
 
     Information came from [here](http://genome.cshlp.org/content/suppl/2013/08/20/gr.157651.113.DC2/Supplemental_Table_3.xls).
 
-    ```bash
-    mkdir -p ~/data/alignment/cele82
-    cd ~/data/alignment/cele82
+```bash
+mkdir -p ~/data/alignment/cele82
+cd ~/data/alignment/cele82
 
-    cat <<EOF > cele82_data.yml
+cat <<EOF > cele82_data.yml
 ---
 data:
   - coverage: 29
@@ -1399,7 +1395,7 @@ data:
     name: PX174
     original_id: 6239
 EOF
-    ```
+```
 
 1. `gen_pop_conf.pl`
 
@@ -1513,11 +1509,11 @@ EOF
 
     Coverages are not real.
 
-    ```bash
-    mkdir -p ~/data/alignment/Protists/Ddis
-    cd ~/data/alignment/Protists/Ddis
+```bash
+mkdir -p ~/data/alignment/Protists/Ddis
+cd ~/data/alignment/Protists/Ddis
 
-    cat <<EOF > ddis_data.yml
+cat <<EOF > ddis_data.yml
 ---
 data:
   - coverage: 10
@@ -1572,7 +1568,7 @@ data:
     name: WS15
     original_id: 44689
 EOF
-    ```
+```
 
 1. `gen_pop_conf.pl`
 
@@ -1642,11 +1638,11 @@ EOF
 
 0. Create data.yml manually.
 
-    ```bash
-    mkdir -p ~/data/alignment/mouse82
-    cd ~/data/alignment/mouse82
+```bash
+mkdir -p ~/data/alignment/mouse82
+cd ~/data/alignment/mouse82
 
-    cat <<EOF > mouse82_data.yml
+cat <<EOF > mouse82_data.yml
 ---
 data:
   - name: 129S1_SvImJ
@@ -1690,7 +1686,7 @@ data:
     taxon: 10092
     sciname: Mus musculus domesticus
 EOF
-    ```
+```
 
 1. `gen_pop_conf.pl`
 
