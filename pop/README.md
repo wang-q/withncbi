@@ -67,10 +67,10 @@ Genus Trichoderma as example.
     ```bash
     export GENUS_ID=5543
     export GENUS=trichoderma
-    mkdir -p ~/data/alignment/Fungi/$GENUS          # operation directory
-    mkdir -p ~/data/alignment/Fungi/GENOMES/$GENUS  # sequence directory
+    mkdir -p ~/data/alignment/Fungi/${GENUS}            # operation directory
+    mkdir -p ~/data/alignment/Fungi/GENOMES/${GENUS}    # sequence directory
 
-    cd ~/data/alignment/Fungi/GENOMES/$GENUS
+    cd ~/data/alignment/Fungi/GENOMES/${GENUS}
     ```
 
     You can copy & paste the following block of codes as a whole unit.
@@ -78,18 +78,18 @@ Genus Trichoderma as example.
     ```bash
     # stage1
     # Results from sql query.
-    mysql -ualignDB -palignDB ar_refseq -e "SELECT SUBSTRING(wgs_master,1,6) as prefix0, SUBSTRING(wgs_master,1,4) as prefix, organism_name, assembly_level FROM ar WHERE wgs_master != '' AND genus_id = $GENUS_ID" \
+    mysql -ualignDB -palignDB ar_refseq -e "SELECT SUBSTRING(wgs_master,1,6) as prefix0, SUBSTRING(wgs_master,1,4) as prefix, organism_name, assembly_level FROM ar WHERE wgs_master != '' AND genus_id = ${GENUS_ID}" \
     	> raw.tsv
 
-    mysql -ualignDB -palignDB ar_genbank -e "SELECT SUBSTRING(wgs_master,1,6) as prefix0, SUBSTRING(wgs_master,1,4) as prefix, organism_name, assembly_level FROM ar WHERE wgs_master != '' AND genus_id = $GENUS_ID" \
+    mysql -ualignDB -palignDB ar_genbank -e "SELECT SUBSTRING(wgs_master,1,6) as prefix0, SUBSTRING(wgs_master,1,4) as prefix, organism_name, assembly_level FROM ar WHERE wgs_master != '' AND genus_id = ${GENUS_ID}" \
         >> raw.tsv
 
-    mysql -ualignDB -palignDB gr_euk -e "SELECT SUBSTRING(wgs,1,6) as prefix0, SUBSTRING(wgs,1,4) as prefix, organism_name, status FROM gr WHERE wgs != '' AND genus_id = $GENUS_ID" \
+    mysql -ualignDB -palignDB gr_euk -e "SELECT SUBSTRING(wgs,1,6) as prefix0, SUBSTRING(wgs,1,4) as prefix, organism_name, status FROM gr WHERE wgs != '' AND genus_id = ${GENUS_ID}" \
         >> raw.tsv
 
     # stage2
     # Combined with NCBI WGS page.
-    curl "http://www.ncbi.nlm.nih.gov/Traces/wgs/?&size=100&term=$GENUS&retmode=text&size=all" \
+    curl "http://www.ncbi.nlm.nih.gov/Traces/wgs/?&size=100&term=${GENUS}&retmode=text&size=all" \
         | perl -nl -a -F"\t" -e \
         '$p = substr($F[0],0,4); print qq{$F[0]\t$p\t$F[4]\t$F[5]}' \
         >> raw.tsv
@@ -112,10 +112,10 @@ Genus Trichoderma as example.
         | uniq \
         >> raw3.tsv
 
-    mv raw3.tsv $GENUS.tsv
+    mv raw3.tsv ${GENUS}.tsv
 
     # find potential duplicated strains or assemblies
-    cat $GENUS.tsv \
+    cat ${GENUS}.tsv \
         | perl -nl -a -F"\t" -e 'print $F[0]' \
         | uniq -c
 
