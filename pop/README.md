@@ -4,11 +4,19 @@ Or order, family, species.
 
 Genus Trichoderma as example.
 
+[TOC]: # " "
+
+- [Section 1: select strains and download sequences.](#section-1-select-strains-and-download-sequences)
+- [Section 2: create configuration file and generate alignments.](#section-2-create-configuration-file-and-generate-alignments)
+- [Section 3: cleaning.](#section-3-cleaning)
+- [FAQ](#faq)
+
+
 ## Section 1: select strains and download sequences.
 
 1. Create `pop/trichoderma.tsv` manually. Names should only contain alphanumeric characters and
-underscores. Be careful with tabs and spaces, because .tsv stands for Tab-separated values, white
-spaces matters.
+   underscores. Be careful with tabs and spaces, because .tsv stands for Tab-separated values, white
+   spaces matters.
 
     Check NCBI pages
 
@@ -20,7 +28,7 @@ spaces matters.
     And query a local ar_genbank DB. This is just a convenient but not accurate approach, especially
     for sub-species parts.
 
-    ```sql
+    ```mysql
     SELECT
         CONCAT(LEFT(genus, 1),
                 LEFT(TRIM(REPLACE(species, genus, '')),
@@ -42,7 +50,7 @@ spaces matters.
     For genus contains many species, you should be careful that "Gspe" (G_enus spe_cies) style
     abbreviation may mix up two or more species.
 
-    ```sql
+    ```mysql
     SELECT DISTINCT
         species
     FROM
@@ -263,7 +271,7 @@ Working directory should be `~/data/alignment/Fungi/trichoderma` in this section
     ```
 
 7. When you are satisfied and don't see any wrong, rename `pop/trichoderma_test.yml` to
-`pop/trichoderma_data.yml` and commit it.
+   `pop/trichoderma_data.yml` and commit it.
 
     ```bash
     mv ~/Scripts/withncbi/pop/trichoderma_test.yml ~/Scripts/withncbi/pop/trichoderma_data.yml
@@ -310,5 +318,5 @@ your disk capacity.
 
 * I have a very good assembly on chromosome level, but I can't find it in WGS.
 
-    Best genomes on the world went to NCBI RefSeq. Use tools in `util/` to
-    download them. Examples can be found in `pop/OPs-download.md`.
+    Best genomes on the world went to NCBI RefSeq. Use tools in `util/` to download them. Examples
+    can be found in `pop/OPs-download.md`.
