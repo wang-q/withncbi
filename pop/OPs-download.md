@@ -3,6 +3,30 @@
 Less detailed than Trichoderma in [README.md](README.md), but include examples for genomes out of
 WGS, which usually in better assembling levels.
 
+[TOC]: # " "
+
+- [*Saccharomyces* WGS](#saccharomyces-wgs)
+- [Scer_wgs WGS](#scer-wgs-wgs)
+- [Scer_100 ASSEMBLY](#scer-100-assembly)
+- [*Candida* WGS](#candida-wgs)
+- [*Fusarium* WGS](#fusarium-wgs)
+- [*Aspergillus* WGS](#aspergillus-wgs)
+- [*Penicillium* WGS](#penicillium-wgs)
+- [*Plasmodium* WGS](#plasmodium-wgs)
+- [*Plasmodium falciparum* WGS](#plasmodium-falciparum-wgs)
+- [*Arabidopsis* 19 genomes](#arabidopsis-19-genomes)
+- [*Orazy sativa* Japonica 24 genomes](#orazy-sativa-japonica-24-genomes)
+- [*Drosophila* Population Genomics Project (dpgp)](#drosophila-population-genomics-project-dpgp)
+- [Primates](#primates)
+- [Human individuals from Simons project](#human-individuals-from-simons-project)
+- [*Caenorhabditis elegans*](#caenorhabditis-elegans)
+- [*Dictyostelium* WGS](#dictyostelium-wgs)
+- [*Dictyostelium discoideum*](#dictyostelium-discoideum)
+- [Mouse](#mouse)
+- [Other plants](#other-plants)
+- [Currently not used](#currently-not-used)
+
+
 ## *Saccharomyces* WGS
 
 1. Create `pop/saccharomyces.tsv` manually.
@@ -57,7 +81,7 @@ WGS, which usually in better assembling levels.
     This step is totally manual operation. **Be careful.**
 
     | assigned name | organism_name                    | assembly_accession |
-    | :------------ | :------------                    | :------------      |
+    |:--------------|:---------------------------------|:-------------------|
     | Scer_S288c    | *Saccharomyces cerevisiae* S288c | GCF_000146045.2    |
 
     ```bash
@@ -134,7 +158,7 @@ WGS, which usually in better assembling levels.
 3. Download strains of *Saccharomyces cerevisiae* at good assembly status.
 
     Click the `Download table` link on the top-right of [Genome
-    list](http://www.ncbi.nlm.nih.gov/genome/genomes/15), save it as .csv file.
+        list](http://www.ncbi.nlm.nih.gov/genome/genomes/15), save it as .csv file.
 
     ```bash
     mkdir -p ~/data/alignment/Fungi/GENOMES/scer_wgs/DOWNLOAD
@@ -197,7 +221,7 @@ WGS, which usually in better assembling levels.
 2. Download strains of *Saccharomyces cerevisiae* at good assembly status.
 
     Click the `Download table` link on the top-right of [Genome
-    list](http://www.ncbi.nlm.nih.gov/genome/genomes/15), save it as .csv file.
+        list](http://www.ncbi.nlm.nih.gov/genome/genomes/15), save it as .csv file.
 
     ```bash
     mkdir -p ~/data/alignment/Fungi/GENOMES/scer_100/DOWNLOAD
@@ -295,7 +319,7 @@ WGS, which usually in better assembling levels.
     ```
 
     | assigned name  | organism_name                     | assembly_accession |
-    | :------------  | :------------                     | :------------      |
+    |:---------------|:----------------------------------|:-------------------|
     | Cdub_CD36      | *Candida dubliniensis* CD36       | GCF_000026945.1    |
     | Corh_Co_90_125 | *Candida orthopsilosis* Co 90-125 | GCF_000315875.1    |
 
@@ -375,7 +399,7 @@ WGS, which usually in better assembling levels.
     ```
 
     | assigned name | organism_name                                | assembly_accession |
-    | :------------ | :------------                                | :------------      |
+    |:--------------|:---------------------------------------------|:-------------------|
     | Fgra_PH_1     | *Fusarium graminearum* PH-1                  | GCA_000240135.3    |
     | Foxy_4287     | *Fusarium oxysporum* f. sp. lycopersici 4287 | GCA_000149955.1    |
     | Fpse_CS3270   | *Fusarium pseudograminearum* CS3270          | GCA_000974265.1    |
@@ -490,7 +514,7 @@ WGS, which usually in better assembling levels.
     ```
 
     | assigned name | organism_name                  | assembly_accession |
-    | :------------ | :------------                  | :------------      |
+    |:--------------|:-------------------------------|:-------------------|
     | Afum_Af293    | *Aspergillus fumigatus* Af293  | GCA_000002655.1    |
     | Anid_FGSC_A4  | *Aspergillus nidulans* FGSC A4 | GCA_000011425.1    |
 
@@ -563,10 +587,10 @@ WGS, which usually in better assembling levels.
 
 3. Pick targets.
 
-    ```sql
+    ```mysql
     SELECT *
     FROM gr_euk.gr
-    WHERE genus_id = 5073
+    WHERE genus_id = 5073;
 
     SELECT
         *
@@ -574,14 +598,14 @@ WGS, which usually in better assembling levels.
         ar_genbank.ar
     WHERE
         genus_id = 5073
-    ORDER BY organism_name
+    ORDER BY organism_name;
     ```
 
     There're no good target. Pchr_P2niaD18 is the only one on chromosome level, but is not de novo
     assembled and hasn't annotations.
 
     | assigned name | organism_name                      | assembly_accession |
-    | :------------ | :------------                      | :------------      |
+    |:--------------|:-----------------------------------|:-------------------|
     | Pchr_P2niaD18 | *Penicillium chrysogenum* P2niaD18 | GCA_000710275.1    |
 
 ## *Plasmodium* WGS
@@ -624,7 +648,6 @@ WGS, which usually in better assembling levels.
 
     Edit the tsv file to fix names and comment out bad strains.
 
-
 2. Create working directory and download WGS sequences.
 
     ```bash
@@ -647,7 +670,7 @@ WGS, which usually in better assembling levels.
     This step is totally manual operation. **Be careful.**
 
     | assigned name | organism_name               | assembly_accession           |
-    | :------------ | :------------               | :------------                |
+    |:--------------|:----------------------------|:-----------------------------|
     | Pfal_3D7      | *Plasmodium falciparum* 3D7 | GCF_000002765.3.assembly.txt |
 
     ```bash
@@ -718,8 +741,8 @@ WGS, which usually in better assembling levels.
 
 3. Download *Plasmodium falciparum* 3D7.
 
-    Click the `Download table` link on the top-right of [Genome list](http://www.ncbi.nlm.nih.gov/genome/genomes/33),
-    save it as .csv file.
+    Click the `Download table` link on the top-right of
+    [Genome list](http://www.ncbi.nlm.nih.gov/genome/genomes/33), save it as .csv file.
 
     ```bash
     mkdir -p ~/data/alignment/Protists/GENOMES/pfal/DOWNLOAD
@@ -773,7 +796,8 @@ WGS, which usually in better assembling levels.
 
 3. *A. thaliana* and *A. lyrata* from ensembl genomes.
 
-    [ensembl_82.yml](ensembl/ensembl_82.yml) creates `Atha` and `Alyr` in `~/data/alignment/Ensembl`.
+    [ensembl_82.yml](ensembl/ensembl_82.yml) creates `Atha` and `Alyr` in
+    `~/data/alignment/Ensembl`.
 
 ## *Orazy sativa* Japonica 24 genomes
 
@@ -808,7 +832,8 @@ WGS, which usually in better assembling levels.
 
 3. nipponbare and 9311 from ensembl genomes.
 
-    [ensembl_82.yml](ensembl/ensembl_82.yml) creates `OsatJap` and `OsatInd` in `~/data/alignment/Ensembl`.
+    [ensembl_82.yml](ensembl/ensembl_82.yml) creates `OsatJap` and `OsatInd` in
+    `~/data/alignment/Ensembl`.
 
 ## *Drosophila* Population Genomics Project (dpgp)
 
@@ -838,7 +863,8 @@ WGS, which usually in better assembling levels.
 
 3. Dmel and Dsim from ensembl genomes.
 
-    [ensembl_82.yml](ensembl/ensembl_82.yml) creates `Dmel` and `Dsim` in `~/data/alignment/Ensemble`.
+    [ensembl_82.yml](ensembl/ensembl_82.yml) creates `Dmel` and `Dsim` in
+    `~/data/alignment/Ensemble`.
 
 ## Primates
 
@@ -901,13 +927,13 @@ http://hgdownload.soe.ucsc.edu/goldenPath/ce10/multiz7way/ce10.commonNames.7way.
 
     Mapping strategy in [here](https://github.com/wang-q/sra/blob/master/cele_mmp_seq.pl).
 
-	```bash
+    ```bash
     mkdir -p ~/data/alignment/others/cele
     cd ~/data/alignment/others/cele
 
     find ~/data/dna-seq/cele_mmp/ -name "*.vcf.fasta" \
         | parallel -j 1 cp {} .
-	```
+    ```
 
 2. Reference strain N2 from ensembl genomes
 
@@ -916,7 +942,7 @@ http://hgdownload.soe.ucsc.edu/goldenPath/ce10/multiz7way/ce10.commonNames.7way.
 ## *Dictyostelium* WGS
 
 | name                         | taxon  |
-| :---                         | :---   |
+|:-----------------------------|:-------|
 | Dictyostelium                | 5782   |
 | Dictyostelium discoideum     | 44689  |
 | Dictyostelium discoideum AX4 | 352472 |
@@ -953,7 +979,6 @@ http://hgdownload.soe.ucsc.edu/goldenPath/ce10/multiz7way/ce10.commonNames.7way.
 
     Edit the tsv file to fix names and comment out bad strains.
 
-
 2. Create working directory and download WGS sequences.
 
     ```bash
@@ -976,7 +1001,7 @@ http://hgdownload.soe.ucsc.edu/goldenPath/ce10/multiz7way/ce10.commonNames.7way.
     This step is totally manual operation. **Be careful.**
 
     | assigned name | organism_name                  | assembly_accession           |
-    | :------------ | :------------                  | :------------                |
+    |:--------------|:-------------------------------|:-----------------------------|
     | Ddis_AX4      | *Dictyostelium discoideum* AX4 | GCF_000004695.1.assembly.txt |
 
     ```bash
@@ -1097,7 +1122,8 @@ http://hgdownload.soe.ucsc.edu/goldenPath/ce10/multiz7way/ce10.commonNames.7way.
 
 3. Reference strain C57BL/6J (GRCm38) and rat from ensembl.
 
-    [ensembl_82.yml](ensembl/ensembl_82.yml) creates `Mouse` and `Rat` in `~/data/alignment/Ensembl`.
+    [ensembl_82.yml](ensembl/ensembl_82.yml) creates `Mouse` and `Rat` in
+    `~/data/alignment/Ensembl`.
 
 ## Other plants
 
@@ -1209,3 +1235,4 @@ http://hgdownload.soe.ucsc.edu/goldenPath/ce10/multiz7way/ce10.commonNames.7way.
         --download 'name=Lemur;taxon=30608;sciname=Microcebus murinus;coverage=1.93x sanger' \
         --download 'name=Bushbaby;taxon=30611;sciname=Otolemur garnettii;coverage=2x sanger' \
         ```
+
