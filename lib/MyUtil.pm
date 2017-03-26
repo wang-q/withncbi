@@ -51,7 +51,7 @@ sub wgs_worker {
 
     {    # extract from tables
         my $page    = $mech->content;
-        my @tables  = qw{ meta-table structured-comments };
+        my @tables  = qw{ master-table structured-comments };
         my @columns = (
             '#_of_Contigs',    'Total_length',
             'Update_date',     'BioProject',
@@ -118,9 +118,9 @@ sub wgs_worker {
     {    # downloads
         my @links = $mech->find_all_links(
             text_regex => qr{$term},
-            url_regex  => => qr{download=},
+            url_regex  => qr{ftp},
         );
-        $info->{download} = [ map { $url_part . $_->url } @links ];
+        $info->{download} = [ map { $_->url } @links ];
     }
 
     return $info;
