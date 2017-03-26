@@ -193,7 +193,7 @@ echo '    SKIP! [% item.skip %]'
 cd [% item.dir %]
 
 for f in `find [% item.dir%] -name "*.fa"` ; do
-    rename 's/fa$/fasta/' $f ;
+    mv $f `dirname $f`/`basename $f .fa`.fasta;
 done
 
 for f in `find [% item.dir%] -name "*.fasta"` ; do
@@ -226,10 +226,10 @@ cd [% item.dir %]
 for f in `find [% item.dir%] -name "*.fasta"` ; do
     if [ -f $f.masked ];
     then
-        rename 's/fasta.masked$/fa/' $f.masked;
+        mv $f.masked `dirname $f`/`basename $f.masked .fasta.masked`.fa;
         find [% item.dir%] -type f -name "`basename $f`*" | xargs rm;
     else
-        rename 's/fasta$/fa/' $f;
+        mv $f `dirname $f`/`basename $f .fasta`.fa;
         echo `date` "RepeatMasker on $f failed.\n" >> RepeatMasker.log
         find [% item.dir%] -type f -name "`basename $f`*" | xargs rm;
     fi;
