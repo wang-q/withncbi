@@ -4,6 +4,15 @@ Turn NCBI genome reports and assembly reports into query-able MySQL databases.
 
 Also, taxonomy information are added to all items.
 
+[TOC]: # " "
+
+- [Get data from NCBI](#get-data-from-ncbi)
+- [Old Bacteria genomes.](#old-bacteria-genomes)
+- [Databases](#databases)
+    - [Genome reports](#genome-reports)
+    - [Assembly reports](#assembly-reports)
+
+
 ## Get data from NCBI
 
 Download paths from NCBI ftp:
@@ -22,13 +31,13 @@ I use the following command lines on a linux box. For mac, aspera's path is diff
 rsync -avP ftp.ncbi.nlm.nih.gov::genomes/GENOME_REPORTS/ \
     ~/data/NCBI/genomes/GENOME_REPORTS/
 
-# ar is huge
-~/.aspera/connect/bin/ascp \
-    -TQ -k1 -p -v \
-    -i ~/.aspera/connect/etc/asperaweb_id_dsa.openssh \
-    anonftp@ftp-private.ncbi.nlm.nih.gov:/genomes/ASSEMBLY_REPORTS \
-   ~/data/NCBI/genomes/
+#~/.aspera/connect/bin/ascp \
+#    -TQ -k1 -p -v \
+#    -i ~/.aspera/connect/etc/asperaweb_id_dsa.openssh \
+#    anonftp@ftp-private.ncbi.nlm.nih.gov:/genomes/ASSEMBLY_REPORTS \
+#   ~/data/NCBI/genomes/
 
+# ar
 # there're hidden useless directories.
 rsync -avP ftp.ncbi.nlm.nih.gov::genomes/ASSEMBLY_REPORTS/ \
     --exclude=".tmp" \
@@ -52,7 +61,7 @@ rsync -avP ftp.ncbi.nlm.nih.gov::pub/taxonomy/ \
     ~/data/NCBI/taxonomy/
 ```
 
-Old Bacteria genomes.
+##  Old Bacteria genomes.
 
 On 02 December 2015 these directories were moved to
 `ftp://ftp.ncbi.nlm.nih.gov/genomes/archive/old_refseq/`.
@@ -88,10 +97,10 @@ So local mirrors are no longer needed.
 
 We create 4 MySQL databases:
 
-    * gr_prok: genome reports for prokaryotes;
-    * gr_euk: genome reports for eukaryotes;
-    * ar_refseq: assembly reports for RefSeq;
-    * ar_genbank: assembly reports for GenBank.
+* gr_prok: genome reports for prokaryotes;
+* gr_euk: genome reports for eukaryotes;
+* ar_refseq: assembly reports for RefSeq;
+* ar_genbank: assembly reports for GenBank.
 
 Also generate some useful excel workbooks.
 
