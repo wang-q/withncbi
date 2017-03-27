@@ -25,8 +25,8 @@ Genus Trichoderma as example.
     * http://www.ncbi.nlm.nih.gov/genome/?term=txid5543[Organism:exp]
     * http://www.ncbi.nlm.nih.gov/assembly?term=txid5543[Organism:exp]
 
-    And query a local ar_genbank DB. This is just a convenient but not accurate approach, especially
-    for sub-species parts.
+    And query a local `ar_genbank` DB. This is just a convenient but not accurate approach,
+    especially for sub-species parts.
 
     ```mysql
     SELECT
@@ -120,7 +120,7 @@ Genus Trichoderma as example.
         | uniq -c
 
     # Edit .tsv, remove duplicated strains, check strain names and comment out poor assemblies.
-    # vim $GENUS.tsv
+    # vim ${GENUS}.tsv
     ```
 
     ```bash
@@ -181,7 +181,7 @@ Genus Trichoderma as example.
     # rsync remote files
     # My connection to NCBI isn't stable, so download sequences in a linode VPS.
     # PLEASE don't hack it.
-    # rsync --progress -av wangq@45.79.80.100:/home/wangq/data/alignment/Fungi/ ~/data/alignment/Fungi/
+    # rsync -avP wangq@45.79.80.100:data/alignment/Fungi/ ~/data/alignment/Fungi/
     ```
 
 ## Section 2: create configuration file and generate alignments.
@@ -282,22 +282,22 @@ Working directory should be `~/data/alignment/Fungi/trichoderma` in this section
 This is the ultimate final step. No more. Actually you may choose not to do this. It's depended on
 your disk capacity.
 
-    ```bash
-    cd ~/data/alignment/Fungi/trichoderma
+```bash
+cd ~/data/alignment/Fungi/trichoderma
 
-    # clean raw fasta
-    find . -maxdepth 1 -type d -name "*_raw" | xargs rm -fr
+# clean raw fasta
+find . -maxdepth 1 -type d -name "*_raw" | xargs rm -fr
 
-    # clean maf-fasta
-    find . -maxdepth 1 -type d -name "*_fasta" | xargs rm -fr
+# clean maf-fasta
+find . -maxdepth 1 -type d -name "*_fasta" | xargs rm -fr
 
-    # clean raxml phy
-    find . -maxdepth 2 -type f -name "*.phy" -or -name "*.phy.reduced" | xargs rm
+# clean raxml phy
+find . -maxdepth 2 -type f -name "*.phy" -or -name "*.phy.reduced" | xargs rm
 
-    # compress files
-    find . -type f -name "*.maf" | parallel gzip
-    find . -type f -name "*.fas" | parallel gzip
-    ```
+# compress files
+find . -type f -name "*.maf" | parallel gzip
+find . -type f -name "*.fas" | parallel gzip
+```
 
 ## FAQ
 
