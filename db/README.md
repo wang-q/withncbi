@@ -50,6 +50,7 @@ NCBI bioproject and taxonomy is also needed.
 ```bash
 # bioproject
 rsync -avP ftp.ncbi.nlm.nih.gov::bioproject/ \
+    --exclude="*.xml" \
     ~/data/NCBI/bioproject/
 
 # taxonomy
@@ -61,7 +62,7 @@ rsync -avP ftp.ncbi.nlm.nih.gov::pub/taxonomy/ \
     ~/data/NCBI/taxonomy/
 ```
 
-##  Old Bacteria genomes.
+## Old Bacteria genomes.
 
 On 02 December 2015 these directories were moved to
 `ftp://ftp.ncbi.nlm.nih.gov/genomes/archive/old_refseq/`.
