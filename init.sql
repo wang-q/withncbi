@@ -40,6 +40,7 @@ create table ar
     genome_rep           char(255),
     released_date        date,
     asm_name             char(255),
+    ftp_path             char(255),
     superkingdom         char(255),
     `group`              char(255),
     subgroup             char(255),

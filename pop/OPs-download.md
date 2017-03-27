@@ -234,7 +234,7 @@ WGS, which usually in better assembling levels.
         > S288c.seq.csv
 
     mysql -ualignDB -palignDB ar_genbank -e "
-        ELECT organism_name, species, assembly_accession 
+        SELECT organism_name, species, ftp_path 
         FROM ar 
         WHERE wgs_master = '' 
         AND organism_name != species 
@@ -247,19 +247,21 @@ WGS, which usually in better assembling levels.
             $n =~ s/\W+/_/g;
             printf qq{%s\t%s\n}, $n, $F[2];
         ' \
-        | grep -v organism_name | grep -v S288c | grep -v EC1118 \
+        | grep -v organism_name | grep -v -i S288c | grep -v EC1118 \
         | perl -nl -a -F"\t" -e '
-            $str = q{echo } . $F[0] . qq{ \n};
-            $str .= q{perl ~/Scripts/withncbi/taxon/assembly_csv.pl} . qq{ \\\n};
-            $str .= q{-f ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/All/} . $F[1] . qq{.assembly.txt \\\n};
-            $str .= q{--nuclear --genbank --chromosome -name } . $F[0] . qq{ \\\n};
-            $str .= q{>> non_wgs.seq.csv};
+            my ($filename) = reverse grep {defined} split q{/}, $F[1];
+            $filename .= q{_assembly_report.txt};
+            my $str = q{echo } . $F[0] . qq{ \n};
+            $str .= q{perl ~/Scripts/withncbi/taxon/assembly_csv.pl};
+            $str .= q{ -f } . $F[1] . q{/} . $filename;
+            $str .= q{ --nuclear --genbank --chromosome -name } . $F[0];
+            $str .= q{ >> non_wgs.seq.csv};
             print $str . qq{\n};
         ' \
         > ass_csv.sh
 
     echo > non_wgs.seq.csv
-    sh ass_csv.sh
+    bash ass_csv.sh
 
     echo "#strain_name,accession,strain_taxon_id,seq_name" > scer_100.seq.csv
     cat S288c.seq.csv non_wgs.seq.csv \

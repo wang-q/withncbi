@@ -88,7 +88,7 @@ $dbh->{csv_tables}->{t0} = {
             refseq_category taxid species_taxid organism_name
             infraspecific_name isolate version_status assembly_level
             release_type genome_rep seq_rel_date asm_name submitter
-            gbrs_paired_asm paired_asm_comp }
+            gbrs_paired_asm paired_asm_comp ftp_path }
     ],
 };
 
@@ -109,7 +109,8 @@ $dbh->{csv_tables}->{t0} = {
             t0.assembly_level,
             t0.genome_rep,
             t0.seq_rel_date,
-            t0.asm_name
+            t0.asm_name,
+            t0.ftp_path
         FROM   t0
         WHERE 1 = 1
         AND t0.version_status = 'latest'
