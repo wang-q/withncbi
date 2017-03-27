@@ -142,6 +142,7 @@ find [% item.pre_dir %] -type f | parallel --no-run-if-empty cp {} .
 echo '    Unzip, filter and split.'
 gzip -d -c --force [% item.fasta %] > toplevel.fa
 perl -p -i -e '/\>gi\|/ and s/\>gi\|(\d+).*/\>gi_$1/' toplevel.fa
+perl -p -i -e '/\>([\w-]+)\.\d+\s/ and $_ = qq{>$1\n}' toplevel.fa
 [% IF item.per_seq -%]
 faops count toplevel.fa | perl -aln -e 'next if $F[0] eq 'total'; print $F[0] if $F[1] > [% per_seq_min_contig * 10 %]; print $F[0] if $F[1] > [% per_seq_min_contig %]  and $F[6]/$F[1] < 0.05' | uniq > listFile
 faops some toplevel.fa listFile toplevel.filtered.fa
