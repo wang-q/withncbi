@@ -202,9 +202,9 @@ WGS, which usually in better assembling levels.
     echo -e '#name\tprefix\torganism\tcontigs' > scer_100.tsv
 
     # outgroups
-    echo -e "Spar\tAABY\tSaccharomyces paradoxus NRRL Y-17217\t832" >> scer_100.tsv
-    echo -e "Spas\tJTFI\tSaccharomyces pastorianus\t878" >> scer_100.tsv
-    echo -e "Sbou\tJRHY\tSaccharomyces sp. boulardii\t193" >> scer_100.tsv
+    echo -e "Spar\tAABY01\tSaccharomyces paradoxus NRRL Y-17217\t832" >> scer_100.tsv
+    echo -e "Spas\tJTFI01\tSaccharomyces pastorianus\t878" >> scer_100.tsv
+    echo -e "Sbou\tJRHY01\tSaccharomyces sp. boulardii\t193" >> scer_100.tsv
 
     perl ~/Scripts/withncbi/taxon/wgs_prep.pl \
         -f scer_100.tsv \
@@ -229,14 +229,33 @@ WGS, which usually in better assembling levels.
 
     # Download S288c separately
     perl ~/Scripts/withncbi/taxon/assembly_csv.pl \
-        -f ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/All/GCF_000146045.2.assembly.txt \
+        -f ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/146/045/GCF_000146045.2_R64/GCF_000146045.2_R64_assembly_report.txt \
         --nuclear -name S288c \
         > S288c.seq.csv
 
-    mysql -ualignDB -palignDB ar_genbank -e "SELECT organism_name, species, assembly_accession FROM ar WHERE wgs_master = '' AND organism_name != species AND species_id = 4932" \
-        | perl -nl -a -F"\t" -e '$n = $F[0]; $rx = quotemeta $F[1]; $n =~ s/$rx\s+//; $n =~ s/\W+/_/g; printf qq{%s\t%s\n}, $n, $F[2];' \
+    mysql -ualignDB -palignDB ar_genbank -e "
+        ELECT organism_name, species, assembly_accession 
+        FROM ar 
+        WHERE wgs_master = '' 
+        AND organism_name != species 
+        AND species_id = 4932
+        " \
+        | perl -nl -a -F"\t" -e '
+            $n = $F[0];
+            $rx = quotemeta $F[1];
+            $n =~ s/$rx\s+//;
+            $n =~ s/\W+/_/g;
+            printf qq{%s\t%s\n}, $n, $F[2];
+        ' \
         | grep -v organism_name | grep -v S288c | grep -v EC1118 \
-        | perl -nl -a -F"\t" -e '$str = q{echo } . $F[0] . qq{ \n}; $str .= q{perl ~/Scripts/withncbi/taxon/assembly_csv.pl} . qq{ \\\n}; $str .= q{-f ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/All/} . $F[1] . qq{.assembly.txt \\\n}; $str .= q{--nuclear --genbank --chromosome -name } . $F[0] . qq{ \\\n}; $str .= q{>> non_wgs.seq.csv}; print $str . qq{\n}' \
+        | perl -nl -a -F"\t" -e '
+            $str = q{echo } . $F[0] . qq{ \n};
+            $str .= q{perl ~/Scripts/withncbi/taxon/assembly_csv.pl} . qq{ \\\n};
+            $str .= q{-f ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/All/} . $F[1] . qq{.assembly.txt \\\n};
+            $str .= q{--nuclear --genbank --chromosome -name } . $F[0] . qq{ \\\n};
+            $str .= q{>> non_wgs.seq.csv};
+            print $str . qq{\n};
+        ' \
         > ass_csv.sh
 
     echo > non_wgs.seq.csv
