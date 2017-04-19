@@ -5,7 +5,6 @@ Turn NCBI genome reports and assembly reports into query-able MySQL databases.
 Also, taxonomy information are added to all items.
 
 [TOC]: # " "
-
 - [Get data from NCBI](#get-data-from-ncbi)
 - [Old Bacteria genomes.](#old-bacteria-genomes)
 - [Databases](#databases)
