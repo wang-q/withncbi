@@ -1,5 +1,25 @@
 # Gene-paralog-repeats
 
+[TOC]: # " "
+- [Sources](#sources)
+- [TODO](#todo)
+- [Stats](#stats)
+- [Repeats](#repeats)
+    - [MITE](#mite)
+    - [Other repeats](#other-repeats)
+- [Scripts](#scripts)
+    - [`proc_prepare.sh`](#proc-preparesh)
+    - [`proc_repeat.sh`](#proc-repeatsh)
+    - [`proc_mite.sh`](#proc-mitesh)
+    - [`proc_paralog.sh`](#proc-paralogsh)
+    - [`proc_all_gene.sh`](#proc-all-genesh)
+    - [`proc_sep_gene.sh`](#proc-sep-genesh)
+    - [`proc_sep_gene_jrunlist.sh`](#proc-sep-gene-jrunlistsh)
+- [Atha](#atha)
+- [Plants aligned with full chromosomes](#plants-aligned-with-full-chromosomes)
+- [Plants aligned with partitioned chromosomes](#plants-aligned-with-partitioned-chromosomes)
+- [Plants with annotations from JGI](#plants-with-annotations-from-jgi)
+
 ## Sources
 
 * Annotations from
