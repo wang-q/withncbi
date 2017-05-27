@@ -58,6 +58,8 @@ done
 
 ## Restore vsself and pop databases
 
+[`vsself`](../pop/OPs-vsself.md) and [`pop`](../pop/OPs-multi.md)
+
 ```bash
 perl ~/Scripts/alignDB/util/dup_db.pl -g Athavsself_tdna -f ~/data/dumps/mysql/Athavsself.sql.gz
 perl ~/Scripts/alignDB/util/dup_db.pl -g Ath_n19_pop_tdna -f ~/data/dumps/mysql/Ath_n19_pop.sql.gz
@@ -68,8 +70,9 @@ perl ~/Scripts/alignDB/util/dup_db.pl -g Ath_n19_pop_tdna -f ~/data/dumps/mysql/
 ```bash
 cd ~/data/salk/Atha
 
-perl ~/Scripts/alignDB/ofg/insert_position.pl \
-    -d Athavsself_tdna  --style center --batch 50 --parallel 8 \
+perl ~/Scripts/alignDB/init/insert_position.pl \
+    -d Athavsself_tdna  --style center \
+    --batch 50 --parallel 8 \
     --tag tdna --type CMT  -f ~/data/salk/Atha/T-DNA.CMT.pos.txt  \
     --tag tdna --type CSHL -f ~/data/salk/Atha/T-DNA.CSHL.pos.txt \
     --tag tdna --type FLAG -f ~/data/salk/Atha/T-DNA.FLAG.pos.txt \
