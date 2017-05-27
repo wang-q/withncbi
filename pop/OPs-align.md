@@ -111,10 +111,9 @@ Manually combine `~/data/alignment/Fungi/GENOMES/saccharomyces/WGS/saccharomyces
         --download "name=S288c;taxon=559292" \
         --download "name=RM11_1a;taxon=285006" \
         --download "name=EC1118;taxon=643680" \
-        --plan 'name=five_way;t=S288c;qs=EC1118,RM11_1a,YJM789,BC187' \
-        --plan 'name=Scer_n8_pop;t=S288c;qs=EC1118,JAY291,Kyokai_no_7,RM11_1a,Sigma1278b,T7,YJM789' \
-        --plan 'name=Scer_n8_Spar;t=S288c;qs=EC1118,JAY291,Kyokai_no_7,RM11_1a,Sigma1278b,T7,YJM789,Spar;o=Spar' \
-        --plan 'name=Scer_n8_Sbou;t=S288c;qs=EC1118,JAY291,Kyokai_no_7,RM11_1a,Sigma1278b,T7,YJM789,Sbou;o=Sbou' \
+        --plan 'name=Scer_n7_pop;t=S288c;qs=EC1118,Kyokai_no_7,RM11_1a,Sigma1278b,T7,YJM789' \
+        --plan 'name=Scer_n7_Spar;t=S288c;qs=EC1118,Kyokai_no_7,RM11_1a,Sigma1278b,T7,YJM789,Spar;o=Spar' \
+        --plan 'name=Scer_n7_Sbou;t=S288c;qs=EC1118,Kyokai_no_7,RM11_1a,Sigma1278b,T7,YJM789,Sbou;o=Sbou' \
         -y
     ```
 
@@ -140,22 +139,17 @@ Manually combine `~/data/alignment/Fungi/GENOMES/saccharomyces/WGS/saccharomyces
     sh 7_multi_db_only.sh
 
     # other plans
-    sh plan_five_way.sh
+    sh plan_Scer_n7_pop.sh
     sh 5_multi_cmd.sh
     sh 7_multi_db_only.sh
 
     # other plans
-    sh plan_Scer_n8_pop.sh
+    sh plan_Scer_n7_Spar.sh
     sh 5_multi_cmd.sh
     sh 7_multi_db_only.sh
 
     # other plans
-    sh plan_Scer_n8_Spar.sh
-    sh 5_multi_cmd.sh
-    sh 7_multi_db_only.sh
-
-    # other plans
-    sh plan_Scer_n8_Sbou.sh
+    sh plan_Scer_n7_Sbou.sh
     sh 5_multi_cmd.sh
     sh 7_multi_db_only.sh
     ```
