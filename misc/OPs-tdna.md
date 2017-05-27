@@ -17,18 +17,41 @@ perl ~/Scripts/download/download.pl -i database.yml -a
 
 ```bash
 mkdir -p ~/data/salk/Atha
-mkdir -p ~/data/salk/OstaJap
-
 for name in CMT CSHL FLAG GABI IMAL MX RATM SAIL SALK SK WISC
 do
-    echo $name;
-    perl ~/Scripts/alignDB/ofg/tdna2position.pl -i ~/data/salk/database/tdnaexpress/T-DNA.$name -o ~/data/salk/Atha/T-DNA.$name.pos.txt;
+    echo ${name};
+    cat ~/data/salk/database/tdnaexpress/T-DNA.${name} \
+        | perl -nla -e '
+            @F >= 2 or next;
+            next unless $F[1];
+        
+            my ( $chr, $pos ) = split /:/, $F[1];
+            $chr =~ s/chr0?//i;
+            $pos =~ s/^0+//;
+            next unless $chr =~ /^\d+$/;
+        
+            print "$chr:$pos";
+        ' \
+        > ~/data/salk/Atha/T-DNA.${name}.pos.txt;
 done
 
+mkdir -p ~/data/salk/OstaJap
 for name in affjp cirad csiro genoplante gsnu ostid PFG_FSTs rifgp rmd ship trim ucd
 do
-    echo $name;
-    perl ~/Scripts/alignDB/ofg/tdna2position.pl -i ~/data/salk/database/RiceGE/T-DNA.$name -o ~/data/salk/OstaJap/T-DNA.$name.pos.txt;
+    echo ${name};
+    cat ~/data/salk/database/RiceGE/T-DNA.${name} \
+        | perl -nla -e '
+            @F >= 2 or next;
+            next unless $F[1];
+        
+            my ( $chr, $pos ) = split /:/, $F[1];
+            $chr =~ s/chr0?//i;
+            $pos =~ s/^0+//;
+            next unless $chr =~ /^\d+$/;
+        
+            print "$chr:$pos";
+        ' \
+        > ~/data/salk/OstaJap/T-DNA.${name}.pos.txt;
 done
 
 ```
