@@ -4,12 +4,12 @@ Or order, family, species.
 
 Genus Trichoderma as example.
 
-[TOC]: # " "
-
-- [Section 1: select strains and download sequences.](#section-1-select-strains-and-download-sequences)
-- [Section 2: create configuration file and generate alignments.](#section-2-create-configuration-file-and-generate-alignments)
-- [Section 3: cleaning.](#section-3-cleaning)
-- [FAQ](#faq)
+[TOC levels=1-3]: # " "
+- [Build alignments on an whole Eukaryotes genus](#build-alignments-on-an-whole-eukaryotes-genus)
+    - [Section 1: select strains and download sequences.](#section-1-select-strains-and-download-sequences)
+    - [Section 2: create configuration file and generate alignments.](#section-2-create-configuration-file-and-generate-alignments)
+    - [Section 3: cleaning.](#section-3-cleaning)
+    - [FAQ](#faq)
 
 
 ## Section 1: select strains and download sequences.
