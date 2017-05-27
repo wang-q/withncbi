@@ -1,4 +1,14 @@
-# vsself alignDB for genomes from Ensembl
+# `vsself` alignDB for genomes from Ensembl
+
+[TOC levels=1-3]: # " "
+- [`vsself` alignDB for genomes from Ensembl](#vsself-aligndb-for-genomes-from-ensembl)
+    - [`chr_length.csv`](#chr-lengthcsv)
+    - [Atha](#atha)
+    - [OsatJap](#osatjap)
+    - [Dmel](#dmel)
+    - [Mouse](#mouse)
+    - [S288c](#s288c)
+
 
 ## `chr_length.csv`
 
