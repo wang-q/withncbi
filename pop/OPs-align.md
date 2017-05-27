@@ -3,7 +3,29 @@
 Less detailed than Trichoderma in [README.md](README.md), but include examples for genomes out of
 WGS, which usually in better assembling levels.
 
-## *Saccharomyces* WGS
+[TOC levels=1-3]: # " "
+- [Aligning steps for each groups](#aligning-steps-for-each-groups)
+- [*Saccharomyces* WGS](#saccharomyces-wgs)
+- [Scer_wgs WGS](#scer-wgs-wgs)
+- [Scer_100 ASSEMBLY](#scer-100-assembly)
+- [*Candida* WGS](#candida-wgs)
+- [*Fusarium* WGS](#fusarium-wgs)
+- [*Aspergillus* WGS](#aspergillus-wgs)
+- [*Penicillium* WGS](#penicillium-wgs)
+- [*Plasmodium* WGS](#plasmodium-wgs)
+- [*Plasmodium falciparum* WGS](#plasmodium-falciparum-wgs)
+- [*Arabidopsis* 19 genomes](#arabidopsis-19-genomes)
+- [*Orazy sativa* Japonica 24 genomes](#orazy-sativa-japonica-24-genomes)
+- [*Drosophila* Population Genomics Project (dpgp)](#drosophila-population-genomics-project-dpgp)
+- [Primates](#primates)
+- [Human individuals from Simons project](#human-individuals-from-simons-project)
+- [*Caenorhabditis elegans* million mutation project (cele_mmp)](#caenorhabditis-elegans-million-mutation-project-cele-mmp)
+- [*Dictyostelium* WGS](#dictyostelium-wgs)
+- [*Dictyostelium discoideum*](#dictyostelium-discoideum)
+- [Mouse](#mouse)
+
+
+# *Saccharomyces* WGS
 
 1. `gen_pop_conf.pl`
 
@@ -60,7 +82,7 @@ WGS, which usually in better assembling levels.
 Manually combine `~/data/alignment/Fungi/GENOMES/saccharomyces/WGS/saccharomyces.csv` and
 `~/data/alignment/Fungi/saccharomyces/basicstat.xlsx`.
 
-## Scer_wgs WGS
+# Scer_wgs WGS
 
 1. `gen_pop_conf.pl`
 
@@ -143,7 +165,7 @@ Manually combine `~/data/alignment/Fungi/GENOMES/saccharomyces/WGS/saccharomyces
 Manually combine `~/data/alignment/Fungi/GENOMES/scer_wgs/WGS/scer_wgs.csv` and
 `~/data/alignment/Fungi/scer_wgs/basicstat.xlsx`.
 
-## Scer_100 ASSEMBLY
+# Scer_100 ASSEMBLY
 
 1. `gen_pop_conf.pl`
 
@@ -302,7 +324,7 @@ Manually combine `~/data/alignment/Fungi/GENOMES/scer_wgs/WGS/scer_wgs.csv` and
     sh 7_multi_db_only.sh
     ```
 
-## *Candida* WGS
+# *Candida* WGS
 
 1. `gen_pop_conf.pl`
 
@@ -361,7 +383,7 @@ Manually combine `~/data/alignment/Fungi/GENOMES/scer_wgs/WGS/scer_wgs.csv` and
     sh 7_multi_db_only.sh
     ```
 
-## *Fusarium* WGS
+# *Fusarium* WGS
 
 1. `gen_pop_conf.pl`
 
@@ -415,7 +437,7 @@ Manually combine `~/data/alignment/Fungi/GENOMES/scer_wgs/WGS/scer_wgs.csv` and
     sh 7_multi_db_only.sh
     ```
 
-## *Aspergillus* WGS
+# *Aspergillus* WGS
 
 1. `gen_pop_conf.pl`
 
@@ -474,7 +496,7 @@ Manually combine `~/data/alignment/Fungi/GENOMES/scer_wgs/WGS/scer_wgs.csv` and
     sh 7_multi_db_only.sh
     ```
 
-## *Penicillium* WGS
+# *Penicillium* WGS
 
 1. `gen_pop_conf.pl`
 
@@ -518,7 +540,7 @@ Manually combine `~/data/alignment/Fungi/GENOMES/scer_wgs/WGS/scer_wgs.csv` and
     sh 7_multi_db_only.sh
     ```
 
-## *Plasmodium* WGS
+# *Plasmodium* WGS
 
 0. RM species
 
@@ -575,7 +597,7 @@ Manually combine `~/data/alignment/Fungi/GENOMES/scer_wgs/WGS/scer_wgs.csv` and
 
     Prei is the only one.
 
-## *Plasmodium falciparum* WGS
+# *Plasmodium falciparum* WGS
 
 1. `gen_pop_conf.pl`
 
@@ -662,7 +684,7 @@ Manually combine `~/data/alignment/Fungi/GENOMES/scer_wgs/WGS/scer_wgs.csv` and
     sh 7_multi_db_only.sh
     ```
 
-## *Arabidopsis* 19 genomes
+# *Arabidopsis* 19 genomes
 
 0. Create data.yml manually.
 
@@ -801,7 +823,7 @@ EOF
     sh 7_multi_db_only.sh
     ```
 
-## *Orazy sativa* Japonica 24 genomes
+# *Orazy sativa* Japonica 24 genomes
 
 0. Create data.yml manually.
 
@@ -963,7 +985,7 @@ EOF
     sh 7_multi_db_only.sh
     ```
 
-## *Drosophila* Population Genomics Project (dpgp)
+# *Drosophila* Population Genomics Project (dpgp)
 
 0. Create data.yml manually.
 
@@ -1091,7 +1113,7 @@ EOF
     sh 7_multi_db_only.sh
     ```
 
-## Primates
+# Primates
 
 0. Create an empty data.yml.
 
@@ -1154,7 +1176,7 @@ EOF
     sh 5_multi_cmd.sh
     ```
 
-## Human individuals from Simons project
+# Human individuals from Simons project
 
 0. Create data.yml manually.
 
@@ -1261,7 +1283,7 @@ EOF
     sh 5_multi_cmd.sh
     ```
 
-## *Caenorhabditis elegans* million mutation project (cele_mmp)
+# *Caenorhabditis elegans* million mutation project (cele_mmp)
 
 0. Create data.yml manually.
 
@@ -1441,7 +1463,7 @@ EOF
     sh 7_multi_db_only.sh
     ```
 
-## *Dictyostelium* WGS
+# *Dictyostelium* WGS
 
 0. RM species
 
@@ -1503,7 +1525,7 @@ EOF
 
     Dictyostelium_citrinum or Dictyostelium_firmibasis assemblies.
 
-## *Dictyostelium discoideum*
+# *Dictyostelium discoideum*
 
 0. Create data.yml manually.
 
@@ -1634,7 +1656,7 @@ EOF
     ```
 
 
-## Mouse
+# Mouse
 
 0. Create data.yml manually.
 
