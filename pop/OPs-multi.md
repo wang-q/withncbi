@@ -35,15 +35,15 @@ cd ~/data/alignment/xlsx
 
 # Runtime 5 hours and 29 minutes.
 perl ~/Scripts/alignDB/alignDB.pl \
-    -d Ath_n19_pop \
+    -d Ath_n19_pop_basic \
     --da ~/data/alignment/arabidopsis82/Ath_n19_pop_refined \
     -a ~/data/alignment/Ensembl/Atha/anno.yml \
     -e arabidopsis_thaliana_core_29_82_10 \
     --chr ~/data/alignment/arabidopsis82/chr_length.csv \
     --lt 5000 --parallel 12 \
-    --run all
+    --run basic
 
-perl ~/Scripts/alignDB/util/dup_db.pl --yes -d Ath_n19_pop -f ~/data/dumps/mysql/Ath_n19_pop.sql.gz
+perl ~/Scripts/alignDB/util/dup_db.pl --yes -d Ath_n19_pop_basic -f ~/data/dumps/mysql/Ath_n19_pop_basic.sql.gz
 
 ```
 

@@ -62,10 +62,10 @@ done
 
 ```bash
 perl ~/Scripts/alignDB/util/dup_db.pl -g Athavsself_tdna -f ~/data/dumps/mysql/Athavsself.sql.gz
-perl ~/Scripts/alignDB/util/dup_db.pl -g Ath_n19_pop_tdna -f ~/data/dumps/mysql/Ath_n19_pop.sql.gz
+perl ~/Scripts/alignDB/util/dup_db.pl -g Ath_n19_pop_tdna -f ~/data/dumps/mysql/Ath_n19_pop_basic.sql.gz
 ```
 
-## Use style 'center'
+## Athavsself_tdna
 
 ```bash
 cd ~/data/salk/Atha
@@ -96,4 +96,37 @@ perl ~/Scripts/alignDB/init/update_annotation.pl \
 perl ~/Scripts/alignDB/stat/ofg_stat_factory.pl \
     --by tt --index --chart \
     -d Athavsself_tdna -o ~/data/salk/Athavsself_tdna.ofg.xlsx
+```
+
+## Ath_n19_pop_tdna
+
+```bash
+cd ~/data/salk/Atha
+
+perl ~/Scripts/alignDB/init/insert_position.pl \
+    -d Ath_n19_pop_tdna  --style center \
+    --batch 50 --parallel 8 \
+    --tag tdna --type CMT  -f ~/data/salk/Atha/T-DNA.CMT.pos.txt  \
+    --tag tdna --type CSHL -f ~/data/salk/Atha/T-DNA.CSHL.pos.txt \
+    --tag tdna --type FLAG -f ~/data/salk/Atha/T-DNA.FLAG.pos.txt \
+    --tag tdna --type GABI -f ~/data/salk/Atha/T-DNA.GABI.pos.txt \
+    --tag tdna --type IMAL -f ~/data/salk/Atha/T-DNA.IMAL.pos.txt \
+    --tag tdna --type MX   -f ~/data/salk/Atha/T-DNA.MX.pos.txt   \
+    --tag tdna --type RATM -f ~/data/salk/Atha/T-DNA.RATM.pos.txt \
+    --tag tdna --type SAIL -f ~/data/salk/Atha/T-DNA.SAIL.pos.txt \
+    --tag tdna --type SALK -f ~/data/salk/Atha/T-DNA.SALK.pos.txt \
+    --tag tdna --type SK   -f ~/data/salk/Atha/T-DNA.SK.pos.txt   \
+    --tag tdna --type WISC -f ~/data/salk/Atha/T-DNA.WISC.pos.txt
+
+perl ~/Scripts/alignDB/init/update_sw_cv.pl \
+    -d Ath_n19_pop_tdna \
+    --batch 10 --parallel 8
+perl ~/Scripts/alignDB/init/update_annotation.pl \
+    -d Ath_n19_pop_tdna \
+    -a ~/data/alignment/Ensembl/Atha/anno.yml \
+    --batch 10 --parallel 8
+
+perl ~/Scripts/alignDB/stat/ofg_stat_factory.pl \
+    --by tt --index --chart \
+    -d Ath_n19_pop_tdna -o ~/data/salk/Ath_n19_pop_tdna.ofg.xlsx
 ```
