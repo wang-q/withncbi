@@ -16,15 +16,15 @@ cd ~/data/alignment/xlsx
 
 # Runtime 12 minutes and 55 seconds.
 perl ~/Scripts/alignDB/alignDB.pl \
-    -d Scer_n8_pop \
-    --da ~/data/alignment/Fungi/scer_wgs/Scer_n8_pop_refined \
+    -d Scer_n7_pop \
+    --da ~/data/alignment/Fungi/scer_wgs/Scer_n7_pop_refined \
     -a ~/data/alignment/Ensembl/S288c/anno.yml \
     -e saccharomyces_cerevisiae_core_29_82_4 \
     --chr ~/data/alignment/Fungi/scer_wgs/chr_length.csv \
     --lt 5000 --parallel 8 --batch 10 \
     --run all
 
-perl ~/Scripts/alignDB/util/dup_db.pl --yes -d Scer_n8_pop -f ~/data/dumps/mysql/Scer_n8_pop.sql.gz
+perl ~/Scripts/alignDB/util/dup_db.pl --yes -d Scer_n7_pop -f ~/data/dumps/mysql/Scer_n7_pop.sql.gz
 
 ```
 

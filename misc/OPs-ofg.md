@@ -74,20 +74,23 @@ perl ~/Scripts/alignDB/stat/ofg_stat_factory.pl \
 ```bash
 cd ~/data/ofg/spo11
 
-perl ~/Scripts/alignDB/util/dup_db.pl -g Scer_n8_pop_spo11 -f ~/data/dumps/mysql/Scer_n8_pop.sql.gz
+perl ~/Scripts/alignDB/util/dup_db.pl -g Scer_n7_pop_spo11 -f ~/data/dumps/mysql/Scer_n7_pop.sql.gz
 
-perl ~/Scripts/alignDB/ofg/insert_position.pl \
-    -d Scer_n8_pop_spo11 --batch 10 --parallel 8 \
+perl ~/Scripts/alignDB/init/insert_position.pl \
+    -d Scer_n7_pop_spo11 --batch 10 --parallel 8 \
     --style center_intact \
     --tag spo11 --type hotspot -f ~/data/ofg/spo11/spo11_hot.pos.txt
 
-perl ~/Scripts/alignDB/init/update_sw_cv.pl -d Scer_n8_pop_spo11 --batch 10 --parallel 8
-perl ~/Scripts/alignDB/init/update_feature.pl \
-    -d Scer_n8_pop_spo11 \
-    -e saccharomyces_cerevisiae_core_29_82_4 \
+perl ~/Scripts/alignDB/init/update_sw_cv.pl -d Scer_n7_pop_spo11 --batch 10 --parallel 8
+
+perl ~/Scripts/alignDB/init/update_annotation.pl \
+    -d Scer_n7_pop_spo11 \
+    -a ~/data/alignment/Ensembl/S288c/anno.yml \
     --batch 10 --parallel 8
 
-perl ~/Scripts/alignDB/stat/ofg_stat_factory.pl -d Scer_n8_pop_spo11 --index --chart
+perl ~/Scripts/alignDB/stat/ofg_stat_factory.pl \
+    --by tt --index --chart \
+    -d Scer_n7_pop_spo11
 ```
 
 ## S288Cvsself edge
