@@ -5,7 +5,7 @@
 - [spo11 (cell 2011)](#spo11-cell-2011)
     - [spo11: data source](#spo11-data-source)
     - [S288Cvsself center_intact](#s288cvsself-center-intact)
-    - [Scer_n8_pop center_intact](#scer-n8-pop-center-intact)
+    - [Scer_n7_pop center_intact](#scer-n7-pop-center-intact)
     - [S288Cvsself edge](#s288cvsself-edge)
 - [S288c X YJM789 (nature 2008)](#s288c-x-yjm789-nature-2008)
     - [Get data](#get-data)
@@ -69,7 +69,7 @@ perl ~/Scripts/alignDB/stat/ofg_stat_factory.pl \
 
 ```
 
-## Scer_n8_pop center_intact
+## Scer_n7_pop center_intact
 
 ```bash
 cd ~/data/ofg/spo11
