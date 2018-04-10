@@ -4,10 +4,9 @@ Less detailed than Trichoderma in [README.md](README.md), but include examples f
 WGS, which usually in better assembling levels.
 
 [TOC]: # " "
-
 - [*Saccharomyces* WGS](#saccharomyces-wgs)
-- [Scer_wgs WGS](#scer-wgs-wgs)
-- [Scer_100 ASSEMBLY](#scer-100-assembly)
+- [Scer_wgs WGS](#scer_wgs-wgs)
+- [Scer_100 ASSEMBLY](#scer_100-assembly)
 - [*Candida* WGS](#candida-wgs)
 - [*Fusarium* WGS](#fusarium-wgs)
 - [*Aspergillus* WGS](#aspergillus-wgs)
@@ -76,13 +75,15 @@ WGS, which usually in better assembling levels.
     find WGS -name "*.gz" | xargs gzip -t
     ```
 
-3. Download *Saccharomyces cerevisiae* S288c.
+3. Download sequences from NCBI assembly
 
     This step is totally manual operation. **Be careful.**
 
     | assigned name | organism_name                    | assembly_accession |
     |:--------------|:---------------------------------|:-------------------|
     | Scer_S288c    | *Saccharomyces cerevisiae* S288c | GCF_000146045.2    |
+    | Seub_FM1318   | *Saccharomyces eubayanus* FM1318 | GCF_001298625.1    |
+
 
     ```bash
     mkdir -p ~/data/alignment/Fungi/GENOMES/saccharomyces/DOWNLOAD
@@ -90,14 +91,24 @@ WGS, which usually in better assembling levels.
 
     # Omit chrMt
     perl ~/Scripts/withncbi/taxon/assembly_csv.pl \
-        -f ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/All/GCF_000146045.2.assembly.txt \
+        -f ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/146/045/GCF_000146045.2_R64/GCF_000146045.2_R64_assembly_report.txt \
         -name Scer_S288c \
         --nuclear \
         > Scer_S288c.seq.csv
 
+    perl ~/Scripts/withncbi/taxon/assembly_csv.pl \
+        -f ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/298/625/GCF_001298625.1_SEUB3.0/GCF_001298625.1_SEUB3.0_assembly_report.txt \
+        -name Seub_FM1318 \
+        > Seub_FM1318.seq.csv
+
+    echo "#strain_name,accession,strain_taxon_id,seq_name" > saccharomyces.seq.csv
+    cat Scer_S288c.seq.csv Seub_FM1318.seq.csv |
+        perl -nl -e '/^#/ and next; /^\s*$/ and next; print;' \
+        >> saccharomyces.seq.csv
+
     # Download, rename files and change fasta headers
     perl ~/Scripts/withncbi/taxon/batch_get_seq.pl \
-        -p -f Scer_S288c.seq.csv
+        -p -f saccharomyces.seq.csv
     ```
 
 ## Scer_wgs WGS
@@ -158,7 +169,7 @@ WGS, which usually in better assembling levels.
 3. Download strains of *Saccharomyces cerevisiae* at good assembly status.
 
     Click the `Download table` link on the top-right of [Genome
-        list](http://www.ncbi.nlm.nih.gov/genome/genomes/15), save it as .csv file.
+                    list](http://www.ncbi.nlm.nih.gov/genome/genomes/15), save it as .csv file.
 
     ```bash
     mkdir -p ~/data/alignment/Fungi/GENOMES/scer_wgs/DOWNLOAD
@@ -221,7 +232,7 @@ WGS, which usually in better assembling levels.
 2. Download strains of *Saccharomyces cerevisiae* at good assembly status.
 
     Click the `Download table` link on the top-right of [Genome
-        list](http://www.ncbi.nlm.nih.gov/genome/genomes/15), save it as .csv file.
+                    list](http://www.ncbi.nlm.nih.gov/genome/genomes/15), save it as .csv file.
 
     ```bash
     mkdir -p ~/data/alignment/Fungi/GENOMES/scer_100/DOWNLOAD
