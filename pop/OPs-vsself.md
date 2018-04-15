@@ -2,7 +2,7 @@
 
 [TOC levels=1-3]: # " "
 - [`vsself` alignDB for genomes from Ensembl](#vsself-aligndb-for-genomes-from-ensembl)
-    - [`chr_length.csv`](#chr-lengthcsv)
+    - [`chr_length.csv`](#chr_lengthcsv)
     - [Atha](#atha)
     - [OsatJap](#osatjap)
     - [Dmel](#dmel)
@@ -136,3 +136,4 @@ perl ~/Scripts/alignDB/init/gen_alignDB_genome.pl \
 
 perl ~/Scripts/alignDB/util/dup_db.pl --yes -d S288cvsself -f ~/data/dumps/mysql/S288cvsself.sql.gz
 ```
+

@@ -6,8 +6,8 @@ WGS, which usually in better assembling levels.
 [TOC levels=1-3]: # " "
 - [Aligning steps for each groups](#aligning-steps-for-each-groups)
 - [*Saccharomyces* WGS](#saccharomyces-wgs)
-- [Scer_wgs WGS](#scer-wgs-wgs)
-- [Scer_100 ASSEMBLY](#scer-100-assembly)
+- [Scer_wgs WGS](#scer_wgs-wgs)
+- [Scer_100 ASSEMBLY](#scer_100-assembly)
 - [*Candida* WGS](#candida-wgs)
 - [*Fusarium* WGS](#fusarium-wgs)
 - [*Aspergillus* WGS](#aspergillus-wgs)
@@ -19,7 +19,7 @@ WGS, which usually in better assembling levels.
 - [*Drosophila* Population Genomics Project (dpgp)](#drosophila-population-genomics-project-dpgp)
 - [Primates](#primates)
 - [Human individuals from Simons project](#human-individuals-from-simons-project)
-- [*Caenorhabditis elegans* million mutation project (cele_mmp)](#caenorhabditis-elegans-million-mutation-project-cele-mmp)
+- [*Caenorhabditis elegans* million mutation project (cele_mmp)](#caenorhabditis-elegans-million-mutation-project-cele_mmp)
 - [*Dictyostelium* WGS](#dictyostelium-wgs)
 - [*Dictyostelium discoideum*](#dictyostelium-discoideum)
 - [Mouse](#mouse)
@@ -45,7 +45,8 @@ WGS, which usually in better assembling levels.
         --opt rm_species=Fungi \
         --dd ~/data/alignment/Fungi/GENOMES/saccharomyces/DOWNLOAD \
         --download 'name=Scer_S288c;taxon=559292;sciname=Saccharomyces cerevisiae S288c' \
-        --plan 'name=plan_test;t=Scer_S288c;qs=Spar_NRRL_Y_17217,Spas_CBS_1483,Ssp_ATCC_MYA_796'
+        --download 'name=Seub_FM1318;taxon=1080349;sciname=Saccharomyces eubayanus FM1318' \
+        --plan 'name=plan_test;t=Scer_S288c;qs=Spar_NRRL_Y_17217,Spas_CBS_1483,Ssp_ATCC_MYA_796,Seub_FM1318'
 
     ```
 
@@ -536,7 +537,7 @@ Manually combine `~/data/alignment/Fungi/GENOMES/scer_wgs/WGS/scer_wgs.csv` and
 
 # *Plasmodium* WGS
 
-0. RM species
+1. RM species
 
     It't OK to not specifies RM species. Protists have very few repeats records.
 
@@ -545,7 +546,7 @@ Manually combine `~/data/alignment/Fungi/GENOMES/scer_wgs/WGS/scer_wgs.csv` and
     /usr/local/Cellar/repeatmasker/4.0.5/libexec/util/queryRepeatDatabase.pl -species Apicomplexa -stat
     ```
 
-1. `gen_pop_conf.pl`
+2. `gen_pop_conf.pl`
 
     ```bash
     mkdir -p ~/data/alignment/Protists/plasmodium
@@ -565,7 +566,7 @@ Manually combine `~/data/alignment/Fungi/GENOMES/scer_wgs/WGS/scer_wgs.csv` and
         -y
     ```
 
-2. Rest routing things.
+3. Rest routing things.
 
     ```bash
     cd ~/data/alignment/Protists/plasmodium
@@ -587,7 +588,7 @@ Manually combine `~/data/alignment/Fungi/GENOMES/scer_wgs/WGS/scer_wgs.csv` and
     sh 7_multi_db_only.sh
     ```
 
-3. Pick outgroup.
+4. Pick outgroup.
 
     Prei is the only one.
 
@@ -680,7 +681,7 @@ Manually combine `~/data/alignment/Fungi/GENOMES/scer_wgs/WGS/scer_wgs.csv` and
 
 # *Arabidopsis* 19 genomes
 
-0. Create data.yml manually.
+1. Create data.yml manually.
 
 ```bash
 mkdir -p ~/data/alignment/arabidopsis82
@@ -819,7 +820,7 @@ EOF
 
 # *Orazy sativa* Japonica 24 genomes
 
-0. Create data.yml manually.
+1. Create data.yml manually.
 
 ```bash
 mkdir -p ~/data/alignment/rice82
@@ -981,7 +982,7 @@ EOF
 
 # *Drosophila* Population Genomics Project (dpgp)
 
-0. Create data.yml manually.
+1. Create data.yml manually.
 
 ```bash
 mkdir -p ~/data/alignment/dpgp82
@@ -1109,7 +1110,7 @@ EOF
 
 # Primates
 
-0. Create an empty data.yml.
+1. Create an empty data.yml.
 
 ```bash
 mkdir -p ~/data/alignment/primates82
@@ -1172,7 +1173,7 @@ EOF
 
 # Human individuals from Simons project
 
-0. Create data.yml manually.
+1. Create data.yml manually.
 
 ```bash
 mkdir -p ~/data/alignment/human_simons
@@ -1279,9 +1280,10 @@ EOF
 
 # *Caenorhabditis elegans* million mutation project (cele_mmp)
 
-0. Create data.yml manually.
+1. Create data.yml manually.
 
-    Information came from [here](http://genome.cshlp.org/content/suppl/2013/08/20/gr.157651.113.DC2/Supplemental_Table_3.xls).
+    Information came from
+    [here](http://genome.cshlp.org/content/suppl/2013/08/20/gr.157651.113.DC2/Supplemental_Table_3.xls).
 
 ```bash
 mkdir -p ~/data/alignment/cele82
@@ -1459,7 +1461,7 @@ EOF
 
 # *Dictyostelium* WGS
 
-0. RM species
+1. RM species
 
     It't OK to not specifies RM species. Protists have very few repeats records.
 
@@ -1468,7 +1470,7 @@ EOF
     /usr/local/Cellar/repeatmasker/4.0.5/libexec/util/queryRepeatDatabase.pl -species Dictyosteliida -stat
     ```
 
-1. `gen_pop_conf.pl`
+2. `gen_pop_conf.pl`
 
     ```bash
     mkdir -p ~/data/alignment/Protists/dictyostelium
@@ -1493,7 +1495,7 @@ EOF
         -y
     ```
 
-2. Rest routing things.
+3. Rest routing things.
 
     ```bash
     cd ~/data/alignment/Protists/dictyostelium
@@ -1515,13 +1517,13 @@ EOF
     sh 7_multi_db_only.sh
     ```
 
-3. Pick outgroup.
+4. Pick outgroup.
 
     Dictyostelium_citrinum or Dictyostelium_firmibasis assemblies.
 
 # *Dictyostelium discoideum*
 
-0. Create data.yml manually.
+1. Create data.yml manually.
 
     Coverages are not real.
 
@@ -1652,7 +1654,7 @@ EOF
 
 # Mouse
 
-0. Create data.yml manually.
+1. Create data.yml manually.
 
 ```bash
 mkdir -p ~/data/alignment/mouse82
@@ -1761,3 +1763,4 @@ EOF
     sh 5_multi_cmd.sh
     sh 7_multi_db_only.sh    
     ```
+
