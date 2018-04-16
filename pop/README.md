@@ -22,8 +22,8 @@ Genus Trichoderma as example.
 
     * http://www.ncbi.nlm.nih.gov/Traces/wgs/?page=1&term=Trichoderma&order=organism
     * http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?mode=Info&id=5543
-    * http://www.ncbi.nlm.nih.gov/genome/?term=txid5543[Organism:exp]
-    * http://www.ncbi.nlm.nih.gov/assembly?term=txid5543[Organism:exp]
+    * http://www.ncbi.nlm.nih.gov/genome/?term=txid5543
+    * http://www.ncbi.nlm.nih.gov/assembly?term=txid5543
 
     And query a local `ar_genbank` DB. This is just a convenient but not accurate approach,
     especially for sub-species parts.
