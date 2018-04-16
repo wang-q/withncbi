@@ -58,12 +58,19 @@ rsync -avP ftp.ncbi.nlm.nih.gov::bioproject/ \
 rsync -avP ftp.ncbi.nlm.nih.gov::pub/taxonomy/ \
     --exclude=".tmp" \
     --exclude=".old" \
+    --exclude="*.Z" \
+    --exclude="new_taxdump" \
     --exclude="accession2taxid" \
     --exclude="gi_taxid_*" \
     ~/data/NCBI/taxonomy/
+    
+rm -fr ~/data/NCBI/taxdmp
+mkdir -p ~/data/NCBI/taxdmp
+tar xvfz ~/data/NCBI/taxonomy/taxdump.tar.gz -C ~/data/NCBI/taxdmp
+
 ```
 
-## Old Bacteria genomes.
+# Old Bacteria genomes.
 
 On 02 December 2015 these directories were moved to
 `ftp://ftp.ncbi.nlm.nih.gov/genomes/archive/old_refseq/`.
