@@ -3,34 +3,25 @@ use strict;
 use warnings;
 use autodie;
 
-use Getopt::Long qw(HelpMessage);
-use Config::Tiny;
-use FindBin;
-use YAML qw(Dump Load DumpFile LoadFile);
+use Getopt::Long qw();
+use YAML::Syck qw();
 
 use Template;
-use Path::Tiny;
-use List::MoreUtils qw(uniq zip);
+use Path::Tiny qw();
 use Text::CSV_XS;
+
+use WWW::Mechanize;
+use HTML::TableExtract;
 
 use Bio::DB::Taxonomy;
 
 use AlignDB::Stopwatch;
 
-use lib "$FindBin::Bin/../lib";
-use MyUtil qw(wgs_worker);
-
 #----------------------------------------------------------#
 # GetOpt section
 #----------------------------------------------------------#
-my $Config = Config::Tiny->read("$FindBin::Bin/../config.ini");
-
 # record ARGV and Config
-my $stopwatch = AlignDB::Stopwatch->new(
-    program_name => $0,
-    program_argv => [@ARGV],
-    program_conf => $Config,
-);
+my $stopwatch = AlignDB::Stopwatch->new();
 
 =head1 NAME
 
@@ -57,20 +48,18 @@ wgs_prep.pl - prepare WGS materials
 
 =cut
 
-my $td_dir = path( $Config->{path}{td} )->stringify;    # taxdmp
-
 # for unrecorded strains, give them arbitrary ids
 my $arbitrary = 100_000_000;
 
-GetOptions(
-    'help|?'     => sub { HelpMessage(0) },
+Getopt::Long::GetOptions(
+    'help|?'     => sub { Getopt::Long::HelpMessage(0) },
     'i|f|file=s' => \my $file_input,
     'o|d|dir=s'  => \my $dir_output,
     'a|aria2'    => \my $aria2,
     'fix'        => \my $fix_strain,
     'nofix=s'    => \my @nofix,
     'csvonly'    => \my $csvonly,
-) or HelpMessage(1);
+) or Getopt::Long::HelpMessage(1);
 
 $dir_output = "." unless $dir_output;
 
@@ -85,12 +74,12 @@ my $taxon_db = Bio::DB::Taxonomy->new( -source => 'entrez', );
 # Read
 #----------------------------#
 $stopwatch->block_message("Load $file_input.");
-my $basename = path($file_input)->basename( ".txt", ".tab", ".tsv" );
+my $basename = Path::Tiny::path($file_input)->basename( ".txt", ".tab", ".tsv" );
 
 my $wgsid_of = {};
 my @orig_orders;
 {
-    my @lines = path($file_input)->lines;
+    my @lines = Path::Tiny::path($file_input)->lines;
     for my $line (@lines) {
         chomp $line;
         $line =~ /^#/ and next;
@@ -130,7 +119,7 @@ $stopwatch->block_message("Generate .csv for info and .url.txt for downloading "
         or die "Cannot use CSV: " . Text::CSV_XS->error_diag;
     $csv->eol("\n");
 
-    my $file_csv = path( $dir_output, "$basename.csv" )->stringify;
+    my $file_csv = Path::Tiny::path( $dir_output, "$basename.csv" )->stringify;
 
     open my $csv_fh, ">", $file_csv;
 
@@ -184,7 +173,7 @@ $stopwatch->block_message("Generate .csv for info and .url.txt for downloading "
     print ".csv generated.\n";
 
     if ( !$csvonly ) {
-        my $file_url = path( $dir_output, "$basename.url.txt" )->stringify;
+        my $file_url = Path::Tiny::path( $dir_output, "$basename.url.txt" )->stringify;
         open my $url_fh, ">", $file_url;
         for my $key (@orig_orders) {
 
@@ -222,7 +211,7 @@ $stopwatch->block_message("Generate .csv for info and .url.txt for downloading "
 if ( !$csvonly ) {
     $stopwatch->block_message("Generate .data.yml");
 
-    my $file_data = path( $dir_output, "$basename.data.yml" )->stringify;
+    my $file_data = Path::Tiny::path( $dir_output, "$basename.data.yml" )->stringify;
 
     my $text = <<'EOF';
 ---
@@ -249,5 +238,99 @@ EOF
 $stopwatch->end_message;
 
 exit;
+
+sub wgs_worker {
+    my $term = shift;
+
+    my $mech = WWW::Mechanize->new;
+    $mech->stack_depth(0);    # no history to save memory
+
+    # local shadowsocks proxy
+    if ( $ENV{SSPROXY} ) {
+        $mech->proxy( [ 'http', 'https' ], 'socks://127.0.0.1:1080' );
+    }
+
+    my $url_part = "http://www.ncbi.nlm.nih.gov/Traces/wgs/";
+    my $url      = $url_part . '?val=' . $term;
+    warn " " x 4 . $url . "\n";
+
+    my $info = { prefix => $term, };
+    $mech->get($url);
+
+    {    # extract from tables
+        my $page    = $mech->content;
+        my @tables  = qw{ master-table structured-comments };
+        my @columns = (
+            '#_of_Contigs',    'Total_length',
+            'Update_date',     'BioProject',
+            'Keywords',        'Organism',
+            'Assembly_Method', 'Assembly_Name',
+            'Genome_Coverage', 'Sequencing_Technology',
+            'Biosource',
+        );
+
+        for my $table (@tables) {
+            print " " x 4 . "Extract from table ", $table, "\n";
+            my $te = HTML::TableExtract->new( attribs => { class => $table, }, );
+            $te->parse($page);
+
+            for my $ts ( $te->table_states ) {
+                for my $row ( $ts->rows ) {
+                    for my $cell (@$row) {
+                        if ($cell) {
+                            $cell =~ s/[,:]//g;
+                            $cell =~ s/^\s+//g;
+                            $cell =~ s/\s+$//g;
+                            $cell =~ s/\s+/ /g;
+                        }
+                    }
+                    next unless $row->[0];
+                    $row->[0] =~ s/\s+/_/g;
+                    next unless grep { $row->[0] eq $_ } @columns;
+
+                    $row->[1] =~ s/\s+.\s+show.+lineage.+$//g;
+                    if ( $row->[0] eq 'Biosource' ) {
+                        my ($biosource_strain)
+                            = grep {/strain = /} grep {defined} split /\//,
+                            $row->[1];
+
+                        #print $row->[1], "\n";
+                        $biosource_strain =~ s/strain = //;
+
+                        #print $biosource_strain, "\n";
+                        $info->{ $row->[0] } = $biosource_strain;
+                    }
+                    else {
+                        $info->{ $row->[0] } = $row->[1];
+                    }
+                }
+            }
+        }
+    }
+
+    {    # taxon id
+        my @links = $mech->find_all_links( url_regex => => qr{wwwtax}, );
+        if ( @links and $links[0]->url =~ /\?id=(\d+)/ ) {
+            $info->{taxon_id} = $1;
+        }
+    }
+
+    {    # pubmed id
+        my @links = $mech->find_all_links( url_regex => => qr{\/pubmed\/}, );
+        if ( @links and $links[0]->url =~ /\/pubmed\/(\d+)/ ) {
+            $info->{pubmed} = $1;
+        }
+    }
+
+    {    # downloads
+        my @links = $mech->find_all_links(
+            text_regex => qr{$term},
+            url_regex  => qr{ftp},
+        );
+        $info->{download} = [ map { $_->url } @links ];
+    }
+
+    return $info;
+}
 
 __END__

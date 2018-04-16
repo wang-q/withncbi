@@ -24,107 +24,12 @@ use vars qw(@ISA @EXPORT_OK %EXPORT_TAGS);
 %EXPORT_TAGS = (
     all => [
         qw{
-            wgs_worker find_ancestor find_group abbr abbr_most
+            find_ancestor find_group abbr abbr_most
             },
     ],
 );
 
 @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
-
-sub wgs_worker {
-    my $term = shift;
-
-    my $mech = WWW::Mechanize->new;
-    $mech->stack_depth(0);    # no history to save memory
-
-    # local shadowsocks proxy
-    if ( $ENV{SSPROXY} ) {
-        $mech->proxy( [ 'http', 'https' ], 'socks://127.0.0.1:1080' );
-    }
-
-    my $url_part = "http://www.ncbi.nlm.nih.gov/Traces/wgs/";
-    my $url      = $url_part . '?val=' . $term;
-    warn " " x 4 . $url . "\n";
-
-    my $info = { prefix => $term, };
-    $mech->get($url);
-
-    {    # extract from tables
-        my $page    = $mech->content;
-        my @tables  = qw{ master-table structured-comments };
-        my @columns = (
-            '#_of_Contigs',    'Total_length',
-            'Update_date',     'BioProject',
-            'Keywords',        'Organism',
-            'Assembly_Method', 'Assembly_Name',
-            'Genome_Coverage', 'Sequencing_Technology',
-            'Biosource',
-        );
-
-        for my $table (@tables) {
-            print " " x 4 . "Extract from table ", $table, "\n";
-            my $te
-                = HTML::TableExtract->new( attribs => { class => $table, }, );
-            $te->parse($page);
-
-            for my $ts ( $te->table_states ) {
-                for my $row ( $ts->rows ) {
-                    for my $cell (@$row) {
-                        if ($cell) {
-                            $cell =~ s/[,:]//g;
-                            $cell =~ s/^\s+//g;
-                            $cell =~ s/\s+$//g;
-                            $cell =~ s/\s+/ /g;
-                        }
-                    }
-                    next unless $row->[0];
-                    $row->[0] =~ s/\s+/_/g;
-                    next unless grep { $row->[0] eq $_ } @columns;
-
-                    $row->[1] =~ s/\s+.\s+show.+lineage.+$//g;
-                    if ( $row->[0] eq 'Biosource' ) {
-                        my ($biosource_strain)
-                            = grep {/strain = /} grep {defined} split /\//,
-                            $row->[1];
-
-                        #print $row->[1], "\n";
-                        $biosource_strain =~ s/strain = //;
-
-                        #print $biosource_strain, "\n";
-                        $info->{ $row->[0] } = $biosource_strain;
-                    }
-                    else {
-                        $info->{ $row->[0] } = $row->[1];
-                    }
-                }
-            }
-        }
-    }
-
-    {    # taxon id
-        my @links = $mech->find_all_links( url_regex => => qr{wwwtax}, );
-        if ( @links and $links[0]->url =~ /\?id=(\d+)/ ) {
-            $info->{taxon_id} = $1;
-        }
-    }
-
-    {    # pubmed id
-        my @links = $mech->find_all_links( url_regex => => qr{\/pubmed\/}, );
-        if ( @links and $links[0]->url =~ /\/pubmed\/(\d+)/ ) {
-            $info->{pubmed} = $1;
-        }
-    }
-
-    {    # downloads
-        my @links = $mech->find_all_links(
-            text_regex => qr{$term},
-            url_regex  => qr{ftp},
-        );
-        $info->{download} = [ map { $_->url } @links ];
-    }
-
-    return $info;
-}
 
 #@returns Bio::Taxon
 sub find_ancestor {
