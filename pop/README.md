@@ -87,12 +87,16 @@ Genus Trichoderma as example.
     mysql -ualignDB -palignDB ar_genbank -e "SELECT CONCAT(SUBSTRING(wgs_master,1,5), RIGHT(wgs_master,1)) as prefix0, SUBSTRING(wgs_master,1,4) as prefix, organism_name, assembly_level FROM ar WHERE wgs_master != '' AND genus_id = ${GENUS_ID}" \
         >> raw.tsv
 
-    # FIXME: NCBI change API again. Won't work
     # stage2
-    # Combined with NCBI WGS page.
-    curl "http://www.ncbi.nlm.nih.gov/Traces/wgs/?term=${GENUS}&retmode=text&size=all" \
-        | perl -nl -a -F"\t" -e \
-        '$p = substr($F[0],0,4); print qq{$F[0]\t$p\t$F[4]\t$F[5]}' \
+    # Click the 'Download' button in the middle of NCBI WGS page.
+    rm -f ~/Downloads/wgs_selector.csv
+    chrome "https://www.ncbi.nlm.nih.gov/Traces/wgs/?view=wgs&search=${GENUS}"
+    cat ~/Downloads/wgs_selector.csv |
+        perl -nl -a -F"," -e '
+            $p = substr($F[0],0,4);
+            $status = $F[13] > 0 ? q{Scaffold} : q{Contig};
+            print qq{$F[0]\t$p\t$F[4]\t$status}
+        ' \
         >> raw.tsv
 
     cat raw.tsv |
