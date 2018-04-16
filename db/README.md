@@ -4,7 +4,8 @@ Turn NCBI genome reports and assembly reports into query-able MySQL databases.
 
 Also, taxonomy information are added to all items.
 
-[TOC]: # " "
+[TOC levels=1-3]: # " "
+- [`db/`](#db)
 - [Get data from NCBI](#get-data-from-ncbi)
 - [Old Bacteria genomes.](#old-bacteria-genomes)
 - [Databases](#databases)
@@ -12,7 +13,7 @@ Also, taxonomy information are added to all items.
     - [Assembly reports](#assembly-reports)
 
 
-## Get data from NCBI
+# Get data from NCBI
 
 Download paths from NCBI ftp:
 
@@ -42,6 +43,7 @@ rsync -avP ftp.ncbi.nlm.nih.gov::genomes/ASSEMBLY_REPORTS/ \
     --exclude=".tmp" \
     --exclude=".old" \
     ~/data/NCBI/genomes/ASSEMBLY_REPORTS/
+
 ```
 
 NCBI bioproject and taxonomy is also needed.
@@ -87,15 +89,16 @@ rsync -av -P ftp.ncbi.nlm.nih.gov::genomes/archive/old_genbank/Bacteria_DRAFT/ \
     --exclude=".tmp" \
     --exclude=".old" \
     ~/data/NCBI/genbank/genomes/Bacteria_DRAFT/
+
 ```
 
 Newer genomes list in genomes/refseq/bacteria are just symlinks to genomes/all/*.
 
 So local mirrors are no longer needed.
 
-## Databases
+# Databases
 
-We create 4 MySQL databases:
+We will create 4 MySQL databases:
 
 * gr_prok: genome reports for prokaryotes;
 * gr_euk: genome reports for eukaryotes;
@@ -104,7 +107,7 @@ We create 4 MySQL databases:
 
 Also generate some useful excel workbooks.
 
-### Genome reports
+## Genome reports
 
 ```bash
 cd ~/Scripts/withncbi/db
@@ -120,9 +123,10 @@ perl gr_db.pl --db gr_euk --file euk_strains.csv
 # generate .xlsx
 perl gr_overview.pl --db gr_prok
 perl gr_overview.pl --db gr_euk
+
 ```
 
-### Assembly reports
+## Assembly reports
 
 ```bash
 cd ~/Scripts/withncbi/db
@@ -138,5 +142,6 @@ perl ar_overview.pl --db ar_genbank
 
 cp -f *.xlsx ../doc
 rm *.xlsx *.csv
+
 ```
 
