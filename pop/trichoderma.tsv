@@ -1,12 +1,26 @@
 #name	prefix	organism	contigs
-Tatr_IMI_206040	ABDG	Trichoderma atroviride IMI 206040	29
-Tvir_Gv29_8	ABDF	Trichoderma virens Gv29-8	93
-Tree_QM6a	AAIL	Trichoderma reesei QM6a	121
-Tatr_XS2015	JZUQ	Trichoderma atroviride	131
-Tlon_SMF2	ANBJ	Trichoderma longibrachiatum SMF2	316
-Tvir_FT_333	JTGJ	Trichoderma virens FT-333	586
-Tree_RUT_C_30	JABP	Trichoderma reesei RUT C-30	680
-Tpar_	LFMI	Trichoderma parareesei	885
-Thar_B05	JNNP	Trichoderma harzianum	1439
-Thar_T6776	JOKZ	Trichoderma harzianum	1572
-Tham_GD12	ANCB	Trichoderma hamatum GD12	14797
+Tkon_JCM_1883	BCGH01	Trichoderma koningii	13
+Tatr_IMI_206040	ABDG02	Trichoderma atroviride IMI 206040	29
+Tgui_NJAU_4742	LVVK01	Trichoderma guizhouense	63
+Tvir_Gv29_8	ABDF02	Trichoderma virens Gv29-8	93
+Tvir_IMI_304061	LQCH01	Trichoderma virens	107
+Tree_QM6a	AAIL02	Trichoderma reesei QM6a	121
+Tatr_XS2015	JZUQ01	Trichoderma atroviride	131
+Tkon_POS7	MRBD01	Trichoderma koningiopsis	147
+Tree_CBS_999_97	MLIW01	Trichoderma reesei	167
+Tgam_T6085	JPDN02	Trichoderma gamsii	172
+Tgam_A5MH	MTYH01	Trichoderma gamsii	292
+Tlon_SMF2	ANBJ01	Trichoderma longibrachiatum SMF2	316
+Tvir_FT_333	JTGJ01	Trichoderma virens FT-333	586
+Tree_RUT_C_30	JABP01	Trichoderma reesei RUT C-30	680
+Tcit_TUCIM_6016	MBDI01	Trichoderma citrinoviride	754
+Tasp_CBS_433_97_	MBGH01	Trichoderma asperellum CBS 433.97	802
+Thar_CBS_226_95_	MBGI01	Trichoderma harzianum CBS 226.95	841
+Tpar_	LFMI01	Trichoderma parareesei	885
+Tham_GD12	ANCB02	Trichoderma hamatum GD12	960
+Taru_IBT_40837	PXOA01	Trichoderma arundinaceum	1370
+Tbre_IBT_40841	PXNZ01	Trichoderma brevicompactum	1404
+Tasp_B05	JNNP01	Trichoderma asperellum	1439 (1 is dead)
+Tlon_ATCC_18648_	MBDJ01	Trichoderma longibrachiatum ATCC 18648	1489
+Thar_T6776	JOKZ01	Trichoderma harzianum	1572
+Tple_TPhu1	MDJU01	Trichoderma pleuroti	2355

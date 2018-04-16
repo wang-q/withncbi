@@ -20,10 +20,10 @@ Genus Trichoderma as example.
 
     Check NCBI pages
 
-    * http://www.ncbi.nlm.nih.gov/Traces/wgs/?page=1&term=Trichoderma&order=organism
+    * https://www.ncbi.nlm.nih.gov/Traces/wgs/?view=wgs&search=Trichoderma
     * http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?mode=Info&id=5543
-    * http://www.ncbi.nlm.nih.gov/genome/?term=txid5543
-    * http://www.ncbi.nlm.nih.gov/assembly?term=txid5543
+    * http://www.ncbi.nlm.nih.gov/genome/?term=txid5543[Organism:exp]
+    * http://www.ncbi.nlm.nih.gov/assembly?term=txid5543[Organism:exp]
 
     And query a local `ar_genbank` DB. This is just a convenient but not accurate approach,
     especially for sub-species parts.
@@ -47,7 +47,7 @@ Genus Trichoderma as example.
     ORDER BY assembly_level , organism_name
     ```
 
-    For genus contains many species, you should be careful that "Gspe" (G_enus spe_cies) style
+    For genus contains many species, you should be careful that "Gspe" (*G*enus *spe*cies) style
     abbreviation may mix up two or more species.
 
     ```mysql
@@ -78,46 +78,58 @@ Genus Trichoderma as example.
     ```bash
     # stage1
     # Results from sql query.
-    mysql -ualignDB -palignDB ar_refseq -e "SELECT SUBSTRING(wgs_master,1,6) as prefix0, SUBSTRING(wgs_master,1,4) as prefix, organism_name, assembly_level FROM ar WHERE wgs_master != '' AND genus_id = ${GENUS_ID}" \
-    	> raw.tsv
-
-    mysql -ualignDB -palignDB ar_genbank -e "SELECT SUBSTRING(wgs_master,1,6) as prefix0, SUBSTRING(wgs_master,1,4) as prefix, organism_name, assembly_level FROM ar WHERE wgs_master != '' AND genus_id = ${GENUS_ID}" \
-        >> raw.tsv
-
     mysql -ualignDB -palignDB gr_euk -e "SELECT SUBSTRING(wgs,1,6) as prefix0, SUBSTRING(wgs,1,4) as prefix, organism_name, status FROM gr WHERE wgs != '' AND genus_id = ${GENUS_ID}" \
+        > raw.tsv
+
+    mysql -ualignDB -palignDB ar_refseq -e "SELECT CONCAT(SUBSTRING(wgs_master,1,5), RIGHT(wgs_master,1)) as prefix0, SUBSTRING(wgs_master,1,4) as prefix, organism_name, assembly_level FROM ar WHERE wgs_master != '' AND genus_id = ${GENUS_ID}" \
+    	>> raw.tsv
+
+    mysql -ualignDB -palignDB ar_genbank -e "SELECT CONCAT(SUBSTRING(wgs_master,1,5), RIGHT(wgs_master,1)) as prefix0, SUBSTRING(wgs_master,1,4) as prefix, organism_name, assembly_level FROM ar WHERE wgs_master != '' AND genus_id = ${GENUS_ID}" \
         >> raw.tsv
 
+    # FIXME: NCBI change API again. Won't work
     # stage2
     # Combined with NCBI WGS page.
-    curl "http://www.ncbi.nlm.nih.gov/Traces/wgs/?&size=100&term=${GENUS}&retmode=text&size=all" \
+    curl "http://www.ncbi.nlm.nih.gov/Traces/wgs/?term=${GENUS}&retmode=text&size=all" \
         | perl -nl -a -F"\t" -e \
         '$p = substr($F[0],0,4); print qq{$F[0]\t$p\t$F[4]\t$F[5]}' \
         >> raw.tsv
 
-    cat raw.tsv \
-        | perl -nl -a -F"\t" -e \
-        'BEGIN{my %seen}; /^prefix/i and next; $seen{$F[1]}++; $seen{$F[1]} > 1 and next; print' \
+    cat raw.tsv |
+        perl -nl -a -F"\t" -e '
+            BEGIN{my %seen}; 
+            /^prefix/i and next;
+            $seen{$F[1]}++;
+            $seen{$F[1]} > 1 and next;
+            print join(qq{\t}, $F[0], $F[0], $F[2], $F[3]);
+        ' \
         > raw2.tsv
 
     # stage3
     # Run `wgs_prep.pl` to get a crude `raw2.csv`
     perl ~/Scripts/withncbi/taxon/wgs_prep.pl -f raw2.tsv --csvonly
 
-    # FIXME:  @O =split(/ /, $F[3]) just take the first part of sub-species.
+    # FIXME:  @O =split(/ /, $F[3]) just take the first part of sub-species string.
     echo -e '#name\tprefix\torganism\tcontigs' > raw3.tsv
-    cat raw2.csv \
-        | perl -nl -a -F"," -e \
-        '/^prefix/i and next; s/"//g for @F; @O =split(/ /, $F[3]); $F[4] =~ s/\W+/_/g; $name = substr($O[0],0,1) . substr($O[1],0,3) . q{_} . $F[4]; print qq{$name\t$F[0]\t$F[3]\t$F[9]}' \
-        | sort -t$'\t' -k4 -n \
-        | uniq \
+    cat raw2.csv |
+        perl -nl -a -F"," -e '
+            /^prefix/i and next;
+            s/"//g for @F;
+            @O =split(/ /, $F[3]);
+            $F[4] =~ s/\W+/_/g;
+            $name = substr($O[0],0,1) . substr($O[1],0,3) . q{_} . $F[4];
+            print qq{$name\t$F[0]\t$F[3]\t$F[9]}
+        ' |
+        sort -t$'\t' -k4 -n |
+        uniq \
         >> raw3.tsv
 
     mv raw3.tsv ${GENUS}.tsv
 
     # find potential duplicated strains or assemblies
-    cat ${GENUS}.tsv \
-        | perl -nl -a -F"\t" -e 'print $F[0]' \
-        | uniq -c
+    cat ${GENUS}.tsv |
+        perl -nl -a -F"\t" -e 'print $F[0]' |
+        uniq -c
 
     # Edit .tsv, remove duplicated strains, check strain names and comment out poor assemblies.
     # vim ${GENUS}.tsv
