@@ -38,11 +38,14 @@ wgs_prep.pl - prepare WGS materials
         --nofix         @STR    Skip some strains
         --csvonly               only generate the csv file
 
-    perl wgs_prep.pl -a -f trichoderma.tsv -o WGS
+    perl wgs_prep.pl -a -f trichoderma.wgs.tsv -o WGS
+
+    #name	prefix	organism	contigs
+
     Three files will be generated.
-    trichoderma.csv
-    trichoderma.url.txt
-    trichoderma.data.txt
+    trichoderma.wgs.tsv
+    trichoderma.wgs.url.txt
+    trichoderma.wgs.data.yml
 
 =cut
 
