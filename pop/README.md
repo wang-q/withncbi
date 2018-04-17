@@ -10,6 +10,7 @@ Genus Trichoderma as example.
     - [`pop/trichoderma.tsv`](#poptrichodermatsv)
     - [`wgs_prep.pl`](#wgs_preppl)
     - [Download WGS files.](#download-wgs-files)
+    - [Download ASSEMBLY files](#download-assembly-files)
 - [Section 2: create configuration file and generate alignments.](#section-2-create-configuration-file-and-generate-alignments)
 - [Section 3: cleaning.](#section-3-cleaning)
 - [FAQ](#faq)
@@ -73,6 +74,7 @@ Working directory should be `~/data/alignment/trichoderma` in this section.
 export RANK_LEVEL=genus
 export RANK_ID=5543
 export RANK_NAME=trichoderma
+
 mkdir -p ~/data/alignment/${RANK_NAME}            # Working directory
 
 cd ~/data/alignment/${RANK_NAME}
@@ -176,14 +178,6 @@ cat ${RANK_NAME}.wgs.tsv |
 
 ```
 
-```bash
-# Cleaning
-rm raw*.*sv
-unset GENUS_ID
-unset GENUS
-
-```
-
 Put the .tsv file to `~/Scripts/withncbi/pop/` and run `wgs_prep.pl` again. When everything is fine,
 commit the .tsv file.
 
@@ -246,7 +240,7 @@ find WGS -name "*.gz" | parallel -j 4 gzip -t
 
 ```bash
 
-echo -e '#name\tftp_path\torganism\tassembly_level' > ${GENUS}.assembly.tsv
+echo -e '#name\tftp_path\torganism\tassembly_level' > ${RANK_NAME}.assembly.tsv
 
 # comment out unneeded conditions
 mysql -ualignDB -palignDB ar_genbank -e "
@@ -257,7 +251,7 @@ mysql -ualignDB -palignDB ar_genbank -e "
 #        AND wgs_master = ''
 #        AND assembly_level = 'Chromosome'
         AND organism_name != species
-        AND genus_id = ${GENUS_ID}
+        AND ${RANK_LEVEL}_id = ${RANK_ID}
     " |
     perl -nl -a -F"\t" -e '
         /^organism_name/i and next;
@@ -271,22 +265,33 @@ mysql -ualignDB -palignDB ar_genbank -e "
         $name .= q{_} . $n if $n;
         printf qq{%s\t%s\t%s\t%s\n}, $name, $F[2], $F[1], $F[3];
         ' \
-    >> ${GENUS}.assembly.tsv
+    >> ${RANK_NAME}.assembly.tsv
 
 perl ~/Scripts/withncbi/taxon/assembly_prep.pl \
-    -f ${GENUS}.assembly.tsv \
+    -f ${RANK_NAME}.assembly.tsv \
     -o ASSEMBLY
-
-# rsync -avP wangq@173.230.144.105:data/alignment/trichoderma/ ~/data/alignment/trichoderma
 
 ```
 
 ```bash
 cd ~/data/alignment/trichoderma
-bash ASSEMBLY/trichoderma.assembly.sh
+
+bash ASSEMBLY/trichoderma.assembly.rsync.sh
+
+# rsync -avP wangq@173.230.144.105:data/alignment/trichoderma/ ~/data/alignment/trichoderma
+
+bash ASSEMBLY/trichoderma.assembly.collect.sh
 
 ```
 
+```bash
+# Cleaning
+rm raw*.*sv
+unset RANK_LEVEL
+unset RANK_ID
+unset RANK_NAME
+
+```
 
 # Section 2: create configuration file and generate alignments.
 
