@@ -70,11 +70,12 @@ intermediate results on necessary.
 Working directory should be `~/data/alignment/trichoderma` in this section.
 
 ```bash
-export GENUS_ID=5543
-export GENUS=trichoderma
-mkdir -p ~/data/alignment/${GENUS}            # Working directory
+export RANK_LEVEL=genus
+export RANK_ID=5543
+export RANK_NAME=trichoderma
+mkdir -p ~/data/alignment/${RANK_NAME}            # Working directory
 
-cd ~/data/alignment/${GENUS}
+cd ~/data/alignment/${RANK_NAME}
 ```
 
 You can copy & paste the following block of codes as a whole unit.
@@ -89,7 +90,7 @@ mysql -ualignDB -palignDB gr_euk -e "
         organism_name,
         status 
     FROM gr 
-    WHERE wgs != '' AND genus_id = ${GENUS_ID}
+    WHERE wgs != '' AND ${RANK_LEVEL}_id = ${RANK_ID}
     " \
     > raw.tsv
 
@@ -100,7 +101,7 @@ mysql -ualignDB -palignDB ar_refseq -e "
         organism_name,
         assembly_level 
     FROM ar 
-    WHERE wgs_master != '' AND genus_id = ${GENUS_ID}
+    WHERE wgs_master != '' AND ${RANK_LEVEL}_id = ${RANK_ID}
     " \
     >> raw.tsv
 
@@ -111,7 +112,7 @@ mysql -ualignDB -palignDB ar_genbank -e "
         organism_name,
         assembly_level 
     FROM ar 
-    WHERE wgs_master != '' AND genus_id = ${GENUS_ID}
+    WHERE wgs_master != '' AND ${RANK_LEVEL}_id = ${RANK_ID}
     " \
     >> raw.tsv
 
@@ -119,7 +120,7 @@ mysql -ualignDB -palignDB ar_genbank -e "
 # Click the 'Download' button in the middle of NCBI WGS page.
 # NCBI changed its WGS page, make curl defunct
 rm -f ~/Downloads/wgs_selector*.csv
-chrome "https://www.ncbi.nlm.nih.gov/Traces/wgs/?view=wgs&search=${GENUS}"
+chrome "https://www.ncbi.nlm.nih.gov/Traces/wgs/?view=wgs&search=${RANK_NAME}"
 
 # Quit chrome Cmd-Q
 
@@ -163,10 +164,10 @@ cat raw2.csv |
     uniq \
     >> raw3.tsv
 
-mv raw3.tsv ${GENUS}.wgs.tsv
+mv raw3.tsv ${RANK_NAME}.wgs.tsv
 
 # find potential duplicated strains or assemblies
-cat ${GENUS}.wgs.tsv |
+cat ${RANK_NAME}.wgs.tsv |
     perl -nl -a -F"\t" -e 'print $F[0]' |
     uniq -c
 
