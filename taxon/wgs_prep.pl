@@ -150,8 +150,10 @@ $stopwatch->block_message("Generate .csv for info and .url.txt for downloading "
                 # So try looking up this strain in taxonomy dumps
                 print "Fix strain taxon info for $info{name}\n";
                 $info{Organism} = $info{Organism} . " " . $info{Biosource};
-                my $node = $taxon_db->get_taxon( -name => $info{Organism} );
-                if ( !$node ) {
+
+                my $node;
+                eval { $node = $taxon_db->get_taxon( -name => $info{Organism} ); };
+                if ( $@ or !$node ) {
                     print " " x 4, "Can't find taxon for $info{name}\n";
                     $arbitrary++;
                     print " " x 4, "Give it arbitrary id as $arbitrary\n";
