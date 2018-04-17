@@ -2,7 +2,7 @@
 
 Or order, family, species.
 
-Genus Trichoderma as example.
+Genus *Trichoderma* as example.
 
 [TOC levels=1-3]: # " "
 - [Build alignments on an whole Eukaryotes genus](#build-alignments-on-an-whole-eukaryotes-genus)
@@ -237,6 +237,7 @@ find WGS -name "*.gz" | parallel -j 4 gzip -t
 
 ## Download ASSEMBLY files
 
+**Caution**: line endings of *_assembly_report.txt files are CRLF.
 
 ```bash
 
