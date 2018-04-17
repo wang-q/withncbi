@@ -163,15 +163,15 @@ cat raw2.csv |
     uniq \
     >> raw3.tsv
 
-mv raw3.tsv ${GENUS}.tsv
+mv raw3.tsv ${GENUS}.wgs.tsv
 
 # find potential duplicated strains or assemblies
-cat ${GENUS}.tsv |
+cat ${GENUS}.wgs.tsv |
     perl -nl -a -F"\t" -e 'print $F[0]' |
     uniq -c
 
 # Edit .tsv, remove duplicated strains, check strain names and comment out poor assemblies.
-# vim ${GENUS}.tsv
+# vim ${GENUS}.wgs.tsv
 
 ```
 
@@ -232,14 +232,60 @@ cd ~/data/alignment/trichoderma
 aria2c -UWget -x 6 -s 3 -c -i WGS/trichoderma.url.txt
 
 # check downloaded .gz files
-find WGS -name "*.gz" | xargs gzip -t
+find WGS -name "*.gz" | parallel -j 4 gzip -t
 
 # rsync remote files
 # My connection to NCBI isn't stable, so download sequences in a linode VPS.
 # PLEASE don't hack it.
-# rsync -avP ~/data/alignment/trichoderma/ wangq@173.230.144.105:data/alignment/trichoderma
 # rsync -avP wangq@173.230.144.105:data/alignment/trichoderma/ ~/data/alignment/trichoderma
 ```
+
+## Download ASSEMBLY files
+
+
+```bash
+
+echo -e '#name\tftp_path\torganism\tassembly_level' > ${GENUS}.assembly.tsv
+
+# comment out unneeded conditions
+mysql -ualignDB -palignDB ar_genbank -e "
+    SELECT 
+        organism_name, species, ftp_path, assembly_level
+    FROM ar 
+    WHERE 1=1
+#        AND wgs_master = ''
+#        AND assembly_level = 'Chromosome'
+        AND organism_name != species
+        AND genus_id = ${GENUS_ID}
+    " |
+    perl -nl -a -F"\t" -e '
+        /^organism_name/i and next;
+        $n = $F[0];
+        $rx = quotemeta $F[1];
+        $n =~ s/$rx\s*//;
+        $n =~ s/\s+$//;
+        $n =~ s/\W+/_/g;
+        @O = split(/ /, $F[1]);
+        $name = substr($O[0],0,1) . substr($O[1],0,3);
+        $name .= q{_} . $n if $n;
+        printf qq{%s\t%s\t%s\t%s\n}, $name, $F[2], $F[1], $F[3];
+        ' \
+    >> ${GENUS}.assembly.tsv
+
+perl ~/Scripts/withncbi/taxon/assembly_prep.pl \
+    -f ${GENUS}.assembly.tsv \
+    -o ASSEMBLY
+
+# rsync -avP wangq@173.230.144.105:data/alignment/trichoderma/ ~/data/alignment/trichoderma
+
+```
+
+```bash
+cd ~/data/alignment/trichoderma
+bash ASSEMBLY/trichoderma.assembly.sh
+
+```
+
 
 # Section 2: create configuration file and generate alignments.
 
