@@ -5,14 +5,12 @@ use autodie;
 
 use Getopt::Long qw();
 use YAML::Syck qw();
+use Path::Tiny qw();
 
 use Template;
-use Path::Tiny qw();
 use Text::CSV_XS;
-
 use WWW::Mechanize;
 use HTML::TableExtract;
-
 use Bio::DB::Taxonomy;
 
 use AlignDB::Stopwatch;
@@ -33,9 +31,9 @@ wgs_prep.pl - prepare WGS materials
       Options:
         --help      -?          brief help message
 
-        -i, -f, --file      tab seperated file containing wgs prefix and name
-        -o, -d, --dir       output dir
-        --aria2     -a          url file is for aria2
+        --file, -f      STR     tab seperated file containing wgs prefix and name
+        --outdir, -o    STR     output dir
+        --aria2, -a     STR     url file is for aria2
         --fix                   sometimes WGS records miss assigning strain id
         --nofix         @STR    Skip some strains
         --csvonly               only generate the csv file
@@ -53,9 +51,9 @@ my $arbitrary = 100_000_000;
 
 Getopt::Long::GetOptions(
     'help|?'     => sub { Getopt::Long::HelpMessage(0) },
-    'i|f|file=s' => \my $file_input,
-    'o|d|dir=s'  => \my $dir_output,
-    'a|aria2'    => \my $aria2,
+    'file|f=s'   => \my $file_input,
+    'outdir|o=s' => \my $dir_output,
+    'aria2|a'    => \my $aria2,
     'fix'        => \my $fix_strain,
     'nofix=s'    => \my @nofix,
     'csvonly'    => \my $csvonly,
@@ -202,7 +200,7 @@ $stopwatch->block_message("Generate .csv for info and .url.txt for downloading "
             print "find $dir_output -name \"*.gz\" | xargs gzip -t \n";
         }
         else {
-            print "Download urls in file $file_url\n";
+            print "Downloading urls in file $file_url\n";
         }
     }
 }
@@ -234,7 +232,7 @@ EOF
     $tt->process( \$text, { names => [@orig_orders], master => $master, }, $file_data )
         or die Template->error;
 
-    print ".data.txt generated.\n";
+    print ".data.yml generated.\n";
 }
 
 $stopwatch->end_message;
