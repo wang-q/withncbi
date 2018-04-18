@@ -199,8 +199,7 @@ cd ~/data/alignment/${RANK_NAME}
 perl ~/Scripts/withncbi/taxon/wgs_prep.pl \
     -f ~/Scripts/withncbi/pop/${RANK_NAME}.wgs.tsv \
     --fix \
-    -o WGS \
-    -a
+    -o WGS
 
 ```
 
@@ -208,9 +207,9 @@ perl ~/Scripts/withncbi/taxon/wgs_prep.pl \
 
     Various information for WGS projects extracted from NCBI WGS record pages.
 
-2. `trichoderma.wgs.url.txt`
+2. `trichoderma.wgs.rsync.sh`
 
-    Download urls for WGS files.
+    Download WGS files.
 
 3. `trichoderma.wgs.data.yml`
 
@@ -227,9 +226,9 @@ perl ~/Scripts/withncbi/taxon/wgs_prep.pl \
 Download WGS files.
 
 ```bash
-# download with aria2
 cd ~/data/alignment/trichoderma
-aria2c -UWget -x 6 -s 3 -c -i WGS/trichoderma.wgs.url.txt
+
+bash WGS/trichoderma.wgs.rsync.sh
 
 # check downloaded .gz files
 find WGS -name "*.gz" | parallel -j 4 gzip -t
