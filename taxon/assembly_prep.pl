@@ -156,7 +156,7 @@ EOF
 BASE_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 cd ${BASE_DIR}
 
-echo "[% header %]" \
+echo "name,[% header %]" \
     > [% basename %].collect.csv
 
 [% FOREACH n IN names -%]
@@ -173,7 +173,7 @@ find [% n %] -type f -name "*_assembly_report.txt" |
         scalar @O == 2 or next;
         $O[0] =~ s/\s*$//g;
         $O[0] =~ s/\W/_/g;
-        $O[1] =~ /([\w .-]+)/ or next;
+        $O[1] =~ /([\w =.-]+)/ or next;
         $stat{$O[0]} = $1;
 
         END {
@@ -186,7 +186,7 @@ find [% n %] -type f -name "*_assembly_report.txt" |
                     push @c, q{};
                 }
             }
-            print join(q{,}, @c);
+            print join(q{,}, q{[% n %]}, @c);
         }
     ' \
     >> [% basename %].collect.csv
