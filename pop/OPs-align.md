@@ -491,50 +491,6 @@ Manually combine `~/data/alignment/Fungi/GENOMES/scer_wgs/WGS/scer_wgs.csv` and
     sh 7_multi_db_only.sh
     ```
 
-# *Penicillium* WGS
-
-1. `gen_pop_conf.pl`
-
-    Pay attentions to --downloaded orders. The first one will be the default target.
-
-    ```bash
-    mkdir -p ~/data/alignment/Fungi/penicillium
-    cd ~/data/alignment/Fungi/penicillium
-
-    perl ~/Scripts/withncbi/pop/gen_pop_conf.pl \
-        -i ~/data/alignment/Fungi/penicillium/WGS/penicillium.data.yml \
-        -o ~/Scripts/withncbi/pop/penicillium_test.yml \
-        -d ~/data/alignment/Fungi/penicillium/WGS \
-        -m prefix \
-        -r '*.fsa_nt.gz' \
-        --opt group_name=penicillium \
-        --opt base_dir='~/data/alignment/Fungi' \
-        --opt data_dir='~/data/alignment/Fungi/penicillium' \
-        --opt rm_species=Fungi \
-        --opt per_seq_min_contig=30000 \
-        --per_seq Pchr_P2niaD18
-    ```
-
-2. Rest routing things.
-
-    ```bash
-    # pop_prep.pl
-    perl ~/Scripts/withncbi/pop/pop_prep.pl -p 12 -i ~/Scripts/withncbi/pop/penicillium_test.yml
-
-    sh 01_file.sh
-    sh 02_rm.sh
-    sh 03_strain_info.sh
-
-    # plan_ALL.sh
-    sh plan_ALL.sh
-
-    sh 1_real_chr.sh
-    sh 3_pair_cmd.sh
-    sh 4_rawphylo.sh
-    sh 5_multi_cmd.sh
-    sh 7_multi_db_only.sh
-    ```
-
 # *Plasmodium* WGS
 
 1. RM species

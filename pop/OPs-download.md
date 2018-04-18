@@ -7,10 +7,8 @@ WGS, which usually in better assembling levels.
 - [*Saccharomyces* WGS](#saccharomyces-wgs)
 - [Scer_wgs WGS](#scer_wgs-wgs)
 - [Scer_100 ASSEMBLY](#scer_100-assembly)
-- [*Candida* WGS](#candida-wgs)
 - [*Fusarium* WGS](#fusarium-wgs)
 - [*Aspergillus* WGS](#aspergillus-wgs)
-- [*Penicillium* WGS](#penicillium-wgs)
 - [*Plasmodium* WGS](#plasmodium-wgs)
 - [*Plasmodium falciparum* WGS](#plasmodium-falciparum-wgs)
 - [*Arabidopsis* 19 genomes](#arabidopsis-19-genomes)
@@ -169,8 +167,8 @@ WGS, which usually in better assembling levels.
 3. Download strains of *Saccharomyces cerevisiae* at good assembly status.
 
     Click the `Download table` link on the top-right of [Genome
-                            list](http://www.ncbi.nlm.nih.gov/genome/genomes/15), save it as .csv
-    file.
+                                list](http://www.ncbi.nlm.nih.gov/genome/genomes/15), save it as
+    .csv file.
 
     ```bash
     mkdir -p ~/data/alignment/Fungi/GENOMES/scer_wgs/DOWNLOAD
@@ -233,8 +231,8 @@ WGS, which usually in better assembling levels.
 2. Download strains of *Saccharomyces cerevisiae* at good assembly status.
 
     Click the `Download table` link on the top-right of [Genome
-                            list](http://www.ncbi.nlm.nih.gov/genome/genomes/15), save it as .csv
-    file.
+                                list](http://www.ncbi.nlm.nih.gov/genome/genomes/15), save it as
+    .csv file.
 
     ```bash
     mkdir -p ~/data/alignment/Fungi/GENOMES/scer_100/DOWNLOAD
@@ -285,98 +283,6 @@ WGS, which usually in better assembling levels.
     perl ~/Scripts/withncbi/taxon/batch_get_seq.pl \
         -p -f scer_100.seq.csv
 
-    ```
-
-## *Candida* WGS
-
-1. Create `pop/candida.tsv` manually.
-
-    Check NCBI pages
-
-    * http://www.ncbi.nlm.nih.gov/Traces/wgs/?page=1&term=Candida*&order=organism
-    * http://www.ncbi.nlm.nih.gov/assembly?term=txid1535326[Organism:exp]
-    * http://www.ncbi.nlm.nih.gov/genome/?term=txid1535326[Organism:exp]
-
-    The wgs page contains a lot of strains from other genus.
-
-    ```bash
-    export GENUS_ID=1535326
-    export GENUS=candida
-    mkdir -p ~/data/alignment/Fungi/$GENUS          # operation directory
-    mkdir -p ~/data/alignment/Fungi/GENOMES/$GENUS  # sequence directory
-
-    cd ~/data/alignment/Fungi/GENOMES/$GENUS
-
-    ...
-    # Edit raw2.tsv, remove lines containing CANDIDATUS or CANDIDATE DIVISION
-    cat raw2.tsv | grep -v 'CANDIDATUS' | grep -v 'CANDIDATE DIVISION' > tmp.tsv
-    mv tmp.tsv raw2.tsv
-    ...
-
-    # Cleaning
-    rm raw*.*sv
-    unset GENUS_ID
-    unset GENUS
-    ```
-
-2. Create working directory and download WGS sequences.
-
-    ```bash
-    mkdir -p ~/data/alignment/Fungi/GENOMES/candida
-    cd ~/data/alignment/Fungi/GENOMES/candida
-
-    perl ~/Scripts/withncbi/taxon/wgs_prep.pl \
-        -f ~/Scripts/withncbi/pop/candida.tsv \
-        --fix \
-        -o WGS \
-        -a
-
-    aria2c -UWget -x 6 -s 3 -c -i WGS/candida.url.txt
-
-    find WGS -name "*.gz" | xargs gzip -t
-    ```
-
-3. Pick targets.
-
-    ```sql
-    SELECT *
-    FROM gr.gr
-    WHERE genus_id = 1535326
-
-    SELECT
-        organism_name, assembly_accession
-    FROM
-        ar_refseq.ar
-    WHERE
-        genus_id = 1535326
-    ORDER BY organism_name
-    ```
-
-    | assigned name  | organism_name                     | assembly_accession |
-    |:---------------|:----------------------------------|:-------------------|
-    | Cdub_CD36      | *Candida dubliniensis* CD36       | GCF_000026945.1    |
-    | Corh_Co_90_125 | *Candida orthopsilosis* Co 90-125 | GCF_000315875.1    |
-
-    ```bash
-    mkdir -p ~/data/alignment/Fungi/GENOMES/candida/DOWNLOAD
-    cd ~/data/alignment/Fungi/GENOMES/candida/DOWNLOAD
-
-    perl ~/Scripts/withncbi/taxon/assembly_csv.pl \
-        -f ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/All/GCF_000026945.1.assembly.txt \
-        -name Cdub_CD36 \
-        > Cdub_CD36.seq.csv
-
-    perl ~/Scripts/withncbi/taxon/assembly_csv.pl \
-        -f ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/All/GCF_000315875.1.assembly.txt \
-        -name Corh_Co_90_125 \
-        > Corh_Co_90_125.seq.csv
-
-    # Download, rename files and change fasta headers
-    perl ~/Scripts/withncbi/taxon/batch_get_seq.pl \
-        -p -f Cdub_CD36.seq.csv
-
-    perl ~/Scripts/withncbi/taxon/batch_get_seq.pl \
-        -p -f Corh_Co_90_125.seq.csv
     ```
 
 ## *Fusarium* WGS
