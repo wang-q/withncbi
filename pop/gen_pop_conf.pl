@@ -3,15 +3,13 @@ use strict;
 use warnings;
 use autodie;
 
-use Getopt::Long qw(HelpMessage);
-use Config::Tiny;
-use FindBin;
-use YAML qw(Dump Load DumpFile LoadFile);
+use Getopt::Long qw();
+use YAML::Syck qw();
 
 use File::Basename;
 use File::Find::Rule;
 use File::Spec;
-use String::Compare;
+use String::Similarity;
 use List::MoreUtils qw(zip);
 use Set::Scalar;
 
@@ -20,14 +18,7 @@ use AlignDB::Stopwatch;
 #----------------------------------------------------------#
 # GetOpt section
 #----------------------------------------------------------#
-my $Config = Config::Tiny->read("$FindBin::RealBin/../config.ini");
-
-# record ARGV and Config
-my $stopwatch = AlignDB::Stopwatch->new(
-    program_name => $0,
-    program_argv => [@ARGV],
-    program_conf => $Config,
-);
+my $stopwatch = AlignDB::Stopwatch->new();
 
 =head1 NAME
 
@@ -58,30 +49,27 @@ gen_pop_conf.pl - for each @data entries in YAML, find matched files, check para
 
 =cut
 
-#
-
-GetOptions(
-    'help|?'     => sub { HelpMessage(0) },
-    'input|i=s'  => \my $file_input,
-    'output|o=s' => \my $file_output,
-    'dir|d=s'    => \my $dir_scan,
-    'match|m=s' => \( my $match_field = 'name' ),
-    'rule|r=s' => \my @name_rules,
+Getopt::Long::GetOptions(
+    'help|?'      => sub { Getopt::Long::HelpMessage(0) },
+    'input|i=s'   => \my $infile,
+    'output|o=s'  => \my $outfile,
+    'dir|d=s'     => \my $dir_scan,
+    'match|m=s'   => \( my $match_field = 'name' ),
+    'rule|r=s'    => \my @name_rules,
     'pattern|p=s' => \my $pattern,
     'opt=s'       => \my %other_opts,
     'skip=s'      => \my %skip,
     'per_seq=s'   => \my @per_seq,
-    'arbitrary=i' => \( my $arbitrary = 100_000_000 ),
     'dd=s'        => \( my $dir_download = "." ),
     'download=s'  => \my @downloaded,
     'plan=s'      => \my @plan,
     'yes|y'       => \my $yes,
-) or HelpMessage(1);
+) or Getopt::Long::HelpMessage(1);
 
-die "Need a YAML file" unless $file_input;
+die "Need a YAML file" unless $infile;
 
-unless ($file_output) {
-    $file_output = $file_input;
+unless ($outfile) {
+    $outfile = $infile;
 }
 
 my %per_seq = map { $_ => 1 } @per_seq;
@@ -96,7 +84,7 @@ unless ( scalar @name_rules ) {
 $stopwatch->start_message;
 
 $stopwatch->block_message("Load YAML");
-my $yml  = LoadFile($file_input);
+my $yml  = YAML::Syck::LoadFile($infile);
 my @data = @{ $yml->{data} };
 
 if ( defined $dir_scan and -d $dir_scan ) {
@@ -119,7 +107,7 @@ if ( defined $dir_scan and -d $dir_scan ) {
         # match the most similar name
         my ($fasta) = map { $_->[0] }
             sort { $b->[1] <=> $a->[1] }
-            map { [ $_, compare( $_, $item->{$match_field} ) ] }
+            map { [ $_, similarity( $_, $item->{$match_field} ) ] }
             keys %{$file_of};
         $item->{fasta} = $file_of->{$fasta};
         printf " " x 4 . "%s => %s => %s\n", $item->{$match_field}, $fasta, $item->{fasta};
@@ -156,8 +144,7 @@ for my $item (@data) {
 # arbitrary ids
 for my $item (@data) {
     if ( !exists $item->{taxon} ) {
-        $arbitrary++;
-        $item->{taxon} = $arbitrary;
+        $item->{taxon} = 0;
     }
 }
 
@@ -233,26 +220,26 @@ for my $key ( sort keys %other_opts ) {
     $yml->{$key} = $other_opts{$key};
 }
 
-if ( -e $file_output ) {
-    if ( $file_input ne $file_output ) {
+if ( -e $outfile ) {
+    if ( $infile ne $outfile ) {
         if ($yes) {
-            $stopwatch->block_message("Write YAML [$file_output]");
-            DumpFile( $file_output, $yml );
+            $stopwatch->block_message("Write YAML [$outfile]");
+            YAML::Syck::DumpFile( $outfile, $yml );
         }
         else {
             $stopwatch->block_message("NOTICE");
             print
-                "[$file_output] exists and may contain manually added infomaton. Don't overwrite it.\n";
+                "[$outfile] exists and may contain manually added information. Don't overwrite it.\n";
         }
     }
     else {
-        $stopwatch->block_message("Update YAML [$file_output]");
-        DumpFile( $file_output, $yml );
+        $stopwatch->block_message("Update YAML [$outfile]");
+        YAML::Syck::DumpFile( $outfile, $yml );
     }
 }
 else {
-    $stopwatch->block_message("Write YAML [$file_output]");
-    DumpFile( $file_output, $yml );
+    $stopwatch->block_message("Write YAML [$outfile]");
+    YAML::Syck::DumpFile( $outfile, $yml );
 }
 
 $stopwatch->end_message;
