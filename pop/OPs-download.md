@@ -75,7 +75,7 @@ WGS, which usually in better assembling levels.
     find WGS -name "*.gz" | xargs gzip -t
     ```
 
-3. Download sequences from NCBI assembly
+- Download sequences from NCBI assembly
 
     This step is totally manual operation. **Be careful.**
 
@@ -169,7 +169,8 @@ WGS, which usually in better assembling levels.
 3. Download strains of *Saccharomyces cerevisiae* at good assembly status.
 
     Click the `Download table` link on the top-right of [Genome
-                    list](http://www.ncbi.nlm.nih.gov/genome/genomes/15), save it as .csv file.
+                            list](http://www.ncbi.nlm.nih.gov/genome/genomes/15), save it as .csv
+    file.
 
     ```bash
     mkdir -p ~/data/alignment/Fungi/GENOMES/scer_wgs/DOWNLOAD
@@ -232,7 +233,8 @@ WGS, which usually in better assembling levels.
 2. Download strains of *Saccharomyces cerevisiae* at good assembly status.
 
     Click the `Download table` link on the top-right of [Genome
-                    list](http://www.ncbi.nlm.nih.gov/genome/genomes/15), save it as .csv file.
+                            list](http://www.ncbi.nlm.nih.gov/genome/genomes/15), save it as .csv
+    file.
 
     ```bash
     mkdir -p ~/data/alignment/Fungi/GENOMES/scer_100/DOWNLOAD
@@ -245,10 +247,10 @@ WGS, which usually in better assembling levels.
         > S288c.seq.csv
 
     mysql -ualignDB -palignDB ar_genbank -e "
-        SELECT organism_name, species, ftp_path 
-        FROM ar 
-        WHERE wgs_master = '' 
-        AND organism_name != species 
+        SELECT organism_name, species, ftp_path
+        FROM ar
+        WHERE wgs_master = ''
+        AND organism_name != species
         AND species_id = 4932
         " \
         | perl -nl -a -F"\t" -e '
@@ -574,71 +576,6 @@ WGS, which usually in better assembling levels.
     perl ~/Scripts/withncbi/taxon/batch_get_seq.pl \
         -p -f Anid_FGSC_A4.seq.csv
     ```
-
-## *Penicillium* WGS
-
-1. Create `pop/penicillium.tsv` manually.
-
-    * http://www.ncbi.nlm.nih.gov/Traces/wgs/?page=1&term=penicillium&order=organism
-    * http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?mode=Info&id=5073
-    * http://www.ncbi.nlm.nih.gov/assembly?term=txid5073[Organism:exp]
-    * http://www.ncbi.nlm.nih.gov/genome/?term=txid5073[Organism:exp]
-
-    ```bash
-    export GENUS_ID=5073
-    export GENUS=penicillium
-    mkdir -p ~/data/alignment/Fungi/$GENUS          # operation directory
-    mkdir -p ~/data/alignment/Fungi/GENOMES/$GENUS  # sequence directory
-
-    cd ~/data/alignment/Fungi/GENOMES/$GENUS
-
-    ...
-
-    # Cleaning
-    rm raw*.*sv
-    unset GENUS_ID
-    unset GENUS
-    ```
-
-2. Create working directory and download WGS sequences.
-
-    ```bash
-    mkdir -p ~/data/alignment/Fungi/GENOMES/penicillium
-    cd ~/data/alignment/Fungi/GENOMES/penicillium
-
-    perl ~/Scripts/withncbi/taxon/wgs_prep.pl \
-        -f ~/Scripts/withncbi/pop/penicillium.tsv \
-        --fix \
-        -o WGS \
-        -a
-
-    aria2c -UWget -x 6 -s 3 -c -i WGS/penicillium.url.txt
-
-    find WGS -name "*.gz" | xargs gzip -t
-    ```
-
-3. Pick targets.
-
-    ```mysql
-    SELECT *
-    FROM gr_euk.gr
-    WHERE genus_id = 5073;
-
-    SELECT
-        *
-    FROM
-        ar_genbank.ar
-    WHERE
-        genus_id = 5073
-    ORDER BY organism_name;
-    ```
-
-    There're no good target. Pchr_P2niaD18 is the only one on chromosome level, but is not de novo
-    assembled and hasn't annotations.
-
-    | assigned name | organism_name                      | assembly_accession |
-    |:--------------|:-----------------------------------|:-------------------|
-    | Pchr_P2niaD18 | *Penicillium chrysogenum* P2niaD18 | GCA_000710275.1    |
 
 ## *Plasmodium* WGS
 
