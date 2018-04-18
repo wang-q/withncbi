@@ -192,7 +192,7 @@ fasta and project description manually.
 cd ~/data/alignment/trichoderma
 
 perl ~/Scripts/withncbi/taxon/wgs_prep.pl \
-    -f ~/Scripts/withncbi/pop/trichoderma.tsv \
+    -f ~/Scripts/withncbi/pop/trichoderma.wgs.tsv \
     --fix \
     -o WGS \
     -a
@@ -237,6 +237,15 @@ find WGS -name "*.gz" | parallel -j 4 gzip -t
 
 ## Download ASSEMBLY files
 
+```bash
+export RANK_LEVEL=genus
+export RANK_ID=5543
+export RANK_NAME=trichoderma
+
+mkdir -p ~/data/alignment/${RANK_NAME}            # Working directory
+
+cd ~/data/alignment/${RANK_NAME}
+```
 
 ```bash
 
@@ -296,6 +305,81 @@ unset RANK_ID
 unset RANK_NAME
 
 ```
+
+# Section 2: Prepare sequences for `egaz`
+
+```bash
+cd ~/data/alignment/trichoderma
+
+mkdir -p GENOMES
+
+# Sanger
+for perseq in Tree_QM6a Tvir_Gv29_8 Tatr_IMI_206040; do
+    echo ASSEMBLY/${perseq}; 
+done |
+    parallel --no-run-if-empty --linebuffer -k -j 2 '
+        echo >&2 "==> {/}"
+        
+        if [ -d GENOMES/{/} ]; then
+            echo >&2 "    GENOMES/{/} presents"
+            exit;
+        fi
+        
+        FILE_FA=$(ls {} | grep "_genomic.fna.gz" | grep -v "_from_")
+        echo >&2 "==> Processing {}/${FILE_FA}"
+
+        egaz prepseq \
+            {}/${FILE_FA} \
+            -o GENOMES/{/} \
+            --min 50000 --gi -v --repeatmasker "--species Fungi --parallel 8"
+            
+        FILE_GFF=$(ls {} | grep "_genomic.gff.gz")
+        echo >&2 "==> Processing {}/${FILE_GFF}"
+        
+        gzip -d -c {}/${FILE_GFF} > GENOMES/{/}/chr.gff
+    '
+
+# Other assemblies
+find ASSEMBLY -maxdepth 1 -type d -path "*/????*" |
+    parallel --no-run-if-empty --linebuffer -k -j 2 '
+        echo >&2 "==> {/}"
+        
+        if [ -d GENOMES/{/} ]; then
+            echo >&2 "    GENOMES/{/} presents"
+            exit;
+        fi
+
+        FILE_FA=$(ls {} | grep "_genomic.fna.gz" | grep -v "_from_")
+    
+        egaz prepseq \
+            {}/${FILE_FA} \
+            -o GENOMES/{/} \
+            --about 5000000 \
+            --min 5000 --gi -v --repeatmasker "--species Fungi --parallel 8" 
+            
+        FILE_GFF=$(ls {} | grep "_genomic.gff.gz")
+        echo >&2 "==> Processing {}/${FILE_GFF}"
+        
+        gzip -d -c {}/${FILE_GFF} > GENOMES/{/}/chr.gff
+    '
+
+# WGS
+find ASSEMBLY -maxdepth 1 -type d -path "*/????*" |
+    parallel --no-run-if-empty --linebuffer -k -j 2 '
+        echo >&2 "==> {/}"
+        
+        if [ -d GENOMES/{/} ]; then
+            echo >&2 "    GENOMES/{/} presents"
+            exit;
+        fi
+
+    '
+
+
+```
+
+
+
 
 # Section 2: create configuration file and generate alignments.
 
