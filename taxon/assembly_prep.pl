@@ -25,7 +25,7 @@ assembly_prep.pl - prepare ASSEMBLY materials
 
     perl assembly_prep.pl [options]
       Options:
-        --help      -?          brief help message
+        --help, -?              brief help message
 
         --file, -f      STR     tab seperated file containing wgs prefix and name
         --outdir, -o    STR     output dir
@@ -35,11 +35,14 @@ assembly_prep.pl - prepare ASSEMBLY materials
 
     #name   ftp_path    organism    assembly_level
 
-    Two files will be generated.
-    trichoderma.assembly.rsync.sh
-    trichoderma.assembly.collect.sh
+    Two files will be generated:
 
-    The latter one will create trichoderma.assembly.collect.csv
+        trichoderma.assembly.rsync.sh
+        trichoderma.assembly.collect.sh
+
+    The latter one will create:
+
+        trichoderma.assembly.collect.csv
 
 =cut
 
@@ -47,7 +50,6 @@ Getopt::Long::GetOptions(
     'help|?'     => sub { Getopt::Long::HelpMessage(0) },
     'file|f=s'   => \my $infile,
     'outdir|o=s' => \( my $outdir = "." ),
-    'csvonly'    => \my $csvonly,
 ) or Getopt::Long::HelpMessage(1);
 
 #----------------------------------------------------------#
