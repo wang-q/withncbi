@@ -34,7 +34,7 @@ export RANK_NAME=candida
 mkdir -p ~/data/alignment/${RANK_NAME}            # Working directory
 cd ~/data/alignment/${RANK_NAME}
 
-... # paste codes from README.md#poptrichodermawgstsv
+... # paste codes from README.md
 
 # Cleaning
 rm raw*.*sv
@@ -60,12 +60,12 @@ find WGS -name "*.gz" | parallel -j 4 gzip -t
 
 ## candida: assembly
 
-Same as [here](README.md#download-assembly-files)
+Same as [here](README.md#assembly_preppl)
 
 ```bash
 cd ~/data/alignment/${RANK_NAME}
 
-... # paste codes from README.md#download-assembly-files
+... # paste codes from README.md
 
 unset RANK_LEVEL
 unset RANK_ID
@@ -84,6 +84,9 @@ bash ASSEMBLY/candida.assembly.rsync.sh
 bash ASSEMBLY/candida.assembly.collect.sh
 
 ```
+
+    --plan 'name=four_way;t=Cdub_CD36;qs=Corh_Co_90_125,Calb_WO_1,Ctro_MYA_3404'
+    --plan 'name=four_way_2;t=Corh_Co_90_125;qs=Cdub_CD36,Calb_WO_1,Ctro_MYA_3404'
 
 # *Penicillium*
 
@@ -104,7 +107,7 @@ export RANK_NAME=penicillium
 mkdir -p ~/data/alignment/${RANK_NAME}            # Working directory
 cd ~/data/alignment/${RANK_NAME}
 
-... # paste codes from README.md#poptrichodermawgstsv
+... # paste codes from README.md
 
 # Cleaning
 rm raw*.*sv
@@ -130,12 +133,12 @@ find WGS -name "*.gz" | xargs gzip -t
 
 ## penicillium: assembly
 
-Same as [here](README.md#download-assembly-files)
+Same as [here](README.md#assembly_preppl)
 
 ```bash
 cd ~/data/alignment/${RANK_NAME}
 
-... # paste codes from README.md#download-assembly-files
+... # paste codes from README.md
 
 unset RANK_LEVEL
 unset RANK_ID

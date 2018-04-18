@@ -8,10 +8,8 @@ WGS, which usually in better assembling levels.
 - [*Saccharomyces* WGS](#saccharomyces-wgs)
 - [Scer_wgs WGS](#scer_wgs-wgs)
 - [Scer_100 ASSEMBLY](#scer_100-assembly)
-- [*Candida* WGS](#candida-wgs)
 - [*Fusarium* WGS](#fusarium-wgs)
 - [*Aspergillus* WGS](#aspergillus-wgs)
-- [*Penicillium* WGS](#penicillium-wgs)
 - [*Plasmodium* WGS](#plasmodium-wgs)
 - [*Plasmodium falciparum* WGS](#plasmodium-falciparum-wgs)
 - [*Arabidopsis* 19 genomes](#arabidopsis-19-genomes)
@@ -315,65 +313,6 @@ Manually combine `~/data/alignment/Fungi/GENOMES/scer_wgs/WGS/scer_wgs.csv` and
     # other plans
     sh plan_og_spar.sh
 
-    sh 5_multi_cmd.sh
-    sh 7_multi_db_only.sh
-    ```
-
-# *Candida* WGS
-
-1. `gen_pop_conf.pl`
-
-    Pay attentions to --downloaded orders. The first one will be the default target.
-
-    ```bash
-    mkdir -p ~/data/alignment/Fungi/candida
-    cd ~/data/alignment/Fungi/candida
-
-    perl ~/Scripts/withncbi/pop/gen_pop_conf.pl \
-        -i ~/data/alignment/Fungi/candida/WGS/candida.data.yml \
-        -o ~/Scripts/withncbi/pop/candida_test.yml \
-        -d ~/data/alignment/Fungi/candida/WGS \
-        -m prefix \
-        -r '*.fsa_nt.gz' \
-        --opt group_name=candida \
-        --opt base_dir='~/data/alignment/Fungi' \
-        --opt data_dir='~/data/alignment/Fungi/candida' \
-        --opt rm_species=Fungi \
-        --dd ~/data/alignment/Fungi/candida/DOWNLOAD \
-        --download 'name=Cdub_CD36;taxon=573826;sciname=Candida dubliniensis CD36' \
-        --download 'name=Corh_Co_90_125;taxon=1136231;sciname=Candida orthopsilosis Co 90-125' \
-        --plan 'name=four_way;t=Cdub_CD36;qs=Corh_Co_90_125,Calb_WO_1,Ctro_MYA_3404' \
-        --plan 'name=four_way_2;t=Corh_Co_90_125;qs=Cdub_CD36,Calb_WO_1,Ctro_MYA_3404'
-    ```
-
-2. Rest routing things.
-
-    ```bash
-    # pop_prep.pl
-    perl ~/Scripts/withncbi/pop/pop_prep.pl -p 12 -i ~/Scripts/withncbi/pop/candida_test.yml
-
-    sh 01_file.sh
-    sh 02_rm.sh
-    sh 03_strain_info.sh
-
-    # plan_ALL.sh
-    sh plan_ALL.sh
-
-    sh 1_real_chr.sh
-    sh 3_pair_cmd.sh
-    sh 4_rawphylo.sh
-    sh 5_multi_cmd.sh
-    sh 7_multi_db_only.sh
-
-    # other plans
-    sh plan_four_way.sh
-
-    sh 5_multi_cmd.sh
-    sh 7_multi_db_only.sh
-
-    sh plan_four_way_2.sh
-
-    sh 3_pair_cmd.sh # Only do this when target switched
     sh 5_multi_cmd.sh
     sh 7_multi_db_only.sh
     ```
