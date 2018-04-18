@@ -237,7 +237,6 @@ find WGS -name "*.gz" | parallel -j 4 gzip -t
 
 ## Download ASSEMBLY files
 
-**Caution**: line endings of *_assembly_report.txt files are CRLF.
 
 ```bash
 
@@ -273,6 +272,10 @@ perl ~/Scripts/withncbi/taxon/assembly_prep.pl \
     -o ASSEMBLY
 
 ```
+
+Information of assemblies are collected from *_assembly_report.txt *after* downloading.
+
+**Caution**: line endings of *_assembly_report.txt files are `CRLF`.
 
 ```bash
 cd ~/data/alignment/trichoderma
