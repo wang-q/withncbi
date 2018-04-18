@@ -33,7 +33,6 @@ wgs_prep.pl - prepare WGS materials
 
         --file, -f      STR     tab seperated file containing wgs prefix and name
         --outdir, -o    STR     output dir
-        --aria2, -a     STR     url file is for aria2
         --fix                   sometimes WGS records miss assigning strain id
         --nofix         @STR    Skip some strains
         --csvonly               only generate the csv file
@@ -43,9 +42,10 @@ wgs_prep.pl - prepare WGS materials
     #name	prefix	organism	contigs
 
     Three files will be generated.
-    trichoderma.wgs.tsv
-    trichoderma.wgs.url.txt
-    trichoderma.wgs.data.yml
+
+        trichoderma.wgs.csv
+        trichoderma.wgs.rsync.sh
+        trichoderma.wgs.data.yml
 
 =cut
 
@@ -54,15 +54,12 @@ my $arbitrary = 100_000_000;
 
 Getopt::Long::GetOptions(
     'help|?'     => sub { Getopt::Long::HelpMessage(0) },
-    'file|f=s'   => \my $file_input,
-    'outdir|o=s' => \my $dir_output,
-    'aria2|a'    => \my $aria2,
+    'file|f=s'   => \my $infile,
+    'outdir|o=s' => \( my $outdir = "." ),
     'fix'        => \my $fix_strain,
     'nofix=s'    => \my @nofix,
     'csvonly'    => \my $csvonly,
 ) or Getopt::Long::HelpMessage(1);
-
-$dir_output = "." unless $dir_output;
 
 #----------------------------------------------------------#
 # init
@@ -74,13 +71,13 @@ my $taxon_db = Bio::DB::Taxonomy->new( -source => 'entrez', );
 #----------------------------#
 # Read
 #----------------------------#
-$stopwatch->block_message("Load $file_input.");
-my $basename = Path::Tiny::path($file_input)->basename( ".txt", ".tab", ".tsv" );
+$stopwatch->block_message("Load $infile.");
+my $basename = Path::Tiny::path($infile)->basename( ".txt", ".tab", ".tsv" );
 
 my $wgsid_of = {};
 my @orig_orders;
 {
-    my @lines = Path::Tiny::path($file_input)->lines;
+    my @lines = Path::Tiny::path($infile)->lines;
     for my $line (@lines) {
         chomp $line;
         $line =~ /^#/ and next;
@@ -110,17 +107,17 @@ my $master = {};
 }
 
 #----------------------------#
-# csv and url
+# csv and rsync
 #----------------------------#
 $stopwatch->block_message("Generate .csv for info and .url.txt for downloading ");
 {
-    mkdir $dir_output unless -d $dir_output;
+    mkdir $outdir unless -d $outdir;
 
     my $csv = Text::CSV_XS->new( { binary => 1 } )
         or die "Cannot use CSV: " . Text::CSV_XS->error_diag;
     $csv->eol("\n");
 
-    my $file_csv = Path::Tiny::path( $dir_output, "$basename.csv" )->stringify;
+    my $file_csv = Path::Tiny::path( $outdir, "$basename.csv" )->stringify;
 
     open my $csv_fh, ">", $file_csv;
 
@@ -176,34 +173,44 @@ $stopwatch->block_message("Generate .csv for info and .url.txt for downloading "
     print ".csv generated.\n";
 
     if ( !$csvonly ) {
-        my $file_url = Path::Tiny::path( $dir_output, "$basename.url.txt" )->stringify;
-        open my $url_fh, ">", $file_url;
-        for my $key (@orig_orders) {
+        my $file_rsync = Path::Tiny::path( $outdir, "$basename.rsync.sh" );
+        $file_rsync->remove if $file_rsync->is_file;
 
+        $file_rsync->append(
+            <<'EOF'
+#!/bin/bash
+
+BASE_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+cd ${BASE_DIR}
+
+EOF
+        );
+
+        for my $key (@orig_orders) {
             my %info = %{ $master->{$key} };
 
-            my @downloads = @{ $info{download} };
-            if ($aria2) {
-                for (@downloads) {
-                    print {$url_fh} $_, "\n";
-                    print {$url_fh} "  dir=", "$dir_output/$key", "\n";
-                }
-            }
-            else {
-                print {$url_fh} $_, "\n" for @downloads;
+            my ($ftp) = grep {/\.fsa_nt\.gz/} @{ $info{download} };
+
+            # ftp   - ftp://ftp.ncbi.nlm.nih.gov/sra/wgs_aux/JY/NM/JYNM02/JYNM02.1.fsa_nt.gz
+            # rsync - ftp.ncbi.nlm.nih.gov::sra/wgs_aux/JY/NM/JYNM02/JYNM02.1.fsa_nt.gz
+
+            my $rsync = $ftp;
+            $rsync =~ s/ftp:\/\/ftp.ncbi.nlm.nih.gov\//ftp.ncbi.nlm.nih.gov::/;
+            if ( $rsync eq $ftp ) {
+                die "Check the ftp url: [$key] $ftp\n";
             }
 
-        }
-        close $url_fh;
-        if ($aria2) {
-            print "# Run the follow cmd to download with aria2c\n";
-            print "aria2c -UWget -x 6 -s 3 -c -i $file_url\n";
-            print "\n";
-            print "# Use the following cmd to check .gz files\n";
-            print "find $dir_output -name \"*.gz\" | xargs gzip -t \n";
-        }
-        else {
-            print "Downloading urls in file $file_url\n";
+            $rsync =~ s/\/[\w.]+fsa_nt\.gz$//;
+
+            $file_rsync->append(
+                <<"EOF"
+echo >&2
+echo >&2 "==> $key"
+mkdir -p $key
+rsync -avP $rsync/ $key/
+
+EOF
+            );
         }
     }
 }
@@ -214,7 +221,7 @@ $stopwatch->block_message("Generate .csv for info and .url.txt for downloading "
 if ( !$csvonly ) {
     $stopwatch->block_message("Generate .data.yml");
 
-    my $file_data = Path::Tiny::path( $dir_output, "$basename.data.yml" )->stringify;
+    my $file_data = Path::Tiny::path( $outdir, "$basename.data.yml" )->stringify;
 
     my $text = <<'EOF';
 ---
