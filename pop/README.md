@@ -9,11 +9,10 @@ Genus *Trichoderma* as example.
 - [Section 1: select strains and download sequences.](#section-1-select-strains-and-download-sequences)
     - [`pop/trichoderma.wgs.tsv`](#poptrichodermawgstsv)
     - [`wgs_prep.pl`](#wgs_preppl)
-    - [Download WGS files.](#download-wgs-files)
-    - [Download ASSEMBLY files](#download-assembly-files)
+    - [`assembly_prep.pl`](#assembly_preppl)
 - [Section 2: prepare sequences for `egaz`](#section-2-prepare-sequences-for-egaz)
-- [Section 2: create configuration file and generate alignments.](#section-2-create-configuration-file-and-generate-alignments)
-- [Section 3: cleaning.](#section-3-cleaning)
+- [Section 3: generate alignments](#section-3-generate-alignments)
+- [Section 4: cleaning](#section-4-cleaning)
 - [FAQ](#faq)
 
 
@@ -121,8 +120,9 @@ mysql -ualignDB -palignDB ar_genbank -e "
     >> raw.tsv
 
 # stage2
-# Click the 'Download' button in the middle of NCBI WGS page.
 # NCBI changed its WGS page, make curl defunct
+# Click on the 'Taxonomic Groups' on the left panel
+# Click the 'Download' button in the middle of NCBI WGS page.
 rm -f ~/Downloads/wgs_selector*.csv
 chrome "https://www.ncbi.nlm.nih.gov/Traces/wgs/?view=wgs&search=${RANK_NAME}"
 
@@ -178,6 +178,9 @@ cat ${RANK_NAME}.wgs.tsv |
 # Edit .tsv, remove duplicated strains, check strain names and comment out poor assemblies.
 # vim ${GENUS}.wgs.tsv
 
+# Cleaning
+rm raw*.*sv
+
 ```
 
 ## `wgs_prep.pl`
@@ -201,15 +204,15 @@ perl ~/Scripts/withncbi/taxon/wgs_prep.pl \
 
 ```
 
-1. `trichoderma.csv`
+1. `trichoderma.wgs.csv`
 
     Various information for WGS projects extracted from NCBI WGS record pages.
 
-2. `trichoderma.url.txt`
+2. `trichoderma.wgs.url.txt`
 
     Download urls for WGS files.
 
-3. `trichoderma.data.yml`
+3. `trichoderma.wgs.data.yml`
 
     ```yaml
     ---
@@ -221,12 +224,12 @@ perl ~/Scripts/withncbi/taxon/wgs_prep.pl \
         coverage: '8.26x Sanger'
     ```
 
-## Download WGS files.
+Download WGS files.
 
 ```bash
 # download with aria2
-cd ~/data/alignment/${RANK_NAME}
-aria2c -UWget -x 6 -s 3 -c -i WGS/${RANK_NAME}.url.txt
+cd ~/data/alignment/trichoderma
+aria2c -UWget -x 6 -s 3 -c -i WGS/trichoderma.wgs.url.txt
 
 # check downloaded .gz files
 find WGS -name "*.gz" | parallel -j 4 gzip -t
@@ -237,7 +240,7 @@ find WGS -name "*.gz" | parallel -j 4 gzip -t
 # rsync -avP wangq@173.230.144.105:data/alignment/trichoderma/ ~/data/alignment/trichoderma
 ```
 
-## Download ASSEMBLY files
+## `assembly_prep.pl`
 
 ```bash
 
@@ -279,19 +282,17 @@ Information of assemblies are collected from *_assembly_report.txt *after* downl
 **Caution**: line endings of *_assembly_report.txt files are `CRLF`.
 
 ```bash
-cd ~/data/alignment/${RANK_NAME}
+cd ~/data/alignment/trichoderma
 
-bash ASSEMBLY/${RANK_NAME}.assembly.rsync.sh
+bash ASSEMBLY/trichoderma.assembly.rsync.sh
 
 # rsync -avP wangq@173.230.144.105:data/alignment/trichoderma/ ~/data/alignment/trichoderma
 
-bash ASSEMBLY/${RANK_NAME}.assembly.collect.sh
+bash ASSEMBLY/trichoderma.assembly.collect.sh
 
 ```
 
 ```bash
-# Cleaning
-rm raw*.*sv
 
 unset RANK_LEVEL
 unset RANK_ID
@@ -300,6 +301,9 @@ unset RANK_NAME
 ```
 
 # Section 2: prepare sequences for `egaz`
+
+* `perseq` mean split fasta by names, target or good assembles should set it
+* `--species Fungi` specify the species or clade of this group for RepeatMasker
 
 ```bash
 cd ~/data/alignment/trichoderma
@@ -357,7 +361,7 @@ find ASSEMBLY -maxdepth 1 -type d -path "*/????*" |
     '
 
 # WGS
-find ASSEMBLY -maxdepth 1 -type d -path "*/????*" |
+find WGS -maxdepth 1 -type d -path "*/????*" |
     parallel --no-run-if-empty --linebuffer -k -j 2 '
         echo >&2 "==> {/}"
         
@@ -366,108 +370,46 @@ find ASSEMBLY -maxdepth 1 -type d -path "*/????*" |
             exit;
         fi
 
+        FILE_FA=$(ls {} | grep ".fsa_nt.gz")
+    
+        egaz prepseq \
+            {}/${FILE_FA} \
+            -o GENOMES/{/} \
+            --about 5000000 \
+            --min 5000 --gi -v --repeatmasker "--species Fungi --parallel 8" 
     '
 
 
 ```
 
+# Section 3: generate alignments
 
+* Rsync to hpcc
 
+```bash
+rsync -avP \
+    ~/data/alignment/trichoderma/ \
+    wangq@202.119.37.251:data/alignment/trichoderma
 
-# Section 2: create configuration file and generate alignments.
+# rsync -avP wangq@202.119.37.251:data/alignment/trichoderma/ ~/data/alignment/trichoderma
 
-Working directory should be `~/data/alignment/Fungi/trichoderma` in this section.
+```
 
-1. Use `gen_pop_conf.pl` find matched files for each data entries in YAML and store extra options.
+```bash
+cd ~/data/alignment/trichoderma
 
-    * `per_seq` mean split fasta by names, target or good assembles should set it.
-    * `skip` mean skip this strain.
-    * `--opt rm_species=Fungi` specify the species or clade of this group for RepeatMasker.
-    * `--opt min_contig=5000` to exclude short contigs.
-    * `--opt per_seq_min_contig=20000` to exclude more short contigs for potential target.
-    * The script will not overwrite existing .yml file by default, use `-y` to force it.
+egaz template \
+    GENOMES/Tatr_IMI_206040 \
+    $(find GENOMES -maxdepth 1 -type d -path "*/????*" | grep -v "Tatr_IMI_206040") \
+    --multi --rawphylo -o multi/ --parallel 8 -v
 
-    ```bash
-    mkdir -p ~/data/alignment/Fungi/trichoderma
-    cd ~/data/alignment/Fungi/trichoderma
+bash multi/1_pair.sh
+bash multi/2_rawphylo.sh
+bash multi/3_multi.sh
 
-    perl ~/Scripts/withncbi/pop/gen_pop_conf.pl \
-        -i ~/data/alignment/Fungi/GENOMES/trichoderma/WGS/trichoderma.data.yml \
-        -o ~/Scripts/withncbi/pop/trichoderma_test.yml \
-        -d ~/data/alignment/Fungi/GENOMES/trichoderma/WGS \
-        -m prefix \
-        -r '*.fsa_nt.gz' \
-        --opt group_name=trichoderma \
-        --opt base_dir='~/data/alignment/Fungi/' \
-        --opt data_dir='~/data/alignment/Fungi/trichoderma' \
-        --opt rm_species=Fungi \
-        --opt min_contig=5000 \
-        --opt per_seq_min_contig=30000 \
-        --plan 'name=four_way;t=Tatr_IMI_206040;qs=Tatr_XS2015,Tree_QM6a,Tvir_Gv29_8' \
-        --skip Tham_GD12='contigs are too short' \
-        --per_seq Tatr_IMI_206040
-    ```
+```
 
-2. Edit `pop/trichoderma_test.yml` on necessary.
-
-    The following cmd refresh existing YAML file.
-
-    ```bash
-    perl ~/Scripts/withncbi/pop/gen_pop_conf.pl \
-        -i ~/Scripts/withncbi/pop/trichoderma_test.yml
-    ```
-
-3. `pop_prep.pl` will generate four or more bash scripts:
-
-    ```bash
-    perl ~/Scripts/withncbi/pop/pop_prep.pl -p 12 -i ~/Scripts/withncbi/pop/trichoderma_test.yml
-    ```
-
-    1. `01_file.sh`: unzip, filter and split
-    2. `02_rm.sh`: RepeatMasker
-    3. `03_strain_info.sh`: strain_info
-    4. `plan_ALL.sh`: alignment plan for all genomes
-    5. `plan_four_way.sh`: alignment plan for `four_way`, specified by `--plan` of `gen_pop_conf.pl`
-
-4. Run generated scripts.
-
-    Scripts starting with a "0" means they are doing preparing works.
-
-    ```bash
-    sh 01_file.sh
-    sh 02_rm.sh
-    sh 03_strain_info.sh
-    ```
-
-5. `plan_ALL.sh` generates some bash files, execute them in order.
-
-    ```bash
-    sh plan_ALL.sh
-
-    sh 1_real_chr.sh
-    sh 3_pair_cmd.sh
-    sh 4_rawphylo.sh
-    sh 5_multi_cmd.sh
-    sh 7_multi_db_only.sh
-    ```
-
-6. `plan_four_way.sh` will overwrite some bash files, execute the following:
-
-    ```bash
-    sh plan_four_way.sh
-
-    sh 5_multi_cmd.sh
-    sh 7_multi_db_only.sh
-    ```
-
-7. When you are satisfied and don't see any wrong, rename `pop/trichoderma_test.yml` to
-   `pop/trichoderma_data.yml` and commit it.
-
-    ```bash
-    mv ~/Scripts/withncbi/pop/trichoderma_test.yml ~/Scripts/withncbi/pop/trichoderma_data.yml
-    ```
-
-# Section 3: cleaning.
+# Section 4: cleaning
 
 This is the ultimate final step. No more. Actually you may choose not to do this. It's depended on
 your disk capacity.
@@ -487,6 +429,7 @@ find . -maxdepth 2 -type f -name "*.phy" -or -name "*.phy.reduced" | xargs rm
 # compress files
 find . -type f -name "*.maf" | parallel gzip
 find . -type f -name "*.fas" | parallel gzip
+
 ```
 
 # FAQ
