@@ -7,10 +7,11 @@ Genus *Trichoderma* as example.
 [TOC levels=1-3]: # " "
 - [Build alignments on an whole Eukaryotes genus](#build-alignments-on-an-whole-eukaryotes-genus)
 - [Section 1: select strains and download sequences.](#section-1-select-strains-and-download-sequences)
-    - [`pop/trichoderma.tsv`](#poptrichodermatsv)
+    - [`pop/trichoderma.wgs.tsv`](#poptrichodermawgstsv)
     - [`wgs_prep.pl`](#wgs_preppl)
     - [Download WGS files.](#download-wgs-files)
     - [Download ASSEMBLY files](#download-assembly-files)
+- [Section 2: prepare sequences for `egaz`](#section-2-prepare-sequences-for-egaz)
 - [Section 2: create configuration file and generate alignments.](#section-2-create-configuration-file-and-generate-alignments)
 - [Section 3: cleaning.](#section-3-cleaning)
 - [FAQ](#faq)
@@ -18,9 +19,8 @@ Genus *Trichoderma* as example.
 
 # Section 1: select strains and download sequences.
 
-## `pop/trichoderma.tsv`
 
-Create `pop/trichoderma.tsv` manually. Names should only contain alphanumeric characters and
+Create `pop/trichoderma.wgs.tsv` manually. Names should only contain alphanumeric characters and
 underscores. Be careful with tabs and spaces, because .tsv stands for Tab-separated values, white
 spaces matters.
 
@@ -65,6 +65,8 @@ WHERE
     genus = 'Trichoderma'
 ```
 
+## `pop/trichoderma.wgs.tsv`
+
 When the two approaches get very different number of strains, you run the following steps. Check
 intermediate results on necessary.
 
@@ -76,8 +78,8 @@ export RANK_ID=5543
 export RANK_NAME=trichoderma
 
 mkdir -p ~/data/alignment/${RANK_NAME}            # Working directory
-
 cd ~/data/alignment/${RANK_NAME}
+
 ```
 
 You can copy & paste the following block of codes as a whole unit.
@@ -178,21 +180,21 @@ cat ${RANK_NAME}.wgs.tsv |
 
 ```
 
+## `wgs_prep.pl`
+
 Put the .tsv file to `~/Scripts/withncbi/pop/` and run `wgs_prep.pl` again. When everything is fine,
 commit the .tsv file.
 
 For detailed WGS info, click Prefix column lead to WGS project, where we could download gzipped
 fasta and project description manually.
 
-## `wgs_prep.pl`
-
 `wgs_prep.pl` will create a directory named `WGS` and three files containing meta information:
 
 ```bash
-cd ~/data/alignment/trichoderma
+cd ~/data/alignment/${RANK_NAME}
 
 perl ~/Scripts/withncbi/taxon/wgs_prep.pl \
-    -f ~/Scripts/withncbi/pop/trichoderma.wgs.tsv \
+    -f ~/Scripts/withncbi/pop/${RANK_NAME}.wgs.tsv \
     --fix \
     -o WGS \
     -a
@@ -223,8 +225,8 @@ perl ~/Scripts/withncbi/taxon/wgs_prep.pl \
 
 ```bash
 # download with aria2
-cd ~/data/alignment/trichoderma
-aria2c -UWget -x 6 -s 3 -c -i WGS/trichoderma.url.txt
+cd ~/data/alignment/${RANK_NAME}
+aria2c -UWget -x 6 -s 3 -c -i WGS/${RANK_NAME}.url.txt
 
 # check downloaded .gz files
 find WGS -name "*.gz" | parallel -j 4 gzip -t
@@ -236,16 +238,6 @@ find WGS -name "*.gz" | parallel -j 4 gzip -t
 ```
 
 ## Download ASSEMBLY files
-
-```bash
-export RANK_LEVEL=genus
-export RANK_ID=5543
-export RANK_NAME=trichoderma
-
-mkdir -p ~/data/alignment/${RANK_NAME}            # Working directory
-
-cd ~/data/alignment/${RANK_NAME}
-```
 
 ```bash
 
@@ -287,26 +279,27 @@ Information of assemblies are collected from *_assembly_report.txt *after* downl
 **Caution**: line endings of *_assembly_report.txt files are `CRLF`.
 
 ```bash
-cd ~/data/alignment/trichoderma
+cd ~/data/alignment/${RANK_NAME}
 
-bash ASSEMBLY/trichoderma.assembly.rsync.sh
+bash ASSEMBLY/${RANK_NAME}.assembly.rsync.sh
 
 # rsync -avP wangq@173.230.144.105:data/alignment/trichoderma/ ~/data/alignment/trichoderma
 
-bash ASSEMBLY/trichoderma.assembly.collect.sh
+bash ASSEMBLY/${RANK_NAME}.assembly.collect.sh
 
 ```
 
 ```bash
 # Cleaning
 rm raw*.*sv
+
 unset RANK_LEVEL
 unset RANK_ID
 unset RANK_NAME
 
 ```
 
-# Section 2: Prepare sequences for `egaz`
+# Section 2: prepare sequences for `egaz`
 
 ```bash
 cd ~/data/alignment/trichoderma
