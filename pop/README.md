@@ -11,6 +11,8 @@ Genus *Trichoderma* as example.
     - [`wgs_prep.pl`](#wgs_preppl)
     - [`assembly_prep.pl`](#assembly_preppl)
 - [Section 2: prepare sequences for `egaz`](#section-2-prepare-sequences-for-egaz)
+    - [Manually](#manually)
+    - [`egaz template --prep`](#egaz-template---prep)
 - [Section 3: generate alignments](#section-3-generate-alignments)
 - [Section 4: cleaning](#section-4-cleaning)
 - [FAQ](#faq)
@@ -301,6 +303,8 @@ unset RANK_NAME
 
 # Section 2: prepare sequences for `egaz`
 
+## Manually
+
 * `perseq` mean split fasta by names, target or good assembles should set it
 * `--species Fungi` specify the species or clade of this group for RepeatMasker
 
@@ -380,6 +384,8 @@ find WGS -maxdepth 1 -type d -path "*/????*" |
 
 
 ```
+
+## `egaz template --prep`
 
 Or use `egaz template --prep`. In this approach, GFF files should be manually placed in the GENOMES/
 directory.
