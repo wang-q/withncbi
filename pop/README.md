@@ -381,6 +381,23 @@ find WGS -maxdepth 1 -type d -path "*/????*" |
 
 ```
 
+Or use `egaz template --prep`. In this approach, GFF files should be manually placed in the GENOMES/
+directory.
+
+```bash
+cd ~/data/alignment/trichoderma
+
+egaz template \
+    ASSEMBLY WGS \
+    --prep -o GENOMES \
+    --perseq Tree_QM6a --perseq Tvir_Gv29_8 --perseq Tatr_IMI_206040 \
+    --min 5000 --about 5000000 \
+    -v --repeatmasker "--species Fungi --parallel 8"
+
+bash GENOMES/0_prep.sh
+
+```
+
 # Section 3: generate alignments
 
 * Rsync to hpcc
@@ -394,13 +411,18 @@ rsync -avP \
 
 ```
 
+* No results for Tatr_IMI_206040vsTkon_JCM_1883
+
+Tatr_IMI_206040;qs=Tatr_XS2015,Tree_QM6a,Tvir_Gv29_8
+
 ```bash
 cd ~/data/alignment/trichoderma
 
 egaz template \
     GENOMES/Tatr_IMI_206040 \
-    $(find GENOMES -maxdepth 1 -type d -path "*/????*" | grep -v "Tatr_IMI_206040") \
-    --multi --rawphylo -o multi/ --parallel 8 -v
+    $(find GENOMES -maxdepth 1 -type d -path "*/????*" | grep -v "Tatr_IMI_206040"| grep -v "Tkon_JCM_1883") \
+    --multi -o multi/ \
+    --rawphylo --parallel 8 -v
 
 bash multi/1_pair.sh
 bash multi/2_rawphylo.sh
