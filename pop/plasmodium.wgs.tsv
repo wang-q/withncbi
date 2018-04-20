@@ -27,7 +27,6 @@ Prei_CDC	CBXM01	Plasmodium reichenowi	2055
 Pova_curtisi	FLQU01	Plasmodium ovale curtisi	2227
 Pfal_58_1	JPRY01	Plasmodium falciparum 58.1	2448
 Pviv_North_Korean	AFNJ01	Plasmodium vivax North Korean	2499
-Pfal_RAJ116	ACBR01	Plasmodium falciparum RAJ116	2728 (1 is dead)
 Pfal_397_1	JPSI01	Plasmodium falciparum 397.1	2774
 Pfal_HB3	AANS01	Plasmodium falciparum HB3	2971
 Pfal_327_1	JPSD01	Plasmodium falciparum 327.1	3143
@@ -40,6 +39,7 @@ Pfal_CAMP	AOPU01	Plasmodium falciparum CAMP/Malaysia	4583
 Pfal_Santa_Lucia	ABHA02	Plasmodium falciparum Santa Lucia	4589
 Pfal_NF135	AOPS01	Plasmodium falciparum NF135/5.C10	4690
 Pfal_7G8	ABGZ02	Plasmodium falciparum 7G8	4776
+#Pfal_RAJ116	ACBR01	Plasmodium falciparum RAJ116	2728 (1 is dead)
 #Pova	FLRI01	Plasmodium ovale	638
 #Pviv	FLZR01	Plasmodium vivax	226 # 4.8 M
 #Pcyn_M	FXLJ01	Plasmodium cynomolgi	40  # 4.7 M

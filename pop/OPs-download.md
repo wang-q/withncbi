@@ -9,8 +9,6 @@ WGS, which usually in better assembling levels.
 - [Scer_100 ASSEMBLY](#scer_100-assembly)
 - [*Fusarium* WGS](#fusarium-wgs)
 - [*Aspergillus* WGS](#aspergillus-wgs)
-- [*Plasmodium* WGS](#plasmodium-wgs)
-- [*Plasmodium falciparum* WGS](#plasmodium-falciparum-wgs)
 - [*Arabidopsis* 19 genomes](#arabidopsis-19-genomes)
 - [*Orazy sativa* Japonica 24 genomes](#orazy-sativa-japonica-24-genomes)
 - [*Drosophila* Population Genomics Project (dpgp)](#drosophila-population-genomics-project-dpgp)
@@ -167,7 +165,7 @@ WGS, which usually in better assembling levels.
 3. Download strains of *Saccharomyces cerevisiae* at good assembly status.
 
     Click the `Download table` link on the top-right of [Genome
-                                list](http://www.ncbi.nlm.nih.gov/genome/genomes/15), save it as
+                                    list](http://www.ncbi.nlm.nih.gov/genome/genomes/15), save it as
     .csv file.
 
     ```bash
@@ -231,7 +229,7 @@ WGS, which usually in better assembling levels.
 2. Download strains of *Saccharomyces cerevisiae* at good assembly status.
 
     Click the `Download table` link on the top-right of [Genome
-                                list](http://www.ncbi.nlm.nih.gov/genome/genomes/15), save it as
+                                    list](http://www.ncbi.nlm.nih.gov/genome/genomes/15), save it as
     .csv file.
 
     ```bash
