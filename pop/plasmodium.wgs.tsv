@@ -1,25 +1,10 @@
 #name	prefix	organism	contigs
 Pfal_NF54	NYMT01	Plasmodium falciparum NF54	19
 Pkno_Malayan_Strain_Pk1_A_	NETL01	Plasmodium knowlesi	28
-Psp_DRC_Itaito	OEYZ01	Plasmodium sp. DRC-Itaito	30
-Prei	OFAE01	Plasmodium reichenowi	34
-Pmal	FLRK01	Plasmodium malariae	35
 Pkno_H	CWHR02	Plasmodium knowlesi strain H	37
-Pcyn_M	FXLJ01	Plasmodium cynomolgi	40
-Psp_gorilla_clade_G2	OEYY01	Plasmodium sp. gorilla clade G2	68
-Psp_83	FMKE01	Plasmodium sp.	83
 Pgal_8A	CVMV01	Plasmodium gallinaceum	152
-Pviv	FLZR01	Plasmodium vivax	226
-Pber_SP11_RLL	FMIH01	Plasmodium berghei	253
-Pber_NK65e	FLVA01	Plasmodium berghei	294
 Pvin_petteri	AMYN01	Plasmodium vinckei petteri	297
-Pber_SP11_Antwerpcl1	FMII01	Plasmodium berghei	308
 Pvin_vinckei	AMYS01	Plasmodium vinckei vinckei	349
-Pcha_CB	FMIM01	Plasmodium chabaudi chabaudi	430
-Pber_K173	FFUQ01	Plasmodium berghei	464
-Prel_SGS1	CVMU01	Plasmodium relictum	498
-Pova	FLRI01	Plasmodium ovale	638
-Pcha_DK	FMIO01	Plasmodium chabaudi adami	647
 Pcoa_Hackeri	JFFQ01	Plasmodium coatneyi	661
 Pgon_ATCC_30045	BDQF01	Plasmodium gonderi	743
 Prei_SY57	LVLA01	Plasmodium reichenowi	777
@@ -55,9 +40,24 @@ Pfal_CAMP	AOPU01	Plasmodium falciparum CAMP/Malaysia	4583
 Pfal_Santa_Lucia	ABHA02	Plasmodium falciparum Santa Lucia	4589
 Pfal_NF135	AOPS01	Plasmodium falciparum NF135/5.C10	4690
 Pfal_7G8	ABGZ02	Plasmodium falciparum 7G8	4776
+#Pova	FLRI01	Plasmodium ovale	638
+#Pviv	FLZR01	Plasmodium vivax	226 # 4.8 M
+#Pcyn_M	FXLJ01	Plasmodium cynomolgi	40  # 4.7 M
+#Prel_SGS1	CVMU01	Plasmodium relictum	498 # 3.9 M
+#Pcha_DK	FMIO01	Plasmodium chabaudi adami	647 # 2.2 M
+#Psp_gorilla_clade_G2	OEYY01	Plasmodium sp. gorilla clade G2	68
+#Pcha_CB	FMIM01	Plasmodium chabaudi chabaudi	430 # 1.7 M
+#Prei	OFAE01	Plasmodium reichenowi	34 # 1.4 M
+#Psp_83	FMKE01	Plasmodium sp.	83  # 1.4 M
+#Pber_SP11_RLL	FMIH01	Plasmodium berghei	253 # 0.9 M
+#Pber_NK65e	FLVA01	Plasmodium berghei	294 # 1.0 M
+#Pber_SP11_Antwerpcl1	FMII01	Plasmodium berghei	308 #  1.0 M
+#Pber_K173	FFUQ01	Plasmodium berghei	464 # 0.8 M
+#Pmal	FLRK01	Plasmodium malariae	35  # 0.1 M
 #Pkno_H	CWHQ02	Plasmodium knowlesi strain H	45
-#Pmal	FLRL01	Plasmodium malariae	47
-#Psp_DRC_Itaito	OMPV01	Plasmodium sp. DRC-Itaito	75
+#Pmal	FLRL01	Plasmodium malariae	47  # 3.9 M
+#Psp_DRC_Itaito	OEYZ01	Plasmodium sp. DRC-Itaito	30  # 0.4 M
+#Psp_DRC_Itaito	OMPV01	Plasmodium sp. DRC-Itaito	75  # 1.1 M
 #Pviv	FLYH01	Plasmodium vivax	360
 #Pova	FLRJ01	Plasmodium ovale	771 (8 are dead)
 #Pviv	FLYI01	Plasmodium vivax	530 (119 are dead)
