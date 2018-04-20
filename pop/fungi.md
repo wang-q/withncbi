@@ -9,6 +9,7 @@ Less detailed than *Trichoderma* in
 - [*Candida*](#candida)
     - [candida: wgs](#candida-wgs)
     - [candida: assembly](#candida-assembly)
+    - [candida: run](#candida-run)
 - [*Penicillium*](#penicillium)
     - [penicillium: wgs](#penicillium-wgs)
     - [penicillium: assembly](#penicillium-assembly)
@@ -57,7 +58,6 @@ find WGS -name "*.gz" | parallel -j 4 gzip -t
 
 ```
 
-
 ## candida: assembly
 
 Same as [here](README.md#assembly_preppl)
@@ -85,8 +85,50 @@ bash ASSEMBLY/candida.assembly.collect.sh
 
 ```
 
-    --plan 'name=four_way;t=Cdub_CD36;qs=Corh_Co_90_125,Calb_WO_1,Ctro_MYA_3404'
-    --plan 'name=four_way_2;t=Corh_Co_90_125;qs=Cdub_CD36,Calb_WO_1,Ctro_MYA_3404'
+## candida: run
+
+
+* Rsync to hpcc
+
+```bash
+rsync -avP \
+    ~/data/alignment/candida/ \
+    wangq@202.119.37.251:data/alignment/candida
+
+# rsync -avP wangq@202.119.37.251:data/alignment/candida/ ~/data/alignment/candida
+
+```
+
+```bash
+cd ~/data/alignment/candida
+
+egaz template \
+    ASSEMBLY WGS \
+    --prep -o GENOMES \
+    --perseq Calb_SC5314 \
+    --perseq Calb_WO_1 \
+    --perseq Cdub_CD36 \
+    --perseq Cort_Co_90_125 \
+    --perseq Ctro_MYA_3404\
+    --min 5000 --about 5000000 \
+    -v --repeatmasker "--species Fungi --parallel 24"
+
+bsub -q mpi -n 24 -J "candida-0_prep" "bash GENOMES/0_prep.sh"
+
+egaz template \
+    GENOMES/Calb_SC5314 \
+    $(find GENOMES -maxdepth 1 -type d -path "*/????*" | grep -v "Calb_SC5314") \
+    --multi -o multi/ \
+    --rawphylo --parallel 24 -v
+
+bsub -q mpi -n 24 -J "candida-1_pair" "bash multi/1_pair.sh"
+bsub -w "ended(candida-1_pair)"
+    -q mpi -n 24 -J "candida-2_rawphylo" "bash multi/2_rawphylo.sh"
+bsub  -w "ended(candida-2_rawphylo)"
+    -q mpi -n 24 -J "candida-3_multi" "bash multi/3_multi.sh"
+
+
+```
 
 # *Penicillium*
 
