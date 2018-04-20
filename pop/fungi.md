@@ -115,6 +115,15 @@ egaz template \
 
 bsub -q mpi -n 24 -J "candida-0_prep" "bash GENOMES/0_prep.sh"
 
+ls -t output.* | head -n 1 | xargs tail -f | grep "==>"
+
+# gff
+for n in Calb_SC5314 Cdub_CD36 Cort_Co_90_125; do
+    FILE_GFF=$(find ASSEMBLY -type f -name "*_genomic.gff.gz" | grep "${n}")
+    echo >&2 "==> Processing ${n}/${FILE_GFF}"
+    
+    gzip -d -c ${FILE_GFF} > GENOMES/${n}/chr.gff
+done
 egaz template \
     GENOMES/Calb_SC5314 \
     $(find GENOMES -maxdepth 1 -type d -path "*/????*" | grep -v "Calb_SC5314") \
@@ -127,6 +136,17 @@ bsub -w "ended(candida-1_pair)"
 bsub  -w "ended(candida-2_rawphylo)"
     -q mpi -n 24 -J "candida-3_multi" "bash multi/3_multi.sh"
 
+# self
+egaz template \
+    GENOMES/Calb_SC5314 GENOMES/Cdub_CD36 GENOMES/Cort_Co_90_125  \
+    --self -o self/ \
+    --circos --parallel 24 -v
+
+bsub -q mpi -n 24 -J "candida-1_self" "bash self/1_self.sh"
+bsub -w "ended(candida-1_self)" \
+    -q mpi -n 24 -J "candida-3_proc" "bash self/3_proc.sh"
+bsub  -w "ended(candida-3_proc)" \
+    -q mpi -n 24 -J "candida-4_circos" "bash self/4_circos.sh"
 
 ```
 
