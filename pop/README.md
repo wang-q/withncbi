@@ -179,7 +179,9 @@ mv raw3.tsv ${RANK_NAME}.wgs.tsv
 # find potential duplicated strains or assemblies
 cat ${RANK_NAME}.wgs.tsv |
     perl -nl -a -F"\t" -e 'print $F[0]' |
-    uniq -c
+    sort |
+    uniq -c |
+    sort -nr
 
 # Edit .tsv, remove duplicated strains, check strain names and comment out poor assemblies.
 # vim ${GENUS}.wgs.tsv
@@ -219,6 +221,13 @@ mysql -ualignDB -palignDB ar_genbank -e "
         printf qq{%s\t%s\t%s\t%s\n}, $name, $F[2], $F[1], $F[3];
         ' \
     >> ${RANK_NAME}.assembly.tsv
+
+# find potential duplicated strains or assemblies
+cat ${RANK_NAME}.assembly.tsv |
+    perl -nl -a -F"\t" -e 'print $F[0]' |
+    sort |
+    uniq -c |
+    sort -nr
 
 # Edit .tsv, remove unnecessary strains, check strain names and comment out poor assemblies.
 # vim ${GENUS}.assembly.tsv

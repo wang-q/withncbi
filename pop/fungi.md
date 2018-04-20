@@ -82,9 +82,6 @@ perl ~/Scripts/withncbi/taxon/assembly_prep.pl \
 
 bash ASSEMBLY/candida.assembly.rsync.sh
 
-# linode
-# rsync -avP wangq@173.230.144.105:data/alignment/candida/ ~/data/alignment/candida
-
 bash ASSEMBLY/candida.assembly.collect.sh
 
 ```
@@ -229,8 +226,6 @@ unset RANK_NAME
 cd ~/data/alignment/penicillium
 
 bash ASSEMBLY/penicillium.assembly.rsync.sh
-
-# rsync -avP wangq@173.230.144.105:data/alignment/penicillium/ ~/data/alignment/penicillium
 
 bash ASSEMBLY/penicillium.assembly.collect.sh
 
