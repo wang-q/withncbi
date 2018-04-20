@@ -25,7 +25,7 @@ Check NCBI pages
 
 ## candida: wgs
 
-Same as [here](README.md#poptrichodermawgstsv)
+Same as [here](README.md#wgstsv)
 
 ```bash
 export RANK_LEVEL=genus
@@ -60,7 +60,7 @@ find WGS -name "*.gz" | parallel -j 4 gzip -t
 
 ## candida: assembly
 
-Same as [here](README.md#assembly_preppl)
+Same as [here](README.md#assemblytsv)
 
 ```bash
 cd ~/data/alignment/${RANK_NAME}
@@ -76,6 +76,10 @@ unset RANK_NAME
 ```bash
 cd ~/data/alignment/candida
 
+perl ~/Scripts/withncbi/taxon/assembly_prep.pl \
+    -f ~/Scripts/withncbi/pop/candida.assembly.tsv \
+    -o ASSEMBLY
+
 bash ASSEMBLY/candida.assembly.rsync.sh
 
 # linode
@@ -86,7 +90,6 @@ bash ASSEMBLY/candida.assembly.collect.sh
 ```
 
 ## candida: run
-
 
 * Rsync to hpcc
 
@@ -99,17 +102,18 @@ rsync -avP \
 
 ```
 
+`--perseq` for Chromosome-level assemblies; Calb_WO_1 is not soo good.
+
 ```bash
 cd ~/data/alignment/candida
 
+# prep
 egaz template \
     ASSEMBLY WGS \
     --prep -o GENOMES \
     --perseq Calb_SC5314 \
-    --perseq Calb_WO_1 \
     --perseq Cdub_CD36 \
     --perseq Cort_Co_90_125 \
-    --perseq Ctro_MYA_3404\
     --min 5000 --about 5000000 \
     -v --repeatmasker "--species Fungi --parallel 24"
 
@@ -124,6 +128,8 @@ for n in Calb_SC5314 Cdub_CD36 Cort_Co_90_125; do
     
     gzip -d -c ${FILE_GFF} > GENOMES/${n}/chr.gff
 done
+
+# multi
 egaz template \
     GENOMES/Calb_SC5314 \
     $(find GENOMES -maxdepth 1 -type d -path "*/????*" | grep -v "Calb_SC5314") \
@@ -131,9 +137,9 @@ egaz template \
     --rawphylo --parallel 24 -v
 
 bsub -q mpi -n 24 -J "candida-1_pair" "bash multi/1_pair.sh"
-bsub -w "ended(candida-1_pair)"
+bsub -w "ended(candida-1_pair)" \
     -q mpi -n 24 -J "candida-2_rawphylo" "bash multi/2_rawphylo.sh"
-bsub  -w "ended(candida-2_rawphylo)"
+bsub  -w "ended(candida-2_rawphylo)" \
     -q mpi -n 24 -J "candida-3_multi" "bash multi/3_multi.sh"
 
 # self
