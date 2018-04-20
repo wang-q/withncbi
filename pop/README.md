@@ -7,7 +7,9 @@ Genus *Trichoderma* as example.
 [TOC levels=1-3]: # " "
 - [Build alignments on an whole Eukaryotes genus](#build-alignments-on-an-whole-eukaryotes-genus)
 - [Section 1: select strains and download sequences.](#section-1-select-strains-and-download-sequences)
-    - [`pop/trichoderma.wgs.tsv`](#poptrichodermawgstsv)
+    - [`pop/trichoderma.*.tsv`](#poptrichodermatsv)
+        - [`.wgs.tsv`](#wgstsv)
+        - [`.assembly.tsv`](#assemblytsv)
     - [`wgs_prep.pl`](#wgs_preppl)
     - [`assembly_prep.pl`](#assembly_preppl)
 - [Section 2: prepare sequences for `egaz`](#section-2-prepare-sequences-for-egaz)
@@ -66,7 +68,7 @@ WHERE
     genus = 'Trichoderma'
 ```
 
-## `pop/trichoderma.wgs.tsv`
+## `pop/trichoderma.*.tsv`
 
 When the two approaches get very different number of strains, you run the following steps. Check
 intermediate results on necessary.
@@ -83,7 +85,9 @@ cd ~/data/alignment/${RANK_NAME}
 
 ```
 
-You can copy & paste the following block of codes as a whole unit.
+### `.wgs.tsv`
+
+You can copy & paste the following block of codes.
 
 ```bash
 # stage1
@@ -185,6 +189,49 @@ rm raw*.*sv
 
 ```
 
+### `.assembly.tsv`
+
+```bash
+
+echo -e '#name\tftp_path\torganism\tassembly_level' > ${RANK_NAME}.assembly.tsv
+
+# comment out unneeded conditions
+mysql -ualignDB -palignDB ar_genbank -e "
+    SELECT 
+        organism_name, species, ftp_path, assembly_level
+    FROM ar 
+    WHERE 1=1
+#        AND wgs_master = ''
+#        AND assembly_level = 'Chromosome'
+        AND organism_name != species
+        AND ${RANK_LEVEL}_id = ${RANK_ID}
+    " |
+    perl -nl -a -F"\t" -e '
+        /^organism_name/i and next;
+        $n = $F[0];
+        $rx = quotemeta $F[1];
+        $n =~ s/$rx\s*//;
+        $n =~ s/\s+$//;
+        $n =~ s/\W+/_/g;
+        @O = split(/ /, $F[1]);
+        $name = substr($O[0],0,1) . substr($O[1],0,3);
+        $name .= q{_} . $n if $n;
+        printf qq{%s\t%s\t%s\t%s\n}, $name, $F[2], $F[1], $F[3];
+        ' \
+    >> ${RANK_NAME}.assembly.tsv
+
+# Edit .tsv, remove unnecessary strains, check strain names and comment out poor assemblies.
+# vim ${GENUS}.assembly.tsv
+
+```
+
+```bash
+unset RANK_LEVEL
+unset RANK_ID
+unset RANK_NAME
+
+```
+
 ## `wgs_prep.pl`
 
 Put the .tsv file to `~/Scripts/withncbi/pop/` and run `wgs_prep.pl` again. When everything is fine,
@@ -196,10 +243,10 @@ fasta and project description manually.
 `wgs_prep.pl` will create a directory named `WGS` and three files containing meta information:
 
 ```bash
-cd ~/data/alignment/${RANK_NAME}
+cd ~/data/alignment/trichoderma
 
 perl ~/Scripts/withncbi/taxon/wgs_prep.pl \
-    -f ~/Scripts/withncbi/pop/${RANK_NAME}.wgs.tsv \
+    -f ~/Scripts/withncbi/pop/trichoderma.wgs.tsv \
     --fix \
     -o WGS
 
@@ -243,41 +290,6 @@ find WGS -name "*.gz" | parallel -j 4 gzip -t
 
 ## `assembly_prep.pl`
 
-```bash
-
-echo -e '#name\tftp_path\torganism\tassembly_level' > ${RANK_NAME}.assembly.tsv
-
-# comment out unneeded conditions
-mysql -ualignDB -palignDB ar_genbank -e "
-    SELECT 
-        organism_name, species, ftp_path, assembly_level
-    FROM ar 
-    WHERE 1=1
-#        AND wgs_master = ''
-#        AND assembly_level = 'Chromosome'
-        AND organism_name != species
-        AND ${RANK_LEVEL}_id = ${RANK_ID}
-    " |
-    perl -nl -a -F"\t" -e '
-        /^organism_name/i and next;
-        $n = $F[0];
-        $rx = quotemeta $F[1];
-        $n =~ s/$rx\s*//;
-        $n =~ s/\s+$//;
-        $n =~ s/\W+/_/g;
-        @O = split(/ /, $F[1]);
-        $name = substr($O[0],0,1) . substr($O[1],0,3);
-        $name .= q{_} . $n if $n;
-        printf qq{%s\t%s\t%s\t%s\n}, $name, $F[2], $F[1], $F[3];
-        ' \
-    >> ${RANK_NAME}.assembly.tsv
-
-perl ~/Scripts/withncbi/taxon/assembly_prep.pl \
-    -f ${RANK_NAME}.assembly.tsv \
-    -o ASSEMBLY
-
-```
-
 Information of assemblies are collected from *_assembly_report.txt *after* downloading.
 
 **Caution**: line endings of *_assembly_report.txt files are `CRLF`.
@@ -285,19 +297,15 @@ Information of assemblies are collected from *_assembly_report.txt *after* downl
 ```bash
 cd ~/data/alignment/trichoderma
 
+perl ~/Scripts/withncbi/taxon/assembly_prep.pl \
+    -f ~/Scripts/withncbi/pop/trichoderma.assembly.tsv \
+    -o ASSEMBLY
+
 bash ASSEMBLY/trichoderma.assembly.rsync.sh
 
 # rsync -avP wangq@173.230.144.105:data/alignment/trichoderma/ ~/data/alignment/trichoderma
 
 bash ASSEMBLY/trichoderma.assembly.collect.sh
-
-```
-
-```bash
-
-unset RANK_LEVEL
-unset RANK_ID
-unset RANK_NAME
 
 ```
 
