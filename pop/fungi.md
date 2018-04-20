@@ -142,6 +142,17 @@ bsub -w "ended(candida-1_pair)" \
 bsub  -w "ended(candida-2_rawphylo)" \
     -q mpi -n 24 -J "candida-3_multi" "bash multi/3_multi.sh"
 
+# multi_Calb
+egaz template \
+    GENOMES/Calb_SC5314 \
+    $(find GENOMES -maxdepth 1 -type d -path "*/????*" | grep "Calb_" | grep -v "Calb_SC5314") \
+    GENOMES/Cdub_CD36 \
+    --multi -o multi/ \
+    --multiname multi_Calb --tree multi/Results/multi.nwk --outgroup Cdub_CD36 \
+    --parallel 24 -v
+
+bsub -q mpi -n 24 -J "candida-3_multi" "bash multi/3_multi.sh"
+
 # self
 egaz template \
     GENOMES/Calb_SC5314 GENOMES/Cdub_CD36 GENOMES/Cort_Co_90_125  \
