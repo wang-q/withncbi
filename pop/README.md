@@ -195,9 +195,19 @@ rm raw*.*sv
 
 ```bash
 
-echo -e '#name\tftp_path\torganism\tassembly_level' > ${RANK_NAME}.assembly.tsv
 
-# comment out unneeded conditions
+mysql -ualignDB -palignDB ar_refseq -e "
+    SELECT 
+        organism_name, species, ftp_path, assembly_level
+    FROM ar 
+    WHERE 1=1
+#        AND wgs_master = ''
+#        AND assembly_level = 'Chromosome'
+        AND organism_name != species
+        AND ${RANK_LEVEL}_id = ${RANK_ID}
+    " \
+    > raw.tsv
+
 mysql -ualignDB -palignDB ar_genbank -e "
     SELECT 
         organism_name, species, ftp_path, assembly_level
@@ -207,8 +217,14 @@ mysql -ualignDB -palignDB ar_genbank -e "
 #        AND assembly_level = 'Chromosome'
         AND organism_name != species
         AND ${RANK_LEVEL}_id = ${RANK_ID}
-    " |
+    " \
+    >> raw.tsv
+
+echo -e '#name\tftp_path\torganism\tassembly_level' > ${RANK_NAME}.assembly.tsv
+
+cat raw.tsv |
     perl -nl -a -F"\t" -e '
+        BEGIN{my %seen}; 
         /^organism_name/i and next;
         $n = $F[0];
         $rx = quotemeta $F[1];
@@ -218,9 +234,14 @@ mysql -ualignDB -palignDB ar_genbank -e "
         @O = split(/ /, $F[1]);
         $name = substr($O[0],0,1) . substr($O[1],0,3);
         $name .= q{_} . $n if $n;
+        $seen{$name}++;
+        $seen{$name} > 1 and next;
         printf qq{%s\t%s\t%s\t%s\n}, $name, $F[2], $F[1], $F[3];
         ' \
     >> ${RANK_NAME}.assembly.tsv
+
+
+# comment out unneeded conditions
 
 # find potential duplicated strains or assemblies
 cat ${RANK_NAME}.assembly.tsv |
@@ -231,6 +252,9 @@ cat ${RANK_NAME}.assembly.tsv |
 
 # Edit .tsv, remove unnecessary strains, check strain names and comment out poor assemblies.
 # vim ${GENUS}.assembly.tsv
+
+# Cleaning
+rm raw*.*sv
 
 ```
 
