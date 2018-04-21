@@ -23,11 +23,11 @@ Less detailed than *Trichoderma* in
 
 Check NCBI pages
 
-
 * http://www.ncbi.nlm.nih.gov/Traces/wgs/?page=1&term=plasmodium&order=organism
 * http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?mode=Info&id=5820
 * http://www.ncbi.nlm.nih.gov/assembly?term=txid5820[Organism:exp]
 * http://www.ncbi.nlm.nih.gov/genome/?term=txid5820[Organism:exp]
+* http://www.ncbi.nlm.nih.gov/genome/genomes/33
 
 ## plasmodium: wgs
 
@@ -110,7 +110,7 @@ rsync -avP \
 
 ```
 
-`--perseq` for Chromosome-level assemblies.
+`--perseq` for RefSeq Chromosome-level assemblies.
 
 ```bash
 cd ~/data/alignment/plasmodium
@@ -120,6 +120,10 @@ egaz template \
     ASSEMBLY WGS \
     --prep -o GENOMES \
     --perseq Pfal_3D7 \
+    --perseq Pber_ANKA \
+    --perseq Pcha_chabaudi \
+    --perseq Pcyn_strain_B \
+    --perseq Pkno_strain_H \
     --min 5000 --about 5000000 \
     -v --repeatmasker "--species Alveolata --parallel 24"
 
@@ -128,7 +132,7 @@ bsub -q mpi -n 24 -J "plasmodium-0_prep" "bash GENOMES/0_prep.sh"
 ls -t output.* | head -n 1 | xargs tail -f | grep "==>"
 
 # gff
-for n in Pfal_3D7; do
+for n in Pfal_3D7 Pber_ANKA Pcha_adami Pcha_chabaudi Pcyn_strain_B Pkno_strain_H; do
     FILE_GFF=$(find ASSEMBLY -type f -name "*_genomic.gff.gz" | grep "${n}")
     echo >&2 "==> Processing ${n}/${FILE_GFF}"
     
@@ -150,18 +154,19 @@ bsub  -w "ended(plasmodium-2_rawphylo)" \
 
 # multi_Pfal
 egaz template \
-    GENOMES/Calb_SC5314 \
+    GENOMES/Pfal_3D7 \
     $(find GENOMES -maxdepth 1 -type d -path "*/????*" | grep "Pfal_" | grep -v "Pfal_3D7") \
-    GENOMES/Cdub_CD36 \
+    GENOMES/Prei_SY57 \
     --multi -o multi/ \
-    --multiname multi_Pfal --tree multi/Results/multi.nwk --outgroup Cdub_CD36 \
+    --multiname multi_Pfal --tree multi/Results/multi.nwk --outgroup Prei_SY57 \
     --parallel 24 -v
 
 bsub -q mpi -n 24 -J "plasmodium-3_multi" "bash multi/3_multi.sh"
 
 # self
 egaz template \
-    GENOMES/Pfal_3D7 GENOMES/Cdub_CD36 GENOMES/Cort_Co_90_125  \
+    GENOMES/Pfal_3D7 GENOMES/Pber_ANKA GENOMES/Pcha_chabaudi \
+    GENOMES/Pcyn_strain_B GENOMES/Pkno_strain_H \
     --self -o self/ \
     --circos --parallel 24 -v
 
