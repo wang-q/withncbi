@@ -3,22 +3,21 @@ use strict;
 use warnings;
 use autodie;
 
-use Path::Tiny;
+use Path::Tiny qw();
 use LWP::Simple;
 
-my $id  = shift || "NC_001284";
+my $id  = shift // die "Provide a valid GenBank accession\n";
 my $dir = shift || ".";
 
 if ( !-d $dir ) {
-    path($dir)->mkpath;
+    Path::Tiny::path($dir)->mkpath;
 }
 
-# Some .gb files only contain assembling infomation, so we need download both
-# types.
-# When network connection is aweful, downloads may be incomplete.
-my @types = qw(gb fasta);
+# Some .gb files only contain assembling information, so we need download both types.
+# When network connection is awful, downloads may be incomplete.
+my %suffix_of = ( gb => "gb", fasta => "fa" );
 
-for my $type (@types) {
+for my $type (keys %suffix_of) {
     my $url_template
         = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?"
         . "db=nucleotide"
@@ -26,7 +25,7 @@ for my $type (@types) {
         . "&retmode=text";
 
     my $url = sprintf $url_template, $id, $type;
-    my $file = path( $dir, "$id.$type" )->absolute->stringify;
+    my $file = Path::Tiny::path( $dir, "$id.$suffix_of{$type}" )->absolute->stringify;
 
     my $rc = LWP::Simple::mirror( $url, $file );
     printf "* URL: %s\n" . "* LOCAL: %s\n", $url, $file;
@@ -43,6 +42,6 @@ get_seq.pl - retrieve nucleotide sequences from NCBI via eutils
 
     perl get_seq.pl <Accession> [Output directory]
     
-    perl get_seq.pl NC_001284 .
+    perl get_seq.pl NC_012920 .
 
 =cut

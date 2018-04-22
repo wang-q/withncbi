@@ -3,13 +3,12 @@ use strict;
 use warnings;
 use autodie;
 
-use Getopt::Long;
-use Config::Tiny;
+use Getopt::Long qw();
 use FindBin;
-use YAML::Syck;
+use YAML::Syck qw();
 
 use File::Find::Rule;
-use Path::Tiny;
+use Path::Tiny qw();
 use Text::CSV_XS;
 
 #----------------------------------------------------------#
@@ -43,7 +42,7 @@ Columns:
     strain_name     =>  files will be stored in a directory named after this
     accession       =>  NCBI sequence accession
     strain_taxon_id =>  optional, not needed
-    seq_name        =>  optional, with -r, rename filename and sequence header
+    seq_name        =>  optional, rename filename and sequence header
 
 =head1 EXAMPLE
 
@@ -53,20 +52,20 @@ Columns:
 
 =cut
 
-GetOptions(
+Getopt::Long::GetOptions(
     'help|?'    => sub { Getopt::Long::HelpMessage(0) },
-    'file|f=s'  => \my $in_file,
+    'file|f=s'  => \my $infile,
     'local|l=s' => \my $local,
 ) or Getopt::Long::HelpMessage(1);
 
-die "Provide a .csv file\n" unless defined $in_file and -e $in_file;
+die "Provide a .csv file\n" unless defined $infile and -e $infile;
 
 #----------------------------------------------------------#
 # Init
 #----------------------------------------------------------#
 my ( @fna_files, @gff_files );
 if ($local) {
-    $local = path($local)->absolute->stringify;
+    $local = Path::Tiny::path($local)->absolute->stringify;
     print "Reading file list from [$local]\n";
     @fna_files = File::Find::Rule->file->name('*.fna')->in($local);
     @gff_files = File::Find::Rule->file->name('*.gff')->in($local);
@@ -74,7 +73,7 @@ if ($local) {
 }
 
 my $csv = Text::CSV_XS->new( { binary => 1, eol => "\n" } );
-open my $csv_fh, "<", $in_file or die "$in_file: $!";
+open my $csv_fh, "<", $infile or die "$infile: $!";
 $csv->getline($csv_fh);    # bypass title line
 
 #----------------------------------------------------------#
@@ -88,7 +87,7 @@ while ( my $row = $csv->getline($csv_fh) ) {
     $id =~ s/[\W]+/_/g;
 
     print "==> id: [$id]\tseq: [$acc]\n";
-    if ( -e "$id/$acc.gff" and -e "$id/$acc.fasta" ) {
+    if ( -e "$id/$acc.gff" and -e "$id/$acc.fa" ) {
         print "Sequence [$id/$acc] exists, next\n\n";
         next;
     }
@@ -99,7 +98,7 @@ while ( my $row = $csv->getline($csv_fh) ) {
     }
     else {
         print "Try finding sequences from local disk\n";
-        my $id_dir = path($id);
+        my $id_dir = Path::Tiny::path($id);
         if ( !-e $id_dir ) {
             $id_dir->mkpath;
         }
@@ -110,21 +109,21 @@ while ( my $row = $csv->getline($csv_fh) ) {
             system "perl $FindBin::RealBin/get_seq.pl $acc $id";
         }
         else {
-            path($fna_file)->copy("$id/$acc.fasta");
+            Path::Tiny::path($fna_file)->copy("$id/$acc.fa");
 
             my ($gff_file) = grep {/$acc/} @gff_files;
-            path($gff_file)->copy("$id/$acc.gff");
+            Path::Tiny::path($gff_file)->copy("$id/$acc.gff");
         }
     }
 
-    # replace contents from .gb and .fasta
+    # replace contents from .gb and .fa
     if ( defined $row->[3] ) {
         my $seq_name = $row->[3];
         if ( -e "$id/$acc.gb" ) {
             system "perl -i -nlp -e '/^(?:LOCUS)/ and s/$acc/$seq_name/' $id/$acc.gb";
         }
-        if ( -e "$id/$acc.fasta" ) {
-            system "perl -i -nlp -e '/^(?:>)/ and s/.+/>$seq_name/' $id/$acc.fasta";
+        if ( -e "$id/$acc.fa" ) {
+            system "perl -i -nlp -e '/^(?:>)/ and s/.+/>$seq_name/' $id/$acc.fa";
         }
     }
 
@@ -136,9 +135,9 @@ while ( my $row = $csv->getline($csv_fh) ) {
 
     if ( defined $row->[3] ) {
         my $seq_name = $row->[3];
-        print " " x 4 . "Rename .fasta and .gff\n";
-        path("$id/$acc.fasta")->move("$id/$seq_name.fasta");
-        path("$id/$acc.gff")->move("$id/$seq_name.gff");
+        print " " x 4 . "Rename .fa and .gff\n";
+        Path::Tiny::path("$id/$acc.fa")->move("$id/$seq_name.fa");
+        Path::Tiny::path("$id/$acc.gff")->move("$id/$seq_name.gff");
     }
 
     print "\n\n";
