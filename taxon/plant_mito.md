@@ -8,6 +8,7 @@
 - [Filtering based on valid families and genera](#filtering-based-on-valid-families-and-genera)
 - [Find a way to name these](#find-a-way-to-name-these)
 - [Download sequences and regenerate lineage information.](#download-sequences-and-regenerate-lineage-information)
+- [Prepare sequences for lastz](#prepare-sequences-for-lastz)
 - [Create alignment plans](#create-alignment-plans)
 - [Aligning](#aligning)
     - [Batch running for groups](#batch-running-for-groups)
@@ -348,7 +349,7 @@ cat ../mitochondrion_summary/mitochondrion.ABBR.csv |
 # some warnings from bioperl, just ignore them
 perl ~/Scripts/withncbi/taxon/batch_get_seq.pl \
     -f mitochondrion_name_acc_id.csv \
-    -p 2>&1 |
+    2>&1 |
     tee mitochondrion_seq.log
 
 # count downloaded sequences
@@ -356,6 +357,33 @@ find . -name "*.fasta" | wc -l
 
 ```
 
+
+# Prepare sequences for lastz
+
+```bash
+cd ~/data/organelle/mitochondrion_genomes
+
+find . -maxdepth 1 -type d -path "*/*" |
+    sort |
+    parallel --no-run-if-empty --linebuffer -k -j 2 '
+        echo >&2 "==> {}"
+        
+        if [ -e {}/chr.fasta ]; then
+            echo >&2 "    {} has been processed"
+            exit;
+        fi
+
+        egaz prepseq \
+            {} \
+            --gi -v --repeatmasker " --gff --parallel 8"
+    '
+
+# restore to original states
+#for suffix in .2bit .fasta .fasta.fai .sizes .rm.out .rm.gff; do
+#    find . -name "*${suffix}" | parallel --no-run-if-empty rm 
+#done
+
+```
 
 # Create alignment plans
 
