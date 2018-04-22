@@ -48,7 +48,8 @@ Columns:
 =head1 EXAMPLE
 
     cd ~/data/alignment/yeast_genome
-    perl ~/Scripts/withncbi/taxon/batch_get_seq.pl -p -f yeast_name_seq.csv 2>&1 | tee yeast_name_seq.log
+    perl ~/Scripts/withncbi/taxon/batch_get_seq.pl -f yeast_name_seq.csv 2>&1 |
+        tee yeast_name_seq.log
 
 =cut
 
@@ -56,7 +57,6 @@ GetOptions(
     'help|?'    => sub { Getopt::Long::HelpMessage(0) },
     'file|f=s'  => \my $in_file,
     'local|l=s' => \my $local,
-    'pure|p'    => \my $pure_gff,
 ) or Getopt::Long::HelpMessage(1);
 
 die "Provide a .csv file\n" unless defined $in_file and -e $in_file;
@@ -130,10 +130,7 @@ while ( my $row = $csv->getline($csv_fh) ) {
 
     if ( -e "$id/$acc.gb" ) {
         system "perl $FindBin::Bin/bp_genbank2gff3.pl $id/$acc.gb";
-        path("$acc.gb.gff")->move("$id/$acc.gff");
-    }
-
-    if ($pure_gff) {
+        Path::Tiny::path("$acc.gb.gff")->move("$id/$acc.gff");
         system "perl -i -nlp -e '/^\#\#FASTA/ and last' $id/$acc.gff";
     }
 
