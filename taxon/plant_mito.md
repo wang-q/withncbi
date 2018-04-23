@@ -12,8 +12,8 @@
 - [Create alignment plans](#create-alignment-plans)
 - [Aligning](#aligning)
     - [Batch running for groups](#batch-running-for-groups)
-    - [Self alignments.](#self-alignments)
     - [Alignments of families for outgroups.](#alignments-of-families-for-outgroups)
+    - [Self alignments](#self-alignments)
 
 
 # Scrap id and acc from NCBI
@@ -39,8 +39,8 @@ pages.
 Got **217** accessions.
 
 ```bash
-mkdir -p ~/data/organelle/mitochondrion_genomes
-cd ~/data/organelle/mitochondrion_genomes
+mkdir -p ~/data/organelle/mito/GENOMES
+cd ~/data/organelle/mito/GENOMES
 
 rm webpage_id_seq.csv
 
@@ -57,7 +57,7 @@ perl ~/Scripts/withncbi/taxon/id_seq_dom_select.pl \
 Use `taxon/gb_taxon_locus.pl` to extract information from refseq genbank files.
 
 ```bash
-cd ~/data/organelle/mitochondrion_genomes
+cd ~/data/organelle/mito/GENOMES
 
 wget -N ftp://ftp.ncbi.nlm.nih.gov/genomes/refseq/mitochondrion/mitochondrion.1.genomic.gbff.gz
 wget -N ftp://ftp.ncbi.nlm.nih.gov/genomes/refseq/mitochondrion/mitochondrion.2.genomic.gbff.gz
@@ -84,7 +84,7 @@ cat mitochondrion_id_seq.csv | grep -v "^#" | wc -l
 Restrict taxonomy ids to green plants with `taxon/id_restrict.pl`.
 
 ```bash
-cd ~/data/organelle/mitochondrion_genomes
+cd ~/data/organelle/mito/GENOMES
 
 echo '#strain_taxon_id,accession' > plant_mitochondrion_id_seq.csv
 cat mitochondrion_id_seq.csv |
@@ -110,12 +110,12 @@ Give ids better shapes for manually checking and automatic filtering.
 If you sure, you can add or delete lines and contents in `mitochondrion.CHECKME.csv`.
 
 ```bash
-mkdir -p ~/data/organelle/mitochondrion_summary
-cd ~/data/organelle/mitochondrion_summary
+mkdir -p ~/data/organelle/mito/summary
+cd ~/data/organelle/mito/summary
 
 # generate a .csv file for manually checking
 echo '#strain_taxon_id,accession,strain,species,genus,family,order,class,phylum' > mitochondrion.CHECKME.csv
-cat ../mitochondrion_genomes/plant_mitochondrion_id_seq.csv |
+cat ../GENOMES/plant_mitochondrion_id_seq.csv |
     grep -v "^#" |
     perl ~/Scripts/withncbi/taxon/id_project_to.pl -s "," |
     perl ~/Scripts/withncbi/taxon/id_project_to.pl -s "," --rank species |
@@ -134,7 +134,7 @@ Manually correct lineages. # FIXME
 Split Streptophyta according to http://www.theplantlist.org/
 
 ```bash
-cd ~/data/organelle/mitochondrion_summary
+cd ~/data/organelle/mito/summary
 
 # Angiosperms
 perl -Mojo -e '
@@ -213,8 +213,8 @@ Species and genus should not be "NA" and genus has 2 or more members.
 
 
 ```bash
-mkdir -p ~/data/organelle/mitochondrion_summary
-cd ~/data/organelle/mitochondrion_summary
+mkdir -p ~/data/organelle/mito/summary
+cd ~/data/organelle/mito/summary
 
 # filter out accessions without linage information (strain, species, genus and family)
 cat mitochondrion.CHECKME.csv |
@@ -313,7 +313,7 @@ cat mitochondrion.DOWNLOAD.csv |
 Create abbreviations.
 
 ```bash
-cd ~/data/organelle/mitochondrion_summary
+cd ~/data/organelle/mito/summary
 
 echo '#strain_taxon_id,accession,strain,species,genus,family,order,class,phylum,abbr' > mitochondrion.ABBR.csv
 cat mitochondrion.DOWNLOAD.csv |
@@ -327,8 +327,7 @@ cat mitochondrion.DOWNLOAD.csv |
 # Download sequences and regenerate lineage information.
 
 ```bash
-mkdir -p ~/data/organelle/mitochondrion_genomes
-cd ~/data/organelle/mitochondrion_genomes
+cd ~/data/organelle/mito/GENOMES
 
 echo "#strain_name,accession,strain_taxon_id" > mitochondrion_name_acc_id.csv
 cat ../mitochondrion_summary/mitochondrion.ABBR.csv |
@@ -361,7 +360,7 @@ find . -name "*.fasta" | wc -l
 # Prepare sequences for lastz
 
 ```bash
-cd ~/data/organelle/mitochondrion_genomes
+cd ~/data/organelle/mito/GENOMES
 
 find . -maxdepth 1 -type d -path "*/*" |
     sort |
@@ -392,7 +391,7 @@ We got **111** accessions.
 Numbers for higher ranks are: 15 orders, 17 families, 27 genera and 85 species.
 
 ```bash
-cd ~/data/organelle/mitochondrion_summary
+cd ~/data/organelle/mito/summary
 
 # valid genera
 cat mitochondrion.ABBR.csv |
@@ -443,7 +442,7 @@ Create `mitochondrion_OG.md` for picking outgroups.
 Manually edit it then move to `~/Scripts/withncbi/doc/mitochondrion_OG.md`.
 
 ```bash
-cd ~/data/organelle/mitochondrion_summary
+cd ~/data/organelle/mito/summary
 
 cat mitochondrion.GENUS.csv |
     grep -v "^#" |
@@ -475,7 +474,7 @@ cat mitochondrion.GENUS.csv |
 Create alignments without/with outgroups.
 
 ```bash
-cd ~/data/organelle/mitochondrion_summary
+cd ~/data/organelle/mito/summary
 
 # tab-separated
 # name  t   qs
@@ -563,7 +562,7 @@ cat genus.tsv |
 ```
 
 ```bash
-cd ~/data/organelle/mitochondrion_summary
+cd ~/data/organelle/mito/summary
 
 cat <<'EOF' > egaz_template_multi.tt
 
@@ -693,8 +692,8 @@ cat genus.tsv |
 ## Batch running for groups
 
 ```bash
-mkdir -p ~/data/organelle/mitochondrion.working
-cd ~/data/organelle/mitochondrion.working
+mkdir -p ~/data/organelle/mito/genus
+cd ~/data/organelle/mito/genus
 
 bash ../mitochondrion.cmd.txt 2>&1 | tee log_cmd.txt
 
@@ -719,8 +718,8 @@ find . -mindepth 1 -maxdepth 3 -type d -name "*_fasta" | parallel -r rm -fr
 ## Alignments of families for outgroups.
 
 ```bash
-mkdir -p ~/data/organelle/mitochondrion_families
-cd ~/data/organelle/mitochondrion_families
+mkdir -p ~/data/organelle/mito/families
+cd ~/data/organelle/mito/families
 
 time bash ../mitochondrion_families.cmd.txt 2>&1 | tee log_cmd.txt
 
@@ -741,14 +740,14 @@ find . -mindepth 1 -maxdepth 3 -type d -name "*_fasta" | parallel -r rm -fr
 
 ```
 
-In previous steps, we have manually edited `~/Scripts/withncbi/doc/mitochondrion_OG.md` and generated
-`genus_OG.tsv`.
+In previous steps, we have manually edited `~/Scripts/withncbi/doc/mitochondrion_OG.md` and
+generated `genus_OG.tsv`.
 
 *D* between target and outgroup should be around **0.05**.
 
 ```bash
-mkdir -p ~/data/organelle/mitochondrion_OG
-cd ~/data/organelle/mitochondrion_OG
+mkdir -p ~/data/organelle/mito/genus_OG
+cd ~/data/organelle/mito/genus_OG
 
 time bash ../mitochondrion_OG.cmd.txt 2>&1 | tee log_cmd.txt
 
@@ -770,8 +769,8 @@ find . -mindepth 1 -maxdepth 3 -type d -name "*_fasta" | parallel -r rm -fr
 ## Self alignments
 
 ```bash
-mkdir -p ~/data/organelle/mitochondrion_self
-cd ~/data/organelle/mitochondrion_self
+mkdir -p ~/data/organelle/mito/self
+cd ~/data/organelle/mito/self
 
 time bash ../mitochondrion_self.cmd.txt 2>&1 | tee log_cmd.txt
 
