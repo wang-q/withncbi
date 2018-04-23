@@ -543,7 +543,7 @@ cat mitochondrion.ABBR.csv |
 
 # name  t   qs  o
 cat genus.tsv |
-    perl -nl -a -F"\t" -MPath::Tiny -e '
+    perl -nla -F"\t" -MPath::Tiny -e '
         BEGIN{
             @ls = grep {/\S/}
                   grep {!/^#/}
@@ -556,44 +556,137 @@ cat genus.tsv |
 
         if (exists $h{$F[0]}) {
             printf qq{%s\t%s\t%s\t%s\n}, $F[0] . q{_OG}, $F[1], $F[2], $h{$F[0]};
-        }' \
+        }
+    ' \
     > genus_OG.tsv
 
+```
+
+```bash
+cd ~/data/organelle/mitochondrion_summary
+
+cat <<'EOF' > egaz_template_multi.tt
+
+# [% name %]
+egaz template \
+    ~/data/organelle/mitochondrion_genomes/[% t %] \
+[% FOREACH q IN qs -%]
+    ~/data/organelle/mitochondrion_genomes/[% q %] \
+[% END -%]
+[% IF o -%]
+    ~/data/organelle/mitochondrion_genomes/[% o %] \
+    --outgroup [% o %] \
+[% END -%]
+    --multi -o [% name %] \
+    --taxon ~/data/organelle/mitochondrion_genomes/mitochondrion_ncbi.csv \
+    --rawphylo --parallel 8 -v
+
+EOF
+
 # every genera
-echo -e "mkdir -p ~/data/organelle/mitochondrion.working \ncd ~/data/organelle/mitochondrion.working\n" > ../mitochondrion.cmd.txt
+echo "mkdir -p ~/data/organelle/mitochondrion.working"  > ../mitochondrion.cmd.txt
+echo "cd       ~/data/organelle/mitochondrion.working" >> ../mitochondrion.cmd.txt
 cat genus.tsv |
-    perl ~/Scripts/withncbi/taxon/cmd_template.pl \
-        --seq_dir ~/data/organelle/mitochondrion_genomes \
-        --csv_taxon ~/data/organelle/mitochondrion_genomes/mitochondrion_ncbi.csv \
-        --parallel 8 \
+    TT_FILE=egaz_template_multi.tt perl -MTemplate -nla -F"\t" -e '
+        next unless scalar @F >= 3;
+        
+        my $tt = Template->new;
+        $tt->process(
+            $ENV{TT_FILE},
+            {
+                name       => $F[0],
+                t          => $F[1],
+                qs         => [ split /,/, $F[2] ],
+                o          => $F[3],
+            },
+            \*STDOUT
+        ) or die Template->error;
+
+    ' \
     >> ../mitochondrion.cmd.txt
 
-echo -e "mkdir -p ~/data/organelle/mitochondrion.working \ncd ~/data/organelle/mitochondrion.working\n" > ../mitochondrion.redo.cmd.txt
-cat genus.tsv |
-    perl ~/Scripts/withncbi/taxon/cmd_template.pl \
-        --csv_taxon ~/data/organelle/mitochondrion_genomes/mitochondrion_ncbi.csv \
-        --parallel 8 \
-    >> ../mitochondrion.redo.cmd.txt
-
 # this is for finding outgroups
-echo -e "mkdir -p ~/data/organelle/mitochondrion_families \ncd ~/data/organelle/mitochondrion_families\n" > ../mitochondrion_families.cmd.txt
+echo "mkdir -p ~/data/organelle/mitochondrion_families"  > ../mitochondrion_families.cmd.txt
+echo "cd       ~/data/organelle/mitochondrion_families" >> ../mitochondrion_families.cmd.txt
 cat family.tsv |
-    perl -n -e '/,\w+,/ and print' |
-    perl ~/Scripts/withncbi/taxon/cmd_template.pl \
-        --seq_dir ~/data/organelle/mitochondrion_genomes \
-        --csv_taxon ~/data/organelle/mitochondrion_genomes/mitochondrion_ncbi.csv \
-        --parallel 8 \
+    TT_FILE=egaz_template_multi.tt perl -MTemplate -nla -F"\t" -e '
+        next unless scalar @F >= 3;
+        
+        my $tt = Template->new;
+        $tt->process(
+            $ENV{TT_FILE},
+            {
+                name       => $F[0],
+                t          => $F[1],
+                qs         => [ split /,/, $F[2] ],
+                o          => $F[3],
+            },
+            \*STDOUT
+        ) or die Template->error;
+
+    ' \
     >> ../mitochondrion_families.cmd.txt
 
 # genera with outgroups
+echo "mkdir -p ~/data/organelle/mitochondrion_OG"  > ../mitochondrion_OG.cmd.txt
+echo "cd       ~/data/organelle/mitochondrion_OG" >> ../mitochondrion_OG.cmd.txt
 echo -e "mkdir -p ~/data/organelle/mitochondrion_OG \ncd ~/data/organelle/mitochondrion_OG\n" > ../mitochondrion_OG.cmd.txt
 cat genus_OG.tsv |
-    perl ~/Scripts/withncbi/taxon/cmd_template.pl \
-        --seq_dir ~/data/organelle/mitochondrion_genomes \
-        --csv_taxon ~/data/organelle/mitochondrion_genomes/mitochondrion_ncbi.csv \
-        --parallel 8 \
+    TT_FILE=egaz_template_multi.tt perl -MTemplate -nla -F"\t" -e '
+        next unless scalar @F >= 3;
+        
+        my $tt = Template->new;
+        $tt->process(
+            $ENV{TT_FILE},
+            {
+                name       => $F[0],
+                t          => $F[1],
+                qs         => [ split /,/, $F[2] ],
+                o          => $F[3],
+            },
+            \*STDOUT
+        ) or die Template->error;
+
+    ' \
     >> ../mitochondrion_OG.cmd.txt
+
+cat <<'EOF' > egaz_templates_self.tt
+
+# [% name %]
+egaz template \
+    ~/data/organelle/mitochondrion_genomes/[% t %] \
+[% FOREACH q IN qs -%]
+    ~/data/organelle/mitochondrion_genomes/[% q %] \
+[% END -%]
+    --self -o [% name %] \
+    --taxon ~/data/organelle/mitochondrion_genomes/mitochondrion_ncbi.csv \
+    --circos --aligndb --parallel 8 -v
+
+EOF
+
+# every genera
+echo "mkdir -p ~/data/organelle/mitochondrion_self"  > ../mitochondrion_self.cmd.txt
+echo "cd       ~/data/organelle/mitochondrion_self" >> ../mitochondrion_self.cmd.txt
+cat genus.tsv |
+    TT_FILE=egaz_templates_self.tt perl -MTemplate -nla -F"\t" -e '
+        next unless scalar @F >= 3;
+        
+        my $tt = Template->new;
+        $tt->process(
+            $ENV{TT_FILE},
+            {
+                name       => $F[0],
+                t          => $F[1],
+                qs         => [ split /,/, $F[2] ],
+            },
+            \*STDOUT
+        ) or die Template->error;
+
+    ' \
+    >> ../mitochondrion_self.cmd.txt
+
 ```
+
 
 # Aligning
 
@@ -604,70 +697,16 @@ mkdir -p ~/data/organelle/mitochondrion.working
 cd ~/data/organelle/mitochondrion.working
 
 bash ../mitochondrion.cmd.txt 2>&1 | tee log_cmd.txt
-# bash ../mitochondrion.redo.cmd.txt 2>&1 | tee log_redo_cmd.txt # skip real_chr and repeatmasker
 
-#----------------------------#
-# Approach 1: one by one
-#----------------------------#
 for d in `find . -mindepth 1 -maxdepth 1 -type d | sort `;do
     echo "echo \"====> Processing $d <====\""
-    echo bash $d/1_real_chr.sh ;
-    echo bash $d/2_file_rm.sh ;
-    echo bash $d/3_pair_cmd.sh ;
-    echo bash $d/4_rawphylo.sh ;
-    echo bash $d/5_multi_cmd.sh ;
-    echo bash $d/7_multi_db_only.sh ;
+    echo bash $d/1_pair.sh;
+    echo bash $d/2_rawphylo.sh;
+    echo bash $d/3_multi.sh;
     echo ;
 done  > runall.sh
 
 sh runall.sh 2>&1 | tee log_runall.txt
-
-#----------------------------#
-# Approach 2: step by step
-#----------------------------#
-# real_chr
-for f in `find . -mindepth 1 -maxdepth 2 -type f -name 1_real_chr.sh | sort `;do
-    echo bash $f ;
-    echo ;
-done  > run_1.sh
-
-# RepeatMasker
-for f in `find . -mindepth 1 -maxdepth 2 -type f -name 2_file_rm.sh | sort `;do
-    echo bash $f ;
-    echo ;
-done  > run_2.sh
-
-# pair
-for f in `find . -mindepth 1 -maxdepth 2 -type f -name 3_pair_cmd.sh | sort `;do
-    echo bash $f ;
-    echo ;
-done  > run_3.sh
-
-# rawphylo
-for f in `find . -mindepth 1 -maxdepth 2 -type f -name 4_rawphylo.sh | sort `;do
-    echo bash $f ;
-    echo ;
-done  > run_4.sh
-
-# multi cmd
-for f in `find . -mindepth 1 -maxdepth 2 -type f -name 5_multi_cmd.sh | sort `;do
-    echo bash $f ;
-    echo ;
-done  > run_5.sh
-
-# multi db
-for f in `find . -mindepth 1 -maxdepth 2 -type f -name 7_multi_db_only.sh | sort `;do
-    echo bash $f ;
-    echo ;
-done  > run_7.sh
-
-# 24 cores
-cat run_1.sh | grep . | parallel -r -j 16 2>&1 | tee log_1.txt
-cat run_2.sh | grep . | parallel -r -j 8  2>&1 | tee log_2.txt
-cat run_3.sh | grep . | parallel -r -j 16 2>&1 | tee log_3.txt
-cat run_4.sh | grep . | parallel -r -j 4  2>&1 | tee log_4.txt
-cat run_5.sh | grep . | parallel -r -j 4  2>&1 | tee log_5.txt
-cat run_7.sh | grep . | parallel -r -j 16 2>&1 | tee log_7.txt
 
 #----------------------------#
 # Clean
@@ -675,46 +714,6 @@ cat run_7.sh | grep . | parallel -r -j 16 2>&1 | tee log_7.txt
 find . -mindepth 1 -maxdepth 3 -type d -name "*_raw" | parallel -r rm -fr
 find . -mindepth 1 -maxdepth 3 -type d -name "*_fasta" | parallel -r rm -fr
 
-find . -mindepth 1 -maxdepth 4 -type f -name "*.phy" | parallel -r rm
-find . -mindepth 1 -maxdepth 4 -type f -name "*.phy.reduced" | parallel -r rm
-```
-
-## Self alignments.
-
-```bash
-cd ~/data/organelle/
-
-perl -p -e '
-    s/mitochondrion\.working/mitochondrion_self.working/g;
-    s/multi_batch/self_batch/g;
-    s/(\-\-parallel)/--length 1000 \1/g;
-' mitochondrion.cmd.txt > mitochondrion_self.cmd.txt
-
-mkdir -p ~/data/organelle/mitochondrion_self.working
-cd ~/data/organelle/mitochondrion_self.working
-
-time bash ../mitochondrion_self.cmd.txt 2>&1 | tee log_cmd.txt
-
-# Don't need 6_feature_cmd.sh
-for d in `find . -mindepth 1 -maxdepth 1 -type d | sort `;do
-    echo "echo \"====> Processing $d <====\""
-    echo bash $d/1_real_chr.sh ;
-    echo bash $d/2_file_rm.sh ;
-    echo bash $d/3_self_cmd.sh ;
-    echo bash $d/4_proc_cmd.sh ;
-    echo bash $d/5_circos_cmd.sh ;
-    echo bash $d/7_pair_stat.sh ;
-    echo ;
-done  > runall.sh
-
-sh runall.sh 2>&1 | tee log_runall.txt
-
-# clean
-find . -mindepth 1 -maxdepth 2 -type d -name "*_raw" | parallel -r rm -fr
-find . -mindepth 1 -maxdepth 2 -type d -name "*_fasta" | parallel -r rm -fr
-
-# clean mysql
-#find  /usr/local/var/mysql -type d -name "[A-Z]*" | parallel -r rm -fr
 ```
 
 ## Alignments of families for outgroups.
@@ -727,11 +726,9 @@ time bash ../mitochondrion_families.cmd.txt 2>&1 | tee log_cmd.txt
 
 for d in `find . -mindepth 1 -maxdepth 1 -type d | sort `;do
     echo "echo \"====> Processing $d <====\""
-    echo bash $d/1_real_chr.sh ;
-    echo bash $d/2_file_rm.sh ;
-    echo bash $d/3_pair_cmd.sh ;
-    echo bash $d/4_rawphylo.sh ;
-    echo bash $d/5_multi_cmd.sh ;
+    echo bash $d/1_pair.sh;
+    echo bash $d/2_rawphylo.sh;
+    echo bash $d/3_multi.sh;
     echo ;
 done  > runall.sh
 
@@ -739,14 +736,60 @@ sh runall.sh 2>&1 | tee log_runall.txt
 
 find ~/data/organelle/mitochondrion_families -type f -path "*_phylo*" -name "*.nwk"
 
-#----------------------------#
-# Clean
-#----------------------------#
 find . -mindepth 1 -maxdepth 3 -type d -name "*_raw" | parallel -r rm -fr
 find . -mindepth 1 -maxdepth 3 -type d -name "*_fasta" | parallel -r rm -fr
 
-find . -mindepth 1 -maxdepth 4 -type f -name "*.phy" | parallel -r rm
-find . -mindepth 1 -maxdepth 4 -type f -name "*.phy.reduced" | parallel -r rm
+```
+
+In previous steps, we have manually edited `~/Scripts/withncbi/doc/mitochondrion_OG.md` and generated
+`genus_OG.tsv`.
+
+*D* between target and outgroup should be around **0.05**.
+
+```bash
+mkdir -p ~/data/organelle/mitochondrion_OG
+cd ~/data/organelle/mitochondrion_OG
+
+time bash ../mitochondrion_OG.cmd.txt 2>&1 | tee log_cmd.txt
+
+for d in `find . -mindepth 1 -maxdepth 1 -type d | sort `; do
+    echo "echo \"====> Processing $d <====\""
+    echo bash $d/1_pair.sh;
+    echo bash $d/2_rawphylo.sh;
+    echo bash $d/3_multi.sh;
+    echo ;
+done  > runall.sh
+
+sh runall.sh 2>&1 | tee log_runall.txt
+
+find . -mindepth 1 -maxdepth 3 -type d -name "*_raw" | parallel -r rm -fr
+find . -mindepth 1 -maxdepth 3 -type d -name "*_fasta" | parallel -r rm -fr
+
+```
+
+## Self alignments
+
+```bash
+mkdir -p ~/data/organelle/mitochondrion_self
+cd ~/data/organelle/mitochondrion_self
+
+time bash ../mitochondrion_self.cmd.txt 2>&1 | tee log_cmd.txt
+
+# Don't need 6_feature_cmd.sh 7_pair_stat.sh
+for d in `find . -mindepth 1 -maxdepth 1 -type d | sort `;do
+    echo "echo \"====> Processing $d <====\""
+    echo bash $d/1_self.sh;
+    echo bash $d/3_proc.sh;
+    echo bash $d/4_circos.sh;
+    echo bash $d/7_chr_length.sh;
+    echo ;
+done  > runall.sh
+
+sh runall.sh 2>&1 | tee log_runall.txt
+
+# clean
+find . -mindepth 1 -maxdepth 2 -type d -name "*_raw" | parallel -r rm -fr
+find . -mindepth 1 -maxdepth 2 -type d -name "*_fasta" | parallel -r rm -fr
 
 ```
 
