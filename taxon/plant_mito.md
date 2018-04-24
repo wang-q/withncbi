@@ -698,10 +698,10 @@ cd ~/data/organelle/mito/genus
 bash ../mitochondrion.cmd.txt 2>&1 | tee log_cmd.txt
 
 for d in `find . -mindepth 1 -maxdepth 1 -type d | sort `;do
-    echo "echo \"====> Processing $d <====\""
-    echo bash $d/1_pair.sh;
-    echo bash $d/2_rawphylo.sh;
-    echo bash $d/3_multi.sh;
+    echo "echo \"====> Processing ${d} <====\""
+    echo bash ${d}/1_pair.sh;
+    echo bash ${d}/2_rawphylo.sh;
+    echo bash ${d}/3_multi.sh;
     echo ;
 done  > runall.sh
 
@@ -724,10 +724,10 @@ cd ~/data/organelle/mito/families
 time bash ../mitochondrion_families.cmd.txt 2>&1 | tee log_cmd.txt
 
 for d in `find . -mindepth 1 -maxdepth 1 -type d | sort `;do
-    echo "echo \"====> Processing $d <====\""
-    echo bash $d/1_pair.sh;
-    echo bash $d/2_rawphylo.sh;
-    echo bash $d/3_multi.sh;
+    echo "echo \"====> Processing ${d} <====\""
+    echo bash ${d}/1_pair.sh;
+    echo bash ${d}/2_rawphylo.sh;
+    echo bash ${d}/3_multi.sh;
     echo ;
 done  > runall.sh
 
@@ -752,10 +752,10 @@ cd ~/data/organelle/mito/genus_OG
 time bash ../mitochondrion_OG.cmd.txt 2>&1 | tee log_cmd.txt
 
 for d in `find . -mindepth 1 -maxdepth 1 -type d | sort `; do
-    echo "echo \"====> Processing $d <====\""
-    echo bash $d/1_pair.sh;
-    echo bash $d/2_rawphylo.sh;
-    echo bash $d/3_multi.sh;
+    echo "echo \"====> Processing ${d} <====\""
+    echo bash ${d}/1_pair.sh;
+    echo bash ${d}/2_rawphylo.sh;
+    echo bash ${d}/3_multi.sh;
     echo ;
 done  > runall.sh
 
@@ -776,11 +776,11 @@ time bash ../mitochondrion_self.cmd.txt 2>&1 | tee log_cmd.txt
 
 # Don't need 6_feature_cmd.sh 7_pair_stat.sh
 for d in `find . -mindepth 1 -maxdepth 1 -type d | sort `;do
-    echo "echo \"====> Processing $d <====\""
-    echo bash $d/1_self.sh;
-    echo bash $d/3_proc.sh;
-    echo bash $d/4_circos.sh;
-    echo bash $d/7_chr_length.sh;
+    echo "echo \"====> Processing ${d} <====\""
+    echo bash ${d}/1_self.sh;
+    echo bash ${d}/3_proc.sh;
+    echo bash ${d}/4_circos.sh;
+    echo bash ${d}/7_chr_length.sh;
     echo ;
 done  > runall.sh
 
