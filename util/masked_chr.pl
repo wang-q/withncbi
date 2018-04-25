@@ -43,7 +43,7 @@ masked_chr.pl - Soft-masking fa file.
     faops split-name Saccharomyces_cerevisiae.R64-1-1.dna.toplevel.fa.gz genome
     faops size genome/*.fa > genome/chr.sizes
 
-    perl ~/Scripts/alignDB/slice/write_runlist_feature.pl -e yeast --feature repeat
+    perl ~/Scripts/withncbi/ensembl/feature_runlists.pl -e yeast --feature repeat
 
     # Or use gff2runlist.pl or rmout2runlist.pl
     # wget -N ftp://ftp.ensembl.org/pub/release-82/gff3/saccharomyces_cerevisiae/Saccharomyces_cerevisiae.R64-1-1.82.gff3.gz

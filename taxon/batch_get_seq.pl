@@ -26,7 +26,6 @@ batch_get_seq.pl - retrieve all sequences listed in a file
         --help      -?          brief help message
         --file      -f  STR     input csv file
         --local     -l  STR     find files from this local directory first
-        --pure      -p          remove fasta sequences from generated gff files
 
 =head1 CSV file format
 
