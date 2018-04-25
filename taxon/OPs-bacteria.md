@@ -1,9 +1,6 @@
 # Processing bacterial genomes species by species
 
-The following command lines are about how I processed the plastid genomes of green plants.
-Many tools of `taxon/` are used here, which makes a good example for users.
-
-## Init genome report database.
+# Init genome report database.
 
 `db/README.md`
 
@@ -12,15 +9,16 @@ cd ~/Scripts/withncbi/db
 perl gr_strains.pl -o prok_strains.csv
 perl gr_db.pl --db gr_prok --file prok_strains.csv
 rm prok_strains.csv
+
 ```
 
 Find valid species.
 
-Got **159** species.
+Got **173** species.
 
 ```bash
-mkdir -p ~/data/bacteria/bac_summary
-cd ~/data/bacteria/bac_summary
+mkdir -p ~/data/bacteria/summary
+cd ~/data/bacteria/summary
 
 perl ~/Scripts/alignDB/util/query_sql.pl --db gr_prok -q '
         SELECT  species_id `#species_id`,
@@ -39,24 +37,25 @@ perl ~/Scripts/alignDB/util/query_sql.pl --db gr_prok -q '
         GROUP BY species_id
         HAVING count > 2 AND species_code > 0       # having enough and representative member
         ORDER BY subgroup, species_id
-    ' -o stdout \
-    | cut -d ',' -f 1 \
-    | grep -v "^#" \
+    ' -o stdout |
+    cut -d ',' -f 1 |
+    grep -v "^#" \
     > bac.SPECIES.csv
 cat bac.SPECIES.csv | wc -l
+
 ```
 
 Expand species to strains. (Nested single quotes in bash should be '\'')
 
-Got **1470** strains.
+Got **1836** strains.
 
 
 ```bash
-cd ~/data/bacteria/bac_summary
+cd ~/data/bacteria/summary
 
 rm bac.STRAIN.csv
-cat bac.SPECIES.csv \
-    | parallel --keep-order -r -j 8 '
+cat bac.SPECIES.csv |
+    parallel --keep-order -r -j 8 '
         perl ~/Scripts/alignDB/util/query_sql.pl --db gr_prok -q '\''
             SELECT  taxonomy_id `#strain_taxonomy_id`,
                     organism_name `strain`,
@@ -75,16 +74,17 @@ cat bac.SPECIES.csv \
             AND (LENGTH(wgs) = 0 OR wgs IS NULL)        # avoid bad assembly
             AND species_id = {}
         '\'' -o stdout
-    ' \
-    | grep -v "^#" \
+    ' |
+    grep -v "^#" \
     >> bac.STRAIN.csv
 cat bac.STRAIN.csv | wc -l
+
 ```
 
 Create abbreviations.
 
 ```bash
-cd ~/data/bacteria/bac_summary
+cd ~/data/bacteria/summary
 
 echo '#strain_taxonomy_id,strain,species,genus,subgroup,code,accession,abbr' > bac.ABBR.csv
 cat bac.STRAIN.csv \
@@ -92,55 +92,84 @@ cat bac.STRAIN.csv \
     | perl ~/Scripts/withncbi/taxon/abbr_name.pl -c "2,3,4" -s "," -m 0 --shortsub \
     | sort -t',' -k5,5 -k4,4 -k3,3 -k6,6 \
     >> bac.ABBR.csv
+
 ```
 
-## Download sequences and regenerate lineage information.
+# Download sequences and regenerate lineage information.
 
-We don't rename sequences here, so the file has three columns. **1587** accessions.
+We don't rename sequences here, so the file has three columns. **1960** accessions.
 
 And create `bac_ncbi.csv` with abbr names as taxon file.
 
 ```bash
-mkdir -p ~/data/bacteria/bac_genomes
-cd ~/data/bacteria/bac_genomes
+mkdir -p ~/data/bacteria/GENOMES
+cd ~/data/bacteria/GENOMES
 
-cat ../bac_summary/bac.ABBR.csv \
-    | grep -v '^#' \
-    | perl -nla -F"," -e 'print qq{$F[0],$F[7]}' \
-    | uniq \
-    | perl ~/Scripts/withncbi/taxon/strain_info.pl --stdin --withname --file bac_ncbi.csv
+cat ../summary/bac.ABBR.csv |
+    grep -v '^#' |
+    perl -nla -F"," -e 'print qq{$F[0],$F[7]}' |
+    uniq |
+    perl ~/Scripts/withncbi/taxon/strain_info.pl --stdin --withname --file bac_ncbi.csv
 
 echo "#strain_name,accession,strain_taxon_id" > bac_name_acc_id.csv
-cat ../bac_summary/bac.ABBR.csv \
-    | grep -v '^#' \
-    | perl -nla -F"," -e '
+cat ../summary/bac.ABBR.csv |
+    grep -v '^#' |
+    perl -nla -F"," -e '
         my $acc = $F[6];
         $acc =~ s/"//g;
         $acc =~ s/\.\d+//g;
         for my $s (split /\|/, $acc) {
             print qq{$F[7],$s,$F[0]};
         }
-    ' \
-    | sort \
+    ' |
+    sort \
     >> bac_name_acc_id.csv
 cat bac_name_acc_id.csv | wc -l
 
 perl ~/Scripts/withncbi/taxon/batch_get_seq.pl \
     -f bac_name_acc_id.csv \
     -l ~/data/NCBI/genomes/Bacteria \
-    -p 2>&1 \
-    | tee bac_seq.log
+    2>&1 |
+    tee bac_seq.log
 
 # count downloaded sequences
-find . -name "*.fasta" | wc -l
+find . -name "*.fa" | wc -l
+
 ```
 
-## Create alignment plans
-
-Numbers for higher ranks are: 16 subgroups, 80 genera and 159 species.
+# Prepare sequences for lastz
 
 ```bash
-cd ~/data/bacteria/bac_summary/
+cd ~/data/bacteria/GENOMES
+
+find . -maxdepth 1 -type d -path "*/*" |
+    sort |
+    parallel --no-run-if-empty --linebuffer -k -j 2 '
+        echo >&2 "==> {}"
+        
+        if [ -e {}/chr.fasta ]; then
+            echo >&2 "    {} has been processed"
+            exit;
+        fi
+
+        egaz prepseq \
+            {} \
+            --gi -v --repeatmasker " --gff --parallel 8"
+    '
+
+# restore to original states
+#for suffix in .2bit .fasta .fasta.fai .sizes .rm.out .rm.gff; do
+#    find . -name "*${suffix}" | parallel --no-run-if-empty rm 
+#done
+
+```
+
+# Create alignment plans
+
+Numbers for higher ranks are: 17 subgroups, 89 genera and 173 species.
+
+```bash
+cd ~/data/bacteria/summary/
 
 # count every ranks
 #  16 subgroup.list.tmp
@@ -156,19 +185,20 @@ rm *.tmp
 
 Exclude diverged strains.
 
-* 391904, Bifidobacterium longum subsp. infantis ATCC 15697 = JCM 1222 = DSM 20088, 2008-11-20, Complete Genome, 
+* 391904, Bifidobacterium longum subsp. infantis ATCC 15697 = JCM 1222 = DSM 20088, 2008-11-20,
+  Complete Genome,
 * 553190, Gardnerella vaginalis 409-05, 2010-01-07, Complete Genome, COM
-* 1386087, Neisseria meningitidis LNP21362, 2015-01-07, Complete Genome, 
-* 935590, Neisseria meningitidis M0579, 2015-06-19, Complete Genome, 
-* 1415774, Clostridium botulinum 202F, 2014-12-04, Complete Genome, 
-* 508767, Clostridium botulinum E3 str. Alaska E43, 2008-05-16, Complete Genome, 
-* 929506, Clostridium botulinum BKT015925, 2011-04-18, Complete Genome, 
-* 935198, Clostridium botulinum B str. Eklund 17B (NRP), 2008-05-07, Complete Genome, 
-* 869303, Streptococcus pneumoniae SPN034156, 2010-07-29, Complete Genome, 
-* 869311, Streptococcus pneumoniae SPN032672, 2010-07-29, Complete Genome, 
-* 869312, Streptococcus pneumoniae SPN033038, 2010-07-29, Complete Genome, 
-* 261317, Buchnera aphidicola (Cinara tujafilina), 2011-06-09, Complete Genome, 
-* 372461, Buchnera aphidicola BCc, 2006-10-18, Complete Genome, 
+* 1386087, Neisseria meningitidis LNP21362, 2015-01-07, Complete Genome,
+* 935590, Neisseria meningitidis M0579, 2015-06-19, Complete Genome,
+* 1415774, Clostridium botulinum 202F, 2014-12-04, Complete Genome,
+* 508767, Clostridium botulinum E3 str. Alaska E43, 2008-05-16, Complete Genome,
+* 929506, Clostridium botulinum BKT015925, 2011-04-18, Complete Genome,
+* 935198, Clostridium botulinum B str. Eklund 17B (NRP), 2008-05-07, Complete Genome,
+* 869303, Streptococcus pneumoniae SPN034156, 2010-07-29, Complete Genome,
+* 869311, Streptococcus pneumoniae SPN032672, 2010-07-29, Complete Genome,
+* 869312, Streptococcus pneumoniae SPN033038, 2010-07-29, Complete Genome,
+* 261317, Buchnera aphidicola (Cinara tujafilina), 2011-06-09, Complete Genome,
+* 372461, Buchnera aphidicola BCc, 2006-10-18, Complete Genome,
 
 ```sql
 SELECT taxonomy_id, organism_name, released_date, status, code
@@ -176,26 +206,28 @@ FROM gr_prok.gr
 WHERE species = "Gluconobacter oxydans" 
 and status NOT IN ('Contig', 'Scaffold')
 ORDER BY released_date, status, code
+
 ```
 
 ```bash
-cd ~/data/bacteria/bac_summary
+cd ~/data/bacteria/summary
 
-cat bac.ABBR.csv \
-    | grep -v "391904," \
-    | grep -v "553190," \
-    | grep -v "1386087," \
-    | grep -v "935590," \
-    | grep -v "1415774," \
-    | grep -v "508767," \
-    | grep -v "929506," \
-    | grep -v "935198," \
-    | grep -v "869303," \
-    | grep -v "869311," \
-    | grep -v "869312," \
-    | grep -v "261317," \
-    | grep -v "372461," \
+cat bac.ABBR.csv |
+    grep -v "391904," |
+    grep -v "553190," |
+    grep -v "1386087," |
+    grep -v "935590," |
+    grep -v "1415774," |
+    grep -v "508767," |
+    grep -v "929506," |
+    grep -v "935198," |
+    grep -v "869303," |
+    grep -v "869311," |
+    grep -v "869312," |
+    grep -v "261317," |
+    grep -v "372461," \
     > bac.WORKING.csv
+
 ```
 
 Create `bac_target_OG.md` for picking target and outgroup.
@@ -203,11 +235,11 @@ Create `bac_target_OG.md` for picking target and outgroup.
 Manually edit it then move to `~/Scripts/withncbi/doc/bac_target_OG.md`.
 
 ```bash
-cd ~/data/bacteria/bac_summary
+cd ~/data/bacteria/summary
 
-cat bac.ABBR.csv \
-    | grep -v "^#" \
-    | perl -na -F"," -e '
+cat bac.ABBR.csv |
+    grep -v "^#" |
+    perl -na -F"," -e '
         BEGIN{
             ($subgroup, $genus, $species,) = (q{}, q{}, q{});
         }
@@ -230,6 +262,7 @@ cat bac.ABBR.csv \
         printf qq{%s,%s,%s\n}, $species, $F[7], $F[5];
     ' \
     > bac_target_OG.md
+
 ```
 
 Create alignments without outgroups.
@@ -240,18 +273,18 @@ bac.WORKING.csv
 ```
 
 ```bash
-cd ~/data/bacteria/bac_summary
+cd ~/data/bacteria/summary
 
-# 159, same as previous count
-cat ~/Scripts/withncbi/doc/bac_target_OG.md \
-    | grep -v '^#' \
-    | grep -E '\S+' \
-    | wc -l
+# 179, more than previous count # FIXME
+cat ~/Scripts/withncbi/doc/bac_target_OG.md |
+    grep -v '^#' |
+    grep -E '\S+' |
+    wc -l
 
 # tab-separated
 # name  t   qs
-cat bac.WORKING.csv \
-    | perl -nl -a -F"," -MPath::Tiny -e '
+cat bac.WORKING.csv |
+    perl -nl -a -F"," -MPath::Tiny -e '
         BEGIN{
             $name = q{};
             %id_of = ();
