@@ -18,7 +18,9 @@ Gardnerella_vaginalis,Ga_vaginalis_ATCC_14019
 ## Mycobacterium 分枝杆菌属
 Mycobacterium_abscessus,Mycob_abscessus_ATCC_19977
 Mycobacterium_avium,Mycob_avium_paratuberculosis_K_10
+Mycobacterium_bovis,Mycob_bovis_AF2122_97
 Mycobacterium_intracellulare,Mycob_intracellulare_MOTT_64
+Mycobacterium_kansasii,Mycob_kansasii_ATCC_12478
 Mycobacterium_tuberculosis,Mycob_tuberculosis_H37Rv
 ## Propionibacterium 丙酸杆菌属
 Propionibacterium_acnes,Prop_acnes_KPA171202
@@ -31,6 +33,8 @@ Streptomyces_hygroscopicus,Streptom_hygroscopicus_jinggangensis_5008
 # Bacteroidetes/Chlorobi group 拟杆菌门/绿菌门
 ## Bacteroides 拟杆菌属
 Bacteroides_fragilis,Bact_fragilis_YCH46
+## Elizabethkingia 伊莉莎白菌属
+Elizabethkingia_anophelis,El_anophelis_Ag1
 ## Flavobacterium  产黄菌属
 Flavobacterium_psychrophilum,Fl_psychrophilum_JIP02_86
 ## Porphyromonas 卟啉单胞菌属
@@ -47,6 +51,8 @@ Chlamydia_psittaci,Ch_psittaci_6BC
 Chlamydia_trachomatis,Ch_trachomatis_D_UW_3_CX
 
 # Cyanobacteria/Melainabacteria group 蓝菌门
+## Microcystis 微胞藻属
+Microcystis_aeruginosa,Mi_aeruginosa_NIES_843
 ## Prochlorococcus 原绿球藻
 Prochlorococcus_marinus,Proc_marinus_marinus_CCMP1375
 
@@ -60,8 +66,10 @@ Bacillus_anthracis,Baci_anthracis_Ames
 Bacillus_cereus,Baci_cereus_ATCC_14579
 Bacillus_coagulans,Baci_coagulans_2_6
 Bacillus_megaterium,Baci_megaterium_DSM_319
+Bacillus_subtilis,Baci_subtilis_subtilis_168
 ## Clostridium
 Clostridium_acetobutylicum,Clo_acetobutylicum_ATCC_824
+Clostridium_beijerinckii,Cl_beijerinckii_NCIMB_8052
 Clostridium_botulinum,Clo_botulinum_A_ATCC_3502
 Clostridium_pasteurianum,Clo_pasteurianum_BC1
 Clostridium_perfringens,Clo_perfringens_13
@@ -81,6 +89,8 @@ Lactococcus_lactis,Lactoc_lactis_lactis_Il1403
 ## Leuconostoc
 Leuconostoc_gelidum,Leu_gelidum_JB7
 Leuconostoc_mesenteroides,Leu_mesenteroides_mesenteroides_ATCC_8293
+## Listeria
+Listeria_monocytogenes,Li_monocytogenes_EGD_e
 ## Paenibacillus
 Paenibacillus_mucilaginosus,Pae_mucilaginosus_KNP414
 Paenibacillus_polymyxa,Pae_polymyxa_E681
@@ -98,14 +108,15 @@ Streptococcus_intermedius,Streptoc_intermedius_JTH08
 Streptococcus_mutans,Streptoc_mutans_UA159
 Streptococcus_pneumoniae,Streptoc_pneumoniae_TIGR4
 Streptococcus_pyogenes,Streptoc_pyogenes_M1_GAS
+Streptococcus_suis,Streptoc_suis_05ZYH33
 Streptococcus_thermophilus,Streptoc_thermophilus_CNRZ1066
 
 # Fusobacteriia 梭杆菌门
-## Fusobacterium
+## Fusobacterium 梭杆菌属
 Fusobacterium_nucleatum,Fu_nucleatum_nucleatum_ATCC_25586
 
 # Alphaproteobacteria α-变形菌
-## Acetobacter 醋杆菌属
+## Acetobacter 醋酸细菌属
 Acetobacter_pasteurianus,Ace_pasteurianus_IFO_3283_01
 ## Anaplasma 无形体属
 Anaplasma_phagocytophilum,An_phagocytophilum_HZ
@@ -117,24 +128,33 @@ Brucella_suis,Bru_suis_1330
 Ehrlichia_chaffeensis,Eh_chaffeensis_Arkansas
 ## Gluconobacter 葡糖杆菌属
 Gluconobacter_oxydans,Gl_oxydans_621H
-## Granulibacter
+## Granulibacter 颗粒杆菌属
 Granulibacter_bethesdensis,Gr_bethesdensis_CGDNIH1
 ## Methylobacterium 甲基杆菌属
 Methylobacterium_extorquens,Methy_extorquens_PA1
 ## Rhizobium 根瘤菌属
 Rhizobium_etli,Rhi_etli_CFN_42
 Rhizobium_leguminosarum,Rhi_leguminosarum_bv_viciae_3841
+## Rhodopseudomonas 红假单胞菌属
+Rhodopseudomonas_palustris,Rhodop_palustris_CGA009
 ## Rickettsia 立克次体属
+Rickettsia_prowazekii,Ric_prowazekii_Madrid_E
 Rickettsia_rickettsii,Ric_rickettsii_Iowa
 Rickettsia_typhi,Ric_typhi_Wilmington
 ## Sinorhizobium 中华根瘤菌属
 Sinorhizobium_meliloti,Si_meliloti_1021
+## Wolbachia 沃尔巴克氏体属
+Wolbachia_endosymbiont_of_Drosophila_simulans,W_endosymbiont_of_Drosophila_simulans_wHa
 ## Zymomonas 发酵单胞菌属
 Zymomonas_mobilis,Z_mobilis_mobilis_ZM4_ATCC_31821
 
 # Betaproteobacteria β-变形菌
+## Achromobacter
+Achromobacter_xylosoxidans,Ach_xylosoxidans_A8
 ## Bordetella
-Bordetella_holmesii,Bord_holmesii_F627
+Bordetella_bronchiseptica,Bord_bronchiseptica_253
+Bordetella_holmesii,Bord_holmesii_F627,Default
+Bordetella_pertussis,Bord_pertussis_Tohama_I
 ## Burkholderia
 Burkholderia_cenocepacia,Bur_cenocepacia_HI2424
 Burkholderia_glumae,Bur_glumae_BGR1
@@ -153,10 +173,15 @@ Ralstonia_solanacearum,Ra_solanacearum_GMI1000
 Variovorax_paradoxus,Va_paradoxus_S110
 
 # Gammaproteobacteria γ-变形菌
+## Acinetobacter
+Acinetobacter_baumannii,Aci_baumannii_ATCC_17978
 ## Actinobacillus
 Actinobacillus_pleuropneumoniae,Act_pleuropneumoniae_5b_L20
 ## Aeromonas
 Aeromonas_hydrophila,Ae_hydrophila_hydrophila_ATCC_7966
+Aeromonas_salmonicida,Ae_salmonicida_salmonicida_A449
+## Aggregatibacter
+Aggregatibacter_actinomycetemcomitans,Ag_actinomycetemcomitans_D11S_1
 ## Azotobacter
 Azotobacter_vinelandii,Az_vinelandii_DJ
 ## Buchnera
@@ -165,6 +190,8 @@ Buchnera_aphidicola,Buc_aphidicola_APS_Acyrthosiphon_pisum
 Coxiella_burnetii,Cox_burnetii_RSA_493
 ## Cronobacter
 Cronobacter_sakazakii,Cr_sakazakii_ATCC_BAA_894
+## Dickeya
+Dickeya_solani,Di_solani_IPO_2222
 ## Enterobacter
 Enterobacter_cloacae,Enterob_cloacae_cloacae_ATCC_13047
 ## Escherichia
@@ -183,9 +210,11 @@ Legionella_pneumophila,Leg_pneumophila_pneumophila_Philadelphia_1
 Mannheimia_haemolytica,Ma_haemolytica_USDA_ARS_USMARC_185
 ## Pantoea
 Pantoea_ananatis,Pan_ananatis_LMG_20103
-## Pasteurella
+## Pasteurella 巴斯德氏菌属
 Pasteurella_multocida,Pas_multocida_multocida_Pm70
-## Pseudomonas
+## Pectobacterium 果胶杆菌属
+Pectobacterium_carotovorum,Pe_carotovorum_carotovorum_PC1
+## Pseudomonas 假单胞菌属
 Pseudomonas_aeruginosa,Ps_aeruginosa_PAO1
 Pseudomonas_fluorescens,Ps_fluorescens_Pf0_1
 Pseudomonas_mendocina,Ps_mendocina_ymp
@@ -193,34 +222,34 @@ Pseudomonas_protegens,Ps_protegens_Pf_5
 Pseudomonas_putida,Ps_putida_KT2440
 Pseudomonas_stutzeri,Ps_stutzeri_A1501
 Pseudomonas_syringae,Ps_syringae_pv_syringae_B728a
-## Salmonella
+## Salmonella 沙门氏菌
 Salmonella_bongori,Sa_bongori_NCTC_12419
 Salmonella_enterica,Sa_enterica_enterica_Typhimurium_LT2
-## Serratia
+## Serratia 沙雷氏菌属
 Serratia_plymuthica,Se_plymuthica_AS9
-## Shewanella
+## Shewanella 希瓦氏菌属
 Shewanella_baltica,She_baltica_OS155
-## Shigella
+## Shigella 志贺氏菌属
 Shigella_flexneri,Shi_flexneri_2a_301
-## Stenotrophomonas
+## Stenotrophomonas 寡养单胞菌
 Stenotrophomonas_maltophilia,Ste_maltophilia_K279a
-## Vibrio
+## Vibrio 弧菌属
 Vibrio_cholerae,Vi_cholerae_O1_biovar_El_Tor_N16961
 Vibrio_parahaemolyticus,Vi_parahaemolyticus_RIMD_2210633
 Vibrio_vulnificus,Vi_vulnificus_CMCP6
-## Xanthomonas
+## Xanthomonas 黄单胞菌属
 Xanthomonas_campestris,Xa_campestris_pv_campestris_ATCC_33913
 Xanthomonas_citri,Xa_citri_Xanthomonas_axonopodis_pv_citri_306
 Xanthomonas_oryzae,Xa_oryzae_pv_oryzae_KACC_10331
-## Xylella
+## Xylella 木杆菌属
 Xylella_fastidiosa,Xy_fastidiosa_9a5c
-## Yersinia
+## Yersinia 鼠疫杆菌属
 Yersinia_enterocolitica,Y_enterocolitica_enterocolitica_8081
 Yersinia_pestis,Y_pestis_CO92
 Yersinia_pseudotuberculosis,Y_pseudotuberculosis_IP_32953
 
 # delta/epsilon subdivisions δ/ε-变形菌
-## Arcobacter
+## Arcobacter 弓形杆菌属
 Arcobacter_butzleri,Ar_butzleri_RM4018
 ## Campylobacter 弯曲菌属
 Campylobacter_fetus,Ca_fetus_fetus_82_40
@@ -231,14 +260,18 @@ Desulfovibrio_vulgaris,D_vulgaris_Hildenborough
 ## Helicobacter 螺杆菌属
 Helicobacter_pylori,He_pylori_26695
 
+# Oligoflexia
+## Bdellovibrio 蛭弧菌属
+Bdellovibrio_bacteriovorus,Bd_bacteriovorus_Tiberius,COM
+
 # Spirochaetia 螺旋体门
 ## Borreliella
 Borreliella_afzelii,Borr_afzelii_Borrelia_afzelii_HLJ01
 Borreliella_burgdorferi,Borr_burgdorferi_Borrelia_burgdorferi_B31
 Borreliella_garinii,Borr_garinii_Borrelia_garinii_BgVir
-## Brachyspira
+## Brachyspira 短螺菌属
 Brachyspira_pilosicoli,Bra_pilosicoli_95_1000
-## Leptospira
+## Leptospira 细螺旋体属
 Leptospira_borgpetersenii,Lep_borgpetersenii_Hardjo_bovis_L550
 Leptospira_interrogans,Lep_interrogans_Lai_56601
 
