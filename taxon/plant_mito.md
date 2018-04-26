@@ -569,23 +569,23 @@ cat <<'EOF' > egaz_template_multi.tt
 
 # [% name %]
 egaz template \
-    ~/data/organelle/mitochondrion_genomes/[% t %] \
+    ~/data/organelle/mito/GENOMES/[% t %] \
 [% FOREACH q IN qs -%]
-    ~/data/organelle/mitochondrion_genomes/[% q %] \
+    ~/data/organelle/mito/GENOMES/[% q %] \
 [% END -%]
 [% IF o -%]
-    ~/data/organelle/mitochondrion_genomes/[% o %] \
+    ~/data/organelle/mito/GENOMES/[% o %] \
     --outgroup [% o %] \
 [% END -%]
     --multi -o [% name %] \
-    --taxon ~/data/organelle/mitochondrion_genomes/mitochondrion_ncbi.csv \
+    --taxon ~/data/organelle/mito/GENOMES/mitochondrion_ncbi.csv \
     --rawphylo --parallel 8 -v
 
 EOF
 
 # every genera
-echo "mkdir -p ~/data/organelle/mitochondrion.working"  > ../mitochondrion.cmd.txt
-echo "cd       ~/data/organelle/mitochondrion.working" >> ../mitochondrion.cmd.txt
+echo "mkdir -p ~/data/organelle/mito/genus"  > ../mitochondrion.cmd.txt
+echo "cd       ~/data/organelle/mito/genus" >> ../mitochondrion.cmd.txt
 cat genus.tsv |
     TT_FILE=egaz_template_multi.tt perl -MTemplate -nla -F"\t" -e '
         next unless scalar @F >= 3;
@@ -606,8 +606,8 @@ cat genus.tsv |
     >> ../mitochondrion.cmd.txt
 
 # this is for finding outgroups
-echo "mkdir -p ~/data/organelle/mitochondrion_families"  > ../mitochondrion_families.cmd.txt
-echo "cd       ~/data/organelle/mitochondrion_families" >> ../mitochondrion_families.cmd.txt
+echo "mkdir -p ~/data/organelle/mito/family"  > ../mitochondrion.family.cmd.txt
+echo "cd       ~/data/organelle/mito/family" >> ../mitochondrion.family.cmd.txt
 cat family.tsv |
     TT_FILE=egaz_template_multi.tt perl -MTemplate -nla -F"\t" -e '
         next unless scalar @F >= 3;
@@ -625,12 +625,11 @@ cat family.tsv |
         ) or die Template->error;
 
     ' \
-    >> ../mitochondrion_families.cmd.txt
+    >> ../mitochondrion.family.cmd.txt
 
 # genera with outgroups
-echo "mkdir -p ~/data/organelle/mitochondrion_OG"  > ../mitochondrion_OG.cmd.txt
-echo "cd       ~/data/organelle/mitochondrion_OG" >> ../mitochondrion_OG.cmd.txt
-echo -e "mkdir -p ~/data/organelle/mitochondrion_OG \ncd ~/data/organelle/mitochondrion_OG\n" > ../mitochondrion_OG.cmd.txt
+echo "mkdir -p ~/data/organelle/mito/OG"  > ../mitochondrion.OG.cmd.txt
+echo "cd       ~/data/organelle/mito/OG" >> ../mitochondrion.OG.cmd.txt
 cat genus_OG.tsv |
     TT_FILE=egaz_template_multi.tt perl -MTemplate -nla -F"\t" -e '
         next unless scalar @F >= 3;
@@ -648,25 +647,25 @@ cat genus_OG.tsv |
         ) or die Template->error;
 
     ' \
-    >> ../mitochondrion_OG.cmd.txt
+    >> ../mitochondrion.OG.cmd.txt
 
 cat <<'EOF' > egaz_templates_self.tt
 
 # [% name %]
 egaz template \
-    ~/data/organelle/mitochondrion_genomes/[% t %] \
+    ~/data/organelle/mito/GENOMES/[% t %] \
 [% FOREACH q IN qs -%]
-    ~/data/organelle/mitochondrion_genomes/[% q %] \
+    ~/data/organelle/mito/GENOMES/[% q %] \
 [% END -%]
     --self -o [% name %] \
-    --taxon ~/data/organelle/mitochondrion_genomes/mitochondrion_ncbi.csv \
+    --taxon ~/data/organelle/mito/GENOMES/mitochondrion_ncbi.csv \
     --circos --aligndb --parallel 8 -v
 
 EOF
 
 # every genera
-echo "mkdir -p ~/data/organelle/mitochondrion_self"  > ../mitochondrion_self.cmd.txt
-echo "cd       ~/data/organelle/mitochondrion_self" >> ../mitochondrion_self.cmd.txt
+echo "mkdir -p ~/data/organelle/mito/self"  > ../mitochondrion.self.cmd.txt
+echo "cd       ~/data/organelle/mito/self" >> ../mitochondrion.self.cmd.txt
 cat genus.tsv |
     TT_FILE=egaz_templates_self.tt perl -MTemplate -nla -F"\t" -e '
         next unless scalar @F >= 3;
@@ -683,7 +682,7 @@ cat genus.tsv |
         ) or die Template->error;
 
     ' \
-    >> ../mitochondrion_self.cmd.txt
+    >> ../mitochondrion.self.cmd.txt
 
 ```
 
@@ -719,10 +718,10 @@ find . -mindepth 1 -maxdepth 3 -type d -name "*_fasta" | parallel -r rm -fr
 ## Alignments of families for outgroups.
 
 ```bash
-mkdir -p ~/data/organelle/mito/families
-cd ~/data/organelle/mito/families
+mkdir -p ~/data/organelle/mito/family
+cd ~/data/organelle/mito/family
 
-time bash ../mitochondrion_families.cmd.txt 2>&1 | tee log_cmd.txt
+time bash ../mitochondrion.family.cmd.txt 2>&1 | tee log_cmd.txt
 
 for d in `find . -mindepth 1 -maxdepth 1 -type d | sort `;do
     echo "echo \"====> Processing ${d} <====\""
@@ -734,7 +733,7 @@ done  > runall.sh
 
 sh runall.sh 2>&1 | tee log_runall.txt
 
-find ~/data/organelle/mitochondrion_families -type f -path "*_phylo*" -name "*.nwk"
+find ~/data/organelle/mito/family -type f -name "*.nwk"
 
 find . -mindepth 1 -maxdepth 3 -type d -name "*_raw" | parallel -r rm -fr
 find . -mindepth 1 -maxdepth 3 -type d -name "*_fasta" | parallel -r rm -fr
@@ -747,10 +746,10 @@ generated `genus_OG.tsv`.
 *D* between target and outgroup should be around **0.05**.
 
 ```bash
-mkdir -p ~/data/organelle/mito/genus_OG
-cd ~/data/organelle/mito/genus_OG
+mkdir -p ~/data/organelle/mito/OG
+cd ~/data/organelle/mito/OG
 
-time bash ../mitochondrion_OG.cmd.txt 2>&1 | tee log_cmd.txt
+time bash ../mitochondrion.OG.cmd.txt 2>&1 | tee log_cmd.txt
 
 for d in `find . -mindepth 1 -maxdepth 1 -type d | sort `; do
     echo "echo \"====> Processing ${d} <====\""
@@ -773,7 +772,7 @@ find . -mindepth 1 -maxdepth 3 -type d -name "*_fasta" | parallel -r rm -fr
 mkdir -p ~/data/organelle/mito/self
 cd ~/data/organelle/mito/self
 
-time bash ../mitochondrion_self.cmd.txt 2>&1 | tee log_cmd.txt
+time bash ../mitochondrion.self.cmd.txt 2>&1 | tee log_cmd.txt
 
 # Don't need 6_feature_cmd.sh 7_pair_stat.sh
 for d in `find . -mindepth 1 -maxdepth 1 -type d | sort `;do
