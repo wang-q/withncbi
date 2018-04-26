@@ -207,7 +207,7 @@ FIXME
 Species and genus should not be "NA" and genus has 2 or more members.
 
 ```text
-217 ---------> 209 ---------> 89 ---------> 111
+217 ---------> 210 ---------> 86 ---------> 112
         NA           genus         family
 ```
 
@@ -225,7 +225,7 @@ cat mitochondrion.CHECKME.csv |
     ' \
     > mitochondrion.tmp
 
-# 209
+# 210
 wc -l mitochondrion.tmp
 
 #----------------------------#
@@ -246,7 +246,7 @@ cat mitochondrion.tmp |
 # intersect between two files
 grep -F -f genus.tmp mitochondrion.tmp > mitochondrion.genus.tmp
 
-# 89
+# 86
 wc -l mitochondrion.genus.tmp
 
 #----------------------------#
@@ -260,7 +260,7 @@ cat mitochondrion.genus.tmp |
 # intersect between two files
 grep -F -f family.tmp mitochondrion.tmp > mitochondrion.family.tmp
 
-# 111
+# 112
 wc -l mitochondrion.family.tmp
 
 #----------------------------#
@@ -271,6 +271,7 @@ cat mitochondrion.family.tmp >> mitochondrion.DOWNLOAD.csv
 
 # clean
 rm *.tmp *.bak
+
 ```
 
 # Find a way to name these
@@ -330,7 +331,7 @@ cat mitochondrion.DOWNLOAD.csv |
 cd ~/data/organelle/mito/GENOMES
 
 echo "#strain_name,accession,strain_taxon_id" > mitochondrion_name_acc_id.csv
-cat ../mitochondrion_summary/mitochondrion.ABBR.csv |
+cat ../summary/mitochondrion.ABBR.csv |
     grep -v '^#' |
     perl -nl -a -F"," -e 'print qq{$F[9],$F[1],$F[0]}' |
     sort \
@@ -339,7 +340,7 @@ cat ../mitochondrion_summary/mitochondrion.ABBR.csv |
 # local, Runtime 10 seconds.
 # with --entrez, Runtime 7 minutes and 23 seconds.
 # And which-can't-find is still which-can't-find.
-cat ../mitochondrion_summary/mitochondrion.ABBR.csv |
+cat ../summary/mitochondrion.ABBR.csv |
     grep -v '^#' |
     perl -nla -F"," -e 'print qq{$F[0],$F[9]}' |
     uniq |
@@ -388,7 +389,7 @@ find . -maxdepth 1 -type d -path "*/*" |
 
 We got **111** accessions.
 
-Numbers for higher ranks are: 15 orders, 17 families, 27 genera and 85 species.
+Numbers for higher ranks are: 15 orders, 17 families, 27 genera and 82 species.
 
 ```bash
 cd ~/data/organelle/mito/summary
@@ -409,14 +410,14 @@ cat mitochondrion.ABBR.csv |
 # intersect between two files
 grep -F -f genus.tmp mitochondrion.ABBR.csv > mitochondrion.GENUS.csv
 
-# 89
+# 86
 wc -l mitochondrion.GENUS.csv
 
 #   count every ranks
 #      15 order.list.tmp
 #      17 family.list.tmp
 #      27 genus.list.tmp
-#      85 species.list.tmp
+#      82 species.list.tmp
 cut -d',' -f 4 mitochondrion.GENUS.csv | sort | uniq > species.list.tmp
 cut -d',' -f 5 mitochondrion.GENUS.csv | sort | uniq > genus.list.tmp
 cut -d',' -f 6 mitochondrion.GENUS.csv | sort | uniq > family.list.tmp
