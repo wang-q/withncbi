@@ -780,7 +780,8 @@ for d in `find . -mindepth 1 -maxdepth 1 -type d | sort `;do
     echo bash ${d}/1_self.sh;
     echo bash ${d}/3_proc.sh;
     echo bash ${d}/4_circos.sh;
-    echo bash ${d}/7_chr_length.sh;
+    echo bash ${d}/6_chr_length.sh;
+    echo bash ${d}/7_self_aligndb.sh;
     echo ;
 done  > runall.sh
 
