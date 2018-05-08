@@ -68,7 +68,7 @@ perl ~/Scripts/withncbi/taxon/gb_taxon_locus.pl mitochondrion.genomic.gbff > ref
 
 rm mitochondrion.genomic.gbff
 
-# 8566
+# 8587
 cat refseq_id_seq.csv | grep -v "^#" | wc -l
 
 # combine
@@ -76,7 +76,7 @@ cat webpage_id_seq.csv refseq_id_seq.csv |
     sort -u -t, -k1,1 \
     > mitochondrion_id_seq.csv
 
-# 8535
+# 8539
 cat mitochondrion_id_seq.csv | grep -v "^#" | wc -l
 
 ```
@@ -353,7 +353,7 @@ perl ~/Scripts/withncbi/taxon/batch_get_seq.pl \
     tee mitochondrion_seq.log
 
 # count downloaded sequences
-find . -name "*.fasta" | wc -l
+find . -name "*.fa" | wc -l
 
 ```
 

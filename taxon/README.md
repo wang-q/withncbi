@@ -528,7 +528,7 @@ perl ~/Scripts/withncbi/taxon/batch_get_seq.pl \
     | tee plastid_seq.log
 
 # count downloaded sequences
-find . -name "*.fasta" | wc -l
+find . -name "*.fa" | wc -l
 ```
 
 ## Create alignment plans
