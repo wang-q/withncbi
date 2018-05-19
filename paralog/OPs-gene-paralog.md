@@ -1,6 +1,7 @@
 # Gene-paralog-repeats
 
-[TOC]: # " "
+[TOC levels=1-3]: # " "
+- [Gene-paralog-repeats](#gene-paralog-repeats)
 - [Sources](#sources)
 - [TODO](#todo)
 - [Stats](#stats)
@@ -21,7 +22,7 @@
 - [Plants with annotations from JGI](#plants-with-annotations-from-jgi)
 
 
-## Sources
+# Sources
 
 * Annotations from
   [Ensembl gff3 files](https://github.com/wang-q/withncbi/blob/master/ensembl/README.md#gff3)
@@ -29,12 +30,12 @@
 * Paralogs from
   [self-aligning](https://github.com/wang-q/withncbi/blob/master/paralog/OPs-selfalign.md)
 
-## TODO
+# TODO
 
 * Remove full transposons (Retro, DNA and RC transposons) from `paralog.yml`.
 * Subfamilies.
 
-## Stats
+# Stats
 
 * Coverages on chromosomes of all feature types.
 * Paralogs and adjacent regions intersect with all repeat families.
@@ -46,14 +47,14 @@
 * Exons, introns, CDSs, five_prime_UTRs and three_prime_UTRs intersect with paralogs and all repeat
   families.
 
-## Repeats
+# Repeats
 
-### MITE
+## MITE
 
 * [Plant MITE database](http://pmite.hzau.edu.cn/download_mite/)
 * http://pmite.hzau.edu.cn/MITE/MITE-SEQ-V2/
 
-### Other repeats
+## Other repeats
 
 Ensembl gff3 files contain correct descriptions for dust and trf, but repeatmasker's descriptions
 are not usable.
@@ -81,11 +82,11 @@ So I rerun RepeatMasker on every genomes and get reports from `genome.fa.out`.
     * dust: Low-complexity regions
     * trf: Tandem repeats
 
-## Scripts
+# Scripts
 
 Same for each species.
 
-### `proc_prepare.sh`
+## `proc_prepare.sh`
 
 Genome, RepeatMasker, dustmasker and gff3.
 
@@ -156,7 +157,7 @@ EOF
 
 ```
 
-### `proc_repeat.sh`
+## `proc_repeat.sh`
 
 Repeats from RepeatMasker and gff3. Create `repeat.family.txt`.
 
@@ -241,7 +242,7 @@ EOF
 
 ```
 
-### `proc_mite.sh`
+## `proc_mite.sh`
 
 MITE. Append to `repeat.family.txt`.
 
@@ -323,7 +324,7 @@ EOF
 
 ```
 
-### `proc_paralog.sh`
+## `proc_paralog.sh`
 
 ```bash
 
@@ -394,7 +395,7 @@ EOF
 
 ```
 
-### `proc_all_gene.sh`
+## `proc_all_gene.sh`
 
 ```bash
 
@@ -426,7 +427,7 @@ EOF
 
 ```
 
-### `proc_sep_gene.sh`
+## `proc_sep_gene.sh`
 
 ```bash
 
@@ -505,7 +506,7 @@ EOF
 
 ```
 
-### `proc_sep_gene_jrunlist.sh`
+## `proc_sep_gene_jrunlist.sh`
 
 ```bash
 
@@ -586,7 +587,7 @@ EOF
 
 ```
 
-## Atha
+# Atha
 
 Full processing time is about 1 hour.
 
@@ -693,7 +694,7 @@ Full processing time is about 1 hour.
     find Atha -type f -not -path "*/data/*" -print | zip Atha.zip -9 -@
     ```
 
-## Plants aligned with full chromosomes
+# Plants aligned with full chromosomes
 
 1. [Data](https://github.com/wang-q/withncbi/blob/master/paralog/OPs-selfalign.md#full-chromosomes)
 
@@ -817,7 +818,7 @@ Full processing time is about 1 hour.
     done
     ```
 
-## Plants aligned with partitioned chromosomes
+# Plants aligned with partitioned chromosomes
 
 1. [Data](https://github.com/wang-q/withncbi/blob/master/paralog/OPs-selfalign.md#partitioned-chromosomes)
 
@@ -905,7 +906,7 @@ Full processing time is about 1 hour.
     done
     ```
 
-## Plants with annotations from JGI
+# Plants with annotations from JGI
 
 1. [Data](https://github.com/wang-q/withncbi/blob/master/paralog/OPs-selfalign.md#full-chromosomes)
 
