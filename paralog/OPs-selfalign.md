@@ -51,6 +51,7 @@ perl        ~/Scripts/withncbi/taxon/strain_info.pl \
     --id    15368  --name 15368=Bdis    \
     --file ensembl_taxon.csv            \
     --entrez
+
 ```
 
 ## Plants
@@ -58,19 +59,19 @@ perl        ~/Scripts/withncbi/taxon/strain_info.pl \
 | Name                       | Classification | Taxon ID | Used |
 |:---------------------------|:---------------|:---------|:----:|
 | Aegilops tauschii          | Liliopsida     | 37682    |      |
-| Amborella trichopoda       | Amborellales   | 13333    |  -   |
-| Arabidopsis lyrata         | eudicotyledons | 81972    |  -   |
-| Arabidopsis thaliana       | eudicotyledons | 3702     |  -   |
-| Brachypodium distachyon    | Liliopsida     | 15368    |  -   |
+| Amborella trichopoda       | Amborellales   | 13333    |  o   |
+| Arabidopsis lyrata         | eudicotyledons | 81972    |  o   |
+| Arabidopsis thaliana       | eudicotyledons | 3702     |  o   |
+| Brachypodium distachyon    | Liliopsida     | 15368    |  o   |
 | Brassica oleracea          | eudicotyledons | 109376   |      |
-| Brassica rapa              | eudicotyledons | 51351    |  -   |
+| Brassica rapa              | eudicotyledons | 51351    |  o   |
 | Chlamydomonas reinhardtii  | Chlorophyta    | 3055     |      |
 | Cyanidioschyzon merolae    | Rhodophyta     | 280699   |      |
-| Glycine max                | eudicotyledons | 3847     |  -   |
+| Glycine max                | eudicotyledons | 3847     |  o   |
 | Hordeum vulgare            | Liliopsida     | 112509   |      |
 | Leersia perrieri           | Liliopsida     | 77586    |      |
-| Medicago truncatula        | eudicotyledons | 3880     |  -   |
-| Musa acuminata             | Liliopsida     | 214687   |  -   |
+| Medicago truncatula        | eudicotyledons | 3880     |  o   |
+| Musa acuminata             | Liliopsida     | 214687   |  o   |
 | Oryza barthii              | Liliopsida     | 65489    |      |
 | Oryza brachyantha          | Liliopsida     | 4533     |      |
 | Oryza glaberrima           | Liliopsida     | 4538     |      |
@@ -81,20 +82,20 @@ perl        ~/Scripts/withncbi/taxon/strain_info.pl \
 | Oryza punctata             | Liliopsida     | 4537     |      |
 | Oryza rufipogon            | Liliopsida     | 4529     |      |
 | Oryza sativa Indica        | Liliopsida     | 39946    |      |
-| Oryza sativa Japonica      | Liliopsida     | 39947    |  -   |
+| Oryza sativa Japonica      | Liliopsida     | 39947    |  o   |
 | Ostreococcus lucimarinus   | Chlorophyta    | 436017   |      |
 | Physcomitrella patens      | Bryophyta      | 3218     |      |
 | Populus trichocarpa        | eudicotyledons | 3694     |      |
 | Prunus persica             | eudicotyledons | 3760     |      |
 | Selaginella moellendorffii | Lycopodiophyta | 88036    |      |
-| Setaria italica            | Liliopsida     | 4555     |  -   |
-| Solanum lycopersicum       | eudicotyledons | 4081     |  -   |
-| Solanum tuberosum          | eudicotyledons | 4113     |  -   |
-| Sorghum bicolor            | Liliopsida     | 4558     |  -   |
+| Setaria italica            | Liliopsida     | 4555     |  o   |
+| Solanum lycopersicum       | eudicotyledons | 4081     |  o   |
+| Solanum tuberosum          | eudicotyledons | 4113     |  o   |
+| Sorghum bicolor            | Liliopsida     | 4558     |  o   |
 | Theobroma cacao            | eudicotyledons | 3641     |      |
 | Triticum aestivum          | Liliopsida     | 4565     |      |
 | Triticum urartu            | Liliopsida     | 4572     |      |
-| Vitis vinifera             | eudicotyledons | 29760    |  -   |
+| Vitis vinifera             | eudicotyledons | 29760    |  o   |
 | Zea mays                   | Liliopsida     | 4577     |      |
 
 TODO:

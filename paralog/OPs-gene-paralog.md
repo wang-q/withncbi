@@ -8,17 +8,18 @@
     - [MITE](#mite)
     - [Other repeats](#other-repeats)
 - [Scripts](#scripts)
-    - [`proc_prepare.sh`](#proc-preparesh)
-    - [`proc_repeat.sh`](#proc-repeatsh)
-    - [`proc_mite.sh`](#proc-mitesh)
-    - [`proc_paralog.sh`](#proc-paralogsh)
-    - [`proc_all_gene.sh`](#proc-all-genesh)
-    - [`proc_sep_gene.sh`](#proc-sep-genesh)
-    - [`proc_sep_gene_jrunlist.sh`](#proc-sep-gene-jrunlistsh)
+    - [`proc_prepare.sh`](#proc_preparesh)
+    - [`proc_repeat.sh`](#proc_repeatsh)
+    - [`proc_mite.sh`](#proc_mitesh)
+    - [`proc_paralog.sh`](#proc_paralogsh)
+    - [`proc_all_gene.sh`](#proc_all_genesh)
+    - [`proc_sep_gene.sh`](#proc_sep_genesh)
+    - [`proc_sep_gene_jrunlist.sh`](#proc_sep_gene_jrunlistsh)
 - [Atha](#atha)
 - [Plants aligned with full chromosomes](#plants-aligned-with-full-chromosomes)
 - [Plants aligned with partitioned chromosomes](#plants-aligned-with-partitioned-chromosomes)
 - [Plants with annotations from JGI](#plants-with-annotations-from-jgi)
+
 
 ## Sources
 
@@ -42,7 +43,8 @@
     * paralog_gene: intersections between paralogs and gene + 2000 bp
 * Genes, upstreams, downstreams intersect with paralogs and all repeat families.
     * Up/down-streams are 2000 bp.
-* Exons, introns, CDSs, five_prime_UTRs and three_prime_UTRs intersect with paralogs and all repeat families.
+* Exons, introns, CDSs, five_prime_UTRs and three_prime_UTRs intersect with paralogs and all repeat
+  families.
 
 ## Repeats
 
@@ -62,7 +64,8 @@ So I rerun RepeatMasker on every genomes and get reports from `genome.fa.out`.
 
     RepeatMasker runned with `-species Viridiplantae`.
 
-    Repeat families listed in `genome.fa.tbl`. Families with proportions less than **0.0005** were dropped.
+    Repeat families listed in `genome.fa.tbl`. Families with proportions less than **0.0005** were
+    dropped.
 
     * DNA: DNA transposons
     * LINE
@@ -1007,3 +1010,4 @@ Full processing time is about 1 hour.
         find ${GENOME_NAME} -type f -not -path "*/data/*" -print | zip ${GENOME_NAME}.zip -9 -@
     done
     ```
+
