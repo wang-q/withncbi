@@ -69,7 +69,7 @@ my $in_fh = IO::Zlib->new( $infile, "rb" );
 
 # runlists
 my $all_gene   = {};    # all genes combined
-my $sep_gene   = {};    # seperated genes
+my $sep_gene   = {};    # separated genes
 my $all_repeat = {};    # dust and trf, repeatmasker in rmout2runlist.pl
 
 # chromosome names
