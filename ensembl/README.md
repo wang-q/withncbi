@@ -17,9 +17,11 @@ cp ensembl.initrc.pm ~/Scripts/alignDB/
 
 ## Downlaod Ensembl data
 
-Ensembl provides rsync service: `rsync://ftp.ensembl.org/ensembl/pub/release-82/`.
+Ensembl and Ensembl Genomes provides rsync service:
 
-Ensembl genomes only provide ftp.
+* `rsync://ftp.ensembl.org/ensembl/pub/release-82/`
+
+* `rsync://ftp.ensemblgenomes.org/all/pub/plants/release-29/`
 
 ### Ensembl mysql
 
