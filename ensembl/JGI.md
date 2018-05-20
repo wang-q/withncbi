@@ -2,10 +2,10 @@
 
 Login [phytozome portal](https://phytozome.jgi.doe.gov/pz/portal.html).
 
-Select needed species in *PhytozomeV11*
-[download page](http://genome.jgi.doe.gov/pages/dynamicOrganismDownload.jsf?organism=PhytozomeV11),
-then click the `Download Selected Files` button. A file named `PhytozomeV11_download.zip` would be
-created on the fly. Extract compressed file to `~/data/PhytozomeV11/SpeciesName`.
+Select needed species in *PhytozomeV12*
+[download page](http://genome.jgi.doe.gov/pages/dynamicOrganismDownload.jsf?organism=PhytozomeV12),
+then click the `Download Selected Files` button. A file named `PhytozomeV12_download.zip` would be
+created on the fly. Extract compressed file to `~/data/PhytozomeV12/SpeciesName`.
 
 JGI recommends using Globus, but it's blocked by GFW.
 
@@ -44,16 +44,16 @@ then
     mkdir -p ~/data/alignment/JGI/${GENOME_NAME}
     cd ~/data/alignment/JGI/${GENOME_NAME}
     
-    find ~/data/PhytozomeV11/${GENOME_NAME}/assembly -type f -name "*.fa.gz" -not -name "*masked" \
-        | xargs gzip -d -c > toplevel.fa
+    find ~/data/PhytozomeV12/${GENOME_NAME}/assembly -type f -name "*.fa.gz" -not -name "*masked" |
+        xargs gzip -d -c > toplevel.fa
     
-    faops count toplevel.fa \
-        | perl -aln -e '
+    faops count toplevel.fa |
+        perl -aln -e '
             next if $F[0] eq 'total';
             print $F[0] if $F[1] > 50000;
             print $F[0] if $F[1] > 5000  and $F[6]/$F[1] < 0.05;
-            ' \
-        | uniq > listFile
+        ' |
+        uniq > listFile
     faops some toplevel.fa listFile toplevel.filtered.fa
     faops split-name toplevel.filtered.fa .
     rm toplevel.fa toplevel.filtered.fa listFile
