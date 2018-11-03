@@ -59,6 +59,7 @@ rsync -avP ftp.ncbi.nlm.nih.gov::pub/taxonomy/ \
     --exclude=".tmp" \
     --exclude=".old" \
     --exclude="*.Z" \
+    --exclude="taxdump_archive" \
     --exclude="new_taxdump" \
     --exclude="accession2taxid" \
     --exclude="gi_taxid_*" \
