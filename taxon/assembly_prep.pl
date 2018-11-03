@@ -95,6 +95,12 @@ Path::Tiny::path($outdir)->mkpath();
 BASE_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 cd ${BASE_DIR}
 
+signaled () {
+    echo Interrupted
+    exit 1
+}
+trap signaled TERM QUIT INT
+
 EOF
     );
 
@@ -157,6 +163,12 @@ EOF
 
 BASE_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 cd ${BASE_DIR}
+
+signaled () {
+    echo Interrupted
+    exit 1
+}
+trap signaled TERM QUIT INT
 
 echo "name,[% header %]" \
     > [% basename %].collect.csv
