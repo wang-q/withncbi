@@ -53,7 +53,6 @@ Mbov_HB0801	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/270/525/GCF_000270525
 Mbov_Hubei_1	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/219/375/GCF_000219375.1_ASM21937v1	Mycoplasma bovis	Complete Genome
 Mbov_M165_69	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/524/555/GCF_000524555.1_ASM52455v1	Mycoplasma bovoculi	Complete Genome
 Mbov_PG45	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/183/385/GCF_000183385.1_ASM18338v1	Mycoplasma bovis	Complete Genome
-Mbus	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/712/875/GCF_001712875.1_ASM171287v1	Maize bushy stunt phytoplasma	Complete Genome
 Mbut	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/733/865/GCF_000733865.1_ASM73386v1	Mycoplasma buteonis	Scaffold
 Mcal	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/695/835/GCF_000695835.1_ASM69583v1	Mycoplasma californicum	Complete Genome
 Mcal_HAZ160_1	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/829/335/GCF_000829335.1_ASM82933v1	Mycoplasma californicum	Complete Genome
@@ -250,6 +249,7 @@ Psp_Vc33	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/001/623/385/GCA_001623385.2_
 PVwit_str_VAC	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/309/405/GCF_000309405.1_ASM30940v1	Vaccinium witches'-broom phytoplasma	Contig
 PWblu	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/495/255/GCF_000495255.1_WBD	Wheat blue dwarf phytoplasma	Contig
 Pwit_NTU2011	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/364/425/GCF_000364425.1_ASM36442v1	Peanut witches'-broom phytoplasma	Contig
+PZmay	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/712/875/GCF_001712875.1_ASM171287v1	Maize bushy stunt phytoplasma	Complete Genome
 Sall	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/003/363/775/GCF_003363775.1_ASM336377v1	Spiroplasma alleghenense	Complete Genome
 Sapi_B31	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/500/935/GCF_000500935.1_ASM50093v1	Spiroplasma apis	Complete Genome
 Satr	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/029/245/GCF_001029245.1_ASM102924v1	Spiroplasma atrichopogonis	Complete Genome
