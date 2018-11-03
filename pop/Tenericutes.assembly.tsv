@@ -13,14 +13,11 @@ Aocu	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/953/195/GCF_000953195.1_Acho
 Apal_J233	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/968/055/GCF_000968055.1_ASM96805v1	Acholeplasma palmae	Complete Genome
 Asp_	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/003/605/085/GCA_003605085.1_ASM360508v1	Acholeplasma sp.	Contig
 Asp_878	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/432/255/GCA_000432255.1_MGS878	Acholeplasma sp. CAG	Scaffold
-CIzi	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/755/705/GCF_000755705.1_ASM75570v1	Candidatus Izimaplasma sp. HR1	Complete Genome
-CMyc	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/770/195/GCA_000770195.1_ASM77019v1	Candidatus Mycoplasma girerdii	Complete Genome
-CMyc_Birmingham_1_	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/319/365/GCF_000319365.1_ASM31936v1	Candidatus Mycoplasma haemominutum	Scaffold
-CMyc_str_Purdue	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/281/235/GCA_000281235.1_ASM28123v1	Candidatus Mycoplasma haemolamae	Complete Genome
-CPhy	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/069/925/GCF_000069925.1_ASM6992v1	Candidatus Phytoplasma australiense	Complete Genome
-CPhy_Strawberry_lethal_yellows_phytoplasma_CPA_str_NZSb11	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/397/185/GCF_000397185.1_ASM39718v1	Candidatus Phytoplasma australiense	Complete Genome
-CSpi	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/135/175/GCA_002135175.2_ASM213517v2	Candidatus Spiroplasma holothuricola	Complete Genome
-Cyel	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/803/325/GCF_000803325.1_ASM80332v1	Chrysanthemum yellows phytoplasma	Contig
+CIsp_HR1	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/755/705/GCF_000755705.1_ASM75570v1	Candidatus Izimaplasma sp. HR1	Complete Genome
+CMgir	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/770/195/GCA_000770195.1_ASM77019v1	Candidatus Mycoplasma girerdii	Complete Genome
+CMhae_Birmingham_1_	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/319/365/GCF_000319365.1_ASM31936v1	Candidatus Mycoplasma haemominutum	Scaffold
+CMhae_str_Purdue	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/281/235/GCA_000281235.1_ASM28123v1	Candidatus Mycoplasma haemolamae	Complete Genome
+CShol	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/135/175/GCA_002135175.2_ASM213517v2	Candidatus Spiroplasma holothuricola	Complete Genome
 Eell	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/002/930/155/GCF_002930155.1_entomo01.02	Entomoplasma ellychniae	Contig
 Efre	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/002/804/205/GCF_002804205.1_ASM280420v1	Entomoplasma freundtii	Complete Genome
 Eluc	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/002/930/185/GCF_002930185.1_entomo04.02	Entomoplasma lucivorax	Contig
@@ -236,10 +233,13 @@ Mwen	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/003/265/155/GCF_003265155.1_ASM3
 Mwen_str_Massachusetts	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/277/795/GCF_000277795.1_ASM27779v1	Mycoplasma wenyonii	Complete Genome
 Myea_13926	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/380/285/GCF_000380285.1_version_1.0	Mycoplasma yeatsii	Contig
 Myea_GM274B	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/875/755/GCF_000875755.1_ASM87575v1	Mycoplasma yeatsii	Complete Genome
+Paus	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/069/925/GCF_000069925.1_ASM6992v1	Candidatus Phytoplasma australiense	Complete Genome
+Paus_str_NZSb11	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/397/185/GCF_000397185.1_ASM39718v1	Candidatus Phytoplasma australiense	Complete Genome
 PAyel_AYWB	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/012/225/GCF_000012225.1_ASM1222v1	Aster yellows witches'-broom phytoplasma	Complete Genome
 PBnap	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/003/181/115/GCA_003181115.1_ASM318111v1	'Brassica napus' phytoplasma	Contig
 Pbra_str_JR1	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/309/465/GCF_000309465.1_ASM30946v1	Poinsettia branch-inducing phytoplasma	Contig
 PCcor	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/744/065/GCF_000744065.1_ASM74406v1	'Chrysanthemum coronarium' phytoplasma	Contig
+Pcyel	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/803/325/GCF_000803325.1_ASM80332v1	Chrysanthemum yellows phytoplasma	Contig
 PEpur	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/307/505/GCF_001307505.1_ASM130750v1	'Echinacea purpurea' witches'-broom phytoplasma	Contig
 PIclo_str_MA1	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/300/695/GCF_000300695.1_ASM30069v1	Italian clover phyllody phytoplasma	Contig
 PMyel_str_MW1	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/309/485/GCF_000309485.1_ASM30948v1	Milkweed yellows phytoplasma	Contig
