@@ -1,20 +1,23 @@
 # Processing bacterial genomes species by species
 
+[TOC]: # " "
+- [Batch running for groups](#batch-running-for-groups)
+- [Alignments of genera for outgroups.](#alignments-of-genera-for-outgroups)
+- [Copy xlsx files](#copy-xlsx-files)
+- [Genome list](#genome-list)
+- [Genome alignment statistics](#genome-alignment-statistics)
+- [sep_chart of d1, d2](#sep_chart-of-d1-d2)
+- [CorelDRAW GC charts](#coreldraw-gc-charts)
+
+
 # Init genome report database.
 
-`db/README.md`
+* Create database by following steps in
+  [`db/README.md`](https://github.com/wang-q/withncbi/blob/master/db/README.md#genome-reports)
 
-```bash
-cd ~/Scripts/withncbi/db
-perl gr_strains.pl -o prok_strains.csv
-perl gr_db.pl --db gr_prok --file prok_strains.csv
-rm prok_strains.csv
+* Find valid species.
 
-```
-
-Find valid species.
-
-Got **173** species.
+    Got **173** species.
 
 ```bash
 mkdir -p ~/data/bacteria/summary
@@ -45,10 +48,9 @@ cat bac.SPECIES.csv | wc -l
 
 ```
 
-Expand species to strains. (Nested single quotes in bash should be '\'')
+* Expand species to strains. (Nested single quotes in bash should be '\'')
 
-Got **1836** strains.
-
+    Got **1836** strains.
 
 ```bash
 cd ~/data/bacteria/summary
@@ -81,7 +83,7 @@ cat bac.STRAIN.csv | wc -l
 
 ```
 
-Create abbreviations.
+* Create abbreviations.
 
 ```bash
 cd ~/data/bacteria/summary
