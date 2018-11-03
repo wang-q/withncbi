@@ -245,7 +245,7 @@ cat raw.tsv |
 
 # find potential duplicated strains or assemblies
 cat ${RANK_NAME}.assembly.tsv |
-    perl -nl -a -F"\t" -e 'print $F[0]' |
+    cut -f 1 |
     sort |
     uniq -c |
     sort -nr
