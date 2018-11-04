@@ -207,6 +207,10 @@ EOF
 
 wc -l taxon/*
 
+find taxon -maxdepth 1 -type f -not -name "*.replace.tsv" |
+    xargs -i basename {} \
+    > genus.list
+
 ```
 
 | Order             | Genus           | Comments | Species | Strains |
@@ -246,6 +250,13 @@ find ASSEMBLY -type f -name "*_protein.faa.gz" |
     xargs gzip -dcf \
     > RnaseR/all.pro.fa
 
+#find ASSEMBLY -type f -name "*_translated_cds.faa.gz" |
+#    xargs gzip -dcf \
+#    > RnaseR/all.tcds.fa
+#
+#cat RnaseR/all.tcds.fa |
+#    grep "ribonuclease R"
+
 # 280; deduped 207
 faops some RnaseR/all.pro.fa \
     <(cat RnaseR/all.pro.fa |
@@ -268,12 +279,68 @@ find ASSEMBLY -maxdepth 1 -type d |
     ' \
     > RnaseR/strains.txt
 
-#find ASSEMBLY -type f -name "*_translated_cds.faa.gz" |
-#    xargs gzip -dcf \
-#    > RnaseR/all.tcds.fa
-#
-#cat RnaseR/all.tcds.fa |
-#    grep "ribonuclease R"
+for GENUS in $(cat genus.list); do
+    cat taxon/${GENUS} |
+        parallel --no-run-if-empty --linebuffer -k -j 4 '
+            result=$(
+                gzip -dcf ASSEMBLY/{}/*_protein.faa.gz |
+                    grep "ribonuclease R" |
+                    cut -d" " -f 1 |
+                    sed "s/^>//"
+            )
+            if [ "$result" ]; then
+                echo $result |
+                    perl -nle '\''
+                        @ns = split /\s+/;
+                        for $n (@ns) {
+                            $s = $n;
+                            $s =~ s/\.\d+//;
+                            printf qq{%s\t%s_%s\n}, $n, {}, $s;
+                        }
+                    '\''
+            fi
+        ' \
+        > taxon/${GENUS}.replace.tsv
+done
+
+# 280
+#cat taxon/*.replace.tsv | wc -l
+
+# extract sequences for each genus
+for GENUS in $(cat genus.list); do
+    echo "==> ${GENUS}"
+    
+    mytmpdir=`mktemp -d 2>/dev/null || mktemp -d -t 'mytmpdir'`
+
+    # avoid duplicated fasta headers
+    faops some RnaseR/all.pro.fa taxon/${GENUS}.replace.tsv stdout |
+        faops filter -u stdin ${mytmpdir}/${GENUS}.fa
+    
+    # avoid duplicated original names
+    cat taxon/${GENUS}.replace.tsv |
+        parallel --no-run-if-empty --linebuffer -k -j 1 "
+            faops replace -s ${mytmpdir}/${GENUS}.fa <(echo {}) stdout
+        " \
+        > RnaseR/${GENUS}.pro.fa
+        
+    rm -fr ${mytmpdir}
+done
+
+# aligning with muscle
+cat genus.list |
+    parallel --no-run-if-empty --linebuffer -k -j 4 '
+        echo "==> {}"
+        
+        muscle -quiet -in RnaseR/{}.pro.fa -out RnaseR/{}.aln.fa
+    '
+
+# newick trees
+cat genus.list |
+    parallel --no-run-if-empty --linebuffer -k -j 4 '
+        echo "==> {}"
+        
+        FastTree -quiet RnaseR/{}.aln.fa > RnaseR/{}.aln.newick
+    '
 
 ```
 
