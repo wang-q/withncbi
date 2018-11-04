@@ -1,6 +1,5 @@
 #name	ftp_path	organism	assembly_level
 Aaxa_ATCC_25176	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/428/705/GCF_000428705.1_ASM42870v1	Acholeplasma axanthum	Scaffold
-Abac	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/003/550/015/GCF_003550015.1_ASM355001v1	Anaeroplasma bactoclasticum	Scaffold
 Abra	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/967/915/GCF_000967915.1_ASM96791v1	Acholeplasma brassicae	Complete Genome
 Aequ_ATCC_29724	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/687/735/GCF_000687735.1_ASM68773v1	Acholeplasma equifetale	Contig
 Agra_ATCC_19168	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/526/235/GCF_000526235.1_ASM52623v1	Acholeplasma granularum	Contig
@@ -13,6 +12,7 @@ Aocu	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/953/195/GCF_000953195.1_Acho
 Apal_J233	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/968/055/GCF_000968055.1_ASM96805v1	Acholeplasma palmae	Complete Genome
 Asp_	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/003/605/085/GCA_003605085.1_ASM360508v1	Acholeplasma sp.	Contig
 Asp_878	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/432/255/GCA_000432255.1_MGS878	Acholeplasma sp. CAG	Scaffold
+Abac	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/003/550/015/GCF_003550015.1_ASM355001v1	Anaeroplasma bactoclasticum	Scaffold
 CIsp_HR1	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/755/705/GCF_000755705.1_ASM75570v1	Candidatus Izimaplasma sp. HR1	Complete Genome
 CMgir	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/770/195/GCA_000770195.1_ASM77019v1	Candidatus Mycoplasma girerdii	Complete Genome
 CMhae_Birmingham_1_	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/319/365/GCF_000319365.1_ASM31936v1	Candidatus Mycoplasma haemominutum	Scaffold
@@ -28,6 +28,23 @@ Emel	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/002/804/105/GCF_002804105.1_ASM2
 Emel_ATCC_49191	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/685/885/GCF_000685885.1_ASM68588v1	Entomoplasma melaleucae	Contig
 Esom	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/002/804/005/GCF_002804005.1_ASM280400v1	Entomoplasma somnilux	Complete Genome
 Esom_ATCC_49194	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/526/835/GCF_000526835.1_ASM52683v1	Entomoplasma somnilux	Contig
+Hcon_SSD_17B	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/215/935/GCF_000215935.2_HLPCO_V2	Haloplasma contractile	Contig
+Ifor	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/003/586/005/GCF_003586005.1_ASM358600v1	Inordinaticella fortuita	Contig
+Mcha	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/002/290/085/GCF_002290085.1_ASM229008v1	Mesoplasma chauliocola	Complete Genome
+Mcha_ATCC_49578	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/518/825/GCF_000518825.1_ASM51882v1	Mesoplasma chauliocola	Scaffold
+Mcol	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/002/804/245/GCF_002804245.1_ASM280424v1	Mesoplasma coleopterae	Complete Genome
+Mcor	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/002/930/145/GCF_002930145.1_meso03.02	Mesoplasma corruscae	Contig
+Ment	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/002/749/675/GCF_002749675.1_ASM274967v1	Mesoplasma entomophilum	Complete Genome
+Mflo	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/002/999/315/GCF_002999315.1_ASM299931v1	Mesoplasma florum	Chromosome
+Mflo_L1	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/008/305/GCF_000008305.1_ASM830v1	Mesoplasma florum	Complete Genome
+Mflo_W37	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/479/355/GCF_000479355.1_ASM47935v1	Mesoplasma florum	Complete Genome
+Mgra_ATCC_49580	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/701/525/GCF_000701525.1_ASM70152v1	Mesoplasma grammopterae	Scaffold
+Mlac_ATCC_49193	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/002/441/935/GCF_002441935.1_ASM244193v1	Mesoplasma lactucae	Complete Genome
+Mpho_ATCC_49581	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/702/725/GCF_000702725.1_ASM70272v1	Mesoplasma photuris	Contig
+Msei_ATCC_49495	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/518/725/GCF_000518725.1_ASM51872v1	Mesoplasma seiffertii	Scaffold
+Msyr	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/002/843/565/GCF_002843565.1_ASM284356v1	Mesoplasma syrphidae	Complete Genome
+Msyr_ATCC_51578	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/686/545/GCF_000686545.1_ASM68654v1	Mesoplasma syrphidae	Scaffold
+Mtab	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/002/804/025/GCF_002804025.1_ASM280402v1	Mesoplasma tabanidae	Complete Genome
 Maga	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/089/865/GCF_000089865.1_ASM8986v1	Mycoplasma agalactiae	Complete Genome
 Maga_14628	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/266/865/GCF_000266865.1_ASM26686v1	Mycoplasma agalactiae	Contig
 Maga_PG2	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/063/605/GCF_000063605.1_ASM6360v1	Mycoplasma agalactiae	Complete Genome
@@ -69,35 +86,27 @@ Mcap_subsp_capripneumoniae	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/952/91
 Mcap_subsp_capripneumoniae_87001	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/835/085/GCF_000835085.1_ASM83508v1	Mycoplasma capricolum	Complete Genome
 Mcap_subsp_capripneumoniae_99108	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/731/685/GCF_000731685.1_ASM73168v1	Mycoplasma capricolum	Contig
 Mcap_subsp_capripneumoniae_M1601	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/192/395/GCF_000192395.2_ASM19239v2	Mycoplasma capricolum	Complete Genome
-Mcha	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/002/290/085/GCF_002290085.1_ASM229008v1	Mesoplasma chauliocola	Complete Genome
-Mcha_ATCC_49578	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/518/825/GCF_000518825.1_ASM51882v1	Mesoplasma chauliocola	Scaffold
 Mclo	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/003/269/445/GCF_003269445.1_ASM326944v1	Mycoplasma cloacale	Complete Genome
 Mclo_ATCC_35276	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/702/745/GCF_000702745.1_ASM70274v1	Mycoplasma cloacale	Contig
-Mcol	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/002/804/245/GCF_002804245.1_ASM280424v1	Mesoplasma coleopterae	Complete Genome
 Mcol_ATCC_29257	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/712/175/GCF_000712175.1_ASM71217v1	Mycoplasma columbinum	Scaffold
 Mcol_ATCC_29258	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/701/845/GCF_000701845.1_ASM70184v1	Mycoplasma columborale	Scaffold
 Mcol_ATCC_35278	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/701/825/GCF_000701825.1_ASM70182v1	Mycoplasma collis	Scaffold
 Mcol_SF7	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/222/995/GCF_000222995.1_ASM22299v1	Mycoplasma columbinum	Contig
 Mcon	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/026/765/GCF_000026765.1_ASM2676v1	Mycoplasma conjunctivae	Chromosome
-Mcor	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/002/930/145/GCF_002930145.1_meso03.02	Mesoplasma corruscae	Contig
 Mcri_ATCC_35279	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/526/955/GCF_000526955.1_ASM52695v1	Mycoplasma cricetuli	Contig
 Mcro_MP145	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/025/845/GCF_000025845.1_ASM2584v1	Mycoplasma crocodyli	Complete Genome
 Mcyn_C142	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/328/725/GCF_000328725.1_ASM32872v1	Mycoplasma cynos	Complete Genome
 Mdis	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/941/075/GCF_000941075.1_ASM94107v1	Mycoplasma dispar	Complete Genome
 Medw	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/900/476/105/GCF_900476105.1_51334_B01	Mycoplasma edwardii	Complete Genome
 Mele_ATCC_51980	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/687/815/GCF_000687815.1_ASM68781v1	Mycoplasma elephantis	Contig
-Ment	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/002/749/675/GCF_002749675.1_ASM274967v1	Mesoplasma entomophilum	Complete Genome
 Mfel_ATCC_23391	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/701/865/GCF_000701865.1_ASM70186v1	Mycoplasma felis	Scaffold
 Mfel_ATCC_43428	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/687/775/GCF_000687775.1_ASM68777v1	Mycoplasma felifaucium	Contig
 Mfer	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/327/395/GCF_000327395.1_ASM32739v1	Mycoplasma feriruminatoris	Scaffold
 Mfer_JER	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/148/625/GCF_000148625.1_ASM14862v1	Mycoplasma fermentans	Complete Genome
 Mfer_M64	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/186/005/GCF_000186005.1_ASM18600v1	Mycoplasma fermentans	Complete Genome
 Mfer_PG18	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/209/735/GCF_000209735.1_ASM20973v1	Mycoplasma fermentans	Chromosome
-Mflo	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/002/999/315/GCF_002999315.1_ASM299931v1	Mesoplasma florum	Chromosome
 Mflo_ATCC_27399	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/815/065/GCF_000815065.1_ASM81506v1	Mycoplasma flocculare	Complete Genome
 Mflo_ATCC_27716	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/367/185/GCF_000367185.1_Mycoplasma_flocculare_genome	Mycoplasma flocculare	Contig
-Mflo_L1	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/008/305/GCF_000008305.1_ASM830v1	Mesoplasma florum	Complete Genome
-Mflo_W37	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/479/355/GCF_000479355.1_ASM47935v1	Mesoplasma florum	Complete Genome
 Mgal	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/637/235/GCF_001637235.1_ASM163723v1	Mycoplasma gallinarum	Contig
 Mgal_ATCC_19610	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/428/645/GCF_000428645.1_ASM42864v1	Mycoplasma gallisepticum	Scaffold
 Mgal_CA06_2006_052_5_2P	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/286/795/GCF_000286795.1_ASM28679v1	Mycoplasma gallisepticum	Complete Genome
@@ -119,7 +128,6 @@ Mgen_M2321	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/292/405/GCF_000292405.
 Mgen_M6282	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/292/445/GCF_000292445.1_ASM29244v1	Mycoplasma genitalium	Complete Genome
 Mgen_M6320	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/292/485/GCF_000292485.1_ASM29248v1	Mycoplasma genitalium	Complete Genome
 Mgly_ATCC_35277	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/687/855/GCF_000687855.1_ASM68785v1	Mycoplasma glycophilum	Contig
-Mgra_ATCC_49580	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/701/525/GCF_000701525.1_ASM70152v1	Mesoplasma grammopterae	Scaffold
 Mhae_Ohio2	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/186/985/GCA_000186985.3_ASM18698v3	Mycoplasma haemofelis	Complete Genome
 Mhae_str_Illinois	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/238/995/GCF_000238995.1_ASM23899v1	Mycoplasma haemocanis	Complete Genome
 Mhae_str_Langford_1	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/200/735/GCF_000200735.1_ASM20073v1	Mycoplasma haemofelis	Complete Genome
@@ -143,7 +151,6 @@ Mimi_ATCC_51306	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/518/305/GCF_00051
 Mine_ATCC_19705	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/701/805/GCF_000701805.1_ASM70180v1	Mycoplasma iners	Scaffold
 Miow_695	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/227/355/GCF_000227355.1_ASM22735v1	Mycoplasma iowae	Contig
 Miow_DK_CPA	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/733/685/GCF_000733685.1_MycoIowaeDkcpa1.0	Mycoplasma iowae	Contig
-Mlac_ATCC_49193	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/002/441/935/GCF_002441935.1_ASM244193v1	Mesoplasma lactucae	Complete Genome
 Mlea_06049	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/003/034/265/GCF_003034265.1_ASM303426v1	Mycoplasma leachii	Contig
 Mlea_99_014_6	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/253/095/GCF_000253095.1_ASM25309v1	Mycoplasma leachii	Chromosome
 Mlea_PG50	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/183/365/GCF_000183365.1_ASM18336v1	Mycoplasma leachii	Complete Genome
@@ -177,7 +184,6 @@ Movi_str_Michigan	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/508/245/GCF_000
 Mpar_str_Indiana	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/477/415/GCF_000477415.1_ASM47741v1	Mycoplasma parvum	Complete Genome
 Mpen_HF_2	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/011/225/GCF_000011225.1_ASM1122v1	Mycoplasma penetrans	Complete Genome
 Mpho	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/003/332/325/GCF_003332325.1_ASM333232v1	Mycoplasma phocidae	Complete Genome
-Mpho_ATCC_49581	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/702/725/GCF_000702725.1_ASM70272v1	Mesoplasma photuris	Contig
 Mpir_ATCC_25960	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/685/905/GCF_000685905.1_ASM68590v1	Mycoplasma pirum	Contig
 Mpir_MPI25960	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/686/245/GCF_000686245.1_mycoplasma_pirum	Mycoplasma pirum	Scaffold
 Mpne	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/272/875/GCF_001272875.1_ASM127287v1	Mycoplasma pneumoniae	Complete Genome
@@ -205,7 +211,6 @@ Mput	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/900/476/175/GCF_900476175.1_5064
 Mput_KS1	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/224/105/GCF_000224105.1_ASM22410v1	Mycoplasma putrefaciens	Complete Genome
 Mput_Mput9231	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/376/625/GCF_000376625.1_ASM37662v1	Mycoplasma putrefaciens	Complete Genome
 Msal_ATCC_23064	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/485/555/GCF_000485555.1_ASM48555v1	Mycoplasma salivarium	Contig
-Msei_ATCC_49495	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/518/725/GCF_000518725.1_ASM51872v1	Mesoplasma seiffertii	Scaffold
 Msim_ATCC_49888	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/702/705/GCF_000702705.1_ASM70270v1	Mycoplasma simbae	Contig
 Msp_472	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/437/315/GCA_000437315.1_MGS472	Mycoplasma sp. CAG	Scaffold
 Msp_611	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/434/175/GCA_000434175.1_MGS611	Mycoplasma sp. CAG	Scaffold
@@ -222,9 +227,6 @@ Msui_str_Illinois	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/179/035/GCF_000
 Msyn	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/003/586/085/GCF_003586085.1_ASM358608v1	Mycoplasma synoviae	Complete Genome
 Msyn_53	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/008/245/GCF_000008245.1_ASM824v1	Mycoplasma synoviae	Complete Genome
 Msyn_ATCC_25204	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/385/095/GCF_000385095.1_ASM38509v1	Mycoplasma synoviae	Contig
-Msyr	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/002/843/565/GCF_002843565.1_ASM284356v1	Mesoplasma syrphidae	Complete Genome
-Msyr_ATCC_51578	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/686/545/GCF_000686545.1_ASM68654v1	Mesoplasma syrphidae	Scaffold
-Mtab	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/002/804/025/GCF_002804025.1_ASM280402v1	Mesoplasma tabanidae	Complete Genome
 Mtes	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/002/245/785/GCF_002245785.1_ASM224578v1	Mycoplasma testudineum	Scaffold
 Mtes_ATCC_43263	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/687/795/GCF_000687795.1_ASM68779v1	Mycoplasma testudinis	Contig
 Mver	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/900/167/035/GCF_900167035.1_IMG-taxon_2582581322_annotated_assembly	Mycoplasma verecundum	Contig
@@ -282,8 +284,8 @@ Ucan_ATCC_51252	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/712/165/GCF_00071
 Udiv	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/941/095/GCA_000941095.1_ASM94109v1	Ureaplasma diversum	Chromosome
 Udiv_NCTC_246	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/731/915/GCF_000731915.1_ASM73191v1	Ureaplasma diversum	Contig
 Upar	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/002/205/515/GCF_002205515.1_ASM220551v1	Ureaplasma parvum	Complete Genome
-Upar_serovar_1_str_ATCC_27813	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/171/375/GCF_000171375.1_ASM17137v1	Ureaplasma parvum	Contig
 Upar_serovar_14_str_ATCC_33697	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/171/355/GCF_000171355.1_ASM17135v1	Ureaplasma parvum	Contig
+Upar_serovar_1_str_ATCC_27813	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/171/375/GCF_000171375.1_ASM17137v1	Ureaplasma parvum	Contig
 Upar_serovar_3	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/828/735/GCF_000828735.1_ASM82873v1	Ureaplasma parvum	Complete Genome
 Upar_serovar_3_str_ATCC_27815	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/019/345/GCF_000019345.1_ASM1934v1	Ureaplasma parvum	Complete Genome
 Upar_serovar_3_str_ATCC_700970	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/006/625/GCF_000006625.1_ASM662v1	Ureaplasma parvum	Complete Genome
