@@ -234,7 +234,7 @@ find taxon -maxdepth 1 -type f -not -name "*.replace.tsv" |
 ```bash
 cd ~/data/alignment/Tenericutes
 
-mkdir -p RnaseR
+mkdir -p RNaseR
 
 # 306
 find ASSEMBLY -maxdepth 1 -type d |
@@ -248,25 +248,28 @@ find ASSEMBLY -type f -name "*_protein.faa.gz" |
 
 find ASSEMBLY -type f -name "*_protein.faa.gz" |
     xargs gzip -dcf \
-    > RnaseR/all.pro.fa
+    > RNaseR/all.pro.fa
 
 #find ASSEMBLY -type f -name "*_translated_cds.faa.gz" |
 #    xargs gzip -dcf \
-#    > RnaseR/all.tcds.fa
+#    > RNaseR/all.tcds.fa
 #
-#cat RnaseR/all.tcds.fa |
+#cat RNaseR/all.tcds.fa |
 #    grep "ribonuclease R"
 
 # 280; deduped 207
-faops some RnaseR/all.pro.fa \
-    <(cat RnaseR/all.pro.fa |
+faops some RNaseR/all.pro.fa \
+    <(cat RNaseR/all.pro.fa |
         grep "ribonuclease R" |
         cut -d" " -f 1 |
         sed "s/^>//" |
         sort | uniq) \
     stdout |
     faops filter -u stdin stdout \
-    > RnaseR/RnaseR.pro.fa
+    > RNaseR/RNaseR.pro.fa
+
+muscle -quiet -in RNaseR/RNaseR.pro.fa -out RNaseR/RNaseR.aln.fa
+FastTree -quiet RNaseR/RNaseR.aln.fa > RNaseR/RNaseR.aln.newick
 
 find ASSEMBLY -maxdepth 1 -type d |
     sort |
@@ -277,7 +280,7 @@ find ASSEMBLY -maxdepth 1 -type d |
             (echo {} && cat)
         echo
     ' \
-    > RnaseR/strains.txt
+    > RNaseR/strains.txt
 
 for GENUS in $(cat genus.list); do
     cat taxon/${GENUS} |
@@ -304,7 +307,7 @@ for GENUS in $(cat genus.list); do
 done
 
 # 280
-#cat taxon/*.replace.tsv | wc -l
+cat taxon/*.replace.tsv | wc -l
 
 # extract sequences for each genus
 for GENUS in $(cat genus.list); do
@@ -313,7 +316,7 @@ for GENUS in $(cat genus.list); do
     mytmpdir=`mktemp -d 2>/dev/null || mktemp -d -t 'mytmpdir'`
 
     # avoid duplicated fasta headers
-    faops some RnaseR/all.pro.fa taxon/${GENUS}.replace.tsv stdout |
+    faops some RNaseR/all.pro.fa taxon/${GENUS}.replace.tsv stdout |
         faops filter -u stdin ${mytmpdir}/${GENUS}.fa
     
     # avoid duplicated original names
@@ -321,7 +324,7 @@ for GENUS in $(cat genus.list); do
         parallel --no-run-if-empty --linebuffer -k -j 1 "
             faops replace -s ${mytmpdir}/${GENUS}.fa <(echo {}) stdout
         " \
-        > RnaseR/${GENUS}.pro.fa
+        > RNaseR/${GENUS}.pro.fa
         
     rm -fr ${mytmpdir}
 done
@@ -331,7 +334,7 @@ cat genus.list |
     parallel --no-run-if-empty --linebuffer -k -j 4 '
         echo "==> {}"
         
-        muscle -quiet -in RnaseR/{}.pro.fa -out RnaseR/{}.aln.fa
+        muscle -quiet -in RNaseR/{}.pro.fa -out RNaseR/{}.aln.fa
     '
 
 # newick trees
@@ -339,7 +342,7 @@ cat genus.list |
     parallel --no-run-if-empty --linebuffer -k -j 4 '
         echo "==> {}"
         
-        FastTree -quiet RnaseR/{}.aln.fa > RnaseR/{}.aln.newick
+        FastTree -quiet RNaseR/{}.aln.fa > RNaseR/{}.aln.newick
     '
 
 ```
