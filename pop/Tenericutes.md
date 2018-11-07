@@ -213,20 +213,20 @@ find taxon -maxdepth 1 -type f -not -name "*.replace.tsv" |
 
 ```
 
-| Order             | Genus           | Comments | Species | Strains |
-|:------------------|:----------------|:---------|--------:|--------:|
-| Acholeplasmatales | Acholeplasma    | 无胆甾原体 |      11 |      13 |
-|                   | Phytoplasma     | 植原体    |         |      18 |
-| Anaeroplasmatales | Anaeroplasma    |          |       1 |       1 |
-|                   | Asteroleplasma  |          |       0 |       0 |
-| Entomoplasmatales | Entomoplasma    |          |       6 |      10 |
-|                   | Mesoplasma      |          |      11 |      15 |
-|                   | Spiroplasma     | 螺原体    |      25 |      29 |
-| Mycoplasmatales   | Mycoplasma      | 支原体    |      81 |     192 |
-|                   | Ureaplasma      | 脲原体    |       4 |      25 |
-| Unclassified      | Izimaplasma     | 独立生活   |       1 |       1 |
-| Haloplasmatales   | Haloplasma      |          |       1 |       1 |
-|                   | Inordinaticella |          |       1 |       1 |
+| Order             | Genus           | Comments           | Species | Strains |
+|:------------------|:----------------|:-------------------|--------:|--------:|
+| Acholeplasmatales | Acholeplasma    | 无胆甾原体           |      11 |      13 |
+|                   | Phytoplasma     | 植原体              |         |      18 |
+| Anaeroplasmatales | Anaeroplasma    |                    |       1 |       1 |
+|                   | Asteroleplasma  |                    |       0 |       0 |
+| Entomoplasmatales | Entomoplasma    |                    |       6 |      10 |
+| 虫原体             | Mesoplasma      |                    |      11 |      15 |
+|                   | Spiroplasma     | 螺原体, 感染昆虫与植物 |      25 |      29 |
+| Mycoplasmatales   | Mycoplasma      | 支原体              |      81 |     192 |
+|                   | Ureaplasma      | 脲原体              |       4 |      25 |
+| Unclassified      | Izimaplasma     | 独立生活             |       1 |       1 |
+| Haloplasmatales   | Haloplasma      |                    |       1 |       1 |
+|                   | Inordinaticella |                    |       1 |       1 |
 
 
 # Find all RNase R
