@@ -52,7 +52,7 @@ GetOptions(
     'port=i'       => \( my $port     = $Config->{database}{port} ),
     'username|u=s' => \( my $username = $Config->{database}{username} ),
     'password|p=s' => \( my $password = $Config->{database}{password} ),
-    'file|i=s'     => \( my $yml_file = "$FindBin::Bin/ensembl_82.yml" ),
+    'file|i=s'     => \( my $yml_file = "$FindBin::Bin/ensembl_94.yml" ),
 ) or HelpMessage(1);
 
 #----------------------------------------------------------#

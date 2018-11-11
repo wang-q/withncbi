@@ -1,7 +1,7 @@
 ---
 dir:
-  mysql: "~/data/ensembl82/mysql"
-  fasta: "~/data/ensembl82/fasta"
+  mysql: "~/data/ensembl94/mysql"
+  fasta: "~/data/ensembl94/fasta"
   dest: "~/data/alignment/Ensembl"
 species:
   "Homo sapiens":
@@ -239,7 +239,7 @@ species:
         - compara_fungi
     initrc: 1
 meta:
-  version: 82
+  version: 94
   initrc_file: "ensembl.initrc.pm"
   build_file: "ensembl.build.sh"
   fasta_file: "ensembl.fasta.sh"
