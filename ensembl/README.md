@@ -7,6 +7,7 @@ Current version of ensembl is 94, the one of ensembl genomes is 41.
 - [Downlaod Ensembl data](#downlaod-ensembl-data)
     - [Ensembl mysql](#ensembl-mysql)
     - [Ensembl fasta](#ensembl-fasta)
+    - [Ensembl gff3](#ensembl-gff3)
 - [Ensembl genomes](#ensembl-genomes)
     - [EG mysql](#eg-mysql)
     - [EG fasta](#eg-fasta)
@@ -71,6 +72,23 @@ rsync -avP \
     --exclude='*.nonchromosomal.*' \
     rsync://ftp.ensembl.org/ensembl/pub/grch37/release-94/fasta/homo_sapiens \
     ~/data/ensembl94/fasta
+
+```
+
+## Ensembl gff3
+
+
+```bash
+mkdir -p ~/data/ensembl94/gff3
+
+rsync -avP \
+    --exclude='*_collection' \
+    --exclude='*.dna.*' \
+    --exclude='*.dna_rm.*' \
+    --exclude='*.chromosome.*' \
+    --exclude='*.nonchromosomal.*' \
+    rsync://ftp.ensembl.org/ensembl/pub/release-94/gff3/ \
+    ~/data/ensembl94/gff3
 
 ```
 
