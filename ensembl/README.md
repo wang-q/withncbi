@@ -1,21 +1,21 @@
 # Ensembl related scripts.
 
-Current version of ensembl is 94, ensembl genomes' one is 41.
+Current version of ensembl is 94, the one of ensembl genomes is 41.
 
-Configurations stored in `ensembl_94.yml`.
+[TOC levels=1-3]: # " "
+- [Ensembl related scripts.](#ensembl-related-scripts)
+- [Downlaod Ensembl data](#downlaod-ensembl-data)
+    - [Ensembl mysql](#ensembl-mysql)
+    - [Ensembl fasta](#ensembl-fasta)
+- [Ensembl genomes](#ensembl-genomes)
+    - [EG mysql](#eg-mysql)
+    - [EG fasta](#eg-fasta)
+    - [EG gff3](#eg-gff3)
+- [Configurations](#configurations)
+- [Build local databases](#build-local-databases)
 
-```bash
-cd ~/Scripts/withncbi/ensembl/
-perl ensembl_batch.pl -i ensembl_94.yml
 
-bash ensembl.build.sh
-bash ensembl.fasta.sh
-bash ensembl.anno.sh
-
-cp ensembl.initrc.pm ~/Scripts/alignDB/
-```
-
-## Downlaod Ensembl data
+# Downlaod Ensembl data
 
 Ensembl and Ensembl Genomes provides rsync service:
 
@@ -23,7 +23,7 @@ Ensembl and Ensembl Genomes provides rsync service:
 
 * `rsync://ftp.ensemblgenomes.org/all/pub/plants/release-41/`
 
-### Ensembl mysql
+## Ensembl mysql
 
 ```bash
 mkdir -p ~/data/ensembl94/mysql
@@ -46,7 +46,7 @@ rsync -avP rsync://ftp.ensembl.org/ensembl/pub/grch37/release-94/mysql/homo_sapi
 rsync -avP rsync://ftp.ensembl.org/ensembl/pub/release-94/mysql/ensembl_compara_94 ~/data/ensembl94/mysql
 ```
 
-### Ensembl fasta
+## Ensembl fasta
 
 ```bash
 mkdir -p ~/data/ensembl94/fasta
@@ -60,13 +60,23 @@ rsync -avP \
     --exclude='*.dna_rm.*' \
     --exclude='*.chromosome.*' \
     --exclude='*.nonchromosomal.*' \
-    rsync://ftp.ensembl.org/ensembl/pub/release-82/fasta/ \
+    rsync://ftp.ensembl.org/ensembl/pub/release-94/fasta/ \
     ~/data/ensembl94/fasta
 
-rsync -avP rsync://ftp.ensembl.org/ensembl/pub/release-75/fasta/homo_sapiens ~/data/ensembl94/fasta # GRCh37
+# GRCh37
+rsync -avP \
+    --exclude='*.dna.*' \
+    --exclude='*.dna_rm.*' \
+    --exclude='*.chromosome.*' \
+    --exclude='*.nonchromosomal.*' \
+    rsync://ftp.ensembl.org/ensembl/pub/grch37/release-94/fasta/homo_sapiens \
+    ~/data/ensembl94/fasta
+
 ```
 
-### Ensembl genomes mysql
+# Ensembl genomes
+
+##  EG mysql
 
 ```bash
 mkdir -p ~/data/ensembl94/mysql
@@ -119,7 +129,7 @@ find . -name ".listing" | xargs rm
 # rsync -avP wangq@45.79.80.100:data/ensembl94/mysql/ ~/data/ensembl94/mysql
 ```
 
-### Ensembl genomes fasta
+## EG fasta
 
 ```bash
 mkdir -p ~/data/ensembl94/fasta
@@ -168,7 +178,7 @@ rsync -avP \
 # rsync -avP wangq@45.79.80.100:data/ensembl94/fasta/ ~/data/ensembl94/fasta
 ```
 
-### gff3
+## EG gff3
 
 
 ```bash
@@ -187,7 +197,22 @@ rsync -avP \
 
 ```
 
-## Build local databases
+# Configurations
+
+Configurations stored in `ensembl_94.yml`.
+
+```bash
+cd ~/Scripts/withncbi/ensembl/
+perl ensembl_batch.pl -i ensembl_94.yml
+
+bash ensembl.build.sh
+bash ensembl.fasta.sh
+bash ensembl.anno.sh
+
+cp ensembl.initrc.pm ~/Scripts/alignDB/
+```
+
+# Build local databases
 
 Use `build_ensembl.pl`.
 
