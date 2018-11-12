@@ -137,6 +137,11 @@ for n in \
         ~/data/ensembl94/mysql
 done
 
+# compara
+rsync -avP \
+    rsync://ftp.ensemblgenomes.org/all/pub/release-41/fungi/mysql/ensembl_compara_fungi_41_94 \
+    ~/data/ensembl94/mysql
+
 ```
 
 ## EG fasta
