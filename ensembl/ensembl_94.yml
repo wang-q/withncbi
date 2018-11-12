@@ -132,24 +132,18 @@ species:
         mv Un.fa Un.fa.skip
         rm Scaffold*.fa
   "Brassica rapa":
-    core: 1
-    initrc: 1
     fasta:
       append: |
         cat Scaffold*.fa > Un.fa
         mv Un.fa Un.fa.skip
         rm Scaffold*.fa
   "Solanum lycopersicum":
-    core: 1
-    initrc: 1
     fasta:
       append: |
         cat SL2*.fa > Un.fa
         mv Un.fa Un.fa.skip
         rm SL2*.fa
   "Solanum tuberosum":
-    core: 1
-    initrc: 1
     fasta: 1
   "Setaria italica":
     fasta:
@@ -195,15 +189,6 @@ species:
       append: |
         mv MtDNA.fa MtDNA.fa.skip
   "Caenorhabditis briggsae":
-    core: 1
-    initrc: 1
-  "Caenorhabditis remanei":
-    core: 1
-    initrc: 1
-  "Caenorhabditis brenneri":
-    core: 1
-    initrc: 1
-  "Caenorhabditis japonica":
     core: 1
     initrc: 1
   "Plasmodium falciparum":

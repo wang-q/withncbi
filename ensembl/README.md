@@ -76,7 +76,6 @@ rsync -avP \
 
 ## Ensembl gff3
 
-
 ```bash
 mkdir -p ~/data/ensembl94/gff3
 
@@ -112,8 +111,8 @@ done
 
 # Metazoa
 for n in \
-    drosophila_melanogaster_core* drosophila_sechellia_core* drosophila_simulans_core* \
-    caenorhabditis_elegans_core* caenorhabditis_briggsae_core* \
+    drosophila_sechellia_core* drosophila_simulans_core* \
+    caenorhabditis_briggsae_core* \
     ; do
     rsync -avP \
         rsync://ftp.ensemblgenomes.org/all/pub/release-41/metazoa/mysql/${n} \
@@ -122,8 +121,7 @@ done
 
 # Fungi
 for n in \
-    saccharomyces_cerevisiae_core* schizosaccharomyces_pombe_core* \
-    aspergillus_fumigatus_core* \
+    schizosaccharomyces_pombe_core* aspergillus_fumigatus_core* \
     ; do
     rsync -avP \
         rsync://ftp.ensemblgenomes.org/all/pub/release-41/fungi/mysql/${n} \
