@@ -12,8 +12,8 @@ Current version of ensembl is 94, the one of ensembl genomes is 41.
     - [EG mysql](#eg-mysql)
     - [EG fasta](#eg-fasta)
     - [EG gff3](#eg-gff3)
-- [Configurations](#configurations)
 - [Build local databases](#build-local-databases)
+- [Configurations](#configurations)
 
 
 # Downlaod Ensembl data
@@ -44,7 +44,6 @@ rsync -avP \
 
 rsync -avP rsync://ftp.ensembl.org/ensembl/pub/grch37/release-94/mysql/homo_sapiens_core_94_37 ~/data/ensembl94/mysql
 
-rsync -avP rsync://ftp.ensembl.org/ensembl/pub/release-94/mysql/ensembl_compara_94 ~/data/ensembl94/mysql
 ```
 
 ## Ensembl fasta
@@ -98,122 +97,101 @@ rsync -avP \
 
 ```bash
 mkdir -p ~/data/ensembl94/mysql
-cd ~/data/ensembl94/mysql
 
 # Plants
-wget -m ftp://ftp.ensemblgenomes.org/pub/plants/release-29/mysql/arabidopsis_thaliana_core_29_94_10 .
-wget -m ftp://ftp.ensemblgenomes.org/pub/plants/release-29/mysql/arabidopsis_lyrata_core_29_94_10 .
-
-wget -m ftp://ftp.ensemblgenomes.org/pub/plants/release-29/mysql/oryza_sativa_core_29_94_7 .
-wget -m ftp://ftp.ensemblgenomes.org/pub/plants/release-29/mysql/oryza_indica_core_29_94_2 .
-
-wget -m ftp://ftp.ensemblgenomes.org/pub/plants/release-29/mysql/brassica_oleracea_core_29_94_1 .
-wget -m ftp://ftp.ensemblgenomes.org/pub/plants/release-29/mysql/brassica_rapa_core_29_94_1 .
-
-wget -m ftp://ftp.ensemblgenomes.org/pub/plants/release-29/mysql/solanum_lycopersicum_core_29_94_250 .
-wget -m ftp://ftp.ensemblgenomes.org/pub/plants/release-29/mysql/solanum_tuberosum_core_29_94_4 .
+for n in \
+    arabidopsis_thaliana_core* arabidopsis_lyrata_core* \
+    oryza_sativa_core* oryza_indica_core* \
+    brassica_oleracea_core* brassica_rapa_core* \
+    solanum_lycopersicum_core* solanum_tuberosum_core* \
+    ; do
+    rsync -avP \
+        rsync://ftp.ensemblgenomes.org/all/pub/release-41/plants/mysql/${n} \
+        ~/data/ensembl94/mysql
+done
 
 # Metazoa
-wget -m ftp://ftp.ensemblgenomes.org/pub/metazoa/release-29/mysql/drosophila_melanogaster_core_29_94_6 .
-wget -m ftp://ftp.ensemblgenomes.org/pub/metazoa/release-29/mysql/drosophila_sechellia_core_29_94_1 .
-wget -m ftp://ftp.ensemblgenomes.org/pub/metazoa/release-29/mysql/drosophila_simulans_core_29_94_1 .
-
-wget -m ftp://ftp.ensemblgenomes.org/pub/metazoa/release-29/mysql/caenorhabditis_elegans_core_29_94_245 .
-wget -m ftp://ftp.ensemblgenomes.org/pub/metazoa/release-29/mysql/caenorhabditis_briggsae_core_29_94_230 .
-wget -m ftp://ftp.ensemblgenomes.org/pub/metazoa/release-29/mysql/caenorhabditis_remanei_core_29_94_233 .
-wget -m ftp://ftp.ensemblgenomes.org/pub/metazoa/release-29/mysql/caenorhabditis_brenneri_core_29_94_233 .
-wget -m ftp://ftp.ensemblgenomes.org/pub/metazoa/release-29/mysql/caenorhabditis_japonica_core_29_94_233 .
+for n in \
+    drosophila_melanogaster_core* drosophila_sechellia_core* drosophila_simulans_core* \
+    caenorhabditis_elegans_core* caenorhabditis_briggsae_core* \
+    ; do
+    rsync -avP \
+        rsync://ftp.ensemblgenomes.org/all/pub/release-41/metazoa/mysql/${n} \
+        ~/data/ensembl94/mysql
+done
 
 # Fungi
-wget -m ftp://ftp.ensemblgenomes.org/pub/fungi/release-29/mysql/saccharomyces_cerevisiae_core_29_94_4 .
-wget -m ftp://ftp.ensemblgenomes.org/pub/fungi/release-29/mysql/schizosaccharomyces_pombe_core_29_94_2 .
-wget -m ftp://ftp.ensemblgenomes.org/pub/fungi/release-29/mysql/aspergillus_fumigatus_core_29_94_2 .
+for n in \
+    saccharomyces_cerevisiae_core* schizosaccharomyces_pombe_core* \
+    aspergillus_fumigatus_core* \
+    ; do
+    rsync -avP \
+        rsync://ftp.ensemblgenomes.org/all/pub/release-41/fungi/mysql/${n} \
+        ~/data/ensembl94/mysql
+done
 
 # Protists
-wget -m ftp://ftp.ensemblgenomes.org/pub/protists/release-29/mysql/plasmodium_falciparum_core_29_94_3 .
-wget -m ftp://ftp.ensemblgenomes.org/pub/protists/release-29/mysql/dictyostelium_discoideum_core_29_94_1 .
+for n in \
+    plasmodium_falciparum_core* dictyostelium_discoideum_core* \
+    ; do
+    rsync -avP \
+        rsync://ftp.ensemblgenomes.org/all/pub/release-41/protists/mysql/${n} \
+        ~/data/ensembl94/mysql
+done
 
-# compara
-wget -m ftp://ftp.ensemblgenomes.org/pub/release-29/fungi/mysql/ensembl_compara_fungi_29_94 .
-
-# clean
-mv ftp.ensemblgenomes.org/pub/metazoa/release-29/mysql/* .
-mv ftp.ensemblgenomes.org/pub/plants/release-29/mysql/* .
-mv ftp.ensemblgenomes.org/pub/fungi/release-29/mysql/* .
-mv ftp.ensemblgenomes.org/pub/protists/release-29/mysql/* .
-
-find . -name ".listing" | xargs rm
-
-# rsync -avP wangq@45.79.80.100:data/ensembl94/mysql/ ~/data/ensembl94/mysql
 ```
 
 ## EG fasta
 
 ```bash
 mkdir -p ~/data/ensembl94/fasta
-cd ~/data/ensembl94/fasta
 
-# Plants
-rsync -avP \
-    --exclude='*_collection' \
-    --exclude='*.dna.*' \
-    --exclude='*.dna_rm.*' \
-    --exclude='*.chromosome.*' \
-    --exclude='*.nonchromosomal.*' \
-    rsync://ftp.ensemblgenomes.org/all/pub/plants/release-29/fasta/ \
-    ~/data/ensembl94/fasta
+for n in \
+    plants metazoa fungi protists \
+    ; do
+    rsync -avP \
+        --exclude='*_collection' \
+        --exclude='*.dna.*' \
+        --exclude='*.dna_rm.*' \
+        --exclude='*.chromosome.*' \
+        --exclude='*.nonchromosomal.*' \
+        rsync://ftp.ensemblgenomes.org/all/pub/release-41/${n}/fasta/ \
+        ~/data/ensembl94/fasta
+done
 
-# Protists
-rsync -avP \
-    --exclude='*_collection' \
-    --exclude='*.dna.*' \
-    --exclude='*.dna_rm.*' \
-    --exclude='*.chromosome.*' \
-    --exclude='*.nonchromosomal.*' \
-    rsync://ftp.ensemblgenomes.org/all/pub/protists/release-29/fasta/ \
-    ~/data/ensembl94/fasta
-
-# Fungi
-rsync -avP \
-    --exclude='*_collection' \
-    --exclude='*.dna.*' \
-    --exclude='*.dna_rm.*' \
-    --exclude='*.chromosome.*' \
-    --exclude='*.nonchromosomal.*' \
-    rsync://ftp.ensemblgenomes.org/all/pub/fungi/release-29/fasta/ \
-    ~/data/ensembl94/fasta
-
-# Metazoa
-rsync -avP \
-    --exclude='*_collection' \
-    --exclude='*.dna.*' \
-    --exclude='*.dna_rm.*' \
-    --exclude='*.chromosome.*' \
-    --exclude='*.nonchromosomal.*' \
-    rsync://ftp.ensemblgenomes.org/all/pub/metazoa/release-29/fasta/ \
-    ~/data/ensembl94/fasta
-
-# rsync -avP wangq@45.79.80.100:data/ensembl94/fasta/ ~/data/ensembl94/fasta
 ```
 
 ## EG gff3
 
-
 ```bash
 mkdir -p ~/data/ensembl94/gff3
-cd ~/data/ensembl94/gff3
 
-# Plants
-rsync -avP \
-    --exclude='*_collection' \
-    --exclude='*.dna.*' \
-    --exclude='*.dna_rm.*' \
-    --exclude='*.chromosome.*' \
-    --exclude='*.nonchromosomal.*' \
-    rsync://ftp.ensemblgenomes.org/all/pub/plants/release-29/gff3/ \
-    ~/data/ensembl94/gff3
+for n in \
+    plants metazoa fungi protists \
+    ; do
+    rsync -avP \
+        --exclude='*_collection' \
+        --exclude='*.dna.*' \
+        --exclude='*.dna_rm.*' \
+        --exclude='*.chromosome.*' \
+        --exclude='*.nonchromosomal.*' \
+        rsync://ftp.ensemblgenomes.org/all/pub/release-41/${n}/gff3/ \
+        ~/data/ensembl94/gff3
+done
 
 ```
+
+# Build local databases
+
+Use `build_ensembl.pl`.
+
+```bash
+perl ~/Scripts/withncbi/ensembl/build_ensembl.pl --checksum --ensembl ~/data/ensembl94/mysql/homo_sapiens_core_94_37
+
+perl ~/Scripts/withncbi/ensembl/build_ensembl.pl --initdb --db human_94 --ensembl ~/data/ensembl94/mysql/homo_sapiens_core_94_37
+```
+
+Or use `ensembl_batch.pl`, see [this](README.md#configurations).
 
 # Configurations
 
@@ -230,14 +208,3 @@ bash ensembl.anno.sh
 cp ensembl.initrc.pm ~/Scripts/alignDB/
 ```
 
-# Build local databases
-
-Use `build_ensembl.pl`.
-
-```bash
-perl ~/Scripts/withncbi/ensembl/build_ensembl.pl --checksum --ensembl ~/data/ensembl94/mysql/homo_sapiens_core_94_37
-
-perl ~/Scripts/withncbi/ensembl/build_ensembl.pl --initdb --db human_94 --ensembl ~/data/ensembl94/mysql/homo_sapiens_core_94_37
-```
-
-Or use `ensembl_batch.pl`, see [this](README.md).
