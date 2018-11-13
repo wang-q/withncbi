@@ -123,57 +123,38 @@ strain_name,accession,strain_taxon_id,seq_name # This line is needed
 MG1655,U00096,
 EOF
 
-perl ~/Scripts/withncbi/taxon/batch_get_seq.pl -p -f name_seq.csv
+perl ~/Scripts/withncbi/taxon/batch_get_seq.pl -f name_seq.csv
 
-mv MG1655/* .
-rm -fr MG1655
+egaz prepseq MG1655/U00096.fa -o . --repeatmasker '--gff --parallel 8' -v
 
-# simplify header
-perl -pi -e 's/^>(\w+).+/>$1/' U00096.fasta
-
-RepeatMasker U00096.fasta -xsmall -gff -parallel 8
-
-mv U00096.fasta.masked U00096.fa
-mv U00096.fasta.out.gff U00096.rm.gff
-rm U00096.fasta*
+mv MG1655/U00096.gff .
 
 # create anno.yml
-perl ~/Scripts/alignDB/util/gff2anno.pl \
-    --type CDS --remove \
-    U00096.gff \
-    > cds.yml
-
-perl ~/Scripts/alignDB/util/gff2anno.pl \
-    --remove \
-    U00096.rm.gff \
-    > repeat.yml
-
-runlist merge \
-    repeat.yml \
-    cds.yml \
-    -o anno.yml
+runlist gff --tag CDS --remove U00096.gff -o cds.yml
+runlist gff --remove U00096.rm.gff -o repeat.yml
+runlist merge repeat.yml cds.yml -o anno.yml
 
 rm repeat.yml cds.yml
+rm -fr MG1655
 
 ```
 
 ```bash
 cd ~/data/alignment/self
 
-perl ~/Scripts/egaz/self_batch.pl \
-    --working_dir ~/data/alignment/self \
-    --seq_dir ~/data/alignment/Ensembl \
-    -c ~/data/alignment/self/ensembl_taxon.csv \
-    --length 1000  \
-    --norm \
-    --name ecoli \
-    --parallel 8 \
-    -t MG1655
+egaz template \
+    ~/data/alignment/Ensembl/MG1655 \
+    --self -o ecoli/ \
+    --taxon ~/data/alignment/self/ensembl_taxon.csv \
+    --circos --aligndb --parallel 8 -v
 
-bash ecoli/1_real_chr.sh
-bash ecoli/3_self_cmd.sh
-bash ecoli/4_proc_cmd.sh
-bash ecoli/5_circos_cmd.sh
+bash ecoli/1_self.sh
+bash ecoli/3_proc.sh
+bash ecoli/4_circos.sh
+bash ecoli/6_chr_length.sh
+bash ecoli/7_self_aligndb.sh
+bash ecoli/9_pack_up.sh
+
 ```
 
 ## Yeast S288c
