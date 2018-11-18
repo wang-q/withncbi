@@ -268,7 +268,7 @@ sub build_fasta {
     my ($ensembl_dir)
         = sort { $score_of{$b} <=> $score_of{$a} } keys %score_of;
     my $ensembl_base = path($ensembl_dir)->basename;
-    printf " " x 4 . "Find %s for %s\n", $ensembl_base, $str;
+    printf " " x 4 . "fasta: [%s] for [%s]\n", $ensembl_base, $str;
     if ( index( $ensembl_base, $str ) != 0 ) {
         print " " x 4, "*** Be careful for [$str]\n";
     }
@@ -350,7 +350,7 @@ sub build_cmd {
     my ($ensembl_dir)
         = sort { $score_of{$b} <=> $score_of{$a} } keys %score_of;
     my $ensembl_base = path($ensembl_dir)->basename;
-    printf " " x 4 . "Find %s for %s\n", $ensembl_base, $str;
+    printf " " x 4 . "db: [%s] for [%s]\n", $ensembl_base, $str;
     if ( index( $ensembl_base, $str ) != 0 ) {
         print " " x 4, "*** Be careful for [$str]\n";
     }
