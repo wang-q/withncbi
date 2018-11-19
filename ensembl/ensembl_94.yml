@@ -78,18 +78,6 @@ species:
         mv Un.fa Un.fa.skip
         mv Y.fa Y.fa.skip
         mv MT.fa MT.fa.skip
-  "Medicago truncatula":
-    fasta:
-      append: |
-        cat scaffold*.fa > Un.fa
-        mv Un.fa Un.fa.skip
-        rm scaffold*.fa
-  "Glycine max":
-    fasta:
-      append: |
-        cat scaffold*.fa > Un.fa
-        mv Un.fa Un.fa.skip
-        rm scaffold*.fa
   "Arabidopsis thaliana":
     core: 1
     initrc: 1
@@ -103,6 +91,18 @@ species:
         cat scaffold*.fa > Un.fa
         rm scaffold*.fa
         mv Un.fa Un.fa.skip
+  "Medicago truncatula":
+    fasta:
+      append: |
+        cat scaffold*.fa > Un.fa
+        mv Un.fa Un.fa.skip
+        rm scaffold*.fa
+  "Glycine max":
+    fasta:
+      append: |
+        cat scaffold*.fa > Un.fa
+        mv Un.fa Un.fa.skip
+        rm scaffold*.fa
   "Vitis vinifera":
     fasta:
       append: |

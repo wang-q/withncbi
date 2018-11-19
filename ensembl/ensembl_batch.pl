@@ -231,19 +231,22 @@ if [ ! -d [% dest %]/[% alias %] ]; then
     mkdir -p [% dest %]/[% alias %]
     cd [% dest %]/[% alias %]
     
-    find [% dir %]/dna/ -name "[% pattern %]" \
-        | xargs gzip -d -c > toplevel.fa
+    find [% dir %]/dna/ -name "[% pattern %]" |
+        xargs gzip -d -c > toplevel.fa
     
-    faops count toplevel.fa \
-        | perl -aln -e '
+    faops count toplevel.fa |
+        perl -nla -e '
             next if $F[0] eq 'total';
             print $F[0] if $F[1] > 50000;
             print $F[0] if $F[1] > 5000  and $F[6]/$F[1] < 0.05;
-            ' \
-        | uniq > listFile
-    faops some toplevel.fa listFile toplevel.filtered.fa
-    faops split-name toplevel.filtered.fa .
-    rm toplevel.fa toplevel.filtered.fa listFile
+        ' |
+        uniq > listFile
+    faops some toplevel.fa listFile stdout |
+        faops filter -N stdin stdout |
+        faops split-name stdin .
+    rm toplevel.fa listFile
+
+[% append %]
 
 else
     echo "==> [% dest %]/[% alias %] exists"
@@ -308,7 +311,8 @@ if [ -d [% dest %]/[% alias %] ]; then
             xargs gzip -d -c > chr.gff
         runlist gff --tag CDS --remove chr.gff -o cds.yml
 
-        faops masked *.fa | jrunlist cover stdin -o repeat.yml
+        faops masked *.fa |
+            jrunlist cover stdin -o repeat.yml
 
         runlist merge repeat.yml cds.yml -o anno.yml
         rm repeat.yml cds.yml
