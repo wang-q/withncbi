@@ -193,58 +193,6 @@ $stopwatch->end_message;
 #----------------------------------------------------------#
 # Subroutines
 #----------------------------------------------------------#
-sub build_anno {
-    my $sp          = shift;
-    my $core_dbname = shift;
-    my $alias       = shift;
-
-    my $text = <<'EOF';
-# [% sp %]
-if [ -d [% dest %]/[% alias %] ];
-then
-    echo "==> [% sp %]"
-
-    if [ -f [% dest %]/[% alias %]/anno.yml ]; then
-        echo "==> [% dest %]/[% alias %]/anno.yml exists"
-    elif mysql -hlocalhost -ualignDB -palignDB -e 'use [% core_dbname %]'; then
-        cd [% dest %]/[% alias %]
-
-        perl ~/Scripts/withncbi/ensembl/feature_runlists.pl \
-            -e [% core_dbname %] \
-            -f repeat \
-            -o repeat.yml
-
-        perl ~/Scripts/withncbi/ensembl/feature_runlists.pl \
-            -e [% core_dbname %] \
-            -f cds \
-            -o cds.yml
-
-        runlist merge repeat.yml cds.yml -o anno.yml
-        rm repeat.yml cds.yml
-    else
-        echo "==> Database [% core_dbname %] does not exist"
-    fi
-else
-    echo "==> [% dest %]/[% alias %] does not exist"
-fi
-
-EOF
-
-    my $tt = Template->new;
-    my $output;
-    $tt->process(
-        \$text,
-        {   sp          => $sp,
-            dest        => $dest_dir,
-            core_dbname => $core_dbname,
-            alias       => $alias,
-        },
-        \$output
-    ) or die Template->error;
-
-    return $output;
-}
-
 sub build_fasta {
     my $sp      = shift;
     my $alias   = shift;
