@@ -128,13 +128,14 @@ perl ~/Scripts/withncbi/taxon/batch_get_seq.pl -f name_seq.csv
 egaz prepseq MG1655/U00096.fa -o . --repeatmasker '--gff --parallel 8' -v
 
 mv MG1655/U00096.gff .
+mv U00096.gff chr.gff
 
 # create anno.yml
-runlist gff --tag CDS --remove U00096.gff -o cds.yml
+runlist gff --tag CDS --remove chr.gff -o cds.yml
 runlist gff --remove U00096.rm.gff -o repeat.yml
 runlist merge repeat.yml cds.yml -o anno.yml
 
-rm repeat.yml cds.yml
+rm repeat.yml cds.yml U00096.rm.gff U00096.rm.out
 rm -fr MG1655
 
 ```

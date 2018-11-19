@@ -14,6 +14,7 @@ Current version of ensembl is 94, the one of ensembl genomes is 41.
     - [EG gff3](#eg-gff3)
 - [Build local databases](#build-local-databases)
 - [Configurations](#configurations)
+- [`egaz prepseq`](#egaz-prepseq)
 
 
 # Downlaod Ensembl
@@ -259,3 +260,4 @@ find ~/data/alignment/Ensembl -maxdepth 1 -type d |
     ' 
 
 ```
+
