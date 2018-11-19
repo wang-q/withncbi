@@ -1,14 +1,14 @@
-# Ensembl related scripts.
+# Ensembl related scripts
 
 Current version of ensembl is 94, the one of ensembl genomes is 41.
 
 [TOC levels=1-3]: # " "
-- [Ensembl related scripts.](#ensembl-related-scripts)
-- [Downlaod Ensembl data](#downlaod-ensembl-data)
+- [Ensembl related scripts](#ensembl-related-scripts)
+- [Downlaod Ensembl](#downlaod-ensembl)
     - [Ensembl mysql](#ensembl-mysql)
     - [Ensembl fasta](#ensembl-fasta)
     - [Ensembl gff3](#ensembl-gff3)
-- [Ensembl genomes](#ensembl-genomes)
+- [Download Ensembl Genomes](#download-ensembl-genomes)
     - [EG mysql](#eg-mysql)
     - [EG fasta](#eg-fasta)
     - [EG gff3](#eg-gff3)
@@ -16,13 +16,13 @@ Current version of ensembl is 94, the one of ensembl genomes is 41.
 - [Configurations](#configurations)
 
 
-# Downlaod Ensembl data
+# Downlaod Ensembl
 
 Ensembl and Ensembl Genomes provides rsync service:
 
 * `rsync://ftp.ensembl.org/ensembl/pub/release-94/`
 
-* `rsync://ftp.ensemblgenomes.org/all/pub/plants/release-41/`
+* `rsync://ftp.ensemblgenomes.org/all/pub/release-41/plants/`
 
 ## Ensembl mysql
 
@@ -51,7 +51,9 @@ for n in \
         ~/data/ensembl94/mysql
 done
 
-rsync -avP rsync://ftp.ensembl.org/ensembl/pub/grch37/release-94/mysql/homo_sapiens_core_94_37 ~/data/ensembl94/mysql
+rsync -avP \
+    rsync://ftp.ensembl.org/ensembl/pub/grch37/release-94/mysql/homo_sapiens_core_94_37 \
+    ~/data/ensembl94/mysql
 
 ```
 
@@ -86,6 +88,7 @@ rsync -avP \
 mkdir -p ~/data/ensembl94/gff3
 
 rsync -avP \
+    --exclude='homo_sapiens' \
     --exclude='*_collection' \
     --exclude='*.dna.*' \
     --exclude='*.dna_rm.*' \
@@ -94,11 +97,20 @@ rsync -avP \
     rsync://ftp.ensembl.org/ensembl/pub/release-94/gff3/ \
     ~/data/ensembl94/gff3
 
+# GRCh37
+rsync -avP \
+    --exclude='*.dna.*' \
+    --exclude='*.dna_rm.*' \
+    --exclude='*.chromosome.*' \
+    --exclude='*.nonchromosomal.*' \
+    rsync://ftp.ensembl.org/ensembl/pub/grch37/release-94/gff3/homo_sapiens \
+    ~/data/ensembl94/gff3
+
 ```
 
-# Ensembl genomes
+# Download Ensembl Genomes
 
-##  EG mysql
+## EG mysql
 
 ```bash
 mkdir -p ~/data/ensembl94/mysql
@@ -148,11 +160,6 @@ for n in \
         ~/data/ensembl94/mysql
 done
 
-# compara
-rsync -avP \
-    rsync://ftp.ensemblgenomes.org/all/pub/release-41/fungi/mysql/ensembl_compara_fungi_41_94 \
-    ~/data/ensembl94/mysql
-
 ```
 
 ## EG fasta
@@ -163,6 +170,7 @@ mkdir -p ~/data/ensembl94/fasta
 for n in \
     plants metazoa fungi protists \
     ; do
+    echo "==> ${n}"
     rsync -avP \
         --exclude='caenorhabditis_elegans' \
         --exclude='drosophila_melanogaster' \
@@ -186,6 +194,7 @@ mkdir -p ~/data/ensembl94/gff3
 for n in \
     plants metazoa fungi protists \
     ; do
+    echo "==> ${n}"
     rsync -avP \
         --exclude='caenorhabditis_elegans' \
         --exclude='drosophila_melanogaster' \
@@ -228,3 +237,25 @@ bash ensembl.anno.sh
 cp ensembl.initrc.pm ~/Scripts/alignDB/
 ```
 
+# `egaz prepseq`
+
+```bash
+find ~/data/alignment/Ensembl -maxdepth 1 -type d |
+    sort |
+    parallel --no-run-if-empty --linebuffer -k -j 2 '
+        echo "==> {}"
+        
+        if [ -e {}/chr.2bit ]; then
+            echo "    chr.2bit exists"
+            exit
+        fi
+        
+        if compgen -G "{}/*.fa" > /dev/null; then
+            egaz prepseq {}
+        else
+            echo "    Can not find *.fa"
+            exit
+        fi
+    ' 
+
+```
