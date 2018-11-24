@@ -30,25 +30,25 @@ cd ~/data/alignment/self
 perl        ~/Scripts/withncbi/taxon/strain_info.pl \
     --id    511145 --name 511145=MG1655 \
     --id    559292 --name 559292=S288c  \
-    --id    7227   --name 7227=Dmel     \
     --id    9606   --name 9606=Human    \
-    --id    6239   --name 6239=Cele     \
-    --id    352472 --name 352472=Ddis   \
     --id    10090  --name 10090=Mouse   \
-    --id    3880   --name 3880=Mtru     \
-    --id    3847   --name 3847=Gmax     \
-    --id    3712   --name 3712=Bole     \
-    --id    3711   --name 3711=Brap     \
     --id    3702   --name 3702=Atha     \
     --id    59689  --name 59689=Alyr    \
+    --id    3880   --name 3880=Mtru     \
+    --id    3847   --name 3847=Gmax     \
     --id    29760  --name 29760=Vvin    \
+    --id    39947  --name 39947=OsatJap \
+    --id    3712   --name 3712=Bole     \
+    --id    3711   --name 3711=Brap     \
     --id    4081   --name 4081=Slyc     \
     --id    4113   --name 4113=Stub     \
-    --id    4641   --name 4641=Macu     \
     --id    4555   --name 4555=Sita     \
     --id    4558   --name 4558=Sbic     \
-    --id    39947  --name 39947=OsatJap \
     --id    15368  --name 15368=Bdis    \
+    --id    4641   --name 4641=Macu     \
+    --id    7227   --name 7227=Dmel     \
+    --id    6239   --name 6239=Cele     \
+    --id    352472 --name 352472=Ddis   \
     --file ensembl_taxon.csv            \
     --entrez
 
@@ -145,7 +145,7 @@ cd ~/data/alignment/self
 
 egaz template \
     ~/data/alignment/Ensembl/MG1655 \
-    --self -o ecoli/ \
+    --self -o ecoli \
     --taxon ~/data/alignment/self/ensembl_taxon.csv \
     --circos --aligndb --parallel 8 -v
 
@@ -163,21 +163,16 @@ bash ecoli/9_pack_up.sh
 ```bash
 cd ~/data/alignment/self
 
-perl ~/Scripts/egaz/self_batch.pl \
-    --working_dir ~/data/alignment/self \
-    --seq_dir ~/data/alignment/Ensembl \
-    -c ~/data/alignment/self/ensembl_taxon.csv \
-    --length 1000  \
-    --norm \
-    --name yeast \
-    --parallel 8 \
-    -t S288c
+egaz template \
+    ~/data/alignment/Ensembl/S288c/ \
+    --self -o yeast \
+    --taxon ~/data/alignment/self/ensembl_taxon.csv \
+    --circos --parallel 8 -v
 
-bash yeast/1_real_chr.sh
-bash yeast/3_self_cmd.sh
-# real    0m46.075s
-time bash yeast/4_proc_cmd.sh
-bash yeast/5_circos_cmd.sh
+bash yeast/1_self.sh
+bash yeast/3_proc.sh
+bash yeast/4_circos.sh
+
 ```
 
 ## Dmel
@@ -185,26 +180,24 @@ bash yeast/5_circos_cmd.sh
 ```bash
 cd ~/data/alignment/self
 
-perl ~/Scripts/egaz/self_batch.pl \
-    --working_dir ~/data/alignment/self \
-    --seq_dir ~/data/alignment/Ensembl \
-    -c ~/data/alignment/self/ensembl_taxon.csv \
-    --length 1000  \
-    --norm \
-    --name fly \
-    --parallel 8 \
-    -t Dmel
+egaz template \
+    ~/data/alignment/Ensembl/Dmel/ \
+    --self -o fly \
+    --taxon ~/data/alignment/self/ensembl_taxon.csv \
+    --circos --parallel 8 -v
 
-bash fly/1_real_chr.sh
-#real    18m1.867s
-#user    126m31.346s
-#sys     0m21.494s
-time bash fly/3_self_cmd.sh
-#real    8m45.703s
-#user    18m48.943s
-#sys     7m3.803s
-time bash fly/4_proc_cmd.sh
-bash fly/5_circos_cmd.sh
+time bash fly/1_self.sh
+#real    20m4.269s
+#user    139m8.359s
+#sys     1m42.665s
+
+time bash fly/3_proc.sh
+#real    6m16.450s
+#user    16m32.193s
+#sys     5m26.875s
+
+bash fly/4_circos.sh
+
 ```
 
 ## Cele
@@ -212,26 +205,16 @@ bash fly/5_circos_cmd.sh
 ```bash
 cd ~/data/alignment/self
 
-perl ~/Scripts/egaz/self_batch.pl \
-    --working_dir ~/data/alignment/self \
-    --seq_dir ~/data/alignment/Ensembl \
-    -c ~/data/alignment/self/ensembl_taxon.csv \
-    --length 1000  \
-    --norm \
-    --name worm \
-    --parallel 8 \
-    -t Cele
+egaz template \
+    ~/data/alignment/Ensembl/Cele/ \
+    --self -o worm \
+    --taxon ~/data/alignment/self/ensembl_taxon.csv \
+    --circos --parallel 8 -v
 
-bash worm/1_real_chr.sh
-#real    16m41.346s
-#user    116m6.311s
-#sys     0m16.111s
-time bash worm/3_self_cmd.sh
-#real    4m56.288s
-#user    9m59.978s
-#sys     5m41.933s
-time bash worm/4_proc_cmd.sh
-bash worm/5_circos_cmd.sh
+bash worm/1_self.sh
+bash worm/3_proc.sh
+bash worm/4_circos.sh
+
 ```
 
 ## Ddis
@@ -262,24 +245,24 @@ bash dicty/5_circos_cmd.sh
 ```bash
 cd ~/data/alignment/self
 
-perl ~/Scripts/egaz/self_batch.pl \
-    --working_dir ~/data/alignment/self \
-    --seq_dir ~/data/alignment/Ensembl \
-    -c ~/data/alignment/self/ensembl_taxon.csv \
-    --length 1000  \
-    --norm \
-    --name human \
-    --parallel 8 \
-    -t Human
+egaz template \
+    ~/data/alignment/Ensembl/Human/ \
+    --self -o human \
+    --taxon ~/data/alignment/self/ensembl_taxon.csv \
+    --circos --parallel 8 -v
 
-cd ~/data/alignment/self/human
+time bash human/1_self.sh
+#real    3158m12.839s
+#user    24898m37.946s
+#sys     138m1.231s
 
-bash 1_real_chr.sh
-# real    4156m4.259s
-time bash 3_self_cmd.sh
-# real    940m13.950s
-time bash 4_proc_cmd.sh
-bash 5_circos_cmd.sh
+time bash human/3_proc.sh
+#real    458m46.491s
+#user    1330m6.094s
+#sys     93m22.268s
+
+bash human/4_circos.sh
+
 ```
 
 ## Mouse
@@ -287,15 +270,19 @@ bash 5_circos_cmd.sh
 ```bash
 cd ~/data/alignment/self
 
-perl ~/Scripts/egaz/self_batch.pl \
-    --working_dir ~/data/alignment/self \
-    --seq_dir ~/data/alignment/Ensembl \
-    -c ~/data/alignment/self/ensembl_taxon.csv \
-    --length 1000  \
-    --norm \
-    --name mouse \
-    --parallel 8 \
-    -t Mouse
+egaz template \
+    ~/data/alignment/Ensembl/Mouse/ \
+    --self -o mouse \
+    --taxon ~/data/alignment/self/ensembl_taxon.csv \
+    --circos --parallel 8 -v
+
+time bash mouse/1_self.sh
+#real    2948m46.920s
+#user    23114m31.078s
+#sys     108m47.712s
+
+time bash mouse/3_proc.sh
+bash mouse/4_circos.sh
 
 cd ~/data/alignment/self/mouse
 
