@@ -379,28 +379,23 @@ bash arabidopsis_par/4_circos.sh
 ```bash
 cd ~/data/alignment/self
 
-perl ~/Scripts/egaz/self_batch.pl \
-    --working_dir ~/data/alignment/self \
-    --seq_dir ~/data/alignment/Ensembl \
-    -c ~/data/alignment/self/ensembl_taxon.csv \
-    --length 1000  \
-    --norm \
-    --name plants \
-    --parallel 12 \
-    -q Alyr \
-    -q Bdis \
-    -q OsatJap \
-    -q Sbic \
-    -t Atha
+egaz template \
+    ~/data/alignment/Ensembl/Atha/ \
+    ~/data/alignment/Ensembl/Alyr/ \
+    ~/data/alignment/Ensembl/OsatJap/ \
+    ~/data/alignment/Ensembl/Sbic/ \
+    --self -o plants \
+    --taxon ~/data/alignment/self/ensembl_taxon.csv \
+    --circos --parallel 12 -v
 
-cd ~/data/alignment/self/plants
+time bash plants/1_self.sh
+#real    133m47.288s
+#user    1387m27.563s
+#sys     16m55.046s
 
-bash 1_real_chr.sh
-# real    658m10.559s
-time bash 3_self_cmd.sh
-# real    971m49.779s
-time bash 4_proc_cmd.sh
-bash 5_circos_cmd.sh
+time bash plants/3_proc.sh
+bash plants/4_circos.sh
+
 ```
 
 ## Plants: partitioned chromosomes
