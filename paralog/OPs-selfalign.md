@@ -219,25 +219,53 @@ bash worm/4_circos.sh
 
 ## Ddis
 
+* .dna_sm.toplevel.fa.gz is unmasked
+
+```bash
+rm -fr  ~/data/alignment/Ensembl/Ddis/
+
+egaz prepseq \
+    --repeatmasker '--gff --parallel 8' --min 50000 -v \
+    ~/data/ensembl94/fasta/dictyostelium_discoideum/dna/Dictyostelium_discoideum.dicty_2.7.dna_sm.toplevel.fa.gz \
+    -o ~/data/alignment/Ensembl/Ddis/
+
+cd ~/data/alignment/Ensembl/Ddis/
+
+find ~/data/ensembl94/gff3/dictyostelium_discoideum/ -name "*.gff3.gz" |
+    grep -v "abinitio.gff3" |
+    grep -v "chr.gff3" |
+    xargs gzip -d -c > chr.gff
+runlist gff --tag CDS --remove chr.gff -o cds.yml
+
+runlist gff --remove \
+    *.rm.gff \
+    -o repeat.yml
+
+runlist merge \
+    cds.yml repeat.yml \
+    -o anno.yml
+
+rm -f repeat.yml cds.yml
+
+```
+
 ```bash
 cd ~/data/alignment/self
 
-perl ~/Scripts/egaz/self_batch.pl \
-    --working_dir ~/data/alignment/self \
-    --seq_dir ~/data/alignment/Ensembl \
-    -c ~/data/alignment/self/ensembl_taxon.csv \
-    --length 1000  \
-    --norm \
-    --name dicty \
-    --parallel 8 \
-    -t Ddis
+egaz template \
+    ~/data/alignment/Ensembl/Ddis/ \
+    --self -o dicty \
+    --taxon ~/data/alignment/self/ensembl_taxon.csv \
+    --circos --parallel 8 -v
 
-bash dicty/1_real_chr.sh
-# real    1m53.391s
-time bash dicty/3_self_cmd.sh
-# real    353m10.864s
-time bash dicty/4_proc_cmd.sh
-bash dicty/5_circos_cmd.sh
+time bash dicty/1_self.sh
+#real    7m32.264s
+#user    54m42.929s
+#sys     0m30.717s
+
+bash dicty/3_proc.sh
+bash dicty/4_circos.sh
+
 ```
 
 ## Human
