@@ -13,10 +13,8 @@
     - [Ddis](#ddis)
     - [Human](#human)
     - [Mouse](#mouse)
-    - [Arabidopsis](#arabidopsis)
-        - [Atha: full chromosomes](#atha-full-chromosomes)
-        - [Atha: partition sequences](#atha-partition-sequences)
 - [All plants](#all-plants)
+    - [Arabidopsis](#arabidopsis)
     - [Plants: full chromosomes](#plants-full-chromosomes)
     - [Plants: partitioned chromosomes](#plants-partitioned-chromosomes)
 
@@ -400,63 +398,83 @@ bash plants/4_circos.sh
 
 ## Plants: partitioned chromosomes
 
-`Bole` contains exact matched pieces with copy number large than one thousand.
-
-It turns out that poor assemblies tend to have this phenomenon.
-
-To speed up processing, use partitioned sequences in `3_self_cmd.sh` and `--discard 50` in
-`4_proc_cmd.sh`.
-
 ```bash
 cd ~/data/alignment/self
 
-mkdir -p ~/data/alignment/self/plants_parted/Genomes
-
-for name in Mtru Gmax Bole Brap Alyr Vvin Slyc Stub Macu Sita OsatJap Bdis Atha
-do
+for name in Atha Alyr OsatJap Sbic Mtru Gmax Bole Brap Vvin Slyc Stub Macu Sita Bdis; do
     echo "==> ${name}"
-    perl ~/Scripts/egaz/part_seq.pl \
-        -i ~/data/alignment/Ensembl/${name} \
-        -o ~/data/alignment/self/plants_parted/Genomes/${name} \
-        --chunk 10010000 --overlap 10000
+    find ~/data/alignment/Ensembl/${name}/ -type f -name "*.fa" |
+        sort |
+        parallel --no-run-if-empty --linebuffer -k -j 8 '
+            echo >&2 {}
+            egaz partition {} --chunk 10010000 --overlap 10000
+        '
 done
 
-perl ~/Scripts/egaz/self_batch.pl \
-    --working_dir ~/data/alignment/self \
-    -c ~/data/alignment/self/ensembl_taxon.csv \
-    --length 1000  \
-    --norm \
-    --name plants_parted \
-    --parallel 12 \
-    -q Mtru \
-    -q Gmax \
-    -q Bole \
-    -q Brap \
-    -q Alyr \
-    -q Vvin \
-    -q Slyc \
-    -q Stub \
-    -q OsatJap \
-    -t Atha \
-    --parted
+egaz template \
+    ~/data/alignment/Ensembl/Atha/ \
+    ~/data/alignment/Ensembl/Alyr/ \
+    ~/data/alignment/Ensembl/OsatJap/ \
+    ~/data/alignment/Ensembl/Sbic/ \
+    ~/data/alignment/Ensembl/Mtru/ \
+    ~/data/alignment/Ensembl/Gmax/ \
+    ~/data/alignment/Ensembl/Bole/ \
+    ~/data/alignment/Ensembl/Brap/ \
+    ~/data/alignment/Ensembl/Vvin/ \
+    ~/data/alignment/Ensembl/Slyc/ \
+    ~/data/alignment/Ensembl/Stub/ \
+    ~/data/alignment/Ensembl/Bdis/ \
+    --self -o plants_par \
+    --taxon ~/data/alignment/self/ensembl_taxon.csv \
+    --circos --partition --parallel 12 -v
 
-    # cost days
-    # -q Macu \
-    # -q Sita \
+time bash plants_par/1_self.sh
+#real    3780m34.746s
+#user    39108m41.641s
+#sys     1656m31.650s
 
-cd ~/data/alignment/self/plants_parted
+time bash plants_par/3_proc.sh
+#real    1177m51.175s
+#user    2609m6.773s
+#sys     1307m16.303s
 
-# perl ~/Scripts/withncbi/ensembl/chr_kary.pl -e oryza_sativa_core_29_82_7
-# bash ~/share/circos/data/karyotype/parse.karyotype oryza_sativa_core_29_82_7.kary.tsv > Processing/OsatJap/karyotype.OsatJap.txt
+bash plants_par/4_circos.sh
 
-# ensembldb.ensembl.org         5306
-# mysql-eg-publicsql.ebi.ac.uk  4157
-# mysql -hmysql-eg-publicsql.ebi.ac.uk -P4157 -uanonymous
-# perl ~/Scripts/withncbi/ensembl/chr_kary.pl -s mysql-eg-publicsql.ebi.ac.uk --port 4157 -u anonymous -p '' -e oryza_sativa_core_29_82_7
-
-bash 1_real_chr.sh
-bash 3_self_cmd.sh
-bash 4_proc_cmd.sh
-bash 5_circos_cmd.sh
 ```
 
+* Results of `egaz template`
+
+```text
+$ du -hs ~/data/alignment/self/plants_par/Pairwise/*
+332M    /home/wangq/data/alignment/self/plants_par/Pairwise/AlyrvsSelf
+111M    /home/wangq/data/alignment/self/plants_par/Pairwise/AthavsSelf
+25G     /home/wangq/data/alignment/self/plants_par/Pairwise/BdisvsSelf
+25G     /home/wangq/data/alignment/self/plants_par/Pairwise/BolevsSelf
+3.6G    /home/wangq/data/alignment/self/plants_par/Pairwise/BrapvsSelf
+8.6G    /home/wangq/data/alignment/self/plants_par/Pairwise/GmaxvsSelf
+2.7G    /home/wangq/data/alignment/self/plants_par/Pairwise/MtruvsSelf
+263M    /home/wangq/data/alignment/self/plants_par/Pairwise/OsatJapvsSelf
+1.6G    /home/wangq/data/alignment/self/plants_par/Pairwise/SbicvsSelf
+8.5G    /home/wangq/data/alignment/self/plants_par/Pairwise/SlycvsSelf
+4.0G    /home/wangq/data/alignment/self/plants_par/Pairwise/StubvsSelf
+14G     /home/wangq/data/alignment/self/plants_par/Pairwise/VvinvsSelf
+
+```
+
+* Results of the old `egaz/self_batch.pl`
+
+```text
+$ du -hs ~/data/alignment/self/plants_parted/Pairwise/*
+890M    /home/wangq/data/alignment/self/plants_parted/Pairwise/Alyrvsselfalign
+94M     /home/wangq/data/alignment/self/plants_parted/Pairwise/Athavsselfalign
+6.2G    /home/wangq/data/alignment/self/plants_parted/Pairwise/Bdisvsselfalign
+17G     /home/wangq/data/alignment/self/plants_parted/Pairwise/Bolevsselfalign
+2.2G    /home/wangq/data/alignment/self/plants_parted/Pairwise/Brapvsselfalign
+42G     /home/wangq/data/alignment/self/plants_parted/Pairwise/Gmaxvsselfalign
+4.4G    /home/wangq/data/alignment/self/plants_parted/Pairwise/Mtruvsselfalign
+845M    /home/wangq/data/alignment/self/plants_parted/Pairwise/OsatJapvsselfalign
+103G    /home/wangq/data/alignment/self/plants_parted/Pairwise/Slycvsselfalign
+15G     /home/wangq/data/alignment/self/plants_parted/Pairwise/Stubvsselfalign
+9.3G    /home/wangq/data/alignment/self/plants_parted/Pairwise/Vvinvsselfalign
+
+```
