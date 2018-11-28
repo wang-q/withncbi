@@ -9,6 +9,7 @@
     - [MITE](#mite)
     - [Other repeats](#other-repeats)
 - [Scripts](#scripts)
+- [Download MITE](#download-mite)
 - [Atha](#atha)
 - [Plants aligned with full chromosomes](#plants-aligned-with-full-chromosomes)
 - [Plants aligned with partitioned chromosomes](#plants-aligned-with-partitioned-chromosomes)
@@ -98,6 +99,21 @@ Same for each species.
 * `proc_all_gene.sh`
 
 * `proc_sep_gene.sh`
+
+# Symlink ensembl gff files
+
+```bash
+for GENOME_NAME in Atha Alyr OsatJap Sbic; do
+    echo "==> ${GENOME_NAME}"
+    
+    pushd ~/data/alignment/gene-paralog/${GENOME_NAME}/data > /dev/null
+    ln -s ~/data/alignment/Ensembl/${GENOME_NAME}/chr.gff chr.gff
+    popd > /dev/null
+    
+    echo
+done
+
+```
 
 # Atha
 

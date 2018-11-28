@@ -15,13 +15,13 @@ cd ~/data/alignment/gene-paralog/${GENOME_NAME}/repeat
 find . -type f -name "*.yml" -or -name "*.csv" | parallel rm
 
 echo "==> gff types"
-gzip -d -c ../data/gff3.gz |
+gzip -dcf ../data/chr.gff |
     perl -nla -e '/^#/ and next; print $F[2]' |
     sort |
     uniq -c \
     > gff.type.txt
 
-gzip -d -c ../data/gff3.gz |
+gzip -dcf ../data/chr.gff |
     perl -nla -e '
         /^#/ and next;
         $F[2] eq q{repeat_region} or next;

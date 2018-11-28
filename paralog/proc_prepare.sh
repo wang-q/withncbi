@@ -53,6 +53,6 @@ cd ~/data/alignment/gene-paralog/${GENOME_NAME}/feature
 
 # For Atha, 0m41.121s. With --clean, 50m49.994s
 time perl ~/Scripts/withncbi/util/gff2runlist.pl \
-    --file ../data/gff3.gz \
+    --file ../data/chr.gff \
     --size ../data/chr.sizes \
     --range 2000
