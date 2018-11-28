@@ -15,25 +15,28 @@ cd ~/data/alignment/gene-paralog/${GENOME_NAME}/repeat
 find . -type f -name "*.yml" -or -name "*.csv" | parallel rm
 
 echo "==> gff types"
-gzip -d -c ../data/gff3.gz \
-    | perl -nla -e '/^#/ and next; print $F[2]' \
-    | sort | uniq -c \
+gzip -d -c ../data/gff3.gz |
+    perl -nla -e '/^#/ and next; print $F[2]' |
+    sort |
+    uniq -c \
     > gff.type.txt
 
-gzip -d -c ../data/gff3.gz \
-    | perl -nla -e '
+gzip -d -c ../data/gff3.gz |
+    perl -nla -e '
         /^#/ and next;
         $F[2] eq q{repeat_region} or next;
         $F[8] =~ /description\=(\w+)/i or next;
         print qq{$F[2]\t$F[1]\t$1};
-        ' \
-    | sort | uniq -c \
+        ' |
+    sort |
+    uniq -c \
     > gff.repeat.txt
 
 echo "==> rmout families"
-cat ../data/genome.fa.out \
-    | perl -nla -e '/^\s*\d+/ or next; print $F[10]' \
-    | sort | uniq -c \
+cat ../data/genome.fa.out |
+    perl -nla -e '/^\s*\d+/ or next; print $F[10]' |
+    sort |
+    uniq -c \
     > rmout.family.txt
 cp ../data/genome.fa.out ../repeat
 cp ../data/genome.fa.tbl ../repeat
@@ -57,14 +60,14 @@ echo "==> basic stat"
 runlist stat all-repeat.yml -s ../data/chr.sizes --mk --all
 
 echo "==> find repeat families large enough"
-cat all-repeat.yml.csv \
-    | perl -nla -F"," -e '
+cat all-repeat.yml.csv |
+    perl -nla -F"," -e '
         next if $F[3] =~ /^c/;
         print $F[0] if $F[3] > 0.0005
     ' \
     > repeat.family.txt
-cat repeat.family.txt \
-    | parallel -j 8 "
+cat repeat.family.txt |
+    parallel -j 8 "
         cp {}.yml ../yml
     "
 

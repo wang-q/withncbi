@@ -2,7 +2,7 @@
 
 USAGE="Usage: $0 GENOME_NAME FEATURE_FILE"
 
-if [ "$#" -lt 2 ]; then
+if [[ "$#" -lt 2 ]]; then
     echo "$USAGE"
     exit 1
 fi
@@ -18,14 +18,13 @@ cd ~/data/alignment/gene-paralog/${GENOME_NAME}/stat
 
 echo "==> intersect"
 # parallel in 1 threads to save memory
-for ftr in gene upstream downstream exon CDS intron five_prime_UTR three_prime_UTR
-do
+for ftr in gene upstream downstream exon CDS intron five_prime_UTR three_prime_UTR; do
     echo ${ftr}
 done \
     | parallel -j 1 --keep-order "
         echo \"==> {} ${FEATURE_BASE}\";
         sleep 1;
-        java -jar ~/Scripts/egaz/jar/jrunlist.jar statop \
+        jrunlist statop \
             ../data/chr.sizes ../feature/sep-{}.yml ${FEATURE_FILE}  \
             --op intersect --all \
             -o stat.sep-{}.${FEATURE_BASE}.csv;
@@ -36,14 +35,12 @@ done \
 
 echo "==> concat gene"
 printf "gene_id," > ${GENOME_NAME}.gene.${FEATURE_BASE}.csv
-for ftr in gene upstream downstream
-do
+for ftr in gene upstream downstream; do
     printf "${ftr}_length,${ftr}_${FEATURE_BASE},"
 done >> ${GENOME_NAME}.gene.${FEATURE_BASE}.csv
 echo >> ${GENOME_NAME}.gene.${FEATURE_BASE}.csv
 
-for ftr in gene upstream downstream
-do
+for ftr in gene upstream downstream; do
     cat stat.sep-${ftr}.${FEATURE_BASE}.csv.tmp
 done \
     | grep -v "^key" \
@@ -52,14 +49,12 @@ done \
 
 echo "==> concat trans"
 printf "trans_id," > ${GENOME_NAME}.trans.${FEATURE_BASE}.csv
-for ftr in exon CDS intron five_prime_UTR three_prime_UTR
-do
+for ftr in exon CDS intron five_prime_UTR three_prime_UTR; do
     printf "${ftr}_length,${ftr}_${FEATURE_BASE},"
 done >> ${GENOME_NAME}.trans.${FEATURE_BASE}.csv
 echo >> ${GENOME_NAME}.trans.${FEATURE_BASE}.csv
 
-for ftr in exon CDS intron five_prime_UTR three_prime_UTR
-do
+for ftr in exon CDS intron five_prime_UTR three_prime_UTR; do
     cat stat.sep-${ftr}.${FEATURE_BASE}.csv.tmp
 done \
     | grep -v "^key" \

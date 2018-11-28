@@ -103,7 +103,7 @@ Same for each species.
 
 Full processing time is about 1 hour.
 
-1. [Data](https://github.com/wang-q/withncbi/blob/master/paralog/OPs-selfalign.md#arabidopsis)
+1. [Data](OPs-selfalign.md#arabidopsis)
 
 2. Prepare
 
@@ -119,57 +119,45 @@ Full processing time is about 1 hour.
 
     echo "====> copy or download needed files here"
     cd ~/data/alignment/gene-paralog/${GENOME_NAME}/data
-    cp ~/data/alignment/self/plants/Genomes/${GENOME_NAME}/chr.sizes chr.sizes
-    cp ~/data/alignment/self/plants/Results/${GENOME_NAME}/${GENOME_NAME}.chr.runlist.yml paralog.yml
+    cp ~/data/alignment/self/plants/Processing/${GENOME_NAME}/chr.sizes chr.sizes
+    cp ~/data/alignment/self/plants/Results/${GENOME_NAME}/${GENOME_NAME}.cover.yml paralog.yml
 
-    cp ~/data/ensembl82/gff3/arabidopsis_thaliana/Arabidopsis_thaliana.TAIR10.29.gff3.gz gff3.gz
-    wget http://pmite.hzau.edu.cn/MITE/MITE-SEQ-V2/03_arabidopsis_mite_seq.fa -O mite.fa
+    cp ~/data/ensembl94/gff3/arabidopsis_thaliana/Arabidopsis_thaliana.TAIR10.41.gff3.gz gff3.gz
+    wget -N http://pmite.hzau.edu.cn/MITE/MITE-SEQ-V2/03_arabidopsis_mite_seq.fa -O mite.fa
     ```
 
     ```bash
     cd ~/data/alignment/gene-paralog/Atha/data
 
-    # 0m44.430s
-    time bash ~/data/alignment/gene-paralog/proc_prepare.sh Atha
-    # 0m46.052s
-    time bash ~/data/alignment/gene-paralog/proc_repeat.sh Atha
-    # 0m43.666s
-    time bash ~/data/alignment/gene-paralog/proc_mite.sh Atha
+    bash ~/Scripts/withncbi/paralog/proc_prepare.sh Atha
+    bash ~/Scripts/withncbi/paralog/proc_repeat.sh Atha
+    bash ~/Scripts/withncbi/paralog/proc_mite.sh Atha
     ```
 
 3. Paralog-repeats stats
 
     ```bash
     cd ~/data/alignment/gene-paralog/Atha/stat
-    # 0m28.356s
-    time bash ~/data/alignment/gene-paralog/proc_paralog.sh Atha
+    bash ~/Scripts/withncbi/paralog/proc_paralog.sh Atha
     ```
 
 4. Gene-paralog stats
 
     ```bash
     cd ~/data/alignment/gene-paralog/Atha/stat
-    # 0m6.888s
-    time bash ~/data/alignment/gene-paralog/proc_all_gene.sh Atha ../yml/paralog.yml
-    # 0m7.283s
-    time bash ~/data/alignment/gene-paralog/proc_all_gene.sh Atha ../yml/paralog_adjacent.yml
+    bash ~/Scripts/withncbi/paralog/proc_all_gene.sh Atha ../yml/paralog.yml
+    bash ~/Scripts/withncbi/paralog/proc_all_gene.sh Atha ../yml/paralog_adjacent.yml
 
-    # E5-2690 v3
-    # real    8m45.668s
-    # user    57m58.984s
-    # sys     0m1.808s
-    # i7-6700k
-    # real	15m18.045s
-    # user	104m21.728s
-    # sys	0m13.363s
-    time bash ~/data/alignment/gene-paralog/proc_sep_gene.sh Atha ../yml/paralog.yml
+    time bash ~/Scripts/withncbi/paralog/proc_sep_gene.sh Atha ../yml/paralog.yml
+    # real    1m49.966s
+    # user    2m5.663s
+    # sys     5m21.424s
 
-    # real	0m35.566s
-    # user	1m12.613s
-    # sys	0m7.601s
-    time bash ~/data/alignment/gene-paralog/proc_sep_gene_jrunlist.sh Atha ../yml/paralog.yml
+    time bash ~/Scripts/withncbi/paralog/proc_sep_gene.sh Atha ../yml/paralog_adjacent.yml
+    # real    2m21.849s
+    # user    2m22.579s
+    # sys     7m50.162s
 
-    bash ~/data/alignment/gene-paralog/proc_sep_gene_jrunlist.sh Atha ../yml/paralog_adjacent.yml
     ```
 
 5. Gene-repeats stats
@@ -177,26 +165,22 @@ Full processing time is about 1 hour.
     ```bash
     cd ~/data/alignment/gene-paralog/Atha/stat
 
-    cat ../yml/repeat.family.txt \
-        | parallel -j 8 --keep-order "
-            bash ~/data/alignment/gene-paralog/proc_all_gene.sh Atha ../yml/{}.yml
-        "
+    time cat ../yml/repeat.family.txt |
+        parallel -j 8 --keep-order '
+            bash ~/Scripts/withncbi/paralog/proc_all_gene.sh Atha ../yml/{}.yml
+        '
+    # real    0m12.990s
+    # user    1m4.103s
+    # sys     0m2.182s
 
-    # 12 hours?
-    # time \
-    # cat ../yml/repeat.family.txt \
-    #     | parallel -j 1 --keep-order "
-    #         bash ~/data/alignment/gene-paralog/proc_sep_gene.sh Atha ../yml/{}.yml
-    #     "    
+    time cat ../yml/repeat.family.txt |
+        parallel -j 1 --keep-order '
+            bash ~/Scripts/withncbi/paralog/proc_sep_gene.sh Atha ../yml/{}.yml
+        '
+    # real    17m10.787s
+    # user    19m43.643s
+    # sys     67m40.396s
 
-    # real	10m34.669s
-    # user	17m27.433s
-    # sys	3m20.765s
-    time \
-        cat ../yml/repeat.family.txt \
-            | parallel -j 1 --keep-order "
-                bash ~/data/alignment/gene-paralog/proc_sep_gene_jrunlist.sh Atha ../yml/{}.yml
-            "
     ```
 
 6. Pack up

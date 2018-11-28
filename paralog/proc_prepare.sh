@@ -31,7 +31,7 @@ if [[ -f ~/data/alignment/gene-paralog/${GENOME_NAME}/data/genome.fa.out ]]; the
     echo "genome.fa.out exists"
 else
     RepeatMasker genome.fa -species Viridiplantae -xsmall --parallel 8
-    rm genome.fa.cat.gz  genome.fa.masked
+    rm genome.fa.cat.gz genome.fa.masked
     rm -fr RM_*
 fi
 

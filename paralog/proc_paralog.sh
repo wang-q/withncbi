@@ -34,8 +34,7 @@ runlist compare --op intersect paralog_gene.2.yml paralog.yml -o paralog_gene.3.
 mv paralog_gene.3.yml paralog_gene.yml
 rm paralog_gene.*.yml
 
-for ftr in paralog paralog_adjacent paralog_gene
-do
+for ftr in paralog paralog_adjacent paralog_gene; do
     echo "==> ${ftr} coverages"
     sleep 1;
     runlist stat -s ../data/chr.sizes ../yml/${ftr}.yml -o ../stat/${ftr}.yml.csv
