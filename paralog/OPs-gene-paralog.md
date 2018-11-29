@@ -106,7 +106,7 @@ Same for each species.
 # Create directories
 
 ```bash
-for GENOME_NAME in Atha Alyr OsatJap Sbic; do
+for GENOME_NAME in Atha Alyr OsatJap Sbic AthaJGI OsatJapJGI; do
     mkdir -p ~/data/alignment/gene-paralog/${GENOME_NAME}/data
     mkdir -p ~/data/alignment/gene-paralog/${GENOME_NAME}/feature
     mkdir -p ~/data/alignment/gene-paralog/${GENOME_NAME}/repeat
@@ -335,6 +335,94 @@ done
 
 ```
 
+# Plants with annotations from JGI
+
+* [Data](OPs-selfalign.md#plants-full-chromosomes)
+
+    * AthaJGI
+    * OsatJapJGI
+
+```bash
+# Prepare
+for GENOME_NAME in Atha OsatJap; do
+    cp ~/data/alignment/gene-paralog/${GENOME_NAME}/data/* \
+        ~/data/alignment/gene-paralog/${GENOME_NAME}JGI/data
+done
+
+cd ~/data/alignment/gene-paralog
+
+# Atha
+gzip -dcf ~/data/PhytozomeV12_unrestricted/Athaliana/Araport11/annotation/Athaliana_447_Araport11.gene_exons.gff3.gz \
+    > ~/data/alignment/gene-paralog/AthaJGI/data/chr.gff
+
+# OsatJap
+gzip -dcf ~/data/PhytozomeV12_unrestricted/Osativa/annotation/Osativa_323_v7.0.gene_exons.gff3.gz \
+    > ~/data/alignment/gene-paralog/OsatJapJGI/data/chr.gff
+
+for GENOME_NAME in AthaJGI OsatJapJGI; do
+    cd ~/data/alignment/gene-paralog/${GENOME_NAME}/feature
+    perl ~/Scripts/withncbi/util/gff2runlist.pl \
+        --file ../data/chr.gff \
+        --size ../data/chr.sizes \
+        --range 2000 --remove
+
+    cd ~/data/alignment/gene-paralog/${GENOME_NAME}/data
+
+    #bash ~/Scripts/withncbi/paralog/proc_prepare.sh ${GENOME_NAME}
+
+    bash ~/Scripts/withncbi/paralog/proc_repeat.sh ${GENOME_NAME}
+    bash ~/Scripts/withncbi/paralog/proc_mite.sh ${GENOME_NAME}
+done
+
+# Paralog-repeats stats
+for GENOME_NAME in AthaJGI OsatJapJGI; do
+    echo "==> ${GENOME_NAME}"
+    cd ~/data/alignment/gene-paralog/${GENOME_NAME}/stat
+    bash ~/Scripts/withncbi/paralog/proc_paralog.sh ${GENOME_NAME}
+    echo
+done
+
+# Gene-paralog stats
+for GENOME_NAME in AthaJGI OsatJapJGI; do
+    echo "==> ${GENOME_NAME}"
+    cd ~/data/alignment/gene-paralog/${GENOME_NAME}/stat
+
+    bash ~/Scripts/withncbi/paralog/proc_all_gene.sh ${GENOME_NAME} ../yml/paralog.yml
+    bash ~/Scripts/withncbi/paralog/proc_all_gene.sh ${GENOME_NAME} ../yml/paralog_adjacent.yml
+
+    bash ~/Scripts/withncbi/paralog/proc_sep_gene.sh ${GENOME_NAME} ../yml/paralog.yml
+    bash ~/Scripts/withncbi/paralog/proc_sep_gene.sh ${GENOME_NAME} ../yml/paralog_adjacent.yml
+    echo
+done
+
+# Gene-repeats stats
+for GENOME_NAME in AthaJGI OsatJapJGI; do
+    cd ~/data/alignment/gene-paralog/${GENOME_NAME}/stat
+    cat ../yml/repeat.family.txt |
+        parallel -j 4 --keep-order "
+            echo '==> {}'
+            bash ~/Scripts/withncbi/paralog/proc_all_gene.sh ${GENOME_NAME} ../yml/{}.yml
+            echo
+        "
+
+    cat ../yml/repeat.family.txt |
+        parallel -j 1 --keep-order "
+            echo '==> {}'
+            bash ~/Scripts/withncbi/paralog/proc_sep_gene.sh ${GENOME_NAME} ../yml/{}.yml
+            echo
+        "
+done
+
+# Pack up
+for GENOME_NAME in AthaJGI OsatJapJGI; do
+    echo "==> ${GENOME_NAME}"
+    cd ~/data/alignment/gene-paralog
+    find ${GENOME_NAME} -type f -not -path "*/data/*" -print | zip ${GENOME_NAME}.zip -9 -@
+    echo
+done
+
+```
+
 # Plants aligned with partitioned chromosomes
 
 1. [Data](OPs-selfalign.md#plants-partitioned-chromosomes)
@@ -428,110 +516,3 @@ done
         bash ~/data/alignment/gene-paralog/proc_mite.sh ${GENOME_NAME}
     done
     ```
-
-# Plants with annotations from JGI
-
-1. [Data](https://github.com/wang-q/withncbi/blob/master/paralog/OPs-selfalign.md#full-chromosomes)
-
-    * AthaJGI
-    * OsatJapJGI
-
-2. Prepare
-
-    ```bash
-    for GENOME_NAME in Atha OsatJap
-    do
-        echo "====> create directories"
-        mkdir -p ~/data/alignment/gene-paralog/${GENOME_NAME}JGI/data
-        mkdir -p ~/data/alignment/gene-paralog/${GENOME_NAME}JGI/feature
-        mkdir -p ~/data/alignment/gene-paralog/${GENOME_NAME}JGI/repeat
-        mkdir -p ~/data/alignment/gene-paralog/${GENOME_NAME}JGI/stat
-        mkdir -p ~/data/alignment/gene-paralog/${GENOME_NAME}JGI/yml
-
-        echo "====> copy or download needed files here"
-        cd ~/data/alignment/gene-paralog/${GENOME_NAME}JGI/data
-        cp ~/data/alignment/gene-paralog/${GENOME_NAME}/data/* .
-    done
-
-    cd ~/data/alignment/gene-paralog
-
-    # Atha
-    cp -f ~/data/PhytozomeV11/Athaliana/annotation/Athaliana_167_TAIR10.gene_exons.gff3.gz \
-        ~/data/alignment/gene-paralog/AthaJGI/data/gff3.gz
-
-    # OsatJap
-    cp ~/data/PhytozomeV11/Osativa/annotation/Osativa_323_v7.0.gene_exons.gff3.gz \
-        ~/data/alignment/gene-paralog/OsatJapJGI/data/gff3.gz
-    ```
-
-    ```bash
-    for GENOME_NAME in AthaJGI OsatJapJGI
-    do
-        cd ~/data/alignment/gene-paralog/${GENOME_NAME}/feature
-        perl ~/Scripts/withncbi/util/gff2runlist.pl \
-            --file ../data/gff3.gz \
-            --size ../data/chr.sizes \
-            --range 2000 --remove
-
-        cd ~/data/alignment/gene-paralog/${GENOME_NAME}/data
-
-        #bash ~/data/alignment/gene-paralog/proc_prepare.sh ${GENOME_NAME}
-
-        bash ~/data/alignment/gene-paralog/proc_repeat.sh ${GENOME_NAME}
-        bash ~/data/alignment/gene-paralog/proc_mite.sh ${GENOME_NAME}
-    done
-    ```
-
-3. Paralog-repeats stats
-
-    ```bash
-    for GENOME_NAME in AthaJGI OsatJapJGI
-    do
-        cd ~/data/alignment/gene-paralog/${GENOME_NAME}/stat
-        bash ~/data/alignment/gene-paralog/proc_paralog.sh ${GENOME_NAME}
-    done
-    ```
-
-4. Gene-paralog stats
-
-    ```bash
-    for GENOME_NAME in AthaJGI OsatJapJGI
-    do
-        cd ~/data/alignment/gene-paralog/${GENOME_NAME}/stat
-
-        bash ~/data/alignment/gene-paralog/proc_all_gene.sh ${GENOME_NAME} ../yml/paralog.yml
-        bash ~/data/alignment/gene-paralog/proc_all_gene.sh ${GENOME_NAME} ../yml/paralog_adjacent.yml
-
-        bash ~/data/alignment/gene-paralog/proc_sep_gene.sh ${GENOME_NAME} ../yml/paralog.yml
-        bash ~/data/alignment/gene-paralog/proc_sep_gene.sh ${GENOME_NAME} ../yml/paralog_adjacent.yml
-    done
-    ```
-
-5. Gene-repeats stats
-
-    ```bash
-    for GENOME_NAME in AthaJGI OsatJapJGI
-    do
-        cd ~/data/alignment/gene-paralog/${GENOME_NAME}/stat
-        cat ../yml/repeat.family.txt \
-            | parallel -j 8 --keep-order "
-                bash ~/data/alignment/gene-paralog/proc_all_gene.sh ${GENOME_NAME} ../yml/{}.yml
-            "
-
-        cat ../yml/repeat.family.txt \
-            | parallel -j 1 --keep-order "
-                bash ~/data/alignment/gene-paralog/proc_sep_gene_jrunlist.sh ${GENOME_NAME} ../yml/{}.yml
-            "
-    done
-    ```
-
-6. Pack up
-
-    ```bash
-    for GENOME_NAME in AthaJGI OsatJapJGI
-    do
-        cd ~/data/alignment/gene-paralog
-        find ${GENOME_NAME} -type f -not -path "*/data/*" -print | zip ${GENOME_NAME}.zip -9 -@
-    done
-    ```
-
