@@ -9,6 +9,9 @@
     - [MITE](#mite)
     - [Other repeats](#other-repeats)
 - [Scripts](#scripts)
+- [Create directories](#create-directories)
+- [Symlink ensembl gff files](#symlink-ensembl-gff-files)
+- [`chr.sizes` and `paralog.yml`](#chrsizes-and-paralogyml)
 - [Download MITE](#download-mite)
 - [Atha](#atha)
 - [Plants aligned with full chromosomes](#plants-aligned-with-full-chromosomes)
@@ -100,6 +103,19 @@ Same for each species.
 
 * `proc_sep_gene.sh`
 
+# Create directories
+
+```bash
+for GENOME_NAME in Atha Alyr OsatJap Sbic; do
+    mkdir -p ~/data/alignment/gene-paralog/${GENOME_NAME}/data
+    mkdir -p ~/data/alignment/gene-paralog/${GENOME_NAME}/feature
+    mkdir -p ~/data/alignment/gene-paralog/${GENOME_NAME}/repeat
+    mkdir -p ~/data/alignment/gene-paralog/${GENOME_NAME}/stat
+    mkdir -p ~/data/alignment/gene-paralog/${GENOME_NAME}/yml
+done
+
+```
+
 # Symlink ensembl gff files
 
 ```bash
@@ -115,224 +131,201 @@ done
 
 ```
 
+```bash
+# Sbic
+## Ensemblgenomes 82 didn't provide a full gff3
+#gt merge -gzip -force \
+#    -o ~/data/alignment/gene-paralog/Sbic/data/gff3.gz \
+#    ~/data/ensembl82/gff3/sorghum_bicolor/Sorghum_bicolor.Sorbi1.29.chromosome.*.gff3.gz
+
+```
+
+# `chr.sizes` and `paralog.yml`
+
+```bash
+for GENOME_NAME in Atha Alyr OsatJap Sbic; do
+    echo "==> ${GENOME_NAME}"
+    
+    pushd ~/data/alignment/gene-paralog/${GENOME_NAME}/data > /dev/null
+    cp ~/data/alignment/self/plants/Processing/${GENOME_NAME}/chr.sizes chr.sizes
+    cp ~/data/alignment/self/plants/Results/${GENOME_NAME}/${GENOME_NAME}.cover.yml paralog.yml
+    popd > /dev/null
+    
+    echo
+done
+
+```
+
+# Download MITE
+
+```bash
+
+# http://stackoverflow.com/questions/1494178/how-to-define-hash-tables-in-bash
+# https://stackoverflow.com/questions/6047648/bash-4-associative-arrays-error-declare-a-invalid-option
+
+find ~/data/alignment/gene-paralog/ -name "mite.fa" | xargs rm
+
+ARRAY=(
+    'Atha::http://pmite.hzau.edu.cn/MITE/MITE-SEQ-V2/03_arabidopsis_mite_seq.fa'
+    'Alyr::http://pmite.hzau.edu.cn/MITE/MITE-SEQ-V2/02_lyrata_mite_seq.fa'
+    'OsatJap::http://pmite.hzau.edu.cn/MITE/MITE-SEQ-V2/26_nipponbare_mite_seq.fa'
+    'Sbic::http://pmite.hzau.edu.cn/MITE/MITE-SEQ-V2/28_sorghum_mite_seq.fa'
+)
+
+for item in "${ARRAY[@]}" ; do
+    GENOME_NAME="${item%%::*}"
+    MITE_URL="${item##*::}"
+    FILENAME=$(MITE_URL="${MITE_URL}" perl -e '$ENV{MITE_URL} =~ m{\/(\w+\.fa)$}; print $1')
+    
+    echo "==> ${FILENAME}"
+
+    pushd ~/data/alignment/gene-paralog/${GENOME_NAME}/data > /dev/null
+    wget -N "${MITE_URL}"
+    ln -s ${FILENAME} mite.fa
+    popd > /dev/null
+    
+    echo
+done
+
+```
+
 # Atha
 
 Full processing time is about 1 hour.
 
-1. [Data](OPs-selfalign.md#arabidopsis)
+* [Data](OPs-selfalign.md#arabidopsis)
 
-2. Prepare
+* Prepare
 
-    ```bash
-    GENOME_NAME=Atha
+```bash
+cd ~/data/alignment/gene-paralog/Atha/data
 
-    echo "====> create directories"
-    mkdir -p ~/data/alignment/gene-paralog/${GENOME_NAME}/data
-    mkdir -p ~/data/alignment/gene-paralog/${GENOME_NAME}/feature
-    mkdir -p ~/data/alignment/gene-paralog/${GENOME_NAME}/repeat
-    mkdir -p ~/data/alignment/gene-paralog/${GENOME_NAME}/stat
-    mkdir -p ~/data/alignment/gene-paralog/${GENOME_NAME}/yml
+bash ~/Scripts/withncbi/paralog/proc_prepare.sh Atha
+bash ~/Scripts/withncbi/paralog/proc_repeat.sh Atha
+bash ~/Scripts/withncbi/paralog/proc_mite.sh Atha
+```
 
-    echo "====> copy or download needed files here"
-    cd ~/data/alignment/gene-paralog/${GENOME_NAME}/data
-    cp ~/data/alignment/self/plants/Processing/${GENOME_NAME}/chr.sizes chr.sizes
-    cp ~/data/alignment/self/plants/Results/${GENOME_NAME}/${GENOME_NAME}.cover.yml paralog.yml
+* Paralog-repeats stats
 
-    cp ~/data/ensembl94/gff3/arabidopsis_thaliana/Arabidopsis_thaliana.TAIR10.41.gff3.gz gff3.gz
-    wget -N http://pmite.hzau.edu.cn/MITE/MITE-SEQ-V2/03_arabidopsis_mite_seq.fa -O mite.fa
-    ```
+```bash
+cd ~/data/alignment/gene-paralog/Atha/stat
+bash ~/Scripts/withncbi/paralog/proc_paralog.sh Atha
+```
 
-    ```bash
-    cd ~/data/alignment/gene-paralog/Atha/data
+* Gene-paralog stats
 
-    bash ~/Scripts/withncbi/paralog/proc_prepare.sh Atha
-    bash ~/Scripts/withncbi/paralog/proc_repeat.sh Atha
-    bash ~/Scripts/withncbi/paralog/proc_mite.sh Atha
-    ```
+```bash
+cd ~/data/alignment/gene-paralog/Atha/stat
+bash ~/Scripts/withncbi/paralog/proc_all_gene.sh Atha ../yml/paralog.yml
+bash ~/Scripts/withncbi/paralog/proc_all_gene.sh Atha ../yml/paralog_adjacent.yml
 
-3. Paralog-repeats stats
+time bash ~/Scripts/withncbi/paralog/proc_sep_gene.sh Atha ../yml/paralog.yml
+#real    1m57.614s
+#user    1m27.512s
+#sys     2m3.066s
 
-    ```bash
-    cd ~/data/alignment/gene-paralog/Atha/stat
-    bash ~/Scripts/withncbi/paralog/proc_paralog.sh Atha
-    ```
+time bash ~/Scripts/withncbi/paralog/proc_sep_gene.sh Atha ../yml/paralog_adjacent.yml
+#real    2m31.327s
+#user    1m34.904s
+#sys     3m13.446s
 
-4. Gene-paralog stats
+```
 
-    ```bash
-    cd ~/data/alignment/gene-paralog/Atha/stat
-    bash ~/Scripts/withncbi/paralog/proc_all_gene.sh Atha ../yml/paralog.yml
-    bash ~/Scripts/withncbi/paralog/proc_all_gene.sh Atha ../yml/paralog_adjacent.yml
+* Gene-repeats stats
 
-    time bash ~/Scripts/withncbi/paralog/proc_sep_gene.sh Atha ../yml/paralog.yml
-    # real    1m49.966s
-    # user    2m5.663s
-    # sys     5m21.424s
+```bash
+cd ~/data/alignment/gene-paralog/Atha/stat
 
-    time bash ~/Scripts/withncbi/paralog/proc_sep_gene.sh Atha ../yml/paralog_adjacent.yml
-    # real    2m21.849s
-    # user    2m22.579s
-    # sys     7m50.162s
+time cat ../yml/repeat.family.txt |
+    parallel -j 4 --keep-order '
+        echo "==> {}"
+        bash ~/Scripts/withncbi/paralog/proc_all_gene.sh Atha ../yml/{}.yml
+        echo
+    '
+#real    0m19.571s
+#user    1m2.364s
+#sys     0m0.925s
 
-    ```
+time cat ../yml/repeat.family.txt |
+    parallel -j 1 --keep-order '
+        echo "==> {}"
+        bash ~/Scripts/withncbi/paralog/proc_sep_gene.sh Atha ../yml/{}.yml
+        echo
+    '
+#real    18m21.261s
+#user    17m41.651s
+#sys     33m40.853s
 
-5. Gene-repeats stats
+```
 
-    ```bash
-    cd ~/data/alignment/gene-paralog/Atha/stat
+* Pack up
 
-    time cat ../yml/repeat.family.txt |
-        parallel -j 8 --keep-order '
-            bash ~/Scripts/withncbi/paralog/proc_all_gene.sh Atha ../yml/{}.yml
-        '
-    # real    0m12.990s
-    # user    1m4.103s
-    # sys     0m2.182s
-
-    time cat ../yml/repeat.family.txt |
-        parallel -j 1 --keep-order '
-            bash ~/Scripts/withncbi/paralog/proc_sep_gene.sh Atha ../yml/{}.yml
-        '
-    # real    17m10.787s
-    # user    19m43.643s
-    # sys     67m40.396s
-
-    ```
-
-6. Pack up
-
-    ```bash
-    cd ~/data/alignment/gene-paralog
-    find Atha -type f -not -path "*/data/*" -print | zip Atha.zip -9 -@
-    ```
+```bash
+cd ~/data/alignment/gene-paralog
+find Atha -type f -not -path "*/data/*" -print | zip Atha.zip -9 -@
+```
 
 # Plants aligned with full chromosomes
 
-1. [Data](https://github.com/wang-q/withncbi/blob/master/paralog/OPs-selfalign.md#full-chromosomes)
+* [Data](OPs-selfalign.md#plants-full-chromosomes)
 
-    * OsatJap
-    * Bdis
     * Alyr
+    * OsatJap
     * Sbic
 
-2. Prepare
+```bash
+# Prepare
+for GENOME_NAME in Alyr OsatJap Sbic; do
+    cd ~/data/alignment/gene-paralog/${GENOME_NAME}/data
 
-    ```bash
-    for GENOME_NAME in OsatJap Bdis Alyr Sbic
-    do
-        echo "====> create directories"
-        mkdir -p ~/data/alignment/gene-paralog/${GENOME_NAME}/data
-        mkdir -p ~/data/alignment/gene-paralog/${GENOME_NAME}/feature
-        mkdir -p ~/data/alignment/gene-paralog/${GENOME_NAME}/repeat
-        mkdir -p ~/data/alignment/gene-paralog/${GENOME_NAME}/stat
-        mkdir -p ~/data/alignment/gene-paralog/${GENOME_NAME}/yml
+    bash ~/Scripts/withncbi/paralog/proc_prepare.sh ${GENOME_NAME}
 
-        echo "====> copy or download needed files here"
-        cd ~/data/alignment/gene-paralog/${GENOME_NAME}/data
-        cp ~/data/alignment/self/plants/Genomes/${GENOME_NAME}/chr.sizes chr.sizes
-        cp ~/data/alignment/self/plants/Results/${GENOME_NAME}/${GENOME_NAME}.chr.runlist.yml paralog.yml
-    done
+    bash ~/Scripts/withncbi/paralog/proc_repeat.sh ${GENOME_NAME}
+    bash ~/Scripts/withncbi/paralog/proc_mite.sh ${GENOME_NAME}
+done
 
-    # http://stackoverflow.com/questions/1494178/how-to-define-hash-tables-in-bash
-    # OSX has bash 3. So no easy hashmaps. Do it manually.
+# Paralog-repeats stats
+for GENOME_NAME in Alyr OsatJap Sbic; do
+    cd ~/data/alignment/gene-paralog/${GENOME_NAME}/stat
+    bash ~/data/alignment/gene-paralog/proc_paralog.sh ${GENOME_NAME}
+done
+
+# Gene-paralog stats
+for GENOME_NAME in Alyr OsatJap Sbic; do
+    cd ~/data/alignment/gene-paralog/${GENOME_NAME}/stat
+
+    bash ~/data/alignment/gene-paralog/proc_all_gene.sh ${GENOME_NAME} ../yml/paralog.yml
+    bash ~/data/alignment/gene-paralog/proc_all_gene.sh ${GENOME_NAME} ../yml/paralog_adjacent.yml
+
+    bash ~/data/alignment/gene-paralog/proc_sep_gene.sh ${GENOME_NAME} ../yml/paralog.yml
+    bash ~/data/alignment/gene-paralog/proc_sep_gene.sh ${GENOME_NAME} ../yml/paralog_adjacent.yml
+done
+
+# Gene-repeats stats
+for GENOME_NAME in Alyr OsatJap Sbic; do
+    cd ~/data/alignment/gene-paralog/${GENOME_NAME}/stat
+    cat ../yml/repeat.family.txt \
+        | parallel -j 8 --keep-order "
+            bash ~/data/alignment/gene-paralog/proc_all_gene.sh ${GENOME_NAME} ../yml/{}.yml
+        "
+
+    cat ../yml/repeat.family.txt \
+        | parallel -j 1 --keep-order "
+            bash ~/data/alignment/gene-paralog/proc_sep_gene.sh ${GENOME_NAME} ../yml/{}.yml
+        "
+done
+
+# Pack up
+for GENOME_NAME in Alyr OsatJap Sbic; do
     cd ~/data/alignment/gene-paralog
+    find ${GENOME_NAME} -type f -not -path "*/data/*" -print | zip ${GENOME_NAME}.zip -9 -@
+done
 
-    # OsatJap
-    cp ~/data/ensembl82/gff3/oryza_sativa/Oryza_sativa.IRGSP-1.0.29.gff3.gz \
-        ~/data/alignment/gene-paralog/OsatJap/data/gff3.gz
-    wget http://pmite.hzau.edu.cn/MITE/MITE-SEQ-V2/26_nipponbare_mite_seq.fa \
-        -O ~/data/alignment/gene-paralog/OsatJap/data/mite.fa
-
-    # Bdis
-    cp ~/data/ensembl82/gff3/brachypodium_distachyon/Brachypodium_distachyon.v1.0.29.gff3.gz \
-        ~/data/alignment/gene-paralog/Bdis/data/gff3.gz
-    wget http://pmite.hzau.edu.cn/MITE/MITE-SEQ-V2/25_brachypodium_mite_seq.fa \
-        -O ~/data/alignment/gene-paralog/Bdis/data/mite.fa
-
-    # Alyr
-    cp ~/data/ensembl82/gff3/arabidopsis_lyrata/Arabidopsis_lyrata.v.1.0.29.gff3.gz \
-        ~/data/alignment/gene-paralog/Alyr/data/gff3.gz
-    wget http://pmite.hzau.edu.cn/MITE/MITE-SEQ-V2/02_lyrata_mite_seq.fa \
-        -O ~/data/alignment/gene-paralog/Alyr/data/mite.fa
-
-    # Sbic
-    # Ensemblgenomes 82 didn't provide a full gff3
-    gt merge -gzip -force \
-        -o ~/data/alignment/gene-paralog/Sbic/data/gff3.gz \
-        ~/data/ensembl82/gff3/sorghum_bicolor/Sorghum_bicolor.Sorbi1.29.chromosome.*.gff3.gz
-    wget http://pmite.hzau.edu.cn/MITE/MITE-SEQ-V2/28_sorghum_mite_seq.fa \
-        -O ~/data/alignment/gene-paralog/Sbic/data/mite.fa
-
-    ```
-
-    ```bash
-    for GENOME_NAME in OsatJap Alyr Sbic
-    do
-        cd ~/data/alignment/gene-paralog/${GENOME_NAME}/data
-
-        bash ~/data/alignment/gene-paralog/proc_prepare.sh ${GENOME_NAME}
-
-        bash ~/data/alignment/gene-paralog/proc_repeat.sh ${GENOME_NAME}
-        bash ~/data/alignment/gene-paralog/proc_mite.sh ${GENOME_NAME}
-    done
-    ```
-
-3. Paralog-repeats stats
-
-    ```bash
-    for GENOME_NAME in OsatJap Alyr Sbic
-    do
-        cd ~/data/alignment/gene-paralog/${GENOME_NAME}/stat
-        bash ~/data/alignment/gene-paralog/proc_paralog.sh ${GENOME_NAME}
-    done
-    ```
-
-4. Gene-paralog stats
-
-    ```bash
-    for GENOME_NAME in OsatJap Alyr Sbic
-    do
-        cd ~/data/alignment/gene-paralog/${GENOME_NAME}/stat
-
-        bash ~/data/alignment/gene-paralog/proc_all_gene.sh ${GENOME_NAME} ../yml/paralog.yml
-        bash ~/data/alignment/gene-paralog/proc_all_gene.sh ${GENOME_NAME} ../yml/paralog_adjacent.yml
-
-        bash ~/data/alignment/gene-paralog/proc_sep_gene.sh ${GENOME_NAME} ../yml/paralog.yml
-        bash ~/data/alignment/gene-paralog/proc_sep_gene.sh ${GENOME_NAME} ../yml/paralog_adjacent.yml
-    done
-    ```
-
-5. Gene-repeats stats
-
-    ```bash
-    for GENOME_NAME in OsatJap Alyr Sbic
-    do
-        cd ~/data/alignment/gene-paralog/${GENOME_NAME}/stat
-        cat ../yml/repeat.family.txt \
-            | parallel -j 8 --keep-order "
-                bash ~/data/alignment/gene-paralog/proc_all_gene.sh ${GENOME_NAME} ../yml/{}.yml
-            "
-
-        cat ../yml/repeat.family.txt \
-            | parallel -j 1 --keep-order "
-                bash ~/data/alignment/gene-paralog/proc_sep_gene.sh ${GENOME_NAME} ../yml/{}.yml
-            "
-    done
-    ```
-
-6. Pack up
-
-    ```bash
-    for GENOME_NAME in OsatJap Alyr Sbic
-    do
-        cd ~/data/alignment/gene-paralog
-        find ${GENOME_NAME} -type f -not -path "*/data/*" -print | zip ${GENOME_NAME}.zip -9 -@
-    done
-    ```
+```
 
 # Plants aligned with partitioned chromosomes
 
-1. [Data](https://github.com/wang-q/withncbi/blob/master/paralog/OPs-selfalign.md#partitioned-chromosomes)
+1. [Data](OPs-selfalign.md#plants-partitioned-chromosomes)
 
     * Mtru
     * Gmax
