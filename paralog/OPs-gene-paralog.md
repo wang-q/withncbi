@@ -276,49 +276,61 @@ find Atha -type f -not -path "*/data/*" -print | zip Atha.zip -9 -@
 ```bash
 # Prepare
 for GENOME_NAME in Alyr OsatJap Sbic; do
+    echo "==> ${GENOME_NAME}"
     cd ~/data/alignment/gene-paralog/${GENOME_NAME}/data
 
     bash ~/Scripts/withncbi/paralog/proc_prepare.sh ${GENOME_NAME}
 
     bash ~/Scripts/withncbi/paralog/proc_repeat.sh ${GENOME_NAME}
     bash ~/Scripts/withncbi/paralog/proc_mite.sh ${GENOME_NAME}
+    echo
 done
 
 # Paralog-repeats stats
 for GENOME_NAME in Alyr OsatJap Sbic; do
+    echo "==> ${GENOME_NAME}"
     cd ~/data/alignment/gene-paralog/${GENOME_NAME}/stat
-    bash ~/data/alignment/gene-paralog/proc_paralog.sh ${GENOME_NAME}
+    bash ~/Scripts/withncbi/paralog/proc_paralog.sh ${GENOME_NAME}
+    echo
 done
 
 # Gene-paralog stats
 for GENOME_NAME in Alyr OsatJap Sbic; do
+    echo "==> ${GENOME_NAME}"
     cd ~/data/alignment/gene-paralog/${GENOME_NAME}/stat
 
-    bash ~/data/alignment/gene-paralog/proc_all_gene.sh ${GENOME_NAME} ../yml/paralog.yml
-    bash ~/data/alignment/gene-paralog/proc_all_gene.sh ${GENOME_NAME} ../yml/paralog_adjacent.yml
+    bash ~/Scripts/withncbi/paralog/proc_all_gene.sh ${GENOME_NAME} ../yml/paralog.yml
+    bash ~/Scripts/withncbi/paralog/proc_all_gene.sh ${GENOME_NAME} ../yml/paralog_adjacent.yml
 
-    bash ~/data/alignment/gene-paralog/proc_sep_gene.sh ${GENOME_NAME} ../yml/paralog.yml
-    bash ~/data/alignment/gene-paralog/proc_sep_gene.sh ${GENOME_NAME} ../yml/paralog_adjacent.yml
+    bash ~/Scripts/withncbi/paralog/proc_sep_gene.sh ${GENOME_NAME} ../yml/paralog.yml
+    bash ~/Scripts/withncbi/paralog/proc_sep_gene.sh ${GENOME_NAME} ../yml/paralog_adjacent.yml
+    echo
 done
 
 # Gene-repeats stats
 for GENOME_NAME in Alyr OsatJap Sbic; do
     cd ~/data/alignment/gene-paralog/${GENOME_NAME}/stat
-    cat ../yml/repeat.family.txt \
-        | parallel -j 8 --keep-order "
-            bash ~/data/alignment/gene-paralog/proc_all_gene.sh ${GENOME_NAME} ../yml/{}.yml
+    cat ../yml/repeat.family.txt |
+        parallel -j 4 --keep-order "
+            echo '==> {}'
+            bash ~/Scripts/withncbi/paralog/proc_all_gene.sh ${GENOME_NAME} ../yml/{}.yml
+            echo
         "
 
-    cat ../yml/repeat.family.txt \
-        | parallel -j 1 --keep-order "
-            bash ~/data/alignment/gene-paralog/proc_sep_gene.sh ${GENOME_NAME} ../yml/{}.yml
+    cat ../yml/repeat.family.txt |
+        parallel -j 1 --keep-order "
+            echo '==> {}'
+            bash ~/Scripts/withncbi/paralog/proc_sep_gene.sh ${GENOME_NAME} ../yml/{}.yml
+            echo
         "
 done
 
 # Pack up
 for GENOME_NAME in Alyr OsatJap Sbic; do
+    echo "==> ${GENOME_NAME}"
     cd ~/data/alignment/gene-paralog
     find ${GENOME_NAME} -type f -not -path "*/data/*" -print | zip ${GENOME_NAME}.zip -9 -@
+    echo
 done
 
 ```
@@ -391,6 +403,12 @@ done
         ~/data/alignment/gene-paralog/Stub/data/gff3.gz
     wget http://pmite.hzau.edu.cn/MITE/MITE-SEQ-V2/38_potato_mite_seq.fa \
         -O ~/data/alignment/gene-paralog/Stub/data/mite.fa
+
+    # Bdis
+    cp ~/data/ensembl82/gff3/brachypodium_distachyon/Brachypodium_distachyon.v1.0.29.gff3.gz \
+        ~/data/alignment/gene-paralog/Bdis/data/gff3.gz
+    wget http://pmite.hzau.edu.cn/MITE/MITE-SEQ-V2/25_brachypodium_mite_seq.fa \
+        -O ~/data/alignment/gene-paralog/Bdis/data/mite.fa
 
     # # Sita
     # cp ~/data/ensembl82/gff3/setaria_italica/Setaria_italica.JGIv2.0.29.gff3.gz \
