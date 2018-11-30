@@ -15,8 +15,8 @@
 - [Download MITE](#download-mite)
 - [Atha](#atha)
 - [Plants aligned with full chromosomes](#plants-aligned-with-full-chromosomes)
-- [Plants aligned with partitioned chromosomes](#plants-aligned-with-partitioned-chromosomes)
 - [Plants with annotations from JGI](#plants-with-annotations-from-jgi)
+- [Plants aligned with partitioned chromosomes](#plants-aligned-with-partitioned-chromosomes)
 
 
 # Sources
@@ -106,7 +106,7 @@ Same for each species.
 # Create directories
 
 ```bash
-for GENOME_NAME in Atha Alyr OsatJap Sbic AthaJGI OsatJapJGI; do
+for GENOME_NAME in Atha Alyr OsatJap Sbic AthaJGI OsatJapJGI Mtru Gmax Brap Vvin Slyc Stub; do
     mkdir -p ~/data/alignment/gene-paralog/${GENOME_NAME}/data
     mkdir -p ~/data/alignment/gene-paralog/${GENOME_NAME}/feature
     mkdir -p ~/data/alignment/gene-paralog/${GENOME_NAME}/repeat
@@ -119,7 +119,7 @@ done
 # Symlink ensembl gff files
 
 ```bash
-for GENOME_NAME in Atha Alyr OsatJap Sbic; do
+for GENOME_NAME in Atha Alyr OsatJap Sbic Mtru Gmax Brap Vvin Slyc Stub; do
     echo "==> ${GENOME_NAME}"
     
     pushd ~/data/alignment/gene-paralog/${GENOME_NAME}/data > /dev/null
@@ -154,6 +154,17 @@ for GENOME_NAME in Atha Alyr OsatJap Sbic; do
     echo
 done
 
+for GENOME_NAME in Mtru Gmax Brap Vvin Slyc Stub; do
+    echo "==> ${GENOME_NAME}"
+    
+    pushd ~/data/alignment/gene-paralog/${GENOME_NAME}/data > /dev/null
+    cp ~/data/alignment/self/plants_par/Processing/${GENOME_NAME}/chr.sizes chr.sizes
+    cp ~/data/alignment/self/plants_par/Results/${GENOME_NAME}/${GENOME_NAME}.cover.yml paralog.yml
+    popd > /dev/null
+    
+    echo
+done
+
 ```
 
 # Download MITE
@@ -170,6 +181,14 @@ ARRAY=(
     'Alyr::http://pmite.hzau.edu.cn/MITE/MITE-SEQ-V2/02_lyrata_mite_seq.fa'
     'OsatJap::http://pmite.hzau.edu.cn/MITE/MITE-SEQ-V2/26_nipponbare_mite_seq.fa'
     'Sbic::http://pmite.hzau.edu.cn/MITE/MITE-SEQ-V2/28_sorghum_mite_seq.fa'
+    'Mtru::http://pmite.hzau.edu.cn/MITE/MITE-SEQ-V2/20_medicago_mite_seq.fa'
+    'Gmax::http://pmite.hzau.edu.cn/MITE/MITE-SEQ-V2/18_soybean_mite_seq.fa'
+    'Brap::http://pmite.hzau.edu.cn/MITE/MITE-SEQ-V2/04_brassica_mite_seq.fa'
+    'Vvin::http://pmite.hzau.edu.cn/MITE/MITE-SEQ-V2/39_grape_mite_seq.fa'
+    'Slyc::http://pmite.hzau.edu.cn/MITE/MITE-SEQ-V2/37_tomato_mite_seq.fa'
+    'Stub::http://pmite.hzau.edu.cn/MITE/MITE-SEQ-V2/38_potato_mite_seq.fa'
+#    'Bdis::http://pmite.hzau.edu.cn/MITE/MITE-SEQ-V2/25_brachypodium_mite_seq.fa'
+#    'Sita::http://pmite.hzau.edu.cn/MITE/MITE-SEQ-V2/27_foxtail_mite_seq.fa'
 )
 
 for item in "${ARRAY[@]}" ; do
@@ -425,7 +444,7 @@ done
 
 # Plants aligned with partitioned chromosomes
 
-1. [Data](OPs-selfalign.md#plants-partitioned-chromosomes)
+* [Data](OPs-selfalign.md#plants-partitioned-chromosomes)
 
     * Mtru
     * Gmax
@@ -436,83 +455,19 @@ done
 
     * Bole (no mite)
 
-2. Prepare
 
-    ```bash
-    for GENOME_NAME in Mtru Gmax Brap Vvin Slyc Stub
-    do
-        echo "====> create directories"
-        mkdir -p ~/data/alignment/gene-paralog/${GENOME_NAME}/data
-        mkdir -p ~/data/alignment/gene-paralog/${GENOME_NAME}/feature
-        mkdir -p ~/data/alignment/gene-paralog/${GENOME_NAME}/repeat
-        mkdir -p ~/data/alignment/gene-paralog/${GENOME_NAME}/stat
-        mkdir -p ~/data/alignment/gene-paralog/${GENOME_NAME}/yml
+```bash
+# Prepare
+for GENOME_NAME in Mtru Gmax Brap Vvin Slyc Stub; do
+    echo "==> ${GENOME_NAME}"
+    cd ~/data/alignment/gene-paralog/${GENOME_NAME}/data
 
-        echo "====> copy or download needed files here"
-        cd ~/data/alignment/gene-paralog/${GENOME_NAME}/data
-        cp ~/data/alignment/self/plants_parted/Genomes/${GENOME_NAME}/chr.sizes chr.sizes
-        cp ~/data/alignment/self/plants_parted/Results/${GENOME_NAME}/${GENOME_NAME}.chr.runlist.yml paralog.yml
-    done
+    bash ~/Scripts/withncbi/paralog/proc_prepare.sh ${GENOME_NAME}
 
-    cd ~/data/alignment/gene-paralog
+    bash ~/Scripts/withncbi/paralog/proc_repeat.sh ${GENOME_NAME}
+    bash ~/Scripts/withncbi/paralog/proc_mite.sh ${GENOME_NAME}
+    echo
+done
 
-    # Mtru
-    cp ~/data/ensembl82/gff3/medicago_truncatula/Medicago_truncatula.GCA_000219495.2.29.gff3.gz \
-        ~/data/alignment/gene-paralog/Mtru/data/gff3.gz
-    wget http://pmite.hzau.edu.cn/MITE/MITE-SEQ-V2/20_medicago_mite_seq.fa \
-        -O ~/data/alignment/gene-paralog/Mtru/data/mite.fa
+```
 
-    # Gmax
-    cp ~/data/ensembl82/gff3/glycine_max/Glycine_max.V1.0.29.gff3.gz \
-        ~/data/alignment/gene-paralog/Gmax/data/gff3.gz
-    wget http://pmite.hzau.edu.cn/MITE/MITE-SEQ-V2/18_soybean_mite_seq.fa \
-        -O ~/data/alignment/gene-paralog/Gmax/data/mite.fa
-
-    # Brap
-    cp ~/data/ensembl82/gff3/brassica_rapa/Brassica_rapa.IVFCAASv1.29.gff3.gz \
-        ~/data/alignment/gene-paralog/Brap/data/gff3.gz
-    wget http://pmite.hzau.edu.cn/MITE/MITE-SEQ-V2/04_brassica_mite_seq.fa \
-        -O ~/data/alignment/gene-paralog/Brap/data/mite.fa
-
-    # Vvin
-    cp ~/data/ensembl82/gff3/vitis_vinifera/Vitis_vinifera.IGGP_12x.29.gff3.gz \
-        ~/data/alignment/gene-paralog/Vvin/data/gff3.gz
-    wget http://pmite.hzau.edu.cn/MITE/MITE-SEQ-V2/39_grape_mite_seq.fa \
-        -O ~/data/alignment/gene-paralog/Vvin/data/mite.fa
-
-    # Slyc
-    cp ~/data/ensembl82/gff3/solanum_lycopersicum/Solanum_lycopersicum.GCA_000188115.2.29.gff3.gz \
-        ~/data/alignment/gene-paralog/Slyc/data/gff3.gz
-    wget http://pmite.hzau.edu.cn/MITE/MITE-SEQ-V2/37_tomato_mite_seq.fa \
-        -O ~/data/alignment/gene-paralog/Slyc/data/mite.fa
-
-    # Stub
-    cp ~/data/ensembl82/gff3/solanum_tuberosum/Solanum_tuberosum.3.0.29.gff3.gz \
-        ~/data/alignment/gene-paralog/Stub/data/gff3.gz
-    wget http://pmite.hzau.edu.cn/MITE/MITE-SEQ-V2/38_potato_mite_seq.fa \
-        -O ~/data/alignment/gene-paralog/Stub/data/mite.fa
-
-    # Bdis
-    cp ~/data/ensembl82/gff3/brachypodium_distachyon/Brachypodium_distachyon.v1.0.29.gff3.gz \
-        ~/data/alignment/gene-paralog/Bdis/data/gff3.gz
-    wget http://pmite.hzau.edu.cn/MITE/MITE-SEQ-V2/25_brachypodium_mite_seq.fa \
-        -O ~/data/alignment/gene-paralog/Bdis/data/mite.fa
-
-    # # Sita
-    # cp ~/data/ensembl82/gff3/setaria_italica/Setaria_italica.JGIv2.0.29.gff3.gz \
-    #     ~/data/alignment/gene-paralog/Sita/data/gff3.gz
-    # wget http://pmite.hzau.edu.cn/MITE/MITE-SEQ-V2/27_foxtail_mite_seq.fa \
-    #     -O ~/data/alignment/gene-paralog/Sita/data/mite.fa
-    ```
-
-    ```bash
-    for GENOME_NAME in Mtru Gmax Brap Vvin Slyc Stub Sita
-    do
-        cd ~/data/alignment/gene-paralog/${GENOME_NAME}/data
-
-        bash ~/data/alignment/gene-paralog/proc_prepare.sh ${GENOME_NAME}
-
-        bash ~/data/alignment/gene-paralog/proc_repeat.sh ${GENOME_NAME}
-        bash ~/data/alignment/gene-paralog/proc_mite.sh ${GENOME_NAME}
-    done
-    ```
