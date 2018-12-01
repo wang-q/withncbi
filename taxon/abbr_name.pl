@@ -103,6 +103,8 @@ while ( my $line = <> ) {
         $strain =~ s/\bserovar\b//g;
         $strain =~ s/\bstr\b//g;
         $strain =~ s/\bstrain\b//g;
+        $strain =~ s/\bserotype\b//g;
+        $strain =~ s/\bbiovar\b//g;
     }
 
     s/\W+/_/g for ( $strain, $species, $genus );
