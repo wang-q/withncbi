@@ -50,12 +50,11 @@ cat bac.SPECIES.csv | wc -l
 
 * Expand species to strains. (Nested single quotes in bash should be '\'')
 
-    Got **1836** strains.
+    Got **2091** strains.
 
 ```bash
 cd ~/data/bacteria/summary
 
-rm bac.STRAIN.csv
 cat bac.SPECIES.csv |
     parallel --keep-order -r -j 8 '
         perl ~/Scripts/alignDB/util/query_sql.pl --db gr_prok -q '\''
@@ -75,10 +74,21 @@ cat bac.SPECIES.csv |
             AND (chr IS NOT NULL OR LENGTH(CHR) > 0)    # has chromosome accession
             AND (LENGTH(wgs) = 0 OR wgs IS NULL)        # avoid bad assembly
             AND species_id = {}
-        '\'' -o stdout
+            ORDER BY released_date                      # oldest first
+        '\'' -o stdout |
+            grep -v "^#" |
+            datamash transpose -t, |
+            perl -MList::MoreUtils -e '\''
+                my @lines = <>;
+                if ($lines[5] =~ /^,+$/) {
+                    $lines[5] = q{first} . $lines[5];
+                }
+                print $_ for @lines;
+            '\'' |
+            datamash transpose -t,
     ' |
     grep -v "^#" \
-    >> bac.STRAIN.csv
+    > bac.STRAIN.csv
 cat bac.STRAIN.csv | wc -l
 
 ```
