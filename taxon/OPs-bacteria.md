@@ -544,13 +544,13 @@ sh runall.sh 2>&1 | tee log_runall.txt
 mkdir -p ~/data/bacteria/bac_summary/xlsx
 cd ~/data/bacteria/bac_summary/xlsx
 
-find  ~/data/bacteria/bac.working -type f -name "*.common.xlsx" \
-    | grep -v "vs[A-Z]" \
-    | parallel cp {} .
+find  ~/data/bacteria/bac.working -type f -name "*.common.xlsx" |
+    grep -v "vs[A-Z]" |
+    parallel cp {} .
 
-find  ~/data/bacteria/bac.working -type f -name "*.gc.xlsx" \
-    | grep -v "vs[A-Z]" \
-    | parallel cp {} .
+find  ~/data/bacteria/bac.working -type f -name "*.gc.xlsx" |
+    grep -v "vs[A-Z]" |
+    parallel cp {} .
 
 ```
 
@@ -596,9 +596,9 @@ perl -l -MPath::Tiny -e '
     >> target_all.lst
 
 echo "#abbr,species,accession,length" > length.tmp
-find ~/data/bacteria/bac.working -type f -name "chr.sizes" \
-    | sort \
-    | parallel --jobs 1 --keep-order -r '
+find ~/data/bacteria/bac.working -type f -name "chr.sizes" |
+    sort |
+    parallel --jobs 1 --keep-order -r '
         perl -nl -e '\''
             BEGIN {
                 %l = ();
@@ -622,22 +622,22 @@ find ~/data/bacteria/bac.working -type f -name "chr.sizes" \
     >> length.tmp
 
 echo "#abbr,subgroup,genus,species,taxon_id" > abbr.tmp
-cat ~/data/bacteria/bac_summary/bac.WORKING.csv \
-    | grep -v "^#" \
-    | perl -nla -F"," -e 'print qq{$F[7],$F[4],$F[3],$F[2],$F[0]}' \
+cat ~/data/bacteria/bac_summary/bac.WORKING.csv |
+    grep -v "^#" |
+    perl -nla -F"," -e 'print qq{$F[7],$F[4],$F[3],$F[2],$F[0]}' \
     >> abbr.tmp
 
 # #abbr,species,accession,length,subgroup,genus,species,taxon_id
-cat length.tmp abbr.tmp \
-    | perl ~/Scripts/withncbi/util/merge_csv.pl \
-        -f 0 --concat -o stdout \
-    | perl -nl -a -F"," -e 'print qq{$F[4],$F[5],$F[6],$F[0],$F[7],$F[2],$F[3]}' \
+cat length.tmp abbr.tmp |
+    perl ~/Scripts/withncbi/util/merge_csv.pl \
+        -f 0 --concat -o stdout |
+    perl -nl -a -F"," -e 'print qq{$F[4],$F[5],$F[6],$F[0],$F[7],$F[2],$F[3]}' \
     > list.tmp
 
 echo "#subgroup,genus,species,abbr,taxon_id,accession,length" > bac.list.csv
-cat list.tmp \
-    | grep -v "#" \
-    | perl -nl -a -F',' -MPath::Tiny -e '
+cat list.tmp |
+    grep -v "#" |
+    perl -nl -a -F',' -MPath::Tiny -e '
         BEGIN{
             %species, %target;
             my @l1 = path(q{species_all.lst})->lines({ chomp => 1});
@@ -649,9 +649,9 @@ cat list.tmp \
         die qq{$_\n} unless defined $idx_s;
         my $idx_t = exists $target{$F[3]} ? $target{$F[3]} : 999_999;
         print qq{$_,$idx_s,$idx_t};
-    ' \
-    | sort -n -t',' -k8,8 -k9,9 \
-    | cut -d',' -f 1-7 \
+    ' |
+    sort -n -t',' -k8,8 -k9,9 |
+    cut -d',' -f 1-7 \
     >> bac.list.csv
 
 rm *.tmp
