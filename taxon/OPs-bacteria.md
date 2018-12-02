@@ -17,7 +17,8 @@
 
 * Find valid species.
 
-    Got **173** species.
+    * Got **207** species.
+    * 40 species have no `species_code`
 
 ```bash
 mkdir -p ~/data/bacteria/summary
@@ -38,7 +39,7 @@ perl ~/Scripts/alignDB/util/query_sql.pl --db gr_prok -q '
         AND species_member > 2
         AND genus IS NOT NULL
         GROUP BY species_id
-        HAVING count > 2 AND species_code > 0       # having enough and representative member
+        HAVING count > 2 #AND species_code > 0       # having enough and representative member
         ORDER BY subgroup, species_id
     ' -o stdout |
     cut -d ',' -f 1 |
@@ -99,17 +100,17 @@ cat bac.STRAIN.csv | wc -l
 cd ~/data/bacteria/summary
 
 echo '#strain_taxonomy_id,strain,species,genus,subgroup,code,accession,abbr' > bac.ABBR.csv
-cat bac.STRAIN.csv \
-    | grep -v '^#' \
-    | perl ~/Scripts/withncbi/taxon/abbr_name.pl -c "2,3,4" -s "," -m 0 --shortsub \
-    | sort -t',' -k5,5 -k4,4 -k3,3 -k6,6 \
+cat bac.STRAIN.csv |
+    grep -v '^#' |
+    perl ~/Scripts/withncbi/taxon/abbr_name.pl -c "2,3,4" -s "," -m 0 --shortsub |
+    sort -t',' -k5,5 -k4,4 -k3,3 -k6,6 \
     >> bac.ABBR.csv
 
 ```
 
 # Download sequences and regenerate lineage information.
 
-We don't rename sequences here, so the file has three columns. **1960** accessions.
+We don't rename sequences here, so the file has three columns. **2231** accessions.
 
 And create `bac_ncbi.csv` with abbr names as taxon file.
 
@@ -145,7 +146,8 @@ perl ~/Scripts/withncbi/taxon/batch_get_seq.pl \
     tee bac_seq.log
 
 # count downloaded sequences
-find . -name "*.fa" | wc -l
+find . -maxdepth 2 -name "*.fa" | wc -l
+find . -maxdepth 1 -type d | wc -l
 
 ```
 
@@ -178,15 +180,15 @@ find . -maxdepth 1 -type d -path "*/*" |
 
 # Create alignment plans
 
-Numbers for higher ranks are: 17 subgroups, 89 genera and 173 species.
+Numbers for higher ranks are: 18 subgroups, 104 genera and 207 species.
 
 ```bash
 cd ~/data/bacteria/summary/
 
 # count every ranks
-#  16 subgroup.list.tmp
-#  80 genus.list.tmp
-# 159 species.list.tmp
+#  18 subgroup.list.tmp
+# 104 genus.list.tmp
+# 207 species.list.tmp
 cat bac.ABBR.csv | grep -v '^#'| cut -d',' -f 3 | sort | uniq > species.list.tmp
 cat bac.ABBR.csv | grep -v '^#'| cut -d',' -f 4 | sort | uniq > genus.list.tmp
 cat bac.ABBR.csv | grep -v '^#'| cut -d',' -f 5 | sort | uniq > subgroup.list.tmp
@@ -287,7 +289,7 @@ bac.WORKING.csv
 ```bash
 cd ~/data/bacteria/summary
 
-# 179, more than previous count # FIXME
+# 207
 cat ~/Scripts/withncbi/doc/bac_target_OG.md |
     grep -v '^#' |
     grep -E '\S+' |
@@ -396,6 +398,7 @@ EOF
 # every species
 echo "mkdir -p ~/data/bacteria/self"  > ../bac.self.cmd.txt
 echo "cd       ~/data/bacteria/self" >> ../bac.self.cmd.txt
+
 cat species.tsv |
     TT_FILE=egaz_templates_self.tt perl -MTemplate -nla -F"\t" -e '
         next unless scalar @F >= 3;
@@ -418,7 +421,7 @@ cat species.tsv |
 
 Align all representative strains of every genera.
 
-**39** genera.
+**44** genera.
 
 ```bash
 cd ~/data/bacteria/summary
@@ -518,7 +521,7 @@ find . -mindepth 1 -maxdepth 3 -type d -name "*_fasta" | parallel -r rm -fr
 mkdir -p ~/data/bacteria/genus
 cd ~/data/bacteria/genus
 
-time bash ../bac.genus.cmd.txt 2>&1 | tee log_cmd.txt
+bash ../bac.genus.cmd.txt 2>&1 | tee log_cmd.txt
 
 for d in `find . -mindepth 1 -maxdepth 1 -type d | sort `; do
     echo "echo \"====> Processing ${d} <====\""
