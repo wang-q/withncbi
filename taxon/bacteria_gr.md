@@ -497,15 +497,30 @@ cd ~/data/bacteria/species
 
 bash ../bac.cmd.txt 2>&1 | tee log_cmd.txt
 
-for d in `find . -mindepth 1 -maxdepth 1 -type d | sort `;do
-    echo "echo \"====> Processing $d <====\""
-    echo bash ${d}/1_pair.sh;
-    echo bash ${d}/2_rawphylo.sh;
-    echo bash ${d}/3_multi.sh;
-    echo ;
-done  > runall.sh
+#----------------------------#
+# Step by step
+#----------------------------#
+# 1_pair
+for f in `find . -mindepth 1 -maxdepth 2 -type f -name 1_pair.sh | sort`; do
+    echo "bash $f"
+    echo
+done > run_1.sh
 
-sh runall.sh 2>&1 | tee log_runall.txt
+# 2_rawphylo
+for f in `find . -mindepth 1 -maxdepth 2 -type f -name 2_rawphylo.sh | sort`; do
+    echo "bash $f"
+    echo
+done > run_2.sh
+
+# 3_multi
+for f in `find . -mindepth 1 -maxdepth 2 -type f -name 3_multi.sh | sort`; do
+    echo "bash $f"
+    echo
+done > run_3.sh
+
+cat run_1.sh | grep . | parallel -r -j 4  2>&1 | tee log_1.txt
+cat run_2.sh | grep . | parallel -r -j 2  2>&1 | tee log_2.txt
+cat run_3.sh | grep . | parallel -r -j 2  2>&1 | tee log_3.txt
 
 #----------------------------#
 # Clean
@@ -524,7 +539,7 @@ cd ~/data/bacteria/genus
 bash ../bac.genus.cmd.txt 2>&1 | tee log_cmd.txt
 
 for d in `find . -mindepth 1 -maxdepth 1 -type d | sort `; do
-    echo "echo \"====> Processing ${d} <====\""
+    echo "echo \"==> Processing ${d} <==\""
     echo bash ${d}/1_pair.sh;
     echo bash ${d}/2_rawphylo.sh;
     echo bash ${d}/3_multi.sh;
