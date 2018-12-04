@@ -519,8 +519,8 @@ for f in `find . -mindepth 1 -maxdepth 2 -type f -name 3_multi.sh | sort`; do
 done > run_3.sh
 
 cat run_1.sh | grep . | parallel -r -j 4  2>&1 | tee log_1.txt
-cat run_2.sh | grep . | parallel -r -j 2  2>&1 | tee log_2.txt
-cat run_3.sh | grep . | parallel -r -j 2  2>&1 | tee log_3.txt
+cat run_2.sh | grep . | parallel -r -j 3  2>&1 | tee log_2.txt
+cat run_3.sh | grep . | parallel -r -j 3  2>&1 | tee log_3.txt
 
 #----------------------------#
 # Clean

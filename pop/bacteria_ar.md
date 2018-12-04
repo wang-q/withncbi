@@ -6,6 +6,7 @@
 - [Strain info](#strain-info)
 - [bacteria_ar: assembly](#bacteria_ar-assembly)
 - [Count strains](#count-strains)
+- [bacteria_ar: prepare](#bacteria_ar-prepare)
 - [bacteria_ar: run](#bacteria_ar-run)
 
 
@@ -162,7 +163,7 @@ find taxon -maxdepth 1 -type f -not -name "*.replace.tsv" |
 
 ```
 
-# bacteria_ar: run
+# bacteria_ar: prepare
 
 * `--perseq` for RefSeq_category Reference Genome assemblies.
 
@@ -195,6 +196,11 @@ for n in Cfre_CFNIH1 Kaer_KCTC_2190 Mmor_subsp_morganii_KT Pmir_HI4320 \
     gzip -dcf ${FILE_GFF} > GENOMES/${n}/chr.gff
 done
 
+```
+
+# bacteria_ar: run
+
+```bash
 # species and targets
 ARRAY=(
     'Citrobacter_freundii::Cfre_CFNIH1'
@@ -224,6 +230,10 @@ for item in "${ARRAY[@]}" ; do
     bash species/${SPECIES_NAME}/3_multi.sh
 
 done
+
+# clean
+find species -mindepth 1 -maxdepth 3 -type d -name "*_raw" | parallel -r rm -fr
+find species -mindepth 1 -maxdepth 3 -type d -name "*_fasta" | parallel -r rm -fr
 
 ```
 
