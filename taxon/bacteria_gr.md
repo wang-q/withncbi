@@ -192,7 +192,9 @@ find . -maxdepth 1 -type d -path "*/*" |
 
 # Create alignment plans
 
-Numbers for higher ranks are: 18 subgroups, 104 genera and 207 species.
+##  Numbers for higher ranks
+
+18 subgroups, 104 genera and 207 species.
 
 ```bash
 cd ~/data/bacteria/summary/
@@ -209,7 +211,7 @@ wc -l subgroup.list.tmp genus.list.tmp species.list.tmp
 rm *.tmp
 ```
 
-Exclude diverged strains.
+## Exclude diverged strains
 
 * 391904, Bifidobacterium longum subsp. infantis ATCC 15697 = JCM 1222 = DSM 20088, 2008-11-20,
   Complete Genome,
@@ -227,6 +229,7 @@ Exclude diverged strains.
 * 372461, Buchnera aphidicola BCc, 2006-10-18, Complete Genome,
 
 * 1243591, Salmonella enterica subsp. enterica serovar Quebec str. S-1267
+* Exclude all strains of "NZ_*" in Salmonella enterica
 
 ```sql
 SELECT taxonomy_id, organism_name, released_date, status, code
@@ -300,7 +303,7 @@ cat bac.ABBR.csv |
 
 ```
 
-Create alignments without outgroups.
+## Create alignments without outgroups.
 
 ```text
 bac.WORKING.csv
@@ -440,7 +443,7 @@ cat species.tsv |
 
 ```
 
-Align all representative strains of every genera.
+## Align all representative strains of every genera.
 
 **44** genera.
 
