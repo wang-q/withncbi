@@ -226,6 +226,8 @@ Exclude diverged strains.
 * 261317, Buchnera aphidicola (Cinara tujafilina), 2011-06-09, Complete Genome,
 * 372461, Buchnera aphidicola BCc, 2006-10-18, Complete Genome,
 
+* 1243591, Salmonella enterica subsp. enterica serovar Quebec str. S-1267
+
 ```sql
 SELECT taxonomy_id, organism_name, released_date, status, code
 FROM gr_prok.gr
@@ -251,12 +253,19 @@ cat bac.ABBR.csv |
     grep -v "869311," |
     grep -v "869312," |
     grep -v "261317," |
-    grep -v "372461," \
+    grep -v "372461," |
+    grep -v "1243591," |
+    perl -nla -F"," -e '
+        if ($F[2] eq q{Salmonella enterica}) {
+            $F[6] =~ /^NZ_/ and next;
+        }
+        print;
+    ' \
     > bac.WORKING.csv
 
 ```
 
-Create `bac_target_OG.md` for picking target and outgroup.
+## Create `bac_target_OG.md` for picking target and outgroup.
 
 Manually edit it then move to `~/Scripts/withncbi/doc/bac_target_OG.md`.
 
