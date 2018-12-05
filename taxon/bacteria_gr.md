@@ -1,13 +1,25 @@
 # Processing bacterial genomes species by species
 
-[TOC]: # " "
-- [Batch running for groups](#batch-running-for-groups)
-- [Alignments of genera for outgroups.](#alignments-of-genera-for-outgroups)
-- [Copy xlsx files](#copy-xlsx-files)
-- [Genome list](#genome-list)
-- [Genome alignment statistics](#genome-alignment-statistics)
-- [sep_chart of d1, d2](#sep_chart-of-d1-d2)
-- [CorelDRAW GC charts](#coreldraw-gc-charts)
+[TOC levels=1-3]: # " "
+- [Processing bacterial genomes species by species](#processing-bacterial-genomes-species-by-species)
+- [Init genome report database.](#init-genome-report-database)
+- [Download sequences and regenerate lineage information.](#download-sequences-and-regenerate-lineage-information)
+- [Prepare sequences for lastz](#prepare-sequences-for-lastz)
+- [Create alignment plans](#create-alignment-plans)
+    - [Numbers for higher ranks](#numbers-for-higher-ranks)
+    - [Exclude diverged strains](#exclude-diverged-strains)
+    - [Create `bac_target_OG.md` for picking target and outgroup.](#create-bac_target_ogmd-for-picking-target-and-outgroup)
+    - [Create alignments without outgroups.](#create-alignments-without-outgroups)
+    - [Align all representative strains of every genera.](#align-all-representative-strains-of-every-genera)
+- [Aligning](#aligning)
+    - [Batch running for groups](#batch-running-for-groups)
+    - [Alignments of genera for outgroups.](#alignments-of-genera-for-outgroups)
+- [Summary](#summary)
+    - [Copy xlsx files](#copy-xlsx-files)
+    - [Genome list](#genome-list)
+    - [Genome alignment statistics](#genome-alignment-statistics)
+    - [sep_chart of d1, d2](#sep_chart-of-d1-d2)
+    - [CorelDRAW GC charts](#coreldraw-gc-charts)
 
 
 # Init genome report database.
