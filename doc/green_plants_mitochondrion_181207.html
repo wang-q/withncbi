@@ -1,0 +1,2802 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+</html>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>Complete genomes: Viridiplantae</title>
+
+<meta name="keywords" content="NCBI, National Center for Biotechnology Information, National Library of Medicine, NLM, genome">
+<meta name="description" content="The Complete Genomes Resource is a collection of genomic sequences that is a part of the Entrez Genomes, which provides curated sequence data and annotations of complete genomes to the scientific community.">
+
+<meta name="ncbilinksmenu" content="triggerPosition: 'bottom left', closeEvent : 'mouseout'"/>
+
+<link rel="stylesheet" type="text/css" href="/coreweb/styles/ncbi_styles.css">
+<link rel="stylesheet" type="text/css" href="GenomesGroup.css">
+
+<script type="text/javascript" src="/core/jig/1.14.8/js/jig.min.js"></script>
+
+<script language="javascript" src="GenomesGroup.js"></script>
+
+</head>
+
+<body background="/coreweb/template1/pix/bg_main3.gif" topmargin="10" marginheight="10">
+
+<div id="maincontent">
+
+<table width="99%" border="0" cellspacing="0" cellpadding="0" align="center">
+<tr>
+  <td>
+  <table width="100%" border="0" cellspacing="0" cellpadding="0" align="center">
+  <tr>
+    <td><a href="/"><img src="/coreweb/template1/pix/ncbi_logo.gif" width="145" height="83" alt="NCBI" border="0"></a></td>
+    <td width="100%" align="center" valign="middle" nowrap="nowrap" background="/coreweb/template1/pix/top_bg_white.gif">
+      <table border="0" cellpadding="0" cellspacing="0" width="500">
+      <tr bgcolor="#f4fff4">
+        <td>&nbsp;&nbsp;</td>
+        <td width="360" align="left" valign="center">&nbsp;<span class="H3" size=+1>Organelle Genome Resources</span></td>
+        <td width="100" valign="BOTTOM"><img height="45" src="/genomes/ORGANELLES/gmito.gif" ALT="mitochondria picture">
+        </td>
+      </tr>
+      </table>
+    </td>
+    <td align="right" background="/coreweb/template1/pix/top_bg_white.gif"><img src="/coreweb/template1/pix/top_right.gif" alt="" width="5" height="83" border="0"></td>
+  </tr>
+  </table>
+
+  <table id="toolbar">
+  <tr>
+    <td class="ncbi_links"><img src="/coreweb/template1/pix/top3_ulm_no_a.gif" border="0" usemap="#unlmenu" id="unl_menu_pix" alt="NCBI links"></td>
+    <td><a href="/genome/">Genomes Home</a></td>
+    <td><a href="/genome/organelle/">Organelle Resources</a></td>
+    <td><a href="/genomes/ORGANELLES/taxtree.cgi?db=Mito&taxid=2759&result=frame&complete=All&init_rankid=1">Taxonomy Tree</a></td>
+    <td><a href="/taxonomy/">Taxonomy</a></td>
+    <td><a href="mailto:genomes@ncbi.nlm.nih.gov?subject=Organelle Genomes Resource">Contact us</a></td>
+  </tr>
+  </table>
+
+  <table align="center" cellpadding="0" cellspacing="0" width="100%">
+  <tr>
+    <td width="1" background="/coreweb/template1/pix/main_left_bg.gif"></td>
+    <td width="10000" bgcolor="#e4eeff">
+
+    <!-- TABs start -->
+      <div id="Tab1" style="display: none">
+      <table width="100%" border="0" bgcolor="#e4eeff" cellpadding="0" cellspacing="0">
+	<!-- tops -->
+	<tr>
+	  <!-- Current -->
+	  <td><img src="/coreweb/images/tabs/tab_active_left_top.gif" width="6" height="13" border="0"></td>
+	  <td class="TabActiveTop"></td>
+	  <td><img src="/coreweb/images/tabs/tab_active_right_top.gif" width="6" height="13" border="0"></td>
+	  <!-- Linked -->
+	  <td class="TabLinkTop"></td>
+	  <td><img src="/coreweb/images/tabs/tab_middle_top.gif" width="11" height="13" border="0"></td>
+
+	  <td class="TabLinkTop"></td>
+	  <td><img src="/coreweb/images/tabs/tab_middle_top.gif" width="11" height="13" border="0"></td>
+
+	  <td class="TabLinkTop"></td>
+	  <td><img src="/coreweb/images/tabs/tab_last_right_top.gif" width="6" height="13" border="0"></td>
+	</tr>
+	<!-- middles -->
+	<tr>
+	  <!-- Current -->
+	  <td class="TabActiveLeft"></td>
+	  <td class="TabActiveTxt">Genomes</td>
+	  <td class="TabActiveRight"></td>
+	  <!-- Linked -->
+	  <td class="TabLinkTxt"><a title="Click to see taxonomy tree" href="/genomes/ORGANELLES/taxtree.cgi?db=Mito&taxid=33208&result=frame&complete=All&init_rankid=5">Metazoa taxonomy tree</a></td>
+	  <td class="TabLinkMid"></td>
+	  <td class="TabLinkTxt"><a title="Click to see gene order" href="javascript:toggle2Tabs('Tab1','Tab2','Tbl1','Tbl2');">Gene order</a></td>
+	  <td class="TabLinkMid"></td>
+	  <td class="TabLinkTxt"><a title="Click to compare your sequence to Metazoa mitochondria protein database" href="?taxid=33090&hopt=blast">Match gene</a></td>
+	  <td class="TabLinkMid"></td>
+	</tr>
+	<!-- bottoms -->
+	<tr>
+	  <!-- Current -->
+	  <td colspan="3" bgcolor="white"><img src="/coreweb/images/tabs/pixel.gif" width="1" height="1" border="0"></td>
+	  <!-- Linked -->
+	  <td colspan="6" bgcolor="#8A8D9C"><img src="/coreweb/images/tabs/pixel.gif" width="1" height="1" border="0"></td>
+	</tr>
+      </table>
+      </div>
+      <div id="Tab2" style="display: none">
+      <table width="100%" border="0" bgcolor="#e4eeff" cellpadding="0" cellspacing="0">
+	<!-- tops -->
+	<tr>
+	  <!-- Linked -->
+	  <td><img src="/coreweb/images/tabs/tab_1st_left_top.gif" width="6" height="13" border="0"></td>
+	  <td class="TabLinkTop"></td>
+	  <td><img src="/coreweb/images/tabs/tab_middle_top.gif" width="11" height="13" border="0"></td>
+	  <td class="TabLinkTop"></td>
+	  <!-- Current -->
+	  <td><img src="/coreweb/images/tabs/tab_active_left_top.gif" width="6" height="13" border="0"></td>
+	  <td class="TabActiveTop"></td>
+	  <td><img src="/coreweb/images/tabs/tab_active_right_top.gif" width="6" height="13" border="0"></td>
+	  <!-- Linked -->
+	  <td class="TabLinkTop"></td>
+	  <td><img src="/coreweb/images/tabs/tab_last_right_top.gif" width="6" height="13" border="0"></td>
+	</tr>
+	<!-- middles -->
+	<tr>
+	  <!-- Linked -->
+	  <td class="TabLinkLeft"></td>
+	  <td class="TabLinkTxt"><a title="Click to see list of genomes" href="javascript:toggle2Tabs('Tab1','Tab2','Tbl1','Tbl2');">Genomes</a></td>
+	  <td class="TabLinkMid"></td>
+	  <td class="TabLinkTxt"><a title="Click to see taxonomy tree" href="/genomes/ORGANELLES/taxtree.cgi?db=Mito&taxid=33208&result=frame&complete=All&init_rankid=5">Metazoa taxonomy tree</a></td>
+	  <!-- Current -->
+	  <td class="TabActiveLeft"></td>
+	  <td class="TabActiveTxt">Gene order</td>
+	  <td class="TabActiveRight"></td>
+	  <!-- Linked -->
+	  <td class="TabLinkTxt"><a title="Click to compare your sequence to Metazoa mitochondria protein database" href="?taxid=33090&hopt=blast">Match gene</a></td>
+	  <td class="TabLinkMid"></td>
+	</tr>
+	<!-- bottoms -->
+	<tr>
+	  <!-- Linked -->
+	  <td colspan="4" bgcolor="#8A8D9C"><img src="/coreweb/images/tabs/pixel.gif" width="1" height="1" border="0"></td>
+	  <!-- Current -->
+	  <td colspan="3" bgcolor="white"><img src="/coreweb/images/tabs/pixel.gif" width="1" height="1" border="0"></td>
+	  <!-- Linked -->
+	  <td colspan="2" bgcolor="#8A8D9C"><img src="/coreweb/images/tabs/pixel.gif" width="1" height="1" border="0"></td>
+	</tr>
+      </table>
+      </div>
+      <!-- TABs end -->
+
+      <table id="taxbar"><tr><td><a href="https://www.ncbi.nlm.nih.gov/genomes/GenomesGroup.cgi?opt=organelle&amp;taxid=2759">Eukaryota</a>&nbsp;&nbsp;<img alt="" border="0" src="/sutils/static/GP_IMAGE/tax-sep.png">  </td></tr></table>
+
+      <table width="100%" border="0">
+      <tr>
+        <td width="10%">&nbsp;</td>
+        <td class="H3">
+          <i>Viridiplantae</i> <span>mitochondrial genomes - 221 records</span>
+        </td>
+      </tr>
+      </table>
+
+      <table class="brdcrumbs"><tr><td nowrap><a data-jig="ncbilinksmenu" data-jigconfig="destSelector:'#GG3041'" href="#"><i>Chlorophyta</i></a><ul id="GG3041" style="display:none"><li><span class="popmenuHead">Chlorophyta</span></li>
+<li><a href="#3041">Find on page</a></li>
+<li><a href="https://www.ncbi.nlm.nih.gov/genomes/GenomesGroup.cgi?opt=organelle&amp;taxid=3041">Complete genomes</a></li>
+<li><a href="/Taxonomy/Browser/wwwtax.cgi?p=7&amp;id=3041">Taxonomy</a></li>
+</ul>
+&nbsp;<span color="#6699CC">[51]</span></td>
+<td nowrap><a data-jig="ncbilinksmenu" data-jigconfig="destSelector:'#GG35493'" href="#"><i>Streptophyta</i></a><ul id="GG35493" style="display:none"><li><span class="popmenuHead">Streptophyta</span></li>
+<li><a href="#35493">Find on page</a></li>
+<li><a href="https://www.ncbi.nlm.nih.gov/genomes/GenomesGroup.cgi?opt=organelle&amp;taxid=35493">Complete genomes</a></li>
+<li><a href="/Taxonomy/Browser/wwwtax.cgi?p=7&amp;id=35493">Taxonomy</a></li>
+</ul>
+&nbsp;<span color="#6699CC">[170]</span></td>
+</tr></table>
+
+      <span color="#FF00FF"></span>
+      <br />
+      
+      <br />
+      <div id="Tbl1" style="display: block">
+          <table border="0" cellpadding="0" cellspacing="0" class="Overhead" width="100%"><tr><td class="Select1">Sort the genomes list by: <select name="sort" onChange="location = this.options[this.selectedIndex].value;"><option selected value="https://www.ncbi.nlm.nih.gov/genomes/GenomesGroup.cgi?opt=organelle&amp;taxid=33090">taxonomy</option>
+<option value="https://www.ncbi.nlm.nih.gov/genomes/GenomesGroup.cgi?opt=organelle&amp;taxid=33090&amp;sort=Genome">genome name (alphabetically)</option>
+</select>
+</td>
+<td class="Downld"><a class="Downld" data-jig="ncbilinksmenu" data-jigconfig="destSelector:'#Downld'" href="#">&gt;Download</a><ul id="Downld" style="display:none"><li><a href="https://www.ncbi.nlm.nih.gov/genomes/GenomesGroup.cgi?opt=organelle&amp;taxid=33090&amp;cmd=download">Download the table</a></li>
+<li><a href="https://www.ncbi.nlm.nih.gov/genomes/GenomesGroup.cgi?opt=organelle&amp;taxid=33090&amp;cmd=download1">Download the list of accessions</a></li>
+</ul>
+</td>
+</tr></table>
+<table bgcolor="#FFFFFF" border="0" cellpadding="1" cellspacing="1" class="tblTxt" width="100%"><tr class="row1"><td><a class="tblHead SrtColumn" href="https://www.ncbi.nlm.nih.gov/genomes/GenomesGroup.cgi?opt=organelle&amp;taxid=33090&amp;sort=Genome" title="Click to sort alphabetically">Genome</a></td>
+<td><a class="tblHead" href="#" title="Accession">Accession</a></td>
+<td><a class="tblHead" href="#" title="RefSeq type">RefSeq type</a></td>
+<td align="right" width="60"><a class="tblHead" href="#" title="Genome length">Length</a></td>
+<td align="right" width="40">&nbsp;<a class="tblHead" href="#" title="Number of proteins">Protein</a></td>
+<td align="right" width="40">&nbsp;<a class="tblHead" href="#" title="Number of structural RNAs">RNA</a></td>
+<td align="right" width="40"><a class="tblHead" href="#" title="Date completed">Created</a></td>
+<td align="right" width="40"><a class="tblHead" href="#" title="Update date">Updated</a></td>
+</tr>
+<tr><td colspan="3"><img alt="Show/hide all segment lists" border="0" class="GGtglAll" id="TglAllImg" src="/sutils/static/GP_IMAGE/plus.png"><span id="TglAllTxt">Show / hide all segment lists</span></td></tr>
+<tr bgcolor="#F8F8F8">
+<td colspan="16">
+<a name="3041"></a>
+<a href="#maincontent" title="Go to the top of the page"><img src="/sutils/static/GP_IMAGE/drb_top.gif" border="0" align="right" alt="Go to the top of the page"></a>
+<span class="FamName">Chlorophyta</span>
+</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=3075" title="Chlorophyta; Species: Auxenochlorella protothecoides">Auxenochlorella protothecoides</a>
+</td>
+<td><a href="/nuccore/741870561">NC_026009</a></td>
+complete</td>
+<td align="right">57274&nbsp;nt</td>
+<td align="right">39&nbsp;</td>
+<td align="right">29&nbsp;</td>
+<td align="right" class="Gray">12/30/2014</td>
+<td align="right" class="Gray">12/30/2014</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=41875" title="Chlorophyta; Species: Bathycoccus prasinos">Bathycoccus prasinos</a>
+</td>
+<td><a href="/nuccore/571069183">NC_023273</a></td>
+complete</td>
+<td align="right">43614&nbsp;nt</td>
+<td align="right">41&nbsp;</td>
+<td align="right">30&nbsp;</td>
+<td align="right" class="Gray">06/21/2012</td>
+<td align="right" class="Gray">07/07/2016</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=38881" title="Chlorophyta; Species: Botryococcus braunii">Botryococcus braunii</a>
+</td>
+<td><a href="/nuccore/918020277">NC_027722</a></td>
+complete</td>
+<td align="right">84583&nbsp;nt</td>
+<td align="right">42&nbsp;</td>
+<td align="right">26&nbsp;</td>
+<td align="right" class="Gray">08/18/2015</td>
+<td align="right" class="Gray">08/18/2015</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=50041" title="Chlorophyta; Species: Bracteacoccus aerius">Bracteacoccus aerius strain UTEX 1250</a>
+</td>
+<td><a href="/nuccore/674840664">NC_024755</a></td>
+complete</td>
+<td align="right">47158&nbsp;nt</td>
+<td align="right">17&nbsp;</td>
+<td align="right">30&nbsp;</td>
+<td align="right" class="Gray">08/26/2014</td>
+<td align="right" class="Gray">08/26/2014</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=50037" title="Chlorophyta; Species: Bracteacoccus minor">Bracteacoccus minor strain UTEX B66</a>
+</td>
+<td><a href="/nuccore/674840682">NC_024756</a></td>
+complete</td>
+<td align="right">45175&nbsp;nt</td>
+<td align="right">21&nbsp;</td>
+<td align="right">30&nbsp;</td>
+<td align="right" class="Gray">08/26/2014</td>
+<td align="right" class="Gray">08/26/2014</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=1034604" title="Chlorophyta; Species: Chlamydomonas leiostraca">Chlamydomonas leiostraca strain SAG 11-49</a>
+</td>
+<td><a href="/nuccore/788229420">NC_026573</a></td>
+complete</td>
+<td align="right">14029&nbsp;nt</td>
+<td align="right">7&nbsp;</td>
+<td align="right">12&nbsp;</td>
+<td align="right" class="Gray">03/27/2015</td>
+<td align="right" class="Gray">03/27/2015</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=3054" title="Chlorophyta; Species: Chlamydomonas moewusii">Chlamydomonas moewusii</a>
+</td>
+<td><a href="/nuccore/11465907">NC_001872</a></td>
+complete</td>
+<td align="right">22897&nbsp;nt</td>
+<td align="right">14&nbsp;</td>
+<td align="right">13&nbsp;</td>
+<td align="right" class="Gray">02/11/1998</td>
+<td align="right" class="Gray">01/27/2017</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=3055" title="Chlorophyta; Species: Chlamydomonas reinhardtii">Chlamydomonas reinhardtii</a>
+</td>
+<td><a href="/nuccore/11467088">NC_001638</a></td>
+complete</td>
+<td align="right">15758&nbsp;nt</td>
+<td align="right">8&nbsp;</td>
+<td align="right">17&nbsp;</td>
+<td align="right" class="Gray">11/02/1994</td>
+<td align="right" class="Gray">02/01/2010</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=3076" title="Chlorophyta; Species: Chlorella sorokiniana">Chlorella sorokiniana isolate 1230</a>
+</td>
+<td><a href="/nuccore/671743011">NC_024626</a></td>
+complete</td>
+<td align="right">52528&nbsp;nt</td>
+<td align="right">33&nbsp;</td>
+<td align="right">28&nbsp;</td>
+<td align="right" class="Gray">08/06/2014</td>
+<td align="right" class="Gray">08/06/2014</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=554065" title="Chlorophyta; Species: Chlorella variabilis">Chlorella variabilis isolate NC64A</a>
+</td>
+<td><a href="/nuccore/712912119">NC_025413</a></td>
+complete</td>
+<td align="right">78500&nbsp;nt</td>
+<td align="right">32&nbsp;</td>
+<td align="right">30&nbsp;</td>
+<td align="right" class="Gray">11/10/2014</td>
+<td align="right" class="Gray">07/07/2016</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=162317" title="Chlorophyta; Species: Chlorotetraedron incus">Chlorotetraedron incus strain SAG 43.81</a>
+</td>
+<td><a href="/nuccore/674840704">NC_024757</a></td>
+complete</td>
+<td align="right">38406&nbsp;nt</td>
+<td align="right">16&nbsp;</td>
+<td align="right">30&nbsp;</td>
+<td align="right" class="Gray">08/26/2014</td>
+<td align="right" class="Gray">08/26/2014</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=31302" title="Chlorophyta; Species: Chromochloris zofingiensis">Chromochloris zofingiensis strain UTEX 56</a>
+</td>
+<td><a href="/nuccore/674840721">NC_024758</a></td>
+complete</td>
+<td align="right">44840&nbsp;nt</td>
+<td align="right">17&nbsp;</td>
+<td align="right">30&nbsp;</td>
+<td align="right" class="Gray">08/26/2014</td>
+<td align="right" class="Gray">08/26/2014</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=574566" title="Chlorophyta; Species: Coccomyxa subellipsoidea">Coccomyxa sp. C-169</a>
+</td>
+<td><a href="/nuccore/327195223">NC_015316</a></td>
+complete</td>
+<td align="right">65497&nbsp;nt</td>
+<td align="right">31&nbsp;</td>
+<td align="right">29&nbsp;</td>
+<td align="right" class="Gray">03/29/2011</td>
+<td align="right" class="Gray">03/29/2011</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=36881" title="Chlorophyta; Species: Cymbomonas tetramitiformis">Cymbomonas tetramitiformis strain PLY262</a>
+</td>
+<td><a href="/nuccore/1330355580">NC_036614</a></td>
+complete</td>
+<td align="right">73520&nbsp;nt</td>
+<td align="right">31&nbsp;</td>
+<td align="right">34&nbsp;</td>
+<td align="right" class="Gray">01/17/2018</td>
+<td align="right" class="Gray">01/17/2018</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=3046" title="Chlorophyta; Species: Dunaliella salina">Dunaliella salina</a>
+</td>
+<td><a href="/nuccore/254033622">NC_012930</a></td>
+complete</td>
+<td align="right">28331&nbsp;nt</td>
+<td align="right">9&nbsp;</td>
+<td align="right">12&nbsp;</td>
+<td align="right" class="Gray">07/16/2009</td>
+<td align="right" class="Gray">07/02/2010</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=140095" title="Chlorophyta; Species: Dunaliella viridis">Dunaliella viridis strain CCM-UDEC 002</a>
+</td>
+<td><a href="/nuccore/772311199">NC_026571</a></td>
+complete</td>
+<td align="right">45980&nbsp;nt</td>
+<td align="right">8&nbsp;</td>
+<td align="right">12&nbsp;</td>
+<td align="right" class="Gray">03/20/2015</td>
+<td align="right" class="Gray">03/20/2015</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=33097" title="Chlorophyta; Species: Gonium pectorale">Gonium pectorale</a>
+</td>
+<td><a href="/nuccore/459172117">NC_020437</a></td>
+complete</td>
+<td align="right">15993&nbsp;nt</td>
+<td align="right">8&nbsp;</td>
+<td align="right">16&nbsp;</td>
+<td align="right" class="Gray">03/04/2013</td>
+<td align="right" class="Gray">03/07/2013</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=145475" title="Chlorophyta; Species: Helicosporidium sp. ex Simulium jonesi">Helicosporidium sp. ex Simulium jonesi</a>
+</td>
+<td><a href="/nuccore/386800430">NC_017841</a></td>
+complete</td>
+<td align="right">49343&nbsp;nt</td>
+<td align="right">37&nbsp;</td>
+<td align="right">28&nbsp;</td>
+<td align="right" class="Gray">05/09/2012</td>
+<td align="right" class="Gray">05/09/2012</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=312850" title="Chlorophyta; Species: Lobosphaera incisa">Lobosphaera incisa strain SAG 2468</a>
+</td>
+<td><a href="/nuccore/821316988">NC_027060</a></td>
+complete</td>
+<td align="right">69997&nbsp;nt</td>
+<td align="right">34&nbsp;</td>
+<td align="right">30&nbsp;</td>
+<td align="right" class="Gray">05/14/2015</td>
+<td align="right" class="Gray">08/18/2015</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=296587" title="Chlorophyta; Species: Micromonas commoda">Micromonas sp. RCC299</a>
+</td>
+<td><a href="/nuccore/229315892">NC_012643</a></td>
+complete</td>
+<td align="right">47425&nbsp;nt</td>
+<td align="right">39&nbsp;</td>
+<td align="right">40&nbsp;</td>
+<td align="right" class="Gray">05/01/2009</td>
+<td align="right" class="Gray">08/15/2010</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=163317" title="Chlorophyta; Species: Microspora stagnorum">Microspora stagnorum culture-collection SAG:51.86</a>
+</td>
+<td><a href="/nuccore/563940464">NC_022862</a></td>
+complete</td>
+<td align="right">87405&nbsp;nt</td>
+<td align="right">47&nbsp;</td>
+<td align="right">31&nbsp;</td>
+<td align="right" class="Gray">12/06/2013</td>
+<td align="right" class="Gray">12/06/2013</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=141716" title="Chlorophyta; Species: Monomastix sp. OKE-1">Monomastix sp. OKE-1</a>
+</td>
+<td><a href="/nuccore/563940183">NC_022797</a></td>
+complete</td>
+<td align="right">60883&nbsp;nt</td>
+<td align="right">58&nbsp;</td>
+<td align="right">30&nbsp;</td>
+<td align="right" class="Gray">12/06/2013</td>
+<td align="right" class="Gray">12/06/2013</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=145388" title="Chlorophyta; Species: Monoraphidium neglectum">Monoraphidium neglectum strain SAG 48.87 mitochondrion, whole genome shotgun sequence</a>
+</td>
+<td><a href="/nuccore/926799095">NW_014013625</a></td>
+complete</td>
+<td align="right">93840&nbsp;nt</td>
+<td align="right">17&nbsp;</td>
+<td align="right">23&nbsp;</td>
+<td align="right" class="Gray">09/10/2015</td>
+<td align="right" class="Gray">09/10/2015</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=31300" title="Chlorophyta; Species: Mychonastes homosphaera">Mychonastes homosphaera strain CAUP H6502</a>
+</td>
+<td><a href="/nuccore/674840740">NC_024760</a></td>
+complete</td>
+<td align="right">25149&nbsp;nt</td>
+<td align="right">13&nbsp;</td>
+<td align="right">29&nbsp;</td>
+<td align="right" class="Gray">08/26/2014</td>
+<td align="right" class="Gray">08/26/2014</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=3099" title="Chlorophyta; Species: Neochloris aquatica">Neochloris aquatica strain UTEX 138</a>
+</td>
+<td><a href="/nuccore/674840754">NC_024761</a></td>
+complete</td>
+<td align="right">38021&nbsp;nt</td>
+<td align="right">15&nbsp;</td>
+<td align="right">30&nbsp;</td>
+<td align="right" class="Gray">08/26/2014</td>
+<td align="right" class="Gray">08/26/2014</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=31312" title="Chlorophyta; Species: Nephroselmis olivacea">Nephroselmis olivacea</a>
+</td>
+<td><a href="/nuccore/110225635">NC_008239</a></td>
+complete</td>
+<td align="right">45223&nbsp;nt</td>
+<td align="right">40&nbsp;</td>
+<td align="right">30&nbsp;</td>
+<td align="right" class="Gray">07/07/2006</td>
+<td align="right" class="Gray">07/13/2006</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=51324" title="Chlorophyta; Species: Oltmannsiellopsis viridis">Oltmannsiellopsis viridis</a>
+</td>
+<td><a href="/nuccore/110816043">NC_008256</a></td>
+complete</td>
+<td align="right">56761&nbsp;nt</td>
+<td align="right">36&nbsp;</td>
+<td align="right">27&nbsp;</td>
+<td align="right" class="Gray">07/28/2006</td>
+<td align="right" class="Gray">07/07/2016</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=70448" title="Chlorophyta; Species: Ostreococcus tauri">Ostreococcus tauri</a>
+</td>
+<td><a href="/nuccore/113170473">NC_008290</a></td>
+complete</td>
+<td align="right">44237&nbsp;nt</td>
+<td align="right">43&nbsp;</td>
+<td align="right">35&nbsp;</td>
+<td align="right" class="Gray">04/30/2005</td>
+<td align="right" class="Gray">04/13/2007</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=132186" title="Chlorophyta; Species: Ourococcus multisporus">Ourococcus multisporus strain UTEX 1240</a>
+</td>
+<td><a href="/nuccore/674840770">NC_024762</a></td>
+complete</td>
+<td align="right">49705&nbsp;nt</td>
+<td align="right">20&nbsp;</td>
+<td align="right">28&nbsp;</td>
+<td align="right" class="Gray">08/26/2014</td>
+<td align="right" class="Gray">08/26/2014</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=91197" title="Chlorophyta; Species: Pectinodesmus pectinatus">Pectinodesmus pectinatus</a>
+</td>
+<td><a href="/nuccore/1331211015">NC_036659</a></td>
+complete</td>
+<td align="right">32195&nbsp;nt</td>
+<td align="right">13&nbsp;</td>
+<td align="right">33&nbsp;</td>
+<td align="right" class="Gray">01/18/2018</td>
+<td align="right" class="Gray">01/18/2018</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=3159" title="Chlorophyta; Species: Pedinomonas minor">Pedinomonas minor</a>
+</td>
+<td><a href="/nuccore/11465922">NC_000892</a></td>
+complete</td>
+<td align="right">25137&nbsp;nt</td>
+<td align="right">11&nbsp;</td>
+<td align="right">12&nbsp;</td>
+<td align="right" class="Gray">03/09/1999</td>
+<td align="right" class="Gray">02/01/2010</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=330485" title="Chlorophyta; Species: Pleodorina starrii">Pleodorina starrii</a>
+</td>
+<td><a href="/nuccore/484759758">NC_021108</a></td>
+complete</td>
+<td align="right">20375&nbsp;nt</td>
+<td align="right">10&nbsp;</td>
+<td align="right">15&nbsp;</td>
+<td align="right" class="Gray">04/30/2013</td>
+<td align="right" class="Gray">04/30/2013</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=40532" title="Chlorophyta; Species: Polytoma uvella">Polytoma uvella strain UTEX 964</a>
+</td>
+<td><a href="/nuccore/783063999">NC_026572</a></td>
+complete</td>
+<td align="right">17411&nbsp;nt</td>
+<td align="right">7&nbsp;</td>
+<td align="right">12&nbsp;</td>
+<td align="right" class="Gray">03/25/2015</td>
+<td align="right" class="Gray">03/25/2015</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=351368" title="Chlorophyta; Species: Polytomella capuana">Polytomella capuana</a>
+</td>
+<td><a href="/nuccore/169142681">NC_010357</a></td>
+complete</td>
+<td align="right">12998&nbsp;nt</td>
+<td align="right">7&nbsp;</td>
+<td align="right">13&nbsp;</td>
+<td align="right" class="Gray">02/28/2008</td>
+<td align="right" class="Gray">04/21/2009</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=353565" title="Chlorophyta; Species: Polytomella magna">Polytomella magna</a>
+</td>
+<td><a href="/nuccore/568244880">NC_023091</a></td>
+complete</td>
+<td align="right">24370&nbsp;nt</td>
+<td align="right">7&nbsp;</td>
+<td align="right">26&nbsp;</td>
+<td align="right" class="Gray">12/20/2013</td>
+<td align="right" class="Gray">02/04/2014</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<img border="0" src="/sutils/static/GP_IMAGE/plus.png" alt="toggle on/off" id="Toggle_51329" class="GGtgl"><a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=51329" title="Chlorophyta; Species: Polytomella parva">Polytomella parva</a>
+</td>
+<td></td>
+complete</td>
+<td align="right">16153&nbsp;nt</td>
+<td align="right">7&nbsp;</td>
+<td align="right">13&nbsp;</td>
+<td align="right" class="Gray">02/22/2012</td>
+<td align="right" class="Gray">02/22/2012</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td colspan="9"><div id="SDescr_51329" style="display: none">
+<table class="segmtbl" sellspacing="1" cellpadding="1">
+<tr>
+<td><a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=51329" title="Chlorophyta; Species: Polytomella parva">Polytomella parva mitochondrion chromosome 1</a>
+</td>
+<td><span class="tblTxt">(13135 nt)</span>
+</td>
+<td><a href="/nuccore/377810561">NC_016916</a></td>
+<td><span class="tblTxt">proteins: 6</span></td>
+<td><span class="tblTxt">RNA: </span>13</td>
+</tr>
+<tr>
+<td><a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=51329" title="Chlorophyta; Species: Polytomella parva">Polytomella parva mitochondrion chromosome 2</a>
+</td>
+<td><span class="tblTxt">(3018 nt)</span>
+</td>
+<td><a href="/nuccore/377810568">NC_016917</a></td>
+<td><span class="tblTxt">proteins: 1</span></td>
+</tr>
+</table>
+</div>
+</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<img border="0" src="/sutils/static/GP_IMAGE/plus.png" alt="toggle on/off" id="Toggle_351366" class="GGtgl"><a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=351366" title="Chlorophyta; Species: Polytomella piriformis">Polytomella piriformis</a>
+</td>
+<td></td>
+complete</td>
+<td align="right">16083&nbsp;nt</td>
+<td align="right">7&nbsp;</td>
+<td align="right">13&nbsp;</td>
+<td align="right" class="Gray">02/22/2012</td>
+<td align="right" class="Gray">02/22/2012</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td colspan="9"><div id="SDescr_351366" style="display: none">
+<table class="segmtbl" sellspacing="1" cellpadding="1">
+<tr>
+<td><a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=351366" title="Chlorophyta; Species: Polytomella piriformis">Polytomella sp. SAG 63-10 mitochondrion chromosome 1</a>
+</td>
+<td><span class="tblTxt">(13004 nt)</span>
+</td>
+<td><a href="/nuccore/267857462">NC_013472</a></td>
+<td><span class="tblTxt">proteins: 6</span></td>
+<td><span class="tblTxt">RNA: </span>13</td>
+</tr>
+<tr>
+<td><a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=351366" title="Chlorophyta; Species: Polytomella piriformis">Polytomella sp. SAG 63-10 mitochondrion chromosome 2</a>
+</td>
+<td><span class="tblTxt">(3079 nt)</span>
+</td>
+<td><a href="/nuccore/377810570">NC_016918</a></td>
+<td><span class="tblTxt">proteins: 1</span></td>
+</tr>
+</table>
+</div>
+</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=156133" title="Chlorophyta; Species: Prasinoderma coloniale">Prasinoderma coloniale culture-collection CCMP:1220</a>
+</td>
+<td><a href="/nuccore/575925518">NC_023355</a></td>
+complete</td>
+<td align="right">54546&nbsp;nt</td>
+<td align="right">34&nbsp;</td>
+<td align="right">40&nbsp;</td>
+<td align="right" class="Gray">01/24/2014</td>
+<td align="right" class="Gray">01/24/2014</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=3111" title="Chlorophyta; Species: Prototheca wickerhamii">Prototheca wickerhamii</a>
+</td>
+<td><a href="/nuccore/11497452">NC_001613</a></td>
+complete</td>
+<td align="right">55328&nbsp;nt</td>
+<td align="right">36&nbsp;</td>
+<td align="right">29&nbsp;</td>
+<td align="right" class="Gray">04/05/1994</td>
+<td align="right" class="Gray">02/01/2010</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=3112" title="Chlorophyta; Species: Prototheca zopfii">Prototheca zopfii strain SAG 2063</a>
+</td>
+<td><a href="/nuccore/1381389463">NC_037449</a></td>
+complete</td>
+<td align="right">38164&nbsp;nt</td>
+<td align="right">33&nbsp;</td>
+<td align="right">29&nbsp;</td>
+<td align="right" class="Gray">04/24/2018</td>
+<td align="right" class="Gray">04/24/2018</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=160070" title="Chlorophyta; Species: Tupiella akineta">Pseudendoclonium akinetum</a>
+</td>
+<td><a href="/nuccore/49147156">NC_005926</a></td>
+complete</td>
+<td align="right">95880&nbsp;nt</td>
+<td align="right">72&nbsp;</td>
+<td align="right">27&nbsp;</td>
+<td align="right" class="Gray">06/23/2004</td>
+<td align="right" class="Gray">09/22/2016</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=889459" title="Chlorophyta; Species: Pseudomuriella schumacherensis">Pseudomuriella schumacherensis strain SAG 2137</a>
+</td>
+<td><a href="/nuccore/674840791">NC_024763</a></td>
+complete</td>
+<td align="right">43134&nbsp;nt</td>
+<td align="right">16&nbsp;</td>
+<td align="right">32&nbsp;</td>
+<td align="right" class="Gray">08/26/2014</td>
+<td align="right" class="Gray">08/26/2014</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=41880" title="Chlorophyta; Species: Pycnococcus provasolii">Pycnococcus provasolii</a>
+</td>
+<td><a href="/nuccore/291010610">NC_013935</a></td>
+complete</td>
+<td align="right">24321&nbsp;nt</td>
+<td align="right">18&nbsp;</td>
+<td align="right">18&nbsp;</td>
+<td align="right" class="Gray">03/12/2010</td>
+<td align="right" class="Gray">03/12/2010</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=36894" title="Chlorophyta; Species: Pyramimonas parkeae">Pyramimonas parkeae strain SCCAP K-0007</a>
+</td>
+<td><a href="/nuccore/1088472482">NC_031504</a></td>
+complete</td>
+<td align="right">43294&nbsp;nt</td>
+<td align="right">42&nbsp;</td>
+<td align="right">37&nbsp;</td>
+<td align="right" class="Gray">10/21/2016</td>
+<td align="right" class="Gray">10/21/2016</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=3088" title="Chlorophyta; Species: Tetradesmus obliquus">Tetradesmus obliquus strain KS3-2</a>
+</td>
+<td><a href="/nuccore/11467911">NC_002254</a></td>
+complete</td>
+<td align="right">42781&nbsp;nt</td>
+<td align="right">20&nbsp;</td>
+<td align="right">33&nbsp;</td>
+<td align="right" class="Gray">06/05/1990</td>
+<td align="right" class="Gray">07/21/2016</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=1208065" class="unclassified" title="Chlorophyta; Species: Trebouxiophyceae sp. MX-AZ01">Trebouxiophyceae sp. MX-AZ01</a>
+</td>
+<td><a href="/nuccore/409052422">NC_018568</a></td>
+complete</td>
+<td align="right">74423&nbsp;nt</td>
+<td align="right">41&nbsp;</td>
+<td align="right">26&nbsp;</td>
+<td align="right" class="Gray">10/16/2012</td>
+<td align="right" class="Gray">07/10/2013</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=111617" title="Chlorophyta; Species: Ulva fasciata">Ulva fasciata</a>
+</td>
+<td><a href="/nuccore/938340384">NC_028081</a></td>
+complete</td>
+<td align="right">61614&nbsp;nt</td>
+<td align="right">36&nbsp;</td>
+<td align="right">29&nbsp;</td>
+<td align="right" class="Gray">10/14/2015</td>
+<td align="right" class="Gray">10/14/2015</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=83791" title="Chlorophyta; Species: Ulva flexuosa">Ulva flexuosa</a>
+</td>
+<td><a href="/nuccore/1241928957">NC_035809</a></td>
+complete</td>
+<td align="right">71545&nbsp;nt</td>
+<td align="right">41&nbsp;</td>
+<td align="right">29&nbsp;</td>
+<td align="right" class="Gray">09/13/2017</td>
+<td align="right" class="Gray">09/13/2017</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=63409" title="Chlorophyta; Species: Ulva linza">Ulva linza</a>
+</td>
+<td><a href="/nuccore/1011056512">NC_029701</a></td>
+complete</td>
+<td align="right">70858&nbsp;nt</td>
+<td align="right">28&nbsp;</td>
+<td align="right">24&nbsp;</td>
+<td align="right" class="Gray">03/28/2016</td>
+<td align="right" class="Gray">03/28/2016</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=3120" title="Chlorophyta; Species: Ulva pertusa">Ulva pertusa</a>
+</td>
+<td><a href="/nuccore/1238821081">NC_035722</a></td>
+complete</td>
+<td align="right">69333&nbsp;nt</td>
+<td align="right">43&nbsp;</td>
+<td align="right">28&nbsp;</td>
+<td align="right" class="Gray">08/31/2017</td>
+<td align="right" class="Gray">08/31/2017</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=51707" title="Chlorophyta; Species: Yamagishiella unicocca">Yamagishiella unicocca strain NIES-3982</a>
+</td>
+<td><a href="/nuccore/1150150426">NC_033969</a></td>
+complete</td>
+<td align="right">30876&nbsp;nt</td>
+<td align="right">12&nbsp;</td>
+<td align="right">15&nbsp;</td>
+<td align="right" class="Gray">02/27/2017</td>
+<td align="right" class="Gray">02/27/2017</td>
+</tr>
+<tr bgcolor="#F8F8F8">
+<td colspan="16">
+<a name="35493"></a>
+<a href="#maincontent" title="Go to the top of the page"><img src="/sutils/static/GP_IMAGE/drb_top.gif" border="0" align="right" alt="Go to the top of the page"></a>
+<span class="FamName">Streptophyta</span>
+</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=4573" title="Streptophyta; Species: Aegilops speltoides">Aegilops speltoides mitochondrial DNA</a>
+</td>
+<td><a href="/nuccore/556926995">NC_022666</a></td>
+complete</td>
+<td align="right">476091&nbsp;nt</td>
+<td align="right">34&nbsp;</td>
+<td align="right">35&nbsp;</td>
+<td align="right" class="Gray">11/05/2013</td>
+<td align="right" class="Gray">11/05/2013</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=38596" title="Streptophyta; Species: Ajuga reptans">Ajuga reptans</a>
+ / bugle</td>
+<td><a href="/nuccore/568245145">NC_023103</a></td>
+complete</td>
+<td align="right">352069&nbsp;nt</td>
+<td align="right">30&nbsp;</td>
+<td align="right">20&nbsp;</td>
+<td align="right" class="Gray">12/20/2013</td>
+<td align="right" class="Gray">07/29/2016</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=4679" title="Streptophyta; Species: Allium cepa">Allium cepa</a>
+ / onion</td>
+<td><a href="/nuccore/1028369727">NC_030100</a></td>
+complete</td>
+<td align="right">316363&nbsp;nt</td>
+<td align="right">26&nbsp;</td>
+<td align="right">18&nbsp;</td>
+<td align="right" class="Gray">05/16/2016</td>
+<td align="right" class="Gray">05/16/2016</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=126911" title="Streptophyta; Species: Ammopiptanthus mongolicus">Ammopiptanthus mongolicus</a>
+</td>
+<td><a href="/nuccore/1511253925">NC_039660</a></td>
+complete</td>
+<td align="right">475396&nbsp;nt</td>
+<td align="right">79&nbsp;</td>
+<td align="right">47&nbsp;</td>
+<td align="right" class="Gray">11/09/2018</td>
+<td align="right" class="Gray">11/09/2018</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=39026" title="Streptophyta; Species: Aneura pinguis">Aneura pinguis</a>
+</td>
+<td><a href="/nuccore/813426483">NC_026901</a></td>
+complete</td>
+<td align="right">165603&nbsp;nt</td>
+<td align="right">40&nbsp;</td>
+<td align="right">30&nbsp;</td>
+<td align="right" class="Gray">04/22/2015</td>
+<td align="right" class="Gray">04/22/2015</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=119543" title="Streptophyta; Species: Anomodon attenuatus">Anomodon attenuatus</a>
+</td>
+<td><a href="/nuccore/529249678">NC_021931</a></td>
+complete</td>
+<td align="right">104252&nbsp;nt</td>
+<td align="right">40&nbsp;</td>
+<td align="right">27&nbsp;</td>
+<td align="right" class="Gray">08/06/2013</td>
+<td align="right" class="Gray">02/25/2015</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=84230" title="Streptophyta; Species: Anomodon rugelii">Anomodon rugelii</a>
+</td>
+<td><a href="/nuccore/353526533">NC_016121</a></td>
+complete</td>
+<td align="right">104239&nbsp;nt</td>
+<td align="right">46&nbsp;</td>
+<td align="right">27&nbsp;</td>
+<td align="right" class="Gray">10/21/2011</td>
+<td align="right" class="Gray">10/03/2018</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=48387" title="Streptophyta; Species: Anthoceros angustus">Anthoceros angustus</a>
+</td>
+<td><a href="/nuccore/1381391280">NC_037476</a></td>
+complete</td>
+<td align="right">242410&nbsp;nt</td>
+<td align="right">49&nbsp;</td>
+<td align="right">23&nbsp;</td>
+<td align="right" class="Gray">04/24/2018</td>
+<td align="right" class="Gray">04/24/2018</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=3702" title="Streptophyta; Species: Arabidopsis thaliana">Arabidopsis thaliana ecotype Col-0</a>
+ / thale cress</td>
+<td><a href="/nuccore/1373662007">NC_037304</a></td>
+complete</td>
+<td align="right">367808&nbsp;nt</td>
+<td align="right">33&nbsp;</td>
+<td align="right">279&nbsp;</td>
+<td align="right" class="Gray">04/03/2018</td>
+<td align="right" class="Gray">10/10/2018</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=48545" title="Streptophyta; Species: Asclepias syriaca">Asclepias syriaca</a>
+</td>
+<td><a href="/nuccore/557923428">NC_022796</a></td>
+complete</td>
+<td align="right">682498&nbsp;nt</td>
+<td align="right">37&nbsp;</td>
+<td align="right">30&nbsp;</td>
+<td align="right" class="Gray">11/14/2013</td>
+<td align="right" class="Gray">07/28/2016</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=37310" title="Streptophyta; Species: Atrichum angustatum">Atrichum angustatum</a>
+</td>
+<td><a href="/nuccore/669017329">NC_024520</a></td>
+complete</td>
+<td align="right">115146&nbsp;nt</td>
+<td align="right">40&nbsp;</td>
+<td align="right">27&nbsp;</td>
+<td align="right" class="Gray">07/28/2014</td>
+<td align="right" class="Gray">06/03/2015</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=52976" title="Streptophyta; Species: Bartramia pomiformis">Bartramia pomiformis</a>
+</td>
+<td><a href="/nuccore/669017288">NC_024519</a></td>
+complete</td>
+<td align="right">106198&nbsp;nt</td>
+<td align="right">40&nbsp;</td>
+<td align="right">27&nbsp;</td>
+<td align="right" class="Gray">07/28/2014</td>
+<td align="right" class="Gray">06/03/2015</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=4436" title="Streptophyta; Species: Batis maritima">Batis maritima</a>
+</td>
+<td><a href="/nuccore/661813519">NC_024429</a></td>
+complete</td>
+<td align="right">403930&nbsp;nt</td>
+<td align="right">112&nbsp;</td>
+<td align="right">23&nbsp;</td>
+<td align="right" class="Gray">07/01/2014</td>
+<td align="right" class="Gray">07/01/2014</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=343494" title="Streptophyta; Species: Beta macrocarpa">Beta macrocarpa</a>
+</td>
+<td><a href="/nuccore/346683116">NC_015994</a></td>
+complete</td>
+<td align="right">385220&nbsp;nt</td>
+<td align="right">156&nbsp;</td>
+<td align="right">31&nbsp;</td>
+<td align="right" class="Gray">09/05/2011</td>
+<td align="right" class="Gray">09/14/2011</td>
+</tr>
+<tr bgcolor="#F8F8F8">
+<td colspan="16">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="Gray">Beta vulgaris</span>
+</td>
+</tr>
+<tr bgcolor="#F8F8F8">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=350892" title="Streptophyta; Species: Beta vulgaris">Beta vulgaris subsp. maritima</a>
+</td>
+<td><a href="/nuccore/323435021">NC_015099</a></td>
+complete</td>
+<td align="right">364950&nbsp;nt</td>
+<td align="right">150&nbsp;</td>
+<td align="right">29&nbsp;</td>
+<td align="right" class="Gray">01/18/2011</td>
+<td align="right" class="Gray">02/15/2011</td>
+</tr>
+<tr bgcolor="#F8F8F8">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=3555" title="Streptophyta; Species: Beta vulgaris">Beta vulgaris subsp. vulgaris</a>
+</td>
+<td><a href="/nuccore/108469695">NC_002511</a></td>
+complete</td>
+<td align="right">368801&nbsp;nt</td>
+<td align="right">140&nbsp;</td>
+<td align="right">31&nbsp;</td>
+<td align="right" class="Gray">07/27/2000</td>
+<td align="right" class="Gray">12/12/2011</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=472368" title="Streptophyta; Species: Dorcoceras hygrometricum">Boea hygrometrica</a>
+</td>
+<td><a href="/nuccore/377806968">NC_016741</a></td>
+complete</td>
+<td align="right">510519&nbsp;nt</td>
+<td align="right">32&nbsp;</td>
+<td align="right">31&nbsp;</td>
+<td align="right" class="Gray">02/22/2012</td>
+<td align="right" class="Gray">07/29/2016</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=45325" title="Streptophyta; Species: Bombax ceiba">Bombax ceiba</a>
+ / Indian kapok</td>
+<td><a href="/nuccore/1436049376">NC_038052</a></td>
+complete</td>
+<td align="right">594390&nbsp;nt</td>
+<td align="right">34&nbsp;</td>
+<td align="right">28&nbsp;</td>
+<td align="right" class="Gray">07/31/2018</td>
+<td align="right" class="Gray">07/31/2018</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=90277" title="Streptophyta; Species: Brachythecium rivulare">Brachythecium rivulare</a>
+</td>
+<td><a href="/nuccore/1070113796">NC_031212</a></td>
+complete</td>
+<td align="right">104460&nbsp;nt</td>
+<td align="right">46&nbsp;</td>
+<td align="right">27&nbsp;</td>
+<td align="right" class="Gray">09/23/2016</td>
+<td align="right" class="Gray">09/23/2016</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=52824" title="Streptophyta; Species: Brassica carinata">Brassica carinata</a>
+</td>
+<td><a href="/nuccore/353526463">NC_016120</a></td>
+complete</td>
+<td align="right">232241&nbsp;nt</td>
+<td align="right">69&nbsp;</td>
+<td align="right">20&nbsp;</td>
+<td align="right" class="Gray">10/21/2011</td>
+<td align="right" class="Gray">10/21/2011</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=3707" title="Streptophyta; Species: Brassica juncea">Brassica juncea</a>
+</td>
+<td><a href="/nuccore/353531331">NC_016123</a></td>
+complete</td>
+<td align="right">219766&nbsp;nt</td>
+<td align="right">78&nbsp;</td>
+<td align="right">21&nbsp;</td>
+<td align="right" class="Gray">10/21/2011</td>
+<td align="right" class="Gray">10/21/2011</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=3708" title="Streptophyta; Species: Brassica napus">Brassica napus</a>
+ / rape</td>
+<td><a href="/nuccore/112253843">NC_008285</a></td>
+complete</td>
+<td align="right">221853&nbsp;nt</td>
+<td align="right">79&nbsp;</td>
+<td align="right">20&nbsp;</td>
+<td align="right" class="Gray">08/14/2006</td>
+<td align="right" class="Gray">01/25/2010</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=3710" title="Streptophyta; Species: Brassica nigra">Brassica nigra</a>
+ / black mustard</td>
+<td><a href="/nuccore/992329667">NC_029182</a></td>
+complete</td>
+<td align="right">232407&nbsp;nt</td>
+<td align="right">77&nbsp;</td>
+<td align="right">22&nbsp;</td>
+<td align="right" class="Gray">02/12/2016</td>
+<td align="right" class="Gray">07/29/2016</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=3712" title="Streptophyta; Species: Brassica oleracea">Brassica oleracea</a>
+ / wild cabbage</td>
+<td><a href="/nuccore/353526371">NC_016118</a></td>
+complete</td>
+<td align="right">360271&nbsp;nt</td>
+<td align="right">77&nbsp;</td>
+<td align="right">21&nbsp;</td>
+<td align="right" class="Gray">10/21/2011</td>
+<td align="right" class="Gray">10/21/2011</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=145471" title="Streptophyta; Species: Brassica rapa">Brassica rapa subsp. campestris</a>
+</td>
+<td><a href="/nuccore/353526650">NC_016125</a></td>
+complete</td>
+<td align="right">219747&nbsp;nt</td>
+<td align="right">78&nbsp;</td>
+<td align="right">21&nbsp;</td>
+<td align="right" class="Gray">10/21/2011</td>
+<td align="right" class="Gray">10/21/2011</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=1079090" title="Streptophyta; Species: Bucklandiella orthotrichacea">Bucklandiella orthotrichacea</a>
+</td>
+<td><a href="/nuccore/817526368">NC_026974</a></td>
+complete</td>
+<td align="right">107215&nbsp;nt</td>
+<td align="right">39&nbsp;</td>
+<td align="right">27&nbsp;</td>
+<td align="right" class="Gray">05/05/2015</td>
+<td align="right" class="Gray">05/05/2015</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=46367" title="Streptophyta; Species: Bupleurum falcatum">Bupleurum falcatum</a>
+</td>
+<td><a href="/nuccore/1252313584">NC_035962</a></td>
+complete</td>
+<td align="right">463792&nbsp;nt</td>
+<td align="right">59&nbsp;</td>
+<td align="right">22&nbsp;</td>
+<td align="right" class="Gray">10/06/2017</td>
+<td align="right" class="Gray">10/06/2017</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=50236" title="Streptophyta; Species: Butomus umbellatus">Butomus umbellatus</a>
+</td>
+<td><a href="/nuccore/511782593">NC_021399</a></td>
+complete</td>
+<td align="right">450826&nbsp;nt</td>
+<td align="right">30&nbsp;</td>
+<td align="right">20&nbsp;</td>
+<td align="right" class="Gray">06/13/2013</td>
+<td align="right" class="Gray">11/05/2013</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=70128" title="Streptophyta; Species: Buxbaumia aphylla">Buxbaumia aphylla</a>
+</td>
+<td><a href="/nuccore/669017248">NC_024518</a></td>
+complete</td>
+<td align="right">100725&nbsp;nt</td>
+<td align="right">39&nbsp;</td>
+<td align="right">27&nbsp;</td>
+<td align="right" class="Gray">07/28/2014</td>
+<td align="right" class="Gray">06/03/2015</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=41852" title="Streptophyta; Species: Calypogeia arguta">Calypogeia arguta</a>
+</td>
+<td><a href="/nuccore/1252314724">NC_035978</a></td>
+complete</td>
+<td align="right">159061&nbsp;nt</td>
+<td align="right">42&nbsp;</td>
+<td align="right">30&nbsp;</td>
+<td align="right" class="Gray">10/06/2017</td>
+<td align="right" class="Gray">10/06/2017</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=70143" title="Streptophyta; Species: Calypogeia integristipula">Calypogeia integristipula</a>
+</td>
+<td><a href="/nuccore/1252314681">NC_035977</a></td>
+complete</td>
+<td align="right">163057&nbsp;nt</td>
+<td align="right">42&nbsp;</td>
+<td align="right">31&nbsp;</td>
+<td align="right" class="Gray">10/06/2017</td>
+<td align="right" class="Gray">10/06/2017</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=1263430" title="Streptophyta; Species: Calypogeia neogaea">Calypogeia neogaea</a>
+</td>
+<td><a href="/nuccore/1252314810">NC_035980</a></td>
+complete</td>
+<td align="right">162175&nbsp;nt</td>
+<td align="right">42&nbsp;</td>
+<td align="right">31&nbsp;</td>
+<td align="right" class="Gray">10/06/2017</td>
+<td align="right" class="Gray">10/06/2017</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=373805" title="Streptophyta; Species: Calypogeia suecica">Calypogeia suecica</a>
+</td>
+<td><a href="/nuccore/1252314767">NC_035979</a></td>
+complete</td>
+<td align="right">161960&nbsp;nt</td>
+<td align="right">42&nbsp;</td>
+<td align="right">31&nbsp;</td>
+<td align="right" class="Gray">10/06/2017</td>
+<td align="right" class="Gray">10/06/2017</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=4072" title="Streptophyta; Species: Capsicum annuum">Capsicum annuum cultivar Jeju</a>
+</td>
+<td><a href="/nuccore/675895159">NC_024624</a></td>
+complete</td>
+<td align="right">511530&nbsp;nt</td>
+<td align="right">193&nbsp;</td>
+<td align="right">28&nbsp;</td>
+<td align="right" class="Gray">09/03/2014</td>
+<td align="right" class="Gray">09/03/2014</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=3649" title="Streptophyta; Species: Carica papaya">Carica papaya</a>
+ / papaya</td>
+<td><a href="/nuccore/224020948">NC_012116</a></td>
+complete</td>
+<td align="right">476890&nbsp;nt</td>
+<td align="right">39&nbsp;</td>
+<td align="right">22&nbsp;</td>
+<td align="right" class="Gray">02/24/2009</td>
+<td align="right" class="Gray">09/15/2011</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=1857654" title="Streptophyta; Species: Castilleja paramensis">Castilleja paramensis</a>
+</td>
+<td><a href="/nuccore/1102547721">NC_031806</a></td>
+complete</td>
+<td align="right">495499&nbsp;nt</td>
+<td align="right">34&nbsp;</td>
+<td align="right">32&nbsp;</td>
+<td align="right" class="Gray">11/14/2016</td>
+<td align="right" class="Gray">01/26/2017</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=96477" title="Streptophyta; Species: Chaetosphaeridium globosum">Chaetosphaeridium globosum</a>
+</td>
+<td><a href="/nuccore/22550330">NC_004118</a></td>
+complete</td>
+<td align="right">56574&nbsp;nt</td>
+<td align="right">46&nbsp;</td>
+<td align="right">31&nbsp;</td>
+<td align="right" class="Gray">08/22/2002</td>
+<td align="right" class="Gray">02/01/2010</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=55564" title="Streptophyta; Species: Chara vulgaris">Chara vulgaris</a>
+</td>
+<td><a href="/nuccore/38638270">NC_005255</a></td>
+complete</td>
+<td align="right">67737&nbsp;nt</td>
+<td align="right">46&nbsp;</td>
+<td align="right">30&nbsp;</td>
+<td align="right" class="Gray">12/03/2003</td>
+<td align="right" class="Gray">02/01/2010</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=3144" title="Streptophyta; Species: Chlorokybus atmophyticus">Chlorokybus atmophyticus</a>
+</td>
+<td><a href="/nuccore/150406455">NC_009630</a></td>
+complete</td>
+<td align="right">201763&nbsp;nt</td>
+<td align="right">58&nbsp;</td>
+<td align="right">31&nbsp;</td>
+<td align="right" class="Gray">07/03/2007</td>
+<td align="right" class="Gray">08/07/2007</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=344871" title="Streptophyta; Species: Chrysanthemum boreale">Chrysanthemum boreale</a>
+</td>
+<td><a href="/nuccore/1511245806">NC_039757</a></td>
+complete</td>
+<td align="right">211002&nbsp;nt</td>
+<td align="right">32&nbsp;</td>
+<td align="right">22&nbsp;</td>
+<td align="right" class="Gray">11/09/2018</td>
+<td align="right" class="Gray">11/09/2018</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=3654" title="Streptophyta; Species: Citrullus lanatus">Citrullus lanatus</a>
+</td>
+<td><a href="/nuccore/295311632">NC_014043</a></td>
+complete</td>
+<td align="right">379236&nbsp;nt</td>
+<td align="right">39&nbsp;</td>
+<td align="right">21&nbsp;</td>
+<td align="right" class="Gray">04/27/2010</td>
+<td align="right" class="Gray">12/06/2010</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=2711" title="Streptophyta; Species: Citrus sinensis">Citrus sinensis</a>
+ / sweet orange</td>
+<td><a href="/nuccore/1381390543">NC_037463</a></td>
+complete</td>
+<td align="right">640906&nbsp;nt</td>
+<td align="right">33&nbsp;</td>
+<td align="right">38&nbsp;</td>
+<td align="right" class="Gray">04/24/2018</td>
+<td align="right" class="Gray">04/24/2018</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=94443" title="Streptophyta; Species: Climacium americanum">Climacium americanum</a>
+</td>
+<td><a href="/nuccore/669017125">NC_024515</a></td>
+complete</td>
+<td align="right">105048&nbsp;nt</td>
+<td align="right">40&nbsp;</td>
+<td align="right">27&nbsp;</td>
+<td align="right" class="Gray">07/28/2014</td>
+<td align="right" class="Gray">10/03/2018</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=1416941" title="Streptophyta; Species: Closterium baillyanum">Closterium baillyanum culture-collection SAG:50.89</a>
+</td>
+<td><a href="/nuccore/558603931">NC_022860</a></td>
+complete</td>
+<td align="right">152089&nbsp;nt</td>
+<td align="right">49&nbsp;</td>
+<td align="right">31&nbsp;</td>
+<td align="right" class="Gray">11/19/2013</td>
+<td align="right" class="Gray">01/26/2017</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=13894" title="Streptophyta; Species: Cocos nucifera">Cocos nucifera</a>
+ / coconut palm</td>
+<td><a href="/nuccore/1099220834">NC_031696</a></td>
+complete</td>
+<td align="right">678653&nbsp;nt</td>
+<td align="right">81&nbsp;</td>
+<td align="right">47&nbsp;</td>
+<td align="right" class="Gray">11/04/2016</td>
+<td align="right" class="Gray">11/04/2016</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=296905" title="Streptophyta; Species: Codriophorus aciculare">Codriophorus aciculare isolate Cacicularis1</a>
+</td>
+<td><a href="/nuccore/806636851">NC_026784</a></td>
+complete</td>
+<td align="right">106818&nbsp;nt</td>
+<td align="right">39&nbsp;</td>
+<td align="right">27&nbsp;</td>
+<td align="right" class="Gray">04/08/2015</td>
+<td align="right" class="Gray">04/08/2015</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=1079087" title="Streptophyta; Species: Dilutineuron laevigatum">Codriophorus laevigatus voucher KRAM B-190278</a>
+</td>
+<td><a href="/nuccore/734703113">NC_025931</a></td>
+complete</td>
+<td align="right">106809&nbsp;nt</td>
+<td align="right">39&nbsp;</td>
+<td align="right">27&nbsp;</td>
+<td align="right" class="Gray">12/18/2014</td>
+<td align="right" class="Gray">12/18/2014</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=1286318" title="Streptophyta; Species: Frisvollia varia">Codriophorus varius</a>
+</td>
+<td><a href="/nuccore/813425098">NC_026891</a></td>
+complete</td>
+<td align="right">106358&nbsp;nt</td>
+<td align="right">39&nbsp;</td>
+<td align="right">27&nbsp;</td>
+<td align="right" class="Gray">04/22/2015</td>
+<td align="right" class="Gray">04/22/2015</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=210143" title="Streptophyta; Species: Corchorus capsularis">Corchorus capsularis</a>
+</td>
+<td><a href="/nuccore/1079485733">NC_031359</a></td>
+complete</td>
+<td align="right">1999602&nbsp;nt</td>
+<td align="right">37&nbsp;</td>
+<td align="right">34&nbsp;</td>
+<td align="right" class="Gray">10/13/2016</td>
+<td align="right" class="Gray">10/13/2016</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=93759" title="Streptophyta; Species: Corchorus olitorius">Corchorus olitorius</a>
+</td>
+<td><a href="/nuccore/1079485771">NC_031360</a></td>
+complete</td>
+<td align="right">1829341&nbsp;nt</td>
+<td align="right">35&nbsp;</td>
+<td align="right">37&nbsp;</td>
+<td align="right" class="Gray">10/13/2016</td>
+<td align="right" class="Gray">10/13/2016</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<img border="0" src="/sutils/static/GP_IMAGE/plus.png" alt="toggle on/off" id="Toggle_3659" class="GGtgl"><a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=3659" title="Streptophyta; Species: Cucumis sativus">Cucumis sativus</a>
+ / cucumber</td>
+<td></td>
+complete</td>
+<td align="right">1684592&nbsp;nt</td>
+<td align="right">37&nbsp;</td>
+<td align="right">26&nbsp;</td>
+<td align="right" class="Gray">09/14/2011</td>
+<td align="right" class="Gray">09/14/2011</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td colspan="9"><div id="SDescr_3659" style="display: none">
+<table class="segmtbl" sellspacing="1" cellpadding="1">
+<tr>
+<td><a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=3659" title="Streptophyta; Species: Cucumis sativus">Cucumis sativus mitochondrion chromosome 1</a>
+</td>
+<td><span class="tblTxt">(1555935 nt)</span>
+</td>
+<td><a href="/nuccore/346683357">NC_016005</a></td>
+<td><span class="tblTxt">proteins: 37</span></td>
+<td><span class="tblTxt">RNA: </span>26</td>
+</tr>
+<tr>
+<td><a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=3659" title="Streptophyta; Species: Cucumis sativus">Cucumis sativus mitochondrion chromosome 2</a>
+</td>
+<td><span class="tblTxt">(83817 nt)</span>
+</td>
+<td><a href="/nuccore/346506133">NC_016004</a></td>
+</tr>
+<tr>
+<td><a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=3659" title="Streptophyta; Species: Cucumis sativus">Cucumis sativus mitochondrion chromosome 3</a>
+</td>
+<td><span class="tblTxt">(44840 nt)</span>
+</td>
+<td><a href="/nuccore/346506134">NC_016006</a></td>
+</tr>
+</table>
+</div>
+</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=3663" title="Streptophyta; Species: Cucurbita pepo">Cucurbita pepo</a>
+</td>
+<td><a href="/nuccore/295311672">NC_014050</a></td>
+complete</td>
+<td align="right">982833&nbsp;nt</td>
+<td align="right">38&nbsp;</td>
+<td align="right">16&nbsp;</td>
+<td align="right" class="Gray">04/27/2010</td>
+<td align="right" class="Gray">12/06/2010</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=54799" title="Streptophyta; Species: Cycas taitungensis">Cycas taitungensis</a>
+</td>
+<td><a href="/nuccore/166895601">NC_010303</a></td>
+complete</td>
+<td align="right">414903&nbsp;nt</td>
+<td align="right">39&nbsp;</td>
+<td align="right">29&nbsp;</td>
+<td align="right" class="Gray">02/05/2008</td>
+<td align="right" class="Gray">11/04/2008</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=79200" title="Streptophyta; Species: Daucus carota">Daucus carota subsp. sativus</a>
+</td>
+<td><a href="/nuccore/386799229">NC_017855</a></td>
+complete</td>
+<td align="right">281132&nbsp;nt</td>
+<td align="right">90&nbsp;</td>
+<td align="right">29&nbsp;</td>
+<td align="right" class="Gray">05/09/2012</td>
+<td align="right" class="Gray">10/06/2015</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=1716017" title="Streptophyta; Species: Diplostephium hartwegii">Diplostephium hartwegii voucher TEX:Vargas 456</a>
+</td>
+<td><a href="/nuccore/1182635699">NC_034354</a></td>
+complete</td>
+<td align="right">277718&nbsp;nt</td>
+<td align="right">35&nbsp;</td>
+<td align="right">24&nbsp;</td>
+<td align="right" class="Gray">04/19/2017</td>
+<td align="right" class="Gray">04/19/2017</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=130991" title="Streptophyta; Species: Entransia fimbriata">Entransia fimbriata culture-collection UTEX:LB 2353</a>
+</td>
+<td><a href="/nuccore/558603981">NC_022861</a></td>
+complete</td>
+<td align="right">61645&nbsp;nt</td>
+<td align="right">35&nbsp;</td>
+<td align="right">33&nbsp;</td>
+<td align="right" class="Gray">11/19/2013</td>
+<td align="right" class="Gray">11/19/2013</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=71139" title="Streptophyta; Species: Eucalyptus grandis">Eucalyptus grandis</a>
+</td>
+<td><a href="/nuccore/1526695003">NC_040010</a></td>
+complete</td>
+<td align="right">478813&nbsp;nt</td>
+<td align="right">38&nbsp;</td>
+<td align="right">24&nbsp;</td>
+<td align="right" class="Gray">12/03/2018</td>
+<td align="right" class="Gray">12/03/2018</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=29583" title="Streptophyta; Species: Funaria hygrometrica">Funaria hygrometrica</a>
+</td>
+<td><a href="/nuccore/669017452">NC_024523</a></td>
+complete</td>
+<td align="right">109586&nbsp;nt</td>
+<td align="right">40&nbsp;</td>
+<td align="right">27&nbsp;</td>
+<td align="right" class="Gray">07/28/2014</td>
+<td align="right" class="Gray">06/03/2015</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=28964" title="Streptophyta; Species: Geranium maderense">Geranium maderense voucher TEX:Weng G1046</a>
+</td>
+<td><a href="/nuccore/817530539">NC_027000</a></td>
+complete</td>
+<td align="right">737091&nbsp;nt</td>
+<td align="right">27&nbsp;</td>
+<td align="right">34&nbsp;</td>
+<td align="right" class="Gray">05/05/2015</td>
+<td align="right" class="Gray">07/29/2016</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=3311" title="Streptophyta; Species: Ginkgo biloba">Ginkgo biloba</a>
+ / maidenhair tree</td>
+<td><a href="/nuccore/937408974">NC_027976</a></td>
+complete</td>
+<td align="right">346544&nbsp;nt</td>
+<td align="right">40&nbsp;</td>
+<td align="right">26&nbsp;</td>
+<td align="right" class="Gray">10/07/2015</td>
+<td align="right" class="Gray">10/07/2015</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=3847" title="Streptophyta; Species: Glycine max">Glycine max</a>
+ / soybean</td>
+<td><a href="/nuccore/476507670">NC_020455</a></td>
+complete</td>
+<td align="right">402558&nbsp;nt</td>
+<td align="right">88&nbsp;</td>
+<td align="right">22&nbsp;</td>
+<td align="right" class="Gray">04/08/2013</td>
+<td align="right" class="Gray">04/18/2013</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=3848" title="Streptophyta; Species: Glycine soja">Glycine soja</a>
+</td>
+<td><a href="/nuccore/1511246382">NC_039768</a></td>
+complete</td>
+<td align="right">402545&nbsp;nt</td>
+<td align="right">88&nbsp;</td>
+<td align="right">22&nbsp;</td>
+<td align="right" class="Gray">11/09/2018</td>
+<td align="right" class="Gray">11/09/2018</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=29729" title="Streptophyta; Species: Gossypium arboreum">Gossypium arboreum</a>
+</td>
+<td><a href="/nuccore/1207372397">NC_035073</a></td>
+complete</td>
+<td align="right">687482&nbsp;nt</td>
+<td align="right">39&nbsp;</td>
+<td align="right">35&nbsp;</td>
+<td align="right" class="Gray">06/15/2017</td>
+<td align="right" class="Gray">06/15/2017</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=3634" title="Streptophyta; Species: Gossypium barbadense">Gossypium barbadense</a>
+ / sea-island cotton</td>
+<td><a href="/nuccore/947838264">NC_028254</a></td>
+complete</td>
+<td align="right">677434&nbsp;nt</td>
+<td align="right">36&nbsp;</td>
+<td align="right">27&nbsp;</td>
+<td align="right" class="Gray">11/04/2015</td>
+<td align="right" class="Gray">07/29/2016</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=34287" title="Streptophyta; Species: Gossypium davidsonii">Gossypium davidsonii</a>
+</td>
+<td><a href="/nuccore/1207372437">NC_035075</a></td>
+complete</td>
+<td align="right">644311&nbsp;nt</td>
+<td align="right">36&nbsp;</td>
+<td align="right">33&nbsp;</td>
+<td align="right" class="Gray">06/15/2017</td>
+<td align="right" class="Gray">06/15/2017</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=34285" title="Streptophyta; Species: Gossypium harknessii">Gossypium harknessii</a>
+</td>
+<td><a href="/nuccore/849123258">NC_027407</a></td>
+complete</td>
+<td align="right">666081&nbsp;nt</td>
+<td align="right">33&nbsp;</td>
+<td align="right">32&nbsp;</td>
+<td align="right" class="Gray">06/24/2015</td>
+<td align="right" class="Gray">06/24/2015</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=3635" title="Streptophyta; Species: Gossypium hirsutum">Gossypium hirsutum</a>
+ / cotton</td>
+<td><a href="/nuccore/849123217">NC_027406</a></td>
+complete</td>
+<td align="right">668584&nbsp;nt</td>
+<td align="right">34&nbsp;</td>
+<td align="right">33&nbsp;</td>
+<td align="right" class="Gray">06/24/2015</td>
+<td align="right" class="Gray">06/24/2015</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=29730" title="Streptophyta; Species: Gossypium raimondii">Gossypium raimondii</a>
+</td>
+<td><a href="/nuccore/1024325351">NC_029998</a></td>
+complete</td>
+<td align="right">676078&nbsp;nt</td>
+<td align="right">39&nbsp;</td>
+<td align="right">36&nbsp;</td>
+<td align="right" class="Gray">04/29/2016</td>
+<td align="right" class="Gray">06/27/2016</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=34273" title="Streptophyta; Species: Gossypium thurberi">Gossypium thurberi</a>
+</td>
+<td><a href="/nuccore/1314948901">NC_035074</a></td>
+complete</td>
+<td align="right">644395&nbsp;nt</td>
+<td align="right">36&nbsp;</td>
+<td align="right">33&nbsp;</td>
+<td align="right" class="Gray">12/18/2017</td>
+<td align="right" class="Gray">12/18/2017</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=34281" title="Streptophyta; Species: Gossypium trilobum">Gossypium trilobum</a>
+</td>
+<td><a href="/nuccore/1207372474">NC_035076</a></td>
+complete</td>
+<td align="right">644460&nbsp;nt</td>
+<td align="right">36&nbsp;</td>
+<td align="right">33&nbsp;</td>
+<td align="right" class="Gray">06/15/2017</td>
+<td align="right" class="Gray">06/15/2017</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=4232" title="Streptophyta; Species: Helianthus annuus">Helianthus annuus</a>
+ / common sunflower</td>
+<td><a href="/nuccore/575925486">NC_023337</a></td>
+complete</td>
+<td align="right">300945&nbsp;nt</td>
+<td align="right">26&nbsp;</td>
+<td align="right">18&nbsp;</td>
+<td align="right" class="Gray">01/24/2014</td>
+<td align="right" class="Gray">01/18/2018</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=126429" title="Streptophyta; Species: Hesperelaea palmeri">Hesperelaea palmeri voucher E. Palmer 81 (MO)</a>
+</td>
+<td><a href="/nuccore/1072314228">NC_031323</a></td>
+complete</td>
+<td align="right">658522&nbsp;nt</td>
+<td align="right">48&nbsp;</td>
+<td align="right">22&nbsp;</td>
+<td align="right" class="Gray">10/01/2016</td>
+<td align="right" class="Gray">10/01/2016</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=229543" title="Streptophyta; Species: Hibiscus cannabinus">Hibiscus cannabinus</a>
+</td>
+<td><a href="/nuccore/1236517134">NC_035549</a></td>
+complete</td>
+<td align="right">569915&nbsp;nt</td>
+<td align="right">37&nbsp;</td>
+<td align="right">32&nbsp;</td>
+<td align="right" class="Gray">08/24/2017</td>
+<td align="right" class="Gray">08/24/2017</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=73615" title="Streptophyta; Species: Phlegmariurus squarrosus">Huperzia squarrosa</a>
+</td>
+<td><a href="/nuccore/385099735">NC_017755</a></td>
+complete</td>
+<td align="right">413530&nbsp;nt</td>
+<td align="right">147&nbsp;</td>
+<td align="right">40&nbsp;</td>
+<td align="right" class="Gray">04/20/2012</td>
+<td align="right" class="Gray">10/03/2018</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=4079" title="Streptophyta; Species: Hyoscyamus niger">Hyoscyamus niger</a>
+ / henbane</td>
+<td><a href="/nuccore/814071725">NC_026515</a></td>
+complete</td>
+<td align="right">501401&nbsp;nt</td>
+<td align="right">38&nbsp;</td>
+<td align="right">32&nbsp;</td>
+<td align="right" class="Gray">04/22/2015</td>
+<td align="right" class="Gray">09/17/2018</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=49762" title="Streptophyta; Species: Hypnum imponens">Hypnum imponens</a>
+</td>
+<td><a href="/nuccore/669017166">NC_024516</a></td>
+complete</td>
+<td align="right">103830&nbsp;nt</td>
+<td align="right">40&nbsp;</td>
+<td align="right">27&nbsp;</td>
+<td align="right" class="Gray">07/28/2014</td>
+<td align="right" class="Gray">06/03/2015</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=35883" title="Streptophyta; Species: Ipomoea nil">Ipomoea nil mitochondrial DNA</a>
+ / Japanese morning glory</td>
+<td><a href="/nuccore/1075059435">NC_031158</a></td>
+complete</td>
+<td align="right">265768&nbsp;nt</td>
+<td align="right">30&nbsp;</td>
+<td align="right">23&nbsp;</td>
+<td align="right" class="Gray">10/07/2016</td>
+<td align="right" class="Gray">10/07/2016</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=141186" title="Streptophyta; Species: Lagerstroemia indica">Lagerstroemia indica</a>
+</td>
+<td><a href="/nuccore/1236518757">NC_035616</a></td>
+complete</td>
+<td align="right">333948&nbsp;nt</td>
+<td align="right">36&nbsp;</td>
+<td align="right">19&nbsp;</td>
+<td align="right" class="Gray">08/24/2017</td>
+<td align="right" class="Gray">08/28/2017</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=190760" title="Streptophyta; Species: Leucaena trichandra">Leucaena trichandra</a>
+</td>
+<td><a href="/nuccore/1511244784">NC_039738</a></td>
+complete</td>
+<td align="right">722009&nbsp;nt</td>
+<td align="right">38&nbsp;</td>
+<td align="right">22&nbsp;</td>
+<td align="right" class="Gray">11/09/2018</td>
+<td align="right" class="Gray">11/09/2018</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=3415" title="Streptophyta; Species: Liriodendron tulipifera">Liriodendron tulipifera</a>
+</td>
+<td><a href="/nuccore/484759929">NC_021152</a></td>
+complete</td>
+<td align="right">553721&nbsp;nt</td>
+<td align="right">42&nbsp;</td>
+<td align="right">24&nbsp;</td>
+<td align="right" class="Gray">04/30/2013</td>
+<td align="right" class="Gray">01/27/2014</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=34305" title="Streptophyta; Species: Lotus japonicus">Lotus japonicus</a>
+</td>
+<td><a href="/nuccore/387866040">NC_016743</a></td>
+complete</td>
+<td align="right">380861&nbsp;nt</td>
+<td align="right">34&nbsp;</td>
+<td align="right">23&nbsp;</td>
+<td align="right" class="Gray">01/17/2012</td>
+<td align="right" class="Gray">01/22/2013</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=3750" title="Streptophyta; Species: Malus domestica">Malus x domestica</a>
+ / apple</td>
+<td><a href="/nuccore/404481676">NC_018554</a></td>
+complete</td>
+<td align="right">396947&nbsp;nt</td>
+<td align="right">33&nbsp;</td>
+<td align="right">24&nbsp;</td>
+<td align="right" class="Gray">08/16/2012</td>
+<td align="right" class="Gray">09/14/2012</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=56867" title="Streptophyta; Species: Marchantia paleacea">Marchantia paleacea</a>
+</td>
+<td><a href="/nuccore/11467097">NC_001660</a></td>
+complete</td>
+<td align="right">186609&nbsp;nt</td>
+<td align="right">76&nbsp;</td>
+<td align="right">32&nbsp;</td>
+<td align="right" class="Gray">08/04/1993</td>
+<td align="right" class="Gray">12/19/2017</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=1480154" title="Streptophyta; Species: Marchantia polymorpha">Marchantia polymorpha subsp. ruderalis mitochondrial DNA</a>
+</td>
+<td><a href="/nuccore/1381394015">NC_037508</a></td>
+complete</td>
+<td align="right">186196&nbsp;nt</td>
+<td align="right">65&nbsp;</td>
+<td align="right">32&nbsp;</td>
+<td align="right" class="Gray">04/24/2018</td>
+<td align="right" class="Gray">04/24/2018</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=3880" title="Streptophyta; Species: Medicago truncatula">Medicago truncatula</a>
+ / barrel medic</td>
+<td><a href="/nuccore/1003725997">NC_029641</a></td>
+complete</td>
+<td align="right">271618&nbsp;nt</td>
+<td align="right">31&nbsp;</td>
+<td align="right">19&nbsp;</td>
+<td align="right" class="Gray">03/09/2016</td>
+<td align="right" class="Gray">03/09/2016</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=13813" title="Streptophyta; Species: Nothoceros aenigmaticus">Megaceros aenigmaticus</a>
+</td>
+<td><a href="/nuccore/229328233">NC_012651</a></td>
+complete</td>
+<td align="right">184908&nbsp;nt</td>
+<td align="right">48&nbsp;</td>
+<td align="right">21&nbsp;</td>
+<td align="right" class="Gray">05/01/2009</td>
+<td align="right" class="Gray">06/17/2009</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=41882" title="Streptophyta; Species: Mesostigma viride">Mesostigma viride</a>
+</td>
+<td><a href="/nuccore/110225676">NC_008240</a></td>
+complete</td>
+<td align="right">42424&nbsp;nt</td>
+<td align="right">41&nbsp;</td>
+<td align="right">29&nbsp;</td>
+<td align="right" class="Gray">07/07/2006</td>
+<td align="right" class="Gray">07/13/2006</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=67235" title="Streptophyta; Species: Mielichhoferia elongata">Mielichhoferia elongata</a>
+</td>
+<td><a href="/nuccore/1347725881">NC_036945</a></td>
+complete</td>
+<td align="right">100342&nbsp;nt</td>
+<td align="right">39&nbsp;</td>
+<td align="right">27&nbsp;</td>
+<td align="right" class="Gray">02/22/2018</td>
+<td align="right" class="Gray">02/22/2018</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=56065" title="Streptophyta; Species: Millettia pinnata">Millettia pinnata</a>
+</td>
+<td><a href="/nuccore/372450249">NC_016742</a></td>
+complete</td>
+<td align="right">425718&nbsp;nt</td>
+<td align="right">37&nbsp;</td>
+<td align="right">27&nbsp;</td>
+<td align="right" class="Gray">01/17/2012</td>
+<td align="right" class="Gray">01/22/2013</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=4155" title="Streptophyta; Species: Erythranthe guttata">Mimulus guttatus</a>
+ / spotted monkey flower</td>
+<td><a href="/nuccore/391348915">NC_018041</a></td>
+complete</td>
+<td align="right">525671&nbsp;nt</td>
+<td align="right">41&nbsp;</td>
+<td align="right">28&nbsp;</td>
+<td align="right" class="Gray">06/14/2012</td>
+<td align="right" class="Gray">06/14/2012</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=4432" title="Streptophyta; Species: Nelumbo nucifera">Nelumbo nucifera</a>
+ / sacred lotus</td>
+<td><a href="/nuccore/1052487892">NC_030753</a></td>
+complete</td>
+<td align="right">524797&nbsp;nt</td>
+<td align="right">44&nbsp;</td>
+<td align="right">27&nbsp;</td>
+<td align="right" class="Gray">08/16/2016</td>
+<td align="right" class="Gray">08/16/2016</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=49451" title="Streptophyta; Species: Nicotiana attenuata">Nicotiana attenuata</a>
+</td>
+<td><a href="/nuccore/1314948859">NC_036467</a></td>
+complete</td>
+<td align="right">394341&nbsp;nt</td>
+<td align="right">40&nbsp;</td>
+<td align="right">28&nbsp;</td>
+<td align="right" class="Gray">12/18/2017</td>
+<td align="right" class="Gray">12/18/2017</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=4096" title="Streptophyta; Species: Nicotiana sylvestris">Nicotiana sylvestris cultivar TW 137</a>
+ / wood tobacco</td>
+<td><a href="/nuccore/1016470551">NC_029805</a></td>
+complete</td>
+<td align="right">430597&nbsp;nt</td>
+<td align="right">37&nbsp;</td>
+<td align="right">27&nbsp;</td>
+<td align="right" class="Gray">04/09/2016</td>
+<td align="right" class="Gray">04/09/2016</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=4097" title="Streptophyta; Species: Nicotiana tabacum">Nicotiana tabacum</a>
+ / common tobacco</td>
+<td><a href="/nuccore/57013877">NC_006581</a></td>
+complete</td>
+<td align="right">430597&nbsp;nt</td>
+<td align="right">156&nbsp;</td>
+<td align="right">27&nbsp;</td>
+<td align="right" class="Gray">01/04/2005</td>
+<td align="right" class="Gray">10/12/2007</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=181804" title="Streptophyta; Species: Nitella hyalina">Nitella hyalina</a>
+</td>
+<td><a href="/nuccore/385153400">NC_017598</a></td>
+complete</td>
+<td align="right">80193&nbsp;nt</td>
+<td align="right">48&nbsp;</td>
+<td align="right">30&nbsp;</td>
+<td align="right" class="Gray">04/23/2012</td>
+<td align="right" class="Gray">04/23/2012</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=478072" title="Streptophyta; Species: Nyholmiella gymnostoma">Nyholmiella gymnostoma</a>
+</td>
+<td><a href="/nuccore/1079486984">NC_031391</a></td>
+complete</td>
+<td align="right">104638&nbsp;nt</td>
+<td align="right">40&nbsp;</td>
+<td align="right">27&nbsp;</td>
+<td align="right" class="Gray">10/13/2016</td>
+<td align="right" class="Gray">10/13/2016</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=61564" title="Streptophyta; Species: Nyholmiella obtusifolia">Nyholmiella obtusifolia</a>
+</td>
+<td><a href="/nuccore/1101669385">NC_031767</a></td>
+complete</td>
+<td align="right">104603&nbsp;nt</td>
+<td align="right">40&nbsp;</td>
+<td align="right">27&nbsp;</td>
+<td align="right" class="Gray">11/10/2016</td>
+<td align="right" class="Gray">11/10/2016</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=210225" title="Streptophyta; Species: Nymphaea colorata">Nymphaea colorata</a>
+</td>
+<td><a href="/nuccore/1381390732">NC_037468</a></td>
+complete</td>
+<td align="right">617195&nbsp;nt</td>
+<td align="right">42&nbsp;</td>
+<td align="right">23&nbsp;</td>
+<td align="right" class="Gray">04/24/2018</td>
+<td align="right" class="Gray">04/24/2018</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=1267209" title="Streptophyta; Species: Ophioglossum californicum">Ophioglossum californicum isolate v14</a>
+</td>
+<td><a href="/nuccore/1068357845">NC_030900</a></td>
+complete</td>
+<td align="right">372339&nbsp;nt</td>
+<td align="right">37&nbsp;</td>
+<td align="right">27&nbsp;</td>
+<td align="right" class="Gray">09/19/2016</td>
+<td align="right" class="Gray">09/19/2016</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=1903710" title="Streptophyta; Species: Orthotrichum bicolor">Orthotrichum bicolor</a>
+</td>
+<td><a href="/nuccore/1079486902">NC_031389</a></td>
+complete</td>
+<td align="right">104736&nbsp;nt</td>
+<td align="right">40&nbsp;</td>
+<td align="right">27&nbsp;</td>
+<td align="right" class="Gray">10/13/2016</td>
+<td align="right" class="Gray">10/13/2016</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=1903711" title="Streptophyta; Species: Orthotrichum callistomum">Orthotrichum callistomum</a>
+</td>
+<td><a href="/nuccore/1079486943">NC_031390</a></td>
+complete</td>
+<td align="right">104785&nbsp;nt</td>
+<td align="right">40&nbsp;</td>
+<td align="right">27&nbsp;</td>
+<td align="right" class="Gray">10/13/2016</td>
+<td align="right" class="Gray">10/13/2016</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=522324" title="Streptophyta; Species: Orthotrichum diaphanum">Orthotrichum diaphanum</a>
+</td>
+<td><a href="/nuccore/1002161500">NC_029356</a></td>
+complete</td>
+<td align="right">104744&nbsp;nt</td>
+<td align="right">40&nbsp;</td>
+<td align="right">27&nbsp;</td>
+<td align="right" class="Gray">03/01/2016</td>
+<td align="right" class="Gray">03/01/2016</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=279753" title="Streptophyta; Species: Orthotrichum macrocephalum">Orthotrichum macrocephalum</a>
+</td>
+<td><a href="/nuccore/1002161459">NC_029355</a></td>
+complete</td>
+<td align="right">104624&nbsp;nt</td>
+<td align="right">40&nbsp;</td>
+<td align="right">27&nbsp;</td>
+<td align="right" class="Gray">03/01/2016</td>
+<td align="right" class="Gray">03/01/2016</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=70136" title="Streptophyta; Species: Lewinskya speciosa">Orthotrichum speciosum voucher OL-M661543</a>
+</td>
+<td><a href="/nuccore/746948573">NC_026121</a></td>
+complete</td>
+<td align="right">104747&nbsp;nt</td>
+<td align="right">40&nbsp;</td>
+<td align="right">27&nbsp;</td>
+<td align="right" class="Gray">01/13/2015</td>
+<td align="right" class="Gray">08/04/2015</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=522327" title="Streptophyta; Species: Orthotrichum stellatum">Orthotrichum stellatum</a>
+</td>
+<td><a href="/nuccore/669017411">NC_024522</a></td>
+complete</td>
+<td align="right">104131&nbsp;nt</td>
+<td align="right">40&nbsp;</td>
+<td align="right">27&nbsp;</td>
+<td align="right" class="Gray">07/28/2014</td>
+<td align="right" class="Gray">06/03/2015</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=63629" title="Streptophyta; Species: Oryza minuta">Oryza minuta voucher W1340</a>
+</td>
+<td><a href="/nuccore/1016471130">NC_029816</a></td>
+complete</td>
+<td align="right">515022&nbsp;nt</td>
+<td align="right">59&nbsp;</td>
+<td align="right">33&nbsp;</td>
+<td align="right" class="Gray">04/09/2016</td>
+<td align="right" class="Gray">04/09/2016</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=4529" title="Streptophyta; Species: Oryza rufipogon">Oryza rufipogon</a>
+</td>
+<td><a href="/nuccore/289065026">NC_013816</a></td>
+complete</td>
+<td align="right">559045&nbsp;nt</td>
+<td align="right">41&nbsp;</td>
+<td align="right">18&nbsp;</td>
+<td align="right" class="Gray">02/18/2010</td>
+<td align="right" class="Gray">07/02/2010</td>
+</tr>
+<tr bgcolor="#F8F8F8">
+<td colspan="16">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="Gray">Oryza sativa</span>
+</td>
+</tr>
+<tr bgcolor="#F8F8F8">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=39946" title="Streptophyta; Species: Oryza sativa">Oryza sativa Indica Group</a>
+ / long-grained rice</td>
+<td><a href="/nuccore/89280701">NC_007886</a></td>
+complete</td>
+<td align="right">491515&nbsp;nt</td>
+<td align="right">54&nbsp;</td>
+<td align="right">39&nbsp;</td>
+<td align="right" class="Gray">03/09/2006</td>
+<td align="right" class="Gray">12/08/2008</td>
+</tr>
+<tr bgcolor="#F8F8F8">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=39947" title="Streptophyta; Species: Oryza sativa">Oryza sativa Japonica Group</a>
+ / Japanese rice</td>
+<td><a href="/nuccore/194033210">NC_011033</a></td>
+complete</td>
+<td align="right">490520&nbsp;nt</td>
+<td align="right">53&nbsp;</td>
+<td align="right">25&nbsp;</td>
+<td align="right" class="Gray">07/10/2008</td>
+<td align="right" class="Gray">12/09/2008</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=301336" title="Streptophyta; Species: Chionoloma tenuirostre">Oxystegus tenuirostris</a>
+</td>
+<td><a href="/nuccore/937547625">NC_028040</a></td>
+complete</td>
+<td align="right">105001&nbsp;nt</td>
+<td align="right">39&nbsp;</td>
+<td align="right">27&nbsp;</td>
+<td align="right" class="Gray">10/08/2015</td>
+<td align="right" class="Gray">10/08/2015</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=37308" title="Streptophyta; Species: Phaeoceros laevis">Phaeoceros laevis</a>
+</td>
+<td><a href="/nuccore/284794729">NC_013765</a></td>
+complete</td>
+<td align="right">209482&nbsp;nt</td>
+<td align="right">38&nbsp;</td>
+<td align="right">23&nbsp;</td>
+<td align="right" class="Gray">01/27/2010</td>
+<td align="right" class="Gray">10/17/2011</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=42345" title="Streptophyta; Species: Phoenix dactylifera">Phoenix dactylifera</a>
+ / date palm</td>
+<td><a href="/nuccore/372450205">NC_016740</a></td>
+complete</td>
+<td align="right">715001&nbsp;nt</td>
+<td align="right">43&nbsp;</td>
+<td align="right">21&nbsp;</td>
+<td align="right" class="Gray">01/17/2012</td>
+<td align="right" class="Gray">08/09/2012</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=3218" title="Streptophyta; Species: Physcomitrella patens">Physcomitrella patens</a>
+</td>
+<td><a href="/nuccore/91208838">NC_007945</a></td>
+complete</td>
+<td align="right">105340&nbsp;nt</td>
+<td align="right">42&nbsp;</td>
+<td align="right">27&nbsp;</td>
+<td align="right" class="Gray">04/07/2006</td>
+<td align="right" class="Gray">07/09/2008</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=3352" title="Streptophyta; Species: Pinus taeda">Pinus Taeda</a>
+ / loblolly pine</td>
+<td><a href="/nuccore/1511245057">NC_039746</a></td>
+complete</td>
+<td align="right">1191054&nbsp;nt</td>
+<td align="right">39&nbsp;</td>
+<td align="right">44&nbsp;</td>
+<td align="right" class="Gray">11/09/2018</td>
+<td align="right" class="Gray">11/09/2018</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=94286" title="Streptophyta; Species: Platycodon grandiflorus">Platycodon grandiflorus</a>
+</td>
+<td><a href="/nuccore/1252313291">NC_035958</a></td>
+complete</td>
+<td align="right">1249593&nbsp;nt</td>
+<td align="right">33&nbsp;</td>
+<td align="right">24&nbsp;</td>
+<td align="right" class="Gray">10/06/2017</td>
+<td align="right" class="Gray">10/06/2017</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=280637" title="Streptophyta; Species: Pleurozia purpurea">Pleurozia purpurea</a>
+</td>
+<td><a href="/nuccore/262186694">NC_013444</a></td>
+complete</td>
+<td align="right">168526&nbsp;nt</td>
+<td align="right">69&nbsp;</td>
+<td align="right">31&nbsp;</td>
+<td align="right" class="Gray">10/28/2009</td>
+<td align="right" class="Gray">10/17/2011</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=266767" title="Streptophyta; Species: Populus davidiana">Populus davidiana</a>
+</td>
+<td><a href="/nuccore/1211677951">NC_035157</a></td>
+complete</td>
+<td align="right">779361&nbsp;nt</td>
+<td align="right">53&nbsp;</td>
+<td align="right">25&nbsp;</td>
+<td align="right" class="Gray">06/27/2017</td>
+<td align="right" class="Gray">06/27/2017</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=113636" title="Streptophyta; Species: Populus tremula">Populus tremula clone W52</a>
+</td>
+<td><a href="/nuccore/939575802">NC_028096</a></td>
+complete</td>
+<td align="right">783442&nbsp;nt</td>
+<td align="right">33&nbsp;</td>
+<td align="right">25&nbsp;</td>
+<td align="right" class="Gray">10/19/2015</td>
+<td align="right" class="Gray">04/13/2016</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=80863" title="Streptophyta; Species: Populus tremula x Populus alba">Populus tremula x Populus alba</a>
+</td>
+<td><a href="/nuccore/948299255">NC_028329</a></td>
+complete</td>
+<td align="right">783513&nbsp;nt</td>
+<td align="right">32&nbsp;</td>
+<td align="right">25&nbsp;</td>
+<td align="right" class="Gray">11/05/2015</td>
+<td align="right" class="Gray">05/17/2016</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=3240" title="Streptophyta; Species: Psilotum nudum">Psilotum nudum isolate v16 chromosome 1</a>
+</td>
+<td><a href="/nuccore/1068359729">NC_030952</a></td>
+complete</td>
+<td align="right">364070&nbsp;nt</td>
+<td align="right">26&nbsp;</td>
+<td align="right">11&nbsp;</td>
+<td align="right" class="Gray">09/19/2016</td>
+<td align="right" class="Gray">09/19/2016</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=245469" title="Streptophyta; Species: Ptychomnion cygnisetum">Ptychomnion cygnisetum</a>
+</td>
+<td><a href="/nuccore/669017085">NC_024514</a></td>
+complete</td>
+<td align="right">104480&nbsp;nt</td>
+<td align="right">39&nbsp;</td>
+<td align="right">27&nbsp;</td>
+<td align="right" class="Gray">07/28/2014</td>
+<td align="right" class="Gray">06/09/2015</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=71396" title="Streptophyta; Species: Niphotrichum elongatum">Racomitrium elongatum</a>
+</td>
+<td><a href="/nuccore/813424996">NC_026890</a></td>
+complete</td>
+<td align="right">106746&nbsp;nt</td>
+<td align="right">39&nbsp;</td>
+<td align="right">27&nbsp;</td>
+<td align="right" class="Gray">04/22/2015</td>
+<td align="right" class="Gray">04/22/2015</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=1079084" title="Streptophyta; Species: Racomitrium emersum">Racomitrium emersum</a>
+</td>
+<td><a href="/nuccore/817526510">NC_026975</a></td>
+complete</td>
+<td align="right">107186&nbsp;nt</td>
+<td align="right">39&nbsp;</td>
+<td align="right">27&nbsp;</td>
+<td align="right" class="Gray">05/05/2015</td>
+<td align="right" class="Gray">05/05/2015</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=657341" title="Streptophyta; Species: Niphotrichum ericoides">Racomitrium ericoides</a>
+</td>
+<td><a href="/nuccore/788229053">NC_026540</a></td>
+complete</td>
+<td align="right">106727&nbsp;nt</td>
+<td align="right">39&nbsp;</td>
+<td align="right">27&nbsp;</td>
+<td align="right" class="Gray">03/27/2015</td>
+<td align="right" class="Gray">03/27/2015</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=140628" title="Streptophyta; Species: Racomitrium lanuginosum">Racomitrium lanuginosum</a>
+</td>
+<td><a href="/nuccore/1002165137">NC_029452</a></td>
+complete</td>
+<td align="right">106795&nbsp;nt</td>
+<td align="right">42&nbsp;</td>
+<td align="right">27&nbsp;</td>
+<td align="right" class="Gray">03/01/2016</td>
+<td align="right" class="Gray">03/01/2016</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=3726" title="Streptophyta; Species: Raphanus sativus">Raphanus sativus</a>
+ / radish</td>
+<td><a href="/nuccore/404481640">NC_018551</a></td>
+complete</td>
+<td align="right">258426&nbsp;nt</td>
+<td align="right">35&nbsp;</td>
+<td align="right">21&nbsp;</td>
+<td align="right" class="Gray">09/14/2012</td>
+<td align="right" class="Gray">09/14/2012</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=396313" title="Streptophyta; Species: Rhazya stricta">Rhazya stricta</a>
+</td>
+<td><a href="/nuccore/651729735">NC_024293</a></td>
+complete</td>
+<td align="right">548608&nbsp;nt</td>
+<td align="right">46&nbsp;</td>
+<td align="right">23&nbsp;</td>
+<td align="right" class="Gray">06/11/2014</td>
+<td align="right" class="Gray">07/01/2014</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=104537" title="Streptophyta; Species: Roya obtusa">Roya obtusa culture-collection SAG:168.80</a>
+</td>
+<td><a href="/nuccore/558604017">NC_022863</a></td>
+complete</td>
+<td align="right">69465&nbsp;nt</td>
+<td align="right">41&nbsp;</td>
+<td align="right">29&nbsp;</td>
+<td align="right" class="Gray">11/19/2013</td>
+<td align="right" class="Gray">11/19/2013</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=4547" title="Streptophyta; Species: Saccharum officinarum">Saccharum officinarum mitochondrial chromosome 1 DNA</a>
+</td>
+<td><a href="/nuccore/1070108944">NC_031164</a></td>
+complete</td>
+<td align="right">300784&nbsp;nt</td>
+<td align="right">20&nbsp;</td>
+<td align="right">22&nbsp;</td>
+<td align="right" class="Gray">09/23/2016</td>
+<td align="right" class="Gray">09/23/2016</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=77065" title="Streptophyta; Species: Salix purpurea">Salix purpurea</a>
+</td>
+<td><a href="/nuccore/1011056159">NC_029693</a></td>
+complete</td>
+<td align="right">598970&nbsp;nt</td>
+<td align="right">32&nbsp;</td>
+<td align="right">24&nbsp;</td>
+<td align="right" class="Gray">03/28/2016</td>
+<td align="right" class="Gray">03/28/2016</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=1278906" title="Streptophyta; Species: Salix suchowensis">Salix suchowensis</a>
+</td>
+<td><a href="/nuccore/1002167010">NC_029317</a></td>
+complete</td>
+<td align="right">644437&nbsp;nt</td>
+<td align="right">33&nbsp;</td>
+<td align="right">25&nbsp;</td>
+<td align="right" class="Gray">03/01/2016</td>
+<td align="right" class="Gray">03/01/2016</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=226208" title="Streptophyta; Species: Salvia miltiorrhiza">Salvia miltiorrhiza</a>
+</td>
+<td><a href="/nuccore/570699874">NC_023209</a></td>
+complete</td>
+<td align="right">499236&nbsp;nt</td>
+<td align="right">138&nbsp;</td>
+<td align="right">27&nbsp;</td>
+<td align="right" class="Gray">01/02/2014</td>
+<td align="right" class="Gray">01/02/2014</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=140003" title="Streptophyta; Species: Sanionia uncinata">Sanionia uncinata</a>
+</td>
+<td><a href="/nuccore/937423892">NC_027974</a></td>
+complete</td>
+<td align="right">104497&nbsp;nt</td>
+<td align="right">40&nbsp;</td>
+<td align="right">27&nbsp;</td>
+<td align="right" class="Gray">10/07/2015</td>
+<td align="right" class="Gray">10/07/2015</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=362788" title="Streptophyta; Species: Senna tora">Senna tora</a>
+</td>
+<td><a href="/nuccore/1436049411">NC_038053</a></td>
+complete</td>
+<td align="right">566589&nbsp;nt</td>
+<td align="right">36&nbsp;</td>
+<td align="right">27&nbsp;</td>
+<td align="right" class="Gray">07/31/2018</td>
+<td align="right" class="Gray">07/31/2018</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=37657" title="Streptophyta; Species: Silene latifolia">Silene latifolia</a>
+</td>
+<td><a href="/nuccore/307101719">NC_014487</a></td>
+complete</td>
+<td align="right">253413&nbsp;nt</td>
+<td align="right">30&nbsp;</td>
+<td align="right">13&nbsp;</td>
+<td align="right" class="Gray">09/16/2010</td>
+<td align="right" class="Gray">09/16/2010</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=29728" title="Streptophyta; Species: Sinapis arvensis">Sinapis arvensis</a>
+</td>
+<td><a href="/nuccore/1102547431">NC_031896</a></td>
+complete</td>
+<td align="right">240024&nbsp;nt</td>
+<td align="right">70&nbsp;</td>
+<td align="right">21&nbsp;</td>
+<td align="right" class="Gray">11/14/2016</td>
+<td align="right" class="Gray">11/14/2016</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<img border="0" src="/sutils/static/GP_IMAGE/plus.png" alt="toggle on/off" id="Toggle_4081" class="GGtgl"><a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=4081" title="Streptophyta; Species: Solanum lycopersicum">Solanum lycopersicum</a>
+ / tomato</td>
+<td></td>
+complete</td>
+<td align="right">892514&nbsp;nt</td>
+<td align="right">78&nbsp;</td>
+<td align="right">64&nbsp;</td>
+<td align="right" class="Gray">10/06/2017</td>
+<td align="right" class="Gray">10/06/2017</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td colspan="9"><div id="SDescr_4081" style="display: none">
+<table class="segmtbl" sellspacing="1" cellpadding="1">
+<tr>
+<td><a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=4081" title="Streptophyta; Species: Solanum lycopersicum">Solanum lycopersicum bio-material TGRC:LA1421</a>
+</td>
+<td><span class="tblTxt">(446257 nt)</span>
+</td>
+<td><a href="/nuccore/1252313644">NC_035963</a></td>
+<td><span class="tblTxt">proteins: 39</span></td>
+<td><span class="tblTxt">RNA: </span>32</td>
+</tr>
+<tr>
+<td><a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=4081" title="Streptophyta; Species: Solanum lycopersicum">Solanum lycopersicum bio-material TGRC:LA1421</a>
+</td>
+<td><span class="tblTxt">(446257 nt)</span>
+</td>
+<td><a href="/nuccore/1252313644">NC_035963</a></td>
+<td><span class="tblTxt">proteins: 39</span></td>
+<td><span class="tblTxt">RNA: </span>32</td>
+</tr>
+</table>
+</div>
+</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=28526" title="Streptophyta; Species: Solanum pennellii">Solanum pennellii bio-material TGRC:LA0716</a>
+</td>
+<td><a href="/nuccore/1252313684">NC_035964</a></td>
+complete</td>
+<td align="right">423596&nbsp;nt</td>
+<td align="right">41&nbsp;</td>
+<td align="right">29&nbsp;</td>
+<td align="right" class="Gray">10/06/2017</td>
+<td align="right" class="Gray">11/01/2017</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=4558" title="Streptophyta; Species: Sorghum bicolor">Sorghum bicolor</a>
+ / sorghum</td>
+<td><a href="/nuccore/115278525">NC_008360</a></td>
+complete</td>
+<td align="right">468628&nbsp;nt</td>
+<td align="right">32&nbsp;</td>
+<td align="right">21&nbsp;</td>
+<td align="right" class="Gray">09/21/2006</td>
+<td align="right" class="Gray">04/21/2009</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=13805" title="Streptophyta; Species: Sphagnum palustre">Sphagnum palustre</a>
+</td>
+<td><a href="/nuccore/669017370">NC_024521</a></td>
+complete</td>
+<td align="right">141276&nbsp;nt</td>
+<td align="right">40&nbsp;</td>
+<td align="right">27&nbsp;</td>
+<td align="right" class="Gray">07/28/2014</td>
+<td align="right" class="Gray">06/03/2015</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=3562" title="Streptophyta; Species: Spinacia oleracea">Spinacia oleracea</a>
+ / spinach</td>
+<td><a href="/nuccore/1236518794">NC_035618</a></td>
+complete</td>
+<td align="right">329613&nbsp;nt</td>
+<td align="right">29&nbsp;</td>
+<td align="right">26&nbsp;</td>
+<td align="right" class="Gray">08/24/2017</td>
+<td align="right" class="Gray">08/24/2017</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=29656" title="Streptophyta; Species: Spirodela polyrhiza">Spirodela polyrhiza</a>
+ / great duckweed</td>
+<td><a href="/nuccore/387164694">NC_017840</a></td>
+complete</td>
+<td align="right">228493&nbsp;nt</td>
+<td align="right">35&nbsp;</td>
+<td align="right">22&nbsp;</td>
+<td align="right" class="Gray">05/11/2012</td>
+<td align="right" class="Gray">05/11/2012</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=1903712" title="Streptophyta; Species: Stoneobryum bunyaense">Stoneobryum bunyaense</a>
+</td>
+<td><a href="/nuccore/1079487025">NC_031392</a></td>
+complete</td>
+<td align="right">104352&nbsp;nt</td>
+<td align="right">40&nbsp;</td>
+<td align="right">27&nbsp;</td>
+<td align="right" class="Gray">10/13/2016</td>
+<td align="right" class="Gray">10/13/2016</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=262980" title="Streptophyta; Species: Stoneobryum mirum">Stoneobryum mirum</a>
+</td>
+<td><a href="/nuccore/1199893933">NC_034907</a></td>
+complete</td>
+<td align="right">104345&nbsp;nt</td>
+<td align="right">40&nbsp;</td>
+<td align="right">27&nbsp;</td>
+<td align="right" class="Gray">06/02/2017</td>
+<td align="right" class="Gray">06/02/2017</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=55494" title="Streptophyta; Species: Stratiotes aloides">Stratiotes aloides voucher Seberg et al. C2459</a>
+</td>
+<td><a href="/nuccore/1215846169">NC_035317</a></td>
+complete</td>
+<td align="right">349058&nbsp;nt</td>
+<td align="right">28&nbsp;</td>
+<td align="right">11&nbsp;</td>
+<td align="right" class="Gray">07/14/2017</td>
+<td align="right" class="Gray">07/14/2017</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=1678074" title="Streptophyta; Species: Syntrichia filaris">Syntrichia filaris</a>
+</td>
+<td><a href="/nuccore/885000942">NC_027515</a></td>
+complete</td>
+<td align="right">106343&nbsp;nt</td>
+<td align="right">40&nbsp;</td>
+<td align="right">27&nbsp;</td>
+<td align="right" class="Gray">07/14/2015</td>
+<td align="right" class="Gray">07/14/2015</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=37420" title="Streptophyta; Species: Tetraphis pellucida">Tetraphis pellucida</a>
+</td>
+<td><a href="/nuccore/651514883">NC_024290</a></td>
+complete</td>
+<td align="right">107730&nbsp;nt</td>
+<td align="right">41&nbsp;</td>
+<td align="right">27&nbsp;</td>
+<td align="right" class="Gray">06/11/2014</td>
+<td align="right" class="Gray">01/26/2017</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=260168" title="Streptophyta; Species: Tetraplodon fuegianus">Tetraplodon fuegianus</a>
+</td>
+<td><a href="/nuccore/944543036">NC_028191</a></td>
+complete</td>
+<td align="right">104741&nbsp;nt</td>
+<td align="right">40&nbsp;</td>
+<td align="right">27&nbsp;</td>
+<td align="right" class="Gray">11/01/2015</td>
+<td align="right" class="Gray">04/13/2016</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=93845" title="Streptophyta; Species: Treubia lacunosa">Treubia lacunosa</a>
+</td>
+<td><a href="/nuccore/353526580">NC_016122</a></td>
+complete</td>
+<td align="right">151983&nbsp;nt</td>
+<td align="right">69&nbsp;</td>
+<td align="right">30&nbsp;</td>
+<td align="right" class="Gray">10/21/2011</td>
+<td align="right" class="Gray">10/03/2018</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=4563" title="Streptophyta; Species: Tripsacum dactyloides">Tripsacum dactyloides</a>
+ / gama grass</td>
+<td><a href="/nuccore/115278594">NC_008362</a></td>
+complete</td>
+<td align="right">704100&nbsp;nt</td>
+<td align="right">33&nbsp;</td>
+<td align="right">21&nbsp;</td>
+<td align="right" class="Gray">09/21/2006</td>
+<td align="right" class="Gray">09/21/2006</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=4565" title="Streptophyta; Species: Triticum aestivum">Triticum aestivum cultivar Chinese Yumai</a>
+ / bread wheat</td>
+<td><a href="/nuccore/1252412259">NC_036024</a></td>
+complete</td>
+<td align="right">452526&nbsp;nt</td>
+<td align="right">36&nbsp;</td>
+<td align="right">31&nbsp;</td>
+<td align="right" class="Gray">10/06/2017</td>
+<td align="right" class="Gray">10/06/2017</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=4570" title="Streptophyta; Species: Triticum timopheevii">Triticum timopheevii mitochondrial DNA</a>
+</td>
+<td><a href="/nuccore/556927176">NC_022714</a></td>
+complete</td>
+<td align="right">443419&nbsp;nt</td>
+<td align="right">35&nbsp;</td>
+<td align="right">31&nbsp;</td>
+<td align="right" class="Gray">11/05/2013</td>
+<td align="right" class="Gray">11/05/2013</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=248352" title="Streptophyta; Species: Tritomaria quinquedentata">Tritomaria quinquedentata</a>
+</td>
+<td><a href="/nuccore/1347731748">NC_037041</a></td>
+complete</td>
+<td align="right">142510&nbsp;nt</td>
+<td align="right">42&nbsp;</td>
+<td align="right">31&nbsp;</td>
+<td align="right" class="Gray">02/22/2018</td>
+<td align="right" class="Gray">02/22/2018</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=140636" title="Streptophyta; Species: Ulota crispa">Ulota crispa</a>
+</td>
+<td><a href="/nuccore/1079487066">NC_031393</a></td>
+complete</td>
+<td align="right">104636&nbsp;nt</td>
+<td align="right">40&nbsp;</td>
+<td align="right">27&nbsp;</td>
+<td align="right" class="Gray">10/13/2016</td>
+<td align="right" class="Gray">10/13/2016</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=279761" title="Streptophyta; Species: Ulota hutchinsiae">Ulota hutchinsiae</a>
+</td>
+<td><a href="/nuccore/669017207">NC_024517</a></td>
+complete</td>
+<td align="right">104608&nbsp;nt</td>
+<td align="right">40&nbsp;</td>
+<td align="right">27&nbsp;</td>
+<td align="right" class="Gray">07/28/2014</td>
+<td align="right" class="Gray">06/03/2015</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=67002" title="Streptophyta; Species: Ulota phyllantha">Ulota phyllantha</a>
+</td>
+<td><a href="/nuccore/1079487107">NC_031394</a></td>
+complete</td>
+<td align="right">104671&nbsp;nt</td>
+<td align="right">40&nbsp;</td>
+<td align="right">27&nbsp;</td>
+<td align="right" class="Gray">10/13/2016</td>
+<td align="right" class="Gray">10/13/2016</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=192314" title="Streptophyta; Species: Utricularia reniformis">Utricularia reniformis</a>
+</td>
+<td><a href="/nuccore/1206246996">NC_034982</a></td>
+complete</td>
+<td align="right">857234&nbsp;nt</td>
+<td align="right">2190&nbsp;</td>
+<td align="right">28&nbsp;</td>
+<td align="right" class="Gray">06/13/2017</td>
+<td align="right" class="Gray">06/13/2017</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=13750" title="Streptophyta; Species: Vaccinium macrocarpon">Vaccinium macrocarpon</a>
+</td>
+<td><a href="/nuccore/576303560">NC_023338</a></td>
+complete</td>
+<td align="right">459678&nbsp;nt</td>
+<td align="right">33&nbsp;</td>
+<td align="right">21&nbsp;</td>
+<td align="right" class="Gray">01/27/2014</td>
+<td align="right" class="Gray">01/27/2014</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=3914" title="Streptophyta; Species: Vigna angularis">Vigna angularis mitochondrial DNA</a>
+ / adzuki bean</td>
+<td><a href="/nuccore/501594995">NC_021092</a></td>
+complete</td>
+<td align="right">404466&nbsp;nt</td>
+<td align="right">26&nbsp;</td>
+<td align="right">19&nbsp;</td>
+<td align="right" class="Gray">05/17/2013</td>
+<td align="right" class="Gray">05/17/2013</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=157791" title="Streptophyta; Species: Vigna radiata">Vigna radiata</a>
+</td>
+<td><a href="/nuccore/323149028">NC_015121</a></td>
+complete</td>
+<td align="right">401262&nbsp;nt</td>
+<td align="right">32&nbsp;</td>
+<td align="right">19&nbsp;</td>
+<td align="right" class="Gray">02/10/2011</td>
+<td align="right" class="Gray">02/10/2011</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=3972" title="Streptophyta; Species: Viscum album">Viscum album voucher C2546</a>
+ / European mistletoe</td>
+<td><a href="/nuccore/971821784">NC_029039</a></td>
+complete</td>
+<td align="right">565432&nbsp;nt</td>
+<td align="right">12&nbsp;</td>
+<td align="right">7&nbsp;</td>
+<td align="right" class="Gray">01/05/2016</td>
+<td align="right" class="Gray">01/05/2016</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=29760" title="Streptophyta; Species: Vitis vinifera">Vitis vinifera</a>
+ / wine grape</td>
+<td><a href="/nuccore/224365609">NC_012119</a></td>
+complete</td>
+<td align="right">773279&nbsp;nt</td>
+<td align="right">74&nbsp;</td>
+<td align="right">34&nbsp;</td>
+<td align="right" class="Gray">10/23/2008</td>
+<td align="right" class="Gray">04/21/2009</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=3377" title="Streptophyta; Species: Welwitschia mirabilis">Welwitschia mirabilis</a>
+</td>
+<td><a href="/nuccore/985761555">NC_029130</a></td>
+complete</td>
+<td align="right">978846&nbsp;nt</td>
+<td align="right">29&nbsp;</td>
+<td align="right">11&nbsp;</td>
+<td align="right" class="Gray">02/05/2016</td>
+<td align="right" class="Gray">02/06/2016</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=15945" title="Streptophyta; Species: Zea luxurians">Zea luxurians</a>
+</td>
+<td><a href="/nuccore/114151590">NC_008333</a></td>
+complete</td>
+<td align="right">539368&nbsp;nt</td>
+<td align="right">32&nbsp;</td>
+<td align="right">20&nbsp;</td>
+<td align="right" class="Gray">09/07/2006</td>
+<td align="right" class="Gray">09/07/2006</td>
+</tr>
+<tr bgcolor="#F8F8F8">
+<td colspan="16">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="Gray">Zea mays</span>
+</td>
+</tr>
+<tr bgcolor="#F8F8F8">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=381124" title="Streptophyta; Species: Zea mays">Zea mays subsp. mays</a>
+ / maize</td>
+<td><a href="/nuccore/94502557">NC_007982</a></td>
+complete</td>
+<td align="right">569630&nbsp;nt</td>
+<td align="right">163&nbsp;</td>
+<td align="right">33&nbsp;</td>
+<td align="right" class="Gray">05/03/2006</td>
+<td align="right" class="Gray">08/04/2018</td>
+</tr>
+<tr bgcolor="#F8F8F8">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=76912" title="Streptophyta; Species: Zea mays">Zea mays subsp. parviglumis</a>
+</td>
+<td><a href="/nuccore/114151623">NC_008332</a></td>
+complete</td>
+<td align="right">680603&nbsp;nt</td>
+<td align="right">42&nbsp;</td>
+<td align="right">19&nbsp;</td>
+<td align="right" class="Gray">09/07/2006</td>
+<td align="right" class="Gray">12/08/2008</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=4580" title="Streptophyta; Species: Zea perennis">Zea perennis</a>
+</td>
+<td><a href="/nuccore/114151557">NC_008331</a></td>
+complete</td>
+<td align="right">570354&nbsp;nt</td>
+<td align="right">32&nbsp;</td>
+<td align="right">20&nbsp;</td>
+<td align="right" class="Gray">09/07/2006</td>
+<td align="right" class="Gray">09/07/2006</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=326968" title="Streptophyta; Species: Ziziphus jujuba">Ziziphus jujuba</a>
+ / common jujube</td>
+<td><a href="/nuccore/1016470791">NC_029809</a></td>
+complete</td>
+<td align="right">365190&nbsp;nt</td>
+<td align="right">35&nbsp;</td>
+<td align="right">21&nbsp;</td>
+<td align="right" class="Gray">04/09/2016</td>
+<td align="right" class="Gray">04/12/2016</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=29655" title="Streptophyta; Species: Zostera marina">Zostera marina voucher C2544</a>
+</td>
+<td><a href="/nuccore/1215847952">NC_035345</a></td>
+complete</td>
+<td align="right">191481&nbsp;nt</td>
+<td align="right">25&nbsp;</td>
+<td align="right">13&nbsp;</td>
+<td align="right" class="Gray">07/14/2017</td>
+<td align="right" class="Gray">07/14/2017</td>
+</tr>
+<tr bgcolor="#F0F0F0">
+<td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/Taxonomy/Browser/wwwtax.cgi?lvl=0&id=146584" title="Streptophyta; Species: Zygodon viridissimus">Zygodon viridissimus</a>
+</td>
+<td><a href="/nuccore/1102548779">NC_031846</a></td>
+complete</td>
+<td align="right">103098&nbsp;nt</td>
+<td align="right">40&nbsp;</td>
+<td align="right">27&nbsp;</td>
+<td align="right" class="Gray">11/14/2016</td>
+<td align="right" class="Gray">11/14/2016</td>
+</tr>
+</table>
+
+      </div>
+      <div id="Tbl2" style="display: none">
+          
+      </div>
+
+    </td>
+    <td width="1" background="/coreweb/template1/pix/main_right_bg.gif"></td>
+  </tr>
+  <tr>
+    <td background="/coreweb/template1/pix/but_left.gif"><img src="/coreweb/template1/pix/but_left.gif" width="4" height="4" alt="" border="0"></td>
+    <td width="10000" bgcolor="#ffffff" background="/coreweb/template1/pix/but_mid_bg.gif"><img src="/coreweb/template1/pix/pixel.gif" width="1" height="1" alt="" border="0"></td>
+    <td align="right" background="/coreweb/template1/pix/but_right.gif"><img src="/coreweb/template1/pix/but_right.gif" alt="" width="4" height="4" border="0"></td>
+  </tr>
+  </table>
+
+</td>
+</tr>
+</table>
+
+</div>
+
+<table width="100%" border="0" cellspacing="0" cellpadding="0" align="center">
+<tr>
+  <td>&nbsp;</td>
+  <td valign="top" align="right" nowrap>
+    <span class="HELPBAR">|<a HREF="/About/disclaimer.html" target=_blank> Disclaimer </a>|<a HREF="/privacy.html" target=_blank CLASS="HELPBAR"> Privacy statement </a>|</span>
+    <br />
+  </td>
+</tr>
+</table>
+
+<map name="unlmenu">
+    <area alt="NCBI Home" coords="2,0,39,15" href="/" shape="RECT">
+    <area alt="NCBI Search" coords="40,0,91,15" href="/ncbisearch/" shape="RECT">
+    <area alt="NCBI SiteMap" coords="92,0,143,15" href="/guide/sitemap/" shape="RECT">
+</map>
+
+</body>
+</html>
