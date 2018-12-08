@@ -115,10 +115,15 @@ cat plant_mitochondrion_id_seq.csv |
 #      2 51329 Polytomella parva has 2 chromosomes
 #      2 351366 Polytomella sp. SAG 63-10 has 2 chromosomes
 
-sed -i".bak" "/,NC_001284/d" plant_mitochondrion_id_seq.csv # Arabidopsis thaliana
+sed -i".bak" "/,NC_001284$/d" plant_mitochondrion_id_seq.csv # Arabidopsis thaliana
 sed -i".bak" "/,NC_004946$/d" plant_mitochondrion_id_seq.csv # Brassica napus
 sed -i".bak" "/,NC_001751$/d" plant_mitochondrion_id_seq.csv # Oryza sativa japonica
 sed -i".bak" "/,NC_001776$/d" plant_mitochondrion_id_seq.csv # Oryza sativa indica
+
+# Vicia faba mitochondrial plasmid MtVFPL3 NC_011084
+# Zea mays mitochondrial plasmid pBMSmt1.9 NC_001400
+sed -i".bak" "/,NC_011084$/d" plant_mitochondrion_id_seq.csv
+sed -i".bak" "/,NC_001400$/d" plant_mitochondrion_id_seq.csv
 
 ```
 
