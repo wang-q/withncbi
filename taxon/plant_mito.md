@@ -79,7 +79,8 @@ cat refseq_id_seq.csv | grep -v "^#" | wc -l
 
 # combine
 cat webpage_id_seq.csv refseq_id_seq.csv |
-    sort -u -t, -k1,1 \
+    sort -u | # duplicated id-seq pair
+    sort -t, -k1,1 \
     > mitochondrion_id_seq.csv
 
 # 8539
