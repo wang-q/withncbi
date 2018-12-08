@@ -27,10 +27,10 @@ All [Eukaryota](https://www.ncbi.nlm.nih.gov/genomes/GenomesGroup.cgi?taxid=2759
 `doc/eukaryota_mitochondrion_180325.html`.
 
 ```text
-Eukaryota (2759)                8455
-    Viridiplantae (33090)       211
+Eukaryota (2759)                8746
+    Viridiplantae (33090)       221
         Chlorophyta (3041)      51
-        Streptophyta (35493)    160
+        Streptophyta (35493)    170
 ```
 
 Use `taxon/id_seq_dom_select.pl` to extract Taxonomy ids and genbank accessions from all history
@@ -45,9 +45,15 @@ cd ~/data/organelle/mito/GENOMES
 rm webpage_id_seq.csv
 
 perl ~/Scripts/withncbi/taxon/id_seq_dom_select.pl \
+    ~/Scripts/withncbi/doc/eukaryota_mitochondrion_181207.html \
+    >> webpage_id_seq.csv
+perl ~/Scripts/withncbi/taxon/id_seq_dom_select.pl \
     ~/Scripts/withncbi/doc/eukaryota_mitochondrion_180325.html \
     >> webpage_id_seq.csv
 
+perl ~/Scripts/withncbi/taxon/id_seq_dom_select.pl \
+    ~/Scripts/withncbi/doc/green_plants_mitochondrion_181207.html \
+    >> webpage_id_seq.csv    
 perl ~/Scripts/withncbi/taxon/id_seq_dom_select.pl \
     ~/Scripts/withncbi/doc/green_plants_mitochondrion_180325.html \
     >> webpage_id_seq.csv    
@@ -62,7 +68,7 @@ cd ~/data/organelle/mito/GENOMES
 wget -N ftp://ftp.ncbi.nlm.nih.gov/genomes/refseq/mitochondrion/mitochondrion.1.genomic.gbff.gz
 wget -N ftp://ftp.ncbi.nlm.nih.gov/genomes/refseq/mitochondrion/mitochondrion.2.genomic.gbff.gz
 
-gzip -c -d mitochondrion.*.genomic.gbff.gz > mitochondrion.genomic.gbff
+gzip -dcf mitochondrion.*.genomic.gbff.gz > mitochondrion.genomic.gbff
 
 perl ~/Scripts/withncbi/taxon/gb_taxon_locus.pl mitochondrion.genomic.gbff > refseq_id_seq.csv
 
