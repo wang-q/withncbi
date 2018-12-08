@@ -74,7 +74,7 @@ perl ~/Scripts/withncbi/taxon/gb_taxon_locus.pl mitochondrion.genomic.gbff > ref
 
 rm mitochondrion.genomic.gbff
 
-# 8587
+# 9103
 cat refseq_id_seq.csv | grep -v "^#" | wc -l
 
 # combine
@@ -83,7 +83,7 @@ cat webpage_id_seq.csv refseq_id_seq.csv |
     sort -t, -k1,1 \
     > mitochondrion_id_seq.csv
 
-# 8539
+# 9132
 cat mitochondrion_id_seq.csv | grep -v "^#" | wc -l
 
 ```
@@ -99,12 +99,26 @@ cat mitochondrion_id_seq.csv |
     perl ~/Scripts/withncbi/taxon/id_restrict.pl -s "," -a 33090 \
     >> plant_mitochondrion_id_seq.csv
 
-# 217
+# 232
 cat plant_mitochondrion_id_seq.csv | grep -v "^#" | wc -l
 
-# rice mitochondria have plasmids
-sed -i".bak" "s/,NC_001751$/,NC_011033/" plant_mitochondrion_id_seq.csv # japonica
-sed -i".bak" "s/,NC_001776$/,NC_007886/" plant_mitochondrion_id_seq.csv # indica
+cat plant_mitochondrion_id_seq.csv |
+    cut -d',' -f 1 |
+    sort -n |
+    uniq -c |
+    grep -v -E '\s+1\s+'
+#      3 3659 Cucumis sativus has 3 chromosomes
+#      2 3702 Arabidopsis thaliana NC_001284.2 was removed by RefSeq staff
+#      2 3708 Brassica napus linear plasmid NC_004946
+#      2 39946 Oryza sativa indica plasmid B2 NC_001776
+#      2 39947 Oryza sativa japonica plasmid B1 NC_001751
+#      2 51329 Polytomella parva has 2 chromosomes
+#      2 351366 Polytomella sp. SAG 63-10 has 2 chromosomes
+
+sed -i".bak" "/,NC_001284/d" plant_mitochondrion_id_seq.csv # Arabidopsis thaliana
+sed -i".bak" "/,NC_004946$/d" plant_mitochondrion_id_seq.csv # Brassica napus
+sed -i".bak" "/,NC_001751$/d" plant_mitochondrion_id_seq.csv # Oryza sativa japonica
+sed -i".bak" "/,NC_001776$/d" plant_mitochondrion_id_seq.csv # Oryza sativa indica
 
 ```
 
