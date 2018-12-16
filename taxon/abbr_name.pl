@@ -30,7 +30,7 @@ abbr_name.pl - Abbreviate strain scientific names.
                             If there's no strain, use 1,1,2.
                             Don't need the strain part, use 2,2,3
                             When there's only strain, use 1,1,1
-        --seperator -s  STR seperator of the line, default is "\s+"
+        --separator -s  STR separator of the line, default is "\s+"
         --min INT           mininal length for abbreviation of species
         --tight             no underscore between Genus and species
         --shortsub          clean subspecies parts
@@ -57,7 +57,7 @@ abbr_name.pl - Abbreviate strain scientific names.
 GetOptions(
     'help|?' => sub { Getopt::Long::HelpMessage(0) },
     'column|c=s'    => \( my $column      = '1,2,3' ),
-    'seperator|s=s' => \( my $seperator   = '\s+' ),
+    'separator|s=s' => \( my $separator   = '\s+' ),
     'min|m=i'       => \( my $min_species = 3 ),
     'tight'         => \my $tight,
     'shortsub'      => \my $shortsub,
@@ -77,7 +77,7 @@ my @rows;
 while ( my $line = <> ) {
     chomp $line;
     next unless $line;
-    my @row = split /$seperator/, $line;
+    my @row = split /$separator/, $line;
     s/"|'//g for @row;
 
     my ( $strain, $species, $genus ) = @row[@columns];
@@ -103,6 +103,8 @@ while ( my $line = <> ) {
         $strain =~ s/\bserovar\b//g;
         $strain =~ s/\bstr\b//g;
         $strain =~ s/\bstrain\b//g;
+        $strain =~ s/\bserotype\b//g;
+        $strain =~ s/\bbiovar\b//g;
     }
 
     s/\W+/_/g for ( $strain, $species, $genus );

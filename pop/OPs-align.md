@@ -3,7 +3,25 @@
 Less detailed than Trichoderma in [README.md](README.md), but include examples for genomes out of
 WGS, which usually in better assembling levels.
 
-## *Saccharomyces* WGS
+[TOC levels=1-3]: # " "
+- [Aligning steps for each groups](#aligning-steps-for-each-groups)
+- [*Saccharomyces* WGS](#saccharomyces-wgs)
+- [Scer_wgs WGS](#scer_wgs-wgs)
+- [Scer_100 ASSEMBLY](#scer_100-assembly)
+- [*Fusarium* WGS](#fusarium-wgs)
+- [*Aspergillus* WGS](#aspergillus-wgs)
+- [*Arabidopsis* 19 genomes](#arabidopsis-19-genomes)
+- [*Orazy sativa* Japonica 24 genomes](#orazy-sativa-japonica-24-genomes)
+- [*Drosophila* Population Genomics Project (dpgp)](#drosophila-population-genomics-project-dpgp)
+- [Primates](#primates)
+- [Human individuals from Simons project](#human-individuals-from-simons-project)
+- [*Caenorhabditis elegans* million mutation project (cele_mmp)](#caenorhabditis-elegans-million-mutation-project-cele_mmp)
+- [*Dictyostelium* WGS](#dictyostelium-wgs)
+- [*Dictyostelium discoideum*](#dictyostelium-discoideum)
+- [Mouse](#mouse)
+
+
+# *Saccharomyces* WGS
 
 1. `gen_pop_conf.pl`
 
@@ -23,7 +41,8 @@ WGS, which usually in better assembling levels.
         --opt rm_species=Fungi \
         --dd ~/data/alignment/Fungi/GENOMES/saccharomyces/DOWNLOAD \
         --download 'name=Scer_S288c;taxon=559292;sciname=Saccharomyces cerevisiae S288c' \
-        --plan 'name=plan_test;t=Scer_S288c;qs=Spar_NRRL_Y_17217,Spas_CBS_1483,Ssp_ATCC_MYA_796'
+        --download 'name=Seub_FM1318;taxon=1080349;sciname=Saccharomyces eubayanus FM1318' \
+        --plan 'name=plan_test;t=Scer_S288c;qs=Spar_NRRL_Y_17217,Spas_CBS_1483,Ssp_ATCC_MYA_796,Seub_FM1318'
 
     ```
 
@@ -57,12 +76,10 @@ WGS, which usually in better assembling levels.
 
 3. Create a summary xlsx.
 
-Run `chart.bat` under Windows.
-
 Manually combine `~/data/alignment/Fungi/GENOMES/saccharomyces/WGS/saccharomyces.csv` and
 `~/data/alignment/Fungi/saccharomyces/basicstat.xlsx`.
 
-## Scer_wgs WGS
+# Scer_wgs WGS
 
 1. `gen_pop_conf.pl`
 
@@ -91,10 +108,9 @@ Manually combine `~/data/alignment/Fungi/GENOMES/saccharomyces/WGS/saccharomyces
         --download "name=S288c;taxon=559292" \
         --download "name=RM11_1a;taxon=285006" \
         --download "name=EC1118;taxon=643680" \
-        --plan 'name=five_way;t=S288c;qs=EC1118,RM11_1a,YJM789,BC187' \
-        --plan 'name=Scer_n8_pop;t=S288c;qs=EC1118,JAY291,Kyokai_no_7,RM11_1a,Sigma1278b,T7,YJM789' \
-        --plan 'name=Scer_n8_Spar;t=S288c;qs=EC1118,JAY291,Kyokai_no_7,RM11_1a,Sigma1278b,T7,YJM789,Spar;o=Spar' \
-        --plan 'name=Scer_n8_Sbou;t=S288c;qs=EC1118,JAY291,Kyokai_no_7,RM11_1a,Sigma1278b,T7,YJM789,Sbou;o=Sbou' \
+        --plan 'name=Scer_n7_pop;t=S288c;qs=EC1118,Kyokai_no_7,RM11_1a,Sigma1278b,T7,YJM789' \
+        --plan 'name=Scer_n7_Spar;t=S288c;qs=EC1118,Kyokai_no_7,RM11_1a,Sigma1278b,T7,YJM789,Spar;o=Spar' \
+        --plan 'name=Scer_n7_Sbou;t=S288c;qs=EC1118,Kyokai_no_7,RM11_1a,Sigma1278b,T7,YJM789,Sbou;o=Sbou' \
         -y
     ```
 
@@ -120,34 +136,27 @@ Manually combine `~/data/alignment/Fungi/GENOMES/saccharomyces/WGS/saccharomyces
     sh 7_multi_db_only.sh
 
     # other plans
-    sh plan_five_way.sh
+    sh plan_Scer_n7_pop.sh
     sh 5_multi_cmd.sh
     sh 7_multi_db_only.sh
 
     # other plans
-    sh plan_Scer_n8_pop.sh
+    sh plan_Scer_n7_Spar.sh
     sh 5_multi_cmd.sh
     sh 7_multi_db_only.sh
 
     # other plans
-    sh plan_Scer_n8_Spar.sh
-    sh 5_multi_cmd.sh
-    sh 7_multi_db_only.sh
-
-    # other plans
-    sh plan_Scer_n8_Sbou.sh
+    sh plan_Scer_n7_Sbou.sh
     sh 5_multi_cmd.sh
     sh 7_multi_db_only.sh
     ```
 
 3. Create a summary xlsx.
 
-Run `chart.bat` under Windows.
-
 Manually combine `~/data/alignment/Fungi/GENOMES/scer_wgs/WGS/scer_wgs.csv` and
 `~/data/alignment/Fungi/scer_wgs/basicstat.xlsx`.
 
-## Scer_100 ASSEMBLY
+# Scer_100 ASSEMBLY
 
 1. `gen_pop_conf.pl`
 
@@ -306,66 +315,7 @@ Manually combine `~/data/alignment/Fungi/GENOMES/scer_wgs/WGS/scer_wgs.csv` and
     sh 7_multi_db_only.sh
     ```
 
-## *Candida* WGS
-
-1. `gen_pop_conf.pl`
-
-    Pay attentions to --downloaded orders. The first one will be the default target.
-
-    ```bash
-    mkdir -p ~/data/alignment/Fungi/candida
-    cd ~/data/alignment/Fungi/candida
-
-    perl ~/Scripts/withncbi/pop/gen_pop_conf.pl \
-        -i ~/data/alignment/Fungi/candida/WGS/candida.data.yml \
-        -o ~/Scripts/withncbi/pop/candida_test.yml \
-        -d ~/data/alignment/Fungi/candida/WGS \
-        -m prefix \
-        -r '*.fsa_nt.gz' \
-        --opt group_name=candida \
-        --opt base_dir='~/data/alignment/Fungi' \
-        --opt data_dir='~/data/alignment/Fungi/candida' \
-        --opt rm_species=Fungi \
-        --dd ~/data/alignment/Fungi/candida/DOWNLOAD \
-        --download 'name=Cdub_CD36;taxon=573826;sciname=Candida dubliniensis CD36' \
-        --download 'name=Corh_Co_90_125;taxon=1136231;sciname=Candida orthopsilosis Co 90-125' \
-        --plan 'name=four_way;t=Cdub_CD36;qs=Corh_Co_90_125,Calb_WO_1,Ctro_MYA_3404' \
-        --plan 'name=four_way_2;t=Corh_Co_90_125;qs=Cdub_CD36,Calb_WO_1,Ctro_MYA_3404'
-    ```
-
-2. Rest routing things.
-
-    ```bash
-    # pop_prep.pl
-    perl ~/Scripts/withncbi/pop/pop_prep.pl -p 12 -i ~/Scripts/withncbi/pop/candida_test.yml
-
-    sh 01_file.sh
-    sh 02_rm.sh
-    sh 03_strain_info.sh
-
-    # plan_ALL.sh
-    sh plan_ALL.sh
-
-    sh 1_real_chr.sh
-    sh 3_pair_cmd.sh
-    sh 4_rawphylo.sh
-    sh 5_multi_cmd.sh
-    sh 7_multi_db_only.sh
-
-    # other plans
-    sh plan_four_way.sh
-
-    sh 5_multi_cmd.sh
-    sh 7_multi_db_only.sh
-
-    sh plan_four_way_2.sh
-
-    sh 3_pair_cmd.sh # Only do this when target switched
-    sh 5_multi_cmd.sh
-    sh 7_multi_db_only.sh
-    ```
-
-## *Fusarium* WGS
+# *Fusarium* WGS
 
 1. `gen_pop_conf.pl`
 
@@ -419,7 +369,7 @@ Manually combine `~/data/alignment/Fungi/GENOMES/scer_wgs/WGS/scer_wgs.csv` and
     sh 7_multi_db_only.sh
     ```
 
-## *Aspergillus* WGS
+# *Aspergillus* WGS
 
 1. `gen_pop_conf.pl`
 
@@ -478,203 +428,15 @@ Manually combine `~/data/alignment/Fungi/GENOMES/scer_wgs/WGS/scer_wgs.csv` and
     sh 7_multi_db_only.sh
     ```
 
-## *Penicillium* WGS
+# *Arabidopsis* 19 genomes
 
-1. `gen_pop_conf.pl`
+1. Create data.yml manually.
 
-    Pay attentions to --downloaded orders. The first one will be the default target.
+```bash
+mkdir -p ~/data/alignment/arabidopsis82
+cd ~/data/alignment/arabidopsis82
 
-    ```bash
-    mkdir -p ~/data/alignment/Fungi/penicillium
-    cd ~/data/alignment/Fungi/penicillium
-
-    perl ~/Scripts/withncbi/pop/gen_pop_conf.pl \
-        -i ~/data/alignment/Fungi/penicillium/WGS/penicillium.data.yml \
-        -o ~/Scripts/withncbi/pop/penicillium_test.yml \
-        -d ~/data/alignment/Fungi/penicillium/WGS \
-        -m prefix \
-        -r '*.fsa_nt.gz' \
-        --opt group_name=penicillium \
-        --opt base_dir='~/data/alignment/Fungi' \
-        --opt data_dir='~/data/alignment/Fungi/penicillium' \
-        --opt rm_species=Fungi \
-        --opt per_seq_min_contig=30000 \
-        --per_seq Pchr_P2niaD18
-    ```
-
-2. Rest routing things.
-
-    ```bash
-    # pop_prep.pl
-    perl ~/Scripts/withncbi/pop/pop_prep.pl -p 12 -i ~/Scripts/withncbi/pop/penicillium_test.yml
-
-    sh 01_file.sh
-    sh 02_rm.sh
-    sh 03_strain_info.sh
-
-    # plan_ALL.sh
-    sh plan_ALL.sh
-
-    sh 1_real_chr.sh
-    sh 3_pair_cmd.sh
-    sh 4_rawphylo.sh
-    sh 5_multi_cmd.sh
-    sh 7_multi_db_only.sh
-    ```
-
-## *Plasmodium* WGS
-
-0. RM species
-
-    It't OK to not specifies RM species. Protists have very few repeats records.
-
-    ```bash
-    /usr/local/Cellar/repeatmasker/4.0.5/libexec/util/queryTaxonomyDatabase.pl -taxDBFile /usr/local/Cellar/repeatmasker/4.0.5/libexec/Libraries/taxonomy.dat -species Apicomplexa
-    /usr/local/Cellar/repeatmasker/4.0.5/libexec/util/queryRepeatDatabase.pl -species Apicomplexa -stat
-    ```
-
-1. `gen_pop_conf.pl`
-
-    ```bash
-    mkdir -p ~/data/alignment/Protists/plasmodium
-    cd ~/data/alignment/Protists/plasmodium
-
-    perl ~/Scripts/withncbi/pop/gen_pop_conf.pl \
-        -i ~/data/alignment/Protists/GENOMES/plasmodium/WGS/plasmodium.data.yml \
-        -o ~/Scripts/withncbi/pop/plasmodium_test.yml \
-        -d ~/data/alignment/Protists/GENOMES/plasmodium/WGS \
-        -m prefix \
-        -r '*.fsa_nt.gz' \
-        --opt group_name=plasmodium \
-        --opt base_dir='~/data/alignment/Protists' \
-        --opt data_dir='~/data/alignment/Protists/plasmodium' \
-        --dd ~/data/alignment/Protists/GENOMES/plasmodium/DOWNLOAD \
-        --download 'name=Pfal_3D7;taxon=36329;sciname=Plasmodium falciparum 3D7' \
-        -y
-    ```
-
-2. Rest routing things.
-
-    ```bash
-    cd ~/data/alignment/Protists/plasmodium
-
-    # pop_prep.pl
-    perl ~/Scripts/withncbi/pop/pop_prep.pl -p 8 -i ~/Scripts/withncbi/pop/plasmodium_test.yml
-
-    sh 01_file.sh
-    sh 02_rm.sh
-    sh 03_strain_info.sh
-
-    # plan_ALL.sh
-    sh plan_ALL.sh
-
-    sh 1_real_chr.sh
-    sh 3_pair_cmd.sh
-    sh 4_rawphylo.sh
-    sh 5_multi_cmd.sh
-    sh 7_multi_db_only.sh
-    ```
-
-3. Pick outgroup.
-
-    Prei is the only one.
-
-## *Plasmodium falciparum* WGS
-
-1. `gen_pop_conf.pl`
-
-    ```bash
-    mkdir -p ~/data/alignment/Protists/pfal
-    cd ~/data/alignment/Protists/pfal
-
-    cat ~/data/alignment/Protists/GENOMES/pfal/DOWNLOAD/pfal.seq.csv \
-        | grep -v "^#" \
-        | cut -d',' -f1,3 \
-        | uniq \
-        | perl -nl -a -F"," -e 'printf qq{    --download "name=%s;taxon=%s" \\\n}, $F[0], $F[1];'
-
-    perl ~/Scripts/withncbi/pop/gen_pop_conf.pl \
-        -i ~/data/alignment/Protists/GENOMES/pfal/WGS/pfal.data.yml \
-        -o ~/Scripts/withncbi/pop/pfal_test.yml \
-        -d ~/data/alignment/Protists/GENOMES/pfal/WGS \
-        -m prefix \
-        -r '*.fsa_nt.gz' \
-        --opt group_name=pfal \
-        --opt base_dir='~/data/alignment/Protists' \
-        --opt data_dir='~/data/alignment/Protists/pfal' \
-        --dd ~/data/alignment/Protists/GENOMES/pfal/DOWNLOAD \
-        --download 'name=3D7;taxon=36329;sciname=Plasmodium falciparum 3D7' \
-        --download "name=CAMP_Malaysia;taxon=5835" \
-        --download "name=NF54;taxon=5843" \
-        --download "name=7G8;taxon=57266" \
-        --download "name=Palo_Alto_Uganda;taxon=57270" \
-        --download "name=Santa_Lucia;taxon=478859" \
-        --download "name=Vietnam_Oak_Knoll_FVO_;taxon=1036723" \
-        --download "name=FCH_4;taxon=1036724" \
-        --download "name=Tanzania_2000708_;taxon=1036725" \
-        --download "name=NF135_5_C10;taxon=1036726" \
-        --download "name=MaliPS096_E11;taxon=1036727" \
-        --download "name=UGT5_1;taxon=1237627" \
-        --plan 'name=Pfal_n15_Prei;t=3D7;qs=7G8,CAMP_Malaysia,Dd2,FCH_4,HB3,IGH_CR14,MaliPS096_E11,NF135_5_C10,NF54,Palo_Alto_Uganda,Santa_Lucia,Tanzania_2000708_,UGT5_1,Vietnam_Oak_Knoll_FVO_,Prei;o=Prei' \
-        --plan 'name=Pfal_n11_Prei;t=3D7;qs=7G8,CAMP_Malaysia,HB3,IGH_CR14,MaliPS096_E11,NF135_5_C10,Palo_Alto_Uganda,Santa_Lucia,Tanzania_2000708_,UGT5_1,Vietnam_Oak_Knoll_FVO_,Prei;o=Prei' \
-        --plan 'name=Pfal_n11_pop;t=3D7;qs=7G8,CAMP_Malaysia,HB3,IGH_CR14,MaliPS096_E11,NF135_5_C10,Palo_Alto_Uganda,Santa_Lucia,Tanzania_2000708_,UGT5_1,Vietnam_Oak_Knoll_FVO_' \
-        --plan 'name=Pfal_n7_pop;t=3D7;qs=7G8,CAMP_Malaysia,HB3,NF135_5_C10,Santa_Lucia,Vietnam_Oak_Knoll_FVO_' \
-        --plan 'name=Pfal_n7_Prei;t=3D7;qs=7G8,CAMP_Malaysia,HB3,NF135_5_C10,Santa_Lucia,Vietnam_Oak_Knoll_FVO_,Prei;o=Prei' \
-        -y
-    ```
-
-2. Rest routing things.
-
-    ```bash
-    cd ~/data/alignment/Protists/pfal
-
-    # pop_prep.pl
-    perl ~/Scripts/withncbi/pop/pop_prep.pl -p 8 -i ~/Scripts/withncbi/pop/pfal_test.yml
-
-    sh 01_file.sh
-    sh 02_rm.sh
-    sh 03_strain_info.sh
-
-    # plan_ALL.sh
-    sh plan_ALL.sh
-
-    sh 1_real_chr.sh
-    sh 3_pair_cmd.sh
-    sh 4_rawphylo.sh
-    sh 5_multi_cmd.sh
-    sh 7_multi_db_only.sh
-
-    # other plans
-    sh plan_Pfal_n15_Prei.sh
-    sh 5_multi_cmd.sh
-    sh 7_multi_db_only.sh
-
-    sh plan_Pfal_n11_Prei.sh
-    sh 5_multi_cmd.sh
-    sh 7_multi_db_only.sh
-
-    sh plan_Pfal_n11_pop.sh
-    sh 5_multi_cmd.sh
-    sh 7_multi_db_only.sh
-
-    sh plan_Pfal_n7_Prei.sh
-    sh 5_multi_cmd.sh
-    sh 7_multi_db_only.sh
-
-    sh plan_Pfal_n7_pop.sh
-    sh 5_multi_cmd.sh
-    sh 7_multi_db_only.sh
-    ```
-
-## *Arabidopsis* 19 genomes
-
-0. Create data.yml manually.
-
-    ```bash
-    mkdir -p ~/data/alignment/arabidopsis82
-    cd ~/data/alignment/arabidopsis82
-
-    cat <<EOF > arabidopsis82_data.yml
+cat <<EOF > arabidopsis82_data.yml
 ---
 data:
   - coverage: 25
@@ -750,7 +512,7 @@ data:
     origin: Germany
     original_id: 3702
 EOF
-    ```
+```
 
 1. `gen_pop_conf.pl`
 
@@ -805,15 +567,15 @@ EOF
     sh 7_multi_db_only.sh
     ```
 
-## *Orazy sativa* Japonica 24 genomes
+# *Orazy sativa* Japonica 24 genomes
 
-0. Create data.yml manually.
+1. Create data.yml manually.
 
-    ```bash
-    mkdir -p ~/data/alignment/rice82
-    cd ~/data/alignment/rice82
+```bash
+mkdir -p ~/data/alignment/rice82
+cd ~/data/alignment/rice82
 
-    cat <<EOF > rice82_data.yml
+cat <<EOF > rice82_data.yml
 ---
 data:
   - coverage: 11.33
@@ -909,7 +671,7 @@ data:
     original_id: 4530
     subgroup: ARO
 EOF
-    ```
+```
 
 1. `gen_pop_conf.pl`
 
@@ -967,15 +729,15 @@ EOF
     sh 7_multi_db_only.sh
     ```
 
-## *Drosophila* Population Genomics Project (dpgp)
+# *Drosophila* Population Genomics Project (dpgp)
 
-0. Create data.yml manually.
+1. Create data.yml manually.
 
-    ```bash
-    mkdir -p ~/data/alignment/dpgp82
-    cd ~/data/alignment/dpgp82
+```bash
+mkdir -p ~/data/alignment/dpgp82
+cd ~/data/alignment/dpgp82
 
-    cat <<EOF > dpgp82_data.yml
+cat <<EOF > dpgp82_data.yml
 ---
 data:
   - coverage: 37.8
@@ -1042,7 +804,7 @@ data:
     name: ZS37
     original_id: 7227
 EOF
-    ```
+```
 
 1. `gen_pop_conf.pl`
 
@@ -1095,19 +857,19 @@ EOF
     sh 7_multi_db_only.sh
     ```
 
-## Primates
+# Primates
 
-0. Create an empty data.yml.
+1. Create an empty data.yml.
 
-    ```bash
-    mkdir -p ~/data/alignment/primates82
-    cd ~/data/alignment/primates82
+```bash
+mkdir -p ~/data/alignment/primates82
+cd ~/data/alignment/primates82
 
-    cat <<EOF > primates82_data.yml
+cat <<EOF > primates82_data.yml
 ---
 data: []
 EOF
-    ```
+```
 
 1. `gen_pop_conf.pl`
 
@@ -1158,15 +920,15 @@ EOF
     sh 5_multi_cmd.sh
     ```
 
-## Human individuals from Simons project
+# Human individuals from Simons project
 
-0. Create data.yml manually.
+1. Create data.yml manually.
 
-    ```bash
-    mkdir -p ~/data/alignment/human_simons
-    cd ~/data/alignment/human_simons
+```bash
+mkdir -p ~/data/alignment/human_simons
+cd ~/data/alignment/human_simons
 
-    cat <<EOF > human_simons_data.yml
+cat <<EOF > human_simons_data.yml
 ---
 data:
   - name: HGDP00456
@@ -1214,7 +976,7 @@ data:
     gender: F
     original_id: 9606
 EOF
-    ```
+```
 
 1. `gen_pop_conf.pl`
 
@@ -1265,17 +1027,18 @@ EOF
     sh 5_multi_cmd.sh
     ```
 
-## *Caenorhabditis elegans* million mutation project (cele_mmp)
+# *Caenorhabditis elegans* million mutation project (cele_mmp)
 
-0. Create data.yml manually.
+1. Create data.yml manually.
 
-    Information came from [here](http://genome.cshlp.org/content/suppl/2013/08/20/gr.157651.113.DC2/Supplemental_Table_3.xls).
+    Information came from
+    [here](http://genome.cshlp.org/content/suppl/2013/08/20/gr.157651.113.DC2/Supplemental_Table_3.xls).
 
-    ```bash
-    mkdir -p ~/data/alignment/cele82
-    cd ~/data/alignment/cele82
+```bash
+mkdir -p ~/data/alignment/cele82
+cd ~/data/alignment/cele82
 
-    cat <<EOF > cele82_data.yml
+cat <<EOF > cele82_data.yml
 ---
 data:
   - coverage: 29
@@ -1399,7 +1162,7 @@ data:
     name: PX174
     original_id: 6239
 EOF
-    ```
+```
 
 1. `gen_pop_conf.pl`
 
@@ -1445,9 +1208,9 @@ EOF
     sh 7_multi_db_only.sh
     ```
 
-## *Dictyostelium* WGS
+# *Dictyostelium* WGS
 
-0. RM species
+1. RM species
 
     It't OK to not specifies RM species. Protists have very few repeats records.
 
@@ -1456,7 +1219,7 @@ EOF
     /usr/local/Cellar/repeatmasker/4.0.5/libexec/util/queryRepeatDatabase.pl -species Dictyosteliida -stat
     ```
 
-1. `gen_pop_conf.pl`
+2. `gen_pop_conf.pl`
 
     ```bash
     mkdir -p ~/data/alignment/Protists/dictyostelium
@@ -1481,7 +1244,7 @@ EOF
         -y
     ```
 
-2. Rest routing things.
+3. Rest routing things.
 
     ```bash
     cd ~/data/alignment/Protists/dictyostelium
@@ -1503,21 +1266,21 @@ EOF
     sh 7_multi_db_only.sh
     ```
 
-3. Pick outgroup.
+4. Pick outgroup.
 
     Dictyostelium_citrinum or Dictyostelium_firmibasis assemblies.
 
-## *Dictyostelium discoideum*
+# *Dictyostelium discoideum*
 
-0. Create data.yml manually.
+1. Create data.yml manually.
 
     Coverages are not real.
 
-    ```bash
-    mkdir -p ~/data/alignment/Protists/Ddis
-    cd ~/data/alignment/Protists/Ddis
+```bash
+mkdir -p ~/data/alignment/Protists/Ddis
+cd ~/data/alignment/Protists/Ddis
 
-    cat <<EOF > ddis_data.yml
+cat <<EOF > ddis_data.yml
 ---
 data:
   - coverage: 10
@@ -1572,7 +1335,7 @@ data:
     name: WS15
     original_id: 44689
 EOF
-    ```
+```
 
 1. `gen_pop_conf.pl`
 
@@ -1638,15 +1401,15 @@ EOF
     ```
 
 
-## Mouse
+# Mouse
 
-0. Create data.yml manually.
+1. Create data.yml manually.
 
-    ```bash
-    mkdir -p ~/data/alignment/mouse82
-    cd ~/data/alignment/mouse82
+```bash
+mkdir -p ~/data/alignment/mouse82
+cd ~/data/alignment/mouse82
 
-    cat <<EOF > mouse82_data.yml
+cat <<EOF > mouse82_data.yml
 ---
 data:
   - name: 129S1_SvImJ
@@ -1690,7 +1453,7 @@ data:
     taxon: 10092
     sciname: Mus musculus domesticus
 EOF
-    ```
+```
 
 1. `gen_pop_conf.pl`
 
@@ -1749,3 +1512,4 @@ EOF
     sh 5_multi_cmd.sh
     sh 7_multi_db_only.sh    
     ```
+

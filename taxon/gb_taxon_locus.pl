@@ -18,7 +18,7 @@ $file = path($file);
 
 my $content = $file->slurp;
 
-my @gbs = grep {/\S+/} split( /\/\//, $content );
+my @gbs = grep {/\S+/} split( /^\/\//m, $content );
 
 printf STDERR "There are [%d] sequences.\n", scalar @gbs;
 

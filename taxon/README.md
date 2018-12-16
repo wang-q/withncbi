@@ -565,6 +565,7 @@ perl ~/Scripts/withncbi/taxon/batch_get_seq.pl \
     -p 2>&1 \
     | tee plastid_seq.log
 
+
 # count downloaded sequences # 2577 #
 find . -name "*.fa" | wc -l
 ```
@@ -1342,12 +1343,12 @@ cat ~/Scripts/withncbi/doc/ir_lsc_ssc.tsv \
             print qq{fasops slice -n $F[1] -o $F[0].$key.fas \\};
             print qq{    ~/data/organelle/plastid.working/$F[0]/$F[0]_refined/$F[3].synNet.maf.gz.fas.gz \\};
             print qq{    $F[0].$key.yml};
-            print qq{perl ~/Scripts/alignDB/util/multi_way_batch.pl \\};
+            print qq{perl ~/Scripts/alignDB/alignDB.pl \\};
             print qq{    -d $F[0]_$key \\};
             print qq{    -da ~/data/organelle/plastid_slices/$F[0].$key.fas \\};
             print qq{    -a ~/data/organelle/plastid.working/$F[0]/Stats/anno.yml \\};
             print qq{    -chr ~/data/organelle/plastid.working/$F[0]/chr_length.csv \\};
-            print qq{    -lt 1000 --parallel 8 --batch 5 \\};
+            print qq{    --lt 1000 --parallel 8 --batch 5 \\};
             print qq{    --run common};
             print qq{};
         }

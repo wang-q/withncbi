@@ -1,54 +1,75 @@
 # Self-aligning steps for each groups
 
-## Taxonomy for Ensembl species
+
+[TOC levels=1-3]: # " "
+- [Self-aligning steps for each groups](#self-aligning-steps-for-each-groups)
+- [Taxonomy for Ensembl species](#taxonomy-for-ensembl-species)
+    - [Plants](#plants)
+- [Model organisms](#model-organisms)
+    - [Ecoli K-12 MG1655](#ecoli-k-12-mg1655)
+    - [Yeast S288c](#yeast-s288c)
+    - [Dmel](#dmel)
+    - [Cele](#cele)
+    - [Ddis](#ddis)
+    - [Human](#human)
+    - [Mouse](#mouse)
+- [All plants](#all-plants)
+    - [Arabidopsis](#arabidopsis)
+    - [Plants: full chromosomes](#plants-full-chromosomes)
+    - [Plants: partitioned chromosomes](#plants-partitioned-chromosomes)
+
+
+# Taxonomy for Ensembl species
 
 ```bash
 mkdir -p ~/data/alignment/self
 cd ~/data/alignment/self
 
 perl        ~/Scripts/withncbi/taxon/strain_info.pl \
+    --id    511145 --name 511145=MG1655 \
     --id    559292 --name 559292=S288c  \
-    --id    7227   --name 7227=Dmel     \
     --id    9606   --name 9606=Human    \
-    --id    6239   --name 6239=Cele     \
-    --id    352472 --name 352472=Ddis   \
     --id    10090  --name 10090=Mouse   \
-    --id    3880   --name 3880=Mtru     \
-    --id    3847   --name 3847=Gmax     \
-    --id    3712   --name 3712=Bole     \
-    --id    3711   --name 3711=Brap     \
     --id    3702   --name 3702=Atha     \
     --id    59689  --name 59689=Alyr    \
+    --id    3880   --name 3880=Mtru     \
+    --id    3847   --name 3847=Gmax     \
     --id    29760  --name 29760=Vvin    \
+    --id    39947  --name 39947=OsatJap \
+    --id    3712   --name 3712=Bole     \
+    --id    3711   --name 3711=Brap     \
     --id    4081   --name 4081=Slyc     \
     --id    4113   --name 4113=Stub     \
-    --id    4641   --name 4641=Macu     \
     --id    4555   --name 4555=Sita     \
     --id    4558   --name 4558=Sbic     \
-    --id    39947  --name 39947=OsatJap \
     --id    15368  --name 15368=Bdis    \
+    --id    4641   --name 4641=Macu     \
+    --id    7227   --name 7227=Dmel     \
+    --id    6239   --name 6239=Cele     \
+    --id    352472 --name 352472=Ddis   \
     --file ensembl_taxon.csv            \
     --entrez
+
 ```
 
-### Plants
+## Plants
 
 | Name                       | Classification | Taxon ID | Used |
-| :---                       | :---           | :---     | :--- |
+|:---------------------------|:---------------|:---------|:----:|
 | Aegilops tauschii          | Liliopsida     | 37682    |      |
-| Amborella trichopoda       | Amborellales   | 13333    | -    |
-| Arabidopsis lyrata         | eudicotyledons | 81972    | -    |
-| Arabidopsis thaliana       | eudicotyledons | 3702     | -    |
-| Brachypodium distachyon    | Liliopsida     | 15368    | -    |
+| Amborella trichopoda       | Amborellales   | 13333    |  o   |
+| Arabidopsis lyrata         | eudicotyledons | 81972    |  o   |
+| Arabidopsis thaliana       | eudicotyledons | 3702     |  o   |
+| Brachypodium distachyon    | Liliopsida     | 15368    |  o   |
 | Brassica oleracea          | eudicotyledons | 109376   |      |
-| Brassica rapa              | eudicotyledons | 51351    | -    |
+| Brassica rapa              | eudicotyledons | 51351    |  o   |
 | Chlamydomonas reinhardtii  | Chlorophyta    | 3055     |      |
 | Cyanidioschyzon merolae    | Rhodophyta     | 280699   |      |
-| Glycine max                | eudicotyledons | 3847     | -    |
+| Glycine max                | eudicotyledons | 3847     |  o   |
 | Hordeum vulgare            | Liliopsida     | 112509   |      |
 | Leersia perrieri           | Liliopsida     | 77586    |      |
-| Medicago truncatula        | eudicotyledons | 3880     | -    |
-| Musa acuminata             | Liliopsida     | 214687   | -    |
+| Medicago truncatula        | eudicotyledons | 3880     |  o   |
+| Musa acuminata             | Liliopsida     | 214687   |  o   |
 | Oryza barthii              | Liliopsida     | 65489    |      |
 | Oryza brachyantha          | Liliopsida     | 4533     |      |
 | Oryza glaberrima           | Liliopsida     | 4538     |      |
@@ -59,180 +80,190 @@ perl        ~/Scripts/withncbi/taxon/strain_info.pl \
 | Oryza punctata             | Liliopsida     | 4537     |      |
 | Oryza rufipogon            | Liliopsida     | 4529     |      |
 | Oryza sativa Indica        | Liliopsida     | 39946    |      |
-| Oryza sativa Japonica      | Liliopsida     | 39947    | -    |
+| Oryza sativa Japonica      | Liliopsida     | 39947    |  o   |
 | Ostreococcus lucimarinus   | Chlorophyta    | 436017   |      |
 | Physcomitrella patens      | Bryophyta      | 3218     |      |
 | Populus trichocarpa        | eudicotyledons | 3694     |      |
 | Prunus persica             | eudicotyledons | 3760     |      |
 | Selaginella moellendorffii | Lycopodiophyta | 88036    |      |
-| Setaria italica            | Liliopsida     | 4555     | -    |
-| Solanum lycopersicum       | eudicotyledons | 4081     | -    |
-| Solanum tuberosum          | eudicotyledons | 4113     | -    |
-| Sorghum bicolor            | Liliopsida     | 4558     | -    |
+| Setaria italica            | Liliopsida     | 4555     |  o   |
+| Solanum lycopersicum       | eudicotyledons | 4081     |  o   |
+| Solanum tuberosum          | eudicotyledons | 4113     |  o   |
+| Sorghum bicolor            | Liliopsida     | 4558     |  o   |
 | Theobroma cacao            | eudicotyledons | 3641     |      |
 | Triticum aestivum          | Liliopsida     | 4565     |      |
 | Triticum urartu            | Liliopsida     | 4572     |      |
-| Vitis vinifera             | eudicotyledons | 29760    | -    |
+| Vitis vinifera             | eudicotyledons | 29760    |  o   |
 | Zea mays                   | Liliopsida     | 4577     |      |
+
+TODO:
+
+* Sequencing strategy and coverage: BAC, WGS, Illumina
+    * N50 of contigs and scaffolds
+
+# Model organisms
+
+## Ecoli K-12 MG1655
+
+Pretend to be an Ensembl project.
+
+Use GenBank accessions instead of RefSeq accessions.
+
+```bash
+mkdir -p ~/data/alignment/Ensembl/MG1655
+cd ~/data/alignment/Ensembl/MG1655
+
+#curl -s "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=nucleotide&id=NC_000913.3&rettype=fasta&retmode=txt" \
+#    > NC_000913.fa
+
+cat <<EOF > name_seq.csv
+strain_name,accession,strain_taxon_id,seq_name # This line is needed
+MG1655,U00096,
+EOF
+
+perl ~/Scripts/withncbi/taxon/batch_get_seq.pl -f name_seq.csv
+
+egaz prepseq MG1655/U00096.fa -o . --repeatmasker '--gff --parallel 8' -v
+
+mv MG1655/U00096.gff .
+mv U00096.gff chr.gff
+
+# create anno.yml
+runlist gff --tag CDS --remove chr.gff -o cds.yml
+runlist gff --remove U00096.rm.gff -o repeat.yml
+runlist merge repeat.yml cds.yml -o anno.yml
+
+rm repeat.yml cds.yml U00096.rm.gff U00096.rm.out
+rm -fr MG1655
+
+```
+
+```bash
+cd ~/data/alignment/self
+
+egaz template \
+    ~/data/alignment/Ensembl/MG1655 \
+    --self -o ecoli \
+    --taxon ~/data/alignment/self/ensembl_taxon.csv \
+    --circos --aligndb --parallel 8 -v
+
+bash ecoli/1_self.sh
+bash ecoli/3_proc.sh
+bash ecoli/4_circos.sh
+bash ecoli/6_chr_length.sh
+bash ecoli/7_self_aligndb.sh
+bash ecoli/9_pack_up.sh
+
+```
 
 ## Yeast S288c
 
 ```bash
 cd ~/data/alignment/self
 
-perl ~/Scripts/egaz/self_batch.pl \
-    --working_dir ~/data/alignment/self \
-    --seq_dir ~/data/alignment/Ensembl \
-    -c ~/data/alignment/self/ensembl_taxon.csv \
-    --length 1000  \
-    --norm \
-    --name yeast \
-    --parallel 8 \
-    -t S288c
+egaz template \
+    ~/data/alignment/Ensembl/S288c/ \
+    --self -o yeast \
+    --taxon ~/data/alignment/self/ensembl_taxon.csv \
+    --circos --parallel 8 -v
 
-bash yeast/1_real_chr.sh
-bash yeast/3_self_cmd.sh
-# real    0m46.075s
-time bash yeast/4_proc_cmd.sh
-bash yeast/5_circos_cmd.sh
+bash yeast/1_self.sh
+bash yeast/3_proc.sh
+bash yeast/4_circos.sh
+
 ```
 
-## Arabidopsis
-
-### 1. full chromosomes
+## Dmel
 
 ```bash
 cd ~/data/alignment/self
 
-perl ~/Scripts/egaz/self_batch.pl \
-    --working_dir ~/data/alignment/self \
-    --seq_dir ~/data/alignment/Ensembl \
-    -c ~/data/alignment/self/ensembl_taxon.csv \
-    --length 1000  \
-    --norm \
-    --name arabidopsis \
-    --parallel 8 \
-    -t Atha
+egaz template \
+    ~/data/alignment/Ensembl/Dmel/ \
+    --self -o fly \
+    --taxon ~/data/alignment/self/ensembl_taxon.csv \
+    --circos --parallel 8 -v
 
-cd ~/data/alignment/self/arabidopsis
+time bash fly/1_self.sh
+#real    20m4.269s
+#user    139m8.359s
+#sys     1m42.665s
 
-# ath centromere position from the follow file:
-# ftp://ftp.arabidopsis.org/home/tair/Sequences/whole_chromosomes/tair9_Assembly_gaps.gff
-# chr1 14511722	14803970
-# chr2 3611839	3633423
-# chr3 13589757	13867121
-# chr4 3133664	3133674
-# chr5 11194538	11723210
+time bash fly/3_proc.sh
+#real    6m16.450s
+#user    16m32.193s
+#sys     5m26.875s
 
-# Hosouchi, T., Kumekawa, N., Tsuruoka, H. & Kotani, H. Physical Map-Based Sizes of the Centromeric Regions of Arabidopsis thaliana Chromosomes 1, 2, and 3. DNA Res 9, 117®C121 (2002).
-TAB=$'\t'
-cat <<EOF > Atha.kary.tsv
-#chrom${TAB}chromStart${TAB}chromEnd${TAB}name${TAB}gieStain
-1${TAB}1${TAB}14200000${TAB}p1${TAB}gpos50${TAB}#14.2M
-1${TAB}14200000${TAB}15627671${TAB}p1${TAB}acen
-1${TAB}15627671${TAB}30427671${TAB}q1${TAB}gpos50${TAB}#14.8M
-2${TAB}1${TAB}3000000${TAB}p2${TAB}gpos50${TAB}#3.0M
-2${TAB}3000000${TAB}3898289${TAB}p2${TAB}acen
-2${TAB}3898289${TAB}19698289${TAB}q2${TAB}gpos50${TAB}#15.8M
-3${TAB}1${TAB}13200000${TAB}p3${TAB}gpos50${TAB}#13.2M
-3${TAB}13200000${TAB}14459830${TAB}p3${TAB}acen
-3${TAB}14459830${TAB}23459830${TAB}q3${TAB}gpos50${TAB}#9M
-4${TAB}1${TAB}3000000${TAB}p4${TAB}gpos50${TAB}#3M
-4${TAB}3000000${TAB}5085056${TAB}p4${TAB}acen
-4${TAB}5085056${TAB}18585056${TAB}q4${TAB}gpos50${TAB}#13.5M
-5${TAB}1${TAB}11100000${TAB}p5${TAB}gpos50${TAB}#${TAB}1.1M
-5${TAB}11100000${TAB}12575502${TAB}p5${TAB}acen
-5${TAB}12575502${TAB}26975502${TAB}q5${TAB}gpos50${TAB}#14.4M
-EOF
+bash fly/4_circos.sh
 
-mkdir -p Processing/Atha
-bash ~/share/circos/data/karyotype/parse.karyotype Atha.kary.tsv > Processing/Atha/karyotype.Atha.txt
-
-bash 1_real_chr.sh
-# real    25m15.804s
-time bash 3_self_cmd.sh
-# real    10m21.329s
-time bash 4_proc_cmd.sh
-bash 5_circos_cmd.sh
 ```
-
-### 2. partition sequences
-
-```bash
-cd ~/data/alignment/self
-
-mkdir -p ~/data/alignment/self/arabidopsis_parted/Genomes
-perl ~/Scripts/egaz/part_seq.pl \
-    -i ~/data/alignment/Ensembl/Atha \
-    -o ~/data/alignment/self/arabidopsis_parted/Genomes/Atha \
-    --chunk 10010000 --overlap 10000
-
-perl ~/Scripts/egaz/self_batch.pl \
-    --working_dir ~/data/alignment/self \
-    -c ~/data/alignment/self/ensembl_taxon.csv \
-    --parted \
-    --length 1000  \
-    --norm \
-    --name arabidopsis_parted \
-    --parallel 8 \
-    -t Atha
-
-bash arabidopsis_parted/1_real_chr.sh
-# real    21m10.875s
-time bash arabidopsis_parted/3_self_cmd.sh
-# real    9m33.086s
-time bash arabidopsis_parted/4_proc_cmd.sh
-bash arabidopsis_parted/5_circos_cmd.sh
-```
-
-### 3. Comparison
-
-**11.50% vs 9.96%. Use full chromosomes if the running time is acceptable.**
 
 ## Cele
 
 ```bash
 cd ~/data/alignment/self
 
-perl ~/Scripts/egaz/self_batch.pl \
-    --working_dir ~/data/alignment/self \
-    --seq_dir ~/data/alignment/Ensembl \
-    -c ~/data/alignment/self/ensembl_taxon.csv \
-    --length 1000  \
-    --norm \
-    --name worm \
-    --parallel 8 \
-    -t Cele
+egaz template \
+    ~/data/alignment/Ensembl/Cele/ \
+    --self -o worm \
+    --taxon ~/data/alignment/self/ensembl_taxon.csv \
+    --circos --parallel 8 -v
 
-bash worm/1_real_chr.sh
-# real    26m9.090s
-time bash worm/3_self_cmd.sh
-# real    3m24.714s
-time bash worm/4_proc_cmd.sh
-bash worm/5_circos_cmd.sh
+bash worm/1_self.sh
+bash worm/3_proc.sh
+bash worm/4_circos.sh
+
 ```
 
 ## Ddis
 
+* .dna_sm.toplevel.fa.gz is unmasked
+
+```bash
+rm -fr  ~/data/alignment/Ensembl/Ddis/
+
+egaz prepseq \
+    --repeatmasker '--gff --parallel 8' --min 50000 -v \
+    ~/data/ensembl94/fasta/dictyostelium_discoideum/dna/Dictyostelium_discoideum.dicty_2.7.dna_sm.toplevel.fa.gz \
+    -o ~/data/alignment/Ensembl/Ddis/
+
+cd ~/data/alignment/Ensembl/Ddis/
+
+find ~/data/ensembl94/gff3/dictyostelium_discoideum/ -name "*.gff3.gz" |
+    grep -v "abinitio.gff3" |
+    grep -v "chr.gff3" |
+    xargs gzip -d -c > chr.gff
+runlist gff --tag CDS --remove chr.gff -o cds.yml
+
+runlist gff --remove \
+    *.rm.gff \
+    -o repeat.yml
+
+runlist merge \
+    cds.yml repeat.yml \
+    -o anno.yml
+
+rm -f repeat.yml cds.yml
+
+```
+
 ```bash
 cd ~/data/alignment/self
 
-perl ~/Scripts/egaz/self_batch.pl \
-    --working_dir ~/data/alignment/self \
-    --seq_dir ~/data/alignment/Ensembl \
-    -c ~/data/alignment/self/ensembl_taxon.csv \
-    --length 1000  \
-    --norm \
-    --name dicty \
-    --parallel 8 \
-    -t Ddis
+egaz template \
+    ~/data/alignment/Ensembl/Ddis/ \
+    --self -o dicty \
+    --taxon ~/data/alignment/self/ensembl_taxon.csv \
+    --circos --parallel 8 -v
 
-bash dicty/1_real_chr.sh
-# real    1m53.391s
-time bash dicty/3_self_cmd.sh
-# real    353m10.864s
-time bash dicty/4_proc_cmd.sh
-bash dicty/5_circos_cmd.sh
+time bash dicty/1_self.sh
+#real    7m32.264s
+#user    54m42.929s
+#sys     0m30.717s
+
+bash dicty/3_proc.sh
+bash dicty/4_circos.sh
+
 ```
 
 ## Human
@@ -240,24 +271,24 @@ bash dicty/5_circos_cmd.sh
 ```bash
 cd ~/data/alignment/self
 
-perl ~/Scripts/egaz/self_batch.pl \
-    --working_dir ~/data/alignment/self \
-    --seq_dir ~/data/alignment/Ensembl \
-    -c ~/data/alignment/self/ensembl_taxon.csv \
-    --length 1000  \
-    --norm \
-    --name human \
-    --parallel 8 \
-    -t Human
+egaz template \
+    ~/data/alignment/Ensembl/Human/ \
+    --self -o human \
+    --taxon ~/data/alignment/self/ensembl_taxon.csv \
+    --circos --parallel 8 -v
 
-cd ~/data/alignment/self/human
+time bash human/1_self.sh
+#real    3158m12.839s
+#user    24898m37.946s
+#sys     138m1.231s
 
-bash 1_real_chr.sh
-# real    4156m4.259s
-time bash 3_self_cmd.sh
-# real    940m13.950s
-time bash 4_proc_cmd.sh
-bash 5_circos_cmd.sh
+time bash human/3_proc.sh
+#real    458m46.491s
+#user    1330m6.094s
+#sys     93m22.268s
+
+bash human/4_circos.sh
+
 ```
 
 ## Mouse
@@ -265,114 +296,185 @@ bash 5_circos_cmd.sh
 ```bash
 cd ~/data/alignment/self
 
-perl ~/Scripts/egaz/self_batch.pl \
-    --working_dir ~/data/alignment/self \
-    --seq_dir ~/data/alignment/Ensembl \
-    -c ~/data/alignment/self/ensembl_taxon.csv \
-    --length 1000  \
-    --norm \
-    --name mouse \
-    --parallel 8 \
-    -t Mouse
+egaz template \
+    ~/data/alignment/Ensembl/Mouse/ \
+    --self -o mouse \
+    --taxon ~/data/alignment/self/ensembl_taxon.csv \
+    --circos --parallel 8 -v
 
-cd ~/data/alignment/self/mouse
+time bash mouse/1_self.sh
+#real    2948m46.920s
+#user    23114m31.078s
+#sys     108m47.712s
 
-bash 1_real_chr.sh
-# real    3801m39.031s
-time bash 3_self_cmd.sh
-# real    1750m33.958s
-time bash 4_proc_cmd.sh
-bash 5_circos_cmd.sh
+time bash mouse/3_proc.sh
+#real    1012m29.622s
+#user    2487m21.989s
+#sys     193m31.933s
+
+bash mouse/4_circos.sh
+
 ```
 
-## All plants
+# All plants
 
-### Full chromosomes
+## Arabidopsis
+
+Comparison: **9.69% vs 9.34%**. Use full chromosomes if the running time is acceptable.
 
 ```bash
 cd ~/data/alignment/self
 
-perl ~/Scripts/egaz/self_batch.pl \
-    --working_dir ~/data/alignment/self \
-    --seq_dir ~/data/alignment/Ensembl \
-    -c ~/data/alignment/self/ensembl_taxon.csv \
-    --length 1000  \
-    --norm \
-    --name plants \
-    --parallel 12 \
-    -q Alyr \
-    -q OsatJap \
-    -q Sbic \
-    -t Atha
+# full chromosomes
+egaz template \
+    ~/data/alignment/Ensembl/Atha/ \
+    --self -o arabidopsis \
+    --taxon ~/data/alignment/self/ensembl_taxon.csv \
+    --circos --parallel 8 -v
 
-cd ~/data/alignment/self/plants
+time bash arabidopsis/1_self.sh
+#real    17m35.952s
+#user    121m5.877s
+#sys     0m23.514s
 
-bash 1_real_chr.sh
-# real    658m10.559s
-time bash 3_self_cmd.sh
-# real    971m49.779s
-time bash 4_proc_cmd.sh
-bash 5_circos_cmd.sh
+time bash arabidopsis/3_proc.sh
+#real    8m59.367s
+#user    23m0.583s
+#sys     14m46.156s
+
+bash arabidopsis/4_circos.sh
+
+# partitioned chromosomes
+find ~/data/alignment/Ensembl/Atha/ -type f -name "*.fa" |
+    sort |
+    parallel --no-run-if-empty --linebuffer -k -j 8 '
+        echo >&2 {}
+        egaz partition {} --chunk 10010000 --overlap 10000
+    '
+
+egaz template \
+    ~/data/alignment/Ensembl/Atha/ \
+    --self -o arabidopsis_par \
+    --taxon ~/data/alignment/self/ensembl_taxon.csv \
+    --circos --partition --parallel 8 -v
+
+time bash arabidopsis_par/1_self.sh
+#real    16m47.681s
+#user    128m26.793s
+#sys     0m56.079s
+
+time bash arabidopsis_par/3_proc.sh
+#real    9m5.014s
+#user    21m50.142s
+#sys     13m54.494s
+
+bash arabidopsis_par/4_circos.sh
+
 ```
 
-### Partitioned chromosomes
-
-`Bole` contains exact matched pieces with copy number large than one thousand.
-
-It turns out that poor assemblies tend to have this phenomenon.
-
-To speed up processing, use partitioned sequences in `3_self_cmd.sh` and `--discard 50` in `4_proc_cmd.sh`.
+## Plants: full chromosomes
 
 ```bash
 cd ~/data/alignment/self
 
-mkdir -p ~/data/alignment/self/plants_parted/Genomes
+egaz template \
+    ~/data/alignment/Ensembl/Atha/ \
+    ~/data/alignment/Ensembl/Alyr/ \
+    ~/data/alignment/Ensembl/OsatJap/ \
+    ~/data/alignment/Ensembl/Sbic/ \
+    --self -o plants \
+    --taxon ~/data/alignment/self/ensembl_taxon.csv \
+    --circos --parallel 12 -v
 
-for name in Mtru Gmax Bole Brap Alyr Vvin Slyc Stub Macu Sita OsatJap Bdis Atha
-do
+time bash plants/1_self.sh
+#real    133m47.288s
+#user    1387m27.563s
+#sys     16m55.046s
+
+time bash plants/3_proc.sh
+bash plants/4_circos.sh
+
+```
+
+## Plants: partitioned chromosomes
+
+```bash
+cd ~/data/alignment/self
+
+for name in Atha Alyr OsatJap Sbic Mtru Gmax Bole Brap Vvin Slyc Stub Macu Sita Bdis; do
     echo "==> ${name}"
-    perl ~/Scripts/egaz/part_seq.pl \
-        -i ~/data/alignment/Ensembl/${name} \
-        -o ~/data/alignment/self/plants_parted/Genomes/${name} \
-        --chunk 10010000 --overlap 10000
+    find ~/data/alignment/Ensembl/${name}/ -type f -name "*.fa" |
+        sort |
+        parallel --no-run-if-empty --linebuffer -k -j 8 '
+            echo >&2 {}
+            egaz partition {} --chunk 10010000 --overlap 10000
+        '
 done
 
-perl ~/Scripts/egaz/self_batch.pl \
-    --working_dir ~/data/alignment/self \
-    -c ~/data/alignment/self/ensembl_taxon.csv \
-    --length 1000  \
-    --norm \
-    --name plants_parted \
-    --parallel 12 \
-    -q Mtru \
-    -q Gmax \
-    -q Bole \
-    -q Brap \
-    -q Alyr \
-    -q Vvin \
-    -q Slyc \
-    -q Stub \
-    -q OsatJap \
-    -q Bdis \
-    -t Atha \
-    --parted
+egaz template \
+    ~/data/alignment/Ensembl/Atha/ \
+    ~/data/alignment/Ensembl/Alyr/ \
+    ~/data/alignment/Ensembl/OsatJap/ \
+    ~/data/alignment/Ensembl/Sbic/ \
+    ~/data/alignment/Ensembl/Mtru/ \
+    ~/data/alignment/Ensembl/Gmax/ \
+    ~/data/alignment/Ensembl/Bole/ \
+    ~/data/alignment/Ensembl/Brap/ \
+    ~/data/alignment/Ensembl/Vvin/ \
+    ~/data/alignment/Ensembl/Slyc/ \
+    ~/data/alignment/Ensembl/Stub/ \
+    ~/data/alignment/Ensembl/Bdis/ \
+    --self -o plants_par \
+    --taxon ~/data/alignment/self/ensembl_taxon.csv \
+    --circos --partition --parallel 12 -v
 
-    # cost days
-    # -q Macu \
-    # -q Sita \
+time bash plants_par/1_self.sh
+#real    3780m34.746s
+#user    39108m41.641s
+#sys     1656m31.650s
 
-cd ~/data/alignment/self/plants_parted
+time bash plants_par/3_proc.sh
+#real    1177m51.175s
+#user    2609m6.773s
+#sys     1307m16.303s
 
-# perl ~/Scripts/withncbi/ensembl/chr_kary.pl -e oryza_sativa_core_29_82_7
-# bash ~/share/circos/data/karyotype/parse.karyotype oryza_sativa_core_29_82_7.kary.tsv > Processing/OsatJap/karyotype.OsatJap.txt
+bash plants_par/4_circos.sh
 
-# ensembldb.ensembl.org         5306
-# mysql-eg-publicsql.ebi.ac.uk  4157
-# mysql -hmysql-eg-publicsql.ebi.ac.uk -P4157 -uanonymous
-# perl ~/Scripts/withncbi/ensembl/chr_kary.pl -s mysql-eg-publicsql.ebi.ac.uk --port 4157 -u anonymous -p '' -e oryza_sativa_core_29_82_7
+```
 
-bash 1_real_chr.sh
-bash 3_self_cmd.sh
-bash 4_proc_cmd.sh
-bash 5_circos_cmd.sh
+* Results of `egaz template`
+
+```text
+$ du -hs ~/data/alignment/self/plants_par/Pairwise/*
+332M    /home/wangq/data/alignment/self/plants_par/Pairwise/AlyrvsSelf
+111M    /home/wangq/data/alignment/self/plants_par/Pairwise/AthavsSelf
+25G     /home/wangq/data/alignment/self/plants_par/Pairwise/BdisvsSelf
+25G     /home/wangq/data/alignment/self/plants_par/Pairwise/BolevsSelf
+3.6G    /home/wangq/data/alignment/self/plants_par/Pairwise/BrapvsSelf
+8.6G    /home/wangq/data/alignment/self/plants_par/Pairwise/GmaxvsSelf
+2.7G    /home/wangq/data/alignment/self/plants_par/Pairwise/MtruvsSelf
+263M    /home/wangq/data/alignment/self/plants_par/Pairwise/OsatJapvsSelf
+1.6G    /home/wangq/data/alignment/self/plants_par/Pairwise/SbicvsSelf
+8.5G    /home/wangq/data/alignment/self/plants_par/Pairwise/SlycvsSelf
+4.0G    /home/wangq/data/alignment/self/plants_par/Pairwise/StubvsSelf
+14G     /home/wangq/data/alignment/self/plants_par/Pairwise/VvinvsSelf
+
+```
+
+* Results of the old `egaz/self_batch.pl`
+
+```text
+$ du -hs ~/data/alignment/self/plants_parted/Pairwise/*
+890M    /home/wangq/data/alignment/self/plants_parted/Pairwise/Alyrvsselfalign
+94M     /home/wangq/data/alignment/self/plants_parted/Pairwise/Athavsselfalign
+6.2G    /home/wangq/data/alignment/self/plants_parted/Pairwise/Bdisvsselfalign
+17G     /home/wangq/data/alignment/self/plants_parted/Pairwise/Bolevsselfalign
+2.2G    /home/wangq/data/alignment/self/plants_parted/Pairwise/Brapvsselfalign
+42G     /home/wangq/data/alignment/self/plants_parted/Pairwise/Gmaxvsselfalign
+4.4G    /home/wangq/data/alignment/self/plants_parted/Pairwise/Mtruvsselfalign
+845M    /home/wangq/data/alignment/self/plants_parted/Pairwise/OsatJapvsselfalign
+103G    /home/wangq/data/alignment/self/plants_parted/Pairwise/Slycvsselfalign
+15G     /home/wangq/data/alignment/self/plants_parted/Pairwise/Stubvsselfalign
+9.3G    /home/wangq/data/alignment/self/plants_parted/Pairwise/Vvinvsselfalign
+
 ```

@@ -1,0 +1,82 @@
+#name	ftp_path	organism	assembly_level
+Cfre_4_7_47CFAA	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/238/735/GCF_000238735.1_Citr_freu_4_7_47CFAA_V1	Citrobacter freundii	Scaffold
+Cfre_ATCC_8090_MTCC_1658	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/312/465/GCF_000312465.1_ASM31246v1	Citrobacter freundii	Contig
+Cfre_CFNIH1	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/648/515/GCF_000648515.1_ASM64851v1	Citrobacter freundii	Complete Genome
+Cfre_GTC_09479	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/342/325/GCF_000342325.1_Whole_genome_assembly	Citrobacter freundii	Contig
+Cfre_GTC_09629	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/388/155/GCF_000388155.1_Whole_genome_assembly	Citrobacter freundii	Contig
+Cfre_MGH_56	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/692/115/GCF_000692115.1_Citr_freu_MGH_56_V1	Citrobacter freundii	Scaffold
+Cfre_NBRC_12681	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/759/735/GCF_000759735.1_ASM75973v1	Citrobacter freundii	Contig
+Cfre_RLS1	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/582/615/GCF_000582615.1_Citrobacter_assembly	Citrobacter freundii	Contig
+Cfre_str_ballerup_7851_39	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/208/765/GCF_000208765.1_ASM20876v1	Citrobacter freundii	Scaffold
+Cfre_UCI_31	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/521/965/GCF_000521965.1_Citr_freu_UCI_31_V2	Citrobacter freundii	Scaffold
+Cfre_UCI_32	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/521/945/GCF_000521945.1_Citr_freu_UCI_32_V1	Citrobacter freundii	Scaffold
+Kaer_EA1509E	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/334/515/GCF_000334515.1_ASM33451v1	Klebsiella aerogenes	Complete Genome
+Kaer_FGI35	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/383/335/GCF_000383335.1_ASM38333v1	Klebsiella aerogenes	Scaffold
+Kaer_KCTC_2190	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/215/745/GCF_000215745.1_ASM21574v1	Klebsiella aerogenes	Complete Genome
+Kaer_MGH_61	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/692/155/GCF_000692155.1_Ente_aero_MGH_61_V1	Klebsiella aerogenes	Scaffold
+Kaer_MGH_62	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/692/175/GCF_000692175.1_Ente_aero_MGH_62_V1	Klebsiella aerogenes	Scaffold
+Kaer_MGH_77	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/692/195/GCF_000692195.1_Ente_aero_MGH_77_V1	Klebsiella aerogenes	Scaffold
+Kaer_MGH_78	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/692/215/GCF_000692215.1_Ente_aero_MGH_78_V1	Klebsiella aerogenes	Scaffold
+Kaer_UCI_15	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/534/335/GCF_000534335.1_Ente_aero_UCI_15_V1	Klebsiella aerogenes	Scaffold
+Kaer_UCI_16	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/534/315/GCF_000534315.1_Ente_aero_UCI_16_V1	Klebsiella aerogenes	Scaffold
+Kaer_UCI_27	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/534/255/GCF_000534255.1_Ente_aero_UCI_27_V1	Klebsiella aerogenes	Scaffold
+Kaer_UCI_28	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/534/235/GCF_000534235.1_Ente_aero_UCI_28_V1	Klebsiella aerogenes	Scaffold
+Kaer_UCI_45	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/534/135/GCF_000534135.1_Ente_aero_UCI_45_V1	Klebsiella aerogenes	Scaffold
+Kaer_UCI_46	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/534/115/GCF_000534115.1_Ente_aero_UCI_46_V1	Klebsiella aerogenes	Scaffold
+Kaer_UCI_47	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/534/095/GCF_000534095.1_Ente_aero_UCI_47_V1	Klebsiella aerogenes	Scaffold
+Kaer_UCI_48	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/534/075/GCF_000534075.1_Ente_aero_UCI_48_V1	Klebsiella aerogenes	Scaffold
+Mmor_F675	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/752/335/GCF_000752335.1_Morganella_morganii_F675	Morganella morganii	Scaffold
+Mmor_H1r	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/633/515/GCF_000633515.1_ASM63351v1	Morganella morganii	Contig
+Mmor_IS15	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/530/115/GCF_000530115.1_IS15v1	Morganella morganii	Contig
+Mmor_SC01	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/307/755/GCF_000307755.2_ASM30775v2	Morganella morganii	Contig
+Mmor_subsp_morganii_KT	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/286/435/GCF_000286435.2_ASM28643v2	Morganella morganii	Complete Genome
+Mmor_subsp_morganii_NBRC_3848	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/598/895/GCF_001598895.1_ASM159889v1	Morganella morganii	Contig
+Pmir_ATCC_29906	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/160/755/GCF_000160755.1_ASM16075v1	Proteus mirabilis	Scaffold
+Pmir_BB2000	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/444/425/GCF_000444425.1_ASM44442v1	Proteus mirabilis	Complete Genome
+Pmir_C05028	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/313/255/GCF_000313255.1_Version_1_for_Proteus_mirabilis_C05028_genome	Proteus mirabilis	Scaffold
+Pmir_HI4320	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/069/965/GCF_000069965.1_ASM6996v1	Proteus mirabilis	Complete Genome
+Pmir_PR03	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/372/565/GCF_000372565.1_PM_version_1	Proteus mirabilis	Contig
+Pmir_WGLW4	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/297/835/GCF_000297835.1_Prot_mira_WGLW4_V1	Proteus mirabilis	Scaffold
+Pmir_WGLW6	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/297/815/GCF_000297815.1_Prot_mira_WGLW6_V1	Proteus mirabilis	Scaffold
+Smar_AB42556419_isolate1	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/418/935/GCF_000418935.1_S_marcescensAB42556419-isolate1-1.0	Serratia marcescens	Scaffold
+Smar_BIDMC_44	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/521/925/GCF_000521925.1_Serr_marc_BIDMC_44_V1	Serratia marcescens	Scaffold
+Smar_BIDMC_50	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/521/905/GCF_000521905.1_Serr_marc_BIDMC_50_V1	Serratia marcescens	Scaffold
+Smar_BIDMC_80	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/633/715/GCF_000633715.1_Serr_marc_BIDMC_80_V1	Serratia marcescens	Scaffold
+Smar_BIDMC_81	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/633/695/GCF_000633695.1_Serr_marc_BIDMC_81_V1	Serratia marcescens	Scaffold
+Smar_EGD_HP20	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/465/615/GCF_000465615.2_GS_De_Novo_Assembly	Serratia marcescens	Contig
+Smar_H1q	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/633/335/GCF_000633335.1_ASM63333v1	Serratia marcescens	Contig
+Smar_LCT_SM166	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/442/455/GCF_000442455.1_S.marcescens_LCT-SM166	Serratia marcescens	Scaffold
+Smar_LCT_SM213	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/264/275/GCF_000264275.1_ASM26427v1	Serratia marcescens	Scaffold
+Smar_LCT_SM262	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/442/375/GCF_000442375.1_S.marcescens_LCT-SM262	Serratia marcescens	Scaffold
+Smar_MC458	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/418/915/GCF_000418915.1_S_marcescensMC458-1.0	Serratia marcescens	Scaffold
+Smar_MC459	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/418/895/GCF_000418895.1_S_marcescensMC459-1.0	Serratia marcescens	Scaffold
+Smar_MC460	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/418/875/GCF_000418875.1_S_marcescensMC460-1.0	Serratia marcescens	Scaffold
+Smar_MC6000	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/418/855/GCF_000418855.2_S_marcescensMC6000-1.0	Serratia marcescens	Scaffold
+Smar_MC6001	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/418/835/GCF_000418835.1_S_marcescensMC6001-1.0	Serratia marcescens	Scaffold
+Smar_MC620	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/418/815/GCF_000418815.1_S_marcescensMC620-1.0	Serratia marcescens	Scaffold
+Smar_PH1a	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/633/555/GCF_000633555.1_ASM63355v1	Serratia marcescens	Contig
+Smar_SM39	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/828/775/GCF_000828775.1_ASM82877v1	Serratia marcescens	Complete Genome
+Smar_SMB2099	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/900/029/885/GCF_900029885.1_Sm_SMB2099	Serratia marcescens	Complete Genome
+Smar_subsp_marcescens	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/051/865/GCF_001051865.1_ASM105186v1	Serratia marcescens	Contig
+Smar_subsp_marcescens_ATCC_13880	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/735/445/GCF_000735445.1_GSMA_DRAFTv1	Serratia marcescens	Contig
+Smar_subsp_marcescens_Db11	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/513/215/GCF_000513215.1_DB11	Serratia marcescens	Complete Genome
+Smar_subsp_sakuensis	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/002/762/595/GCF_002762595.1_ASM276259v1	Serratia marcescens	Scaffold
+Smar_VGH107	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/342/205/GCF_000342205.1_SerMar_1.0	Serratia marcescens	Contig
+Smar_W2_3	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/292/365/GCF_000292365.1_ASM29236v1	Serratia marcescens	Contig
+Smar_WW4	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/336/425/GCF_000336425.1_ASM33642v1	Serratia marcescens	Complete Genome
+Scap_C87	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/183/705/GCF_000183705.1_ASM18370v1	Staphylococcus capitis	Scaffold
+Scap_CR01	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/499/705/GCF_000499705.1_ScapHOJ_3778_PRJEB1494	Staphylococcus capitis	Scaffold
+Scap_QN1	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/263/775/GCF_000263775.1_StacapQN11.0	Staphylococcus capitis	Contig
+Scap_SK14	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/174/135/GCF_000174135.1_ASM17413v1	Staphylococcus capitis	Contig
+Scap_subsp_capitis	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/028/645/GCF_001028645.1_ASM102864v1	Staphylococcus capitis	Complete Genome
+Scap_subsp_urealyticus	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/002/901/925/GCF_002901925.1_ASM290192v1	Staphylococcus capitis	Scaffold
+Scap_VCU116	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/221/525/GCF_000221525.1_ASM22152v2	Staphylococcus capitis	Contig
+Shae_DNF00585	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/759/125/GCF_000759125.1_04_NF40_HMP2135v01	Staphylococcus haemolyticus	Contig
+Shae_JCSC1435	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/009/865/GCF_000009865.1_ASM986v1	Staphylococcus haemolyticus	Complete Genome
+Shae_R1P1	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/261/465/GCF_000261465.1_ASM26146v1	Staphylococcus haemolyticus	Contig
+Shom_SK119	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/174/735/GCF_000174735.1_ASM17473v1	Staphylococcus hominis	Contig
+Shom_subsp_hominis	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/002/156/675/GCF_002156675.1_ASM215667v1	Staphylococcus hominis	Contig
+Shom_subsp_hominis_C80	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/183/685/GCF_000183685.1_ASM18368v1	Staphylococcus hominis	Scaffold
+Shom_subsp_hominis_ZBW5	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/269/685/GCF_000269685.1_Stahom1.0	Staphylococcus hominis	Contig
+Shom_subsp_novobiosepticus	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/002/902/465/GCF_002902465.1_ASM290246v1	Staphylococcus hominis	Scaffold
+Shom_VCU122	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/247/085/GCF_000247085.1_ASM24708v2	Staphylococcus hominis	Contig

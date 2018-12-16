@@ -3,12 +3,10 @@ use strict;
 use warnings;
 use autodie;
 
-use Getopt::Long;
-use Config::Tiny;
-use FindBin;
-use YAML qw(Dump Load DumpFile LoadFile);
+use Getopt::Long qw();
+use YAML::Syck qw();
 
-use IO::All;    # simplify ftp retrieving
+use Path::Tiny qw();
 use Text::CSV_XS;
 
 #----------------------------------------------------------#
@@ -27,7 +25,6 @@ assemble_csv.pl - convert NCBI assemble report to a .csv file for batch_get_seq.
 
         --file      -f  STR     input assemble report file
                                 local  - GCA_000149445.2.assembly.txt
-                                remote - ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/All/GCF_000146045.2.assembly.txt
         --name      -n  STR     name of the strain, optional
         --taxon     -t  INT     taxonomy id of the strain, optional
         --genbank               genbank instead of refseq
@@ -39,11 +36,11 @@ assemble_csv.pl - convert NCBI assemble report to a .csv file for batch_get_seq.
 
 =head1 EXAMPLE
 
-    perl ~/Scripts/withncbi/taxon/assembly_csv.pl -f ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/All/GCF_000146045.2.assembly.txt
+    perl ~/Scripts/withncbi/taxon/assembly_csv.pl -f GCF_000146045.2.assembly.txt
 
 =cut
 
-GetOptions(
+Getopt::Long::GetOptions(
     'help|?'     => sub { Getopt::Long::HelpMessage(0) },
     'file|f=s'   => \my $in_file,
     'name|n=s'   => \my $strain_name,
@@ -56,7 +53,7 @@ GetOptions(
     'length=i'   => \my $length,
 ) or Getopt::Long::HelpMessage(1);
 
-die "Provide a input file (like GCA_000146045.2.assembly.txt) or a remote url.\n"
+die "Provide a input file (like GCA_000146045.2.assembly.txt).\n"
     unless defined $in_file;
 
 # 0 Sequence-Name
@@ -70,8 +67,7 @@ die "Provide a input file (like GCA_000146045.2.assembly.txt) or a remote url.\n
 # 8 Sequence-Length
 # 9 UCSC-style-name
 
-#@type IO::All
-my $handle = io($in_file);
+my $fh = Path::Tiny::path($in_file)->openr;
 
 #@type Text::CSV_XS
 my $csv = Text::CSV_XS->new( { binary => 1, eol => "\n" } );
@@ -79,7 +75,7 @@ my $csv = Text::CSV_XS->new( { binary => 1, eol => "\n" } );
 # Header line
 $csv->print( *STDOUT, [ '#strain_name', 'accession', 'strain_taxon_id', 'seq_name' ] );
 
-while ( defined( my $line = $handle->getline ) ) {
+while ( my $line = <$fh> ) {
     chomp $line;
 
     # meta info lines
@@ -131,5 +127,7 @@ while ( defined( my $line = $handle->getline ) ) {
 
     $csv->print( *STDOUT, [ $strain_name, $accession, $taxon_id, $seq_name ] );
 }
+
+close $fh;
 
 __END__

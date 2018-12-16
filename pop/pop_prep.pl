@@ -142,6 +142,7 @@ find [% item.pre_dir %] -type f | parallel --no-run-if-empty cp {} .
 echo '    Unzip, filter and split.'
 gzip -d -c --force [% item.fasta %] > toplevel.fa
 perl -p -i -e '/\>gi\|/ and s/\>gi\|(\d+).*/\>gi_$1/' toplevel.fa
+perl -p -i -e '/\>([\w-]+)\.\d+\s/ and $_ = qq{>$1\n}' toplevel.fa
 [% IF item.per_seq -%]
 faops count toplevel.fa | perl -aln -e 'next if $F[0] eq 'total'; print $F[0] if $F[1] > [% per_seq_min_contig * 10 %]; print $F[0] if $F[1] > [% per_seq_min_contig %]  and $F[6]/$F[1] < 0.05' | uniq > listFile
 faops some toplevel.fa listFile toplevel.filtered.fa
@@ -193,7 +194,7 @@ echo '    SKIP! [% item.skip %]'
 cd [% item.dir %]
 
 for f in `find [% item.dir%] -name "*.fa"` ; do
-    rename 's/fa$/fasta/' $f ;
+    mv $f `dirname $f`/`basename $f .fa`.fasta;
 done
 
 for f in `find [% item.dir%] -name "*.fasta"` ; do
@@ -226,10 +227,10 @@ cd [% item.dir %]
 for f in `find [% item.dir%] -name "*.fasta"` ; do
     if [ -f $f.masked ];
     then
-        rename 's/fasta.masked$/fa/' $f.masked;
+        mv $f.masked `dirname $f`/`basename $f.masked .fasta.masked`.fa;
         find [% item.dir%] -type f -name "`basename $f`*" | xargs rm;
     else
-        rename 's/fasta$/fa/' $f;
+        mv $f `dirname $f`/`basename $f .fasta`.fa;
         echo `date` "RepeatMasker on $f failed.\n" >> RepeatMasker.log
         find [% item.dir%] -type f -name "`basename $f`*" | xargs rm;
     fi;

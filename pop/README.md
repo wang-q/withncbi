@@ -2,296 +2,505 @@
 
 Or order, family, species.
 
-Genus Trichoderma as example.
+Genus *Trichoderma* as example.
 
-## Section 1: select strains and download sequences.
+[TOC levels=1-3]: # " "
+- [Build alignments on an whole Eukaryotes genus](#build-alignments-on-an-whole-eukaryotes-genus)
+- [Section 1: select strains and download sequences.](#section-1-select-strains-and-download-sequences)
+    - [`pop/trichoderma.*.tsv`](#poptrichodermatsv)
+        - [`.wgs.tsv`](#wgstsv)
+        - [`.assembly.tsv`](#assemblytsv)
+    - [`wgs_prep.pl`](#wgs_preppl)
+    - [`assembly_prep.pl`](#assembly_preppl)
+- [Section 2: prepare sequences for `egaz`](#section-2-prepare-sequences-for-egaz)
+    - [Manually](#manually)
+    - [`egaz template --prep`](#egaz-template---prep)
+- [Section 3: generate alignments](#section-3-generate-alignments)
+- [Section 4: cleaning](#section-4-cleaning)
+- [FAQ](#faq)
 
-1. Create `pop/trichoderma.tsv` manually. Names should only contain alphanumeric characters and
+
+# Section 1: select strains and download sequences.
+
+
+Create `pop/trichoderma.wgs.tsv` manually. Names should only contain alphanumeric characters and
 underscores. Be careful with tabs and spaces, because .tsv stands for Tab-separated values, white
 spaces matters.
 
-    Check NCBI pages
+Check NCBI pages
 
-    * http://www.ncbi.nlm.nih.gov/Traces/wgs/?page=1&term=Trichoderma&order=organism
-    * http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?mode=Info&id=5543
-    * http://www.ncbi.nlm.nih.gov/genome/?term=txid5543[Organism:exp]
-    * http://www.ncbi.nlm.nih.gov/assembly?term=txid5543[Organism:exp]
+* https://www.ncbi.nlm.nih.gov/Traces/wgs/?view=wgs&search=Trichoderma
+* http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?mode=Info&id=5543
+* http://www.ncbi.nlm.nih.gov/genome/?term=txid5543[Organism:exp]
+* http://www.ncbi.nlm.nih.gov/assembly?term=txid5543[Organism:exp]
 
-    And query a local ar_genbank DB. This is just a convenient but not accurate approach, especially
-    for sub-species parts.
+And query a local `ar_genbank` DB. This is just a convenient but not accurate approach, especially
+for sub-species parts.
 
-    ```sql
-    SELECT
-        CONCAT(LEFT(genus, 1),
-                LEFT(TRIM(REPLACE(species, genus, '')),
-                    3),
-                REPLACE((REPLACE(organism_name, species, '')),
-                    ' ',
-                    '_')),
-        SUBSTRING(wgs_master, 1, 4),
+```mysql
+SELECT
+    CONCAT(LEFT(genus, 1),
+            LEFT(TRIM(REPLACE(species, genus, '')),
+                3),
+            REPLACE((REPLACE(organism_name, species, '')),
+                ' ',
+                '_')),
+    SUBSTRING(wgs_master, 1, 4),
+    organism_name,
+    assembly_level
+FROM
+    ar_genbank.ar
+WHERE
+    genus = 'Trichoderma'
+        AND wgs_master LIKE '%000%'
+ORDER BY assembly_level , organism_name
+```
+
+For genus contains many species, you should be careful that "Gspe" (*G*enus *spe*cies) style
+abbreviation may mix up two or more species.
+
+```mysql
+SELECT DISTINCT
+    species
+FROM
+    ar_genbank.ar
+WHERE
+    genus = 'Trichoderma'
+```
+
+## `pop/trichoderma.*.tsv`
+
+When the two approaches get very different number of strains, you run the following steps. Check
+intermediate results on necessary.
+
+Working directory should be `~/data/alignment/trichoderma` in this section.
+
+```bash
+export RANK_LEVEL=genus
+export RANK_ID=5543
+export RANK_NAME=trichoderma
+
+mkdir -p ~/data/alignment/${RANK_NAME}            # Working directory
+cd ~/data/alignment/${RANK_NAME}
+
+```
+
+### `.wgs.tsv`
+
+You can copy & paste the following block of codes.
+
+```bash
+# stage1
+# Results from sql query.
+mysql -ualignDB -palignDB gr_euk -e "
+    SELECT 
+        SUBSTRING(wgs,1,6) as prefix0,
+        SUBSTRING(wgs,1,4) as prefix,
         organism_name,
-        assembly_level
-    FROM
-        ar_genbank.ar
-    WHERE
-        genus = 'Trichoderma'
-            AND wgs_master LIKE '%000%'
-    ORDER BY assembly_level , organism_name
+        status 
+    FROM gr 
+    WHERE wgs != '' AND ${RANK_LEVEL}_id = ${RANK_ID}
+    " \
+    > raw.tsv
+
+mysql -ualignDB -palignDB ar_refseq -e "
+    SELECT 
+        CONCAT(SUBSTRING(wgs_master,1,5), RIGHT(wgs_master,1)) as prefix0,
+        SUBSTRING(wgs_master,1,4) as prefix,
+        organism_name,
+        assembly_level 
+    FROM ar 
+    WHERE wgs_master != '' AND ${RANK_LEVEL}_id = ${RANK_ID}
+    " \
+    >> raw.tsv
+
+mysql -ualignDB -palignDB ar_genbank -e "
+    SELECT
+        CONCAT(SUBSTRING(wgs_master,1,5), RIGHT(wgs_master,1)) as prefix0,
+        SUBSTRING(wgs_master,1,4) as prefix,
+        organism_name,
+        assembly_level 
+    FROM ar 
+    WHERE wgs_master != '' AND ${RANK_LEVEL}_id = ${RANK_ID}
+    " \
+    >> raw.tsv
+
+# stage2
+# NCBI changed its WGS page, make curl defunct
+# Click on the 'Taxonomic Groups' on the left panel
+# Click the 'Download' button in the middle of NCBI WGS page.
+rm -f ~/Downloads/wgs_selector*.csv
+chrome "https://www.ncbi.nlm.nih.gov/Traces/wgs/?view=wgs&search=${RANK_NAME}"
+
+# Quit chrome Cmd-Q
+
+# There're no chromosome level assemblies in WGS
+cat ~/Downloads/wgs_selector.csv |
+    perl -nl -a -F"," -e '
+        my $p = substr($F[0],0,4);
+        my $status = $F[13] > 0 ? q{Scaffold} : q{Contig};
+        print qq{$F[0]\t$p\t$F[4]\t$status}
+    ' \
+    >> raw.tsv
+
+cat raw.tsv |
+    perl -nl -a -F"\t" -e '
+        BEGIN{my %seen}; 
+        /^prefix/i and next;
+        scalar @F == 4 or next;
+        $seen{$F[1]}++;
+        $seen{$F[1]} > 1 and next;
+        print join(qq{\t}, $F[0], $F[0], $F[2], $F[3]);
+    ' \
+    > raw2.tsv
+
+# stage3
+# Run `wgs_prep.pl` to get a crude `raw2.csv`
+perl ~/Scripts/withncbi/taxon/wgs_prep.pl -f raw2.tsv --csvonly
+
+echo -e '#name\tprefix\torganism\tcontigs' > raw3.tsv
+cat raw2.csv |
+    perl -nl -a -F"," -e '
+        /^prefix/i and next;
+        s/"//g for @F;
+        @O = split(/ /, $F[3]);
+        $F[4] =~ s/\s+$//g;
+        $F[4] =~ s/\W+/_/g;
+        $name = substr($O[0],0,1) . substr($O[1],0,3);
+        $name .= q{_} . $F[4] if $F[4];
+        print qq{$name\t$F[0]\t$F[3]\t$F[9]}
+    ' |
+    sort -t$'\t' -k4 -n |
+    uniq \
+    >> raw3.tsv
+
+mv raw3.tsv ${RANK_NAME}.wgs.tsv
+
+# find potential duplicated strains or assemblies
+cat ${RANK_NAME}.wgs.tsv |
+    perl -nl -a -F"\t" -e 'print $F[0]' |
+    sort |
+    uniq -c |
+    sort -nr
+
+# Edit .tsv, remove duplicated strains, check strain names and comment out poor assemblies.
+# vim ${GENUS}.wgs.tsv
+
+# Cleaning
+rm raw*.*sv
+
+```
+
+### `.assembly.tsv`
+
+```bash
+
+
+mysql -ualignDB -palignDB ar_refseq -e "
+    SELECT 
+        organism_name, species, ftp_path, assembly_level
+    FROM ar 
+    WHERE 1=1
+#        AND wgs_master = ''
+#        AND assembly_level = 'Chromosome'
+        AND organism_name != species
+        AND ${RANK_LEVEL}_id = ${RANK_ID}
+    " \
+    > raw.tsv
+
+mysql -ualignDB -palignDB ar_genbank -e "
+    SELECT 
+        organism_name, species, ftp_path, assembly_level
+    FROM ar 
+    WHERE 1=1
+#        AND wgs_master = ''
+#        AND assembly_level = 'Chromosome'
+        AND organism_name != species
+        AND ${RANK_LEVEL}_id = ${RANK_ID}
+    " \
+    >> raw.tsv
+
+echo -e '#name\tftp_path\torganism\tassembly_level' > ${RANK_NAME}.assembly.tsv
+
+cat raw.tsv |
+    perl -nl -a -F"\t" -e '
+        BEGIN{my %seen}; 
+        /^organism_name/i and next;
+        $n = $F[0];
+        $rx = quotemeta $F[1];
+        $n =~ s/$rx\s*//;
+        $n =~ s/\s+$//;
+        $n =~ s/\W+/_/g;
+        @O = split(/ /, $F[1]);
+        $name = substr($O[0],0,1) . substr($O[1],0,3);
+        $name .= q{_} . $n if $n;
+        $seen{$name}++;
+        $seen{$name} > 1 and next;
+        printf qq{%s\t%s\t%s\t%s\n}, $name, $F[2], $F[1], $F[3];
+        ' \
+    >> ${RANK_NAME}.assembly.tsv
+
+
+# comment out unneeded conditions
+
+# find potential duplicated strains or assemblies
+cat ${RANK_NAME}.assembly.tsv |
+    cut -f 1 |
+    sort |
+    uniq -c |
+    sort -nr
+
+# Edit .tsv, remove unnecessary strains, check strain names and comment out poor assemblies.
+# vim ${GENUS}.assembly.tsv
+
+# Cleaning
+rm raw*.*sv
+
+```
+
+```bash
+unset RANK_LEVEL
+unset RANK_ID
+unset RANK_NAME
+
+```
+
+## `wgs_prep.pl`
+
+Put the .tsv file to `~/Scripts/withncbi/pop/` and run `wgs_prep.pl` again. When everything is fine,
+commit the .tsv file.
+
+For detailed WGS info, click Prefix column lead to WGS project, where we could download gzipped
+fasta and project description manually.
+
+`wgs_prep.pl` will create a directory named `WGS` and three files containing meta information:
+
+```bash
+cd ~/data/alignment/trichoderma
+
+perl ~/Scripts/withncbi/taxon/wgs_prep.pl \
+    -f ~/Scripts/withncbi/pop/trichoderma.wgs.tsv \
+    --fix \
+    -o WGS
+
+```
+
+1. `trichoderma.wgs.csv`
+
+    Various information for WGS projects extracted from NCBI WGS record pages.
+
+2. `trichoderma.wgs.rsync.sh`
+
+    Download WGS files.
+
+3. `trichoderma.wgs.data.yml`
+
+    ```yaml
+    ---
+    data:
+      - taxon: 452589
+        name: 'Tart_IMI_2206040'
+        sciname: 'Trichoderma atroviride IMI 206040'
+        prefix: 'ABDG02'
+        coverage: '8.26x Sanger'
     ```
 
-    For genus contains many species, you should be careful that "Gspe" (G_enus spe_cies) style
-    abbreviation may mix up two or more species.
+Download WGS files.
 
-    ```sql
-    SELECT DISTINCT
-        species
-    FROM
-        ar_genbank.ar
-    WHERE
-        genus = 'Trichoderma'
-    ```
+```bash
+cd ~/data/alignment/trichoderma
 
-    When the two approaches get very different number of strains, you run the following steps. Check
-    intermediate results on necessary.
+bash WGS/trichoderma.wgs.rsync.sh
 
-    Working directory should be `~/data/alignment/Fungi/GENOMES/trichoderma` in this section.
+# check downloaded .gz files
+find WGS -name "*.gz" | parallel -j 4 gzip -t
 
-    ```bash
-    export GENUS_ID=5543
-    export GENUS=trichoderma
-    mkdir -p ~/data/alignment/Fungi/$GENUS          # operation directory
-    mkdir -p ~/data/alignment/Fungi/GENOMES/$GENUS  # sequence directory
+# rsync remote files
+# My connection to NCBI isn't stable, so download sequences in a linode VPS.
+# PLEASE don't hack it.
+# rsync -avP wangq@173.230.144.105:data/alignment/trichoderma/ ~/data/alignment/trichoderma
+```
 
-    cd ~/data/alignment/Fungi/GENOMES/$GENUS
-    ```
+## `assembly_prep.pl`
 
-    You can copy & paste the following block of codes as a whole unit.
+Information of assemblies are collected from *_assembly_report.txt *after* downloading.
 
-    ```bash
-    # stage1
-    # Results from sql query.
-    mysql -ualignDB -palignDB ar_refseq -e "SELECT SUBSTRING(wgs_master,1,6) as prefix0, SUBSTRING(wgs_master,1,4) as prefix, organism_name, assembly_level FROM ar WHERE wgs_master != '' AND genus_id = $GENUS_ID" \
-    	> raw.tsv
+**Caution**: line endings of *_assembly_report.txt files are `CRLF`.
 
-    mysql -ualignDB -palignDB ar_genbank -e "SELECT SUBSTRING(wgs_master,1,6) as prefix0, SUBSTRING(wgs_master,1,4) as prefix, organism_name, assembly_level FROM ar WHERE wgs_master != '' AND genus_id = $GENUS_ID" \
-        >> raw.tsv
+```bash
+cd ~/data/alignment/trichoderma
 
-    mysql -ualignDB -palignDB gr_euk -e "SELECT SUBSTRING(wgs,1,6) as prefix0, SUBSTRING(wgs,1,4) as prefix, organism_name, status FROM gr WHERE wgs != '' AND genus_id = $GENUS_ID" \
-        >> raw.tsv
+perl ~/Scripts/withncbi/taxon/assembly_prep.pl \
+    -f ~/Scripts/withncbi/pop/trichoderma.assembly.tsv \
+    -o ASSEMBLY
 
-    # stage2
-    # Combined with NCBI WGS page.
-    curl "http://www.ncbi.nlm.nih.gov/Traces/wgs/?&size=100&term=$GENUS&retmode=text&size=all" \
-        | perl -nl -a -F"\t" -e \
-        '$p = substr($F[0],0,4); print qq{$F[0]\t$p\t$F[4]\t$F[5]}' \
-        >> raw.tsv
+bash ASSEMBLY/trichoderma.assembly.rsync.sh
 
-    cat raw.tsv \
-        | perl -nl -a -F"\t" -e \
-        'BEGIN{my %seen}; /^prefix/i and next; $seen{$F[1]}++; $seen{$F[1]} > 1 and next; print' \
-        > raw2.tsv
+# rsync -avP wangq@173.230.144.105:data/alignment/trichoderma/ ~/data/alignment/trichoderma
 
-    # stage3
-    # Run `wgs_prep.pl` to get a crude `raw2.csv`
-    perl ~/Scripts/withncbi/taxon/wgs_prep.pl -f raw2.tsv --csvonly
+bash ASSEMBLY/trichoderma.assembly.collect.sh
 
-    # FIXME:  @O =split(/ /, $F[3]) just take the first part of sub-species.
-    echo -e '#name\tprefix\torganism\tcontigs' > raw3.tsv
-    cat raw2.csv \
-        | perl -nl -a -F"," -e \
-        '/^prefix/i and next; s/"//g for @F; @O =split(/ /, $F[3]); $F[4] =~ s/\W+/_/g; $name = substr($O[0],0,1) . substr($O[1],0,3) . q{_} . $F[4]; print qq{$name\t$F[0]\t$F[3]\t$F[9]}' \
-        | sort -t$'\t' -k4 -n \
-        | uniq \
-        >> raw3.tsv
+```
 
-    mv raw3.tsv $GENUS.tsv
+# Section 2: prepare sequences for `egaz`
 
-    # find potential duplicated strains or assemblies
-    cat $GENUS.tsv \
-        | perl -nl -a -F"\t" -e 'print $F[0]' \
-        | uniq -c
+## Manually
 
-    # Edit .tsv, remove duplicated strains, check strain names and comment out poor assemblies.
-    # vim $GENUS.tsv
-    ```
+* `perseq` mean split fasta by names, target or good assembles should set it
+* `--species Fungi` specify the species or clade of this group for RepeatMasker
 
-    ```bash
-    # Cleaning
-    rm raw*.*sv
-    unset GENUS_ID
-    unset GENUS
-    ```
+```bash
+cd ~/data/alignment/trichoderma
 
-    Put the .tsv file to `~/Scripts/withncbi/pop/` and run `wgs_prep.pl` again. When everything is
-    fine, commit the .tsv file.
+mkdir -p GENOMES
 
-    For detailed WGS info, click Prefix column lead to WGS project, where we could download gzipped
-    fasta and project description manually.
+# Sanger
+for perseq in Tree_QM6a Tvir_Gv29_8 Tatr_IMI_206040; do
+    echo ASSEMBLY/${perseq}; 
+done |
+    parallel --no-run-if-empty --linebuffer -k -j 2 '
+        echo >&2 "==> {/}"
+        
+        if [ -d GENOMES/{/} ]; then
+            echo >&2 "    GENOMES/{/} presents"
+            exit;
+        fi
+        
+        FILE_FA=$(ls {} | grep "_genomic.fna.gz" | grep -v "_from_")
+        echo >&2 "==> Processing {}/${FILE_FA}"
 
-2. `wgs_prep.pl` will create a directory named `WGS` and three files containing meta information:
+        egaz prepseq \
+            {}/${FILE_FA} \
+            -o GENOMES/{/} \
+            --min 50000 --gi -v --repeatmasker "--species Fungi --parallel 8"
+            
+        FILE_GFF=$(ls {} | grep "_genomic.gff.gz")
+        echo >&2 "==> Processing {}/${FILE_GFF}"
+        
+        gzip -d -c {}/${FILE_GFF} > GENOMES/{/}/chr.gff
+    '
 
-    ```bash
-    mkdir -p ~/data/alignment/Fungi/GENOMES/trichoderma
-    cd ~/data/alignment/Fungi/GENOMES/trichoderma
+# Other assemblies
+find ASSEMBLY -maxdepth 1 -type d -path "*/????*" |
+    parallel --no-run-if-empty --linebuffer -k -j 2 '
+        echo >&2 "==> {/}"
+        
+        if [ -d GENOMES/{/} ]; then
+            echo >&2 "    GENOMES/{/} presents"
+            exit;
+        fi
 
-    perl ~/Scripts/withncbi/taxon/wgs_prep.pl \
-        -f ~/Scripts/withncbi/pop/trichoderma.tsv \
-        --fix \
-        -o WGS \
-        -a
-    ```
+        FILE_FA=$(ls {} | grep "_genomic.fna.gz" | grep -v "_from_")
+    
+        egaz prepseq \
+            {}/${FILE_FA} \
+            -o GENOMES/{/} \
+            --about 5000000 \
+            --min 5000 --gi -v --repeatmasker "--species Fungi --parallel 8" 
+            
+        FILE_GFF=$(ls {} | grep "_genomic.gff.gz")
+        echo >&2 "==> Processing {}/${FILE_GFF}"
+        
+        gzip -d -c {}/${FILE_GFF} > GENOMES/{/}/chr.gff
+    '
 
-    1. `trichoderma.csv`
+# WGS
+find WGS -maxdepth 1 -type d -path "*/????*" |
+    parallel --no-run-if-empty --linebuffer -k -j 2 '
+        echo >&2 "==> {/}"
+        
+        if [ -d GENOMES/{/} ]; then
+            echo >&2 "    GENOMES/{/} presents"
+            exit;
+        fi
 
-        Various information for WGS projects extracted from NCBI WGS record pages.
+        FILE_FA=$(ls {} | grep ".fsa_nt.gz")
+    
+        egaz prepseq \
+            {}/${FILE_FA} \
+            -o GENOMES/{/} \
+            --about 5000000 \
+            --min 5000 --gi -v --repeatmasker "--species Fungi --parallel 8" 
+    '
 
-    2. `trichoderma.data.yml`
 
-        ```yaml
-        ---
-        data:
-          - taxon: 452589
-            name: 'Tart_IMI_2206040'
-            sciname: 'Trichoderma atroviride IMI 206040'
-            prefix: 'ABDG02'
-            coverage: '8.26x Sanger'
-        ```
+```
 
-    3. `trichoderma.url.txt`
+## `egaz template --prep`
 
-        Download urls for WGS files.
+Or use `egaz template --prep`. In this approach, GFF files should be manually placed in the GENOMES/
+directory.
 
-3. Download WGS files.
+```bash
+cd ~/data/alignment/trichoderma
 
-    ```bash
-    # download with aria2
-    aria2c -x 6 -s 3 -c -i WGS/trichoderma.url.txt
+egaz template \
+    ASSEMBLY WGS \
+    --prep -o GENOMES \
+    --perseq Tree_QM6a --perseq Tvir_Gv29_8 --perseq Tatr_IMI_206040 \
+    --min 5000 --about 5000000 \
+    -v --repeatmasker "--species Fungi --parallel 8"
 
-    # check downloaded .gz files
-    find WGS -name "*.gz" | xargs gzip -t
+bash GENOMES/0_prep.sh
 
-    # rsync remote files
-    # My connection to NCBI isn't stable, so download sequences in a linode VPS.
-    # PLEASE don't hack it.
-    # rsync --progress -av wangq@45.79.80.100:/home/wangq/data/alignment/Fungi/ ~/data/alignment/Fungi/
-    ```
+```
 
-## Section 2: create configuration file and generate alignments.
+# Section 3: generate alignments
 
-Working directory should be `~/data/alignment/Fungi/trichoderma` in this section.
+* Rsync to hpcc
 
-1. Use `gen_pop_conf.pl` find matched files for each data entries in YAML and store extra options.
+```bash
+rsync -avP \
+    ~/data/alignment/trichoderma/ \
+    wangq@202.119.37.251:data/alignment/trichoderma
 
-    * `per_seq` mean split fasta by names, target or good assembles should set it.
-    * `skip` mean skip this strain.
-    * `--opt rm_species=Fungi` specify the species or clade of this group for RepeatMasker.
-    * `--opt min_contig=5000` to exclude short contigs.
-    * `--opt per_seq_min_contig=20000` to exclude more short contigs for potential target.
-    * The script will not overwrite existing .yml file by default, use `-y` to force it.
+# rsync -avP wangq@202.119.37.251:data/alignment/trichoderma/ ~/data/alignment/trichoderma
 
-    ```bash
-    mkdir -p ~/data/alignment/Fungi/trichoderma
-    cd ~/data/alignment/Fungi/trichoderma
+```
 
-    perl ~/Scripts/withncbi/pop/gen_pop_conf.pl \
-        -i ~/data/alignment/Fungi/GENOMES/trichoderma/WGS/trichoderma.data.yml \
-        -o ~/Scripts/withncbi/pop/trichoderma_test.yml \
-        -d ~/data/alignment/Fungi/GENOMES/trichoderma/WGS \
-        -m prefix \
-        -r '*.fsa_nt.gz' \
-        --opt group_name=trichoderma \
-        --opt base_dir='~/data/alignment/Fungi/' \
-        --opt data_dir='~/data/alignment/Fungi/trichoderma' \
-        --opt rm_species=Fungi \
-        --opt min_contig=5000 \
-        --opt per_seq_min_contig=30000 \
-        --plan 'name=four_way;t=Tatr_IMI_206040;qs=Tatr_XS2015,Tree_QM6a,Tvir_Gv29_8' \
-        --skip Tham_GD12='contigs are too short' \
-        --per_seq Tatr_IMI_206040
-    ```
+* No results for Tatr_IMI_206040vsTkon_JCM_1883
 
-2. Edit `pop/trichoderma_test.yml` on necessary.
+Tatr_IMI_206040;qs=Tatr_XS2015,Tree_QM6a,Tvir_Gv29_8
 
-    The following cmd refresh existing YAML file.
+```bash
+cd ~/data/alignment/trichoderma
 
-    ```bash
-    perl ~/Scripts/withncbi/pop/gen_pop_conf.pl \
-        -i ~/Scripts/withncbi/pop/trichoderma_test.yml
-    ```
+egaz template \
+    GENOMES/Tatr_IMI_206040 \
+    $(find GENOMES -maxdepth 1 -type d -path "*/????*" | grep -v "Tatr_IMI_206040"| grep -v "Tkon_JCM_1883") \
+    --multi -o multi/ \
+    --rawphylo --parallel 8 -v
 
-3. `pop_prep.pl` will generate four or more bash scripts:
+bash multi/1_pair.sh
+bash multi/2_rawphylo.sh
+bash multi/3_multi.sh
 
-    ```bash
-    perl ~/Scripts/withncbi/pop/pop_prep.pl -p 12 -i ~/Scripts/withncbi/pop/trichoderma_test.yml
-    ```
+```
 
-    1. `01_file.sh`: unzip, filter and split
-    2. `02_rm.sh`: RepeatMasker
-    3. `03_strain_info.sh`: strain_info
-    4. `plan_ALL.sh`: alignment plan for all genomes
-    5. `plan_four_way.sh`: alignment plan for `four_way`, specified by `--plan` of `gen_pop_conf.pl`
-
-4. Run generated scripts.
-
-    Scripts starting with a "0" means they are doing preparing works.
-
-    ```bash
-    sh 01_file.sh
-    sh 02_rm.sh
-    sh 03_strain_info.sh
-    ```
-
-5. `plan_ALL.sh` generates some bash files, execute them in order.
-
-    ```bash
-    sh plan_ALL.sh
-
-    sh 1_real_chr.sh
-    sh 3_pair_cmd.sh
-    sh 4_rawphylo.sh
-    sh 5_multi_cmd.sh
-    sh 7_multi_db_only.sh
-    ```
-
-6. `plan_four_way.sh` will overwrite some bash files, execute the following:
-
-    ```bash
-    sh plan_four_way.sh
-
-    sh 5_multi_cmd.sh
-    sh 7_multi_db_only.sh
-    ```
-
-7. When you are satisfied and don't see any wrong, rename `pop/trichoderma_test.yml` to
-`pop/trichoderma_data.yml` and commit it.
-
-    ```bash
-    mv ~/Scripts/withncbi/pop/trichoderma_test.yml ~/Scripts/withncbi/pop/trichoderma_data.yml
-    ```
-
-## Section 3: cleaning.
+# Section 4: cleaning
 
 This is the ultimate final step. No more. Actually you may choose not to do this. It's depended on
 your disk capacity.
 
-    ```bash
-    cd ~/data/alignment/Fungi/trichoderma
+```bash
+cd ~/data/alignment/Fungi/trichoderma
 
-    # clean raw fasta
-    find . -maxdepth 1 -type d -name "*_raw" | xargs rm -fr
+# clean raw fasta
+find . -maxdepth 1 -type d -name "*_raw" | xargs rm -fr
 
-    # clean maf-fasta
-    find . -maxdepth 1 -type d -name "*_fasta" | xargs rm -fr
+# clean maf-fasta
+find . -maxdepth 1 -type d -name "*_fasta" | xargs rm -fr
 
-    # clean raxml phy
-    find . -maxdepth 2 -type f -name "*.phy" -or -name "*.phy.reduced" | xargs rm
+# clean raxml phy
+find . -maxdepth 2 -type f -name "*.phy" -or -name "*.phy.reduced" | xargs rm
 
-    # compress files
-    find . -type f -name "*.maf" | parallel gzip
-    find . -type f -name "*.fas" | parallel gzip
-    ```
+# compress files
+find . -type f -name "*.maf" | parallel gzip
+find . -type f -name "*.fas" | parallel gzip
 
-## FAQ
+```
+
+# FAQ
 
 * Why .tsv? All of your other programs use .csv.
 
@@ -310,5 +519,5 @@ your disk capacity.
 
 * I have a very good assembly on chromosome level, but I can't find it in WGS.
 
-    Best genomes on the world went to NCBI RefSeq. Use tools in `util/` to
-    download them. Examples can be found in `pop/OPs-download.md`.
+    Best genomes on the world went to NCBI RefSeq. Use tools in `util/` to download them. Examples
+    can be found in `pop/OPs-download.md`.

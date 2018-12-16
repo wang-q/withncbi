@@ -84,10 +84,10 @@ if ( !$euk ) {
         skip_first_row => 1,
         quote_char     => '',
         col_names      => [
-            qw{ Organism_Name TaxID BioProject_Accession BioProject_ID Group
-                SubGroup Size GC Chromosomes Chromosomes_INSDC Plasmids_RefSeq
-                Plasmids_INSDC WGS Scaffolds Genes Proteins Release_Date Modify_Date
-                Status Center }
+            qw{ Organism_Name TaxID BioProject_Accession BioProject_ID Group SubGroup Size GC
+                Replicons WGS Scaffolds Genes Proteins Release_Date Modify_Date Status Center
+                BioSample_Accession Assembly_Accession Reference FTP_Path Pubmed_ID Strain
+                }
         ],
     };
 }
@@ -99,9 +99,11 @@ else {
         skip_first_row => 1,
         quote_char     => '',
         col_names      => [
-            qw{ Organism_Name TaxID BioProject_Accession BioProject_ID Group
-                SubGroup Size GC Assembly Chromosomes Organelles Plasmids WGS
-                Scaffolds Genes Proteins Release_Date Modify_Date Status Center }
+            qw{ Organism_Name TaxID BioProject_Accession BioProject_ID Group SubGroup Size GC
+                Assembly_Accession
+                Replicons WGS Scaffolds Genes Proteins Release_Date Modify_Date Status Center
+                BioSample_Accession
+                }
         ],
     };
 }
@@ -121,10 +123,11 @@ else {
             t0.SubGroup,
             t0.Size,
             t0.GC,
-            t0.Chromosomes,
+            t0.Replicons,
             t0.WGS,
             t0.Scaffolds,
             t0.Release_Date,
+            t0.Assembly_Accession,
             t0.Status
         FROM t0
         WHERE 1 = 1
@@ -136,7 +139,7 @@ else {
 
     # prepare output csv file
     my $csv = Text::CSV_XS->new( { binary => 1, eol => "\n" } );
-    open my $csv_fh, ">", $strain_file or die "$strain_file: $!";
+    open my $csv_fh, ">", $strain_file;
     my @cols_name = map { s/^t[01]\.//; $_ } @{ $header_sth->{'NAME'} };
     $csv->print(
         $csv_fh,
@@ -147,8 +150,8 @@ else {
     );
 
     my @strs = (
-        q{ AND t0.Chromosomes <> '-'
-            AND t0.Chromosomes <> ''
+        q{ AND t0.Replicons <> '-'
+            AND t0.Replicons <> ''
             ORDER BY t0.Release_Date },
         q{ AND t0.Status = 'Scaffold'
             AND t0.WGS <> '-'
@@ -166,10 +169,20 @@ else {
         while ( my @row = $join_sth->fetchrow_array ) {
             for my $item (@row) {
                 $item = undef if ( $item eq '-' );
-
             }
-            # replace commas
-            $row[7] =~ s/\,/\|/g if $row[7];
+
+            # only keep chromosomes
+            if ( defined $row[7] ) {
+                my @accs;
+                for my $s ( split /;\s*/, $row[7] ) {
+                    next unless $s =~ /chromosome/;
+                    my @parts = split /:/, $s;
+                    $parts[1] =~ s/\/.+//;
+                    push @accs, $parts[1];
+
+                }
+                $row[7] = join "|", @accs;
+            }
 
             # find each strains' species and genus
             my $taxon_id = $row[0];
@@ -215,8 +228,7 @@ else {
 
 if ( $^O ne "Win32" ) {
     print "\n";
-    system "wc -l $_"
-        for "$gr_dir/prokaryotes.txt", "$gr_dir/eukaryotes.txt", $strain_file;
+    system "wc -l $_" for "$gr_dir/prokaryotes.txt", "$gr_dir/eukaryotes.txt", $strain_file;
 }
 
 #----------------------------#

@@ -3,10 +3,10 @@ use strict;
 use warnings;
 use autodie;
 
-use File::Slurp;
+use Path::Tiny qw();
 use Mojo::DOM;
 use Tie::IxHash;
-use YAML qw(Dump Load DumpFile LoadFile);
+use YAML::Syck qw();
 
 # http://www.ncbi.nlm.nih.gov/genomes/GenomesGroup.cgi?taxid=2759&opt=plastid
 # http://www.ncbi.nlm.nih.gov/genomes/GenomesGroup.cgi?taxid=33090&opt=organelle
@@ -14,7 +14,7 @@ use YAML qw(Dump Load DumpFile LoadFile);
 my $file = shift;
 die "Provide a valid html file!\n" unless $file;
 
-my $html = read_file($file);
+my $html = Path::Tiny::path($file)->slurp;
 
 my $dom = Mojo::DOM->new($html);
 

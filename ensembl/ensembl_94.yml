@@ -1,7 +1,8 @@
 ---
 dir:
-  mysql: "~/data/ensembl82/mysql"
-  fasta: "~/data/ensembl82/fasta"
+  mysql: "~/data/ensembl94/mysql"
+  fasta: "~/data/ensembl94/fasta"
+  gff3: "~/data/ensembl94/gff3"
   dest: "~/data/alignment/Ensembl"
 species:
   "Homo sapiens":
@@ -19,40 +20,39 @@ species:
         mv Y.fa Y.fa.skip
         mv MT.fa MT.fa.skip
   "Pan troglodytes":
-    core:
-      aliases:
-        - chimp
-    initrc: 1
     fasta:
       alias: Chimp
       append: |
-        cat GL*.fa > Un.fa
-        cat AACZ*.fa >> Un.fa
-        rm GL*.fa AACZ*.fa
+        cat KV*.fa AACZ*.fa > Un.fa
+        rm KV*.fa AACZ*.fa
+        mv Un.fa Un.fa.skip
+        mv Y.fa Y.fa.skip
+        mv MT.fa MT.fa.skip
   "Gorilla gorilla":
-    core:
-      aliases:
-        - gorilla
-    initrc: 1
     fasta:
       alias: Gorilla
+      append: |
+        cat CABD*.fa > Un.fa
+        rm CABD*.fa
+        mv Un.fa Un.fa.skip
+        mv MT.fa MT.fa.skip
   "Pongo abelii":
-    core:
-      aliases:
-        - orangutan
-    initrc: 1
     fasta:
       alias: Orangutan
+      append: |
+        cat *random.fa *hap*.fa >> Un.fa
+        rm *random.fa *hap*.fa
+        mv Un.fa Un.fa.skip
+        mv MT.fa MT.fa.skip
   "Macaca mulatta":
-    core:
-      aliases:
-        - rhesus
-    initrc: 1
     fasta:
       alias: Rhesus
       append: |
-        cat 1099*.fa > Un.fa
-        rm 1099*.fa
+        cat JSUE*.fa KQ*.fa > Un.fa
+        rm JSUE*.fa KQ*.fa
+        mv Un.fa Un.fa.skip
+        mv Y.fa Y.fa.skip
+        mv MT.fa MT.fa.skip
   "Mus musculus":
     core:
       aliases:
@@ -78,18 +78,6 @@ species:
         mv Un.fa Un.fa.skip
         mv Y.fa Y.fa.skip
         mv MT.fa MT.fa.skip
-  "Medicago truncatula":
-    fasta:
-      append: |
-        cat scaffold*.fa > Un.fa
-        mv Un.fa Un.fa.skip
-        rm scaffold*.fa
-  "Glycine max":
-    fasta:
-      append: |
-        cat scaffold*.fa > Un.fa
-        mv Un.fa Un.fa.skip
-        rm scaffold*.fa
   "Arabidopsis thaliana":
     core: 1
     initrc: 1
@@ -103,8 +91,24 @@ species:
         cat scaffold*.fa > Un.fa
         rm scaffold*.fa
         mv Un.fa Un.fa.skip
+  "Medicago truncatula":
+    fasta:
+      append: |
+        cat scaffold*.fa > Un.fa
+        mv Un.fa Un.fa.skip
+        rm scaffold*.fa
+  "Glycine max":
+    fasta:
+      append: |
+        cat scaffold*.fa > Un.fa
+        mv Un.fa Un.fa.skip
+        rm scaffold*.fa
   "Vitis vinifera":
-    fasta: 1
+    fasta:
+      append: |
+        cat *random.fa >> Un.fa
+        rm *random.fa
+        mv Un.fa Un.fa.skip
   "Oryza sativa":
     core: 1
     initrc: 1
@@ -116,6 +120,8 @@ species:
         cat Syng*.fa >> Un.fa
         rm AC*.fa AP*.fa Syng*.fa
         mv Un.fa Un.fa.skip
+        mv Mt.fa Mt.fa.skip
+        mv Pt.fa Pt.fa.skip
   "Oryza indica":
     fasta:
       alias: OsatInd
@@ -132,43 +138,37 @@ species:
         mv Un.fa Un.fa.skip
         rm Scaffold*.fa
   "Brassica rapa":
-    core: 1
-    initrc: 1
     fasta:
       append: |
         cat Scaffold*.fa > Un.fa
         mv Un.fa Un.fa.skip
         rm Scaffold*.fa
   "Solanum lycopersicum":
-    core: 1
-    initrc: 1
     fasta:
       append: |
         cat SL2*.fa > Un.fa
         mv Un.fa Un.fa.skip
         rm SL2*.fa
   "Solanum tuberosum":
-    core: 1
-    initrc: 1
     fasta: 1
   "Setaria italica":
     fasta:
       append: |
-        cat scaffold*.fa > Un.fa
+        cat KQ*.fa > Un.fa
         mv Un.fa Un.fa.skip
-        rm scaffold*.fa
+        rm KQ*.fa
   "Sorghum bicolor":
     fasta:
       append: |
-        cat GL*.fa > Un.fa
+        cat super*.fa > Un.fa
         mv Un.fa Un.fa.skip
-        rm GL*.fa
+        rm super*.fa
   "Brachypodium distachyon":
     fasta:
       append: |
-        cat GG*.fa > Un.fa
+        cat KZ*.fa Bd1_*.fa > Un.fa
         mv Un.fa Un.fa.skip
-        rm GG*.fa
+        rm KZ*.fa Bd1_*.fa
   "Musa acuminata":
     fasta: 1
   "Drosophila melanogaster":
@@ -176,18 +176,24 @@ species:
     initrc: 1
     fasta:
       append: |
+        cat *Scaffold*.fa 211*.fa > Un.fa
+        mv Un.fa Un.fa.skip
         rm *Scaffold*.fa 211*.fa
         mv 4.fa 4.fa.skip
         mv Y.fa Y.fa.skip
         mv rDNA.fa rDNA.fa.skip
-        mv dmel_mitochondrion_genome.fa dmel_mitochondrion_genome.fa.skip
+        mv mitochondrion_genome.fa mitochondrion_genome.fa.skip
   "Drosophila sechellia":
-    core: 1
-    initrc: 1
+    skip: 1
   "Drosophila simulans":
-    core: 1
-    initrc: 1
-    fasta: 1
+    fasta:
+      append: |
+        cat JPYS*.fa > Un.fa
+        mv Un.fa Un.fa.skip
+        rm JPYS*.fa
+        mv 4.fa 4.fa.skip
+        mv Y.fa Y.fa.skip
+        mv MT.fa MT.fa.skip
   "Caenorhabditis elegans":
     core: 1
     initrc: 1
@@ -195,17 +201,11 @@ species:
       append: |
         mv MtDNA.fa MtDNA.fa.skip
   "Caenorhabditis briggsae":
-    core: 1
-    initrc: 1
-  "Caenorhabditis remanei":
-    core: 1
-    initrc: 1
-  "Caenorhabditis brenneri":
-    core: 1
-    initrc: 1
-  "Caenorhabditis japonica":
-    core: 1
-    initrc: 1
+    fasta:
+      append: |
+        cat cb25*.fa > Un.fa
+        mv Un.fa Un.fa.skip
+        rm cb25*.fa
   "Plasmodium falciparum":
     core: 1
     initrc: 1
@@ -213,7 +213,11 @@ species:
   "Dictyostelium discoideum":
     core: 1
     initrc: 1
-    fasta: 1
+    fasta:
+      append: |
+        cat CH*.fa > Un.fa
+        mv Un.fa Un.fa.skip
+        rm CH*.fa
   "Aspergillus fumigatus":
     core: 1
     initrc: 1
@@ -239,7 +243,7 @@ species:
         - compara_fungi
     initrc: 1
 meta:
-  version: 82
+  version: 94
   initrc_file: "ensembl.initrc.pm"
   build_file: "ensembl.build.sh"
   fasta_file: "ensembl.fasta.sh"

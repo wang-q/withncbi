@@ -43,7 +43,7 @@ masked_chr.pl - Soft-masking fa file.
     faops split-name Saccharomyces_cerevisiae.R64-1-1.dna.toplevel.fa.gz genome
     faops size genome/*.fa > genome/chr.sizes
 
-    perl ~/Scripts/alignDB/slice/write_runlist_feature.pl -e yeast --feature repeat
+    perl ~/Scripts/withncbi/ensembl/feature_runlists.pl -e yeast --feature repeat
 
     # Or use gff2runlist.pl or rmout2runlist.pl
     # wget -N ftp://ftp.ensembl.org/pub/release-82/gff3/saccharomyces_cerevisiae/Saccharomyces_cerevisiae.R64-1-1.82.gff3.gz
@@ -75,7 +75,7 @@ my @files = sort File::Find::Rule->file->name('*.fa')->in($dir_fa);
 
 my @chrs = map { basename $_ , ".fa" } @files;    # strip dir and suffix
 while (1) {
-    my $lcss = lcss(@chrs);
+    my $lcss = lcp(@chrs);
     last unless $lcss;
     print "LCSS [$lcss]\n";
     my $rx = quotemeta $lcss;
@@ -152,9 +152,10 @@ MCE::Flow::finish;
 
 $stopwatch->end_message;
 
+# Longest common prefix
 # comes from
 # http://stackoverflow.com/questions/499967/how-do-i-determine-the-longest-similar-portion-of-several-strings
-sub lcss {
+sub lcp {
     return '' unless @_;
     return $_[0] if @_ == 1;
     my $i          = 0;

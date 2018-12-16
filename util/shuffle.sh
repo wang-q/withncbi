@@ -9,7 +9,7 @@ if [ "$#" -lt 1 ]; then
     exit 1
 fi
 
-# chech faops is installed
+# check whether faops is installed
 hash faops 2>/dev/null || {
     echo >&2 "faops is required but it's not installed.";
     echo >&2 "Install with homebrew: brew install wang-q/tap/faops";

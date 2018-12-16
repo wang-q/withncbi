@@ -3,6 +3,25 @@
 Less detailed than Trichoderma in [README.md](README.md), but include examples for genomes out of
 WGS, which usually in better assembling levels.
 
+[TOC]: # " "
+- [*Saccharomyces* WGS](#saccharomyces-wgs)
+- [Scer_wgs WGS](#scer_wgs-wgs)
+- [Scer_100 ASSEMBLY](#scer_100-assembly)
+- [*Fusarium* WGS](#fusarium-wgs)
+- [*Aspergillus* WGS](#aspergillus-wgs)
+- [*Arabidopsis* 19 genomes](#arabidopsis-19-genomes)
+- [*Orazy sativa* Japonica 24 genomes](#orazy-sativa-japonica-24-genomes)
+- [*Drosophila* Population Genomics Project (dpgp)](#drosophila-population-genomics-project-dpgp)
+- [Primates](#primates)
+- [Human individuals from Simons project](#human-individuals-from-simons-project)
+- [*Caenorhabditis elegans*](#caenorhabditis-elegans)
+- [*Dictyostelium* WGS](#dictyostelium-wgs)
+- [*Dictyostelium discoideum*](#dictyostelium-discoideum)
+- [Mouse](#mouse)
+- [Other plants](#other-plants)
+- [Currently not used](#currently-not-used)
+
+
 ## *Saccharomyces* WGS
 
 1. Create `pop/saccharomyces.tsv` manually.
@@ -52,13 +71,15 @@ WGS, which usually in better assembling levels.
     find WGS -name "*.gz" | xargs gzip -t
     ```
 
-3. Download *Saccharomyces cerevisiae* S288c.
+- Download sequences from NCBI assembly
 
     This step is totally manual operation. **Be careful.**
 
     | assigned name | organism_name                    | assembly_accession |
-    | :------------ | :------------                    | :------------      |
+    |:--------------|:---------------------------------|:-------------------|
     | Scer_S288c    | *Saccharomyces cerevisiae* S288c | GCF_000146045.2    |
+    | Seub_FM1318   | *Saccharomyces eubayanus* FM1318 | GCF_001298625.1    |
+
 
     ```bash
     mkdir -p ~/data/alignment/Fungi/GENOMES/saccharomyces/DOWNLOAD
@@ -66,14 +87,24 @@ WGS, which usually in better assembling levels.
 
     # Omit chrMt
     perl ~/Scripts/withncbi/taxon/assembly_csv.pl \
-        -f ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/All/GCF_000146045.2.assembly.txt \
+        -f ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/146/045/GCF_000146045.2_R64/GCF_000146045.2_R64_assembly_report.txt \
         -name Scer_S288c \
         --nuclear \
         > Scer_S288c.seq.csv
 
+    perl ~/Scripts/withncbi/taxon/assembly_csv.pl \
+        -f ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/298/625/GCF_001298625.1_SEUB3.0/GCF_001298625.1_SEUB3.0_assembly_report.txt \
+        -name Seub_FM1318 \
+        > Seub_FM1318.seq.csv
+
+    echo "#strain_name,accession,strain_taxon_id,seq_name" > saccharomyces.seq.csv
+    cat Scer_S288c.seq.csv Seub_FM1318.seq.csv |
+        perl -nl -e '/^#/ and next; /^\s*$/ and next; print;' \
+        >> saccharomyces.seq.csv
+
     # Download, rename files and change fasta headers
     perl ~/Scripts/withncbi/taxon/batch_get_seq.pl \
-        -p -f Scer_S288c.seq.csv
+        -p -f saccharomyces.seq.csv
     ```
 
 ## Scer_wgs WGS
@@ -134,7 +165,8 @@ WGS, which usually in better assembling levels.
 3. Download strains of *Saccharomyces cerevisiae* at good assembly status.
 
     Click the `Download table` link on the top-right of [Genome
-    list](http://www.ncbi.nlm.nih.gov/genome/genomes/15), save it as .csv file.
+                                    list](http://www.ncbi.nlm.nih.gov/genome/genomes/15), save it as
+    .csv file.
 
     ```bash
     mkdir -p ~/data/alignment/Fungi/GENOMES/scer_wgs/DOWNLOAD
@@ -142,12 +174,12 @@ WGS, which usually in better assembling levels.
 
     # Download S288c, EC1118 and RM11_1a separately
     perl ~/Scripts/withncbi/taxon/assembly_csv.pl \
-        -f ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/All/GCF_000146045.2.assembly.txt \
+        -f ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/146/045/GCF_000146045.2_R64/GCF_000146045.2_R64_assembly_report.txt \
         --nuclear -name S288c \
         > S288c.seq.csv
 
     perl ~/Scripts/withncbi/taxon/assembly_csv.pl \
-        -f ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/All/GCA_000218975.1.assembly.txt \
+        -f ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/218/975/GCA_000218975.1_ASM21897v1/GCA_000218975.1_ASM21897v1_assembly_report.txt \
         --nuclear --genbank --scaffold -name EC1118 \
         > EC1118.seq.csv
 
@@ -178,9 +210,9 @@ WGS, which usually in better assembling levels.
     echo -e '#name\tprefix\torganism\tcontigs' > scer_100.tsv
 
     # outgroups
-    echo -e "Spar\tAABY\tSaccharomyces paradoxus NRRL Y-17217\t832" >> scer_100.tsv
-    echo -e "Spas\tJTFI\tSaccharomyces pastorianus\t878" >> scer_100.tsv
-    echo -e "Sbou\tJRHY\tSaccharomyces sp. boulardii\t193" >> scer_100.tsv
+    echo -e "Spar\tAABY01\tSaccharomyces paradoxus NRRL Y-17217\t832" >> scer_100.tsv
+    echo -e "Spas\tJTFI01\tSaccharomyces pastorianus\t878" >> scer_100.tsv
+    echo -e "Sbou\tJRHY01\tSaccharomyces sp. boulardii\t193" >> scer_100.tsv
 
     perl ~/Scripts/withncbi/taxon/wgs_prep.pl \
         -f scer_100.tsv \
@@ -197,7 +229,8 @@ WGS, which usually in better assembling levels.
 2. Download strains of *Saccharomyces cerevisiae* at good assembly status.
 
     Click the `Download table` link on the top-right of [Genome
-    list](http://www.ncbi.nlm.nih.gov/genome/genomes/15), save it as .csv file.
+                                    list](http://www.ncbi.nlm.nih.gov/genome/genomes/15), save it as
+    .csv file.
 
     ```bash
     mkdir -p ~/data/alignment/Fungi/GENOMES/scer_100/DOWNLOAD
@@ -205,18 +238,39 @@ WGS, which usually in better assembling levels.
 
     # Download S288c separately
     perl ~/Scripts/withncbi/taxon/assembly_csv.pl \
-        -f ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/All/GCF_000146045.2.assembly.txt \
+        -f ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/146/045/GCF_000146045.2_R64/GCF_000146045.2_R64_assembly_report.txt \
         --nuclear -name S288c \
         > S288c.seq.csv
 
-    mysql -ualignDB -palignDB ar_genbank -e "SELECT organism_name, species, assembly_accession FROM ar WHERE wgs_master = '' AND organism_name != species AND species_id = 4932" \
-        | perl -nl -a -F"\t" -e '$n = $F[0]; $rx = quotemeta $F[1]; $n =~ s/$rx\s+//; $n =~ s/\W+/_/g; printf qq{%s\t%s\n}, $n, $F[2];' \
-        | grep -v organism_name | grep -v S288c | grep -v EC1118 \
-        | perl -nl -a -F"\t" -e '$str = q{echo } . $F[0] . qq{ \n}; $str .= q{perl ~/Scripts/withncbi/taxon/assembly_csv.pl} . qq{ \\\n}; $str .= q{-f ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/All/} . $F[1] . qq{.assembly.txt \\\n}; $str .= q{--nuclear --genbank --chromosome -name } . $F[0] . qq{ \\\n}; $str .= q{>> non_wgs.seq.csv}; print $str . qq{\n}' \
+    mysql -ualignDB -palignDB ar_genbank -e "
+        SELECT organism_name, species, ftp_path
+        FROM ar
+        WHERE wgs_master = ''
+        AND organism_name != species
+        AND species_id = 4932
+        " \
+        | perl -nl -a -F"\t" -e '
+            $n = $F[0];
+            $rx = quotemeta $F[1];
+            $n =~ s/$rx\s+//;
+            $n =~ s/\W+/_/g;
+            printf qq{%s\t%s\n}, $n, $F[2];
+        ' \
+        | grep -v organism_name | grep -v -i S288c | grep -v EC1118 \
+        | perl -nl -a -F"\t" -e '
+            my ($filename) = reverse grep {defined} split q{/}, $F[1];
+            $filename .= q{_assembly_report.txt};
+            my $str = q{echo } . $F[0] . qq{ \n};
+            $str .= q{perl ~/Scripts/withncbi/taxon/assembly_csv.pl};
+            $str .= q{ -f } . $F[1] . q{/} . $filename;
+            $str .= q{ --nuclear --genbank --chromosome -name } . $F[0];
+            $str .= q{ >> non_wgs.seq.csv};
+            print $str . qq{\n};
+        ' \
         > ass_csv.sh
 
     echo > non_wgs.seq.csv
-    sh ass_csv.sh
+    bash ass_csv.sh
 
     echo "#strain_name,accession,strain_taxon_id,seq_name" > scer_100.seq.csv
     cat S288c.seq.csv non_wgs.seq.csv \
@@ -227,98 +281,6 @@ WGS, which usually in better assembling levels.
     perl ~/Scripts/withncbi/taxon/batch_get_seq.pl \
         -p -f scer_100.seq.csv
 
-    ```
-
-## *Candida* WGS
-
-1. Create `pop/candida.tsv` manually.
-
-    Check NCBI pages
-
-    * http://www.ncbi.nlm.nih.gov/Traces/wgs/?page=1&term=Candida*&order=organism
-    * http://www.ncbi.nlm.nih.gov/assembly?term=txid1535326[Organism:exp]
-    * http://www.ncbi.nlm.nih.gov/genome/?term=txid1535326[Organism:exp]
-
-    The wgs page contains a lot of strains from other genus.
-
-    ```bash
-    export GENUS_ID=1535326
-    export GENUS=candida
-    mkdir -p ~/data/alignment/Fungi/$GENUS          # operation directory
-    mkdir -p ~/data/alignment/Fungi/GENOMES/$GENUS  # sequence directory
-
-    cd ~/data/alignment/Fungi/GENOMES/$GENUS
-
-    ...
-    # Edit raw2.tsv, remove lines containing CANDIDATUS or CANDIDATE DIVISION
-    cat raw2.tsv | grep -v 'CANDIDATUS' | grep -v 'CANDIDATE DIVISION' > tmp.tsv
-    mv tmp.tsv raw2.tsv
-    ...
-
-    # Cleaning
-    rm raw*.*sv
-    unset GENUS_ID
-    unset GENUS
-    ```
-
-2. Create working directory and download WGS sequences.
-
-    ```bash
-    mkdir -p ~/data/alignment/Fungi/GENOMES/candida
-    cd ~/data/alignment/Fungi/GENOMES/candida
-
-    perl ~/Scripts/withncbi/taxon/wgs_prep.pl \
-        -f ~/Scripts/withncbi/pop/candida.tsv \
-        --fix \
-        -o WGS \
-        -a
-
-    aria2c -UWget -x 6 -s 3 -c -i WGS/candida.url.txt
-
-    find WGS -name "*.gz" | xargs gzip -t
-    ```
-
-3. Pick targets.
-
-    ```sql
-    SELECT *
-    FROM gr.gr
-    WHERE genus_id = 1535326
-
-    SELECT
-        organism_name, assembly_accession
-    FROM
-        ar_refseq.ar
-    WHERE
-        genus_id = 1535326
-    ORDER BY organism_name
-    ```
-
-    | assigned name  | organism_name                     | assembly_accession |
-    | :------------  | :------------                     | :------------      |
-    | Cdub_CD36      | *Candida dubliniensis* CD36       | GCF_000026945.1    |
-    | Corh_Co_90_125 | *Candida orthopsilosis* Co 90-125 | GCF_000315875.1    |
-
-    ```bash
-    mkdir -p ~/data/alignment/Fungi/GENOMES/candida/DOWNLOAD
-    cd ~/data/alignment/Fungi/GENOMES/candida/DOWNLOAD
-
-    perl ~/Scripts/withncbi/taxon/assembly_csv.pl \
-        -f ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/All/GCF_000026945.1.assembly.txt \
-        -name Cdub_CD36 \
-        > Cdub_CD36.seq.csv
-
-    perl ~/Scripts/withncbi/taxon/assembly_csv.pl \
-        -f ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/All/GCF_000315875.1.assembly.txt \
-        -name Corh_Co_90_125 \
-        > Corh_Co_90_125.seq.csv
-
-    # Download, rename files and change fasta headers
-    perl ~/Scripts/withncbi/taxon/batch_get_seq.pl \
-        -p -f Cdub_CD36.seq.csv
-
-    perl ~/Scripts/withncbi/taxon/batch_get_seq.pl \
-        -p -f Corh_Co_90_125.seq.csv
     ```
 
 ## *Fusarium* WGS
@@ -375,7 +337,7 @@ WGS, which usually in better assembling levels.
     ```
 
     | assigned name | organism_name                                | assembly_accession |
-    | :------------ | :------------                                | :------------      |
+    |:--------------|:---------------------------------------------|:-------------------|
     | Fgra_PH_1     | *Fusarium graminearum* PH-1                  | GCA_000240135.3    |
     | Foxy_4287     | *Fusarium oxysporum* f. sp. lycopersici 4287 | GCA_000149955.1    |
     | Fpse_CS3270   | *Fusarium pseudograminearum* CS3270          | GCA_000974265.1    |
@@ -490,7 +452,7 @@ WGS, which usually in better assembling levels.
     ```
 
     | assigned name | organism_name                  | assembly_accession |
-    | :------------ | :------------                  | :------------      |
+    |:--------------|:-------------------------------|:-------------------|
     | Afum_Af293    | *Aspergillus fumigatus* Af293  | GCA_000002655.1    |
     | Anid_FGSC_A4  | *Aspergillus nidulans* FGSC A4 | GCA_000011425.1    |
 
@@ -519,239 +481,6 @@ WGS, which usually in better assembling levels.
         -p -f Anid_FGSC_A4.seq.csv
     ```
 
-## *Penicillium* WGS
-
-1. Create `pop/penicillium.tsv` manually.
-
-    * http://www.ncbi.nlm.nih.gov/Traces/wgs/?page=1&term=penicillium&order=organism
-    * http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?mode=Info&id=5073
-    * http://www.ncbi.nlm.nih.gov/assembly?term=txid5073[Organism:exp]
-    * http://www.ncbi.nlm.nih.gov/genome/?term=txid5073[Organism:exp]
-
-    ```bash
-    export GENUS_ID=5073
-    export GENUS=penicillium
-    mkdir -p ~/data/alignment/Fungi/$GENUS          # operation directory
-    mkdir -p ~/data/alignment/Fungi/GENOMES/$GENUS  # sequence directory
-
-    cd ~/data/alignment/Fungi/GENOMES/$GENUS
-
-    ...
-
-    # Cleaning
-    rm raw*.*sv
-    unset GENUS_ID
-    unset GENUS
-    ```
-
-2. Create working directory and download WGS sequences.
-
-    ```bash
-    mkdir -p ~/data/alignment/Fungi/GENOMES/penicillium
-    cd ~/data/alignment/Fungi/GENOMES/penicillium
-
-    perl ~/Scripts/withncbi/taxon/wgs_prep.pl \
-        -f ~/Scripts/withncbi/pop/penicillium.tsv \
-        --fix \
-        -o WGS \
-        -a
-
-    aria2c -UWget -x 6 -s 3 -c -i WGS/penicillium.url.txt
-
-    find WGS -name "*.gz" | xargs gzip -t
-    ```
-
-3. Pick targets.
-
-    ```sql
-    SELECT *
-    FROM gr_euk.gr
-    WHERE genus_id = 5073
-
-    SELECT
-        *
-    FROM
-        ar_genbank.ar
-    WHERE
-        genus_id = 5073
-    ORDER BY organism_name
-    ```
-
-    There're no good target. Pchr_P2niaD18 is the only one on chromosome level, but is not de novo
-    assembled and hasn't annotations.
-
-    | assigned name | organism_name                      | assembly_accession |
-    | :------------ | :------------                      | :------------      |
-    | Pchr_P2niaD18 | *Penicillium chrysogenum* P2niaD18 | GCA_000710275.1    |
-
-## *Plasmodium* WGS
-
-    | name                      | taxon |
-    | :---                      | :---  |
-    | Plasmodium                | 5820  |
-    | Plasmodium falciparum     | 5833  |
-    | Plasmodium falciparum 3D7 | 36329 |
-
-1. Create `pop/plasmodium.tsv` manually.
-
-    * http://www.ncbi.nlm.nih.gov/Traces/wgs/?page=1&term=plasmodium&order=organism
-    * http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?mode=Info&id=5820
-    * http://www.ncbi.nlm.nih.gov/assembly?term=txid5820[Organism:exp]
-    * http://www.ncbi.nlm.nih.gov/genome/?term=txid5820[Organism:exp]
-
-    ```bash
-    export GENUS_ID=5820
-    export GENUS=plasmodium
-    mkdir -p ~/data/alignment/Protists/$GENUS          # operation directory
-    mkdir -p ~/data/alignment/Protists/GENOMES/$GENUS  # sequence directory
-
-    cd ~/data/alignment/Protists/GENOMES/$GENUS
-
-    ...
-
-    # Cleaning
-    rm raw*.*sv
-    unset GENUS_ID
-    unset GENUS
-    ```
-
-    Remove all strains of Plasmodium falciparum. 3D7 will be injected later.
-
-    ```bash
-    mv plasmodium.tsv all.tsv
-    cat all.tsv | grep -v Pfal_ > plasmodium.tsv
-    ```
-
-    Edit the tsv file to fix names and comment out bad strains.
-
-
-2. Create working directory and download WGS sequences.
-
-    ```bash
-    mkdir -p ~/data/alignment/Protists/GENOMES/plasmodium
-    cd ~/data/alignment/Protists/GENOMES/plasmodium
-
-    perl ~/Scripts/withncbi/taxon/wgs_prep.pl \
-        -f ~/Scripts/withncbi/pop/plasmodium.tsv \
-        --fix \
-        -o WGS \
-        -a
-
-    aria2c -UWget -x 6 -s 3 -c -i WGS/plasmodium.url.txt
-
-    find WGS -name "*.gz" | xargs gzip -t
-    ```
-
-3. Download *Plasmodium falciparum* 3D7.
-
-    This step is totally manual operation. **Be careful.**
-
-    | assigned name | organism_name               | assembly_accession           |
-    | :------------ | :------------               | :------------                |
-    | Pfal_3D7      | *Plasmodium falciparum* 3D7 | GCF_000002765.3.assembly.txt |
-
-    ```bash
-    mkdir -p ~/data/alignment/Protists/GENOMES/plasmodium/DOWNLOAD
-    cd ~/data/alignment/Protists/GENOMES/plasmodium/DOWNLOAD
-
-    # Omit chrMt
-    perl ~/Scripts/withncbi/taxon/assembly_csv.pl \
-        -f ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/All/GCF_000002765.3.assembly.txt \
-        -name Pfal_3D7 \
-        --nuclear \
-        > Pfal_3D7.seq.csv
-
-    # Download, rename files and change fasta headers
-    perl ~/Scripts/withncbi/taxon/batch_get_seq.pl \
-        -p -f Pfal_3D7.seq.csv
-    ```
-
-## *Plasmodium falciparum* WGS
-
-1. Create `pop/Pfal.tsv` manually.
-
-    ```bash
-    export GENUS_ID=5820
-    export GENUS=plasmodium
-    mkdir -p ~/data/alignment/Protists/pfal          # operation directory
-    mkdir -p ~/data/alignment/Protists/GENOMES/pfal  # sequence directory
-
-    cd ~/data/alignment/Protists/GENOMES/pfal
-
-    ... # paste codes from README.md
-
-    # Cleaning
-    rm raw*.*sv
-    unset GENUS_ID
-    unset GENUS
-    ```
-
-    Remove other species of Plasmodium. Add Prei as outgroup.
-
-    ```bash
-    echo -e '#name\tprefix\torganism\tcontigs' > pfal.tsv
-    cat plasmodium.tsv | grep Pfal_ | sed "s/^Pfal_//" >> pfal.tsv
-    rm plasmodium.tsv
-
-    # outgroup
-    echo -e "Prei\tCBXM\tPlasmodium reichenowi\t2055" >> pfal.tsv
-    ```
-
-    Edit the tsv file to fix names and comment out bad strains.
-
-2. Create working directory and download WGS sequences.
-
-    ```bash
-    cd ~/data/alignment/Protists/GENOMES/pfal
-
-    perl ~/Scripts/withncbi/taxon/wgs_prep.pl \
-        -f ~/Scripts/withncbi/pop/pfal.tsv \
-        --fix \
-        --nofix Prei \
-        -o WGS \
-        -a
-
-    aria2c -UWget -x 6 -s 3 -c -i WGS/pfal.url.txt
-
-    find WGS -name "*.gz" | xargs gzip -t
-    ```
-
-3. Download *Plasmodium falciparum* 3D7.
-
-    Click the `Download table` link on the top-right of [Genome list](http://www.ncbi.nlm.nih.gov/genome/genomes/33),
-    save it as .csv file.
-
-    ```bash
-    mkdir -p ~/data/alignment/Protists/GENOMES/pfal/DOWNLOAD
-    cd ~/data/alignment/Protists/GENOMES/pfal/DOWNLOAD
-
-    # Download Plasmodium falciparum 3D7 separately (36329)
-    perl ~/Scripts/withncbi/taxon/assembly_csv.pl \
-        -f ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/All/GCF_000002765.3.assembly.txt \
-        --nuclear -name 3D7 \
-        > 3D7.seq.csv
-
-    mysql -ualignDB -palignDB ar_genbank -e \
-        "SELECT organism_name, species, assembly_accession FROM ar WHERE taxonomy_id IN (1036723, 5843, 1237627, 1036727, 1036725, 1036726, 57270, 5835, 1036724, 57266, 478859)" \
-        | perl -nl -a -F"\t" -e '$n = $F[0]; $rx = quotemeta $F[1]; $n =~ s/$rx\s+//; $n =~ s/\W+/_/g; printf qq{%s\t%s\n}, $n, $F[2];' \
-        | grep -v organism_name \
-        | perl -nl -a -F"\t" -e '$str = q{echo } . $F[0] . qq{ \n}; $str .= q{perl ~/Scripts/withncbi/taxon/assembly_csv.pl} . qq{ \\\n}; $str .= q{-f ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/All/} . $F[1] . qq{.assembly.txt \\\n}; $str .= q{ --scaffold --length 5000 --genbank -name } . $F[0] . qq{ \\\n}; $str .= q{>> non_wgs.seq.csv}; print $str . qq{\n}' \
-        > ass_csv.sh
-
-    echo > non_wgs.seq.csv
-    sh ass_csv.sh
-
-    echo "#strain_name,accession,strain_taxon_id,seq_name" > pfal.seq.csv
-    cat 3D7.seq.csv non_wgs.seq.csv \
-        | perl -nl -e '/^#/ and next; /^\s*$/ and next; print;' \
-        >> pfal.seq.csv
-
-    # Download, rename files and change fasta headers
-    perl ~/Scripts/withncbi/taxon/batch_get_seq.pl \
-        -p -f pfal.seq.csv
-
-    ```
-
 ## *Arabidopsis* 19 genomes
 
 1. Sources.
@@ -773,7 +502,8 @@ WGS, which usually in better assembling levels.
 
 3. *A. thaliana* and *A. lyrata* from ensembl genomes.
 
-    [ensembl_82.yml](ensembl/ensembl_82.yml) creates `Atha` and `Alyr` in `~/data/alignment/Ensembl`.
+    [ensembl_82.yml](ensembl/ensembl_82.yml) creates `Atha` and `Alyr` in
+    `~/data/alignment/Ensembl`.
 
 ## *Orazy sativa* Japonica 24 genomes
 
@@ -808,7 +538,8 @@ WGS, which usually in better assembling levels.
 
 3. nipponbare and 9311 from ensembl genomes.
 
-    [ensembl_82.yml](ensembl/ensembl_82.yml) creates `OsatJap` and `OsatInd` in `~/data/alignment/Ensembl`.
+    [ensembl_82.yml](ensembl/ensembl_82.yml) creates `OsatJap` and `OsatInd` in
+    `~/data/alignment/Ensembl`.
 
 ## *Drosophila* Population Genomics Project (dpgp)
 
@@ -838,7 +569,8 @@ WGS, which usually in better assembling levels.
 
 3. Dmel and Dsim from ensembl genomes.
 
-    [ensembl_82.yml](ensembl/ensembl_82.yml) creates `Dmel` and `Dsim` in `~/data/alignment/Ensemble`.
+    [ensembl_82.yml](ensembl/ensembl_82.yml) creates `Dmel` and `Dsim` in
+    `~/data/alignment/Ensemble`.
 
 ## Primates
 
@@ -901,13 +633,13 @@ http://hgdownload.soe.ucsc.edu/goldenPath/ce10/multiz7way/ce10.commonNames.7way.
 
     Mapping strategy in [here](https://github.com/wang-q/sra/blob/master/cele_mmp_seq.pl).
 
-	```bash
+    ```bash
     mkdir -p ~/data/alignment/others/cele
     cd ~/data/alignment/others/cele
 
     find ~/data/dna-seq/cele_mmp/ -name "*.vcf.fasta" \
         | parallel -j 1 cp {} .
-	```
+    ```
 
 2. Reference strain N2 from ensembl genomes
 
@@ -916,7 +648,7 @@ http://hgdownload.soe.ucsc.edu/goldenPath/ce10/multiz7way/ce10.commonNames.7way.
 ## *Dictyostelium* WGS
 
 | name                         | taxon  |
-| :---                         | :---   |
+|:-----------------------------|:-------|
 | Dictyostelium                | 5782   |
 | Dictyostelium discoideum     | 44689  |
 | Dictyostelium discoideum AX4 | 352472 |
@@ -953,7 +685,6 @@ http://hgdownload.soe.ucsc.edu/goldenPath/ce10/multiz7way/ce10.commonNames.7way.
 
     Edit the tsv file to fix names and comment out bad strains.
 
-
 2. Create working directory and download WGS sequences.
 
     ```bash
@@ -976,7 +707,7 @@ http://hgdownload.soe.ucsc.edu/goldenPath/ce10/multiz7way/ce10.commonNames.7way.
     This step is totally manual operation. **Be careful.**
 
     | assigned name | organism_name                  | assembly_accession           |
-    | :------------ | :------------                  | :------------                |
+    |:--------------|:-------------------------------|:-----------------------------|
     | Ddis_AX4      | *Dictyostelium discoideum* AX4 | GCF_000004695.1.assembly.txt |
 
     ```bash
@@ -1097,7 +828,8 @@ http://hgdownload.soe.ucsc.edu/goldenPath/ce10/multiz7way/ce10.commonNames.7way.
 
 3. Reference strain C57BL/6J (GRCm38) and rat from ensembl.
 
-    [ensembl_82.yml](ensembl/ensembl_82.yml) creates `Mouse` and `Rat` in `~/data/alignment/Ensembl`.
+    [ensembl_82.yml](ensembl/ensembl_82.yml) creates `Mouse` and `Rat` in
+    `~/data/alignment/Ensembl`.
 
 ## Other plants
 
@@ -1209,3 +941,4 @@ http://hgdownload.soe.ucsc.edu/goldenPath/ce10/multiz7way/ce10.commonNames.7way.
         --download 'name=Lemur;taxon=30608;sciname=Microcebus murinus;coverage=1.93x sanger' \
         --download 'name=Bushbaby;taxon=30611;sciname=Otolemur garnettii;coverage=2x sanger' \
         ```
+

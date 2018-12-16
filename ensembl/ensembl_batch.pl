@@ -3,13 +3,13 @@ use strict;
 use warnings;
 use autodie;
 
-use Getopt::Long qw(HelpMessage);
+use Getopt::Long qw();
 use Config::Tiny;
 use FindBin;
-use YAML qw(Dump Load DumpFile LoadFile);
+use YAML::Syck qw();
 
-use Path::Tiny;
-use String::Compare;
+use Path::Tiny qw();
+use String::Compare qw();
 use Set::Scalar;
 use Template;
 
@@ -46,25 +46,26 @@ ensembl_batch.pl - Ensembl batching
 
 =cut
 
-GetOptions(
-    'help|?' => sub { HelpMessage(0) },
-    'server|s=s'   => \( my $server   = $Config->{database}{server} ),
-    'port=i'       => \( my $port     = $Config->{database}{port} ),
+Getopt::Long::GetOptions(
+    'help|?'       => sub { Getopt::Long::HelpMessage(0) },
+    'server|s=s'   => \( my $server = $Config->{database}{server} ),
+    'port=i'       => \( my $port = $Config->{database}{port} ),
     'username|u=s' => \( my $username = $Config->{database}{username} ),
     'password|p=s' => \( my $password = $Config->{database}{password} ),
-    'file|i=s'     => \( my $yml_file = "$FindBin::Bin/ensembl_82.yml" ),
-) or HelpMessage(1);
+    'file|i=s'     => \( my $yml_file = "$FindBin::Bin/ensembl_94.yml" ),
+) or Getopt::Long::HelpMessage(1);
 
 #----------------------------------------------------------#
 # Init objects
 #----------------------------------------------------------#
 $stopwatch->start_message("Ensembl batching for $yml_file");
 
-my $dispatch = LoadFile($yml_file);
+my $dispatch = YAML::Syck::LoadFile($yml_file);
 
-my $mysql_dir = path( $dispatch->{dir}{mysql} )->absolute->stringify;
-my $fasta_dir = path( $dispatch->{dir}{fasta} )->absolute->stringify;
-my $dest_dir  = path( $dispatch->{dir}{dest} )->absolute->stringify;
+my $mysql_dir = Path::Tiny::path( $dispatch->{dir}{mysql} )->absolute->stringify;
+my $fasta_dir = Path::Tiny::path( $dispatch->{dir}{fasta} )->absolute->stringify;
+my $gff3_dir  = Path::Tiny::path( $dispatch->{dir}{gff3} )->absolute->stringify;
+my $dest_dir  = Path::Tiny::path( $dispatch->{dir}{dest} )->absolute->stringify;
 
 my $species_ref = $dispatch->{species};
 
@@ -169,10 +170,7 @@ for my $sp ( sort keys %{$species_ref} ) {
         $fasta_str .= build_fasta( $sp, $alias, $pattern, $append );
 
         # build anno
-        if ( $info->{core} ) {
-            $anno_str .= build_anno( $sp, $core_dbname, $alias );
-
-        }
+        $anno_str .= build_anno( $sp, $alias );
     }
 }
 
@@ -184,10 +182,10 @@ $initrc_str .= q{
 # Write outfiles
 #----------------------------#
 {
-    path( $dispatch->{meta}{initrc_file} )->spew($initrc_str);
-    path( $dispatch->{meta}{build_file} )->spew($build_str);
-    path( $dispatch->{meta}{fasta_file} )->spew($fasta_str);
-    path( $dispatch->{meta}{anno_file} )->spew($anno_str);
+    Path::Tiny::path( $dispatch->{meta}{initrc_file} )->spew($initrc_str);
+    Path::Tiny::path( $dispatch->{meta}{build_file} )->spew($build_str);
+    Path::Tiny::path( $dispatch->{meta}{fasta_file} )->spew($fasta_str);
+    Path::Tiny::path( $dispatch->{meta}{anno_file} )->spew($anno_str);
 }
 
 $stopwatch->end_message;
@@ -195,58 +193,6 @@ $stopwatch->end_message;
 #----------------------------------------------------------#
 # Subroutines
 #----------------------------------------------------------#
-sub build_anno {
-    my $sp          = shift;
-    my $core_dbname = shift;
-    my $alias       = shift;
-
-    my $text = <<'EOF';
-# [% sp %]
-if [ -d [% dest %]/[% alias %] ];
-then
-    echo "==> [% sp %]"
-
-    if [ -f [% dest %]/[% alias %]/anno.yml ]; then
-        echo "==> [% dest %]/[% alias %]/anno.yml exists"
-    elif mysql -hlocalhost -ualignDB -palignDB -e 'use [% core_dbname %]'; then
-        cd [% dest %]/[% alias %]
-
-        perl ~/Scripts/withncbi/ensembl/feature_runlists.pl \
-            -e [% core_dbname %] \
-            -f repeat \
-            -o repeat.yml
-
-        perl ~/Scripts/withncbi/ensembl/feature_runlists.pl \
-            -e [% core_dbname %] \
-            -f cds \
-            -o cds.yml
-
-        runlist merge repeat.yml cds.yml -o anno.yml
-        rm repeat.yml cds.yml
-    else
-        echo "==> Database [% core_dbname %] does not exist"
-    fi
-else
-    echo "==> [% dest %]/[% alias %] does not exist"
-fi
-
-EOF
-
-    my $tt = Template->new;
-    my $output;
-    $tt->process(
-        \$text,
-        {   sp          => $sp,
-            dest        => $dest_dir,
-            core_dbname => $core_dbname,
-            alias       => $alias,
-        },
-        \$output
-    ) or die Template->error;
-
-    return $output;
-}
-
 sub build_fasta {
     my $sp      = shift;
     my $alias   = shift;
@@ -257,7 +203,7 @@ sub build_fasta {
     my ( $genus, $species, $strain ) = split " ", $sp;
     my $str = lc join "_", grep {$_} ( $genus, $species, $strain );
 
-    my $iter = path($fasta_dir)->iterator( { recurse => 0, } );
+    my $iter = Path::Tiny::path($fasta_dir)->iterator( { recurse => 0, } );
     while ( my Path::Tiny $child = $iter->() ) {
         next unless $child->is_dir;
         my $base_dir = $child->basename;
@@ -267,8 +213,8 @@ sub build_fasta {
 
     my ($ensembl_dir)
         = sort { $score_of{$b} <=> $score_of{$a} } keys %score_of;
-    my $ensembl_base = path($ensembl_dir)->basename;
-    printf " " x 4 . "Find %s for %s\n", $ensembl_base, $str;
+    my $ensembl_base = Path::Tiny::path($ensembl_dir)->basename;
+    printf " " x 4 . "fasta: [%s] for [%s]\n", $ensembl_base, $str;
     if ( index( $ensembl_base, $str ) != 0 ) {
         print " " x 4, "*** Be careful for [$str]\n";
     }
@@ -279,28 +225,29 @@ sub build_fasta {
 
     my $text = <<'EOF';
 # [% sp %]
-if [ ! -d [% dest %]/[% alias %] ]
-then
+if [ ! -d [% dest %]/[% alias %] ]; then
     echo "==> [% sp %]"
 
     mkdir -p [% dest %]/[% alias %]
     cd [% dest %]/[% alias %]
     
-    find [% dir %]/dna/ -name "[% pattern %]" \
-        | xargs gzip -d -c > toplevel.fa
+    find [% dir %]/dna/ -name "[% pattern %]" |
+        xargs gzip -d -c > toplevel.fa
     
-    faops count toplevel.fa \
-        | perl -aln -e '
+    faops count toplevel.fa |
+        perl -nla -e '
             next if $F[0] eq 'total';
             print $F[0] if $F[1] > 50000;
             print $F[0] if $F[1] > 5000  and $F[6]/$F[1] < 0.05;
-            ' \
-        | uniq > listFile
-    faops some toplevel.fa listFile toplevel.filtered.fa
-    faops split-name toplevel.filtered.fa .
-    rm toplevel.fa toplevel.filtered.fa listFile
+        ' |
+        uniq > listFile
+    faops some toplevel.fa listFile stdout |
+        faops filter -N stdin stdout |
+        faops split-name stdin .
+    rm toplevel.fa listFile
 
 [% append %]
+
 else
     echo "==> [% dest %]/[% alias %] exists"
 fi
@@ -324,6 +271,73 @@ EOF
     return $output;
 }
 
+sub build_anno {
+    my $sp      = shift;
+    my $alias   = shift;
+
+    my %score_of;
+    my ( $genus, $species, $strain ) = split " ", $sp;
+    my $str = lc join "_", grep {$_} ( $genus, $species, $strain );
+
+    my $iter = Path::Tiny::path($gff3_dir)->iterator( { recurse => 0, } );
+    while ( my Path::Tiny $child = $iter->() ) {
+        next unless $child->is_dir;
+        my $base_dir = $child->basename;
+        my $score = String::Compare::char_by_char( $base_dir, $str );
+        $score_of{ $child->stringify } = $score;
+    }
+
+    my ($ensembl_dir)
+        = sort { $score_of{$b} <=> $score_of{$a} } keys %score_of;
+    my $ensembl_base = Path::Tiny::path($ensembl_dir)->basename;
+    printf " " x 4 . "gff3: [%s] for [%s]\n", $ensembl_base, $str;
+    if ( index( $ensembl_base, $str ) != 0 ) {
+        print " " x 4, "*** Be careful for [$str]\n";
+    }
+
+    my $text = <<'EOF';
+# [% sp %]
+if [ -d [% dest %]/[% alias %] ]; then
+    echo "==> [% sp %]"
+
+    if [ -f [% dest %]/[% alias %]/anno.yml ]; then
+        echo "==> [% dest %]/[% alias %]/anno.yml exists"
+    else
+        cd [% dest %]/[% alias %]
+
+        find [% dir %]/ -name "*.gff3.gz" |
+            grep -v "abinitio.gff3" |
+            grep -v "chr.gff3" |
+            xargs gzip -d -c > chr.gff
+        runlist gff --tag CDS --remove chr.gff -o cds.yml
+
+        faops masked *.fa |
+            jrunlist cover stdin -o repeat.yml
+
+        runlist merge repeat.yml cds.yml -o anno.yml
+        rm repeat.yml cds.yml
+    fi
+else
+    echo "==> [% dest %]/[% alias %] does not exist"
+fi
+
+EOF
+
+    my $tt = Template->new;
+    my $output;
+    $tt->process(
+        \$text,
+        {   sp      => $sp,
+            dir     => $ensembl_dir,
+            dest    => $dest_dir,
+            alias   => $alias,
+        },
+        \$output
+    ) or die Template->error;
+
+    return $output;
+}
+
 sub build_cmd {
     my $sp    = shift;
     my $group = shift;
@@ -339,7 +353,7 @@ sub build_cmd {
         $str = lc join "_", ( 'ensembl', $group, $genus );
     }
 
-    my $iter = path($mysql_dir)->iterator( { recurse => 0, } );
+    my $iter = Path::Tiny::path($mysql_dir)->iterator( { recurse => 0, } );
     while ( my Path::Tiny $child = $iter->() ) {
         next unless $child->is_dir;
         my $base_dir = $child->basename;
@@ -349,8 +363,8 @@ sub build_cmd {
 
     my ($ensembl_dir)
         = sort { $score_of{$b} <=> $score_of{$a} } keys %score_of;
-    my $ensembl_base = path($ensembl_dir)->basename;
-    printf " " x 4 . "Find %s for %s\n", $ensembl_base, $str;
+    my $ensembl_base = Path::Tiny::path($ensembl_dir)->basename;
+    printf " " x 4 . "db: [%s] for [%s]\n", $ensembl_base, $str;
     if ( index( $ensembl_base, $str ) != 0 ) {
         print " " x 4, "*** Be careful for [$str]\n";
     }

@@ -1,26 +1,40 @@
 # Processing bacterial genomes species by species
 
-The following command lines are about how I processed the plastid genomes of green plants.
-Many tools of `taxon/` are used here, which makes a good example for users.
+[TOC levels=1-3]: # " "
+- [Processing bacterial genomes species by species](#processing-bacterial-genomes-species-by-species)
+- [Init genome report database.](#init-genome-report-database)
+- [Download sequences and regenerate lineage information.](#download-sequences-and-regenerate-lineage-information)
+- [Prepare sequences for lastz](#prepare-sequences-for-lastz)
+- [Create alignment plans](#create-alignment-plans)
+    - [Numbers for higher ranks](#numbers-for-higher-ranks)
+    - [Exclude diverged strains](#exclude-diverged-strains)
+    - [Create `bac_target_OG.md` for picking target and outgroup.](#create-bac_target_ogmd-for-picking-target-and-outgroup)
+    - [Create alignments without outgroups.](#create-alignments-without-outgroups)
+    - [Align all representative strains of every genera.](#align-all-representative-strains-of-every-genera)
+- [Aligning](#aligning)
+    - [Batch running for groups](#batch-running-for-groups)
+    - [Alignments of genera for outgroups.](#alignments-of-genera-for-outgroups)
+- [Summary](#summary)
+    - [Copy xlsx files](#copy-xlsx-files)
+    - [Genome list](#genome-list)
+    - [Genome alignment statistics](#genome-alignment-statistics)
+    - [sep_chart of d1, d2](#sep_chart-of-d1-d2)
+    - [CorelDRAW GC charts](#coreldraw-gc-charts)
 
-## Init genome report database.
 
-`db/README.md`
+# Init genome report database.
+
+* Create database by following steps in
+  [`db/README.md`](https://github.com/wang-q/withncbi/blob/master/db/README.md#genome-reports)
+
+* Find valid species.
+
+    * Got **207** species.
+    * 40 species have no `species_code`
 
 ```bash
-cd ~/Scripts/withncbi/db
-perl gr_strains.pl -o prok_strains.csv
-perl gr_db.pl --db gr_prok --file prok_strains.csv
-rm prok_strains.csv
-```
-
-Find valid species.
-
-Got **159** species.
-
-```bash
-mkdir -p ~/data/bacteria/bac_summary
-cd ~/data/bacteria/bac_summary
+mkdir -p ~/data/bacteria/summary
+cd ~/data/bacteria/summary
 
 perl ~/Scripts/alignDB/util/query_sql.pl --db gr_prok -q '
         SELECT  species_id `#species_id`,
@@ -37,26 +51,25 @@ perl ~/Scripts/alignDB/util/query_sql.pl --db gr_prok -q '
         AND species_member > 2
         AND genus IS NOT NULL
         GROUP BY species_id
-        HAVING count > 2 AND species_code > 0       # having enough and representative member
+        HAVING count > 2 #AND species_code > 0       # having enough and representative member
         ORDER BY subgroup, species_id
-    ' -o stdout \
-    | cut -d ',' -f 1 \
-    | grep -v "^#" \
+    ' -o stdout |
+    cut -d ',' -f 1 |
+    grep -v "^#" \
     > bac.SPECIES.csv
 cat bac.SPECIES.csv | wc -l
+
 ```
 
-Expand species to strains. (Nested single quotes in bash should be '\'')
+* Expand species to strains. (Nested single quotes in bash should be '\'')
 
-Got **1470** strains.
-
+    Got **2091** strains.
 
 ```bash
-cd ~/data/bacteria/bac_summary
+cd ~/data/bacteria/summary
 
-rm bac.STRAIN.csv
-cat bac.SPECIES.csv \
-    | parallel --keep-order -r -j 8 '
+cat bac.SPECIES.csv |
+    parallel --keep-order -r -j 8 '
         perl ~/Scripts/alignDB/util/query_sql.pl --db gr_prok -q '\''
             SELECT  taxonomy_id `#strain_taxonomy_id`,
                     organism_name `strain`,
@@ -74,78 +87,122 @@ cat bac.SPECIES.csv \
             AND (chr IS NOT NULL OR LENGTH(CHR) > 0)    # has chromosome accession
             AND (LENGTH(wgs) = 0 OR wgs IS NULL)        # avoid bad assembly
             AND species_id = {}
-        '\'' -o stdout
-    ' \
-    | grep -v "^#" \
-    >> bac.STRAIN.csv
+            ORDER BY released_date                      # oldest first
+        '\'' -o stdout |
+            grep -v "^#" |
+            datamash transpose -t, |
+            perl -MList::MoreUtils -e '\''
+                my @lines = <>;
+                if ($lines[5] =~ /^,+$/) {
+                    $lines[5] = q{first} . $lines[5];
+                }
+                print $_ for @lines;
+            '\'' |
+            datamash transpose -t,
+    ' |
+    grep -v "^#" \
+    > bac.STRAIN.csv
 cat bac.STRAIN.csv | wc -l
+
 ```
 
-Create abbreviations.
+* Create abbreviations.
 
 ```bash
-cd ~/data/bacteria/bac_summary
+cd ~/data/bacteria/summary
 
 echo '#strain_taxonomy_id,strain,species,genus,subgroup,code,accession,abbr' > bac.ABBR.csv
-cat bac.STRAIN.csv \
-    | grep -v '^#' \
-    | perl ~/Scripts/withncbi/taxon/abbr_name.pl -c "2,3,4" -s "," -m 0 --shortsub \
-    | sort -t',' -k5,5 -k4,4 -k3,3 -k6,6 \
+cat bac.STRAIN.csv |
+    grep -v '^#' |
+    perl ~/Scripts/withncbi/taxon/abbr_name.pl -c "2,3,4" -s "," -m 0 --shortsub |
+    sort -t',' -k5,5 -k4,4 -k3,3 -k6,6 \
     >> bac.ABBR.csv
+
 ```
 
-## Download sequences and regenerate lineage information.
+# Download sequences and regenerate lineage information.
 
-We don't rename sequences here, so the file has three columns. **1587** accessions.
+We don't rename sequences here, so the file has three columns. **2231** accessions.
 
 And create `bac_ncbi.csv` with abbr names as taxon file.
 
 ```bash
-mkdir -p ~/data/bacteria/bac_genomes
-cd ~/data/bacteria/bac_genomes
+mkdir -p ~/data/bacteria/GENOMES
+cd ~/data/bacteria/GENOMES
 
-cat ../bac_summary/bac.ABBR.csv \
-    | grep -v '^#' \
-    | perl -nla -F"," -e 'print qq{$F[0],$F[7]}' \
-    | uniq \
-    | perl ~/Scripts/withncbi/taxon/strain_info.pl --stdin --withname --file bac_ncbi.csv
+cat ../summary/bac.ABBR.csv |
+    grep -v '^#' |
+    perl -nla -F"," -e 'print qq{$F[0],$F[7]}' |
+    uniq |
+    perl ~/Scripts/withncbi/taxon/strain_info.pl --stdin --withname --file bac_ncbi.csv
 
 echo "#strain_name,accession,strain_taxon_id" > bac_name_acc_id.csv
-cat ../bac_summary/bac.ABBR.csv \
-    | grep -v '^#' \
-    | perl -nla -F"," -e '
+cat ../summary/bac.ABBR.csv |
+    grep -v '^#' |
+    perl -nla -F"," -e '
         my $acc = $F[6];
         $acc =~ s/"//g;
         $acc =~ s/\.\d+//g;
         for my $s (split /\|/, $acc) {
             print qq{$F[7],$s,$F[0]};
         }
-    ' \
-    | sort \
+    ' |
+    sort \
     >> bac_name_acc_id.csv
 cat bac_name_acc_id.csv | wc -l
 
 perl ~/Scripts/withncbi/taxon/batch_get_seq.pl \
     -f bac_name_acc_id.csv \
     -l ~/data/NCBI/genomes/Bacteria \
-    -p 2>&1 \
-    | tee bac_seq.log
+    2>&1 |
+    tee bac_seq.log
 
 # count downloaded sequences
-find . -name "*.fasta" | wc -l
+find . -maxdepth 2 -name "*.fa" | wc -l
+find . -maxdepth 1 -type d | wc -l
+
 ```
 
-## Create alignment plans
-
-Numbers for higher ranks are: 16 subgroups, 80 genera and 159 species.
+# Prepare sequences for lastz
 
 ```bash
-cd ~/data/bacteria/bac_summary/
+cd ~/data/bacteria/GENOMES
+
+find . -maxdepth 1 -type d -path "*/*" |
+    sort |
+    parallel --no-run-if-empty --linebuffer -k -j 2 '
+        echo >&2 "==> {}"
+        
+        if [ -e {}/chr.fasta ]; then
+            echo >&2 "    {} has been processed"
+            exit;
+        fi
+
+        egaz prepseq \
+            {} \
+            --gi -v --repeatmasker " --gff --parallel 8"
+    '
+
+# restore to original states
+#for suffix in .2bit .fasta .fasta.fai .sizes .rm.out .rm.gff; do
+#    find . -name "*${suffix}" | parallel --no-run-if-empty rm 
+#done
+
+```
+
+# Create alignment plans
+
+##  Numbers for higher ranks
+
+18 subgroups, 104 genera and 207 species.
+
+```bash
+cd ~/data/bacteria/summary/
 
 # count every ranks
-#  16 subgroup.list.tmp
-#  80 genus.list.tmp
-# 159 species.list.tmp
+#  18 subgroup.list.tmp
+# 104 genus.list.tmp
+# 207 species.list.tmp
 cat bac.ABBR.csv | grep -v '^#'| cut -d',' -f 3 | sort | uniq > species.list.tmp
 cat bac.ABBR.csv | grep -v '^#'| cut -d',' -f 4 | sort | uniq > genus.list.tmp
 cat bac.ABBR.csv | grep -v '^#'| cut -d',' -f 5 | sort | uniq > subgroup.list.tmp
@@ -154,21 +211,25 @@ wc -l subgroup.list.tmp genus.list.tmp species.list.tmp
 rm *.tmp
 ```
 
-Exclude diverged strains.
+## Exclude diverged strains
 
-* 391904, Bifidobacterium longum subsp. infantis ATCC 15697 = JCM 1222 = DSM 20088, 2008-11-20, Complete Genome, 
+* 391904, Bifidobacterium longum subsp. infantis ATCC 15697 = JCM 1222 = DSM 20088, 2008-11-20,
+  Complete Genome,
 * 553190, Gardnerella vaginalis 409-05, 2010-01-07, Complete Genome, COM
-* 1386087, Neisseria meningitidis LNP21362, 2015-01-07, Complete Genome, 
-* 935590, Neisseria meningitidis M0579, 2015-06-19, Complete Genome, 
-* 1415774, Clostridium botulinum 202F, 2014-12-04, Complete Genome, 
-* 508767, Clostridium botulinum E3 str. Alaska E43, 2008-05-16, Complete Genome, 
-* 929506, Clostridium botulinum BKT015925, 2011-04-18, Complete Genome, 
-* 935198, Clostridium botulinum B str. Eklund 17B (NRP), 2008-05-07, Complete Genome, 
-* 869303, Streptococcus pneumoniae SPN034156, 2010-07-29, Complete Genome, 
-* 869311, Streptococcus pneumoniae SPN032672, 2010-07-29, Complete Genome, 
-* 869312, Streptococcus pneumoniae SPN033038, 2010-07-29, Complete Genome, 
-* 261317, Buchnera aphidicola (Cinara tujafilina), 2011-06-09, Complete Genome, 
-* 372461, Buchnera aphidicola BCc, 2006-10-18, Complete Genome, 
+* 1386087, Neisseria meningitidis LNP21362, 2015-01-07, Complete Genome,
+* 935590, Neisseria meningitidis M0579, 2015-06-19, Complete Genome,
+* 1415774, Clostridium botulinum 202F, 2014-12-04, Complete Genome,
+* 508767, Clostridium botulinum E3 str. Alaska E43, 2008-05-16, Complete Genome,
+* 929506, Clostridium botulinum BKT015925, 2011-04-18, Complete Genome,
+* 935198, Clostridium botulinum B str. Eklund 17B (NRP), 2008-05-07, Complete Genome,
+* 869303, Streptococcus pneumoniae SPN034156, 2010-07-29, Complete Genome,
+* 869311, Streptococcus pneumoniae SPN032672, 2010-07-29, Complete Genome,
+* 869312, Streptococcus pneumoniae SPN033038, 2010-07-29, Complete Genome,
+* 261317, Buchnera aphidicola (Cinara tujafilina), 2011-06-09, Complete Genome,
+* 372461, Buchnera aphidicola BCc, 2006-10-18, Complete Genome,
+
+* 1243591, Salmonella enterica subsp. enterica serovar Quebec str. S-1267
+* Exclude all strains of "NZ_*" in Salmonella enterica
 
 ```sql
 SELECT taxonomy_id, organism_name, released_date, status, code
@@ -176,38 +237,47 @@ FROM gr_prok.gr
 WHERE species = "Gluconobacter oxydans" 
 and status NOT IN ('Contig', 'Scaffold')
 ORDER BY released_date, status, code
+
 ```
 
 ```bash
-cd ~/data/bacteria/bac_summary
+cd ~/data/bacteria/summary
 
-cat bac.ABBR.csv \
-    | grep -v "391904," \
-    | grep -v "553190," \
-    | grep -v "1386087," \
-    | grep -v "935590," \
-    | grep -v "1415774," \
-    | grep -v "508767," \
-    | grep -v "929506," \
-    | grep -v "935198," \
-    | grep -v "869303," \
-    | grep -v "869311," \
-    | grep -v "869312," \
-    | grep -v "261317," \
-    | grep -v "372461," \
+cat bac.ABBR.csv |
+    grep -v "391904," |
+    grep -v "553190," |
+    grep -v "1386087," |
+    grep -v "935590," |
+    grep -v "1415774," |
+    grep -v "508767," |
+    grep -v "929506," |
+    grep -v "935198," |
+    grep -v "869303," |
+    grep -v "869311," |
+    grep -v "869312," |
+    grep -v "261317," |
+    grep -v "372461," |
+    grep -v "1243591," |
+    perl -nla -F"," -e '
+        if ($F[2] eq q{Salmonella enterica}) {
+            $F[6] =~ /^NZ_/ and next;
+        }
+        print;
+    ' \
     > bac.WORKING.csv
+
 ```
 
-Create `bac_target_OG.md` for picking target and outgroup.
+## Create `bac_target_OG.md` for picking target and outgroup.
 
 Manually edit it then move to `~/Scripts/withncbi/doc/bac_target_OG.md`.
 
 ```bash
-cd ~/data/bacteria/bac_summary
+cd ~/data/bacteria/summary
 
-cat bac.ABBR.csv \
-    | grep -v "^#" \
-    | perl -na -F"," -e '
+cat bac.ABBR.csv |
+    grep -v "^#" |
+    perl -na -F"," -e '
         BEGIN{
             ($subgroup, $genus, $species,) = (q{}, q{}, q{});
         }
@@ -230,9 +300,10 @@ cat bac.ABBR.csv \
         printf qq{%s,%s,%s\n}, $species, $F[7], $F[5];
     ' \
     > bac_target_OG.md
+
 ```
 
-Create alignments without outgroups.
+## Create alignments without outgroups.
 
 ```text
 bac.WORKING.csv
@@ -240,18 +311,18 @@ bac.WORKING.csv
 ```
 
 ```bash
-cd ~/data/bacteria/bac_summary
+cd ~/data/bacteria/summary
 
-# 159, same as previous count
-cat ~/Scripts/withncbi/doc/bac_target_OG.md \
-    | grep -v '^#' \
-    | grep -E '\S+' \
-    | wc -l
+# 207
+cat ~/Scripts/withncbi/doc/bac_target_OG.md |
+    grep -v '^#' |
+    grep -E '\S+' |
+    wc -l
 
 # tab-separated
 # name  t   qs
-cat bac.WORKING.csv \
-    | perl -nl -a -F"," -MPath::Tiny -e '
+cat bac.WORKING.csv |
+    perl -nl -a -F"," -MPath::Tiny -e '
         BEGIN{
             $name = q{};
             %id_of = ();
@@ -291,34 +362,97 @@ cat bac.WORKING.csv \
     > species.tsv
 
 # every species
-cd ~/data/bacteria/bac_summary
+cd ~/data/bacteria/summary
 
-echo -e "mkdir -p ~/data/bacteria/bac.working \ncd ~/data/bacteria/bac.working\n" > ../bac.cmd.txt
-cat species.tsv \
-    | perl ~/Scripts/withncbi/taxon/cmd_template.pl \
-        --seq_dir ~/data/bacteria/bac_genomes/ \
-        --csv_taxon ~/data/bacteria/bac_genomes/bac_ncbi.csv \
-        --parallel 8 \
+cat <<'EOF' > egaz_template_multi.tt
+
+# [% name %]
+egaz template \
+    ~/data/bacteria/GENOMES/[% t %] \
+[% FOREACH q IN qs -%]
+    ~/data/bacteria/GENOMES/[% q %] \
+[% END -%]
+[% IF o -%]
+    ~/data/bacteria/GENOMES/[% o %] \
+    --outgroup [% o %] \
+[% END -%]
+    --multi -o [% name %] \
+    --taxon ~/data/bacteria/GENOMES/bac_ncbi.csv \
+    --rawphylo --parallel 8 -v
+
+EOF
+
+# every species
+echo "mkdir -p ~/data/bacteria/species"  > ../bac.cmd.txt
+echo "cd       ~/data/bacteria/species" >> ../bac.cmd.txt
+
+cat species.tsv |
+    TT_FILE=egaz_template_multi.tt perl -MTemplate -nla -F"\t" -e '
+        next unless scalar @F >= 3;
+        
+        my $tt = Template->new;
+        $tt->process(
+            $ENV{TT_FILE},
+            {
+                name       => $F[0],
+                t          => $F[1],
+                qs         => [ split /,/, $F[2] ],
+                o          => $F[3],
+            },
+            \*STDOUT
+        ) or die Template->error;
+
+    ' \
     >> ../bac.cmd.txt
 
-echo -e "mkdir -p ~/data/bacteria/bac.working \ncd ~/data/bacteria/bac.working\n" > ../bac.redo.cmd.txt
-cat species.tsv \
-    | perl ~/Scripts/withncbi/taxon/cmd_template.pl \
-        --csv_taxon ~/data/bacteria/bac_genomes/bac_ncbi.csv \
-        --parallel 8 \
-    >> ../bac.redo.cmd.txt
+cat <<'EOF' > egaz_templates_self.tt
+
+# [% name %]
+egaz template \
+    ~/data/bacteria/GENOMES/[% t %] \
+[% FOREACH q IN qs -%]
+    ~/data/bacteria/GENOMES/[% q %] \
+[% END -%]
+    --self -o [% name %] \
+    --taxon ~/data/bacteria/GENOMES/bac_ncbi.csv \
+    --circos --aligndb --parallel 8 -v
+
+EOF
+
+# every species
+echo "mkdir -p ~/data/bacteria/self"  > ../bac.self.cmd.txt
+echo "cd       ~/data/bacteria/self" >> ../bac.self.cmd.txt
+
+cat species.tsv |
+    TT_FILE=egaz_templates_self.tt perl -MTemplate -nla -F"\t" -e '
+        next unless scalar @F >= 3;
+        
+        my $tt = Template->new;
+        $tt->process(
+            $ENV{TT_FILE},
+            {
+                name       => $F[0],
+                t          => $F[1],
+                qs         => [ split /,/, $F[2] ],
+            },
+            \*STDOUT
+        ) or die Template->error;
+
+    ' \
+    >> ../bac.self.cmd.txt
+
 ```
 
-Align all representative strains of every genera.
+## Align all representative strains of every genera.
 
-**39** genera.
+**44** genera.
 
 ```bash
-cd ~/data/bacteria/bac_summary
+cd ~/data/bacteria/summary
 
-cat bac.WORKING.csv \
-    | grep -v "^#" \
-    | perl -na -F"," -e '
+cat bac.WORKING.csv |
+    grep -v "^#" |
+    perl -na -F"," -e '
         BEGIN{
             $name = q{};
             %id_of = ();
@@ -347,96 +481,70 @@ cat bac.WORKING.csv \
             my $qs = join(q{,}, @s);
             printf qq{%s\t%s\t%s\n}, $name, $t, $qs;
         }
-    ' \
-    | perl -nl -e '/\w+\t\w+\t\w+/ and print' \
+    ' |
+    perl -nl -e '/\w+\t\w+\t\w+/ and print' \
     > genus.tsv
 cat genus.tsv | wc -l
 
-# every species
-echo -e "mkdir -p ~/data/bacteria/bac.genus.working \ncd ~/data/bacteria/bac.genus.working" > ../bac.genus.cmd.txt
-cat genus.tsv \
-    | perl ~/Scripts/withncbi/taxon/cmd_template.pl \
-        --seq_dir ~/data/bacteria/bac_genomes/ \
-        --csv_taxon ~/data/bacteria/bac_genomes/bac_ncbi.csv \
-        --parallel 8 \
+# every genera
+echo "mkdir -p ~/data/bacteria/genus"  > ../bac.genus.cmd.txt
+echo "cd       ~/data/bacteria/genus" >> ../bac.genus.cmd.txt
+
+cat genus.tsv |
+    TT_FILE=egaz_template_multi.tt perl -MTemplate -nla -F"\t" -e '
+        next unless scalar @F >= 3;
+        
+        my $tt = Template->new;
+        $tt->process(
+            $ENV{TT_FILE},
+            {
+                name       => $F[0],
+                t          => $F[1],
+                qs         => [ split /,/, $F[2] ],
+                o          => $F[3],
+            },
+            \*STDOUT
+        ) or die Template->error;
+
+    ' \
     >> ../bac.genus.cmd.txt
+
 ```
 
-## Aligning
+# Aligning
 
-### Batch running for groups
-
-The old prepare_run.sh
+## Batch running for groups
 
 ```bash
-mkdir -p ~/data/bacteria/bac.working
-cd ~/data/bacteria/bac.working
+mkdir -p ~/data/bacteria/species
+cd ~/data/bacteria/species
 
 bash ../bac.cmd.txt 2>&1 | tee log_cmd.txt
-# bash ../bac.redo.cmd.txt 2>&1 | tee log_redo_cmd.txt # skip real_chr and repeatmasker
 
 #----------------------------#
-# Approach 1: one by one
+# Step by step
 #----------------------------#
-for d in `find . -mindepth 1 -maxdepth 1 -type d | sort `;do
-    echo "echo \"====> Processing $d <====\""
-    echo bash $d/1_real_chr.sh ;
-    echo bash $d/2_file_rm.sh ;
-    echo bash $d/3_pair_cmd.sh ;
-    echo bash $d/4_rawphylo.sh ;
-    echo bash $d/5_multi_cmd.sh ;
-    echo bash $d/7_multi_db_only.sh ;
-    echo ;
-done  > runall.sh
+# 1_pair
+for f in `find . -mindepth 1 -maxdepth 2 -type f -name 1_pair.sh | sort`; do
+    echo "bash $f"
+    echo
+done > run_1.sh
 
-sh runall.sh 2>&1 | tee log_runall.txt
+# 2_rawphylo
+for f in `find . -mindepth 1 -maxdepth 2 -type f -name 2_rawphylo.sh | sort`; do
+    echo "bash $f"
+    echo
+done > run_2.sh
 
-#----------------------------#
-# Approach 2: step by step
-#----------------------------#
-# real_chr
-for f in `find . -mindepth 1 -maxdepth 2 -type f -name 1_real_chr.sh | sort `;do
-    echo bash $f ;
-    echo ;
-done  > run_1.sh
+# 3_multi
+for f in `find . -mindepth 1 -maxdepth 2 -type f -name 3_multi.sh | sort`; do
+    echo "bash $f"
+    echo
+done > run_3.sh
 
-# RepeatMasker
-for f in `find . -mindepth 1 -maxdepth 2 -type f -name 2_file_rm.sh | sort `;do
-    echo bash $f ;
-    echo ;
-done  > run_2.sh
-
-# pair
-for f in `find . -mindepth 1 -maxdepth 2 -type f -name 3_pair_cmd.sh | sort `;do
-    echo bash $f ;
-    echo ;
-done  > run_3.sh
-
-# rawphylo
-for f in `find . -mindepth 1 -maxdepth 2 -type f -name 4_rawphylo.sh | sort `;do
-    echo bash $f ;
-    echo ;
-done  > run_4.sh
-
-# multi cmd
-for f in `find . -mindepth 1 -maxdepth 2 -type f -name 5_multi_cmd.sh | sort `;do
-    echo bash $f ;
-    echo ;
-done  > run_5.sh
-
-# multi db
-for f in `find . -mindepth 1 -maxdepth 2 -type f -name 7_multi_db_only.sh | sort `;do
-    echo bash $f ;
-    echo ;
-done  > run_7.sh
-
-# 24 cores
-cat run_1.sh | grep . | parallel -r -j 16 2>&1 | tee log_1.txt
-cat run_2.sh | grep . | parallel -r -j 8  2>&1 | tee log_2.txt
-cat run_3.sh | grep . | parallel -r -j 16 2>&1 | tee log_3.txt
-cat run_4.sh | grep . | parallel -r -j 4  2>&1 | tee log_4.txt
-cat run_5.sh | grep . | parallel -r -j 4  2>&1 | tee log_5.txt
-cat run_7.sh | grep . | parallel -r -j 8  2>&1 | tee log_7.txt
+cat run_1.sh | grep . | parallel -r -j 4  2>&1 | tee log_1.txt
+cat run_2.sh | grep . | parallel -r -j 3  2>&1 | tee log_2.txt
+cat run_3.sh | grep . | parallel -r -j 3  2>&1 | tee log_3.txt
 
 #----------------------------#
 # Clean
@@ -444,25 +552,21 @@ cat run_7.sh | grep . | parallel -r -j 8  2>&1 | tee log_7.txt
 find . -mindepth 1 -maxdepth 3 -type d -name "*_raw" | parallel -r rm -fr
 find . -mindepth 1 -maxdepth 3 -type d -name "*_fasta" | parallel -r rm -fr
 
-find . -mindepth 1 -maxdepth 4 -type f -name "*.phy" | parallel -r rm
-find . -mindepth 1 -maxdepth 4 -type f -name "*.phy.reduced" | parallel -r rm
 ```
 
-### Alignments of genera for outgroups.
+## Alignments of genera for outgroups.
 
 ```bash
-mkdir -p ~/data/bacteria/bac.genus.working
-cd ~/data/bacteria/bac.genus.working
+mkdir -p ~/data/bacteria/genus
+cd ~/data/bacteria/genus
 
-time bash ../bac.genus.cmd.txt 2>&1 | tee log_cmd.txt
+bash ../bac.genus.cmd.txt 2>&1 | tee log_cmd.txt
 
 for d in `find . -mindepth 1 -maxdepth 1 -type d | sort `; do
-    echo "echo \"====> Processing ${d} <====\""
-    echo sh ${d}/1_real_chr.sh ;
-    echo sh ${d}/2_file_rm.sh ;
-    echo sh ${d}/3_pair_cmd.sh ;
-    echo sh ${d}/4_rawphylo.sh ;
-    echo sh ${d}/5_multi_cmd.sh ;
+    echo "echo \"==> Processing ${d} <==\""
+    echo bash ${d}/1_pair.sh;
+    echo bash ${d}/2_rawphylo.sh;
+    echo bash ${d}/3_multi.sh;
     echo ;
 done  > runall.sh
 
@@ -471,25 +575,25 @@ sh runall.sh 2>&1 | tee log_runall.txt
 # Clean
 ```
 
-## Summary
+# Summary
 
-### Copy xlsx files
+## Copy xlsx files
 
 ```bash
 mkdir -p ~/data/bacteria/bac_summary/xlsx
 cd ~/data/bacteria/bac_summary/xlsx
 
-find  ~/data/bacteria/bac.working -type f -name "*.common.xlsx" \
-    | grep -v "vs[A-Z]" \
-    | parallel cp {} .
+find  ~/data/bacteria/bac.working -type f -name "*.common.xlsx" |
+    grep -v "vs[A-Z]" |
+    parallel cp {} .
 
-find  ~/data/bacteria/bac.working -type f -name "*.gc.xlsx" \
-    | grep -v "vs[A-Z]" \
-    | parallel cp {} .
+find  ~/data/bacteria/bac.working -type f -name "*.gc.xlsx" |
+    grep -v "vs[A-Z]" |
+    parallel cp {} .
 
 ```
 
-### Genome list
+## Genome list
 
 Create `bac.list.csv` from `bac.WORKING.csv` with sequence lengths.
 
@@ -531,9 +635,9 @@ perl -l -MPath::Tiny -e '
     >> target_all.lst
 
 echo "#abbr,species,accession,length" > length.tmp
-find ~/data/bacteria/bac.working -type f -name "chr.sizes" \
-    | sort \
-    | parallel --jobs 1 --keep-order -r '
+find ~/data/bacteria/bac.working -type f -name "chr.sizes" |
+    sort |
+    parallel --jobs 1 --keep-order -r '
         perl -nl -e '\''
             BEGIN {
                 %l = ();
@@ -557,22 +661,22 @@ find ~/data/bacteria/bac.working -type f -name "chr.sizes" \
     >> length.tmp
 
 echo "#abbr,subgroup,genus,species,taxon_id" > abbr.tmp
-cat ~/data/bacteria/bac_summary/bac.WORKING.csv \
-    | grep -v "^#" \
-    | perl -nla -F"," -e 'print qq{$F[7],$F[4],$F[3],$F[2],$F[0]}' \
+cat ~/data/bacteria/bac_summary/bac.WORKING.csv |
+    grep -v "^#" |
+    perl -nla -F"," -e 'print qq{$F[7],$F[4],$F[3],$F[2],$F[0]}' \
     >> abbr.tmp
 
 # #abbr,species,accession,length,subgroup,genus,species,taxon_id
-cat length.tmp abbr.tmp \
-    | perl ~/Scripts/withncbi/util/merge_csv.pl \
-        -f 0 --concat -o stdout \
-    | perl -nl -a -F"," -e 'print qq{$F[4],$F[5],$F[6],$F[0],$F[7],$F[2],$F[3]}' \
+cat length.tmp abbr.tmp |
+    perl ~/Scripts/withncbi/util/merge_csv.pl \
+        -f 0 --concat -o stdout |
+    perl -nl -a -F"," -e 'print qq{$F[4],$F[5],$F[6],$F[0],$F[7],$F[2],$F[3]}' \
     > list.tmp
 
 echo "#subgroup,genus,species,abbr,taxon_id,accession,length" > bac.list.csv
-cat list.tmp \
-    | grep -v "#" \
-    | perl -nl -a -F',' -MPath::Tiny -e '
+cat list.tmp |
+    grep -v "#" |
+    perl -nl -a -F',' -MPath::Tiny -e '
         BEGIN{
             %species, %target;
             my @l1 = path(q{species_all.lst})->lines({ chomp => 1});
@@ -584,19 +688,20 @@ cat list.tmp \
         die qq{$_\n} unless defined $idx_s;
         my $idx_t = exists $target{$F[3]} ? $target{$F[3]} : 999_999;
         print qq{$_,$idx_s,$idx_t};
-    ' \
-    | sort -n -t',' -k8,8 -k9,9 \
-    | cut -d',' -f 1-7 \
+    ' |
+    sort -n -t',' -k8,8 -k9,9 |
+    cut -d',' -f 1-7 \
     >> bac.list.csv
 
 rm *.tmp
 ```
 
-### Genome alignment statistics
+## Genome alignment statistics
 
 Some species will be filtered out here.
 
 Criteria:
+
 * Coverage >= 0.4
 * Total number of indels >= 100
 * D of multiple alignments < 0.2
@@ -889,6 +994,7 @@ cat ~/data/bacteria/bac_summary/table/species.lst \
     ' \
     > Table_S_bac.yml
 perl ~/Scripts/fig_table/xlsx_table.pl -i Table_S_bac.yml
+
 ```
 
 NCBI Taxonomy tree
@@ -912,9 +1018,10 @@ cat ~/data/bacteria/bac_summary/table/species.lst \
     > species_tree.sh
 
 bash species_tree.sh > species.tree
+
 ```
 
-### sep_chart of d1, d2
+## sep_chart of d1, d2
 
 `collect_xlsx.pl`
 
@@ -972,6 +1079,7 @@ cat ~/data/bacteria/bac_summary/table/species.lst \
 
 cd ~/data/bacteria/bac_summary/xlsx
 bash cmd_collect_d1_d2.sh
+
 ```
 
 `sep_chart.pl`
@@ -1048,9 +1156,10 @@ cat ~/data/bacteria/bac_summary/table/species.lst \
 bash cmd_chart.sh
 rm ~/data/bacteria/bac_summary/xlsx/*.csv
 cp ~/data/bacteria/bac_summary/xlsx/*.pdf ~/data/bacteria/bac_summary/fig
+
 ```
 
-### CorelDRAW GC charts
+## CorelDRAW GC charts
 
 ```bash
 cd ~/data/bacteria/bac_summary/xlsx
@@ -1203,3 +1312,4 @@ cp -f Fig_S_bac_gc_indel.cdr ~/data/bacteria/bac_summary/fig
 cp -f Fig_S_bac_gc_indel_demo.cdr ~/data/bacteria/bac_summary/fig
 
 ```
+

@@ -1,3 +1,5 @@
+# noinspection SqlNoDataSourceInspectionForFile
+
 create table gr
 (
     taxonomy_id          int,
@@ -11,6 +13,7 @@ create table gr
     wgs                  char(255),
     scaffolds            int,
     released_date        date,
+    asm_name             char(255),
     status               char(255),
     species              char(255),
     species_id           int,
@@ -40,6 +43,7 @@ create table ar
     genome_rep           char(255),
     released_date        date,
     asm_name             char(255),
+    ftp_path             char(255),
     superkingdom         char(255),
     `group`              char(255),
     subgroup             char(255),
