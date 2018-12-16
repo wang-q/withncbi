@@ -29,10 +29,10 @@ All
 Or [this link](http://www.ncbi.nlm.nih.gov/genome/browse/?report=5).
 
 ```text
-Eukaryota (2759)                1486
-    Viridiplantae (33090)       1362
-        Chlorophyta (3041)      134
-        Streptophyta (35493)    1472
+Eukaryota (2759)                2938
+    Viridiplantae (33090)       2727
+        Chlorophyta (3041)      121
+        Streptophyta (35493)    2606
 ```
 
 Use `taxon/id_seq_dom_select.pl` to extract Taxonomy ids and genbank
@@ -43,13 +43,16 @@ id,acc
 996148,NC_017006
 ```
 
-Got **1510** accessions.
+Got **2941** accessions.
 
 ```bash
 mkdir -p ~/data/organelle/plastid_genomes
 cd ~/data/organelle/plastid_genomes
 
 rm webpage_id_seq.csv
+perl ~/Scripts/withncbi/taxon/id_seq_dom_select.pl \
+    ~/Scripts/withncbi/doc/eukaryota_plastid_181125.html \
+    >> webpage_id_seq.csv    
 perl ~/Scripts/withncbi/taxon/id_seq_dom_select.pl \
     ~/Scripts/withncbi/doc/eukaryota_plastid_161106.html \
     >> webpage_id_seq.csv
@@ -62,6 +65,9 @@ perl ~/Scripts/withncbi/taxon/id_seq_dom_select.pl \
 perl ~/Scripts/withncbi/taxon/id_seq_dom_select.pl \
     ~/Scripts/withncbi/doc/eukaryota_plastid_150806.html \
     >> webpage_id_seq.csv
+perl ~/Scripts/withncbi/taxon/id_seq_dom_select.pl \
+    ~/Scripts/withncbi/doc/green_plants_plastid_181125.html \
+    >> webpage_id_seq.csv    
 perl ~/Scripts/withncbi/taxon/id_seq_dom_select.pl \
     ~/Scripts/withncbi/doc/green_plants_plastid_161106.html \
     >> webpage_id_seq.csv    
@@ -89,14 +95,14 @@ perl ~/Scripts/withncbi/taxon/gb_taxon_locus.pl plastid.1.genomic.gbff > refseq_
 
 rm plastid.1.genomic.gbff
 
-# 1446
+# 1612
 cat refseq_id_seq.csv | grep -v "^#" | wc -l
 
 # combine
 cat webpage_id_seq.csv refseq_id_seq.csv \
     | sort -u -t, -k1,1 > plastid_id_seq.csv
 
-# 1510
+# 2961
 cat plastid_id_seq.csv | grep -v "^#" | wc -l
 ```
 
@@ -270,6 +276,23 @@ sed -i".bak" "s/Trochodendrales,NA/Trochodendrales,Magnoliopsida/" plastid.CHECK
 sed -i".bak" "s/Vitales,NA/Vitales,Magnoliopsida/" plastid.CHECKME.csv
 sed -i".bak" "s/Welwitschiales,NA/Welwitschiales,Gnetopsida/" plastid.CHECKME.csv
 sed -i".bak" "s/Zygophyllales,NA/Zygophyllales,Magnoliopsida/" plastid.CHECKME.csv
+sed -i".bak" "s/Araucariales,NA/Araucariales,Pinidae/g" plastid.CHECKME.csv
+sed -i".bak" "s/Cupressales,NA/Cupressales,Pinidae/g" plastid.CHECKME.csv
+sed -i".bak" "s/Cycadales,NA/Cycadales,Cycadopsida/g" plastid.CHECKME.csv
+sed -i".bak" "s/Ephedrales,NA/Ephedrales,Gnetidae/g" plastid.CHECKME.csv
+sed -i".bak" "s/Ceratophyllales,NA/Ceratophyllales,Magnoliopsida/g" plastid.CHECKME.csv
+sed -i".bak" "s/Chloranthales.NA/Chloranthales,Magnoliopsida/g" plastid.CHECKME.csv
+sed -i".bak" "s/Fagales,NA/Fagales,Eudicotyledoneae/g" plastid.CHECKME.csv
+sed -i".bak" "s/Garryales,NA/Garryales,Magnoliopsida/g" plastid.CHECKME.csv
+sed -i".bak" "s/Huerteales,NA/Huerteales,Magnoliopsida/g" plastid.CHECKME.csv
+sed -i".bak" "s/Icacinales,NA/Icacinales,eudicots/g" plastid.CHECKME.csv
+sed -i".bak" "s/Laurales,NA/Laurales,Magnoliopsida/g" plastid.CHECKME.csv
+sed -i".bak" "s/Nymphaeales,NA/Nymphaeales,Magnoliopsida/g" plastid.CHECKME.csv
+sed -i".bak" "s/Oxalidales,NA/Oxalidales,eudicots/g" plastid.CHECKME.csv
+sed -i".bak" "s/Piperales,NA/Piperales,Magnoliopsida/g" plastid.CHECKME.csv
+sed -i".bak" "s/Santalales,NA/Santalales,eudicots/g" plastid.CHECKME.csv
+sed -i".bak" "s/Sapindales,NA/Sapindales,eudicots/g" plastid.CHECKME.csv
+sed -i".bak" "s/Amborellales,NA/Amborellales,Magnoliopsida/g" plastid.CHECKME.csv
 
 # Cercozoa
 sed -i".bak" "s/Euglyphida,NA,NA/Euglyphida,Filosa,Cercozoa/" plastid.CHECKME.csv
@@ -371,7 +394,7 @@ rm *.tmp *.bak
 Species and genus should not be "NA" and genus has 2 or more members.
 
 ```text
-1510 ---------> 1496 ---------> 847 ---------> 1171
+2961 ---------> 2939 ---------> 1916 ---------> 2550
         NA             genus          family
 ```
 
@@ -385,7 +408,7 @@ cat plastid.CHECKME.csv \
     '/^#/ and next; ($F[2] eq q{NA} or $F[3] eq q{NA} or $F[4] eq q{NA} or $F[5] eq q{NA} ) and next; print' \
     > plastid.tmp
 
-# 1496
+# 2939
 wc -l plastid.tmp
 
 #----------------------------#
@@ -400,7 +423,7 @@ cat plastid.tmp \
 # intersect between two files
 grep -F -f genus.tmp plastid.tmp > plastid.genus.tmp
 
-# 847
+# 1916
 wc -l plastid.genus.tmp
 
 #----------------------------#
@@ -414,7 +437,7 @@ cat plastid.genus.tmp \
 # intersect between two files
 grep -F -f family.tmp plastid.tmp > plastid.family.tmp
 
-# 1171
+# 2550
 wc -l plastid.family.tmp
 
 #----------------------------#
@@ -438,13 +461,28 @@ cat plastid.DOWNLOAD.csv \
     '/^#/i and next; $seen{$F[3]}++; END {for $k (keys %seen){printf qq{%s,%d\n}, $k, $seen{$k} if $seen{$k} > 1}};' \
     | sort
 
+#Arabidopsis lyrata,2
+#Astragalus mongholicus,2
+#Capsicum baccatum,3
+#Conticribra weissflogii,2
 #Fragaria vesca,2
 #Gossypium herbaceum,2
 #Magnolia officinalis,2
+#Marchantia polymorpha,2
+#Musa balbisiana,2
+#Myrmecia israeliensis,2
 #Olea europaea,4
-#Oryza sativa,3
+#Oryza sativa,4
+#Paris polyphylla,2
+#Pisum sativum,2
 #Plasmodium falciparum,2
+#Pseudopogonatherum contortum,2
 #Saccharum hybrid cultivar,3
+#Sinalliaria limprichtiana,2
+#Trieres chinensis,2
+#Vitis aestivalis,2
+#Vitis cinerea,4
+#Vitis rotundifolia,2
 
 # strain name not equal to species
 cat plastid.DOWNLOAD.csv \
@@ -452,34 +490,34 @@ cat plastid.DOWNLOAD.csv \
     | perl -nl -a -F"," -e '$F[2] ne $F[3] and print $F[2]' \
     | sort
 
-#Babesia bovis T2Bo
-#Brassica rapa subsp. pekinensis
-#Cucumis melo subsp. melo
-#Dioscorea cayennensis subsp. rotundata
-#Eucalyptus globulus subsp. globulus
-#Fagopyrum esculentum subsp. ancestrale
-#Fragaria vesca subsp. bracteata
-#Fragaria vesca subsp. vesca
-#Gossypium herbaceum subsp. africanum
-#Gracilaria tenuistipitata var. liui
-#Hordeum vulgare subsp. vulgare
-#Magnolia officinalis subsp. biloba
-#Micromonas pusilla CCMP1545
+#Musa balbisiana var. balbisiana
 #Oenothera elata subsp. hookeri
 #Olea europaea subsp. cuspidata
 #Olea europaea subsp. europaea
 #Olea europaea subsp. maroccana
 #Olea woodiana subsp. woodiana
+#Oryza sativa f. spontanea
 #Oryza sativa Indica Group
 #Oryza sativa Japonica Group
+#Paris polyphylla var. chinensis
+#Paris polyphylla var. yunnanensis
 #Phalaenopsis aphrodite subsp. formosana
 #Phyllostachys nigra var. henonis
+#Pisum sativum subsp. elatius
 #Plasmodium chabaudi chabaudi
+#Plasmodium falciparum 3D7
 #Plasmodium falciparum HB3
 #Pseudotsuga sinensis var. wilsoniana
+#Rosa chinensis var. spontanea
 #Saccharum hybrid cultivar NCo 310
 #Saccharum hybrid cultivar SP80-3280
+#Sinalliaria limprichtiana var. grandifolia
 #Thalassiosira oceanica CCMP1005
+#Vitis aestivalis var. linsecomii
+#Vitis cinerea var. cinerea
+#Vitis cinerea var. floridana
+#Vitis cinerea var. helleri
+#Vitis rotundifolia var. munsoniana
 ```
 
 Create abbreviations.
@@ -527,13 +565,14 @@ perl ~/Scripts/withncbi/taxon/batch_get_seq.pl \
     -p 2>&1 \
     | tee plastid_seq.log
 
-# count downloaded sequences
+
+# count downloaded sequences # 2577 #
 find . -name "*.fa" | wc -l
 ```
 
 ## Create alignment plans
 
-We got **836** accessions.
+We got **1916** accessions.
 
 Numbers for higher ranks are: 66 orders, 96 families, 211 genera and 836
 species.
@@ -551,14 +590,14 @@ cat plastid.ABBR.csv \
 # intersect between two files
 grep -F -f genus.tmp plastid.ABBR.csv > plastid.GENUS.csv
 
-# 847
+# 1916
 wc -l plastid.GENUS.csv
 
 #   count every ranks
-#      66 order.list.tmp
-#      96 family.list.tmp
-#     211 genus.list.tmp
-#     836 species.list.tmp
+#      81 order.list.tmp
+#     153 family.list.tmp
+#     422 genus.list.tmp
+#    1886 species.list.tmp
 cut -d',' -f 4 plastid.GENUS.csv | sort | uniq > species.list.tmp
 cut -d',' -f 5 plastid.GENUS.csv | sort | uniq > genus.list.tmp
 cut -d',' -f 6 plastid.GENUS.csv | sort | uniq > family.list.tmp
@@ -596,16 +635,16 @@ cat plastid.GENUS.csv \
 
         if ($F[8] ne $phylum) {
             $phylum = $F[8];
-            printf qq{\n# %s\n}, $phylum;
+            printf qq{\n\n# %s\n}, $phylum;
         }
         if ($F[5] ne $family) {
             $family = $F[5];
-            printf qq{## %s\n}, $family;
+            printf qq{\n## %s\n}, $family;
         }
         $F[4] =~ s/\W+/_/g;
         if ($F[4] ne $genus) {
             $genus = $F[4];
-            printf qq{%s\n}, $genus;
+            printf qq{%s,}, $genus;
         }
     ' \
     > plastid_OG.md
@@ -929,7 +968,7 @@ IRA and IRB are presented by `plastid_self.working/${GENUS}/Results/${STRAIN}/${
 
 ```bash
 find ~/data/organelle/plastid_self.working -type f -name "*.links.tsv" \
-    | xargs wc -l | sort \
+    | xargs wc -l | sort -n \
     | grep -v "total" \
     | perl -nl -e 's/^\s*//g; /^(\d+)\s/ and print $1' \
     | uniq -c
