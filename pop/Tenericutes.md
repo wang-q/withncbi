@@ -293,7 +293,7 @@ for GENUS in $(cat genus.list); do
             )
             if [ "$result" ]; then
                 echo $result |
-                    perl -nle '\''
+                    perl -nl -e '\''
                         @ns = split /\s+/;
                         for $n (@ns) {
                             $s = $n;
@@ -363,18 +363,42 @@ Ref.:
 4. `bacteria_and_archaea.tgz`: https://ndownloader.figshare.com/files/3093482
 
 ```bash
-cd ~/data/alignment/Tenericutes
-
-mkdir -p Phylo
-cd Phylo
+mkdir -p ~/data/alignment/Tenericutes/Phylo
+cd ~/data/alignment/Tenericutes/Phylo
 
 wget -N --content-disposition https://ndownloader.figshare.com/files/3093482
 
 tar xvfz bacteria_and_archaea.tgz
 
-parallel --no-run-if-empty --linebuffer -k -j 4 '
-    ls bacteria_and_archaea_dir/BA000{}.hmm
-    ' ::: {01..40}
+```
+
+```bash
+cd ~/data/alignment/Tenericutes
+
+# example
+#gzip -dcf ASSEMBLY/Aaxa_ATCC_25176/*_protein.faa.gz |
+#    hmmsearch -E 1e-50 --domE 1e-50 Phylo/bacteria_and_archaea_dir/BA00001.hmm - |
+#    grep '>>' |
+#    perl -nl -e '/>>\s+(\S+)/ and print $1'
+
+# find all marker genes
+for marker in BA000{01..40}; do
+    echo "==> marker [${marker}]"
+    
+    mkdir -p Phylo/${marker}
+    
+    for GENUS in $(cat genus.list); do
+        echo "==> GENUS [${GENUS}]"
+
+        for STRAIN in $(cat taxon/${GENUS}); do
+            gzip -dcf ASSEMBLY/${STRAIN}/*_protein.faa.gz |
+                hmmsearch -E 1e-50 --domE 1e-50 Phylo/bacteria_and_archaea_dir/${marker}.hmm - |
+                grep '>>' |
+                STRAIN=${STRAIN} perl -nl -e '/>>\s+(\S+)/ and printf qq{%s\t%s\n}, $1, $ENV{STRAIN}'
+        done \
+            > Phylo/${marker}/${GENUS}.replace.tsv
+    done
+done
 
 ```
 
