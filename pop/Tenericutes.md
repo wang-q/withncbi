@@ -7,6 +7,7 @@
 - [Trichoderma: assembly](#trichoderma-assembly)
 - [Count strains](#count-strains)
 - [Find all RNase R](#find-all-rnase-r)
+- [Phylogenetics with 40 single-copy genes](#phylogenetics-with-40-single-copy-genes)
 - [Tenericutes: run](#tenericutes-run)
 
 
@@ -210,6 +211,30 @@ wc -l taxon/*
 find taxon -maxdepth 1 -type f -not -name "*.replace.tsv" |
     xargs -i basename {} \
     > genus.list
+
+# Omit strains without protein annotations
+#CShol
+#Psp_Vc33
+#Mmoa_ATCC_27625
+for GENUS in $(cat genus.list); do
+    for STRAIN in $(cat taxon/${GENUS}); do
+        if ! compgen -G "ASSEMBLY/${STRAIN}/*_protein.faa.gz" > /dev/null; then
+            echo ${STRAIN}
+        fi
+    done 
+done \
+    > omit.list
+
+for GENUS in $(cat genus.list); do
+    perl -nl -i -MPath::Tiny -e '
+        BEGIN { 
+            our %omit = map { $_ => 1 }
+                        grep {/\S/}
+                        path(q{omit.list})->lines({ chomp => 1});
+        }
+        print $_ if ! exists $omit{$_};
+    ' taxon/${GENUS}
+done
 
 ```
 
