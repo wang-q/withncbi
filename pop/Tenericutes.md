@@ -8,6 +8,9 @@
 - [Count strains](#count-strains)
 - [Find all RNase R](#find-all-rnase-r)
 - [Phylogenetics with 40 single-copy genes](#phylogenetics-with-40-single-copy-genes)
+    - [Download HMM models](#download-hmm-models)
+    - [Find corresponding proteins by `hmmsearch`](#find-corresponding-proteins-by-hmmsearch)
+    - [Create valid marker gene list](#create-valid-marker-gene-list)
 - [Tenericutes: run](#tenericutes-run)
 
 
@@ -374,6 +377,8 @@ cat genus.list |
 
 # Phylogenetics with 40 single-copy genes
 
+## Download HMM models
+
 Ref.:
 
 1. Wu, D., Jospin, G. & Eisen, J. A. Systematic Identification of Gene Families for Use as “Markers”
@@ -397,16 +402,22 @@ tar xvfz bacteria_and_archaea.tgz
 
 ```
 
+##  Find corresponding proteins by `hmmsearch`
+
+The `E_VALUE` was manually adjusted to 1e-20.
+
 ```bash
+E_VALUE=1e-20
+
 cd ~/data/alignment/Tenericutes
 
 # example
 #gzip -dcf ASSEMBLY/Aaxa_ATCC_25176/*_protein.faa.gz |
-#    hmmsearch -E 1e-50 --domE 1e-50 Phylo/bacteria_and_archaea_dir/BA00001.hmm - |
+#    hmmsearch -E 1e-20 --domE 1e-20 Phylo/bacteria_and_archaea_dir/BA00001.hmm - |
 #    grep '>>' |
 #    perl -nl -e '/>>\s+(\S+)/ and print $1'
 
-# find all marker genes
+# Find all marker genes
 for marker in BA000{01..40}; do
     echo "==> marker [${marker}]"
     
@@ -417,15 +428,59 @@ for marker in BA000{01..40}; do
 
         for STRAIN in $(cat taxon/${GENUS}); do
             gzip -dcf ASSEMBLY/${STRAIN}/*_protein.faa.gz |
-                hmmsearch -E 1e-50 --domE 1e-50 Phylo/bacteria_and_archaea_dir/${marker}.hmm - |
+                hmmsearch -E ${E_VALUE} --domE ${E_VALUE} Phylo/bacteria_and_archaea_dir/${marker}.hmm - |
                 grep '>>' |
                 STRAIN=${STRAIN} perl -nl -e '/>>\s+(\S+)/ and printf qq{%s\t%s\n}, $1, $ENV{STRAIN}'
         done \
             > Phylo/${marker}/${GENUS}.replace.tsv
     done
+    
+    echo
 done
 
 ```
+
+## Create valid marker gene list
+
+* `hmmsearch` may identify more than one copy for some marker genes.
+
+    * BA00005: translation initiation factor IF-2
+    * BA00008: signal recognition particle protein
+    * BA00013: phenylalanine--tRNA ligase subunit beta
+
+* Misidentified marker genes
+
+    * BA00004: translation initiation factor EF-2
+
+* Missing from many strains
+
+    * BA00022: ribosomal protein L25/L23
+    * BA00027: ribosomal protein L29
+    * BA00032: tRNA pseudouridine synthase B
+    * BA00035: Porphobilinogen deaminase
+    * BA00038: phosphoribosylformylglycinamidine cyclo-ligase
+    * BA00039: ribonuclease HII
+    * BA00040: ribosomal protein L24
+
+Compare proteins and strains.
+
+```bash
+cd ~/data/alignment/Tenericutes
+
+for marker in BA000{01..03} BA000{06..07} BA000{09..12} BA000{14..21} BA000{23..26} BA000{28..31} BA000{33..34} BA000{36..37}; do
+    echo "==> marker [${marker}]"
+
+    for GENUS in $(cat genus.list); do
+        cat Phylo/${marker}/${GENUS}.replace.tsv |
+            cut -f 2 |
+            diff - taxon/${GENUS}
+
+    done
+    
+done
+
+```
+
 
 # Tenericutes: run
 
