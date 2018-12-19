@@ -201,20 +201,20 @@ echo "Ifor" > taxon/Inordinaticella
 
 cat <<EOF > taxon/Phytoplasma
 Paus
-Paus_str_NZSb11
+Paus_NZSb11
 PAyel_AYWB
 PBnap
-Pbra_str_JR1
+Pbra_JR1
 PCcor
 Pcyel
 PEpur
-PIclo_str_MA1
-PMyel_str_MW1
+PIclo_MA1
+PMyel_MW1
 PNJer
 POyel_OY_M
 PRora
 Psp_Vc33
-PVwit_str_VAC
+PVwit_VAC
 PWblu
 Pwit_NTU2011
 PZmay
@@ -309,13 +309,13 @@ cd ~/data/alignment/Tenericutes
 
 mkdir -p RNaseR
 
-# 306
+# 319
 find ASSEMBLY -maxdepth 1 -type d |
     sort |
     grep 'ASSEMBLY/' |
     wc -l
 
-# 303
+# 316
 find ASSEMBLY -type f -name "*_protein.faa.gz" |
     wc -l
 
@@ -330,7 +330,7 @@ find ASSEMBLY -type f -name "*_protein.faa.gz" |
 #cat RNaseR/all.tcds.fa |
 #    grep "ribonuclease R"
 
-# 280; deduped 207
+# 293; deduped 220
 faops some RNaseR/all.pro.fa \
     <(cat RNaseR/all.pro.fa |
         grep "ribonuclease R" |
@@ -340,6 +340,13 @@ faops some RNaseR/all.pro.fa \
     stdout |
     faops filter -u stdin stdout \
     > RNaseR/RNaseR.pro.fa
+
+cat RNaseR/all.pro.fa |
+    grep "ribonuclease R" |
+    wc -l
+cat RNaseR/RNaseR.pro.fa |
+    grep "^>" |
+    wc -l
 
 muscle -quiet -in RNaseR/RNaseR.pro.fa -out RNaseR/RNaseR.aln.fa
 FastTree -quiet RNaseR/RNaseR.aln.fa > RNaseR/RNaseR.aln.newick
@@ -379,7 +386,7 @@ for GENUS in $(cat genus.list); do
         > taxon/${GENUS}.replace.tsv
 done
 
-# 280
+# 293
 cat taxon/*.replace.tsv | wc -l
 
 # extract sequences for each genus
@@ -513,12 +520,20 @@ Compare proteins and strains.
 cd ~/data/alignment/Tenericutes
 
 for marker in BA000{01..03} BA000{06..07} BA000{09..12} BA000{14..21} BA000{23..26} BA000{28..31} BA000{33..34} BA000{36..37}; do
+    echo ${marker}
+done > marker.list
+
+for marker in $(cat marker.list); do
     echo "==> marker [${marker}]"
 
     for GENUS in $(cat genus.list); do
         cat Phylo/${marker}/${GENUS}.replace.tsv |
             cut -f 2 |
             diff - taxon/${GENUS}
+    done
+    
+    echo
+done
 
     done
     
