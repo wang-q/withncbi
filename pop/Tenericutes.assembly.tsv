@@ -10,12 +10,12 @@ Amod_ATCC_29102	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/687/835/GCF_00068
 Amul_ATCC_49900	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/483/165/GCF_000483165.1_ASM48316v1	Acholeplasma multilocale	Scaffold
 Aocu	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/953/195/GCF_000953195.1_Acholeplasma_oculi_strain_19L	Acholeplasma oculi	Complete Genome
 Apal_J233	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/968/055/GCF_000968055.1_ASM96805v1	Acholeplasma palmae	Complete Genome
-Asp_	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/003/605/085/GCA_003605085.1_ASM360508v1	Acholeplasma sp.	Contig
+Asp	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/003/605/085/GCA_003605085.1_ASM360508v1	Acholeplasma sp.	Contig
 Asp_878	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/432/255/GCA_000432255.1_MGS878	Acholeplasma sp. CAG	Scaffold
 Abac	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/003/550/015/GCF_003550015.1_ASM355001v1	Anaeroplasma bactoclasticum	Scaffold
 CIsp_HR1	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/755/705/GCF_000755705.1_ASM75570v1	Candidatus Izimaplasma sp. HR1	Complete Genome
 CMgir	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/770/195/GCA_000770195.1_ASM77019v1	Candidatus Mycoplasma girerdii	Complete Genome
-CMhae_Birmingham_1_	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/319/365/GCF_000319365.1_ASM31936v1	Candidatus Mycoplasma haemominutum	Scaffold
+CMhae_Birmingham_1	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/319/365/GCF_000319365.1_ASM31936v1	Candidatus Mycoplasma haemominutum	Scaffold
 CMhae_Purdue	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/281/235/GCA_000281235.1_ASM28123v1	Candidatus Mycoplasma haemolamae	Complete Genome
 CShol	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/135/175/GCA_002135175.2_ASM213517v2	Candidatus Spiroplasma holothuricola	Complete Genome
 Eell	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/002/930/155/GCF_002930155.1_entomo01.02	Entomoplasma ellychniae	Contig
@@ -118,8 +118,8 @@ Mgal_NC96_1596_4_2P	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/286/715/GCF_0
 Mgal_NY01_2001_047_5_1P	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/286/735/GCF_000286735.1_ASM28673v1	Mycoplasma gallisepticum	Complete Genome
 Mgal_S6	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/211/545/GCF_000211545.4_ASM21154v6	Mycoplasma gallisepticum	Complete Genome
 Mgal_F	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/025/385/GCF_000025385.1_ASM2538v1	Mycoplasma gallisepticum	Complete Genome
-Mgal_R_high_	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/025/365/GCF_000025365.1_ASM2536v1	Mycoplasma gallisepticum	Complete Genome
-Mgal_R_low_	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/092/585/GCF_000092585.1_ASM9258v1	Mycoplasma gallisepticum	Complete Genome
+Mgal_R_high	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/025/365/GCF_000025365.1_ASM2536v1	Mycoplasma gallisepticum	Complete Genome
+Mgal_R_low	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/092/585/GCF_000092585.1_ASM9258v1	Mycoplasma gallisepticum	Complete Genome
 Mgal_VA94_7994_1_7P	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/286/675/GCF_000286675.1_ASM28667v1	Mycoplasma gallisepticum	Complete Genome
 Mgal_WI01_2001_043_13_2P	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/286/755/GCF_000286755.1_ASM28675v1	Mycoplasma gallisepticum	Complete Genome
 Mgen_G37	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/167/595/GCF_000167595.1_ASM16759v1	Mycoplasma genitalium	Contig
@@ -276,7 +276,7 @@ Smon_MQ_1	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/002/865/545/GCF_002865545.1
 Spho_P40	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/003/339/775/GCF_003339775.1_ASM333977v1	Spiroplasma phoeniceum	Complete Genome
 Spou	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/820/525/GCF_000820525.2_SMSRO_2016	Spiroplasma poulsonii	Scaffold
 Ssab_Ar_1343	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/565/215/GCF_000565215.1_ASM56521v1	Spiroplasma sabaudiense	Complete Genome
-Ssp_	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/792/795/GCF_001792795.1_ASM179279v1	Spiroplasma sp. TU-14	Complete Genome
+Ssp_TU_14	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/792/795/GCF_001792795.1_ASM179279v1	Spiroplasma sp. TU-14	Complete Genome
 Ssyr_EA_1	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/400/955/GCF_000400955.1_ASM40095v1	Spiroplasma syrphidicola	Complete Genome
 Stai_CT_1	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/439/435/GCF_000439435.1_ASM43943v1	Spiroplasma taiwanense	Complete Genome
 Stur	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/262/715/GCF_001262715.1_ASM126271v1	Spiroplasma turonicum	Complete Genome
