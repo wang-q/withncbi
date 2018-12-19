@@ -295,13 +295,26 @@ Uure_2033	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/255/375/GCF_000255375.1
 Uure_2608	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/255/395/GCF_000255395.1_Uurealyticum2608v1.0	Ureaplasma urealyticum	Contig
 Uure_4155	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/255/415/GCF_000255415.1_Uurealyticum4155v1.0	Ureaplasma urealyticum	Contig
 Uure_4318	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/255/435/GCF_000255435.1_Uurealyticum4318v1.0	Ureaplasma urealyticum	Contig
-Uure_serovar_10_str_ATCC_33699	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/021/265/GCF_000021265.1_ASM2126v1	Ureaplasma urealyticum	Complete Genome
-Uure_serovar_11_str_ATCC_33695	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/169/935/GCF_000169935.1_ASM16993v1	Ureaplasma urealyticum	Contig
-Uure_serovar_12_str_ATCC_33696	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/169/955/GCF_000169955.1_ASM16995v1	Ureaplasma urealyticum	Contig
-Uure_serovar_13_str_ATCC_33698	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/171/395/GCF_000171395.1_ASM17139v1	Ureaplasma urealyticum	Contig
-Uure_serovar_2_str_ATCC_27814	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/171/555/GCF_000171555.1_ASM17155v1	Ureaplasma urealyticum	Contig
-Uure_serovar_4_str_ATCC_27816	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/169/555/GCF_000169555.1_ASM16955v1	Ureaplasma urealyticum	Contig
-Uure_serovar_5_str_ATCC_27817	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/169/915/GCF_000169915.1_ASM16991v1	Ureaplasma urealyticum	Contig
-Uure_serovar_7_str_ATCC_27819	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/169/575/GCF_000169575.2_ASM16957v2	Ureaplasma urealyticum	Contig
-Uure_serovar_8_str_ATCC_27618	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/169/535/GCF_000169535.1_ASM16953v1	Ureaplasma urealyticum	Contig
-Uure_serovar_9_str_ATCC_33175	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/169/595/GCF_000169595.1_ASM16959v1	Ureaplasma urealyticum	Contig
+Uure_10_ATCC_33699	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/021/265/GCF_000021265.1_ASM2126v1	Ureaplasma urealyticum	Complete Genome
+Uure_11_ATCC_33695	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/169/935/GCF_000169935.1_ASM16993v1	Ureaplasma urealyticum	Contig
+Uure_12_ATCC_33696	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/169/955/GCF_000169955.1_ASM16995v1	Ureaplasma urealyticum	Contig
+Uure_13_ATCC_33698	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/171/395/GCF_000171395.1_ASM17139v1	Ureaplasma urealyticum	Contig
+Uure_2_ATCC_27814	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/171/555/GCF_000171555.1_ASM17155v1	Ureaplasma urealyticum	Contig
+Uure_4_ATCC_27816	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/169/555/GCF_000169555.1_ASM16955v1	Ureaplasma urealyticum	Contig
+Uure_5_ATCC_27817	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/169/915/GCF_000169915.1_ASM16991v1	Ureaplasma urealyticum	Contig
+Uure_7_ATCC_27819	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/169/575/GCF_000169575.2_ASM16957v2	Ureaplasma urealyticum	Contig
+Uure_8_ATCC_27618	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/169/535/GCF_000169535.1_ASM16953v1	Ureaplasma urealyticum	Contig
+Uure_9_ATCC_33175	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/169/595/GCF_000169595.1_ASM16959v1	Ureaplasma urealyticum	Contig
+Bsub_subtilis_168	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/155/325/GCF_000155325.1_ASM15532v1	Bacillus subtilis	Chromosome
+Bext_W1219	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/177/375/GCF_000177375.1_ASM17737v1	Bulleidia extructa	Contig
+Cmit_DSM_15897	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/173/795/GCF_000173795.1_ASM17379v1	Catenibacterium mitsuokai	Contig
+Cace_ATCC_824	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/008/765/GCF_000008765.1_ASM876v1	Clostridium acetobutylicum	Complete Genome
+Cbot_A_ATCC_3502	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/063/585/GCF_000063585.1_ASM6358v1	Clostridium botulinum	Complete Genome
+Ctet_E88	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/007/625/GCF_000007625.1_ASM762v1	Clostridium tetani	Complete Genome
+Ccat	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/186/525/GCF_000186525.1_Coprobacillus_sp_29_1_V1	Coprobacillus cateniformis	Scaffold
+Elar	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/545/095/GCF_001545095.1_ASM154509v1	Erysipelothrix larvae	Complete Genome
+Erhu_Fujisawa	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/270/085/GCF_000270085.1_ASM27008v1	Erysipelothrix rhusiopathiae	Complete Genome
+Elim_KIST612	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/152/245/GCF_000152245.2_ASM15224v2	Eubacterium limosum	Complete Genome
+Hfil_DSM_12042	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/157/995/GCF_000157995.1_ASM15799v1	Holdemania filiformis	Scaffold
+Smoo_F0204	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/186/945/GCF_000186945.2_ASM18694v2	Solobacterium moorei	Scaffold
+Tsan_PC909	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/178/255/GCF_000178255.1_ASM17825v1	Turicibacter sanguinis	Contig
