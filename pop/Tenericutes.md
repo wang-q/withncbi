@@ -43,6 +43,26 @@ Key genera:
     * *Haloplasma*: 471824
     * *Inordinaticella*: 1979191
 
+Outgroup:
+
+* Davis, J. J., Xia, F., Overbeek, R. A. & Olsen, G. J. Genomes of the class Erysipelotrichia
+  clarify the firmicute origin of the class Mollicutes. Int. J. Syst. Evol. Microbiol. 63, 2727–2741
+  (2013).
+
+* *Bacillus subtilis* subsp. subtilis str. 168: 224308
+* *Turicibacter sanguinis* PC909: 702450
+* Eubacterium limosum KIST612: 903814
+* Holdemania filiformis DSM 12042: 545696
+* Bulleidia extructa W1219: 679192
+* Solobacterium moorei F0204: 706433
+* Erysipelothrix rhusiopathiae str. Fujisawa: 650150
+* Erysipelothrix larvae: 1514105
+* Catenibacterium mitsuokai DSM 15897: 451640
+* Coprobacillus cateniformis: 100884
+* Clostridium acetobutylicum ATCC 824: 272562
+* Clostridium tetani E88: 212717
+* Clostridium botulinum A str. ATCC 3502: 413999
+
 Check NCBI pages
 
 * http://www.ncbi.nlm.nih.gov/assembly/?term=txid2093%5BOrganism%3Aexp
@@ -64,6 +84,15 @@ mysql -ualignDB -palignDB ar_refseq -e "
         AND genus_id in (2147, 33926, 2086, 2152, 46238, 46239, 2132, 2093, 2129, 1912503, 471824, 1979191)
     " \
     > raw.tsv
+
+mysql -ualignDB -palignDB ar_refseq -e "
+    SELECT 
+        organism_name, species, ftp_path, assembly_level
+    FROM ar 
+    WHERE 1=1
+        AND taxonomy_id in (224308, 702450, 903814, 545696, 679192, 706433, 650150, 1514105, 451640, 100884, 272562, 212717, 413999)
+    " \
+    >> raw.tsv
 
 mysql -ualignDB -palignDB ar_genbank -e "
     SELECT 
@@ -207,6 +236,22 @@ Msp_611_25_7
 Msp_776
 Msp_877
 Msp_956
+EOF
+
+cat <<EOF > taxon/Outgroup
+Bsub_subtilis_168
+Bext_W1219
+Cmit_DSM_15897
+Cace_ATCC_824
+Cbot_A_ATCC_3502
+Ctet_E88
+Ccat
+Elar
+Erhu_Fujisawa
+Elim_KIST612
+Hfil_DSM_12042
+Smoo_F0204
+Tsan_PC909
 EOF
 
 wc -l taxon/*
