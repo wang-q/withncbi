@@ -11,6 +11,7 @@
     - [Download HMM models](#download-hmm-models)
     - [Find corresponding proteins by `hmmsearch`](#find-corresponding-proteins-by-hmmsearch)
     - [Create valid marker gene list](#create-valid-marker-gene-list)
+    - [Align and concat marker genes to create species tree](#align-and-concat-marker-genes-to-create-species-tree)
 - [Tenericutes: run](#tenericutes-run)
 
 
@@ -535,12 +536,79 @@ for marker in $(cat marker.list); do
     echo
 done
 
-    done
-    
-done
-
 ```
 
+## Align and concat marker genes to create species tree
+
+```bash
+cd ~/data/alignment/Tenericutes
+
+# extract sequences 
+for marker in $(cat marker.list); do
+    echo "==> marker [${marker}]"
+
+    for GENUS in $(cat genus.list); do
+        echo "==> GENUS [${GENUS}]"
+
+        mytmpdir=`mktemp -d 2>/dev/null || mktemp -d -t 'mytmpdir'`
+
+        # avoid duplicated fasta headers
+        faops some RNaseR/all.pro.fa Phylo/${marker}/${GENUS}.replace.tsv stdout |
+            faops filter -u stdin ${mytmpdir}/${GENUS}.fa
+        
+        # avoid duplicated original names
+        cat Phylo/${marker}/${GENUS}.replace.tsv |
+            parallel --no-run-if-empty --linebuffer -k -j 1 "
+                faops replace -s ${mytmpdir}/${GENUS}.fa <(echo {}) stdout
+            " \
+            > Phylo/${marker}/${GENUS}.pro.fa
+            
+        rm -fr ${mytmpdir}
+    done
+    
+    echo
+done
+
+for marker in $(cat marker.list); do
+    echo "==> marker [${marker}]"
+    
+    for GENUS in $(cat genus.list); do
+        cat Phylo/${marker}/${GENUS}.pro.fa
+    done \
+        > Phylo/${marker}/${marker}.pro.fa
+done
+
+# aligning each markers with muscle
+cat marker.list |
+    parallel --no-run-if-empty --linebuffer -k -j 4 "
+        echo '==> {}'
+        
+        muscle -quiet -in Phylo/{}/{}.pro.fa -out Phylo/{}/{}.aln.fa
+    "
+
+# concat marker genes
+for marker in $(cat marker.list); do
+    # sequences in one line
+    faops filter -l 0 Phylo/${marker}/${marker}.aln.fa stdout
+    
+    # empty line for .fas
+    echo
+done \
+    > Phylo/markers.aln.fas
+
+# faspos names need full headers
+#fasops names Phylo/markers.aln.fas -o stdout
+cat Phylo/markers.aln.fas |
+    grep "^>" |
+    sed "s/^>//" |
+    sort |
+    uniq \
+    > strains.list
+fasops concat Phylo/markers.aln.fas strains.list -o Phylo/concat.aln.fa
+
+FastTree -quiet Phylo/concat.aln.fa > Phylo/concat.aln.newick
+
+```
 
 # Tenericutes: run
 
