@@ -8,7 +8,6 @@
 - [Count strains](#count-strains)
 - [Find all RNase R](#find-all-rnase-r)
 - [Phylogenetics with 40 single-copy genes](#phylogenetics-with-40-single-copy-genes)
-    - [Download HMM models](#download-hmm-models)
     - [Find corresponding proteins by `hmmsearch`](#find-corresponding-proteins-by-hmmsearch)
     - [Create valid marker gene list](#create-valid-marker-gene-list)
     - [Align and concat marker genes to create species tree](#align-and-concat-marker-genes-to-create-species-tree)
@@ -454,31 +453,6 @@ cat genus.list |
 ```
 
 # Phylogenetics with 40 single-copy genes
-
-## Download HMM models
-
-Ref.:
-
-1. Wu, D., Jospin, G. & Eisen, J. A. Systematic Identification of Gene Families for Use as “Markers”
-   for Phylogenetic and Phylogeny-Driven Ecological Studies of Bacteria and Archaea and Their Major
-   Subgroups. PLoS ONE 8, e77033 (2013).
-
-2. Skennerton, C. T. et al. Phylogenomic analysis of Candidatus ‘Izimaplasma’ species: free-living
-   representatives from a Tenericutes clade found in methane seeps. ISME J. 10, 2679–2692 (2016).
-
-3. https://doi.org/10.6084/m9.figshare.722713.v1
-
-4. `bacteria_and_archaea.tgz`: https://ndownloader.figshare.com/files/3093482
-
-```bash
-mkdir -p ~/data/alignment/Tenericutes/Phylo
-cd ~/data/alignment/Tenericutes/Phylo
-
-wget -N --content-disposition https://ndownloader.figshare.com/files/3093482
-
-tar xvfz bacteria_and_archaea.tgz
-
-```
 
 ##  Find corresponding proteins by `hmmsearch`
 
