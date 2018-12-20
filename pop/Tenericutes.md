@@ -457,11 +457,16 @@ cat genus.list |
 
 ```
 
-# Phylogenetics with 40 single-copy genes
+# Phylogenetics with 40 single-copy genes, *RpoB*, *EF-tu* and RNase_R
 
 ##  Find corresponding proteins by `hmmsearch`
 
-The `E_VALUE` was manually adjusted to 1e-20.
+* The `E_VALUE` was manually adjusted to 1e-20
+
+* RpoB: TIGR02013
+* EF-tu: TIGR00485
+* RNase_R: TIGR02063
+* 3_prime_RNase: TIGR00358
 
 ```bash
 E_VALUE=1e-20
@@ -470,26 +475,54 @@ cd ~/data/alignment/Tenericutes
 
 # example
 #gzip -dcf ASSEMBLY/Aaxa_ATCC_25176/*_protein.faa.gz |
-#    hmmsearch -E 1e-20 --domE 1e-20 Phylo/bacteria_and_archaea_dir/BA00001.hmm - |
+#    hmmsearch -E 1e-20 --domE 1e-20 --noali --notextw ~/data/HMM/40sg/bacteria_and_archaea_dir/BA00001.hmm - |
 #    grep '>>' |
 #    perl -nl -e '/>>\s+(\S+)/ and print $1'
 
-# Find all marker genes
+# Find all genes
 for marker in BA000{01..40}; do
     echo "==> marker [${marker}]"
     
-    mkdir -p Phylo/${marker}
+    mkdir -p PROTEINS/${marker}
     
     for GENUS in $(cat genus.list); do
         echo "==> GENUS [${GENUS}]"
 
         for STRAIN in $(cat taxon/${GENUS}); do
             gzip -dcf ASSEMBLY/${STRAIN}/*_protein.faa.gz |
-                hmmsearch -E ${E_VALUE} --domE ${E_VALUE} Phylo/bacteria_and_archaea_dir/${marker}.hmm - |
+                hmmsearch -E ${E_VALUE} --domE ${E_VALUE} --noali --notextw ~/data/HMM/40scg/bacteria_and_archaea_dir/${marker}.hmm - |
                 grep '>>' |
-                STRAIN=${STRAIN} perl -nl -e '/>>\s+(\S+)/ and printf qq{%s\t%s\n}, $1, $ENV{STRAIN}'
+                STRAIN=${STRAIN} perl -nl -e '
+                    />>\s+(\S+)/ and printf qq{%s\t%s\n}, $1, $ENV{STRAIN};
+                '
         done \
-            > Phylo/${marker}/${GENUS}.replace.tsv
+            > PROTEINS/${marker}/${GENUS}.replace.tsv
+    done
+    
+    echo
+done
+
+for marker in TIGR02013 TIGR00485 TIGR02063 TIGR00358; do
+    echo "==> marker [${marker}]"
+    
+    mkdir -p PROTEINS/${marker}
+    
+    for GENUS in $(cat genus.list); do
+        echo "==> GENUS [${GENUS}]"
+
+        for STRAIN in $(cat taxon/${GENUS}); do
+            gzip -dcf ASSEMBLY/${STRAIN}/*_protein.faa.gz |
+                hmmsearch -E ${E_VALUE} --domE ${E_VALUE} --noali --notextw ~/data/HMM/TIGRFAM/HMM/${marker}.HMM - |
+                grep '>>' |
+                STRAIN=${STRAIN} perl -nl -e '
+                    />>\s+(\S+)/ or next;
+                    $n = $1;
+                    $s = $n;
+                    $s =~ s/\.\d+//;
+                    printf qq{%s\t%s_%s\n}, $n, $ENV{STRAIN}, $s;
+                '
+        done \
+            > PROTEINS/${marker}/${GENUS}.replace.tsv
     done
     
     echo

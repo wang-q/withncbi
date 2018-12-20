@@ -57,8 +57,8 @@ Ref.:
 4. `bacteria_and_archaea.tgz`: https://ndownloader.figshare.com/files/3093482
 
 ```bash
-mkdir -p ~/data/HMM/40sg
-cd ~/data/HMM/40sg
+mkdir -p ~/data/HMM/40scg
+cd ~/data/HMM/40scg
 
 wget -N --content-disposition https://ndownloader.figshare.com/files/3093482
 
