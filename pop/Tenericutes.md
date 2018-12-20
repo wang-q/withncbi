@@ -357,24 +357,35 @@ find ASSEMBLY -type f -name "*_protein.faa.gz" |
 
 ```
 
+# Find all RNase R
+
+```bash
+cd ~/data/alignment/Tenericutes
+
+mkdir -p PROTEINS/RNaseR
+
+# 297; deduped 224
+faops some PROTEINS/all.pro.fa \
+    <(cat PROTEINS/all.pro.fa |
         grep "ribonuclease R" |
         cut -d" " -f 1 |
         sed "s/^>//" |
         sort | uniq) \
     stdout |
     faops filter -u stdin stdout \
-    > RNaseR/RNaseR.pro.fa
+    > PROTEINS/RNaseR/RNaseR.pro.fa
 
-cat RNaseR/all.pro.fa |
+cat PROTEINS/all.pro.fa |
     grep "ribonuclease R" |
     wc -l
-cat RNaseR/RNaseR.pro.fa |
+cat PROTEINS/RNaseR/RNaseR.pro.fa |
     grep "^>" |
     wc -l
 
-muscle -quiet -in RNaseR/RNaseR.pro.fa -out RNaseR/RNaseR.aln.fa
-FastTree -quiet RNaseR/RNaseR.aln.fa > RNaseR/RNaseR.aln.newick
+muscle -quiet -in PROTEINS/RNaseR/RNaseR.pro.fa -out PROTEINS/RNaseR/RNaseR.aln.fa
+FastTree -quiet PROTEINS/RNaseR/RNaseR.aln.fa > PROTEINS/RNaseR/RNaseR.aln.newick
 
+# Strains and RNase R
 find ASSEMBLY -maxdepth 1 -type d |
     sort |
     grep 'ASSEMBLY/' |
@@ -384,34 +395,29 @@ find ASSEMBLY -maxdepth 1 -type d |
             (echo {} && cat)
         echo
     ' \
-    > RNaseR/strains.txt
+    > PROTEINS/RNaseR/strain_anno.txt
 
+# Find all genes
 for GENUS in $(cat genus.list); do
-    cat taxon/${GENUS} |
-        parallel --no-run-if-empty --linebuffer -k -j 4 '
-            result=$(
-                gzip -dcf ASSEMBLY/{}/*_protein.faa.gz |
-                    grep "ribonuclease R" |
-                    cut -d" " -f 1 |
-                    sed "s/^>//"
-            )
-            if [ "$result" ]; then
-                echo $result |
-                    perl -nl -e '\''
-                        @ns = split /\s+/;
-                        for $n (@ns) {
-                            $s = $n;
-                            $s =~ s/\.\d+//;
-                            printf qq{%s\t%s_%s\n}, $n, {}, $s;
-                        }
-                    '\''
-            fi
-        ' \
-        > taxon/${GENUS}.replace.tsv
+    echo "==> GENUS [${GENUS}]"
+
+    for STRAIN in $(cat taxon/${GENUS}); do
+        gzip -dcf ASSEMBLY/${STRAIN}/*_protein.faa.gz |
+            grep "ribonuclease R" |
+            cut -d" " -f 1 |
+            sed "s/^>//" |
+            STRAIN=${STRAIN} perl -nl -e '
+                $n = $_;
+                $s = $n;
+                $s =~ s/\.\d+//;
+                printf qq{%s\t%s_%s\n}, $n, $ENV{STRAIN}, $s;
+            '
+    done \
+        > PROTEINS/RNaseR/${GENUS}.replace.tsv
 done
 
-# 293
-cat taxon/*.replace.tsv | wc -l
+# 297
+cat PROTEINS/RNaseR/*.replace.tsv | wc -l
 
 # extract sequences for each genus
 for GENUS in $(cat genus.list); do
@@ -420,15 +426,15 @@ for GENUS in $(cat genus.list); do
     mytmpdir=`mktemp -d 2>/dev/null || mktemp -d -t 'mytmpdir'`
 
     # avoid duplicated fasta headers
-    faops some RNaseR/all.pro.fa taxon/${GENUS}.replace.tsv stdout |
+    faops some PROTEINS/all.pro.fa PROTEINS/RNaseR/${GENUS}.replace.tsv stdout |
         faops filter -u stdin ${mytmpdir}/${GENUS}.fa
     
     # avoid duplicated original names
-    cat taxon/${GENUS}.replace.tsv |
+    cat PROTEINS/RNaseR/${GENUS}.replace.tsv |
         parallel --no-run-if-empty --linebuffer -k -j 1 "
             faops replace -s ${mytmpdir}/${GENUS}.fa <(echo {}) stdout
         " \
-        > RNaseR/${GENUS}.pro.fa
+        > PROTEINS/RNaseR/${GENUS}.pro.fa
         
     rm -fr ${mytmpdir}
 done
@@ -438,7 +444,7 @@ cat genus.list |
     parallel --no-run-if-empty --linebuffer -k -j 4 '
         echo "==> {}"
         
-        muscle -quiet -in RNaseR/{}.pro.fa -out RNaseR/{}.aln.fa
+        muscle -quiet -in PROTEINS/RNaseR/{}.pro.fa -out PROTEINS/RNaseR/{}.aln.fa
     '
 
 # newick trees
@@ -446,7 +452,7 @@ cat genus.list |
     parallel --no-run-if-empty --linebuffer -k -j 4 '
         echo "==> {}"
         
-        FastTree -quiet RNaseR/{}.aln.fa > RNaseR/{}.aln.newick
+        FastTree -quiet PROTEINS/RNaseR/{}.aln.fa > PROTEINS/RNaseR/{}.aln.newick
     '
 
 ```
