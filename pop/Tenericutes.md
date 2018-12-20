@@ -6,6 +6,7 @@
 - [Phylum Tenericutes](#phylum-tenericutes)
 - [Trichoderma: assembly](#trichoderma-assembly)
 - [Count strains](#count-strains)
+- [Collect proteins](#collect-proteins)
 - [Find all RNase R](#find-all-rnase-r)
 - [Phylogenetics with 40 single-copy genes](#phylogenetics-with-40-single-copy-genes)
     - [Find corresponding proteins by `hmmsearch`](#find-corresponding-proteins-by-hmmsearch)
@@ -326,27 +327,26 @@ done
 | Haloplasmatales   | Haloplasma      |                    |       1 |       1 |
 |                   | Inordinaticella |                    |       1 |       1 |
 
-
-# Find all RNase R
+# Collect proteins
 
 ```bash
 cd ~/data/alignment/Tenericutes
 
-mkdir -p RNaseR
+mkdir -p PROTEINS
 
-# 319
+# 323
 find ASSEMBLY -maxdepth 1 -type d |
     sort |
     grep 'ASSEMBLY/' |
     wc -l
 
-# 316
+# 320
 find ASSEMBLY -type f -name "*_protein.faa.gz" |
     wc -l
 
 find ASSEMBLY -type f -name "*_protein.faa.gz" |
     xargs gzip -dcf \
-    > RNaseR/all.pro.fa
+    > PROTEINS/all.pro.fa
 
 #find ASSEMBLY -type f -name "*_translated_cds.faa.gz" |
 #    xargs gzip -dcf \
@@ -355,9 +355,8 @@ find ASSEMBLY -type f -name "*_protein.faa.gz" |
 #cat RNaseR/all.tcds.fa |
 #    grep "ribonuclease R"
 
-# 293; deduped 220
-faops some RNaseR/all.pro.fa \
-    <(cat RNaseR/all.pro.fa |
+```
+
         grep "ribonuclease R" |
         cut -d" " -f 1 |
         sed "s/^>//" |
