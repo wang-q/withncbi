@@ -44,25 +44,37 @@ Key genera:
     * *Haloplasma*: 471824
     * *Inordinaticella*: 1979191
 
+Ref.:
+
+1. Skennerton, C. T. et al. Phylogenomic analysis of Candidatus ‘Izimaplasma’ species: free-living
+   representatives from a Tenericutes clade found in methane seeps. ISME J. 10, 2679–2692 (2016).
+
+2. Davis, J. J., Xia, F., Overbeek, R. A. & Olsen, G. J. Genomes of the class Erysipelotrichia
+   clarify the firmicute origin of the class Mollicutes. Int. J. Syst. Evol. Microbiol. 63,
+   2727–2741 (2013).
+
 Outgroup:
 
-* Davis, J. J., Xia, F., Overbeek, R. A. & Olsen, G. J. Genomes of the class Erysipelotrichia
-  clarify the firmicute origin of the class Mollicutes. Int. J. Syst. Evol. Microbiol. 63, 2727–2741
-  (2013).
+* Firmicutes
+    * *Bacillus subtilis* subsp. subtilis str. 168: 224308
+    * *Turicibacter sanguinis* PC909: 702450
+    * Eubacterium limosum KIST612: 903814
+    * Holdemania filiformis DSM 12042: 545696
+    * Bulleidia extructa W1219: 679192
+    * Solobacterium moorei F0204: 706433
+    * Erysipelothrix rhusiopathiae str. Fujisawa: 650150
+    * Erysipelothrix larvae: 1514105
+    * Catenibacterium mitsuokai DSM 15897: 451640
+    * Coprobacillus cateniformis: 100884
+    * Clostridium acetobutylicum ATCC 824: 272562
+    * Clostridium tetani E88: 212717
+    * Clostridium botulinum A str. ATCC 3502: 413999
 
-* *Bacillus subtilis* subsp. subtilis str. 168: 224308
-* *Turicibacter sanguinis* PC909: 702450
-* Eubacterium limosum KIST612: 903814
-* Holdemania filiformis DSM 12042: 545696
-* Bulleidia extructa W1219: 679192
-* Solobacterium moorei F0204: 706433
-* Erysipelothrix rhusiopathiae str. Fujisawa: 650150
-* Erysipelothrix larvae: 1514105
-* Catenibacterium mitsuokai DSM 15897: 451640
-* Coprobacillus cateniformis: 100884
-* Clostridium acetobutylicum ATCC 824: 272562
-* Clostridium tetani E88: 212717
-* Clostridium botulinum A str. ATCC 3502: 413999
+* Actinobacteria
+    * Amycolatopsis mediterranei U32: 749927
+    * Bifidobacterium adolescentis ATCC 15703: 367928
+    * Corynebacterium glutamicum ATCC 13032: 196627
+    * Mycobacterium tuberculosis H37Rv: 83332
 
 Check NCBI pages
 
@@ -92,6 +104,15 @@ mysql -ualignDB -palignDB ar_refseq -e "
     FROM ar 
     WHERE 1=1
         AND taxonomy_id in (224308, 702450, 903814, 545696, 679192, 706433, 650150, 1514105, 451640, 100884, 272562, 212717, 413999)
+    " \
+    >> raw.tsv
+
+mysql -ualignDB -palignDB ar_refseq -e "
+    SELECT 
+        organism_name, species, ftp_path, assembly_level
+    FROM ar 
+    WHERE 1=1
+        AND taxonomy_id in (83332, 196627, 749927, 367928)
     " \
     >> raw.tsv
 
@@ -253,6 +274,10 @@ Elim_KIST612
 Hfil_DSM_12042
 Smoo_F0204
 Tsan_PC909
+Amed_U32
+Bado_ATCC_15703
+Cglu_ATCC_13032
+Mtub_H37Rv
 EOF
 
 wc -l taxon/*

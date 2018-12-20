@@ -318,3 +318,7 @@ Elim_KIST612	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/152/245/GCF_00015224
 Hfil_DSM_12042	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/157/995/GCF_000157995.1_ASM15799v1	Holdemania filiformis	Scaffold
 Smoo_F0204	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/186/945/GCF_000186945.2_ASM18694v2	Solobacterium moorei	Scaffold
 Tsan_PC909	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/178/255/GCF_000178255.1_ASM17825v1	Turicibacter sanguinis	Contig
+Amed_U32	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/196/835/GCF_000196835.1_ASM19683v1	Amycolatopsis mediterranei	Complete Genome
+Bado_ATCC_15703	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/010/425/GCF_000010425.1_ASM1042v1	Bifidobacterium adolescentis	Complete Genome
+Cglu_ATCC_13032	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/196/335/GCF_000196335.1_ASM19633v1	Corynebacterium glutamicum	Complete Genome
+Mtub_H37Rv	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/195/955/GCF_000195955.2_ASM19595v2	Mycobacterium tuberculosis	Complete Genome
