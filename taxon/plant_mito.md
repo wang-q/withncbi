@@ -152,6 +152,7 @@ cat ../GENOMES/plant_mitochondrion_id_seq.csv |
     perl ~/Scripts/withncbi/taxon/id_project_to.pl -s "," --rank phylum |
     sort -t',' -k9,9 -k8,8 -k7,7 -k6,6 -k5,5 \
     >> mitochondrion.CHECKME.csv
+
 ```
 
 Manually correct lineages. # FIXME
@@ -233,7 +234,7 @@ FIXME
 Species and genus should not be "NA" and genus has 2 or more members.
 
 ```text
-217 ---------> 210 ---------> 86 ---------> 112
+224 ---------> 218 ---------> 88 ---------> 116
         NA           genus         family
 ```
 
@@ -251,7 +252,7 @@ cat mitochondrion.CHECKME.csv |
     ' \
     > mitochondrion.tmp
 
-# 210
+# 218
 wc -l mitochondrion.tmp
 
 #----------------------------#
@@ -272,7 +273,7 @@ cat mitochondrion.tmp |
 # intersect between two files
 grep -F -f genus.tmp mitochondrion.tmp > mitochondrion.genus.tmp
 
-# 86
+# 88
 wc -l mitochondrion.genus.tmp
 
 #----------------------------#
@@ -286,7 +287,7 @@ cat mitochondrion.genus.tmp |
 # intersect between two files
 grep -F -f family.tmp mitochondrion.tmp > mitochondrion.family.tmp
 
-# 112
+# 116
 wc -l mitochondrion.family.tmp
 
 #----------------------------#
@@ -413,9 +414,9 @@ find . -maxdepth 1 -type d -path "*/*" |
 
 # Create alignment plans
 
-We got **111** accessions.
+We got **116** accessions.
 
-Numbers for higher ranks are: 15 orders, 17 families, 27 genera and 82 species.
+Numbers for higher ranks are: 16 orders, 17 families, 29 genera and 84 species.
 
 ```bash
 cd ~/data/organelle/mito/summary
@@ -436,14 +437,14 @@ cat mitochondrion.ABBR.csv |
 # intersect between two files
 grep -F -f genus.tmp mitochondrion.ABBR.csv > mitochondrion.GENUS.csv
 
-# 86
+# 88
 wc -l mitochondrion.GENUS.csv
 
-#   count every ranks
-#      15 order.list.tmp
-#      17 family.list.tmp
-#      27 genus.list.tmp
-#      82 species.list.tmp
+# count every ranks
+#  16 order.list.tmp
+#  17 family.list.tmp
+#  29 genus.list.tmp
+#  84 species.list.tmp
 cut -d',' -f 4 mitochondrion.GENUS.csv | sort | uniq > species.list.tmp
 cut -d',' -f 5 mitochondrion.GENUS.csv | sort | uniq > genus.list.tmp
 cut -d',' -f 6 mitochondrion.GENUS.csv | sort | uniq > family.list.tmp
@@ -495,6 +496,7 @@ cat mitochondrion.GENUS.csv |
         }
     ' \
     > mitochondrion_OG.md
+
 ```
 
 
