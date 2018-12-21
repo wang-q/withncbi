@@ -8,10 +8,11 @@
 - [Count strains](#count-strains)
 - [Collect proteins](#collect-proteins)
 - [Find all RNase R](#find-all-rnase-r)
-- [Phylogenetics with 40 single-copy genes](#phylogenetics-with-40-single-copy-genes)
+- [Phylogenetics with 40 single-copy genes, *RpoB*, *EF-tu* and RNase_R](#phylogenetics-with-40-single-copy-genes-rpob-ef-tu-and-rnase_r)
     - [Find corresponding proteins by `hmmsearch`](#find-corresponding-proteins-by-hmmsearch)
     - [Create valid marker gene list](#create-valid-marker-gene-list)
     - [Align and concat marker genes to create species tree](#align-and-concat-marker-genes-to-create-species-tree)
+    - [TIGR](#tigr)
 - [Tenericutes: run](#tenericutes-run)
 
 
@@ -565,7 +566,7 @@ for marker in $(cat marker.list); do
     echo "==> marker [${marker}]"
 
     for GENUS in $(cat genus.list); do
-        cat Phylo/${marker}/${GENUS}.replace.tsv |
+        cat PROTEINS/${marker}/${GENUS}.replace.tsv |
             cut -f 2 |
             diff - taxon/${GENUS}
     done
@@ -581,7 +582,7 @@ done
 cd ~/data/alignment/Tenericutes
 
 # extract sequences 
-for marker in $(cat marker.list); do
+for marker in $(cat marker.list) TIGR02013 TIGR00485 TIGR02063 TIGR00358; do
     echo "==> marker [${marker}]"
 
     for GENUS in $(cat genus.list); do
@@ -590,15 +591,15 @@ for marker in $(cat marker.list); do
         mytmpdir=`mktemp -d 2>/dev/null || mktemp -d -t 'mytmpdir'`
 
         # avoid duplicated fasta headers
-        faops some RNaseR/all.pro.fa Phylo/${marker}/${GENUS}.replace.tsv stdout |
+        faops some PROTEINS/all.pro.fa PROTEINS/${marker}/${GENUS}.replace.tsv stdout |
             faops filter -u stdin ${mytmpdir}/${GENUS}.fa
         
         # avoid duplicated original names
-        cat Phylo/${marker}/${GENUS}.replace.tsv |
+        cat PROTEINS/${marker}/${GENUS}.replace.tsv |
             parallel --no-run-if-empty --linebuffer -k -j 1 "
                 faops replace -s ${mytmpdir}/${GENUS}.fa <(echo {}) stdout
             " \
-            > Phylo/${marker}/${GENUS}.pro.fa
+            > PROTEINS/${marker}/${GENUS}.pro.fa
             
         rm -fr ${mytmpdir}
     done
@@ -606,13 +607,13 @@ for marker in $(cat marker.list); do
     echo
 done
 
-for marker in $(cat marker.list); do
+for marker in $(cat marker.list) TIGR02013 TIGR00485 TIGR02063 TIGR00358; do
     echo "==> marker [${marker}]"
     
     for GENUS in $(cat genus.list); do
-        cat Phylo/${marker}/${GENUS}.pro.fa
+        cat PROTEINS/${marker}/${GENUS}.pro.fa
     done \
-        > Phylo/${marker}/${marker}.pro.fa
+        > PROTEINS/${marker}/${marker}.pro.fa
 done
 
 # aligning each markers with muscle
@@ -620,30 +621,45 @@ cat marker.list |
     parallel --no-run-if-empty --linebuffer -k -j 4 "
         echo '==> {}'
         
-        muscle -quiet -in Phylo/{}/{}.pro.fa -out Phylo/{}/{}.aln.fa
+        muscle -quiet -in PROTEINS/{}/{}.pro.fa -out PROTEINS/{}/{}.aln.fa
     "
 
 # concat marker genes
 for marker in $(cat marker.list); do
     # sequences in one line
-    faops filter -l 0 Phylo/${marker}/${marker}.aln.fa stdout
+    faops filter -l 0 PROTEINS/${marker}/${marker}.aln.fa stdout
     
     # empty line for .fas
     echo
 done \
-    > Phylo/markers.aln.fas
+    > PROTEINS/markers.aln.fas
 
 # faspos names need full headers
 #fasops names Phylo/markers.aln.fas -o stdout
-cat Phylo/markers.aln.fas |
+cat PROTEINS/markers.aln.fas |
     grep "^>" |
     sed "s/^>//" |
     sort |
     uniq \
     > strains.list
-fasops concat Phylo/markers.aln.fas strains.list -o Phylo/concat.aln.fa
+fasops concat PROTEINS/markers.aln.fas strains.list -o PROTEINS/concat.aln.fa
 
-FastTree -quiet Phylo/concat.aln.fa > Phylo/concat.aln.newick
+FastTree -quiet PROTEINS/concat.aln.fa > PROTEINS/concat.aln.newick
+
+```
+
+## TIGR
+
+```bash
+cd ~/data/alignment/Tenericutes
+
+parallel --no-run-if-empty --linebuffer -k -j 4 "
+    echo '==> {}'
+    
+    muscle -quiet -in PROTEINS/{}/{}.pro.fa -out PROTEINS/{}/{}.aln.fa
+    
+    FastTree -quiet PROTEINS/{}/{}.aln.fa > PROTEINS/{}/{}.aln.newick
+    " ::: TIGR02013 TIGR00485 TIGR02063 TIGR00358
 
 ```
 
