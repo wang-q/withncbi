@@ -12,6 +12,7 @@
     - [Find corresponding proteins by `hmmsearch`](#find-corresponding-proteins-by-hmmsearch)
     - [Create valid marker gene list](#create-valid-marker-gene-list)
     - [Align and concat marker genes to create species tree](#align-and-concat-marker-genes-to-create-species-tree)
+    - [Tweak the concat tree](#tweak-the-concat-tree)
     - [TIGR](#tigr)
 - [Tenericutes: run](#tenericutes-run)
 
@@ -652,6 +653,90 @@ cat PROTEINS/markers.aln.fas |
 fasops concat PROTEINS/markers.aln.fas strains.list -o PROTEINS/concat.aln.fa
 
 FastTree -quiet PROTEINS/concat.aln.fa > PROTEINS/concat.aln.newick
+
+```
+
+## Tweak the concat tree
+
+```bash
+cd ~/data/alignment/Tenericutes
+
+# reroot
+nw_reroot PROTEINS/concat.aln.newick Am_med_U32 Bi_ado_ATCC_15703 > PROTEINS/concat.reroot.newick
+
+# Check monophyly for genus
+rm genus.monophyly.list genus.paraphyly.list genus.monophyly.map
+for GENUS in $(cat genus.list); do
+    NODE=$(
+        nw_clade -m PROTEINS/concat.reroot.newick $(cat taxon/${GENUS}) |
+            nw_stats -f l - |
+            cut -f 3
+    )
+    
+    if [[ "$NODE" ]]; then
+        echo "${GENUS}" >> genus.monophyly.list
+        cat taxon/${GENUS} |
+            xargs -I{} echo "{} ${GENUS}___${NODE}" \
+            >> genus.monophyly.map
+    else
+        echo "${GENUS}" >> genus.paraphyly.list
+    fi
+    
+done
+
+# Merge strains in genus to higher-rank
+nw_rename PROTEINS/concat.reroot.newick genus.monophyly.map |
+    nw_condense - \
+    > PROTEINS/concat.map.newick
+
+# strains in species
+for GENUS in $(cat genus.paraphyly.list); do
+    cat taxon/${GENUS}
+done |
+    perl -nl -e '/([[:alpha:]]+_[[:alpha:]]+)/ and print $1' |
+    perl -nl -e '!/_sp$/ and print' |
+    sort |
+    uniq -d -c |
+    perl -nla -e 'print qq{$F[1]\t$F[1]___$F[0]}' \
+    > species.count.tsv
+
+for GENUS in $(cat genus.paraphyly.list); do
+    cat taxon/${GENUS}
+done \
+    > strains.paraphyly.list
+
+# Check monophyly for species
+rm species.monophyly.list species.paraphyly.list species.monophyly.map
+cat species.count.tsv |
+    perl -nl -MPath::Tiny -e '
+        BEGIN {
+            our @strains = 
+                grep {/\S/}
+                path(q{strains.paraphyly.list})->lines({ chomp => 1});
+        }
+        
+        my @ns = split /\t/;
+        my @sts = grep {/^$ns[0]/} @strains;
+        
+        my $cmd = q{nw_clade -m PROTEINS/concat.reroot.newick };
+        $cmd .= " $_ " for @sts;
+        $cmd .= " | nw_stats -f l - | cut -f 3";
+        
+        my $result = `$cmd`;
+        if ($result) {
+            print qq{$_ $ns[1]} for @sts;
+            path(q{species.monophyly.list})->append($ns[0]);
+        }
+        else {
+            path(q{species.paraphyly.list})->append($ns[0]);
+        }
+    ' \
+    > species.monophyly.map
+
+# Merge strains in genus to higher-rank
+nw_rename PROTEINS/concat.map.newick species.monophyly.map |
+    nw_condense - \
+    > PROTEINS/concat.map2.newick
 
 ```
 
