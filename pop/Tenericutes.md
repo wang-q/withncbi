@@ -200,39 +200,50 @@ parallel --no-run-if-empty --linebuffer -k -j 4 '
     ' ::: Acholeplasma Entomoplasma Mesoplasma Spiroplasma Mycoplasma Ureaplasma
 
 #Acholeplasma    11      12
-#Anaeroplasma    1       1
 #Entomoplasma    6       10
 #Mesoplasma      11      15
-#Spiroplasma     25      28
-#Mycoplasma      81      183
+#Spiroplasma     25      30
+#Mycoplasma      86      197
 #Ureaplasma      4       25
 
 mkdir -p taxon
 
-echo "Abac" > taxon/Anaeroplasma
-echo "CIsp_HR1" > taxon/Izimaplasma
-echo "Hcon_SSD_17B" > taxon/Haloplasma
-echo "Ifor" > taxon/Inordinaticella
+echo "An_bac" > taxon/Anaeroplasma
+echo "Ha_cont_SSD_17B" > taxon/Haloplasma
+echo "I_for" > taxon/Inordinaticella
+
+cat <<EOF > taxon/Izimaplasma
+CI_sp_HR1
+CI_sp_HR2
+CI_sp_Z
+EOF
 
 cat <<EOF > taxon/Phytoplasma
-Paus
-Paus_NZSb11
-PAyel_AYWB
-PBnap
-Pbra_JR1
-PCcor
-Pcyel
-PEpur
-PIclo_MA1
-PMyel_MW1
-PNJer
-POyel_OY_M
-PRora
-Psp_Vc33
-PVwit_VAC
-PWblu
-Pwit_NTU2011
-PZmay
+CP_Ast_AYWB
+CP_Bra
+CP_aura
+CP_aus
+CP_aus_Strawberry_NZSb11
+CP_mali
+CP_ory
+CP_phoenici
+CP_pru
+CP_sol
+CP_ziz
+CP_Chrysanthemum_c
+CP_Chrysanthemum_y
+CP_Ech
+CP_Ita_MA1
+CP_Mai
+CP_Mil_MW1
+CP_Vac_VAC
+CP_Whe
+CP_New
+CP_Oni_OY_M
+CP_Pea_NTU2011
+CP_Phy
+CP_Poi_JR1
+CP_Ric
 EOF
 
 parallel --no-run-if-empty --linebuffer -k -j 4 '
@@ -243,34 +254,35 @@ parallel --no-run-if-empty --linebuffer -k -j 4 '
         > taxon/{}
     ' ::: Acholeplasma Entomoplasma Mesoplasma Spiroplasma Mycoplasma Ureaplasma
 
-echo "Asp_878" >> taxon/Acholeplasma
+echo "Ac_sp_CAG_878" >> taxon/Acholeplasma
+
 cat <<EOF >> taxon/Mycoplasma
-Msp_472
-Msp_611
-Msp_611_25_7
-Msp_776
-Msp_877
-Msp_956
+Mycop_sp_CAG_472
+Mycop_sp_CAG_611
+Mycop_sp_CAG_611_25_7
+Mycop_sp_CAG_776
+Mycop_sp_CAG_877
+Mycop_sp_CAG_956
 EOF
 
 cat <<EOF > taxon/Outgroup
-Bsub_subtilis_168
-Bext_W1219
-Cmit_DSM_15897
-Cace_ATCC_824
-Cbot_A_ATCC_3502
-Ctet_E88
-Ccat
-Elar
-Erhu_Fujisawa
-Elim_KIST612
-Hfil_DSM_12042
-Smoo_F0204
-Tsan_PC909
-Amed_U32
-Bado_ATCC_15703
-Cglu_ATCC_13032
-Mtub_H37Rv
+Ba_subt_subtilis_168
+Bu_ext_W1219
+Ca_mit_DSM_15897
+Cop_cat
+Cl_ace_ATCC_824
+Cl_bot_A_ATCC_3502
+Cl_tet_E88
+Er_lar
+Er_rhu_Fujisawa
+Eu_lim_KIST612
+Ho_fil_DSM_12042
+So_moo_F0204
+T_san_PC909
+Am_med_U32
+Bi_ado_ATCC_15703
+Cor_glu_ATCC_13032
+Mycob_tub_H37Rv
 EOF
 
 wc -l taxon/*
@@ -280,9 +292,12 @@ find taxon -maxdepth 1 -type f -not -name "*.replace.tsv" |
     > genus.list
 
 # Omit strains without protein annotations
-#CShol
-#Psp_Vc33
-#Mmoa_ATCC_27625
+#Sp_Chol
+#CP_Phy
+#Mycop_moa_ATCC_27625
+#Mycop_sp_Bg1
+#Mycop_sp_Bg2
+#Mycop_sp_U
 for GENUS in $(cat genus.list); do
     for STRAIN in $(cat taxon/${GENUS}); do
         if ! compgen -G "ASSEMBLY/${STRAIN}/*_protein.faa.gz" > /dev/null; then
@@ -308,15 +323,15 @@ done
 | Order             | Genus           | Comments           | Species | Strains |
 |:------------------|:----------------|:-------------------|--------:|--------:|
 | Acholeplasmatales | Acholeplasma    | 无胆甾原体           |      11 |      13 |
-|                   | Phytoplasma     | 植原体              |         |      18 |
+|                   | Phytoplasma     | 植原体              |         |      25 |
 | Anaeroplasmatales | Anaeroplasma    |                    |       1 |       1 |
-|                   | Asteroleplasma  |                    |       0 |       0 |
+|                   | Asteroleplasma  |                    |         |         |
 | Entomoplasmatales | Entomoplasma    |                    |       6 |      10 |
 | 虫原体             | Mesoplasma      |                    |      11 |      15 |
-|                   | Spiroplasma     | 螺原体, 感染昆虫与植物 |      25 |      29 |
-| Mycoplasmatales   | Mycoplasma      | 支原体              |      81 |     192 |
+|                   | Spiroplasma     | 螺原体, 感染昆虫与植物 |      25 |      31 |
+| Mycoplasmatales   | Mycoplasma      | 支原体              |      86 |     207 |
 |                   | Ureaplasma      | 脲原体              |       4 |      25 |
-| Unclassified      | Izimaplasma     | 独立生活             |       1 |       1 |
+| Unclassified      | Izimaplasma     | 独立生活             |         |       3 |
 | Haloplasmatales   | Haloplasma      |                    |       1 |       1 |
 |                   | Inordinaticella |                    |       1 |       1 |
 
@@ -327,13 +342,13 @@ cd ~/data/alignment/Tenericutes
 
 mkdir -p PROTEINS
 
-# 323
+# 349
 find ASSEMBLY -maxdepth 1 -type d |
     sort |
     grep 'ASSEMBLY/' |
     wc -l
 
-# 320
+# 343
 find ASSEMBLY -type f -name "*_protein.faa.gz" |
     wc -l
 
@@ -357,7 +372,7 @@ cd ~/data/alignment/Tenericutes
 
 mkdir -p PROTEINS/RNaseR
 
-# 297; deduped 224
+# 312; deduped 236
 faops some PROTEINS/all.pro.fa \
     <(cat PROTEINS/all.pro.fa |
         grep "ribonuclease R" |
@@ -409,7 +424,7 @@ for GENUS in $(cat genus.list); do
         > PROTEINS/RNaseR/${GENUS}.replace.tsv
 done
 
-# 297
+# 312
 cat PROTEINS/RNaseR/*.replace.tsv | wc -l
 
 # extract sequences for each genus
