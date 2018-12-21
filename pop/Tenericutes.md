@@ -92,7 +92,7 @@ cd ~/data/alignment/${RANK_NAME}
 
 mysql -ualignDB -palignDB ar_refseq -e "
     SELECT 
-        organism_name, species, ftp_path, assembly_level
+        organism_name, species, genus, ftp_path, assembly_level
     FROM ar 
     WHERE 1=1
         AND genus_id in (2147, 33926, 2086, 2152, 46238, 46239, 2132, 2093, 2129, 1912503, 471824, 1979191)
@@ -101,7 +101,7 @@ mysql -ualignDB -palignDB ar_refseq -e "
 
 mysql -ualignDB -palignDB ar_refseq -e "
     SELECT 
-        organism_name, species, ftp_path, assembly_level
+        organism_name, species, genus, ftp_path, assembly_level
     FROM ar 
     WHERE 1=1
         AND taxonomy_id in (224308, 702450, 903814, 545696, 679192, 706433, 650150, 1514105, 451640, 100884, 272562, 212717, 413999)
@@ -110,7 +110,7 @@ mysql -ualignDB -palignDB ar_refseq -e "
 
 mysql -ualignDB -palignDB ar_refseq -e "
     SELECT 
-        organism_name, species, ftp_path, assembly_level
+        organism_name, species, genus, ftp_path, assembly_level
     FROM ar 
     WHERE 1=1
         AND taxonomy_id in (83332, 196627, 749927, 367928)
@@ -119,7 +119,7 @@ mysql -ualignDB -palignDB ar_refseq -e "
 
 mysql -ualignDB -palignDB ar_genbank -e "
     SELECT 
-        organism_name, species, ftp_path, assembly_level
+        organism_name, species, genus, ftp_path, assembly_level
     FROM ar 
     WHERE 1=1
         AND genus_id in (2147, 33926, 2086, 2152, 46238, 46239, 2132, 2093, 2129, 1912503, 471824, 1979191)
@@ -127,24 +127,16 @@ mysql -ualignDB -palignDB ar_genbank -e "
     >> raw.tsv
 
 cat raw.tsv |
+    grep -v '^#' |
+    perl ~/Scripts/withncbi/taxon/abbr_name.pl -c "1,2,3" -s '\t' -m 3 --shortsub |
     (echo -e '#name\tftp_path\torganism\tassembly_level' && cat ) |
-    perl -nl -a -F"\t" -e '
+    perl -nl -a -F"," -e '
         BEGIN{my %seen}; 
         /^#/ and print and next;
         /^organism_name/i and next;
-        $n = $F[0];
-        $rx = quotemeta $F[1];
-        $n =~ s/$rx\s*//;
-        $n =~ s/\s+$//;
-        $n =~ s/\W+/_/g;
-        @O = split(/ /, $F[1]);
-        $name = substr($O[0],0,1) . substr($O[1],0,3);
-        $name .= q{_} . $n if $n;
-        $name =~ s/\W+/_/g;
-        $name =~ s/_+/_/g;
-        $seen{$name}++;
-        $seen{$name} > 1 and next;
-        printf qq{%s\t%s\t%s\t%s\n}, $name, $F[2], $F[1], $F[3];
+        $seen{$F[5]}++;
+        $seen{$F[5]} > 1 and next;
+        printf qq{%s\t%s\t%s\t%s\n}, $F[5], $F[3], $F[1], $F[4];
         ' |
     keep-header -- sort -k3,3 -k1,1 \
     > ${RANK_NAME}.assembly.tsv

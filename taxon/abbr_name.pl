@@ -97,6 +97,9 @@ while ( my $line = <> ) {
         $species =~ s/^$genus //;
     }
 
+    # Remove `Candidatus`
+    $genus =~ s/\bCandidatus \b/C/g;
+
     # Clean long subspecies names
     if ($shortsub) {
         $strain =~ s/\bsubsp\b//g;
