@@ -434,6 +434,26 @@ find ASSEMBLY -type f -name "*_protein.faa.gz" |
 #cat RNaseR/all.tcds.fa |
 #    grep "ribonuclease R"
 
+# ribonuclease
+cat PROTEINS/all.pro.fa |
+    grep "ribonuclease" |
+    perl -nl -e 's/^>\w+\.\d+\s+//g; print' |
+    perl -nl -e 's/\s+\[.+?\]$//g; print' |
+    perl -nl -e 's/MULTISPECIES: //g; print' |
+    sort |
+    uniq -c -d |
+    sort -nr
+
+# methyltransferase
+cat PROTEINS/all.pro.fa |
+    grep "methyltransferase" |
+    perl -nl -e 's/^>\w+\.\d+\s+//g; print' |
+    perl -nl -e 's/\s+\[.+?\]$//g; print' |
+    perl -nl -e 's/MULTISPECIES: //g; print' |
+    sort |
+    uniq -c -d |
+    sort -nr
+
 ```
 
 # Phylogenetics with 40 single-copy genes, *RpoB*, *EF-tu* and RNase_R
@@ -757,7 +777,7 @@ cd ~/data/alignment/Tenericutes
 
 mkdir -p RNaseR/domains
 
-for domain in OB_RNB CSD2 RNB S1; do
+for domain in OB_RNB CSD2 RNB S1 RNase_II_C_S1; do
     echo 1>&2 "==> domain [${domain}]"
         
     for GENUS in $(cat genus.list); do
