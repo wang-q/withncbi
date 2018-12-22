@@ -734,13 +734,15 @@ parallel --no-run-if-empty --linebuffer -k -j 4 "
 * RNB (PF00773)
 * S1 (PF00575)
 
+* RNase_II_C_S1 (PF18614)
+
 ```bash
 cd ~/data/alignment/Tenericutes
 
 mkdir -p RNaseR/HMM
 cd RNaseR/HMM
 
-for ID in PF08206 PF17876 PF00773 PF00575; do
+for ID in PF08206 PF17876 PF00773 PF00575 PF18614; do
     wget -N --content-disposition http://pfam.xfam.org/family/${ID}/hmm
 done
 
@@ -784,6 +786,7 @@ wc -l RNaseR/domains/*.replace.tsv
 #  250 RNaseR/domains/CSD2.replace.tsv
 #  315 RNaseR/domains/RNB.replace.tsv
 #  696 RNaseR/domains/S1.replace.tsv
+#    2 RNaseR/domains/RNase_II_C_S1.replace.tsv
 
 ```
 
