@@ -186,7 +186,10 @@ cd ~/data/alignment/Tenericutes
 
 bp_taxonomy2tree.pl -e \
     -s "Acholeplasma" \
+    -s "Anaeroplasma" \
     -s "Entomoplasma" \
+    -s "Haloplasma" \
+    -s "Inordinaticella" \
     -s "Mesoplasma" \
     -s "Mycoplasma" \
     -s "Spiroplasma" \
