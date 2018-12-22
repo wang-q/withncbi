@@ -5,6 +5,7 @@
 - [Aligning various genera from Tenericutes](#aligning-various-genera-from-tenericutes)
 - [Phylum Tenericutes](#phylum-tenericutes)
 - [Trichoderma: assembly](#trichoderma-assembly)
+    - [NCBI taxonomy](#ncbi-taxonomy)
 - [Count strains](#count-strains)
 - [Collect proteins](#collect-proteins)
 - [Find all RNase R](#find-all-rnase-r)
@@ -174,6 +175,7 @@ bash ASSEMBLY/Tenericutes.assembly.collect.sh
 
 ```
 
+    -s "Spiroplasma" \
 # Count strains
 
 ```bash
