@@ -263,6 +263,7 @@ mkdir -p taxon
 echo "An_bac" > taxon/Anaeroplasma
 echo "Ha_cont_SSD_17B" > taxon/Haloplasma
 echo "I_for" > taxon/Inordinaticella
+echo "CH_crin_Av" > taxon/Hepatoplasma
 
 cat <<EOF > taxon/Izimaplasma
 CI_sp_HR1
@@ -411,13 +412,13 @@ cd ~/data/alignment/Tenericutes
 
 mkdir -p PROTEINS
 
-# 349
+# 350
 find ASSEMBLY -maxdepth 1 -type d |
     sort |
     grep 'ASSEMBLY/' |
     wc -l
 
-# 343
+# 344
 find ASSEMBLY -type f -name "*_protein.faa.gz" |
     wc -l
 
@@ -751,6 +752,8 @@ E_VALUE=1e-5
 
 cd ~/data/alignment/Tenericutes
 
+mkdir -p RNaseR/domains
+
 for domain in OB_RNB CSD2 RNB S1; do
     echo 1>&2 "==> domain [${domain}]"
         
@@ -770,16 +773,16 @@ for domain in OB_RNB CSD2 RNB S1; do
                 '
         done 
     done \
-        > RNaseR/${domain}.replace.tsv
+        > RNaseR/domains/${domain}.replace.tsv
     
     echo 1>&2
 done
 
-wc -l RNaseR/*.replace.tsv
-#  217 RNaseR/OB_RNB.replace.tsv
-#  250 RNaseR/CSD2.replace.tsv
-#  315 RNaseR/RNB.replace.tsv
-#  696 RNaseR/S1.replace.tsv
+wc -l RNaseR/domains/*.replace.tsv
+#  217 RNaseR/domains/OB_RNB.replace.tsv
+#  250 RNaseR/domains/CSD2.replace.tsv
+#  315 RNaseR/domains/RNB.replace.tsv
+#  696 RNaseR/domains/S1.replace.tsv
 
 ```
 
@@ -797,8 +800,6 @@ wc -l RNaseR/*.replace.tsv
 ```bash
 cd ~/data/alignment/Tenericutes
 
-mkdir -p PROTEINS/RNaseR
-
 faops some PROTEINS/all.pro.fa \
     <(cat PROTEINS/all.pro.fa |
         grep "ribonuclease R" |
@@ -807,19 +808,19 @@ faops some PROTEINS/all.pro.fa \
         sort | uniq) \
     stdout |
     faops filter -u stdin stdout \
-    > PROTEINS/RNaseR/RNaseR.all.fa
+    > RNaseR/RNaseR.all.fa
 
 cat PROTEINS/all.pro.fa |
     grep "ribonuclease R" |
     wc -l
-cat PROTEINS/RNaseR/RNaseR.all.fa |
+cat RNaseR/RNaseR.all.fa |
     grep "^>" |
     wc -l
 for domain in OB_RNB CSD2 RNB S1; do
-    cat PROTEINS/RNaseR/RNaseR.all.fa |
+    cat RNaseR/RNaseR.all.fa |
         grep "^>" |
         sed "s/^>//" |
-        grep -Fx -f <(cut -f 1 RNaseR/${domain}.replace.tsv) |
+        grep -Fx -f <(cut -f 1 RNaseR/domains/${domain}.replace.tsv) |
         wc -l
 done
 
@@ -833,7 +834,7 @@ find ASSEMBLY -maxdepth 1 -type d |
             (echo {} && cat)
         echo
     ' \
-    > PROTEINS/RNaseR/strain_anno.txt
+    > RNaseR/strain_anno.txt
 
 ```
 
@@ -855,7 +856,7 @@ for GENUS in $(cat genus.list); do
                 BEGIN {
                     our %seen = map {(split /\t/)[0] => 1} 
                         grep {/\S/}
-                        path(q{RNaseR/RNB.replace.tsv})->lines({ chomp => 1});
+                        path(q{RNaseR/domains/RNB.replace.tsv})->lines({ chomp => 1});
                 }
                 
                 $n = $_;
@@ -866,11 +867,11 @@ for GENUS in $(cat genus.list); do
                 printf qq{%s\t%s_%s\n}, $n, $ENV{STRAIN}, $s;
             '
     done \
-        > PROTEINS/RNaseR/${GENUS}.replace.tsv
+        > RNaseR/${GENUS}.replace.tsv
 done
 
 # 301
-cat PROTEINS/RNaseR/*.replace.tsv | wc -l
+cat RNaseR/*.replace.tsv | wc -l
 
 # extract sequences for each genus
 for GENUS in $(cat genus.list); do
@@ -879,15 +880,15 @@ for GENUS in $(cat genus.list); do
     mytmpdir=`mktemp -d 2>/dev/null || mktemp -d -t 'mytmpdir'`
 
     # avoid duplicated fasta headers
-    faops some PROTEINS/all.pro.fa PROTEINS/RNaseR/${GENUS}.replace.tsv stdout |
+    faops some PROTEINS/all.pro.fa RNaseR/${GENUS}.replace.tsv stdout |
         faops filter -u stdin ${mytmpdir}/${GENUS}.fa
     
     # avoid duplicated original names
-    cat PROTEINS/RNaseR/${GENUS}.replace.tsv |
+    cat RNaseR/${GENUS}.replace.tsv |
         parallel --no-run-if-empty --linebuffer -k -j 1 "
             faops replace -s ${mytmpdir}/${GENUS}.fa <(echo {}) stdout
         " \
-        > PROTEINS/RNaseR/${GENUS}.pro.fa
+        > RNaseR/${GENUS}.pro.fa
         
     rm -fr ${mytmpdir}
 done
@@ -897,7 +898,7 @@ cat genus.list |
     parallel --no-run-if-empty --linebuffer -k -j 4 '
         echo "==> {}"
         
-        muscle -quiet -in PROTEINS/RNaseR/{}.pro.fa -out PROTEINS/RNaseR/{}.aln.fa
+        muscle -quiet -in RNaseR/{}.pro.fa -out RNaseR/{}.aln.fa
     '
 
 # newick trees
@@ -905,16 +906,16 @@ cat genus.list |
     parallel --no-run-if-empty --linebuffer -k -j 4 '
         echo "==> {}"
         
-        FastTree -quiet PROTEINS/RNaseR/{}.aln.fa > PROTEINS/RNaseR/{}.aln.newick
+        FastTree -quiet RNaseR/{}.aln.fa > RNaseR/{}.aln.newick
     '
 
 for GENUS in $(cat genus.list); do
-    cat PROTEINS/RNaseR/${GENUS}.pro.fa
+    cat RNaseR/${GENUS}.pro.fa
 done \
-    > PROTEINS/RNaseR/RNaseR.pro.fa
+    > RNaseR/RNaseR.pro.fa
 
-muscle -quiet -in PROTEINS/RNaseR/RNaseR.pro.fa -out PROTEINS/RNaseR/RNaseR.aln.fa
-FastTree -quiet PROTEINS/RNaseR/RNaseR.aln.fa > PROTEINS/RNaseR/RNaseR.aln.newick
+muscle -quiet -in RNaseR/RNaseR.pro.fa -out RNaseR/RNaseR.aln.fa
+FastTree -quiet RNaseR/RNaseR.aln.fa > RNaseR/RNaseR.aln.newick
 
 ```
 
