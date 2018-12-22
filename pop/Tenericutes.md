@@ -527,6 +527,13 @@ find ASSEMBLY -maxdepth 1 -type d |
     ' \
     > PROTEINS/RNaseR/strain_anno.txt
 
+```
+
+## Find all RNase R
+
+```bash
+cd ~/data/alignment/Tenericutes
+
 # Find all genes
 for GENUS in $(cat genus.list); do
     echo "==> GENUS [${GENUS}]"
@@ -536,8 +543,16 @@ for GENUS in $(cat genus.list); do
             grep "ribonuclease R" |
             cut -d" " -f 1 |
             sed "s/^>//" |
-            STRAIN=${STRAIN} perl -nl -e '
+            STRAIN=${STRAIN} perl -nl -MPath::Tiny -e '
+                BEGIN {
+                    our %seen = map {(split /\t/)[0] => 1} 
+                        grep {/\S/}
+                        path(q{RNaseR/RNB.replace.tsv})->lines({ chomp => 1});
+                }
+                
                 $n = $_;
+                next unless exists $seen{$n};
+                
                 $s = $n;
                 $s =~ s/\.\d+//;
                 printf qq{%s\t%s_%s\n}, $n, $ENV{STRAIN}, $s;
@@ -546,7 +561,7 @@ for GENUS in $(cat genus.list); do
         > PROTEINS/RNaseR/${GENUS}.replace.tsv
 done
 
-# 312
+# 301
 cat PROTEINS/RNaseR/*.replace.tsv | wc -l
 
 # extract sequences for each genus
