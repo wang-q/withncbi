@@ -294,7 +294,8 @@ parallel --no-run-if-empty --linebuffer -k -j 4 '
         > taxon/{}
     ' ::: Acholeplasma Entomoplasma Mesoplasma Spiroplasma Mycoplasma Ureaplasma
 
-echo "Ac_sp_CAG_878" >> taxon/Acholeplasma
+# Misplaced in taxonomy tree
+#echo "Ac_sp_CAG_878" >> taxon/Acholeplasma
 
 cat <<EOF >> taxon/Mycoplasma
 Mycop_sp_CAG_472
@@ -305,24 +306,33 @@ Mycop_sp_CAG_877
 Mycop_sp_CAG_956
 EOF
 
-cat <<EOF > taxon/Outgroup
-Ba_subt_subtilis_168
-Bu_ext_W1219
-Ca_mit_DSM_15897
-Cop_cat
-Cl_ace_ATCC_824
-Cl_bot_A_ATCC_3502
-Cl_tet_E88
-Er_lar
-Er_rhu_Fujisawa
-Eu_lim_KIST612
-Ho_fil_DSM_12042
-So_moo_F0204
-T_san_PC909
+cat <<EOF > taxon/Actinobacteria
 Am_med_U32
 Bi_ado_ATCC_15703
 Cor_glu_ATCC_13032
 Mycob_tub_H37Rv
+EOF
+
+cat <<EOF > taxon/Clostridiales
+Cl_ace_ATCC_824
+Cl_bot_A_ATCC_3502
+Cl_tet_E88
+Eu_lim_KIST612
+EOF
+
+cat <<EOF > taxon/Erysipelotrichaceae
+Bu_ext_W1219
+Ca_mit_DSM_15897
+Cop_cat
+Er_lar
+Er_rhu_Fujisawa
+Ho_fil_DSM_12042
+So_moo_F0204
+EOF
+
+cat <<EOF > taxon/Others
+Ba_subt_subtilis_168
+T_san_PC909
 EOF
 
 wc -l taxon/*
@@ -421,17 +431,14 @@ faops some PROTEINS/all.pro.fa \
         sort | uniq) \
     stdout |
     faops filter -u stdin stdout \
-    > PROTEINS/RNaseR/RNaseR.pro.fa
+    > PROTEINS/RNaseR/RNaseR.all.fa
 
 cat PROTEINS/all.pro.fa |
     grep "ribonuclease R" |
     wc -l
-cat PROTEINS/RNaseR/RNaseR.pro.fa |
+cat PROTEINS/RNaseR/RNaseR.all.fa |
     grep "^>" |
     wc -l
-
-muscle -quiet -in PROTEINS/RNaseR/RNaseR.pro.fa -out PROTEINS/RNaseR/RNaseR.aln.fa
-FastTree -quiet PROTEINS/RNaseR/RNaseR.aln.fa > PROTEINS/RNaseR/RNaseR.aln.newick
 
 # Strains and RNase R
 find ASSEMBLY -maxdepth 1 -type d |
@@ -502,6 +509,14 @@ cat genus.list |
         
         FastTree -quiet PROTEINS/RNaseR/{}.aln.fa > PROTEINS/RNaseR/{}.aln.newick
     '
+
+for GENUS in $(cat genus.list); do
+    cat PROTEINS/RNaseR/${GENUS}.pro.fa
+done \
+    > PROTEINS/RNaseR/RNaseR.pro.fa
+
+muscle -quiet -in PROTEINS/RNaseR/RNaseR.pro.fa -out PROTEINS/RNaseR/RNaseR.aln.fa
+FastTree -quiet PROTEINS/RNaseR/RNaseR.aln.fa > PROTEINS/RNaseR/RNaseR.aln.newick
 
 ```
 
