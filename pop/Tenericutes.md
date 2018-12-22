@@ -415,7 +415,8 @@ find ASSEMBLY -type f -name "*_protein.faa.gz" |
 
 ```
 
-# Find all RNase R
+# RNase R
+
 ## RNase R domains
 
 * OB_RNB (PF08206)
@@ -435,13 +436,61 @@ done
 
 ```
 
+## Scan every proteins
+
+```bash
+E_VALUE=1e-5
+
+cd ~/data/alignment/Tenericutes
+
+for domain in OB_RNB CSD2 RNB S1; do
+    echo 1>&2 "==> domain [${domain}]"
+        
+    for GENUS in $(cat genus.list); do
+        echo 1>&2 "==> GENUS [${GENUS}]"
+
+        for STRAIN in $(cat taxon/${GENUS}); do
+            gzip -dcf ASSEMBLY/${STRAIN}/*_protein.faa.gz |
+                hmmsearch -E ${E_VALUE} --domE ${E_VALUE} --noali --notextw RNaseR/HMM/${domain}.hmm - |
+                grep '>>' |
+                STRAIN=${STRAIN} perl -nl -e '
+                    />>\s+(\S+)/ or next;
+                    $n = $1;
+                    $s = $n;
+                    $s =~ s/\.\d+//;
+                    printf qq{%s\t%s_%s\n}, $n, $ENV{STRAIN}, $s;
+                '
+        done 
+    done \
+        > RNaseR/${domain}.replace.tsv
+    
+    echo 1>&2
+done
+
+wc -l RNaseR/*.replace.tsv
+#  217 RNaseR/OB_RNB.replace.tsv
+#  250 RNaseR/CSD2.replace.tsv
+#  315 RNaseR/RNB.replace.tsv
+#  696 RNaseR/S1.replace.tsv
+
+```
+
+## Stats of annotations and HMM models
+
+| Item             | Count |
+|:-----------------|------:|
+| "ribonuclease R" |   312 |
+| deduped          |   236 |
+| OB_RNB           |   164 |
+| CSD2             |   175 |
+| RNB              |   225 |
+| S1               |   205 |
 
 ```bash
 cd ~/data/alignment/Tenericutes
 
 mkdir -p PROTEINS/RNaseR
 
-# 312; deduped 236
 faops some PROTEINS/all.pro.fa \
     <(cat PROTEINS/all.pro.fa |
         grep "ribonuclease R" |
@@ -458,6 +507,13 @@ cat PROTEINS/all.pro.fa |
 cat PROTEINS/RNaseR/RNaseR.all.fa |
     grep "^>" |
     wc -l
+for domain in OB_RNB CSD2 RNB S1; do
+    cat PROTEINS/RNaseR/RNaseR.all.fa |
+        grep "^>" |
+        sed "s/^>//" |
+        grep -Fx -f <(cut -f 1 RNaseR/${domain}.replace.tsv) |
+        wc -l
+done
 
 # Strains and RNase R
 find ASSEMBLY -maxdepth 1 -type d |
