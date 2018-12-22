@@ -44,6 +44,7 @@ Key genera:
 * Mycoplasmatales
     * *Mycoplasma*: 2093
     * *Ureaplasma*: 2129
+    * *Candidatus Hepatoplasma*: 295595
 
 * *Candidatus Izimaplasma*: 1912503
 
@@ -101,7 +102,7 @@ mysql -ualignDB -palignDB ar_refseq -e "
         organism_name, species, genus, ftp_path, assembly_level
     FROM ar 
     WHERE 1=1
-        AND genus_id in (2147, 33926, 2086, 2152, 46238, 46239, 2132, 2093, 2129, 1912503, 471824, 1979191)
+        AND genus_id in (2147, 33926, 2086, 2152, 46238, 46239, 2132, 2093, 2129, 295595, 1912503, 471824, 1979191)
     " \
     > raw.tsv
 
@@ -128,7 +129,7 @@ mysql -ualignDB -palignDB ar_genbank -e "
         organism_name, species, genus, ftp_path, assembly_level
     FROM ar 
     WHERE 1=1
-        AND genus_id in (2147, 33926, 2086, 2152, 46238, 46239, 2132, 2093, 2129, 1912503, 471824, 1979191)
+        AND genus_id in (2147, 33926, 2086, 2152, 46238, 46239, 2132, 2093, 2129, 295595, 1912503, 471824, 1979191)
     " \
     >> raw.tsv
 
@@ -190,6 +191,7 @@ bp_taxonomy2tree.pl -e \
     -s "Asteroleplasma" \
     -s "Entomoplasma" \
     -s "Haloplasma" \
+    -s "Hepatoplasma" \
     -s "Inordinaticella" \
     -s "Izimaplasma" \
     -s "Mesoplasma" \
@@ -395,6 +397,7 @@ done
 | Mycoplasmatales   |                 |                    |         |         |
 |                   | Mycoplasma      | 支原体              |      86 |     207 |
 |                   | Ureaplasma      | 脲原体              |       4 |      25 |
+|                   | Hepatoplasma    |                    |       1 |       1 |
 | Unclassified      |                 |                    |         |         |
 |                   | Izimaplasma     | 独立生活             |         |       3 |
 | Haloplasmatales   |                 |                    |         |         |
