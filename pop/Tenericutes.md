@@ -416,6 +416,25 @@ find ASSEMBLY -type f -name "*_protein.faa.gz" |
 ```
 
 # Find all RNase R
+## RNase R domains
+
+* OB_RNB (PF08206)
+* CSD2 (PF17876)
+* RNB (PF00773)
+* S1 (PF00575)
+
+```bash
+cd ~/data/alignment/Tenericutes
+
+mkdir -p RNaseR/HMM
+cd RNaseR/HMM
+
+for ID in PF08206 PF17876 PF00773 PF00575; do
+    wget -N --content-disposition http://pfam.xfam.org/family/${ID}/hmm
+done
+
+```
+
 
 ```bash
 cd ~/data/alignment/Tenericutes
