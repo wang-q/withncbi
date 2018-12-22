@@ -19,6 +19,7 @@
     - [Scan every proteins](#scan-every-proteins)
     - [Stats of annotations and HMM models](#stats-of-annotations-and-hmm-models)
     - [Find all RNase R](#find-all-rnase-r)
+    - [Tweak the tree of RNaseR](#tweak-the-tree-of-rnaser)
 - [Tenericutes: run](#tenericutes-run)
 
 
@@ -702,7 +703,7 @@ cat species.count.tsv |
     ' \
     > species.monophyly.map
 
-# Merge strains in genus to higher-rank
+# Merge strains in species to higher-rank
 nw_rename PROTEINS/concat.map.newick species.monophyly.map |
     nw_condense - \
     > PROTEINS/concat.map2.newick
@@ -918,6 +919,61 @@ muscle -quiet -in RNaseR/RNaseR.pro.fa -out RNaseR/RNaseR.aln.fa
 FastTree -quiet RNaseR/RNaseR.aln.fa > RNaseR/RNaseR.aln.newick
 
 ```
+
+## Tweak the tree of RNaseR
+
+```bash
+cd ~/data/alignment/Tenericutes
+
+# reroot
+nw_reroot RNaseR/RNaseR.aln.newick Am_med_U32_YP_003763410 > RNaseR/RNaseR.reroot.newick
+
+nw_labels -I RNaseR/RNaseR.aln.newick > RNaseR.list
+
+# strains in species
+cat RNaseR.list |
+    perl -nl -e '/([[:alpha:]]+_[[:alpha:]]+)/ and print $1' |
+    perl -nl -e '!/_sp$/ and print' |
+    sort |
+    uniq -d -c |
+    perl -nla -e 'print qq{$F[1]\t$F[1]___$F[0]}' \
+    > species.count.tsv
+
+# Check monophyly for species
+rm species.monophyly.list species.paraphyly.list species.monophyly.map
+cat species.count.tsv |
+    perl -nl -MPath::Tiny -e '
+        BEGIN {
+            our @lists = 
+                grep {/\S/}
+                path(q{RNaseR.list})->lines({ chomp => 1});
+        }
+        
+        my @ns = split /\t/;
+        my @sts = grep {/^$ns[0]/} @lists;
+        
+        my $cmd = q{nw_clade -m RNaseR/RNaseR.reroot.newick };
+        $cmd .= " $_ " for @sts;
+        $cmd .= " | nw_stats -f l - | cut -f 3";
+        
+        my $result = `$cmd`;
+        if ($result) {
+            print qq{$_ $ns[1]} for @sts;
+            path(q{species.monophyly.list})->append($ns[0]);
+        }
+        else {
+            path(q{species.paraphyly.list})->append($ns[0]);
+        }
+    ' \
+    > species.monophyly.map
+
+# Merge strains in species to higher-rank
+nw_rename RNaseR/RNaseR.reroot.newick species.monophyly.map |
+    nw_condense - \
+    > RNaseR/RNaseR.map.newick
+
+```
+
 
 # Tenericutes: run
 
