@@ -175,7 +175,44 @@ bash ASSEMBLY/Tenericutes.assembly.collect.sh
 
 ```
 
+## NCBI taxonomy
+
+```bash
+cd ~/data/alignment/Tenericutes
+
+bp_taxonomy2tree.pl -e \
+    -s "Acholeplasma" \
+    -s "Entomoplasma" \
+    -s "Mesoplasma" \
+    -s "Mycoplasma" \
     -s "Spiroplasma" \
+    -s "Ureaplasma" \
+    -s "Bacillus subtilis" \
+    -s "Bulleidia extructa" \
+    -s "Catenibacterium mitsuokai" \
+    -s "Coprobacillus cateniformis" \
+    -s "Clostridium acetobutylicum" \
+    -s "Clostridium botulinum" \
+    -s "Clostridium tetani" \
+    -s "Erysipelothrix larvae" \
+    -s "Erysipelothrix rhusiopathiae" \
+    -s "Eubacterium limosum" \
+    -s "Holdemania filiformis" \
+    -s "Solobacterium moorei" \
+    -s "Turicibacter sanguinis" \
+    -s "Amycolatopsis mediterranei" \
+    -s "Bifidobacterium adolescentis" \
+    -s "Corynebacterium glutamicum" \
+    -s "Mycobacterium tuberculosis" \
+    > Tenericutes.newick
+
+nw_display -w 600 -s Tenericutes.newick |
+    rsvg-convert -o ~/Scripts/withncbi/pop/Tenericutes.png
+
+```
+
+![Tenericutes.png](Tenericutes.png)
+
 # Count strains
 
 ```bash
