@@ -464,8 +464,6 @@ cat PROTEINS/all.pro.fa |
 
 * RpoB: TIGR02013
 * EF-tu: TIGR00485
-* RNase_R: TIGR02063
-* 3_prime_RNase: TIGR00358
 
 ```bash
 E_VALUE=1e-20
@@ -501,7 +499,7 @@ for marker in BA000{01..40}; do
     echo
 done
 
-for marker in TIGR02013 TIGR00485 TIGR02063 TIGR00358; do
+for marker in TIGR02013 TIGR00485; do
     echo "==> marker [${marker}]"
     
     mkdir -p PROTEINS/${marker}
@@ -741,7 +739,7 @@ parallel --no-run-if-empty --linebuffer -k -j 4 "
     muscle -quiet -in PROTEINS/{}/{}.pro.fa -out PROTEINS/{}/{}.aln.fa
     
     FastTree -quiet PROTEINS/{}/{}.aln.fa > PROTEINS/{}/{}.aln.newick
-    " ::: TIGR02013 TIGR00485 TIGR02063 TIGR00358
+    " ::: TIGR02013 TIGR00485
 
 ```
 
@@ -757,6 +755,9 @@ parallel --no-run-if-empty --linebuffer -k -j 4 "
 * HTH_12 (PF08461)
 * RNase_II_C_S1 (PF18614)
 
+* RNase_R: TIGR02063
+* 3_prime_RNase: TIGR00358
+
 ```bash
 cd ~/data/alignment/Tenericutes
 
@@ -766,6 +767,9 @@ cd RNaseR/HMM
 for ID in PF08206 PF17876 PF00773 PF00575 PF08461 PF18614; do
     wget -N --content-disposition http://pfam.xfam.org/family/${ID}/hmm
 done
+
+cp ~/data/HMM/TIGRFAM/HMM/TIGR02063.HMM TIGR02063.hmm
+cp ~/data/HMM/TIGRFAM/HMM/TIGR00358.HMM TIGR00358.hmm
 
 ```
 
@@ -778,7 +782,7 @@ cd ~/data/alignment/Tenericutes
 
 mkdir -p RNaseR/domains
 
-for domain in OB_RNB CSD2 RNB S1 HTH_12 RNase_II_C_S1; do
+for domain in OB_RNB CSD2 RNB S1 HTH_12 RNase_II_C_S1 TIGR02063 TIGR00358; do
     echo 1>&2 "==> domain [${domain}]"
         
     for GENUS in $(cat genus.list); do
@@ -809,6 +813,8 @@ wc -l RNaseR/domains/*.replace.tsv
 #  696 RNaseR/domains/S1.replace.tsv
 #   21 RNaseR/domains/HTH_12.replace.tsv
 #    2 RNaseR/domains/RNase_II_C_S1.replace.tsv
+#  329 RNaseR/domains/TIGR00358.replace.tsv
+#  426 RNaseR/domains/TIGR02063.replace.tsv
 
 ```
 
