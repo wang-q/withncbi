@@ -860,18 +860,19 @@ echo -e '#name\tOB_RNB\tCSD2\tRNB\tS1\tHTH_12\tRNase_II_C_S1\tTIGR02063\tTIGR003
 | Item             | Count |
 |:-----------------|------:|
 | "ribonuclease R" |   312 |
-| deduped          |   236 |
+| " RNB "          |     7 |
+| deduped          |   243 |
 | OB_RNB           |   200 |
-| CSD2             |   198 |
-| RNB              |   225 |
-| S1               |   212 |
+| CSD2             |   204 |
+| RNB              |   232 |
+| S1               |   213 |
 
 ```bash
 cd ~/data/alignment/Tenericutes
 
 faops some PROTEINS/all.pro.fa \
     <(cat PROTEINS/all.pro.fa |
-        grep "ribonuclease R" |
+        grep -e "ribonuclease R" -e " RNB " |
         cut -d" " -f 1 |
         sed "s/^>//" |
         sort | uniq) \
@@ -881,6 +882,9 @@ faops some PROTEINS/all.pro.fa \
 
 cat PROTEINS/all.pro.fa |
     grep "ribonuclease R" |
+    wc -l
+cat PROTEINS/all.pro.fa |
+    grep " RNB " |
     wc -l
 cat RNaseR/RNaseR.all.fa |
     grep "^>" |
@@ -899,7 +903,7 @@ find ASSEMBLY -maxdepth 1 -type d |
     grep 'ASSEMBLY/' |
     parallel --no-run-if-empty --linebuffer -k -j 4 '
         gzip -dcf {}/*_protein.faa.gz |
-            grep "ribonuclease R" |
+            grep -e "ribonuclease R" -e " RNB " |
             (echo {} && cat)
         echo
     ' \
@@ -918,7 +922,7 @@ for GENUS in $(cat genus.list); do
 
     for STRAIN in $(cat taxon/${GENUS}); do
         gzip -dcf ASSEMBLY/${STRAIN}/*_protein.faa.gz |
-            grep "ribonuclease R" |
+            grep -e "ribonuclease R" -e " RNB " |
             cut -d" " -f 1 |
             sed "s/^>//" |
             STRAIN=${STRAIN} perl -nl -MPath::Tiny -e '
@@ -929,17 +933,20 @@ for GENUS in $(cat genus.list); do
                 }
                 
                 $n = $_;
-                next unless exists $seen{$n};
-                
                 $s = $n;
                 $s =~ s/\.\d+//;
-                printf qq{%s\t%s_%s\n}, $n, $ENV{STRAIN}, $s;
+                if (exists $seen{$n}) {
+                    printf qq{%s\t%s_%s\n}, $n, $ENV{STRAIN}, $s;
+                }
+                else {
+                    printf STDERR qq{%s\t%s_%s\n}, $n, $ENV{STRAIN}, $s;
+                }
             '
     done \
         > RNaseR/${GENUS}.replace.tsv
 done
 
-# 301
+# 308
 cat RNaseR/*.replace.tsv | wc -l
 
 # extract sequences for each genus
@@ -987,6 +994,18 @@ muscle -quiet -in RNaseR/RNaseR.pro.fa -out RNaseR/RNaseR.aln.fa
 FastTree -quiet RNaseR/RNaseR.aln.fa > RNaseR/RNaseR.aln.newick
 
 ```
+
+Annotated as RNase R but lacking RNB domain:
+
+* YP_003767465.1 Am_med_U32_YP_003767465
+* WP_011014519.1 Cor_glu_ATCC_13032_WP_011014519
+* NP_217110.1 Mycob_tub_H37Rv_NP_217110
+* YP_001255798.1 Cl_bot_A_ATCC_3502_YP_001255798
+* OAL10424.1 Mycop_Chaemob_OAL10424
+* AFO52271.1 Mycop_Chaemol_Purdue_AFO52271
+* AEG72387.1 Mycop_haemof_Ohio2_AEG72387
+* WP_112665413.1 Mycop_wen_WP_112665413
+
 
 ## Tweak the tree of RNaseR
 
