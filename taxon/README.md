@@ -979,12 +979,15 @@ Manually check strains not containing singular link.
 
 | count | lines |
 |------:|------:|
-|   122 |     0 |
-|   701 |     1 |
-|    15 |     2 |
-|     7 |     3 |
+|   155 |     0 |
+|  1709 |     1 |
+|    36 |     2 |
+|    17 |     3 |
+|     1 |     4 |
+|     1 |     5 |
 |     1 |     8 |
 |     1 |    10 |
+#there are 2 special strains which have no IR but a palindromic sequence.(Asa_sieboldii,Epipo_aphyllum)
 
 Create `ir_lsc_ssc.tsv` for slicing alignments.
 
@@ -1116,150 +1119,215 @@ cat plastid.ABBR.csv \
 
 ### Can't get clear ir information
 
-  * Aegilops
-      * Aeg_cylindrica 
-      * Aeg_geniculata 
-      * Aeg_speltoides 
-      * Aeg_tauschii 
-  * Amentotaxus
-      * Ame_argotaenia 
-      * Ame_formosana 
-  * Astragalus
-      * Astra_mongholicus 
-      * Astra_nakaianus 
-  * Babesia
-      * Bab_orientalis 
-  * Callitropsis
-      * Call_nootkatensis 
-      * Call_vietnamensis  
-  * Cephalotaxus
-      * Cephalo_oliveri 
-      * Cephalo_wilsoniana 
-  * Ceramium
-      * Ceram_cimbricum 
-      * Ceram_japonicum 
-  * Chlorella
-      * Chlore_sorokiniana 
-      * Chlore_variabilis 
-      * Chlore_vulgaris  
-  * Cupressus
-      * Cup_gigantea 
-      * Cup_sempervirens 
-  * Epipogium
-      * Epipo_aphyllum 
-      * Epipo_roseum 
-  * Erodium
-      * Ero_carvifolium 
-      * Ero_crassifolium 
-      * Ero_manescavi 
-      * Ero_rupestre 
-      * Ero_texanum 
-  * Euglena
-      * Euglena_viridis 
-      * Euglena_gracilis 
-  * Fragaria
-      * Fra_mandshurica 
-      * Fra_vesca_subsp_bracteata 
-  * Gelidium
-      * Gelidi_elegans 
-      * Gelidi_vagum 
-  * Geranium
-      * Ger_incanum 
-  * Gracilaria
-      * Gracilaria_chilensis 
-      * Gracilaria_chorda 
-      * Gracilaria_salicornia 
-      * Gracilaria_tenuistipitata_var_liui 
-  * Hildenbrandia
-      * Hild_rivularis 
-      * Hild_rubra 
-  * Juniperus
-      * Jun_bermudiana 
-      * Jun_cedrus 
-      * Jun_monosperma 
-      * Jun_scopulorum 
-      * Jun_virginiana 
-  * Lathyrus
-      * Lathy_clymenum 
-      * Lathy_davidii 
-      * Lathy_graminifolius 
-      * Lathy_inconspicuus 
-      * Lathy_japonicus 
-      * Lathy_littoralis 
-      * Lathy_ochroleucus 
-      * Lathy_odoratus 
-      * Lathy_palustris 
-      * Lathy_sativus 
-      * Lathy_tingitanus 
-      * Lathy_venosus 
-  * Liagora
-      * Liagora_brachyclada 
-      * Liagora_harveyana 
-  * Medicago
-      * Med_hybrida 
-      * Med_papillosa 
-      * Med_truncatula 
-  * Monomorphina
-      * Mono_parapyrum 
-  * Monsonia
-      * Mons_marlothii 
-      * Mons_emarginata
-      * Mons_marlothii
-  * Oryza
-      * Oryza_glaberrima 
-  * Picea
-      * Pic_abies
-      * Pic_glauca
-      * Pic_jezoensis
-      * Pic_morrisonicola
-      * Pic_sitchensis 
-  * Pilostyles
-      * Pil_aethiopica 
-      * Pil_hamiltonii  
-  * Pinus
-      * Pinus_bungeana 
-      * Pinus_contorta 
-      * Pinus_gerardiana 
-      * Pinus_krempfii 
-      * Pinus_lambertiana 
-      * Pinus_longaeva 
-      * Pinus_massoniana 
-      * Pinus_monophylla 
-      * Pinus_nelsonii 
-      * Pinus_sibirica 
-      * Pinus_strobus 
-      * Pinus_tabuliformis 
-      * Pinus_taeda 
-      * Pinus_taiwanensis 
-      * Pinus_thunbergii 
-  * Plasmodium
-      * Plas_chabaudi_chabaudi 
-      * Plas_falciparum 
-      * Plas_falciparum_HB3 
-      * Plas_ovale 
-  * Podocarpus
-      * Pod_totara  
-  * Pyropia
-      * Pyro_perforata 
-  * Taiwania
-      * Tai_cryptomerioides 
-      * Tai_flousiana 
-  * Trifolium
-      * Trif_subterraneum 
-      * Trif_aureum 
-      * Trif_boissieri 
-      * Trif_glanduliferum 
-      * Trif_grandiflorum 
-      * Trif_meduseum 
-      * Trif_strictum 
-  * Triticum
-      * Trit_urartu 
-  * Ulva
-      * Ul_fasciata 
-      * Ul_linza 
-  * Wisteria
-      * Wis_floribunda 
-      * Wis_sinensis   
+   * Grateloupia
+       *Grat_filicina
+       *Grat_taiwanensis
+   * Caulerpa
+       *Cau_cliftonii
+       *Cau_racemosa
+   * Caloglossa
+       *Calog_beccarii
+       *Calog_intermedia
+       *Calog_monosticha
+   * Pisum
+       *Pisum_fulvum
+       *Pisum_sativum
+       *Pisum_sativum_subsp_elatius
+   * Dasya
+       *Dasya_naccarioides
+   * Diplazium
+       *Diplazium_unilobum
+   * Bryopsis
+       *Bryop_plumosa
+       *Bryop_sp_HV04063
+       *Bry_sp_HV04063
+   * Medicago
+       *Med_falcata
+       *Med_hybrida
+       *Med_papillosa
+       *Med_truncatula
+   * Aegilops
+       *Aeg_cylindrica
+       *Aeg_geniculata
+       *Aeg_speltoides
+       *Aeg_tauschii
+   * Prototheca
+       *Prot_cutis
+       *Prot_stagnorum
+       *Prot_zopfii
+   * Cryptomonas
+       *Cryptomo_curvata
+       *Cryptomo_paramecium
+   * Monotropa
+       *Monotropa_hypopitys
+   * Liagora
+       *Liagora_brachyclada
+       *Liagora_harveyana
+   * Taiwania
+       *Tai_cryptomerioides
+       *Tai_flousiana
+   * Pinus
+       *Pinus_armandii
+       *Pinus_bungeana
+       *Pinus_contorta
+       *Pinus_gerardiana
+       *Pinus_greggii
+       *Pinus_jaliscana
+       *Pinus_koraiensis
+       *Pinus_krempfii
+       *Pinus_lambertiana
+       *Pinus_longaeva
+       *Pinus_massoniana
+       *Pinus_monophylla
+       *Pinus_nelsonii
+       *Pinus_oocarpa
+       *Pinus_pinea
+       *Pinus_sibirica
+       *Pinus_strobus
+       *Pinus_sylvestris
+       *Pinus_tabuliformis
+       *Pinus_taeda
+       *Pinus_taiwanensis
+       *Pinus_thunbergii
+   * Taxus
+       *Taxus_mairei
+   * Picea
+       *Pic_abies
+       *Pic_asperata
+       *Pic_crassifolia
+       *Pic_glauca
+       *Pic_jezoensis
+       *Pic_morrisonicola
+       *Pic_sitchensis
+   * Gracilariopsis
+       *Gracilario_chorda
+       *Gracilario_lemaneiformis
+   * Fragaria
+       *Frag_mandshurica
+       *Frag_vesca_subsp_bracteata
+   * Ulva
+       *Ulva_fasciata
+       *Ulva_flexuosa
+       *Ulva_linza
+       *Ulva_prolifera
+   * Monomorphina
+       *Monom_parapyrum
+   * Epipogium
+       *Epipo_aphyllum
+   * Euglena
+       *Euglena_archaeoplastidiata
+       *Euglena_viridis
+   * Chlorella
+       *Chlore_heliozoae
+       *Chlore_sorokiniana
+       *Chlore_variabilis
+       *Chlore_vulgaris
+   * Erodium
+       *Ero_carvifolium
+       *Ero_crassifolium
+       *Ero_manescavi
+       *Ero_rupestre
+   * Larix
+       *Lar_decidua
+       *Lar_sibirica
+   * Amentotaxus
+       *Ame_argotaenia
+       *Ame_formosana
+   * Pyropia
+       *Pyro_perforata
+   * Ceramium
+       *Ceram_cimbricum
+       *Ceram_japonicum
+       *Ceram_sungminbooi
+   * Hildenbrandia
+       *Hilde_rivularis
+       *Hilde_rubra
+   * Pilostyles
+       *Pilo_aethiopica
+       *Pilo_hamiltonii
+   * Codium
+       *Codi_decorticatum
+       *Codi_sp_arenicola
+   * Torreya
+       *Torreya_fargesii
+       *Torreya_grandis
+   * Vertebrata
+       *Vert_australis
+       *Vert_isogona
+       *Vert_lanosa
+       *Vert_thuyoides
+   * Wisteria
+       *Wis_floribunda
+       *Wis_sinensis
+   * Phelipanche
+       *Pheli_purpurea
+       *Pheli_ramosa
+   * Glycyrrhiza
+       *Glycy_glabra
+       *Glycy_lepidota
+   * Cephalotaxus
+       *Cephalo_wilsoniana
+   * Polysiphonia
+       *Polysi_brodiei
+       *Polysi_elongata
+       *Polysi_infestans
+       *Polysi_schneideri
+       *Polysi_scopulorum
+       *Polysi_sertularioides
+       *Polysi_stricta
+   * Lathyrus
+       *Lathy_clymenum
+       *Lathy_davidii
+       *Lathy_graminifolius
+       *Lathy_inconspicuus
+       *Lathy_littoralis
+       *Lathy_ochroleucus
+       *Lathy_odoratus
+       *Lathy_palustris
+       *Lathy_sativus
+       *Lathy_tingitanus
+   * Babesia
+       *Bab_orientalis
+   * Gelidium
+       *Gelidi_elegans
+       *Gelidi_vagum
+   * Bostrychia
+       *Bos_moritziana
+       *Bos_simpliciuscula
+       *Bos_tenella
+   * Membranoptera
+       *Mem_platyphylla
+       *Mem_tenuis
+       *Mem_weeksiae
+   * Astragalus
+       *Astra_mongholicus
+       *Astra_mongholicus_var_nakaianus
+   * Asarum
+       *Asa_minus
+       *Asa_sieboldii
+   * Gracilaria
+       *Gracilaria_changii
+       *Gracilaria_chilensis
+       *Gracilaria_firma
+       *Gracilaria_salicornia
+       *Gracilaria_tenuistipitata_var_liui
+       *Gracilaria_vermiculophylla
+   * Plasmodium
+       *Plas_chabaudi_chabaudi
+       *Plas_falciparum_HB3
+       *Plas_gallinaceum
+       *Plas_relictum
+       *Plas_vivax
+   * Triticum
+       *Trit_urartu
+   * Trifolium
+       *Trif_aureum
+       *Trif_boissieri
+       *Trif_glanduliferum
+       *Trif_grandiflorum
+       *Trif_strictum
+
+#*:there are 2 special strains which has only one palindromic sequence rather than IR.(as mentioned before)
 
 ### Slices of IR, LSC and SSC
 
@@ -1601,6 +1669,7 @@ cat list.tmp \
     | sort -n -t',' -k8,8 \
     | cut -d',' -f 1-7 \
     >> plastid.list.csv
+# 1905
 
 rm *.tmp
 ```
