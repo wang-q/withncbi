@@ -776,7 +776,7 @@ cp ~/data/HMM/TIGRFAM/HMM/TIGR00358.HMM TIGR00358.hmm
 ## Scan every proteins
 
 ```bash
-E_VALUE=1e-5
+E_VALUE=1e-3
 
 cd ~/data/alignment/Tenericutes
 
@@ -807,14 +807,15 @@ for domain in OB_RNB CSD2 RNB S1 HTH_12 RNase_II_C_S1 TIGR02063 TIGR00358; do
 done
 
 wc -l RNaseR/domains/*.replace.tsv
-#  217 RNaseR/domains/OB_RNB.replace.tsv
-#  250 RNaseR/domains/CSD2.replace.tsv
-#  315 RNaseR/domains/RNB.replace.tsv
-#  696 RNaseR/domains/S1.replace.tsv
-#   21 RNaseR/domains/HTH_12.replace.tsv
-#    2 RNaseR/domains/RNase_II_C_S1.replace.tsv
-#  329 RNaseR/domains/TIGR00358.replace.tsv
-#  426 RNaseR/domains/TIGR02063.replace.tsv
+#   376 RNaseR/domains/OB_RNB.replace.tsv
+#   283 RNaseR/domains/CSD2.replace.tsv
+#   317 RNaseR/domains/RNB.replace.tsv
+#   854 RNaseR/domains/S1.replace.tsv
+#   125 RNaseR/domains/HTH_12.replace.tsv
+#    88 RNaseR/domains/RNase_II_C_S1.replace.tsv
+#   389 RNaseR/domains/TIGR00358.replace.tsv
+#   490 RNaseR/domains/TIGR02063.replace.tsv
+
 
 ```
 
@@ -824,10 +825,10 @@ wc -l RNaseR/domains/*.replace.tsv
 |:-----------------|------:|
 | "ribonuclease R" |   312 |
 | deduped          |   236 |
-| OB_RNB           |   164 |
-| CSD2             |   175 |
+| OB_RNB           |   200 |
+| CSD2             |   198 |
 | RNB              |   225 |
-| S1               |   205 |
+| S1               |   212 |
 
 ```bash
 cd ~/data/alignment/Tenericutes
