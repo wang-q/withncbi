@@ -816,6 +816,42 @@ wc -l RNaseR/domains/*.replace.tsv
 #   389 RNaseR/domains/TIGR00358.replace.tsv
 #   490 RNaseR/domains/TIGR02063.replace.tsv
 
+# All proteins appeared
+find RNaseR/domains/ -name "*.replace.tsv" |
+    sort |
+    parallel -j 1 'cut -f 2 {}' |
+    sort -u \
+    > RNaseR/domains/domains.tsv
+wc -l RNaseR/domains/domains.tsv
+#1094 RNaseR/domains/domains.tsv
+
+# Status of domains
+for domain in OB_RNB CSD2 RNB S1 HTH_12 RNase_II_C_S1 TIGR02063 TIGR00358; do
+    echo 1>&2 "==> domain [${domain}]"
+
+    tsv-join \
+        RNaseR/domains/domains.tsv \
+        --data-fields 1 \
+        -f <(
+            cat RNaseR/domains/${domain}.replace.tsv |
+                perl -nla -e 'print qq{$F[1]\tO}' 
+        ) \
+        --key-fields 1 \
+        --append-fields 2 \
+        --write-all "" \
+        > RNaseR/domains/tmp.tsv
+        
+    mv RNaseR/domains/tmp.tsv RNaseR/domains/domains.tsv
+
+    echo 1>&2
+done
+
+datamash check < RNaseR/domains/domains.tsv
+#1094 lines, 9 fields
+
+# Add header line
+echo -e '#name\tOB_RNB\tCSD2\tRNB\tS1\tHTH_12\tRNase_II_C_S1\tTIGR02063\tTIGR00358' | 
+    cat - RNaseR/domains/domains.tsv > temp && mv temp RNaseR/domains/domains.tsv
 
 ```
 
