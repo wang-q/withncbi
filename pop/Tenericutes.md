@@ -589,7 +589,7 @@ done
 cd ~/data/alignment/Tenericutes
 
 # extract sequences 
-for marker in $(cat marker.list) TIGR02013 TIGR00485 TIGR02063 TIGR00358; do
+for marker in $(cat marker.list) TIGR02013 TIGR00485; do
     echo "==> marker [${marker}]"
 
     for GENUS in $(cat genus.list); do
@@ -614,7 +614,7 @@ for marker in $(cat marker.list) TIGR02013 TIGR00485 TIGR02063 TIGR00358; do
     echo
 done
 
-for marker in $(cat marker.list) TIGR02013 TIGR00485 TIGR02063 TIGR00358; do
+for marker in $(cat marker.list) TIGR02013 TIGR00485; do
     echo "==> marker [${marker}]"
     
     for GENUS in $(cat genus.list); do
