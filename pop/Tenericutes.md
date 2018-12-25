@@ -424,26 +424,19 @@ cd ~/data/alignment/Tenericutes
 
 mkdir -p PROTEINS
 
-# 350
+# 352
 find ASSEMBLY -maxdepth 1 -type d |
     sort |
     grep 'ASSEMBLY/' |
     wc -l
 
-# 344
+# 346
 find ASSEMBLY -type f -name "*_protein.faa.gz" |
     wc -l
 
 find ASSEMBLY -type f -name "*_protein.faa.gz" |
     xargs gzip -dcf \
     > PROTEINS/all.pro.fa
-
-#find ASSEMBLY -type f -name "*_translated_cds.faa.gz" |
-#    xargs gzip -dcf \
-#    > RNaseR/all.tcds.fa
-#
-#cat RNaseR/all.tcds.fa |
-#    grep "ribonuclease R"
 
 # ribonuclease
 cat PROTEINS/all.pro.fa |
@@ -661,7 +654,7 @@ FastTree -quiet PROTEINS/concat.aln.fa > PROTEINS/concat.aln.newick
 cd ~/data/alignment/Tenericutes
 
 # reroot
-nw_reroot PROTEINS/concat.aln.newick Am_med_U32 Bi_ado_ATCC_15703 > PROTEINS/concat.reroot.newick
+nw_reroot PROTEINS/concat.aln.newick Am_med_U32 Es_coli_K_12_MG1655 > PROTEINS/concat.reroot.newick
 
 # Check monophyly for genus
 rm genus.monophyly.list genus.paraphyly.list genus.monophyly.map
@@ -764,7 +757,9 @@ parallel --no-run-if-empty --linebuffer -k -j 4 "
 * S1 (PF00575)
 
 * HTH_12 (PF08461)
+* Importin_rep (PF18773)
 * RNase_II_C_S1 (PF18614)
+* Rrp44_S1 (PF17215)
 
 * RNase_R: TIGR02063
 * 3_prime_RNase: TIGR00358
@@ -775,7 +770,7 @@ cd ~/data/alignment/Tenericutes
 mkdir -p RNaseR/HMM
 cd RNaseR/HMM
 
-for ID in PF08206 PF17876 PF00773 PF00575 PF08461 PF18614; do
+for ID in PF08206 PF17876 PF00773 PF00575 PF08461 PF18773 PF18614 PF17215; do
     wget -N --content-disposition http://pfam.xfam.org/family/${ID}/hmm
 done
 
@@ -793,7 +788,7 @@ cd ~/data/alignment/Tenericutes
 
 mkdir -p RNaseR/domains
 
-for domain in OB_RNB CSD2 RNB S1 HTH_12 RNase_II_C_S1 TIGR02063 TIGR00358; do
+for domain in OB_RNB CSD2 RNB S1 HTH_12 Importin_rep RNase_II_C_S1 Rrp44_S1 TIGR02063 TIGR00358; do
     echo 1>&2 "==> domain [${domain}]"
         
     for GENUS in $(cat genus.list); do
@@ -818,14 +813,16 @@ for domain in OB_RNB CSD2 RNB S1 HTH_12 RNase_II_C_S1 TIGR02063 TIGR00358; do
 done
 
 wc -l RNaseR/domains/*.replace.tsv
-#   376 RNaseR/domains/OB_RNB.replace.tsv
-#   283 RNaseR/domains/CSD2.replace.tsv
-#   317 RNaseR/domains/RNB.replace.tsv
-#   854 RNaseR/domains/S1.replace.tsv
-#   125 RNaseR/domains/HTH_12.replace.tsv
-#    88 RNaseR/domains/RNase_II_C_S1.replace.tsv
-#   389 RNaseR/domains/TIGR00358.replace.tsv
-#   490 RNaseR/domains/TIGR02063.replace.tsv
+#   392 RNaseR/domains/OB_RNB.replace.tsv
+#   287 RNaseR/domains/CSD2.replace.tsv
+#   320 RNaseR/domains/RNB.replace.tsv
+#   869 RNaseR/domains/S1.replace.tsv
+#   129 RNaseR/domains/HTH_12.replace.tsv
+#     6 RNaseR/domains/Importin_rep.replace.tsv
+#    90 RNaseR/domains/RNase_II_C_S1.replace.tsv
+#     1 RNaseR/domains/Rrp44_S1.replace.tsv
+#   400 RNaseR/domains/TIGR00358.replace.tsv
+#   499 RNaseR/domains/TIGR02063.replace.tsv
 
 # All proteins appeared
 find RNaseR/domains/ -name "*.replace.tsv" |
@@ -834,10 +831,10 @@ find RNaseR/domains/ -name "*.replace.tsv" |
     sort -u \
     > RNaseR/domains/domains.tsv
 wc -l RNaseR/domains/domains.tsv
-#1094 RNaseR/domains/domains.tsv
+#1126 RNaseR/domains/domains.tsv
 
 # Status of domains
-for domain in OB_RNB CSD2 RNB S1 HTH_12 RNase_II_C_S1 TIGR02063 TIGR00358; do
+for domain in OB_RNB CSD2 RNB S1 HTH_12 Importin_rep RNase_II_C_S1 Rrp44_S1 TIGR02063 TIGR00358; do
     echo 1>&2 "==> domain [${domain}]"
 
     tsv-join \
@@ -858,32 +855,34 @@ for domain in OB_RNB CSD2 RNB S1 HTH_12 RNase_II_C_S1 TIGR02063 TIGR00358; do
 done
 
 datamash check < RNaseR/domains/domains.tsv
-#1094 lines, 9 fields
+#1126 lines, 11 fields
 
 # Add header line
-echo -e '#name\tOB_RNB\tCSD2\tRNB\tS1\tHTH_12\tRNase_II_C_S1\tTIGR02063\tTIGR00358' | 
+echo -e '#name\tOB_RNB\tCSD2\tRNB\tS1\tHTH_12\tImportin_rep\tRNase_II_C_S1\tRrp44_S1\tTIGR02063\tTIGR00358' | 
     cat - RNaseR/domains/domains.tsv > temp && mv temp RNaseR/domains/domains.tsv
 
 ```
 
 ## Stats of annotations and HMM models
 
-| Item             | Count |
-|:-----------------|------:|
-| "ribonuclease R" |   312 |
-| " RNB "          |     7 |
-| deduped          |   243 |
-| OB_RNB           |   200 |
-| CSD2             |   204 |
-| RNB              |   232 |
-| S1               |   213 |
+| Item               | Count |
+|:-------------------|------:|
+| " ribonuclease R " |   307 |
+| " RNB "            |     6 |
+| " RNase II "       |     1 |
+| " RNase R "        |     2 |
+| deduped            |   239 |
+| OB_RNB             |   199 |
+| CSD2               |   203 |
+| RNB                |   231 |
+| S1                 |   213 |
 
 ```bash
 cd ~/data/alignment/Tenericutes
 
 faops some PROTEINS/all.pro.fa \
     <(cat PROTEINS/all.pro.fa |
-        grep -e "ribonuclease R" -e " RNB " |
+        grep -e " ribonuclease R " -e " RNB " -e " RNase II " -e " RNase R " |
         cut -d" " -f 1 |
         sed "s/^>//" |
         sort | uniq) \
@@ -892,10 +891,16 @@ faops some PROTEINS/all.pro.fa \
     > RNaseR/RNaseR.all.fa
 
 cat PROTEINS/all.pro.fa |
-    grep "ribonuclease R" |
+    grep " ribonuclease R " |
     wc -l
 cat PROTEINS/all.pro.fa |
     grep " RNB " |
+    wc -l
+cat PROTEINS/all.pro.fa |
+    grep " RNase II " |
+    wc -l
+cat PROTEINS/all.pro.fa |
+    grep " RNase R " |
     wc -l
 cat RNaseR/RNaseR.all.fa |
     grep "^>" |
@@ -914,7 +919,7 @@ find ASSEMBLY -maxdepth 1 -type d |
     grep 'ASSEMBLY/' |
     parallel --no-run-if-empty --linebuffer -k -j 4 '
         gzip -dcf {}/*_protein.faa.gz |
-            grep -e "ribonuclease R" -e " RNB " |
+            grep -e " ribonuclease R " -e " RNB " -e " RNase II " -e " RNase R " |
             (echo {} && cat)
         echo
     ' \
@@ -933,7 +938,7 @@ for GENUS in $(cat genus.list); do
 
     for STRAIN in $(cat taxon/${GENUS}); do
         gzip -dcf ASSEMBLY/${STRAIN}/*_protein.faa.gz |
-            grep -e "ribonuclease R" -e " RNB " |
+            grep -e " ribonuclease R " -e " RNB " -e " RNase II " -e " RNase R "|
             cut -d" " -f 1 |
             sed "s/^>//" |
             STRAIN=${STRAIN} perl -nl -MPath::Tiny -e '
@@ -1006,17 +1011,13 @@ FastTree -quiet RNaseR/RNaseR.aln.fa > RNaseR/RNaseR.aln.newick
 
 ```
 
-Annotated as RNase R but lacking RNB domain:
+Annotated as RNase R but lacking RNB domains:
 
-* YP_003767465.1 Am_med_U32_YP_003767465
-* WP_011014519.1 Cor_glu_ATCC_13032_WP_011014519
-* NP_217110.1 Mycob_tub_H37Rv_NP_217110
-* YP_001255798.1 Cl_bot_A_ATCC_3502_YP_001255798
 * OAL10424.1 Mycop_Chaemob_OAL10424
 * AFO52271.1 Mycop_Chaemol_Purdue_AFO52271
 * AEG72387.1 Mycop_haemof_Ohio2_AEG72387
 * WP_112665413.1 Mycop_wen_WP_112665413
-
+* NP_462407.3 Sa_ente_Typhimurium_LT2_NP_462407
 
 ## Tweak the tree of RNaseR
 
