@@ -1073,6 +1073,71 @@ nw_rename RNaseR/RNaseR.reroot.newick species.monophyly.map |
 
 ```
 
+## RNB domain
+
+```bash
+E_VALUE=1e-3
+
+cd ~/data/alignment/Tenericutes
+
+hmmsearch \
+    -E ${E_VALUE} --domE ${E_VALUE} \
+    -A RNaseR/RNB.sto DOMAINS/HMM/RNB.hmm RNaseR/RNaseR.pro.fa
+
+esl-reformat fasta RNaseR/RNB.sto > RNaseR/RNB.pro.fa
+
+muscle -quiet -in RNaseR/RNB.pro.fa -out RNaseR/RNB.aln.fa
+FastTree -quiet RNaseR/RNB.aln.fa > RNaseR/RNB.aln.newick
+
+# reroot
+nw_reroot RNaseR/RNB.aln.newick Am_med_U32_YP_003763410/46-352 > RNaseR/RNB.reroot.newick
+
+nw_labels -I RNaseR/RNB.aln.newick > RNB.list
+
+# strains in species
+cat RNB.list |
+    perl -nl -e '/([[:alpha:]]+_[[:alpha:]]+)/ and print $1' |
+    perl -nl -e '!/_sp$/ and print' |
+    sort |
+    uniq -d -c |
+    perl -nla -e 'print qq{$F[1]\t$F[1]___$F[0]}' \
+    > species.count.tsv
+
+# Check monophyly for species
+rm species.monophyly.list species.paraphyly.list species.monophyly.map
+cat species.count.tsv |
+    perl -nl -MPath::Tiny -e '
+        BEGIN {
+            our @lists = 
+                grep {/\S/}
+                path(q{RNB.list})->lines({ chomp => 1});
+        }
+        
+        my @ns = split /\t/;
+        my @sts = grep {/^$ns[0]/} @lists;
+        
+        my $cmd = q{nw_clade -m RNaseR/RNB.reroot.newick };
+        $cmd .= " $_ " for @sts;
+        $cmd .= " | nw_stats -f l - | cut -f 3";
+        
+        my $result = `$cmd`;
+        if ($result) {
+            print qq{$_ $ns[1]} for @sts;
+            path(q{species.monophyly.list})->append($ns[0]);
+        }
+        else {
+            path(q{species.paraphyly.list})->append($ns[0]);
+        }
+    ' \
+    > species.monophyly.map
+
+# Merge strains in species to higher-rank
+nw_rename RNaseR/RNB.reroot.newick species.monophyly.map |
+    nw_condense - \
+    > RNaseR/RNB.map.newick
+
+```
+
 
 # Tenericutes: run
 
