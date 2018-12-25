@@ -85,6 +85,10 @@ Outgroup:
     * Corynebacterium glutamicum ATCC 13032: 196627
     * Mycobacterium tuberculosis H37Rv: 83332
 
+*  Gammaproteobacteria
+    * Escherichia coli str. K-12 substr. MG1655: 511145
+    * Salmonella enterica subsp. enterica serovar Typhimurium str. LT2: 99287
+
 Check NCBI pages:
 
 * http://www.ncbi.nlm.nih.gov/assembly/?term=txid2093%5BOrganism:exp%5D
@@ -121,7 +125,7 @@ mysql -ualignDB -palignDB ar_refseq -e "
         organism_name, species, genus, ftp_path, assembly_level
     FROM ar 
     WHERE 1=1
-        AND taxonomy_id in (83332, 196627, 749927, 367928)
+        AND taxonomy_id in (749927, 367928, 196627, 83332, 511145, 99287)
     " \
     >> raw.tsv
 
@@ -217,6 +221,8 @@ bp_taxonomy2tree.pl -e \
     -s "Bifidobacterium adolescentis" \
     -s "Corynebacterium glutamicum" \
     -s "Mycobacterium tuberculosis" \
+    -s "Escherichia coli" \
+    -s "Salmonella enterica" \
     > Tenericutes.newick
 
 nw_display -w 600 -s Tenericutes.newick |
@@ -325,6 +331,11 @@ Am_med_U32
 Bi_ado_ATCC_15703
 Cor_glu_ATCC_13032
 Mycob_tub_H37Rv
+EOF
+
+cat <<EOF > taxon/Gammaproteobacteria
+Es_coli_K_12_MG1655
+Sa_ente_Typhimurium_LT2
 EOF
 
 cat <<EOF > taxon/Clostridiales

@@ -349,3 +349,5 @@ Am_med_U32	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/196/835/GCF_000196835.
 Bi_ado_ATCC_15703	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/010/425/GCF_000010425.1_ASM1042v1	Bifidobacterium adolescentis	Complete Genome
 Cor_glu_ATCC_13032	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/196/335/GCF_000196335.1_ASM19633v1	Corynebacterium glutamicum	Complete Genome
 Mycob_tub_H37Rv	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/195/955/GCF_000195955.2_ASM19595v2	Mycobacterium tuberculosis	Complete Genome
+Es_coli_K_12_MG1655	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/005/845/GCF_000005845.2_ASM584v2	Escherichia coli	Complete Genome
+Sa_ente_Typhimurium_LT2	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/006/945/GCF_000006945.2_ASM694v2	Salmonella enterica	Complete Genome
