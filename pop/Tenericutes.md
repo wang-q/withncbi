@@ -20,6 +20,7 @@
     - [Stats of annotations and HMM models](#stats-of-annotations-and-hmm-models)
     - [Find all RNase R](#find-all-rnase-r)
     - [Tweak the tree of RNaseR](#tweak-the-tree-of-rnaser)
+    - [RNB domain](#rnb-domain)
 - [Tenericutes: run](#tenericutes-run)
 
 
@@ -317,14 +318,14 @@ parallel --no-run-if-empty --linebuffer -k -j 4 '
 # Misplaced in taxonomy tree
 #echo "Ac_sp_CAG_878" >> taxon/Acholeplasma
 
-cat <<EOF >> taxon/Mycoplasma
-Mycop_sp_CAG_472
-Mycop_sp_CAG_611
-Mycop_sp_CAG_611_25_7
-Mycop_sp_CAG_776
-Mycop_sp_CAG_877
-Mycop_sp_CAG_956
-EOF
+#cat <<EOF >> taxon/Mycoplasma
+#Mycop_sp_CAG_472
+#Mycop_sp_CAG_611
+#Mycop_sp_CAG_611_25_7
+#Mycop_sp_CAG_776
+#Mycop_sp_CAG_877
+#Mycop_sp_CAG_956
+#EOF
 
 cat <<EOF > taxon/Actinobacteria
 Am_med_U32
@@ -767,8 +768,8 @@ parallel --no-run-if-empty --linebuffer -k -j 4 "
 ```bash
 cd ~/data/alignment/Tenericutes
 
-mkdir -p RNaseR/HMM
-cd RNaseR/HMM
+mkdir -p DOMAINS/HMM
+cd DOMAINS/HMM
 
 for ID in PF08206 PF17876 PF00773 PF00575 PF08461 PF18773 PF18614 PF17215; do
     wget -N --content-disposition http://pfam.xfam.org/family/${ID}/hmm
@@ -786,8 +787,6 @@ E_VALUE=1e-3
 
 cd ~/data/alignment/Tenericutes
 
-mkdir -p RNaseR/domains
-
 for domain in OB_RNB CSD2 RNB S1 HTH_12 Importin_rep RNase_II_C_S1 Rrp44_S1 TIGR02063 TIGR00358; do
     echo 1>&2 "==> domain [${domain}]"
         
@@ -796,7 +795,7 @@ for domain in OB_RNB CSD2 RNB S1 HTH_12 Importin_rep RNase_II_C_S1 Rrp44_S1 TIGR
 
         for STRAIN in $(cat taxon/${GENUS}); do
             gzip -dcf ASSEMBLY/${STRAIN}/*_protein.faa.gz |
-                hmmsearch -E ${E_VALUE} --domE ${E_VALUE} --noali --notextw RNaseR/HMM/${domain}.hmm - |
+                hmmsearch -E ${E_VALUE} --domE ${E_VALUE} --noali --notextw DOMAINS/HMM/${domain}.hmm - |
                 grep '>>' |
                 STRAIN=${STRAIN} perl -nl -e '
                     />>\s+(\S+)/ or next;
@@ -807,59 +806,57 @@ for domain in OB_RNB CSD2 RNB S1 HTH_12 Importin_rep RNase_II_C_S1 Rrp44_S1 TIGR
                 '
         done 
     done \
-        > RNaseR/domains/${domain}.replace.tsv
+        > DOMAINS/${domain}.replace.tsv
     
     echo 1>&2
 done
 
-wc -l RNaseR/domains/*.replace.tsv
-#   392 RNaseR/domains/OB_RNB.replace.tsv
-#   287 RNaseR/domains/CSD2.replace.tsv
-#   320 RNaseR/domains/RNB.replace.tsv
-#   869 RNaseR/domains/S1.replace.tsv
-#   129 RNaseR/domains/HTH_12.replace.tsv
-#     6 RNaseR/domains/Importin_rep.replace.tsv
-#    90 RNaseR/domains/RNase_II_C_S1.replace.tsv
-#     1 RNaseR/domains/Rrp44_S1.replace.tsv
-#   400 RNaseR/domains/TIGR00358.replace.tsv
-#   499 RNaseR/domains/TIGR02063.replace.tsv
+wc -l DOMAINS/*.replace.tsv
+#   384 DOMAINS/OB_RNB.replace.tsv
+#   282 DOMAINS/CSD2.replace.tsv
+#   313 DOMAINS/RNB.replace.tsv
+#   841 DOMAINS/S1.replace.tsv
+#   127 DOMAINS/HTH_12.replace.tsv
+#     6 DOMAINS/Importin_rep.replace.tsv
+#    90 DOMAINS/RNase_II_C_S1.replace.tsv
+#     1 DOMAINS/Rrp44_S1.replace.tsv
+#   390 DOMAINS/TIGR00358.replace.tsv
+#   484 DOMAINS/TIGR02063.replace.tsv
 
 # All proteins appeared
-find RNaseR/domains/ -name "*.replace.tsv" |
+find DOMAINS/ -name "*.replace.tsv" |
     sort |
     parallel -j 1 'cut -f 2 {}' |
     sort -u \
-    > RNaseR/domains/domains.tsv
-wc -l RNaseR/domains/domains.tsv
-#1126 RNaseR/domains/domains.tsv
+    > DOMAINS/domains.tsv
+wc -l DOMAINS/domains.tsv
+#1092 DOMAINS/domains.tsv
 
 # Status of domains
 for domain in OB_RNB CSD2 RNB S1 HTH_12 Importin_rep RNase_II_C_S1 Rrp44_S1 TIGR02063 TIGR00358; do
     echo 1>&2 "==> domain [${domain}]"
 
     tsv-join \
-        RNaseR/domains/domains.tsv \
+        DOMAINS/domains.tsv \
         --data-fields 1 \
         -f <(
-            cat RNaseR/domains/${domain}.replace.tsv |
+            cat DOMAINS/${domain}.replace.tsv |
                 perl -nla -e 'print qq{$F[1]\tO}' 
         ) \
         --key-fields 1 \
         --append-fields 2 \
         --write-all "" \
-        > RNaseR/domains/tmp.tsv
+        > DOMAINS/tmp.tsv
         
-    mv RNaseR/domains/tmp.tsv RNaseR/domains/domains.tsv
-
-    echo 1>&2
+    mv DOMAINS/tmp.tsv DOMAINS/domains.tsv
 done
 
-datamash check < RNaseR/domains/domains.tsv
-#1126 lines, 11 fields
+datamash check < DOMAINS/domains.tsv
+#1092 lines, 11 fields
 
 # Add header line
 echo -e '#name\tOB_RNB\tCSD2\tRNB\tS1\tHTH_12\tImportin_rep\tRNase_II_C_S1\tRrp44_S1\tTIGR02063\tTIGR00358' | 
-    cat - RNaseR/domains/domains.tsv > temp && mv temp RNaseR/domains/domains.tsv
+    cat - DOMAINS/domains.tsv > temp && mv temp DOMAINS/domains.tsv
 
 ```
 
@@ -872,13 +869,15 @@ echo -e '#name\tOB_RNB\tCSD2\tRNB\tS1\tHTH_12\tImportin_rep\tRNase_II_C_S1\tRrp4
 | " RNase II "       |     1 |
 | " RNase R "        |     2 |
 | deduped            |   239 |
-| OB_RNB             |   199 |
-| CSD2               |   203 |
-| RNB                |   231 |
-| S1                 |   213 |
+| OB_RNB             |   194 |
+| CSD2               |   198 |
+| RNB                |   224 |
+| S1                 |   207 |
 
 ```bash
 cd ~/data/alignment/Tenericutes
+
+mkdir -p RNaseR
 
 faops some PROTEINS/all.pro.fa \
     <(cat PROTEINS/all.pro.fa |
@@ -909,7 +908,7 @@ for domain in OB_RNB CSD2 RNB S1; do
     cat RNaseR/RNaseR.all.fa |
         grep "^>" |
         sed "s/^>//" |
-        grep -Fx -f <(cut -f 1 RNaseR/domains/${domain}.replace.tsv) |
+        grep -Fx -f <(cut -f 1 DOMAINS/${domain}.replace.tsv) |
         wc -l
 done
 
@@ -945,7 +944,7 @@ for GENUS in $(cat genus.list); do
                 BEGIN {
                     our %seen = map {(split /\t/)[0] => 1} 
                         grep {/\S/}
-                        path(q{RNaseR/domains/RNB.replace.tsv})->lines({ chomp => 1});
+                        path(q{DOMAINS/RNB.replace.tsv})->lines({ chomp => 1});
                 }
                 
                 $n = $_;
@@ -962,7 +961,7 @@ for GENUS in $(cat genus.list); do
         > RNaseR/${GENUS}.replace.tsv
 done
 
-# 308
+# 301
 cat RNaseR/*.replace.tsv | wc -l
 
 # extract sequences for each genus
