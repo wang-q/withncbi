@@ -134,9 +134,13 @@ $dbh->{csv_tables}->{t0} = {
     );
 
     my @strs = (
-        q{ AND t0.assembly_level like '%Chromosome%'
+        q{ AND t0.assembly_level = 'Complete Genome'
             ORDER BY t0.seq_rel_date },
-        q{ AND t0.assembly_level not like '%Chromosome%'
+        q{ AND t0.assembly_level = 'Chromosome'
+            ORDER BY t0.seq_rel_date },
+        q{ AND t0.assembly_level = 'Scaffold'
+            ORDER BY t0.seq_rel_date },
+        q{ AND t0.assembly_level = 'Contig'
             ORDER BY t0.seq_rel_date },
     );
     my @taxon_ids;

@@ -137,6 +137,20 @@ perl gr_overview.pl --db gr_euk
 ## Assembly reports
 
 ```bash
+cat ~/data/NCBI/genomes/ASSEMBLY_REPORTS/assembly_summary_refseq.txt \
+    ~/data/NCBI/genomes/ASSEMBLY_REPORTS/assembly_summary_genbank.txt |
+    grep -v "^#" |
+    cut -d$'\t' -f 12 | # assembly_level
+    sort |
+    uniq -c
+#   5366 Chromosome
+#  44995 Complete Genome
+# 156577 Contig
+# 136948 Scaffold
+
+```
+
+```bash
 cd ~/Scripts/withncbi/db
 
 perl ar_strains.pl -o ar_strains.csv
