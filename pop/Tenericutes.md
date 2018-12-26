@@ -15,6 +15,10 @@
     - [Tweak the concat tree](#tweak-the-concat-tree)
     - [TIGR](#tigr)
 - [RNase R](#rnase-r)
+    - [Domain organisation](#domain-organisation)
+        - [Dis3](#dis3)
+        - [Ribonuclease R](#ribonuclease-r)
+        - [Ribonuclease II](#ribonuclease-ii)
     - [RNase R domains](#rnase-r-domains)
     - [Scan every proteins](#scan-every-proteins)
     - [Stats of annotations and HMM models](#stats-of-annotations-and-hmm-models)
@@ -749,6 +753,30 @@ parallel --no-run-if-empty --linebuffer -k -j 4 "
 ```
 
 # RNase R
+
+## Domain organisation
+
+### Dis3
+
+* [Pfam](http://pfam.xfam.org/protein/Q9VC93_DROME)
+* [UniProt](https://www.uniprot.org/uniprot/Q9VC93)
+* Subcellular locationi: Nucleus
+
+![Dis3](../image/Q9VC93_DROME.png)
+
+### Ribonuclease R
+
+* [Pfam](http://pfam.xfam.org/protein/RNB_ECOLI)
+* [UniProt](https://www.uniprot.org/uniprot/P30850)
+
+![RNR](../image/RNR_ECOLI.png)
+
+### Ribonuclease II
+
+* [Pfam](http://pfam.xfam.org/protein/RNR_ECOLI)
+* [UniProt](https://www.uniprot.org/uniprot/P21499)
+
+![RNB](../image/RNB_ECOLI.png)
 
 ## RNase R domains
 
