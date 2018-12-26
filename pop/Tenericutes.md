@@ -806,8 +806,13 @@ parallel --no-run-if-empty --linebuffer -k -j 4 "
 * S1 (PF00575)
 
 * HTH_12 (PF08461)
-* Importin_rep (PF18773)
 * RNase_II_C_S1 (PF18614)
+
+* Importin_rep (PF18773)
+
+* PIN_4 (PF13638)
+* Rrp44_CSD1 (PF17216)
+* OB_Dis3 (PF17849)
 * Rrp44_S1 (PF17215)
 
 * RNase_R: TIGR02063
@@ -819,7 +824,9 @@ cd ~/data/alignment/Tenericutes
 mkdir -p DOMAINS/HMM
 cd DOMAINS/HMM
 
-for ID in PF08206 PF17876 PF00773 PF00575 PF08461 PF18773 PF18614 PF17215; do
+for ID in PF08206 PF17876 PF00773 PF00575 \
+    PF08461 PF18614 PF18773 \
+    PF13638 PF17216 PF17849 PF17215; do
     wget -N --content-disposition http://pfam.xfam.org/family/${ID}/hmm
 done
 
@@ -828,14 +835,17 @@ cp ~/data/HMM/TIGRFAM/HMM/TIGR00358.HMM TIGR00358.hmm
 
 ```
 
-## Scan every proteins
+## Scan every domains
 
 ```bash
 E_VALUE=1e-3
 
 cd ~/data/alignment/Tenericutes
 
-for domain in OB_RNB CSD2 RNB S1 HTH_12 Importin_rep RNase_II_C_S1 Rrp44_S1 TIGR02063 TIGR00358; do
+for domain in OB_RNB CSD2 RNB S1 \
+    HTH_12 RNase_II_C_S1 Importin_rep \
+    PIN_4 Rrp44_CSD1 OB_Dis3 Rrp44_S1 \
+    TIGR02063 TIGR00358; do
     echo 1>&2 "==> domain [${domain}]"
         
     for GENUS in $(cat genus.list); do
@@ -865,8 +875,11 @@ wc -l DOMAINS/*.replace.tsv
 #   313 DOMAINS/RNB.replace.tsv
 #   841 DOMAINS/S1.replace.tsv
 #   127 DOMAINS/HTH_12.replace.tsv
-#     6 DOMAINS/Importin_rep.replace.tsv
 #    90 DOMAINS/RNase_II_C_S1.replace.tsv
+#     6 DOMAINS/Importin_rep.replace.tsv
+#    14 DOMAINS/PIN_4.replace.tsv
+#     5 DOMAINS/Rrp44_CSD1.replace.tsv
+#     7 DOMAINS/OB_Dis3.replace.tsv
 #     1 DOMAINS/Rrp44_S1.replace.tsv
 #   390 DOMAINS/TIGR00358.replace.tsv
 #   484 DOMAINS/TIGR02063.replace.tsv
@@ -878,10 +891,13 @@ find DOMAINS/ -name "*.replace.tsv" |
     sort -u \
     > DOMAINS/domains.tsv
 wc -l DOMAINS/domains.tsv
-#1092 DOMAINS/domains.tsv
+#1111 DOMAINS/domains.tsv
 
 # Status of domains
-for domain in OB_RNB CSD2 RNB S1 HTH_12 Importin_rep RNase_II_C_S1 Rrp44_S1 TIGR02063 TIGR00358; do
+for domain in OB_RNB CSD2 RNB S1 \
+    HTH_12 RNase_II_C_S1 Importin_rep \
+    PIN_4 Rrp44_CSD1 OB_Dis3 Rrp44_S1 \
+    TIGR02063 TIGR00358; do
     echo 1>&2 "==> domain [${domain}]"
 
     tsv-join \
@@ -900,10 +916,10 @@ for domain in OB_RNB CSD2 RNB S1 HTH_12 Importin_rep RNase_II_C_S1 Rrp44_S1 TIGR
 done
 
 datamash check < DOMAINS/domains.tsv
-#1092 lines, 11 fields
+#1111 lines, 14 fields
 
 # Add header line
-echo -e '#name\tOB_RNB\tCSD2\tRNB\tS1\tHTH_12\tImportin_rep\tRNase_II_C_S1\tRrp44_S1\tTIGR02063\tTIGR00358' | 
+echo -e '#name\tOB_RNB\tCSD2\tRNB\tS1\tHTH_12\tRNase_II_C_S1\tImportin_rep\tPIN_4\tRrp44_CSD1\tOB_Dis3\tRrp44_S1\tTIGR02063\tTIGR00358' | 
     cat - DOMAINS/domains.tsv > temp && mv temp DOMAINS/domains.tsv
 
 ```
@@ -1185,6 +1201,24 @@ nw_rename RNaseR/RNB.reroot.newick species.monophyly.map |
 
 ```
 
+
+## Importin_rep domain
+
+```bash
+E_VALUE=1e-3
+
+cd ~/data/alignment/Tenericutes
+
+hmmsearch \
+    -E ${E_VALUE} --domE ${E_VALUE} \
+    -A RNaseR/Importin_rep.sto DOMAINS/HMM/Importin_rep.hmm RNaseR/RNaseR.pro.fa
+
+esl-reformat fasta RNaseR/Importin_rep.sto > RNaseR/Importin_rep.pro.fa
+
+muscle -quiet -in RNaseR/Importin_rep.pro.fa -out RNaseR/Importin_rep.aln.fa
+FastTree -quiet RNaseR/Importin_rep.aln.fa > RNaseR/Importin_rep.aln.newick
+
+```
 
 # Tenericutes: run
 
