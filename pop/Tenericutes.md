@@ -443,8 +443,13 @@ find ASSEMBLY -maxdepth 1 -type d |
 find ASSEMBLY -type f -name "*_protein.faa.gz" |
     wc -l
 
-find ASSEMBLY -type f -name "*_protein.faa.gz" |
-    xargs gzip -dcf \
+for GENUS in $(cat genus.list); do
+    echo "==> GENUS [${GENUS}]"
+
+    for STRAIN in $(cat taxon/${GENUS}); do
+        gzip -dcf ASSEMBLY/${STRAIN}/*_protein.faa.gz
+    done
+done \
     > PROTEINS/all.pro.fa
 
 # ribonuclease
@@ -454,7 +459,7 @@ cat PROTEINS/all.pro.fa |
     perl -nl -e 's/\s+\[.+?\]$//g; print' |
     perl -nl -e 's/MULTISPECIES: //g; print' |
     sort |
-    uniq -c -d |
+    uniq -c |
     sort -nr
 
 # methyltransferase
@@ -464,7 +469,7 @@ cat PROTEINS/all.pro.fa |
     perl -nl -e 's/\s+\[.+?\]$//g; print' |
     perl -nl -e 's/MULTISPECIES: //g; print' |
     sort |
-    uniq -c -d |
+    uniq -c |
     sort -nr
 
 ```
@@ -1008,6 +1013,28 @@ find ASSEMBLY -maxdepth 1 -type d |
     ' \
     > RNaseR/strain_anno.txt
 
+# Annotations containing RNB domain
+cat PROTEINS/all.pro.fa |
+    grep "^>" |
+    grep -f <(cut -f 1 DOMAINS/RNB.replace.tsv) |
+    perl -nl -e 's/^>\w+\.\d+\s+//g; print' |
+    perl -nl -e 's/\s+\[.+?\]$//g; print' |
+    perl -nl -e 's/MULTISPECIES: //g; print' |
+    sort |
+    uniq -c |
+    sort -nr
+
+# Annotated as RNase R but lacking RNB domains:
+cat PROTEINS/all.pro.fa |
+    grep "^>" |
+    grep -e " ribonuclease R " -e " RNB " -e " RNase II " -e " RNase R "|
+    grep -v -f <(cut -f 1 DOMAINS/RNB.replace.tsv)
+#>OAL10424.1 ribonuclease R [Candidatus Mycoplasma haemobos]
+#>AFO52271.1 ribonuclease R [Candidatus Mycoplasma haemolamae str. Purdue]
+#>AEG72387.1 ribonuclease R [Mycoplasma haemofelis Ohio2]
+#>WP_112665413.1 ribonuclease R [Mycoplasma wenyonii]
+#>NP_462407.3 putative RNase R [Salmonella enterica subsp. enterica serovar Typhimurium str. LT2]
+
 ```
 
 ## Find all RNase R
@@ -1093,14 +1120,6 @@ muscle -quiet -in RNaseR/RNaseR.pro.fa -out RNaseR/RNaseR.aln.fa
 FastTree -quiet RNaseR/RNaseR.aln.fa > RNaseR/RNaseR.aln.newick
 
 ```
-
-Annotated as RNase R but lacking RNB domains:
-
-* OAL10424.1 Mycop_Chaemob_OAL10424
-* AFO52271.1 Mycop_Chaemol_Purdue_AFO52271
-* AEG72387.1 Mycop_haemof_Ohio2_AEG72387
-* WP_112665413.1 Mycop_wen_WP_112665413
-* NP_462407.3 Sa_ente_Typhimurium_LT2_NP_462407
 
 ## Tweak the tree of RNaseR
 
