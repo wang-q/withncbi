@@ -771,7 +771,7 @@ parallel --no-run-if-empty --linebuffer -k -j 4 "
 * [NCBI](https://www.ncbi.nlm.nih.gov/protein/NP_014621.1)
 * Subcellular locationi: Nucleus, Mitochondrion
 
-![RRP44](../image/RRP44.png)
+![RRP44](../image/RRP44_YEAST.png)
 
 ### E. coli RNase R
 
