@@ -756,7 +756,7 @@ parallel --no-run-if-empty --linebuffer -k -j 4 "
 
 ## Domain organisation
 
-### Dis3
+### Fly Dis3
 
 * [Pfam](http://pfam.xfam.org/protein/Q9VC93_DROME)
 * [UniProt](https://www.uniprot.org/uniprot/Q9VC93)
@@ -764,17 +764,28 @@ parallel --no-run-if-empty --linebuffer -k -j 4 "
 
 ![Dis3](../image/Q9VC93_DROME.png)
 
-### Ribonuclease R
+### Yeast RRP44
+
+* [Pfam](http://pfam.xfam.org/protein/RRP44_YEAST)
+* [UniProt](https://www.uniprot.org/uniprot/Q08162)
+* [NCBI](https://www.ncbi.nlm.nih.gov/protein/NP_014621.1)
+* Subcellular locationi: Nucleus, Mitochondrion
+
+![RRP44](../image/RRP44.png)
+
+### E. coli RNase R
 
 * [Pfam](http://pfam.xfam.org/protein/RNB_ECOLI)
 * [UniProt](https://www.uniprot.org/uniprot/P30850)
+* [NCBI](https://www.ncbi.nlm.nih.gov/protein/NP_418600.4)
 
 ![RNR](../image/RNR_ECOLI.png)
 
-### Ribonuclease II
+### E. coli RNase II
 
 * [Pfam](http://pfam.xfam.org/protein/RNR_ECOLI)
 * [UniProt](https://www.uniprot.org/uniprot/P21499)
+* [NCBI](https://www.ncbi.nlm.nih.gov/protein/NP_415802.1)
 
 ![RNB](../image/RNB_ECOLI.png)
 
