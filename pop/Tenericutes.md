@@ -16,15 +16,18 @@
     - [TIGR](#tigr)
 - [RNase R](#rnase-r)
     - [Domain organisation](#domain-organisation)
-        - [Dis3](#dis3)
-        - [Ribonuclease R](#ribonuclease-r)
-        - [Ribonuclease II](#ribonuclease-ii)
+        - [Human RRP44](#human-rrp44)
+        - [Fly Dis3](#fly-dis3)
+        - [Yeast RRP44](#yeast-rrp44)
+        - [E. coli RNase R](#e-coli-rnase-r)
+        - [E. coli RNase II](#e-coli-rnase-ii)
     - [RNase R domains](#rnase-r-domains)
-    - [Scan every proteins](#scan-every-proteins)
+    - [Scan every domains](#scan-every-domains)
     - [Stats of annotations and HMM models](#stats-of-annotations-and-hmm-models)
     - [Find all RNase R](#find-all-rnase-r)
     - [Tweak the tree of RNaseR](#tweak-the-tree-of-rnaser)
     - [RNB domain](#rnb-domain)
+    - [Importin_rep domain](#importin_rep-domain)
 - [Tenericutes: run](#tenericutes-run)
 
 
@@ -235,7 +238,7 @@ nw_display -w 600 -s Tenericutes.newick |
 
 ```
 
-![Tenericutes.png](Tenericutes.png)
+![Tenericutes.png](../image/Tenericutes.png)
 
 # Count strains
 
