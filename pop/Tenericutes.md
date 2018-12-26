@@ -756,6 +756,15 @@ parallel --no-run-if-empty --linebuffer -k -j 4 "
 
 ## Domain organisation
 
+### Human RRP44
+
+* [Pfam](http://pfam.xfam.org/protein/RRP44_HUMAN)
+* [UniProt](https://www.uniprot.org/uniprot/Q9Y2L1)
+* [NCBI](https://www.ncbi.nlm.nih.gov/protein/NP_055768.3)
+* Subcellular locationi: Nucleus
+
+![RRP44_HUMAN](../image/RRP44_HUMAN.png)
+
 ### Fly Dis3
 
 * [Pfam](http://pfam.xfam.org/protein/Q9VC93_DROME)
@@ -771,23 +780,23 @@ parallel --no-run-if-empty --linebuffer -k -j 4 "
 * [NCBI](https://www.ncbi.nlm.nih.gov/protein/NP_014621.1)
 * Subcellular locationi: Nucleus, Mitochondrion
 
-![RRP44](../image/RRP44_YEAST.png)
+![RRP44_YEAST](../image/RRP44_YEAST.png)
 
 ### E. coli RNase R
 
-* [Pfam](http://pfam.xfam.org/protein/RNB_ECOLI)
-* [UniProt](https://www.uniprot.org/uniprot/P30850)
+* [Pfam](http://pfam.xfam.org/protein/RNR_ECOLI)
+* [UniProt](https://www.uniprot.org/uniprot/P21499)
 * [NCBI](https://www.ncbi.nlm.nih.gov/protein/NP_418600.4)
 
-![RNR](../image/RNR_ECOLI.png)
+![RNR_ECOLI](../image/RNR_ECOLI.png)
 
 ### E. coli RNase II
 
-* [Pfam](http://pfam.xfam.org/protein/RNR_ECOLI)
-* [UniProt](https://www.uniprot.org/uniprot/P21499)
+* [Pfam](http://pfam.xfam.org/protein/RNB_ECOLI)
+* [UniProt](https://www.uniprot.org/uniprot/P30850)
 * [NCBI](https://www.ncbi.nlm.nih.gov/protein/NP_415802.1)
 
-![RNB](../image/RNB_ECOLI.png)
+![RNB_ECOLI](../image/RNB_ECOLI.png)
 
 ## RNase R domains
 
