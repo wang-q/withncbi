@@ -867,11 +867,22 @@ Components of the RNA degradosome in E. coli:
     * RhlB
     * PAP
 
+* ATP-dependent RNA helicase RhlB
+    * https://www.uniprot.org/uniprot/P0A8J8
+    * RHLB_ECOLI
+    * NP_418227
+    * DEAD, Helicase_C
+
+* Poly(A) polymerase I
+    * https://www.uniprot.org/uniprot/P0ABF1
+    * PCNB_ECOLI
+    * NP_414685
+    * PolyA_pol, PolyA_pol_RNAbd, PolyA_pol_arg_C
+
 Ref.:
 
 * Carpousis, A. J. The RNA Degradosome of Escherichia coli : An mRNA-Degrading Machine Assembled on
   RNase E. Annu. Rev. Microbiol. 61, 71–87 (2007).
-
 
 # RNase R
 
@@ -998,7 +1009,6 @@ Ref.:
 
 * HTH_12 (PF08461)
 * RNase_II_C_S1 (PF18614)
-
 * Importin_rep (PF18773)
 
 * PIN_4 (PF13638)
@@ -1009,15 +1019,33 @@ Ref.:
 * RNase_R: TIGR02063
 * 3_prime_RNase: TIGR00358
 
+* RNase_E_G (PF10150)
+* RNase_PH (PF01138)
+* RNase_PH_C (PF03725)
+* PNPase (PF03726)
+* KH_1 (PF00013)
+
+* DEAD (PF00270)
+* Helicase_C (PF00271)
+
+* PolyA_pol (PF01743)
+* PolyA_pol_RNAbd (PF12627)
+* PolyA_pol_arg_C (PF12626)
+
 ```bash
 cd ~/data/alignment/Tenericutes
 
 mkdir -p DOMAINS/HMM
 cd DOMAINS/HMM
 
-for ID in PF08206 PF17876 PF00773 PF00575 \
+for ID in \
+    PF08206 PF17876 PF00773 PF00575 \
     PF08461 PF18614 PF18773 \
-    PF13638 PF17216 PF17849 PF17215; do
+    PF13638 PF17216 PF17849 PF17215 \
+    PF10150 PF01138 PF03725 PF03726 PF00013 \
+    PF00270 PF00271 \
+    PF01743 PF12627 PF12626 \
+    ; do
     wget -N --content-disposition http://pfam.xfam.org/family/${ID}/hmm
 done
 
@@ -1033,10 +1061,15 @@ E_VALUE=1e-3
 
 cd ~/data/alignment/Tenericutes
 
-for domain in OB_RNB CSD2 RNB S1 \
+for domain in \
+    OB_RNB CSD2 RNB S1 \
     HTH_12 RNase_II_C_S1 Importin_rep \
     PIN_4 Rrp44_CSD1 OB_Dis3 Rrp44_S1 \
-    TIGR02063 TIGR00358; do
+    RNase_E_G RNase_PH RNase_PH_C PNPase KH_1 \
+    DEAD Helicase_C \
+    PolyA_pol PolyA_pol_RNAbd PolyA_pol_arg_C \
+    TIGR02063 TIGR00358 \
+    ; do
     echo 1>&2 "==> domain [${domain}]"
         
     for GENUS in $(cat genus.list); do
@@ -1060,20 +1093,20 @@ for domain in OB_RNB CSD2 RNB S1 \
     echo 1>&2
 done
 
-wc -l DOMAINS/*.replace.tsv
-#   384 DOMAINS/OB_RNB.replace.tsv
-#   282 DOMAINS/CSD2.replace.tsv
-#   313 DOMAINS/RNB.replace.tsv
-#   841 DOMAINS/S1.replace.tsv
-#   127 DOMAINS/HTH_12.replace.tsv
-#    90 DOMAINS/RNase_II_C_S1.replace.tsv
-#     6 DOMAINS/Importin_rep.replace.tsv
-#    14 DOMAINS/PIN_4.replace.tsv
-#     5 DOMAINS/Rrp44_CSD1.replace.tsv
-#     7 DOMAINS/OB_Dis3.replace.tsv
-#     1 DOMAINS/Rrp44_S1.replace.tsv
-#   390 DOMAINS/TIGR00358.replace.tsv
-#   484 DOMAINS/TIGR02063.replace.tsv
+for domain in \
+    OB_RNB CSD2 RNB S1 \
+    HTH_12 RNase_II_C_S1 Importin_rep \
+    PIN_4 Rrp44_CSD1 OB_Dis3 Rrp44_S1 \
+    RNase_E_G RNase_PH RNase_PH_C PNPase KH_1 \
+    DEAD Helicase_C \
+    PolyA_pol PolyA_pol_RNAbd PolyA_pol_arg_C \
+    TIGR02063 TIGR00358 \
+    ; do
+    wc -l DOMAINS/${domain}.replace.tsv
+done |
+    datamash reverse -W |
+    (echo -e "Domain\tCount" && cat) |
+    mlr --itsv --omd cat
 
 # All proteins appeared
 find DOMAINS/ -name "*.replace.tsv" |
@@ -1082,13 +1115,18 @@ find DOMAINS/ -name "*.replace.tsv" |
     sort -u \
     > DOMAINS/domains.tsv
 wc -l DOMAINS/domains.tsv
-#1111 DOMAINS/domains.tsv
+#4180 DOMAINS/domains.tsv
 
 # Status of domains
-for domain in OB_RNB CSD2 RNB S1 \
+for domain in \
+    OB_RNB CSD2 RNB S1 \
     HTH_12 RNase_II_C_S1 Importin_rep \
     PIN_4 Rrp44_CSD1 OB_Dis3 Rrp44_S1 \
-    TIGR02063 TIGR00358; do
+    RNase_E_G RNase_PH RNase_PH_C PNPase KH_1 \
+    DEAD Helicase_C \
+    PolyA_pol PolyA_pol_RNAbd PolyA_pol_arg_C \
+    TIGR02063 TIGR00358 \
+    ; do
     echo 1>&2 "==> domain [${domain}]"
 
     tsv-join \
@@ -1107,13 +1145,77 @@ for domain in OB_RNB CSD2 RNB S1 \
 done
 
 datamash check < DOMAINS/domains.tsv
-#1111 lines, 14 fields
+#4180 lines, 24 fields
 
 # Add header line
-echo -e '#name\tOB_RNB\tCSD2\tRNB\tS1\tHTH_12\tRNase_II_C_S1\tImportin_rep\tPIN_4\tRrp44_CSD1\tOB_Dis3\tRrp44_S1\tTIGR02063\tTIGR00358' | 
-    cat - DOMAINS/domains.tsv > temp && mv temp DOMAINS/domains.tsv
+for domain in \
+    OB_RNB CSD2 RNB S1 \
+    HTH_12 RNase_II_C_S1 Importin_rep \
+    PIN_4 Rrp44_CSD1 OB_Dis3 Rrp44_S1 \
+    RNase_E_G RNase_PH RNase_PH_C PNPase KH_1 \
+    DEAD Helicase_C \
+    PolyA_pol PolyA_pol_RNAbd PolyA_pol_arg_C \
+    TIGR02063 TIGR00358 \
+    ; do
+    echo "${domain}"
+done |
+    (echo -e "#name" && cat) |
+    paste -s -d $'\t' - \
+    > DOMAINS/header.tsv
+
+# Filter out DEAD or Helicase_C only sequences
+cat DOMAINS/domains.tsv |
+    tsv-filter --str-eq 18:O --str-eq 19:O \
+    > DOMAINS/RHLB.tsv
+    
+cat DOMAINS/domains.tsv |
+    tsv-filter --str-ne 18:O --str-ne 19:O |
+    (cat DOMAINS/header.tsv && cat) |
+    (cat && cat DOMAINS/RHLB.tsv) |
+    keep-header -- sort -k1,1 \
+    > temp && mv temp DOMAINS/domains.tsv
+
+# protein sizes
+(echo -e "#name\tsize" && cat PROTEINS/all.replace.sizes) > DOMAINS/size.tsv
+
+tsv-join \
+    DOMAINS/size.tsv \
+    --data-fields 1 \
+    -f DOMAINS/domains.tsv \
+    --key-fields 1 \
+    --append-fields 2-24 |
+     keep-header -- sort -k1,1 \
+    > temp && mv temp DOMAINS/domains.tsv
+
+rm DOMAINS/header.tsv DOMAINS/RHLB.tsv DOMAINS/size.tsv
 
 ```
+
+| Domain                              | Count |
+|:------------------------------------|:------|
+| DOMAINS/OB_RNB.replace.tsv          | 384   |
+| DOMAINS/CSD2.replace.tsv            | 282   |
+| DOMAINS/RNB.replace.tsv             | 313   |
+| DOMAINS/S1.replace.tsv              | 841   |
+| DOMAINS/HTH_12.replace.tsv          | 127   |
+| DOMAINS/RNase_II_C_S1.replace.tsv   | 90    |
+| DOMAINS/Importin_rep.replace.tsv    | 6     |
+| DOMAINS/PIN_4.replace.tsv           | 14    |
+| DOMAINS/Rrp44_CSD1.replace.tsv      | 5     |
+| DOMAINS/OB_Dis3.replace.tsv         | 7     |
+| DOMAINS/Rrp44_S1.replace.tsv        | 1     |
+| DOMAINS/RNase_E_G.replace.tsv       | 15    |
+| DOMAINS/RNase_PH.replace.tsv        | 87    |
+| DOMAINS/RNase_PH_C.replace.tsv      | 96    |
+| DOMAINS/PNPase.replace.tsv          | 83    |
+| DOMAINS/KH_1.replace.tsv            | 487   |
+| DOMAINS/DEAD.replace.tsv            | 2324  |
+| DOMAINS/Helicase_C.replace.tsv      | 1505  |
+| DOMAINS/PolyA_pol.replace.tsv       | 64    |
+| DOMAINS/PolyA_pol_RNAbd.replace.tsv | 84    |
+| DOMAINS/PolyA_pol_arg_C.replace.tsv | 3     |
+| DOMAINS/TIGR02063.replace.tsv       | 484   |
+| DOMAINS/TIGR00358.replace.tsv       | 390   |
 
 ## Stats of annotations and HMM models
 
