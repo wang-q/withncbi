@@ -473,6 +473,43 @@ cat PROTEINS/all.pro.fa |
     uniq -c |
     sort -nr
 
+# all.replace.fa
+for GENUS in $(cat genus.list); do
+    echo 1>&2 "==> GENUS [${GENUS}]"
+
+    for STRAIN in $(cat taxon/${GENUS}); do
+        gzip -dcf ASSEMBLY/${STRAIN}/*_protein.faa.gz |
+            grep "^>" |
+            cut -d" " -f 1 |
+            sed "s/^>//" |
+            STRAIN=${STRAIN} perl -nl -MPath::Tiny -e '
+                $n = $_;
+                $s = $n;
+                $s =~ s/\.\d+//;
+                printf qq{%s\t%s_%s\n}, $n, $ENV{STRAIN}, $s;
+            ' \
+        > PROTEINS/${STRAIN}.replace.tsv
+        
+        faops replace -s ASSEMBLY/${STRAIN}/*_protein.faa.gz PROTEINS/${STRAIN}.replace.tsv stdout
+        
+        rm PROTEINS/${STRAIN}.replace.tsv
+    done
+done \
+    > PROTEINS/all.replace.fa
+
+# counting proteins
+cat PROTEINS/all.pro.fa |
+    grep "^>" |
+    wc -l
+#311273
+
+cat PROTEINS/all.replace.fa |
+    grep "^>" |
+    wc -l
+#311273
+
+faops size PROTEINS/all.replace.fa > PROTEINS/all.replace.sizes
+
 ```
 
 # Phylogenetics with 40 single-copy genes, *RpoB*, *EF-tu* and RNase_R
