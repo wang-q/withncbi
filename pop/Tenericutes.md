@@ -809,7 +809,9 @@ parallel --no-run-if-empty --linebuffer -k -j 4 "
 
 ## hmmer.org HMMSCAN Results
 
-![Am_med_U32_YP_003763410.png](../image/Am_med_U32_YP_003763410.png)
+| ![Am_med_U32_YP_003763410.png](../image/Am_med_U32_YP_003763410.png) |
+|:--------------------------------------------------------------------:|
+|                       Am_med_U32_YP_003763410                        |
 
 ![Es_coli_K_12_MG1655_NP_415802.png](../image/Es_coli_K_12_MG1655_NP_415802.png)
 
