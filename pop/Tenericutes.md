@@ -14,6 +14,7 @@
     - [Align and concat marker genes to create species tree](#align-and-concat-marker-genes-to-create-species-tree)
     - [Tweak the concat tree](#tweak-the-concat-tree)
     - [TIGR](#tigr)
+- [Bacteria degradosome](#bacteria-degradosome)
 - [RNase R](#rnase-r)
     - [Domain organisation](#domain-organisation)
         - [Human RRP44](#human-rrp44)
@@ -761,6 +762,79 @@ parallel --no-run-if-empty --linebuffer -k -j 4 "
     " ::: TIGR02013 TIGR00485
 
 ```
+
+
+# Bacteria degradosome
+
+Proteins containing S1 domain in E. coli:
+
+* Exoribonuclease 2
+    * https://www.uniprot.org/uniprot/P30850
+    * RNB_ECOLI
+    * NP_415802
+    * OB_RNB, CSD2, RNB, S1
+
+* Ribonuclease R
+    * https://www.uniprot.org/uniprot/P21499
+    * RNR_ECOLI
+    * NP_418600
+    * HTH_12, OB_RNB, CSD2, RNB, S1
+
+* 30S ribosomal protein S1
+    * https://www.uniprot.org/uniprot/P0AG67
+    * RS1_ECOLI
+    * NP_415431
+    * 6 X S1
+
+* Ribonuclease E
+    * https://www.uniprot.org/uniprot/P21513
+    * RNE_ECOLI
+    * NP_415602
+    * S1, RNase_E_G
+
+* Ribonuclease G
+    * https://www.uniprot.org/uniprot/P0A9J0
+    * RNG_ECOLI
+    * NP_417713
+    * S1, RNase_E_G
+
+* Polyribonucleotide nucleotidyltransferase
+    * https://www.uniprot.org/uniprot/P05055
+    * PNP_ECOLI
+    * NP_417633
+    * RNase_PH, RNase_PH_C, PNPase, RNase_PH, RNase_PH_C, KH_1, S1
+
+* Transcription termination/antitermination protein NusA
+    * https://www.uniprot.org/uniprot/P0AFF6
+    * NUSA_ECOLI
+    * NP_417638
+    * NusA_N, S1, KH_5, HHH_5
+
+* Protein YhgF
+    * https://www.uniprot.org/uniprot/P46837
+    * YHGF_ECOLI
+    * NP_417866
+    * Tex_N, Tex_YqgF, HHH_3, HHH_9, S1
+
+Components of the RNA degradosome in E. coli:
+
+* RNase E initially inactivates polyribosomal mRNA by cleaving in the translation initiation region
+  or in the intercistronic regions of polycistronic messages. As the elongating ribosomes finish
+  translating the functionally inactivated mRNA, RNase E further cleaves the ribosome-free mRNA.
+* Fragments of mRNA produced by RNase E are digested to nucleotides by the exonucleases.
+    * RNase II
+    * RNase R
+    * PNPase
+* RNA helicase B (RhlB) and poly(A) polymerase (PAP) are accessory factors that facilitate
+  exoribonucleolytic activity.
+    * RhlB
+    * PAP
+
+Ref.:
+
+* Carpousis, A. J. The RNA Degradosome of Escherichia coli : An mRNA-Degrading Machine Assembled on
+  RNase E. Annu. Rev. Microbiol. 61, 71–87 (2007).
+
 
 # RNase R
 
