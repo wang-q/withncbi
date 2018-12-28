@@ -23,6 +23,7 @@
         - [Human RRP44](#human-rrp44)
         - [Fly Dis3](#fly-dis3)
         - [Yeast RRP44](#yeast-rrp44)
+        - [Arabidopsis thaliana RP44A](#arabidopsis-thaliana-rp44a)
         - [E. coli RNase R](#e-coli-rnase-r)
         - [E. coli RNase II](#e-coli-rnase-ii)
     - [hmmer.org HMMSCAN Results](#hmmerorg-hmmscan-results)
@@ -42,12 +43,12 @@
 
 Ref.:
 
-1. Skennerton, C. T. et al. Phylogenomic analysis of Candidatus ‘Izimaplasma’ species: free-living
-   representatives from a Tenericutes clade found in methane seeps. ISME J. 10, 2679–2692 (2016).
+1. Skennerton, C. T. et al. Phylogenomic analysis of Candidatus Izimaplasma species: free-living
+   representatives from a Tenericutes clade found in methane seeps. ISME J. 10, 2679-2692 (2016).
 
 2. Davis, J. J., Xia, F., Overbeek, R. A. & Olsen, G. J. Genomes of the class Erysipelotrichia
    clarify the firmicute origin of the class Mollicutes. Int. J. Syst. Evol. Microbiol. 63,
-   2727–2741 (2013).
+   2727-2741 (2013).
 
 Key genera:
 
@@ -808,8 +809,8 @@ parallel --no-run-if-empty --linebuffer -k -j 4 "
 
 Ref.:
 
-* Carpousis, A. J. The RNA Degradosome of Escherichia coli : An mRNA-Degrading Machine Assembled on
-  RNase E. Annu. Rev. Microbiol. 61, 71–87 (2007).
+* Carpousis, A. J. The RNA Degradosome of Escherichia coli: An mRNA-Degrading Machine Assembled on
+  RNase E. Annu. Rev. Microbiol. 61, 71-87 (2007).
 
 * Cho, K. H. The Structure and Function of the Gram-Positive Bacterial RNA Degradosome. Front.
   Microbiol. 8, (2017).
@@ -836,6 +837,7 @@ Ref.:
     * RS1_ECOLI
     * NP_415431
     * 6 X S1
+    * TIGR00717 rpsA
 
 * Ribonuclease E
     * rne
@@ -843,6 +845,7 @@ Ref.:
     * RNE_ECOLI
     * NP_415602
     * S1, RNase_E_G
+    * TIGR00757 RNaseEG
 
 * Ribonuclease G
     * rng
@@ -850,6 +853,7 @@ Ref.:
     * RNG_ECOLI
     * NP_417713
     * S1, RNase_E_G
+    * TIGR00757 RNaseEG
 
 * Polyribonucleotide nucleotidyltransferase
     * pnp
@@ -857,6 +861,7 @@ Ref.:
     * PNP_ECOLI
     * NP_417633
     * RNase_PH, RNase_PH_C, PNPase, RNase_PH, RNase_PH_C, KH_1, S1
+    * TIGR03591 polynuc_phos
 
 * Transcription termination/antitermination protein NusA
     * nusA
@@ -864,6 +869,7 @@ Ref.:
     * NUSA_ECOLI
     * NP_417638
     * NusA_N, S1, KH_5, HHH_5
+    * TIGR01953 NusA
 
 * Protein YhgF
     * yhgF
@@ -873,6 +879,8 @@ Ref.:
     * Tex_N, Tex_YqgF, HHH_3, HHH_9, S1
 
 ## Components of the RNA degradosome in E. coli
+
+![A model of the structure of the RNA degradosome.](../image/mi610071.f2.jpeg)
 
 * RNase E initially inactivates polyribosomal mRNA by cleaving in the translation initiation region
   or in the intercistronic regions of polycistronic messages. As the elongating ribosomes finish
@@ -899,12 +907,58 @@ Ref.:
     * PCNB_ECOLI
     * NP_414685
     * PolyA_pol, PolyA_pol_RNAbd, PolyA_pol_arg_C
+    * TIGR01942 pcnB
 
-![A model of the structure of the RNA degradosome.](../image/mi610071.f2.jpeg)
+* Enolase
+    * eno
+    * https://www.uniprot.org/uniprot/P0A6P9
+    * ENO_ECOLI
+    * NP_417259
+    * Enolase_N, Enolase_C
+    * TIGR01060 eno
 
 ## The Gram-Positive Bacterial RNA Degradosome
 
 ![Model of the Gram-positive RNA degradosome.](../image/fmicb-08-00154-g002.jpg)
+
+* RNase E ==> RNase Y, RNase J1 and J2
+* PNPase == PNPase
+* RhlB ==> CshA
+* Enolase ==> Enolase and PFK
+
+* Ribonuclease Y
+    * rny
+    * https://www.uniprot.org/uniprot/O31774
+    * RNY_BACSU
+    * DUF3552, KH_1, HD
+    * TIGR03319 RNase_Y
+
+* Ribonuclease J1
+    * rnjA
+    * https://www.uniprot.org/uniprot/Q45493
+    * RNJ1_BACSU
+    * Lactamase_B, RMMBL, RNase_J_C
+    * TIGR00649 MG423
+
+* Ribonuclease J2
+    * rnjB
+    * https://www.uniprot.org/uniprot/O31760
+    * RNJ2_BACSU
+    * Lactamase_B, RMMBL, RNase_J_C
+    * TIGR00649 MG423
+
+* DEAD-box ATP-dependent RNA helicase CshA
+    * cshA
+    * https://www.uniprot.org/uniprot/P96614
+    * CSHA_BACSU
+    * DEAD, Helicase_C
+
+* ATP-dependent 6-phosphofructokinase
+    * pfkA
+    * https://www.uniprot.org/uniprot/O34529
+    * PFKA_BACSU
+    * PFK (PF00365)
+    * TIGR02482 PFKA_ATP
 
 # RNase R
 
@@ -1058,6 +1112,18 @@ Ref.:
 * PolyA_pol_RNAbd (PF12627)
 * PolyA_pol_arg_C (PF12626)
 
+* Enolase_N (PF03952)
+* Enolase_C (PF00113)
+
+* DUF3552 (PF12072)
+* HD (PF01966)
+
+* Lactamase_B (PF00753)
+* RMMBL (PF07521)
+* RNase_J_C (PF17770)
+
+* PFK (PF00365)
+
 * RNase_R: TIGR02063
 * 3_prime_RNase: TIGR00358
 
@@ -1066,6 +1132,11 @@ Ref.:
 * polynuc_phos: TIGR03591
 * NusA: TIGR01953
 * pcnB: TIGR01942
+* eno: TIGR01060
+
+* RNase_Y: TIGR03319
+* MG423: TIGR00649
+* PFKA_ATP: TIGR02482
 
 ```bash
 cd ~/data/alignment/Tenericutes
@@ -1080,6 +1151,10 @@ for ID in \
     PF10150 PF01138 PF03725 PF03726 PF00013 \
     PF00270 PF00271 \
     PF01743 PF12627 PF12626 \
+    PF03952 PF00113 \
+    PF12072 PF01966 \
+    PF00753 PF07521 PF17770 \
+    PF00365 \
     ; do
     wget -N --content-disposition http://pfam.xfam.org/family/${ID}/hmm
 done
@@ -1092,6 +1167,11 @@ cp ~/data/HMM/TIGRFAM/HMM/TIGR00757.HMM RNaseEG.hmm
 cp ~/data/HMM/TIGRFAM/HMM/TIGR03591.HMM polynuc_phos.hmm
 cp ~/data/HMM/TIGRFAM/HMM/TIGR01953.HMM NusA.hmm
 cp ~/data/HMM/TIGRFAM/HMM/TIGR01942.HMM pcnB.hmm
+cp ~/data/HMM/TIGRFAM/HMM/TIGR01060.HMM eno.hmm
+
+cp ~/data/HMM/TIGRFAM/HMM/TIGR03319.HMM RNase_Y.hmm
+cp ~/data/HMM/TIGRFAM/HMM/TIGR00649.HMM MG423.hmm
+cp ~/data/HMM/TIGRFAM/HMM/TIGR02482.HMM PFKA_ATP.hmm
 
 ```
 
@@ -1109,9 +1189,19 @@ for domain in \
     RNase_E_G RNase_PH RNase_PH_C PNPase KH_1 \
     DEAD Helicase_C \
     PolyA_pol PolyA_pol_RNAbd PolyA_pol_arg_C \
+    Enolase_N Enolase_C \
+    DUF3552 HD \
+    Lactamase_B RMMBL RNase_J_C \
+    PFK \
     RNase_R 3_prime_RNase \
-    rpsA RNaseEG polynuc_phos NusA pcnB \
+    rpsA RNaseEG polynuc_phos NusA pcnB eno \
+    RNase_Y MG423 PFKA_ATP \
     ; do
+    echo ${domain}
+done \
+    > domain.list
+
+for domain in $(cat domain.list); do
     echo 1>&2 "==> domain [${domain}]"
         
     for GENUS in $(cat genus.list); do
@@ -1135,16 +1225,7 @@ for domain in \
     echo 1>&2
 done
 
-for domain in \
-    OB_RNB CSD2 RNB S1 \
-    HTH_12 RNase_II_C_S1 Importin_rep \
-    PIN_4 Rrp44_CSD1 OB_Dis3 Rrp44_S1 \
-    RNase_E_G RNase_PH RNase_PH_C PNPase KH_1 \
-    DEAD Helicase_C \
-    PolyA_pol PolyA_pol_RNAbd PolyA_pol_arg_C \
-    RNase_R 3_prime_RNase \
-    rpsA RNaseEG polynuc_phos NusA pcnB \
-    ; do
+for domain in $(cat domain.list); do
     wc -l DOMAINS/${domain}.replace.tsv
 done |
     datamash reverse -W |
@@ -1158,19 +1239,10 @@ find DOMAINS/ -name "*.replace.tsv" |
     sort -u \
     > DOMAINS/domains.tsv
 wc -l DOMAINS/domains.tsv
-#4301 DOMAINS/domains.tsv
+#7548 DOMAINS/domains.tsv
 
 # Status of domains
-for domain in \
-    OB_RNB CSD2 RNB S1 \
-    HTH_12 RNase_II_C_S1 Importin_rep \
-    PIN_4 Rrp44_CSD1 OB_Dis3 Rrp44_S1 \
-    RNase_E_G RNase_PH RNase_PH_C PNPase KH_1 \
-    DEAD Helicase_C \
-    PolyA_pol PolyA_pol_RNAbd PolyA_pol_arg_C \
-    RNase_R 3_prime_RNase \
-    rpsA RNaseEG polynuc_phos NusA pcnB \
-    ; do
+for domain in $(cat domain.list); do
     echo 1>&2 "==> domain [${domain}]"
 
     tsv-join \
@@ -1189,19 +1261,10 @@ for domain in \
 done
 
 datamash check < DOMAINS/domains.tsv
-#4301 lines, 29 fields
+#7548 lines, 41 fields
 
 # Add header line
-for domain in \
-    OB_RNB CSD2 RNB S1 \
-    HTH_12 RNase_II_C_S1 Importin_rep \
-    PIN_4 Rrp44_CSD1 OB_Dis3 Rrp44_S1 \
-    RNase_E_G RNase_PH RNase_PH_C PNPase KH_1 \
-    DEAD Helicase_C \
-    PolyA_pol PolyA_pol_RNAbd PolyA_pol_arg_C \
-    RNase_R 3_prime_RNase \
-    rpsA RNaseEG polynuc_phos NusA pcnB \
-    ; do
+for domain in $(cat domain.list); do
     echo "${domain}"
 done |
     (echo -e "#name" && cat) |
@@ -1228,7 +1291,7 @@ tsv-join \
     --data-fields 1 \
     -f DOMAINS/domains.tsv \
     --key-fields 1 \
-    --append-fields 2-29 |
+    --append-fields 2-41 |
      keep-header -- sort -k1,1 \
     > temp && mv temp DOMAINS/domains.tsv
 
@@ -1259,6 +1322,14 @@ rm DOMAINS/header.tsv DOMAINS/RHLB.tsv DOMAINS/size.tsv
 | DOMAINS/PolyA_pol.replace.tsv       | 64    |
 | DOMAINS/PolyA_pol_RNAbd.replace.tsv | 84    |
 | DOMAINS/PolyA_pol_arg_C.replace.tsv | 3     |
+| DOMAINS/Enolase_N.replace.tsv       | 338   |
+| DOMAINS/Enolase_C.replace.tsv       | 340   |
+| DOMAINS/DUF3552.replace.tsv         | 279   |
+| DOMAINS/HD.replace.tsv              | 1353  |
+| DOMAINS/Lactamase_B.replace.tsv     | 833   |
+| DOMAINS/RMMBL.replace.tsv           | 451   |
+| DOMAINS/RNase_J_C.replace.tsv       | 584   |
+| DOMAINS/PFK.replace.tsv             | 340   |
 | DOMAINS/RNase_R.replace.tsv         | 484   |
 | DOMAINS/3_prime_RNase.replace.tsv   | 390   |
 | DOMAINS/rpsA.replace.tsv            | 615   |
@@ -1266,6 +1337,10 @@ rm DOMAINS/header.tsv DOMAINS/RHLB.tsv DOMAINS/size.tsv
 | DOMAINS/polynuc_phos.replace.tsv    | 609   |
 | DOMAINS/NusA.replace.tsv            | 350   |
 | DOMAINS/pcnB.replace.tsv            | 65    |
+| DOMAINS/eno.replace.tsv             | 340   |
+| DOMAINS/RNase_Y.replace.tsv         | 577   |
+| DOMAINS/MG423.replace.tsv           | 784   |
+| DOMAINS/PFKA_ATP.replace.tsv        | 385   |
 
 ## Stats of annotations and HMM models
 
