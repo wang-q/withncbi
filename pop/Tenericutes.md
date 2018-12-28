@@ -806,48 +806,56 @@ parallel --no-run-if-empty --linebuffer -k -j 4 "
 Proteins containing S1 domain in E. coli:
 
 * Exoribonuclease 2
+    * rnb
     * https://www.uniprot.org/uniprot/P30850
     * RNB_ECOLI
     * NP_415802
     * OB_RNB, CSD2, RNB, S1
 
 * Ribonuclease R
+    * rnr
     * https://www.uniprot.org/uniprot/P21499
     * RNR_ECOLI
     * NP_418600
     * HTH_12, OB_RNB, CSD2, RNB, S1
 
 * 30S ribosomal protein S1
+    * rpsA
     * https://www.uniprot.org/uniprot/P0AG67
     * RS1_ECOLI
     * NP_415431
     * 6 X S1
 
 * Ribonuclease E
+    * rne
     * https://www.uniprot.org/uniprot/P21513
     * RNE_ECOLI
     * NP_415602
     * S1, RNase_E_G
 
 * Ribonuclease G
+    * rng
     * https://www.uniprot.org/uniprot/P0A9J0
     * RNG_ECOLI
     * NP_417713
     * S1, RNase_E_G
 
 * Polyribonucleotide nucleotidyltransferase
+    * pnp
     * https://www.uniprot.org/uniprot/P05055
     * PNP_ECOLI
     * NP_417633
     * RNase_PH, RNase_PH_C, PNPase, RNase_PH, RNase_PH_C, KH_1, S1
 
 * Transcription termination/antitermination protein NusA
+    * nusA
     * https://www.uniprot.org/uniprot/P0AFF6
     * NUSA_ECOLI
     * NP_417638
     * NusA_N, S1, KH_5, HHH_5
 
 * Protein YhgF
+    * yhgF
     * https://www.uniprot.org/uniprot/P46837
     * YHGF_ECOLI
     * NP_417866
@@ -868,12 +876,14 @@ Components of the RNA degradosome in E. coli:
     * PAP
 
 * ATP-dependent RNA helicase RhlB
+    * rhlB
     * https://www.uniprot.org/uniprot/P0A8J8
     * RHLB_ECOLI
     * NP_418227
     * DEAD, Helicase_C
 
 * Poly(A) polymerase I
+    * pcnB
     * https://www.uniprot.org/uniprot/P0ABF1
     * PCNB_ECOLI
     * NP_414685
@@ -1016,9 +1026,6 @@ Ref.:
 * OB_Dis3 (PF17849)
 * Rrp44_S1 (PF17215)
 
-* RNase_R: TIGR02063
-* 3_prime_RNase: TIGR00358
-
 * RNase_E_G (PF10150)
 * RNase_PH (PF01138)
 * RNase_PH_C (PF03725)
@@ -1031,6 +1038,15 @@ Ref.:
 * PolyA_pol (PF01743)
 * PolyA_pol_RNAbd (PF12627)
 * PolyA_pol_arg_C (PF12626)
+
+* RNase_R: TIGR02063
+* 3_prime_RNase: TIGR00358
+
+* rpsA: TIGR00717
+* RNaseEG: TIGR00757
+* polynuc_phos: TIGR03591
+* NusA: TIGR01953
+* pcnB: TIGR01942
 
 ```bash
 cd ~/data/alignment/Tenericutes
@@ -1049,8 +1065,14 @@ for ID in \
     wget -N --content-disposition http://pfam.xfam.org/family/${ID}/hmm
 done
 
-cp ~/data/HMM/TIGRFAM/HMM/TIGR02063.HMM TIGR02063.hmm
-cp ~/data/HMM/TIGRFAM/HMM/TIGR00358.HMM TIGR00358.hmm
+cp ~/data/HMM/TIGRFAM/HMM/TIGR02063.HMM RNase_R.hmm
+cp ~/data/HMM/TIGRFAM/HMM/TIGR00358.HMM 3_prime_RNase.hmm
+
+cp ~/data/HMM/TIGRFAM/HMM/TIGR00717.HMM rpsA.hmm
+cp ~/data/HMM/TIGRFAM/HMM/TIGR00757.HMM RNaseEG.hmm
+cp ~/data/HMM/TIGRFAM/HMM/TIGR03591.HMM polynuc_phos.hmm
+cp ~/data/HMM/TIGRFAM/HMM/TIGR01953.HMM NusA.hmm
+cp ~/data/HMM/TIGRFAM/HMM/TIGR01942.HMM pcnB.hmm
 
 ```
 
@@ -1068,7 +1090,8 @@ for domain in \
     RNase_E_G RNase_PH RNase_PH_C PNPase KH_1 \
     DEAD Helicase_C \
     PolyA_pol PolyA_pol_RNAbd PolyA_pol_arg_C \
-    TIGR02063 TIGR00358 \
+    RNase_R 3_prime_RNase \
+    rpsA RNaseEG polynuc_phos NusA pcnB \
     ; do
     echo 1>&2 "==> domain [${domain}]"
         
@@ -1100,7 +1123,8 @@ for domain in \
     RNase_E_G RNase_PH RNase_PH_C PNPase KH_1 \
     DEAD Helicase_C \
     PolyA_pol PolyA_pol_RNAbd PolyA_pol_arg_C \
-    TIGR02063 TIGR00358 \
+    RNase_R 3_prime_RNase \
+    rpsA RNaseEG polynuc_phos NusA pcnB \
     ; do
     wc -l DOMAINS/${domain}.replace.tsv
 done |
@@ -1115,7 +1139,7 @@ find DOMAINS/ -name "*.replace.tsv" |
     sort -u \
     > DOMAINS/domains.tsv
 wc -l DOMAINS/domains.tsv
-#4180 DOMAINS/domains.tsv
+#4301 DOMAINS/domains.tsv
 
 # Status of domains
 for domain in \
@@ -1125,7 +1149,8 @@ for domain in \
     RNase_E_G RNase_PH RNase_PH_C PNPase KH_1 \
     DEAD Helicase_C \
     PolyA_pol PolyA_pol_RNAbd PolyA_pol_arg_C \
-    TIGR02063 TIGR00358 \
+    RNase_R 3_prime_RNase \
+    rpsA RNaseEG polynuc_phos NusA pcnB \
     ; do
     echo 1>&2 "==> domain [${domain}]"
 
@@ -1145,7 +1170,7 @@ for domain in \
 done
 
 datamash check < DOMAINS/domains.tsv
-#4180 lines, 24 fields
+#4301 lines, 29 fields
 
 # Add header line
 for domain in \
@@ -1155,7 +1180,8 @@ for domain in \
     RNase_E_G RNase_PH RNase_PH_C PNPase KH_1 \
     DEAD Helicase_C \
     PolyA_pol PolyA_pol_RNAbd PolyA_pol_arg_C \
-    TIGR02063 TIGR00358 \
+    RNase_R 3_prime_RNase \
+    rpsA RNaseEG polynuc_phos NusA pcnB \
     ; do
     echo "${domain}"
 done |
@@ -1167,7 +1193,7 @@ done |
 cat DOMAINS/domains.tsv |
     tsv-filter --str-eq 18:O --str-eq 19:O \
     > DOMAINS/RHLB.tsv
-    
+
 cat DOMAINS/domains.tsv |
     tsv-filter --str-ne 18:O --str-ne 19:O |
     (cat DOMAINS/header.tsv && cat) |
@@ -1183,7 +1209,7 @@ tsv-join \
     --data-fields 1 \
     -f DOMAINS/domains.tsv \
     --key-fields 1 \
-    --append-fields 2-24 |
+    --append-fields 2-29 |
      keep-header -- sort -k1,1 \
     > temp && mv temp DOMAINS/domains.tsv
 
@@ -1214,8 +1240,13 @@ rm DOMAINS/header.tsv DOMAINS/RHLB.tsv DOMAINS/size.tsv
 | DOMAINS/PolyA_pol.replace.tsv       | 64    |
 | DOMAINS/PolyA_pol_RNAbd.replace.tsv | 84    |
 | DOMAINS/PolyA_pol_arg_C.replace.tsv | 3     |
-| DOMAINS/TIGR02063.replace.tsv       | 484   |
-| DOMAINS/TIGR00358.replace.tsv       | 390   |
+| DOMAINS/RNase_R.replace.tsv         | 484   |
+| DOMAINS/3_prime_RNase.replace.tsv   | 390   |
+| DOMAINS/rpsA.replace.tsv            | 615   |
+| DOMAINS/RNaseEG.replace.tsv         | 17    |
+| DOMAINS/polynuc_phos.replace.tsv    | 609   |
+| DOMAINS/NusA.replace.tsv            | 350   |
+| DOMAINS/pcnB.replace.tsv            | 65    |
 
 ## Stats of annotations and HMM models
 
