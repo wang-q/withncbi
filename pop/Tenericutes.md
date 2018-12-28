@@ -915,7 +915,7 @@ Ref.:
 * [Pfam](http://pfam.xfam.org/protein/RRP44_HUMAN)
 * [UniProt](https://www.uniprot.org/uniprot/Q9Y2L1)
 * [NCBI](https://www.ncbi.nlm.nih.gov/protein/NP_055768.3)
-* Subcellular locationi: Nucleus
+* Subcellular location: Nucleus
 
 ![RRP44_HUMAN](../image/RRP44_HUMAN.png)
 
@@ -923,7 +923,7 @@ Ref.:
 
 * [Pfam](http://pfam.xfam.org/protein/Q9VC93_DROME)
 * [UniProt](https://www.uniprot.org/uniprot/Q9VC93)
-* Subcellular locationi: Nucleus
+* Subcellular location: Nucleus
 
 ![Dis3](../image/Q9VC93_DROME.png)
 
@@ -932,9 +932,16 @@ Ref.:
 * [Pfam](http://pfam.xfam.org/protein/RRP44_YEAST)
 * [UniProt](https://www.uniprot.org/uniprot/Q08162)
 * [NCBI](https://www.ncbi.nlm.nih.gov/protein/NP_014621.1)
-* Subcellular locationi: Nucleus, Mitochondrion
+* Subcellular location: Nucleus, Mitochondrion
 
 ![RRP44_YEAST](../image/RRP44_YEAST.png)
+
+### Arabidopsis thaliana RP44A
+
+* [UniProt](https://www.uniprot.org/uniprot/Q9SHL7)
+* Subcellular location: Nucleus
+
+![RP44A_ARATH](../image/RP44A_ARATH.png)
 
 ### E. coli RNase R
 
