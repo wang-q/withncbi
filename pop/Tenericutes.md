@@ -15,6 +15,9 @@
     - [Tweak the concat tree](#tweak-the-concat-tree)
     - [TIGR](#tigr)
 - [Bacteria degradosome](#bacteria-degradosome)
+    - [Proteins containing S1 domain in E. coli](#proteins-containing-s1-domain-in-e-coli)
+    - [Components of the RNA degradosome in E. coli](#components-of-the-rna-degradosome-in-e-coli)
+    - [The Gram-Positive Bacterial RNA Degradosome](#the-gram-positive-bacterial-rna-degradosome)
 - [RNase R](#rnase-r)
     - [Domain organisation](#domain-organisation)
         - [Human RRP44](#human-rrp44)
@@ -803,7 +806,15 @@ parallel --no-run-if-empty --linebuffer -k -j 4 "
 
 # Bacteria degradosome
 
-Proteins containing S1 domain in E. coli:
+Ref.:
+
+* Carpousis, A. J. The RNA Degradosome of Escherichia coli : An mRNA-Degrading Machine Assembled on
+  RNase E. Annu. Rev. Microbiol. 61, 71–87 (2007).
+
+* Cho, K. H. The Structure and Function of the Gram-Positive Bacterial RNA Degradosome. Front.
+  Microbiol. 8, (2017).
+
+## Proteins containing S1 domain in E. coli
 
 * Exoribonuclease 2
     * rnb
@@ -861,7 +872,7 @@ Proteins containing S1 domain in E. coli:
     * NP_417866
     * Tex_N, Tex_YqgF, HHH_3, HHH_9, S1
 
-Components of the RNA degradosome in E. coli:
+## Components of the RNA degradosome in E. coli
 
 * RNase E initially inactivates polyribosomal mRNA by cleaving in the translation initiation region
   or in the intercistronic regions of polycistronic messages. As the elongating ribosomes finish
@@ -889,10 +900,11 @@ Components of the RNA degradosome in E. coli:
     * NP_414685
     * PolyA_pol, PolyA_pol_RNAbd, PolyA_pol_arg_C
 
-Ref.:
+![A model of the structure of the RNA degradosome.](../image/mi610071.f2.jpeg)
 
-* Carpousis, A. J. The RNA Degradosome of Escherichia coli : An mRNA-Degrading Machine Assembled on
-  RNase E. Annu. Rev. Microbiol. 61, 71–87 (2007).
+## The Gram-Positive Bacterial RNA Degradosome
+
+![Model of the Gram-positive RNA degradosome.](../image/fmicb-08-00154-g002.jpg)
 
 # RNase R
 
