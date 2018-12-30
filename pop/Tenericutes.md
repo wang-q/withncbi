@@ -15,9 +15,9 @@
     - [Tweak the concat tree](#tweak-the-concat-tree)
     - [TIGR](#tigr)
 - [Bacteria degradosome](#bacteria-degradosome)
-    - [Proteins containing S1 domain in E. coli](#proteins-containing-s1-domain-in-e-coli)
     - [Components of the RNA degradosome in E. coli](#components-of-the-rna-degradosome-in-e-coli)
     - [The Gram-Positive Bacterial RNA Degradosome](#the-gram-positive-bacterial-rna-degradosome)
+    - [Proteins containing S1 domain in E. coli](#proteins-containing-s1-domain-in-e-coli)
 - [RNase R](#rnase-r)
     - [Domain organisation](#domain-organisation)
         - [Human RRP44](#human-rrp44)
@@ -409,27 +409,27 @@ done
 
 ```
 
-| Order             | Genus           | Comments           | Species | Strains |
-|:------------------|:----------------|:-------------------|--------:|--------:|
-| Acholeplasmatales |                 |                    |         |         |
-|                   | Acholeplasma    | 无胆甾原体           |      11 |      13 |
-|                   | Phytoplasma     | 植原体              |         |      25 |
-| Anaeroplasmatales |                 |                    |         |         |
-|                   | Anaeroplasma    |                    |       1 |       1 |
-|                   | Asteroleplasma  |                    |         |         |
-| Entomoplasmatales |                 | 虫原体              |         |         |
-|                   | Entomoplasma    |                    |       6 |      10 |
-|                   | Mesoplasma      |                    |      11 |      15 |
-|                   | Spiroplasma     | 螺原体, 感染昆虫与植物 |      25 |      31 |
-| Mycoplasmatales   |                 |                    |         |         |
-|                   | Mycoplasma      | 支原体              |      86 |     207 |
-|                   | Ureaplasma      | 脲原体              |       4 |      25 |
-|                   | Hepatoplasma    |                    |       1 |       1 |
-| Unclassified      |                 |                    |         |         |
-|                   | Izimaplasma     | 独立生活             |         |       3 |
-| Haloplasmatales   |                 |                    |         |         |
-|                   | Haloplasma      |                    |       1 |       1 |
-|                   | Inordinaticella |                    |       1 |       1 |
+| Order             | Genus           | Comments             |  Species |  Strains |
+|:------------------|:----------------|:---------------------|---------:|---------:|
+| Acholeplasmatales |                 |                      |          |          |
+|                   | Acholeplasma    | 无胆甾原体            |       11 |       13 |
+|                   | Phytoplasma     | 植原体                |          |       25 |
+| Anaeroplasmatales |                 |                      |          |          |
+|                   | Anaeroplasma    |                      |        1 |        1 |
+|                   | Asteroleplasma  |                      |          |          |
+| Entomoplasmatales |                 | 虫原体                |          |          |
+|                   | Entomoplasma    |                      |        6 |       10 |
+|                   | Mesoplasma      |                      |       11 |       15 |
+|                   | Spiroplasma     | 螺原体, 感染昆虫与植物  |       25 |       31 |
+| Mycoplasmatales   |                 |                      |          |          |
+|                   | Mycoplasma      | 支原体                |       86 |      207 |
+|                   | Ureaplasma      | 脲原体                |        4 |       25 |
+|                   | Hepatoplasma    |                      |        1 |        1 |
+| Unclassified      |                 |                      |          |          |
+|                   | Izimaplasma     | 独立生活              |          |        3 |
+| Haloplasmatales   |                 |                      |          |          |
+|                   | Haloplasma      |                      |        1 |        1 |
+|                   | Inordinaticella |                      |        1 |        1 |
 
 # Collect proteins
 
@@ -815,69 +815,6 @@ Ref.:
 * Cho, K. H. The Structure and Function of the Gram-Positive Bacterial RNA Degradosome. Front.
   Microbiol. 8, (2017).
 
-## Proteins containing S1 domain in E. coli
-
-* Exoribonuclease 2
-    * rnb
-    * https://www.uniprot.org/uniprot/P30850
-    * RNB_ECOLI
-    * NP_415802
-    * OB_RNB, CSD2, RNB, S1
-
-* Ribonuclease R
-    * rnr
-    * https://www.uniprot.org/uniprot/P21499
-    * RNR_ECOLI
-    * NP_418600
-    * HTH_12, OB_RNB, CSD2, RNB, S1
-
-* 30S ribosomal protein S1
-    * rpsA
-    * https://www.uniprot.org/uniprot/P0AG67
-    * RS1_ECOLI
-    * NP_415431
-    * 6 X S1
-    * TIGR00717 rpsA
-
-* Ribonuclease E
-    * rne
-    * https://www.uniprot.org/uniprot/P21513
-    * RNE_ECOLI
-    * NP_415602
-    * S1, RNase_E_G
-    * TIGR00757 RNaseEG
-
-* Ribonuclease G
-    * rng
-    * https://www.uniprot.org/uniprot/P0A9J0
-    * RNG_ECOLI
-    * NP_417713
-    * S1, RNase_E_G
-    * TIGR00757 RNaseEG
-
-* Polyribonucleotide nucleotidyltransferase
-    * pnp
-    * https://www.uniprot.org/uniprot/P05055
-    * PNP_ECOLI
-    * NP_417633
-    * RNase_PH, RNase_PH_C, PNPase, RNase_PH, RNase_PH_C, KH_1, S1
-    * TIGR03591 polynuc_phos
-
-* Transcription termination/antitermination protein NusA
-    * nusA
-    * https://www.uniprot.org/uniprot/P0AFF6
-    * NUSA_ECOLI
-    * NP_417638
-    * NusA_N, S1, KH_5, HHH_5
-    * TIGR01953 NusA
-
-* Protein YhgF
-    * yhgF
-    * https://www.uniprot.org/uniprot/P46837
-    * YHGF_ECOLI
-    * NP_417866
-    * Tex_N, Tex_YqgF, HHH_3, HHH_9, S1
-
 ## Components of the RNA degradosome in E. coli
 
 ![A model of the structure of the RNA degradosome.](../image/mi610071.f2.jpeg)
@@ -894,28 +831,81 @@ Ref.:
     * RhlB
     * PAP
 
-* ATP-dependent RNA helicase RhlB
-    * rhlB
-    * https://www.uniprot.org/uniprot/P0A8J8
+* rne
+    * RNE_ECOLI
+    * Ribonuclease E
+    * https://www.uniprot.org/uniprot/P21513
+    * NP_415602
+    * S1, RNase_E_G
+    * TIGR00757 RNaseEG
+
+* rnb
+    * RNB_ECOLI
+    * Exoribonuclease 2
+    * https://www.uniprot.org/uniprot/P30850
+    * NP_415802
+    * OB_RNB, CSD2, RNB, S1
+
+* rnr
+    * RNR_ECOLI
+    * Ribonuclease R
+    * https://www.uniprot.org/uniprot/P21499
+    * NP_418600
+    * HTH_12, OB_RNB, CSD2, RNB, S1
+
+* pnp
+    * PNP_ECOLI
+    * Polyribonucleotide nucleotidyltransferase
+    * https://www.uniprot.org/uniprot/P05055
+    * NP_417633
+    * RNase_PH, RNase_PH_C, PNPase, RNase_PH, RNase_PH_C, KH_1, S1
+    * TIGR03591 polynuc_phos
+
+* rhlB
     * RHLB_ECOLI
+    * ATP-dependent RNA helicase RhlB
+    * https://www.uniprot.org/uniprot/P0A8J8
     * NP_418227
     * DEAD, Helicase_C
 
-* Poly(A) polymerase I
-    * pcnB
-    * https://www.uniprot.org/uniprot/P0ABF1
+* eno
+    * ENO_ECOLI
+    * Enolase
+    * https://www.uniprot.org/uniprot/P0A6P9
+    * NP_417259
+    * Enolase_N, Enolase_C
+    * TIGR01060 eno
+
+* pcnB
     * PCNB_ECOLI
+    * Poly(A) polymerase I
+    * https://www.uniprot.org/uniprot/P0ABF1
     * NP_414685
     * PolyA_pol, PolyA_pol_RNAbd, PolyA_pol_arg_C
     * TIGR01942 pcnB
 
-* Enolase
-    * eno
-    * https://www.uniprot.org/uniprot/P0A6P9
-    * ENO_ECOLI
-    * NP_417259
-    * Enolase_N, Enolase_C
-    * TIGR01060 eno
+RNE_ECOLI has binary interactions with 5 proteins:
+
+* SRMB_ECOLI
+* PNP_ECOLI
+* DNAK_ECOLI
+* RHLB_ECOLI
+* ENO_ECOLI
+
+* srmB
+    * SRMB_ECOLI
+    * ATP-dependent RNA helicase SrmB
+    * https://www.uniprot.org/uniprot/P21507
+    * NP_417071
+    * DEAD, Helicase_C
+
+* dnaK
+    * DNAK_ECOLI
+    * Chaperone protein DnaK
+    * https://www.uniprot.org/uniprot/P0A6Y8
+    * NP_414555
+    * HSP70 (PF00012)
+    * TIGR02350 prok_dnaK
 
 ## The Gram-Positive Bacterial RNA Degradosome
 
@@ -926,39 +916,80 @@ Ref.:
 * RhlB ==> CshA
 * Enolase ==> Enolase and PFK
 
-* Ribonuclease Y
-    * rny
-    * https://www.uniprot.org/uniprot/O31774
+* rny
     * RNY_BACSU
+    * Ribonuclease Y
+    * https://www.uniprot.org/uniprot/O31774
     * DUF3552, KH_1, HD
     * TIGR03319 RNase_Y
 
-* Ribonuclease J1
-    * rnjA
-    * https://www.uniprot.org/uniprot/Q45493
+* rnjA
     * RNJ1_BACSU
+    * Ribonuclease J1
+    * https://www.uniprot.org/uniprot/Q45493
     * Lactamase_B, RMMBL, RNase_J_C
     * TIGR00649 MG423
 
-* Ribonuclease J2
-    * rnjB
-    * https://www.uniprot.org/uniprot/O31760
+* rnjB
     * RNJ2_BACSU
+    * Ribonuclease J2
+    * https://www.uniprot.org/uniprot/O31760
     * Lactamase_B, RMMBL, RNase_J_C
     * TIGR00649 MG423
 
-* DEAD-box ATP-dependent RNA helicase CshA
-    * cshA
-    * https://www.uniprot.org/uniprot/P96614
+* cshA
     * CSHA_BACSU
+    * DEAD-box ATP-dependent RNA helicase CshA
+    * https://www.uniprot.org/uniprot/P96614
     * DEAD, Helicase_C
 
-* ATP-dependent 6-phosphofructokinase
-    * pfkA
-    * https://www.uniprot.org/uniprot/O34529
+* pfkA
     * PFKA_BACSU
+    * ATP-dependent 6-phosphofructokinase
+    * https://www.uniprot.org/uniprot/O34529
     * PFK (PF00365)
     * TIGR02482 PFKA_ATP
+
+* pnp
+    * PNP_BACSU
+    * Polyribonucleotide nucleotidyltransferase
+    * https://www.uniprot.org/uniprot/P50849
+    * NP_389551
+    * RNase_PH, RNase_PH_C, PNPase, RNase_PH, RNase_PH_C, KH_1, S1
+    * TIGR03591 polynuc_phos
+
+## Proteins containing S1 domain in E. coli
+
+* rpsA
+    * RS1_ECOLI
+    * 30S ribosomal protein S1
+    * https://www.uniprot.org/uniprot/P0AG67
+    * NP_415431
+    * 6 X S1
+    * TIGR00717 rpsA
+
+* rng
+    * RNG_ECOLI
+    * Ribonuclease G
+    * https://www.uniprot.org/uniprot/P0A9J0
+    * NP_417713
+    * S1, RNase_E_G
+    * TIGR00757 RNaseEG
+
+* nusA
+    * NUSA_ECOLI
+    * Transcription termination/antitermination protein NusA
+    * https://www.uniprot.org/uniprot/P0AFF6
+    * NP_417638
+    * NusA_N, S1, KH_5, HHH_5
+    * TIGR01953 NusA
+
+* yhgF
+    * YHGF_ECOLI
+    * Protein YhgF
+    * https://www.uniprot.org/uniprot/P46837
+    * NP_417866
+    * Tex_N, Tex_YqgF, HHH_3, HHH_9, S1
 
 # RNase R
 
