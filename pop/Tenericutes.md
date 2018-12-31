@@ -8,6 +8,8 @@
     - [NCBI taxonomy](#ncbi-taxonomy)
 - [Count strains](#count-strains)
 - [Collect proteins](#collect-proteins)
+    - [`all.replace.fa` and `all.size.tsv`](#allreplacefa-and-allsizetsv)
+    - [`all.annotation.tsv`](#allannotationtsv)
 - [Phylogenetics with 40 single-copy genes, *RpoB*, *EF-tu* and RNase_R](#phylogenetics-with-40-single-copy-genes-rpob-ef-tu-and-rnase_r)
     - [Find corresponding proteins by `hmmsearch`](#find-corresponding-proteins-by-hmmsearch)
     - [Create valid marker gene list](#create-valid-marker-gene-list)
@@ -477,7 +479,11 @@ cat PROTEINS/all.pro.fa |
     uniq -c |
     sort -nr
 
-# all.replace.fa
+```
+
+## `all.replace.fa` and `all.size.tsv`
+
+```bash
 for GENUS in $(cat genus.list); do
     echo 1>&2 "==> GENUS [${GENUS}]"
 
@@ -486,7 +492,7 @@ for GENUS in $(cat genus.list); do
             grep "^>" |
             cut -d" " -f 1 |
             sed "s/^>//" |
-            STRAIN=${STRAIN} perl -nl -MPath::Tiny -e '
+            STRAIN=${STRAIN} perl -nl -e '
                 $n = $_;
                 $s = $n;
                 $s =~ s/\.\d+//;
@@ -513,6 +519,57 @@ cat PROTEINS/all.replace.fa |
 #311273
 
 faops size PROTEINS/all.replace.fa > PROTEINS/all.replace.sizes
+
+(echo -e "#name\tsize" && cat PROTEINS/all.replace.sizes) > PROTEINS/all.size.tsv
+
+rm PROTEINS/all.replace.sizes
+
+```
+
+## `all.annotation.tsv` and `all.size_anno.tsv`
+
+```bash
+for GENUS in $(cat genus.list); do
+    echo 1>&2 "==> GENUS [${GENUS}]"
+
+    for STRAIN in $(cat taxon/${GENUS}); do
+        gzip -dcf ASSEMBLY/${STRAIN}/*_protein.faa.gz |
+            grep "^>" |
+            sed "s/^>//" |
+            perl -nl -e '/\[.+\[/ and s/\[/\(/; print' |
+            perl -nl -e '/\].+\]/ and s/\]/\)/; print' |
+            perl -nl -e 's/\s+\[.+?\]$//g; print' |
+            perl -nl -e 's/MULTISPECIES: //g; print' |
+            STRAIN=${STRAIN} perl -nl -e '
+                /^(\w+)\.\d+\s+(.+)$/ or next;
+                printf qq{%s_%s\t%s\n}, $ENV{STRAIN}, $1, $2;
+            '
+    done
+done \
+    > PROTEINS/all.annotation.tsv
+
+cat PROTEINS/all.annotation.tsv |
+    wc -l
+#311273
+
+(echo -e "#name\tannotation" && cat PROTEINS/all.annotation.tsv) \
+    > temp && mv temp PROTEINS/all.annotation.tsv
+
+# check differences
+cat PROTEINS/all.size.tsv |
+    grep -F -f <(cut -f 1 PROTEINS/all.annotation.tsv) -v
+
+tsv-join \
+    PROTEINS/all.size.tsv \
+    --data-fields 1 \
+    -f PROTEINS/all.annotation.tsv \
+    --key-fields 1 \
+    --append-fields 2 \
+    > PROTEINS/all.size_anno.tsv
+
+cat PROTEINS/all.size_anno.tsv |
+    wc -l
+#311274
 
 ```
 
@@ -1314,11 +1371,8 @@ cat DOMAINS/domains.tsv |
     keep-header -- sort -k1,1 \
     > temp && mv temp DOMAINS/domains.tsv
 
-# protein sizes
-(echo -e "#name\tsize" && cat PROTEINS/all.replace.sizes) > DOMAINS/size.tsv
-
 tsv-join \
-    DOMAINS/size.tsv \
+    PROTEINS/all.size.tsv \
     --data-fields 1 \
     -f DOMAINS/domains.tsv \
     --key-fields 1 \
@@ -1326,7 +1380,7 @@ tsv-join \
      keep-header -- sort -k1,1 \
     > temp && mv temp DOMAINS/domains.tsv
 
-rm DOMAINS/header.tsv DOMAINS/RHLB.tsv DOMAINS/size.tsv
+rm DOMAINS/header.tsv DOMAINS/RHLB.tsv
 
 ```
 
