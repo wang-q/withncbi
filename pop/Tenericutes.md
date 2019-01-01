@@ -1372,7 +1372,7 @@ cat DOMAINS/domains.tsv |
     > temp && mv temp DOMAINS/domains.tsv
 
 tsv-join \
-    PROTEINS/all.size.tsv \
+    PROTEINS/all.size_anno.tsv \
     --data-fields 1 \
     -f DOMAINS/domains.tsv \
     --key-fields 1 \
