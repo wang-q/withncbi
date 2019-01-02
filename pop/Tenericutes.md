@@ -344,38 +344,30 @@ parallel --no-run-if-empty --linebuffer -k -j 4 '
 #Mycop_sp_CAG_956
 #EOF
 
-cat <<EOF > taxon/Actinobacteria
-Am_med_U32
-Bi_ado_ATCC_15703
-Cor_glu_ATCC_13032
-Mycob_tub_H37Rv
-EOF
-
-cat <<EOF > taxon/Gammaproteobacteria
-Es_coli_K_12_MG1655
-Sa_ente_Typhimurium_LT2
-EOF
-
-cat <<EOF > taxon/Clostridiales
+cat <<EOF > taxon/Firmicutes
+Ba_subt_subtilis_168
+St_aure_aureus_NCTC_8325
 Cl_ace_ATCC_824
-Cl_bot_A_ATCC_3502
 Cl_tet_E88
+Er_rhu_Fujisawa
 Eu_lim_KIST612
 EOF
 
-cat <<EOF > taxon/Erysipelotrichaceae
-Bu_ext_W1219
-Ca_mit_DSM_15897
-Cop_cat
-Er_lar
-Er_rhu_Fujisawa
-Ho_fil_DSM_12042
-So_moo_F0204
+cat <<EOF > taxon/Actinobacteria
+Am_med_U32
+Bi_ado_ATCC_15703
+Co_glu_ATCC_13032
+Mycob_tub_H37Rv
 EOF
 
-cat <<EOF > taxon/Others
-Ba_subt_subtilis_168
-T_san_PC909
+cat <<EOF > taxon/Proteobacteria
+Es_coli_K_12_MG1655
+Sa_ente_Typhimurium_LT2
+P_aer_PAO1
+P_puti_KT2440
+Br_meli_bv_1_16M
+N_gon_FA_1090
+He_pyl_26695
 EOF
 
 wc -l taxon/*
@@ -413,27 +405,27 @@ done
 
 ```
 
-| Order             | Genus           | Comments             |  Species |  Strains |
-|:------------------|:----------------|:---------------------|---------:|---------:|
-| Acholeplasmatales |                 |                      |          |          |
-|                   | Acholeplasma    | 无胆甾原体            |       11 |       13 |
-|                   | Phytoplasma     | 植原体                |          |       25 |
-| Anaeroplasmatales |                 |                      |          |          |
-|                   | Anaeroplasma    |                      |        1 |        1 |
-|                   | Asteroleplasma  |                      |          |          |
-| Entomoplasmatales |                 | 虫原体                |          |          |
-|                   | Entomoplasma    |                      |        6 |       10 |
-|                   | Mesoplasma      |                      |       11 |       15 |
-|                   | Spiroplasma     | 螺原体, 感染昆虫与植物  |       25 |       31 |
-| Mycoplasmatales   |                 |                      |          |          |
-|                   | Mycoplasma      | 支原体                |       86 |      207 |
-|                   | Ureaplasma      | 脲原体                |        4 |       25 |
-|                   | Hepatoplasma    |                      |        1 |        1 |
-| Unclassified      |                 |                      |          |          |
-|                   | Izimaplasma     | 独立生活              |          |        3 |
-| Haloplasmatales   |                 |                      |          |          |
-|                   | Haloplasma      |                      |        1 |        1 |
-|                   | Inordinaticella |                      |        1 |        1 |
+| Order             | Genus           | Comments           | Species | Strains |
+|:------------------|:----------------|:-------------------|--------:|--------:|
+| Acholeplasmatales |                 |                    |         |         |
+|                   | Acholeplasma    | 无胆甾原体           |      11 |      13 |
+|                   | Phytoplasma     | 植原体              |         |      25 |
+| Anaeroplasmatales |                 |                    |         |         |
+|                   | Anaeroplasma    |                    |       1 |       1 |
+|                   | Asteroleplasma  |                    |         |         |
+| Entomoplasmatales |                 | 虫原体              |         |         |
+|                   | Entomoplasma    |                    |       6 |      10 |
+|                   | Mesoplasma      |                    |      11 |      15 |
+|                   | Spiroplasma     | 螺原体, 感染昆虫与植物 |      25 |      31 |
+| Mycoplasmatales   |                 |                    |         |         |
+|                   | Mycoplasma      | 支原体              |      86 |     207 |
+|                   | Ureaplasma      | 脲原体              |       4 |      25 |
+|                   | Hepatoplasma    |                    |       1 |       1 |
+| Unclassified      |                 |                    |         |         |
+|                   | Izimaplasma     | 独立生活             |         |       3 |
+| Haloplasmatales   |                 |                    |         |         |
+|                   | Haloplasma      |                    |       1 |       1 |
+|                   | Inordinaticella |                    |       1 |       1 |
 
 # Collect proteins
 
