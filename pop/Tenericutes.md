@@ -21,8 +21,8 @@
     - [The Gram-Positive Bacterial RNA Degradosome](#the-gram-positive-bacterial-rna-degradosome)
     - [Proteins containing S1 domain in E. coli](#proteins-containing-s1-domain-in-e-coli)
     - [Other RNases](#other-rnases)
-- [RNase R](#rnase-r)
-    - [Domain organisation](#domain-organisation)
+- [Intriguing domains](#intriguing-domains)
+    - [Domain organisation of RNase R](#domain-organisation-of-rnase-r)
         - [E. coli RNase R](#e-coli-rnase-r)
         - [E. coli RNase II](#e-coli-rnase-ii)
         - [Human RRP44](#human-rrp44)
@@ -32,6 +32,7 @@
     - [hmmer.org HMMSCAN Results](#hmmerorg-hmmscan-results)
     - [RNase R domains](#rnase-r-domains)
     - [Scan every domains](#scan-every-domains)
+- [RNase R](#rnase-r)
     - [Stats of annotations and HMM models](#stats-of-annotations-and-hmm-models)
     - [Find all RNase R](#find-all-rnase-r)
     - [Tweak the tree of RNaseR](#tweak-the-tree-of-rnaser)
@@ -1067,9 +1068,9 @@ https://www.uniprot.org/uniprot/?query=Ribonuclease+AND+organism%3A%22Bacillus+s
     * RNase H
     * RNase BN/Z
 
-# RNase R
+# Intriguing domains
 
-## Domain organisation
+## Domain organisation of RNase R
 
 ### E. coli RNase R
 
@@ -1445,6 +1446,8 @@ rm DOMAINS/header.tsv DOMAINS/RHLB.tsv
 | DOMAINS/RNase_Y.replace.tsv         | 551   |
 | DOMAINS/MG423.replace.tsv           | 761   |
 | DOMAINS/PFKA_ATP.replace.tsv        | 371   |
+
+# RNase R
 
 ## Stats of annotations and HMM models
 
