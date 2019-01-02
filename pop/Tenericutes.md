@@ -8,8 +8,9 @@
     - [NCBI taxonomy](#ncbi-taxonomy)
     - [Count strains](#count-strains)
 - [Collect proteins](#collect-proteins)
-    - [`all.replace.fa` and `all.size.tsv`](#allreplacefa-and-allsizetsv)
-    - [`all.annotation.tsv` and `all.size_anno.tsv`](#allannotationtsv-and-allsize_annotsv)
+    - [`all.pro.fa`](#allprofa)
+    - [`all.replace.fa`](#allreplacefa)
+    - [`all.info.tsv`](#allinfotsv)
 - [Phylogenetics with 40 single-copy genes, *RpoB*, *EF-tu* and RNase_R](#phylogenetics-with-40-single-copy-genes-rpob-ef-tu-and-rnase_r)
     - [Find corresponding proteins by `hmmsearch`](#find-corresponding-proteins-by-hmmsearch)
     - [Create valid marker gene list](#create-valid-marker-gene-list)
@@ -32,6 +33,7 @@
     - [hmmer.org HMMSCAN Results](#hmmerorg-hmmscan-results)
     - [RNase R domains](#rnase-r-domains)
     - [Scan every domains](#scan-every-domains)
+    - [InterProScan](#interproscan)
 - [RNase R](#rnase-r)
     - [Stats of annotations and HMM models](#stats-of-annotations-and-hmm-models)
     - [Find all RNase R](#find-all-rnase-r)
@@ -431,6 +433,8 @@ done
 
 # Collect proteins
 
+## `all.pro.fa`
+
 ```bash
 cd ~/data/alignment/Tenericutes
 
@@ -478,9 +482,12 @@ cat PROTEINS/all.pro.fa |
 
 ```
 
-## `all.replace.fa` and `all.size.tsv`
+## `all.replace.fa`
 
 ```bash
+cd ~/data/alignment/Tenericutes
+
+rm PROTEINS/all.strain.tsv
 for GENUS in $(cat genus.list); do
     echo 1>&2 "==> GENUS [${GENUS}]"
 
@@ -493,11 +500,13 @@ for GENUS in $(cat genus.list); do
                 $n = $_;
                 $s = $n;
                 $s =~ s/\.\d+//;
-                printf qq{%s\t%s_%s\n}, $n, $ENV{STRAIN}, $s;
+                printf qq{%s\t%s_%s\t%s\n}, $n, $ENV{STRAIN}, $s, $ENV{STRAIN};
             ' \
         > PROTEINS/${STRAIN}.replace.tsv
         
-        faops replace -s ASSEMBLY/${STRAIN}/*_protein.faa.gz PROTEINS/${STRAIN}.replace.tsv stdout
+        cut -f 2,3 PROTEINS/${STRAIN}.replace.tsv >> PROTEINS/all.strain.tsv
+
+        faops replace -s ASSEMBLY/${STRAIN}/*_protein.faa.gz <(cut -f 1,2 PROTEINS/${STRAIN}.replace.tsv) stdout
         
         rm PROTEINS/${STRAIN}.replace.tsv
     done
@@ -515,6 +524,9 @@ cat PROTEINS/all.replace.fa |
     wc -l
 #310265
 
+(echo -e "#name\tstrain" && cat PROTEINS/all.strain.tsv)  \
+    > temp && mv temp PROTEINS/all.strain.tsv
+
 faops size PROTEINS/all.replace.fa > PROTEINS/all.replace.sizes
 
 (echo -e "#name\tsize" && cat PROTEINS/all.replace.sizes) > PROTEINS/all.size.tsv
@@ -523,9 +535,11 @@ rm PROTEINS/all.replace.sizes
 
 ```
 
-## `all.annotation.tsv` and `all.size_anno.tsv`
+## `all.info.tsv`
 
 ```bash
+cd ~/data/alignment/Tenericutes
+
 for GENUS in $(cat genus.list); do
     echo 1>&2 "==> GENUS [${GENUS}]"
 
@@ -557,14 +571,22 @@ cat PROTEINS/all.size.tsv |
     grep -F -f <(cut -f 1 PROTEINS/all.annotation.tsv) -v
 
 tsv-join \
-    PROTEINS/all.size.tsv \
+    PROTEINS/all.strain.tsv \
+    --data-fields 1 \
+    -f PROTEINS/all.size.tsv \
+    --key-fields 1 \
+    --append-fields 2 \
+    > PROTEINS/all.strain_size.tsv
+
+tsv-join \
+    PROTEINS/all.strain_size.tsv \
     --data-fields 1 \
     -f PROTEINS/all.annotation.tsv \
     --key-fields 1 \
     --append-fields 2 \
-    > PROTEINS/all.size_anno.tsv
+    > PROTEINS/all.info.tsv
 
-cat PROTEINS/all.size_anno.tsv |
+cat PROTEINS/all.info.tsv |
     wc -l
 #310266
 
