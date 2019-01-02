@@ -23,12 +23,12 @@
     - [Other RNases](#other-rnases)
 - [RNase R](#rnase-r)
     - [Domain organisation](#domain-organisation)
+        - [E. coli RNase R](#e-coli-rnase-r)
+        - [E. coli RNase II](#e-coli-rnase-ii)
         - [Human RRP44](#human-rrp44)
         - [Fly Dis3](#fly-dis3)
         - [Yeast RRP44](#yeast-rrp44)
         - [Arabidopsis thaliana RP44A](#arabidopsis-thaliana-rp44a)
-        - [E. coli RNase R](#e-coli-rnase-r)
-        - [E. coli RNase II](#e-coli-rnase-ii)
     - [hmmer.org HMMSCAN Results](#hmmerorg-hmmscan-results)
     - [RNase R domains](#rnase-r-domains)
     - [Scan every domains](#scan-every-domains)
@@ -874,6 +874,8 @@ Ref.:
 
 ![A model of the structure of the RNA degradosome.](../image/mi610071.f2.jpeg)
 
+https://www.uniprot.org/uniprot/?query=ribonuclease+AND+organism%3A%22Escherichia+coli+%28strain+K12%29+%5B83333%5D%22&sort=score
+
 * RNase E initially inactivates polyribosomal mRNA by cleaving in the translation initiation region
   or in the intercistronic regions of polycistronic messages. As the elongating ribosomes finish
   translating the functionally inactivated mRNA, RNase E further cleaves the ribosome-free mRNA.
@@ -965,6 +967,8 @@ RNE_ECOLI has binary interactions with 5 proteins:
 ## The Gram-Positive Bacterial RNA Degradosome
 
 ![Model of the Gram-positive RNA degradosome.](../image/fmicb-08-00154-g002.jpg)
+
+https://www.uniprot.org/uniprot/?query=Ribonuclease+AND+organism%3A%22Bacillus+subtilis+%28strain+168%29+%5B224308%5D%22&sort=score
 
 * RNase E ==> RNase Y, RNase J1 and J2
 * PNPase == PNPase
@@ -1067,6 +1071,22 @@ RNE_ECOLI has binary interactions with 5 proteins:
 
 ## Domain organisation
 
+### E. coli RNase R
+
+* [Pfam](http://pfam.xfam.org/protein/RNR_ECOLI)
+* [UniProt](https://www.uniprot.org/uniprot/P21499)
+* [NCBI](https://www.ncbi.nlm.nih.gov/protein/NP_418600.4)
+
+![RNR_ECOLI](../image/RNR_ECOLI.png)
+
+### E. coli RNase II
+
+* [Pfam](http://pfam.xfam.org/protein/RNB_ECOLI)
+* [UniProt](https://www.uniprot.org/uniprot/P30850)
+* [NCBI](https://www.ncbi.nlm.nih.gov/protein/NP_415802.1)
+
+![RNB_ECOLI](../image/RNB_ECOLI.png)
+
 ### Human RRP44
 
 * [Pfam](http://pfam.xfam.org/protein/RRP44_HUMAN)
@@ -1099,22 +1119,6 @@ RNE_ECOLI has binary interactions with 5 proteins:
 * Subcellular location: Nucleus
 
 ![RP44A_ARATH](../image/RP44A_ARATH.png)
-
-### E. coli RNase R
-
-* [Pfam](http://pfam.xfam.org/protein/RNR_ECOLI)
-* [UniProt](https://www.uniprot.org/uniprot/P21499)
-* [NCBI](https://www.ncbi.nlm.nih.gov/protein/NP_418600.4)
-
-![RNR_ECOLI](../image/RNR_ECOLI.png)
-
-### E. coli RNase II
-
-* [Pfam](http://pfam.xfam.org/protein/RNB_ECOLI)
-* [UniProt](https://www.uniprot.org/uniprot/P30850)
-* [NCBI](https://www.ncbi.nlm.nih.gov/protein/NP_415802.1)
-
-![RNB_ECOLI](../image/RNB_ECOLI.png)
 
 ## hmmer.org HMMSCAN Results
 
