@@ -9,7 +9,7 @@
     - [Count strains](#count-strains)
 - [Collect proteins](#collect-proteins)
     - [`all.replace.fa` and `all.size.tsv`](#allreplacefa-and-allsizetsv)
-    - [`all.annotation.tsv`](#allannotationtsv)
+    - [`all.annotation.tsv` and `all.size_anno.tsv`](#allannotationtsv-and-allsize_annotsv)
 - [Phylogenetics with 40 single-copy genes, *RpoB*, *EF-tu* and RNase_R](#phylogenetics-with-40-single-copy-genes-rpob-ef-tu-and-rnase_r)
     - [Find corresponding proteins by `hmmsearch`](#find-corresponding-proteins-by-hmmsearch)
     - [Create valid marker gene list](#create-valid-marker-gene-list)
@@ -20,6 +20,7 @@
     - [Components of the RNA degradosome in E. coli](#components-of-the-rna-degradosome-in-e-coli)
     - [The Gram-Positive Bacterial RNA Degradosome](#the-gram-positive-bacterial-rna-degradosome)
     - [Proteins containing S1 domain in E. coli](#proteins-containing-s1-domain-in-e-coli)
+    - [Other RNases](#other-rnases)
 - [RNase R](#rnase-r)
     - [Domain organisation](#domain-organisation)
         - [Human RRP44](#human-rrp44)
@@ -434,13 +435,13 @@ cd ~/data/alignment/Tenericutes
 
 mkdir -p PROTEINS
 
-# 352
+# 350
 find ASSEMBLY -maxdepth 1 -type d |
     sort |
     grep 'ASSEMBLY/' |
     wc -l
 
-# 346
+# 344
 find ASSEMBLY -type f -name "*_protein.faa.gz" |
     wc -l
 
@@ -456,6 +457,7 @@ done \
 # ribonuclease
 cat PROTEINS/all.pro.fa |
     grep "ribonuclease" |
+    grep -v "deoxyribonuclease" |
     perl -nl -e 's/^>\w+\.\d+\s+//g; print' |
     perl -nl -e 's/\s+\[.+?\]$//g; print' |
     perl -nl -e 's/MULTISPECIES: //g; print' |
@@ -505,12 +507,12 @@ done \
 cat PROTEINS/all.pro.fa |
     grep "^>" |
     wc -l
-#311273
+#310265
 
 cat PROTEINS/all.replace.fa |
     grep "^>" |
     wc -l
-#311273
+#310265
 
 faops size PROTEINS/all.replace.fa > PROTEINS/all.replace.sizes
 
@@ -544,7 +546,7 @@ done \
 
 cat PROTEINS/all.annotation.tsv |
     wc -l
-#311273
+#310265
 
 (echo -e "#name\tannotation" && cat PROTEINS/all.annotation.tsv) \
     > temp && mv temp PROTEINS/all.annotation.tsv
@@ -563,13 +565,15 @@ tsv-join \
 
 cat PROTEINS/all.size_anno.tsv |
     wc -l
-#311274
+#310266
 
 ```
 
 # Phylogenetics with 40 single-copy genes, *RpoB*, *EF-tu* and RNase_R
 
 ##  Find corresponding proteins by `hmmsearch`
+
+* Download need hmm models in [`hmm/README.md`](../hmm/README.md)
 
 * The `E_VALUE` was manually adjusted to 1e-20 to reach a balance between sensitivity and
   speciality.
