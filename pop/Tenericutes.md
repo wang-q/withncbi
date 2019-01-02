@@ -1469,6 +1469,55 @@ rm DOMAINS/header.tsv DOMAINS/RHLB.tsv
 | DOMAINS/MG423.replace.tsv           | 761   |
 | DOMAINS/PFKA_ATP.replace.tsv        | 371   |
 
+## InterProScan
+
+```bash
+cd ~/data/alignment/Tenericutes
+
+mkdir -p IPS
+
+for GENUS in $(cat genus.list); do
+    echo 1>&2 "==> GENUS [${GENUS}]"
+
+    for STRAIN in $(cat taxon/${GENUS}); do
+        mkdir -p IPS/${STRAIN}
+
+        cat PROTEINS/all.info.tsv |
+            tsv-filter --str-eq 2:${STRAIN} |
+            cut -f 1 |
+            grep -Fx -f <(cut -f 1 DOMAINS/domains.tsv) \
+            > IPS/${STRAIN}/wanted.list
+        
+        faops some PROTEINS/all.replace.fa IPS/${STRAIN}/wanted.list stdout |
+            faops split-name stdin IPS/${STRAIN}
+
+    done
+done
+
+for GENUS in $(cat genus.list); do
+    echo 1>&2 "==> GENUS [${GENUS}]"
+
+    for STRAIN in $(cat taxon/${GENUS}); do
+        echo 1>&2 "==> STRAIN [${STRAIN}]"
+
+        cat IPS/${STRAIN}/wanted.list |
+            parallel --no-run-if-empty --linebuffer -k -j 4 "
+                if [[ -e IPS/${STRAIN}/{}.tsv ]]; then
+                    exit;
+                fi
+                
+                interproscan.sh -dp -f tsv,json,svg -i IPS/${STRAIN}/{}.fa --output-file-base IPS/${STRAIN}/{}
+                tar -xvz -f IPS/${STRAIN}/{}.svg.tar.gz -C IPS/${STRAIN}
+                rm IPS/${STRAIN}/{}.svg.tar.gz
+            "
+
+    done
+    
+    echo 1>&2
+done
+
+```
+
 # RNase R
 
 ## Stats of annotations and HMM models
