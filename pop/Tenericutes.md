@@ -3,10 +3,10 @@
 
 [TOC levels=1-3]: # " "
 - [Aligning various genera from Tenericutes](#aligning-various-genera-from-tenericutes)
-- [Phylum Tenericutes](#phylum-tenericutes)
-- [Trichoderma: assembly](#trichoderma-assembly)
+- [Phylum Tenericutes and outgroups](#phylum-tenericutes-and-outgroups)
+    - [Download from NCBI assembly](#download-from-ncbi-assembly)
     - [NCBI taxonomy](#ncbi-taxonomy)
-- [Count strains](#count-strains)
+    - [Count strains](#count-strains)
 - [Collect proteins](#collect-proteins)
     - [`all.replace.fa` and `all.size.tsv`](#allreplacefa-and-allsizetsv)
     - [`all.annotation.tsv`](#allannotationtsv)
@@ -39,7 +39,7 @@
 - [Tenericutes: run](#tenericutes-run)
 
 
-# Phylum Tenericutes
+# Phylum Tenericutes and outgroups
 
 无壁菌门, 或称柔膜菌门, 无细胞壁
 
@@ -81,7 +81,7 @@ Key genera:
 Outgroup:
 
 * Firmicutes
-    * *Bacillus subtilis* subsp. subtilis str. 168: 224308
+    * Bacillus subtilis subsp. subtilis str. 168: 224308
     * Staphylococcus aureus subsp. aureus NCTC 8325: 93061
     * Eubacterium limosum KIST612: 903814
     * Erysipelothrix rhusiopathiae str. Fujisawa: 650150
@@ -114,7 +114,7 @@ Check NCBI pages:
 * http://www.ncbi.nlm.nih.gov/assembly/?term=txid2093%5BOrganism:exp%5D
 * http://www.ncbi.nlm.nih.gov/genome/?term=txid2093%5BOrganism:exp%5D
 
-# Trichoderma: assembly
+## Download from NCBI assembly
 
 ```bash
 export RANK_NAME=Tenericutes
@@ -225,34 +225,32 @@ bp_taxonomy2tree.pl -e \
     -s "Spiroplasma" \
     -s "Ureaplasma" \
     -s "Bacillus subtilis" \
-    -s "Bulleidia extructa" \
-    -s "Catenibacterium mitsuokai" \
-    -s "Coprobacillus cateniformis" \
-    -s "Clostridium acetobutylicum" \
-    -s "Clostridium botulinum" \
-    -s "Clostridium tetani" \
-    -s "Erysipelothrix larvae" \
-    -s "Erysipelothrix rhusiopathiae" \
+    -s "Staphylococcus aureus" \
     -s "Eubacterium limosum" \
-    -s "Holdemania filiformis" \
-    -s "Solobacterium moorei" \
-    -s "Turicibacter sanguinis" \
+    -s "Erysipelothrix rhusiopathiae" \
+    -s "Clostridium acetobutylicum" \
+    -s "Clostridium tetani" \
     -s "Amycolatopsis mediterranei" \
     -s "Bifidobacterium adolescentis" \
     -s "Corynebacterium glutamicum" \
     -s "Mycobacterium tuberculosis" \
+    -s "Brucella melitensis" \
+    -s "Neisseria gonorrhoeae" \
     -s "Escherichia coli" \
     -s "Salmonella enterica" \
+    -s "Pseudomonas aeruginosa" \
+    -s "Pseudomonas putida" \
+    -s "Helicobacter pylori" \
     > Tenericutes.newick
 
 nw_display -w 600 -s Tenericutes.newick |
-    rsvg-convert -o ~/Scripts/withncbi/pop/Tenericutes.png
+    rsvg-convert -o ~/Scripts/withncbi/image/Tenericutes.png
 
 ```
 
 ![Tenericutes.png](../image/Tenericutes.png)
 
-# Count strains
+## Count strains
 
 ```bash
 cd ~/data/alignment/Tenericutes
