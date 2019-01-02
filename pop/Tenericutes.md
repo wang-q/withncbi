@@ -1048,6 +1048,23 @@ RNE_ECOLI has binary interactions with 5 proteins:
     * NP_417866
     * Tex_N, Tex_YqgF, HHH_3, HHH_9, S1
 
+## Other RNases
+
+* exo
+
+    * RNase D
+    * RNase T
+    * RNase PH
+    * Oligo RNase
+
+* endo
+
+    * RNase I
+    * RNase III
+    * RNase P
+    * RNase H
+    * RNase BN/Z
+
 # RNase R
 
 ## Domain organisation
