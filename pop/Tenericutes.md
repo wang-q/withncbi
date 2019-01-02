@@ -82,18 +82,11 @@ Outgroup:
 
 * Firmicutes
     * *Bacillus subtilis* subsp. subtilis str. 168: 224308
-    * *Turicibacter sanguinis* PC909: 702450
+    * Staphylococcus aureus subsp. aureus NCTC 8325: 93061
     * Eubacterium limosum KIST612: 903814
-    * Holdemania filiformis DSM 12042: 545696
-    * Bulleidia extructa W1219: 679192
-    * Solobacterium moorei F0204: 706433
     * Erysipelothrix rhusiopathiae str. Fujisawa: 650150
-    * Erysipelothrix larvae: 1514105
-    * Catenibacterium mitsuokai DSM 15897: 451640
-    * Coprobacillus cateniformis: 100884
     * Clostridium acetobutylicum ATCC 824: 272562
     * Clostridium tetani E88: 212717
-    * Clostridium botulinum A str. ATCC 3502: 413999
 
 * Actinobacteria
     * Amycolatopsis mediterranei U32: 749927
@@ -101,9 +94,20 @@ Outgroup:
     * Corynebacterium glutamicum ATCC 13032: 196627
     * Mycobacterium tuberculosis H37Rv: 83332
 
-*  Gammaproteobacteria
+* Alphaproteobacteria
+    * Brucella melitensis bv. 1 str. 16M: 224914
+
+* Betaproteobacteria
+    * Neisseria gonorrhoeae FA 1090: 242231
+
+* Gammaproteobacteria
     * Escherichia coli str. K-12 substr. MG1655: 511145
     * Salmonella enterica subsp. enterica serovar Typhimurium str. LT2: 99287
+    * Pseudomonas aeruginosa PAO1: 208964
+    * Pseudomonas putida KT2440: 160488
+
+* delta/epsilon subdivisions
+    * Helicobacter pylori 26695: 85962
 
 Check NCBI pages:
 
@@ -132,7 +136,7 @@ mysql -ualignDB -palignDB ar_refseq -e "
         organism_name, species, genus, ftp_path, assembly_level
     FROM ar 
     WHERE 1=1
-        AND taxonomy_id in (224308, 702450, 903814, 545696, 679192, 706433, 650150, 1514105, 451640, 100884, 272562, 212717, 413999)
+        AND taxonomy_id in (224308, 93061, 903814, 650150, 272562, 212717, 749927, 367928, 196627, 83332)
     " \
     >> raw.tsv
 
@@ -141,7 +145,7 @@ mysql -ualignDB -palignDB ar_refseq -e "
         organism_name, species, genus, ftp_path, assembly_level
     FROM ar 
     WHERE 1=1
-        AND taxonomy_id in (749927, 367928, 196627, 83332, 511145, 99287)
+        AND taxonomy_id in (224914, 242231, 511145, 99287, 208964, 160488, 85962)
     " \
     >> raw.tsv
 

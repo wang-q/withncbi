@@ -33,7 +33,7 @@ Me_cha	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/002/290/085/GCF_002290085.1_AS
 Me_cha_ATCC_49578	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/518/825/GCF_000518825.1_ASM51882v1	Mesoplasma chauliocola	Scaffold
 Me_cole	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/002/804/245/GCF_002804245.1_ASM280424v1	Mesoplasma coleopterae	Complete Genome
 Me_cor	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/002/930/145/GCF_002930145.1_meso03.02	Mesoplasma corruscae	Contig
-Me_ent	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/002/749/675/GCF_002749675.1_ASM274967v1	Mesoplasma entomophilum	Complete Genome
+Me_ento	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/002/749/675/GCF_002749675.1_ASM274967v1	Mesoplasma entomophilum	Complete Genome
 Me_florum	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/002/504/365/GCF_002504365.1_ASM250436v1	Mesoplasma florum	Complete Genome
 Me_florum_L1	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/008/305/GCF_000008305.1_ASM830v1	Mesoplasma florum	Complete Genome
 Me_florum_W37	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/479/355/GCF_000479355.1_ASM47935v1	Mesoplasma florum	Complete Genome
@@ -220,9 +220,9 @@ Mycop_pne_PO1	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/319/655/GCF_0003196
 Mycop_pri_ATCC_25948	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/702/785/GCF_000702785.1_ASM70278v1	Mycoplasma primatum	Contig
 Mycop_pull	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/900/245/GCF_001900245.1_ASM190024v1	Mycoplasma pullorum	Complete Genome
 Mycop_pulm_UAB_CTIP	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/195/875/GCF_000195875.1_ASM19587v1	Mycoplasma pulmonis	Complete Genome
-Mycop_put	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/900/476/175/GCF_900476175.1_50648_D01	Mycoplasma putrefaciens	Complete Genome
-Mycop_put_KS1	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/224/105/GCF_000224105.1_ASM22410v1	Mycoplasma putrefaciens	Complete Genome
-Mycop_put_Mput9231	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/376/625/GCF_000376625.1_ASM37662v1	Mycoplasma putrefaciens	Complete Genome
+Mycop_putr	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/900/476/175/GCF_900476175.1_50648_D01	Mycoplasma putrefaciens	Complete Genome
+Mycop_putr_KS1	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/224/105/GCF_000224105.1_ASM22410v1	Mycoplasma putrefaciens	Complete Genome
+Mycop_putr_Mput9231	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/376/625/GCF_000376625.1_ASM37662v1	Mycoplasma putrefaciens	Complete Genome
 Mycop_sal_ATCC_23064	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/485/555/GCF_000485555.1_ASM48555v1	Mycoplasma salivarium	Contig
 Mycop_sim_ATCC_49888	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/702/705/GCF_000702705.1_ASM70270v1	Mycoplasma simbae	Contig
 Mycop_sp_Bg1	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/001/641/205/GCA_001641205.1_ASM164120v1	Mycoplasma sp. Bg1	Contig
@@ -332,22 +332,20 @@ U_ure_5_ATCC_27817	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/169/915/GCF_00
 U_ure_7_ATCC_27819	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/169/575/GCF_000169575.2_ASM16957v2	Ureaplasma urealyticum	Contig
 U_ure_8_ATCC_27618	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/169/535/GCF_000169535.1_ASM16953v1	Ureaplasma urealyticum	Contig
 U_ure_9_ATCC_33175	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/169/595/GCF_000169595.1_ASM16959v1	Ureaplasma urealyticum	Contig
-Ba_subt_subtilis_168	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/009/045/GCF_000009045.1_ASM904v1	Bacillus subtilis	Complete Genome
-Bu_ext_W1219	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/177/375/GCF_000177375.1_ASM17737v1	Bulleidia extructa	Contig
-Ca_mit_DSM_15897	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/173/795/GCF_000173795.1_ASM17379v1	Catenibacterium mitsuokai	Contig
-Cop_cat	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/186/525/GCF_000186525.1_Coprobacillus_sp_29_1_V1	Coprobacillus cateniformis	Scaffold
-Cl_ace_ATCC_824	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/008/765/GCF_000008765.1_ASM876v1	Clostridium acetobutylicum	Complete Genome
-Cl_bot_A_ATCC_3502	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/063/585/GCF_000063585.1_ASM6358v1	Clostridium botulinum	Complete Genome
-Cl_tet_E88	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/007/625/GCF_000007625.1_ASM762v1	Clostridium tetani	Complete Genome
-Er_lar	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/545/095/GCF_001545095.1_ASM154509v1	Erysipelothrix larvae	Complete Genome
-Er_rhu_Fujisawa	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/270/085/GCF_000270085.1_ASM27008v1	Erysipelothrix rhusiopathiae	Complete Genome
-Eu_lim_KIST612	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/152/245/GCF_000152245.2_ASM15224v2	Eubacterium limosum	Complete Genome
-Ho_fil_DSM_12042	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/157/995/GCF_000157995.1_ASM15799v1	Holdemania filiformis	Scaffold
-So_moo_F0204	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/186/945/GCF_000186945.2_ASM18694v2	Solobacterium moorei	Scaffold
-T_san_PC909	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/178/255/GCF_000178255.1_ASM17825v1	Turicibacter sanguinis	Contig
 Am_med_U32	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/196/835/GCF_000196835.1_ASM19683v1	Amycolatopsis mediterranei	Complete Genome
+Ba_subt_subtilis_168	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/009/045/GCF_000009045.1_ASM904v1	Bacillus subtilis	Complete Genome
 Bi_ado_ATCC_15703	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/010/425/GCF_000010425.1_ASM1042v1	Bifidobacterium adolescentis	Complete Genome
-Cor_glu_ATCC_13032	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/196/335/GCF_000196335.1_ASM19633v1	Corynebacterium glutamicum	Complete Genome
-Mycob_tub_H37Rv	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/195/955/GCF_000195955.2_ASM19595v2	Mycobacterium tuberculosis	Complete Genome
+Br_meli_bv_1_16M	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/007/125/GCF_000007125.1_ASM712v1	Brucella melitensis	Complete Genome
+Cl_ace_ATCC_824	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/008/765/GCF_000008765.1_ASM876v1	Clostridium acetobutylicum	Complete Genome
+Cl_tet_E88	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/007/625/GCF_000007625.1_ASM762v1	Clostridium tetani	Complete Genome
+Co_glu_ATCC_13032	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/196/335/GCF_000196335.1_ASM19633v1	Corynebacterium glutamicum	Complete Genome
+Er_rhu_Fujisawa	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/270/085/GCF_000270085.1_ASM27008v1	Erysipelothrix rhusiopathiae	Complete Genome
 Es_coli_K_12_MG1655	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/005/845/GCF_000005845.2_ASM584v2	Escherichia coli	Complete Genome
+Eu_lim_KIST612	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/152/245/GCF_000152245.2_ASM15224v2	Eubacterium limosum	Complete Genome
+He_pyl_26695	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/008/525/GCF_000008525.1_ASM852v1	Helicobacter pylori	Complete Genome
+Mycob_tub_H37Rv	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/195/955/GCF_000195955.2_ASM19595v2	Mycobacterium tuberculosis	Complete Genome
+N_gon_FA_1090	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/006/845/GCF_000006845.1_ASM684v1	Neisseria gonorrhoeae	Complete Genome
+P_aer_PAO1	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/006/765/GCF_000006765.1_ASM676v1	Pseudomonas aeruginosa	Complete Genome
+P_puti_KT2440	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/007/565/GCF_000007565.2_ASM756v2	Pseudomonas putida	Complete Genome
 Sa_ente_Typhimurium_LT2	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/006/945/GCF_000006945.2_ASM694v2	Salmonella enterica	Complete Genome
+St_aure_aureus_NCTC_8325	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/013/425/GCF_000013425.1_ASM1342v1	Staphylococcus aureus	Complete Genome
