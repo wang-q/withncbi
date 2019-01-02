@@ -1346,7 +1346,7 @@ find DOMAINS/ -name "*.replace.tsv" |
     sort -u \
     > DOMAINS/domains.tsv
 wc -l DOMAINS/domains.tsv
-#7548 DOMAINS/domains.tsv
+#7334 DOMAINS/domains.tsv
 
 # Status of domains
 for domain in $(cat domain.list); do
@@ -1368,7 +1368,7 @@ for domain in $(cat domain.list); do
 done
 
 datamash check < DOMAINS/domains.tsv
-#7548 lines, 41 fields
+#7334 lines, 41 fields
 
 # Add header line
 for domain in $(cat domain.list); do
@@ -1405,60 +1405,60 @@ rm DOMAINS/header.tsv DOMAINS/RHLB.tsv
 
 | Domain                              | Count |
 |:------------------------------------|:------|
-| DOMAINS/OB_RNB.replace.tsv          | 384   |
-| DOMAINS/CSD2.replace.tsv            | 282   |
-| DOMAINS/RNB.replace.tsv             | 313   |
-| DOMAINS/S1.replace.tsv              | 841   |
-| DOMAINS/HTH_12.replace.tsv          | 127   |
-| DOMAINS/RNase_II_C_S1.replace.tsv   | 90    |
+| DOMAINS/OB_RNB.replace.tsv          | 382   |
+| DOMAINS/CSD2.replace.tsv            | 279   |
+| DOMAINS/RNB.replace.tsv             | 312   |
+| DOMAINS/S1.replace.tsv              | 832   |
+| DOMAINS/HTH_12.replace.tsv          | 120   |
+| DOMAINS/RNase_II_C_S1.replace.tsv   | 96    |
 | DOMAINS/Importin_rep.replace.tsv    | 6     |
-| DOMAINS/PIN_4.replace.tsv           | 14    |
+| DOMAINS/PIN_4.replace.tsv           | 13    |
 | DOMAINS/Rrp44_CSD1.replace.tsv      | 5     |
-| DOMAINS/OB_Dis3.replace.tsv         | 7     |
-| DOMAINS/Rrp44_S1.replace.tsv        | 1     |
-| DOMAINS/RNase_E_G.replace.tsv       | 15    |
-| DOMAINS/RNase_PH.replace.tsv        | 87    |
-| DOMAINS/RNase_PH_C.replace.tsv      | 96    |
-| DOMAINS/PNPase.replace.tsv          | 83    |
-| DOMAINS/KH_1.replace.tsv            | 487   |
-| DOMAINS/DEAD.replace.tsv            | 2324  |
-| DOMAINS/Helicase_C.replace.tsv      | 1505  |
-| DOMAINS/PolyA_pol.replace.tsv       | 64    |
-| DOMAINS/PolyA_pol_RNAbd.replace.tsv | 84    |
-| DOMAINS/PolyA_pol_arg_C.replace.tsv | 3     |
-| DOMAINS/Enolase_N.replace.tsv       | 338   |
-| DOMAINS/Enolase_C.replace.tsv       | 340   |
-| DOMAINS/DUF3552.replace.tsv         | 279   |
-| DOMAINS/HD.replace.tsv              | 1353  |
-| DOMAINS/Lactamase_B.replace.tsv     | 833   |
-| DOMAINS/RMMBL.replace.tsv           | 451   |
-| DOMAINS/RNase_J_C.replace.tsv       | 584   |
-| DOMAINS/PFK.replace.tsv             | 340   |
-| DOMAINS/RNase_R.replace.tsv         | 484   |
-| DOMAINS/3_prime_RNase.replace.tsv   | 390   |
-| DOMAINS/rpsA.replace.tsv            | 615   |
-| DOMAINS/RNaseEG.replace.tsv         | 17    |
-| DOMAINS/polynuc_phos.replace.tsv    | 609   |
-| DOMAINS/NusA.replace.tsv            | 350   |
-| DOMAINS/pcnB.replace.tsv            | 65    |
-| DOMAINS/eno.replace.tsv             | 340   |
-| DOMAINS/RNase_Y.replace.tsv         | 577   |
-| DOMAINS/MG423.replace.tsv           | 784   |
-| DOMAINS/PFKA_ATP.replace.tsv        | 385   |
+| DOMAINS/OB_Dis3.replace.tsv         | 8     |
+| DOMAINS/Rrp44_S1.replace.tsv        | 0     |
+| DOMAINS/RNase_E_G.replace.tsv       | 22    |
+| DOMAINS/RNase_PH.replace.tsv        | 88    |
+| DOMAINS/RNase_PH_C.replace.tsv      | 97    |
+| DOMAINS/PNPase.replace.tsv          | 80    |
+| DOMAINS/KH_1.replace.tsv            | 470   |
+| DOMAINS/DEAD.replace.tsv            | 2276  |
+| DOMAINS/Helicase_C.replace.tsv      | 1454  |
+| DOMAINS/PolyA_pol.replace.tsv       | 66    |
+| DOMAINS/PolyA_pol_RNAbd.replace.tsv | 86    |
+| DOMAINS/PolyA_pol_arg_C.replace.tsv | 6     |
+| DOMAINS/Enolase_N.replace.tsv       | 335   |
+| DOMAINS/Enolase_C.replace.tsv       | 337   |
+| DOMAINS/DUF3552.replace.tsv         | 269   |
+| DOMAINS/HD.replace.tsv              | 1280  |
+| DOMAINS/Lactamase_B.replace.tsv     | 789   |
+| DOMAINS/RMMBL.replace.tsv           | 439   |
+| DOMAINS/RNase_J_C.replace.tsv       | 569   |
+| DOMAINS/PFK.replace.tsv             | 321   |
+| DOMAINS/RNase_R.replace.tsv         | 481   |
+| DOMAINS/3_prime_RNase.replace.tsv   | 393   |
+| DOMAINS/rpsA.replace.tsv            | 600   |
+| DOMAINS/RNaseEG.replace.tsv         | 26    |
+| DOMAINS/polynuc_phos.replace.tsv    | 598   |
+| DOMAINS/NusA.replace.tsv            | 349   |
+| DOMAINS/pcnB.replace.tsv            | 67    |
+| DOMAINS/eno.replace.tsv             | 338   |
+| DOMAINS/RNase_Y.replace.tsv         | 551   |
+| DOMAINS/MG423.replace.tsv           | 761   |
+| DOMAINS/PFKA_ATP.replace.tsv        | 371   |
 
 ## Stats of annotations and HMM models
 
 | Item               | Count |
 |:-------------------|------:|
-| " ribonuclease R " |   307 |
+| " ribonuclease R " |   292 |
 | " RNB "            |     6 |
 | " RNase II "       |     1 |
 | " RNase R "        |     2 |
-| deduped            |   239 |
-| OB_RNB             |   194 |
-| CSD2               |   198 |
-| RNB                |   224 |
-| S1                 |   207 |
+| deduped            |   224 |
+| OB_RNB             |   187 |
+| CSD2               |   192 |
+| RNB                |   219 |
+| S1                 |   201 |
 
 ```bash
 cd ~/data/alignment/Tenericutes
@@ -1487,6 +1487,7 @@ cat PROTEINS/all.pro.fa |
 cat PROTEINS/all.pro.fa |
     grep " RNase R " |
     wc -l
+
 cat RNaseR/RNaseR.all.fa |
     grep "^>" |
     wc -l
@@ -1569,7 +1570,7 @@ for GENUS in $(cat genus.list); do
         > RNaseR/${GENUS}.replace.tsv
 done
 
-# 301
+# 296
 cat RNaseR/*.replace.tsv | wc -l
 
 # extract sequences for each genus
