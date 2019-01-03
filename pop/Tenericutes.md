@@ -31,7 +31,7 @@
         - [Yeast RRP44](#yeast-rrp44)
         - [Arabidopsis thaliana RP44A](#arabidopsis-thaliana-rp44a)
     - [hmmer.org HMMSCAN Results](#hmmerorg-hmmscan-results)
-    - [RNase R domains](#rnase-r-domains)
+    - [Domains of RNases and Cooperators](#domains-of-rnases-and-cooperators)
     - [Scan every domains](#scan-every-domains)
     - [InterProScan](#interproscan)
 - [RNase R](#rnase-r)
@@ -524,6 +524,7 @@ cat PROTEINS/all.replace.fa |
     wc -l
 #310265
 
+rm -fr temp
 (echo -e "#name\tstrain" && cat PROTEINS/all.strain.tsv)  \
     > temp && mv temp PROTEINS/all.strain.tsv
 
@@ -563,6 +564,7 @@ cat PROTEINS/all.annotation.tsv |
     wc -l
 #310265
 
+rm -fr temp
 (echo -e "#name\tannotation" && cat PROTEINS/all.annotation.tsv) \
     > temp && mv temp PROTEINS/all.annotation.tsv
 
@@ -1029,20 +1031,55 @@ https://www.uniprot.org/uniprot/?query=Ribonuclease+AND+organism%3A%22Bacillus+s
 
 ## Other RNases
 
-* exo
-
-    * RNase D
-    * RNase T
-    * RNase PH
-    * Oligo RNase
-
 * endo
 
-    * RNase I
-    * RNase III
-    * RNase P
-    * RNase H
-    * RNase BN/Z
+    * rna
+        * Ribonuclease I
+        * https://www.uniprot.org/uniprot/RNI_ECOLI
+        * Ribonuclease_T2
+    * rnc
+        * Ribonuclease 3
+        * https://www.uniprot.org/uniprot/RNC_ECOLI
+        * Ribonucleas_3_3, dsrm
+    * rnpA
+        * Ribonuclease P protein component
+        * https://www.uniprot.org/uniprot/RNPA_ECOLI
+        * Ribonuclease_P
+    * rnhA
+        * Ribonuclease HI
+        * https://www.uniprot.org/uniprot/RNH_ECOLI
+        * RNase_H
+    * rnhB
+        * Ribonuclease HII
+        * https://www.uniprot.org/uniprot/RNH2_ECOLI
+        * RNase_HII
+    * rnhC
+        * Ribonuclease HIII
+        * https://www.uniprot.org/uniprot/RNH3_BACSU
+        * RDUF3378, Nase_HII
+    * rbn
+        * Ribonuclease BN
+        * https://www.uniprot.org/uniprot/RBN_ECOLI
+        * Lactamase_B_2
+
+* exo
+
+    * rnd
+        * Ribonuclease D
+        * https://www.uniprot.org/uniprot/RND_ECOLI
+        * DNA_pol_A_exo1, HRDC
+    * rnt
+        * Ribonuclease T
+        * https://www.uniprot.org/uniprot/RNT_ECOLI
+        * RNase_T
+    * rph
+        * Ribonuclease PH
+        * https://www.uniprot.org/uniprot/RNPH_BACSU
+        * RNase_PH, RNase_PH_C
+    * nrnA
+        * Bifunctional oligoribonuclease and PAP phosphatase NrnA
+        * https://www.uniprot.org/uniprot/NRNA_BACSU
+        * DHH, DHHA1
 
 # Intriguing domains
 
@@ -1158,60 +1195,86 @@ https://www.uniprot.org/uniprot/?query=Ribonuclease+AND+organism%3A%22Bacillus+s
 |:--------------------------------------------------------------------------:|
 |                         Mycop_gen_G37_WP_009885662                         |
 
-## RNase R domains
+## Domains of RNases and Cooperators
 
-* OB_RNB (PF08206)
-* CSD2 (PF17876)
-* RNB (PF00773)
-* S1 (PF00575)
+* RNase II/R
+    * OB_RNB (PF08206)
+    * CSD2 (PF17876)
+    * RNB (PF00773)
+    * S1 (PF00575)
 
-* HTH_12 (PF08461)
-* RNase_II_C_S1 (PF18614)
-* Importin_rep (PF18773)
+    * HTH_12 (PF08461)
+    * RNase_II_C_S1 (PF18614)
+    * Importin_rep (PF18773)
 
-* PIN_4 (PF13638)
-* Rrp44_CSD1 (PF17216)
-* OB_Dis3 (PF17849)
-* Rrp44_S1 (PF17215)
+* Dis3
+    * PIN_4 (PF13638)
+    * Rrp44_CSD1 (PF17216)
+    * OB_Dis3 (PF17849)
+    * Rrp44_S1 (PF17215)
 
-* RNase_E_G (PF10150)
-* RNase_PH (PF01138)
-* RNase_PH_C (PF03725)
-* PNPase (PF03726)
-* KH_1 (PF00013)
+* RNase E
+    * RNase_E_G (PF10150)
 
-* DEAD (PF00270)
-* Helicase_C (PF00271)
+* PNPase
+    * RNase_PH (PF01138)
+    * RNase_PH_C (PF03725)
+    * PNPase (PF03726)
+    * KH_1 (PF00013)
 
-* PolyA_pol (PF01743)
-* PolyA_pol_RNAbd (PF12627)
-* PolyA_pol_arg_C (PF12626)
+* RhlB
+    * DEAD (PF00270)
+    * Helicase_C (PF00271)
 
-* Enolase_N (PF03952)
-* Enolase_C (PF00113)
+* Poly(A) polymerase I
+    * PolyA_pol (PF01743)
+    * PolyA_pol_RNAbd (PF12627)
+    * PolyA_pol_arg_C (PF12626)
 
-* DUF3552 (PF12072)
-* HD (PF01966)
+* Enolase
+    * Enolase_N (PF03952)
+    * Enolase_C (PF00113)
 
-* Lactamase_B (PF00753)
-* RMMBL (PF07521)
-* RNase_J_C (PF17770)
+* RNase Y
+    * DUF3552 (PF12072)
+    * ~~HD (PF01966)~~
 
-* PFK (PF00365)
+* RNase J1/J2
+    * Lactamase_B (PF00753)
+    * RMMBL (PF07521)
+    * RNase_J_C (PF17770)
 
-* RNase_R: TIGR02063
-* 3_prime_RNase: TIGR00358
+* ATP-dependent 6-phosphofructokinase
+    * PFK (PF00365)
 
-* rpsA: TIGR00717
-* RNaseEG: TIGR00757
-* polynuc_phos: TIGR03591
-* NusA: TIGR01953
-* pcnB: TIGR01942
-* eno: TIGR01060
+* Ribonuclease I
+    * Ribonuclease_T2 (PF00445)
 
-* RNase_Y: TIGR03319
-* MG423: TIGR00649
-* PFKA_ATP: TIGR02482
+* Ribonuclease 3
+    * Ribonucleas_3_3 (PF14622)
+    * dsrm (PF00035)
+
+* Ribonuclease P protein component
+    * Ribonuclease_P (PF00825)
+
+* Ribonuclease H
+    * RNase_H (PF00075)
+    * RNase_HII (PF01351)
+    * DUF3378 (PF11858)
+
+* Ribonuclease BN
+    * Lactamase_B_2 (PF12706)
+
+* Ribonuclease D
+    * DNA_pol_A_exo1 (PF01612)
+    * HRDC (PF00570)
+
+* Ribonuclease T
+    * RNase_T (PF00929)
+
+* Bifunctional oligoribonuclease and PAP phosphatase NrnA
+    * DHH (PF01368)
+    * DHHA1 (PF02272)
 
 ```bash
 cd ~/data/alignment/Tenericutes
@@ -1227,26 +1290,20 @@ for ID in \
     PF00270 PF00271 \
     PF01743 PF12627 PF12626 \
     PF03952 PF00113 \
-    PF12072 PF01966 \
+    PF12072 \
     PF00753 PF07521 PF17770 \
     PF00365 \
+    PF00445 \
+    PF14622 PF00035 \
+    PF00825 \
+    PF00075 PF01351 PF11858 \
+    PF12706 \
+    PF01612 PF00570 \
+    PF00929 \
+    PF01368 PF02272 \
     ; do
     wget -N --content-disposition http://pfam.xfam.org/family/${ID}/hmm
 done
-
-cp ~/data/HMM/TIGRFAM/HMM/TIGR02063.HMM RNase_R.hmm
-cp ~/data/HMM/TIGRFAM/HMM/TIGR00358.HMM 3_prime_RNase.hmm
-
-cp ~/data/HMM/TIGRFAM/HMM/TIGR00717.HMM rpsA.hmm
-cp ~/data/HMM/TIGRFAM/HMM/TIGR00757.HMM RNaseEG.hmm
-cp ~/data/HMM/TIGRFAM/HMM/TIGR03591.HMM polynuc_phos.hmm
-cp ~/data/HMM/TIGRFAM/HMM/TIGR01953.HMM NusA.hmm
-cp ~/data/HMM/TIGRFAM/HMM/TIGR01942.HMM pcnB.hmm
-cp ~/data/HMM/TIGRFAM/HMM/TIGR01060.HMM eno.hmm
-
-cp ~/data/HMM/TIGRFAM/HMM/TIGR03319.HMM RNase_Y.hmm
-cp ~/data/HMM/TIGRFAM/HMM/TIGR00649.HMM MG423.hmm
-cp ~/data/HMM/TIGRFAM/HMM/TIGR02482.HMM PFKA_ATP.hmm
 
 ```
 
@@ -1265,12 +1322,17 @@ for domain in \
     DEAD Helicase_C \
     PolyA_pol PolyA_pol_RNAbd PolyA_pol_arg_C \
     Enolase_N Enolase_C \
-    DUF3552 HD \
+    DUF3552 \
     Lactamase_B RMMBL RNase_J_C \
     PFK \
-    RNase_R 3_prime_RNase \
-    rpsA RNaseEG polynuc_phos NusA pcnB eno \
-    RNase_Y MG423 PFKA_ATP \
+    Ribonuclease_T2 \
+    Ribonucleas_3_3 dsrm \
+    Ribonuclease_P \
+    RNase_H RNase_HII DUF3378 \
+    Lactamase_B_2 \
+    DNA_pol_A_exo1 HRDC \
+    RNase_T \
+    DHH DHHA1 \
     ; do
     echo ${domain}
 done \
@@ -1307,6 +1369,55 @@ done |
     (echo -e "Domain\tCount" && cat) |
     mlr --itsv --omd cat
 
+```
+
+| Domain                              | Count |
+|:------------------------------------|------:|
+| DOMAINS/OB_RNB.replace.tsv          |   382 |
+| DOMAINS/CSD2.replace.tsv            |   279 |
+| DOMAINS/RNB.replace.tsv             |   312 |
+| DOMAINS/S1.replace.tsv              |   832 |
+| DOMAINS/HTH_12.replace.tsv          |   120 |
+| DOMAINS/RNase_II_C_S1.replace.tsv   |    96 |
+| DOMAINS/Importin_rep.replace.tsv    |     6 |
+| DOMAINS/PIN_4.replace.tsv           |    13 |
+| DOMAINS/Rrp44_CSD1.replace.tsv      |     5 |
+| DOMAINS/OB_Dis3.replace.tsv         |     8 |
+| DOMAINS/Rrp44_S1.replace.tsv        |     0 |
+| DOMAINS/RNase_E_G.replace.tsv       |    22 |
+| DOMAINS/RNase_PH.replace.tsv        |    88 |
+| DOMAINS/RNase_PH_C.replace.tsv      |    97 |
+| DOMAINS/PNPase.replace.tsv          |    80 |
+| DOMAINS/KH_1.replace.tsv            |   470 |
+| DOMAINS/DEAD.replace.tsv            |  2276 |
+| DOMAINS/Helicase_C.replace.tsv      |  1454 |
+| DOMAINS/PolyA_pol.replace.tsv       |    66 |
+| DOMAINS/PolyA_pol_RNAbd.replace.tsv |    86 |
+| DOMAINS/PolyA_pol_arg_C.replace.tsv |     6 |
+| DOMAINS/Enolase_N.replace.tsv       |   335 |
+| DOMAINS/Enolase_C.replace.tsv       |   337 |
+| DOMAINS/DUF3552.replace.tsv         |   269 |
+| DOMAINS/Lactamase_B.replace.tsv     |   789 |
+| DOMAINS/RMMBL.replace.tsv           |   439 |
+| DOMAINS/RNase_J_C.replace.tsv       |   569 |
+| DOMAINS/PFK.replace.tsv             |   321 |
+| DOMAINS/Ribonuclease_T2.replace.tsv |     3 |
+| DOMAINS/Ribonucleas_3_3.replace.tsv |   343 |
+| DOMAINS/dsrm.replace.tsv            |   307 |
+| DOMAINS/Ribonuclease_P.replace.tsv  |   335 |
+| DOMAINS/RNase_H.replace.tsv         |    89 |
+| DOMAINS/RNase_HII.replace.tsv       |   449 |
+| DOMAINS/DUF3378.replace.tsv         |    77 |
+| DOMAINS/Lactamase_B_2.replace.tsv   |   731 |
+| DOMAINS/DNA_pol_A_exo1.replace.tsv  |   139 |
+| DOMAINS/HRDC.replace.tsv            |    55 |
+| DOMAINS/RNase_T.replace.tsv         |   441 |
+| DOMAINS/DHH.replace.tsv             |   775 |
+| DOMAINS/DHHA1.replace.tsv           |  1034 |
+
+```bash
+cd ~/data/alignment/Tenericutes
+
 # All proteins appeared
 find DOMAINS/ -name "*.replace.tsv" |
     sort |
@@ -1314,7 +1425,7 @@ find DOMAINS/ -name "*.replace.tsv" |
     sort -u \
     > DOMAINS/domains.tsv
 wc -l DOMAINS/domains.tsv
-#7334 DOMAINS/domains.tsv
+#8722 DOMAINS/domains.tsv
 
 # Status of domains
 for domain in $(cat domain.list); do
@@ -1336,7 +1447,7 @@ for domain in $(cat domain.list); do
 done
 
 datamash check < DOMAINS/domains.tsv
-#7334 lines, 41 fields
+#8722 lines, 42 fields
 
 # Add header line
 for domain in $(cat domain.list); do
@@ -1349,12 +1460,20 @@ done |
 # Filter out DEAD or Helicase_C only sequences
 cat DOMAINS/domains.tsv |
     tsv-filter --str-eq 18:O --str-eq 19:O \
-    > DOMAINS/RHLB.tsv
+    > DOMAINS/RhlB.tsv
 
+# Filter out DHH or DHHA1 only sequences
+cat DOMAINS/domains.tsv |
+    tsv-filter --str-eq 41:O --str-eq 42:O \
+    > DOMAINS/NrnA.tsv
+
+rm -fr temp
 cat DOMAINS/domains.tsv |
     tsv-filter --str-ne 18:O --str-ne 19:O |
+    tsv-filter --str-ne 41:O --str-ne 42:O |
     (cat DOMAINS/header.tsv && cat) |
-    (cat && cat DOMAINS/RHLB.tsv) |
+    (cat && cat DOMAINS/RhlB.tsv) |
+    (cat && cat DOMAINS/NrnA.tsv) |
     keep-header -- sort -k1,1 \
     > temp && mv temp DOMAINS/domains.tsv
 
@@ -1363,56 +1482,16 @@ tsv-join \
     --data-fields 1 \
     -f DOMAINS/domains.tsv \
     --key-fields 1 \
-    --append-fields 2-41 |
+    --append-fields 2-42 |
      keep-header -- sort -k1,1 \
     > temp && mv temp DOMAINS/domains.tsv
 
-rm DOMAINS/header.tsv DOMAINS/RHLB.tsv
+datamash check < DOMAINS/domains.tsv
+#7130 lines, 44 fields
+
+rm DOMAINS/header.tsv DOMAINS/RhlB.tsv DOMAINS/NrnA.tsv
 
 ```
-
-| Domain                              | Count |
-|:------------------------------------|:------|
-| DOMAINS/OB_RNB.replace.tsv          | 382   |
-| DOMAINS/CSD2.replace.tsv            | 279   |
-| DOMAINS/RNB.replace.tsv             | 312   |
-| DOMAINS/S1.replace.tsv              | 832   |
-| DOMAINS/HTH_12.replace.tsv          | 120   |
-| DOMAINS/RNase_II_C_S1.replace.tsv   | 96    |
-| DOMAINS/Importin_rep.replace.tsv    | 6     |
-| DOMAINS/PIN_4.replace.tsv           | 13    |
-| DOMAINS/Rrp44_CSD1.replace.tsv      | 5     |
-| DOMAINS/OB_Dis3.replace.tsv         | 8     |
-| DOMAINS/Rrp44_S1.replace.tsv        | 0     |
-| DOMAINS/RNase_E_G.replace.tsv       | 22    |
-| DOMAINS/RNase_PH.replace.tsv        | 88    |
-| DOMAINS/RNase_PH_C.replace.tsv      | 97    |
-| DOMAINS/PNPase.replace.tsv          | 80    |
-| DOMAINS/KH_1.replace.tsv            | 470   |
-| DOMAINS/DEAD.replace.tsv            | 2276  |
-| DOMAINS/Helicase_C.replace.tsv      | 1454  |
-| DOMAINS/PolyA_pol.replace.tsv       | 66    |
-| DOMAINS/PolyA_pol_RNAbd.replace.tsv | 86    |
-| DOMAINS/PolyA_pol_arg_C.replace.tsv | 6     |
-| DOMAINS/Enolase_N.replace.tsv       | 335   |
-| DOMAINS/Enolase_C.replace.tsv       | 337   |
-| DOMAINS/DUF3552.replace.tsv         | 269   |
-| DOMAINS/HD.replace.tsv              | 1280  |
-| DOMAINS/Lactamase_B.replace.tsv     | 789   |
-| DOMAINS/RMMBL.replace.tsv           | 439   |
-| DOMAINS/RNase_J_C.replace.tsv       | 569   |
-| DOMAINS/PFK.replace.tsv             | 321   |
-| DOMAINS/RNase_R.replace.tsv         | 481   |
-| DOMAINS/3_prime_RNase.replace.tsv   | 393   |
-| DOMAINS/rpsA.replace.tsv            | 600   |
-| DOMAINS/RNaseEG.replace.tsv         | 26    |
-| DOMAINS/polynuc_phos.replace.tsv    | 598   |
-| DOMAINS/NusA.replace.tsv            | 349   |
-| DOMAINS/pcnB.replace.tsv            | 67    |
-| DOMAINS/eno.replace.tsv             | 338   |
-| DOMAINS/RNase_Y.replace.tsv         | 551   |
-| DOMAINS/MG423.replace.tsv           | 761   |
-| DOMAINS/PFKA_ATP.replace.tsv        | 371   |
 
 ## InterProScan
 
