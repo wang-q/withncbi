@@ -1050,32 +1050,25 @@ https://www.uniprot.org/uniprot/?query=Ribonuclease+AND+organism%3A%22Bacillus+s
 
 ### E. coli RNase R
 
-* [Pfam](http://pfam.xfam.org/protein/RNR_ECOLI)
-* [UniProt](https://www.uniprot.org/uniprot/P21499)
-* [NCBI](https://www.ncbi.nlm.nih.gov/protein/NP_418600.4)
+* [UniProt](https://www.uniprot.org/uniprot/RNR_ECOLI)
 
 ![RNR_ECOLI](../image/RNR_ECOLI.png)
 
 ### E. coli RNase II
 
-* [Pfam](http://pfam.xfam.org/protein/RNB_ECOLI)
-* [UniProt](https://www.uniprot.org/uniprot/P30850)
-* [NCBI](https://www.ncbi.nlm.nih.gov/protein/NP_415802.1)
+* [UniProt](https://www.uniprot.org/uniprot/RNB_ECOLI)
 
 ![RNB_ECOLI](../image/RNB_ECOLI.png)
 
 ### Human RRP44
 
-* [Pfam](http://pfam.xfam.org/protein/RRP44_HUMAN)
-* [UniProt](https://www.uniprot.org/uniprot/Q9Y2L1)
-* [NCBI](https://www.ncbi.nlm.nih.gov/protein/NP_055768.3)
+* [UniProt](https://www.uniprot.org/uniprot/RRP44_HUMAN)
 * Subcellular location: Nucleus
 
 ![RRP44_HUMAN](../image/RRP44_HUMAN.png)
 
 ### Fly Dis3
 
-* [Pfam](http://pfam.xfam.org/protein/Q9VC93_DROME)
 * [UniProt](https://www.uniprot.org/uniprot/Q9VC93)
 * Subcellular location: Nucleus
 
@@ -1083,16 +1076,14 @@ https://www.uniprot.org/uniprot/?query=Ribonuclease+AND+organism%3A%22Bacillus+s
 
 ### Yeast RRP44
 
-* [Pfam](http://pfam.xfam.org/protein/RRP44_YEAST)
-* [UniProt](https://www.uniprot.org/uniprot/Q08162)
-* [NCBI](https://www.ncbi.nlm.nih.gov/protein/NP_014621.1)
+* [UniProt](https://www.uniprot.org/uniprot/RRP44_YEAST)
 * Subcellular location: Nucleus, Mitochondrion
 
 ![RRP44_YEAST](../image/RRP44_YEAST.png)
 
 ### Arabidopsis thaliana RP44A
 
-* [UniProt](https://www.uniprot.org/uniprot/Q9SHL7)
+* [UniProt](https://www.uniprot.org/uniprot/RP44A_ARATH)
 * Subcellular location: Nucleus
 
 ![RP44A_ARATH](../image/RP44A_ARATH.png)
