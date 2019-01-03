@@ -1471,11 +1471,14 @@ rm DOMAINS/header.tsv DOMAINS/RHLB.tsv
 
 ## InterProScan
 
+InterProScan 启动很慢, 因此一次提交整个菌株里的数十个蛋白.
+
 ```bash
 cd ~/data/alignment/Tenericutes
 
 mkdir -p IPS
 
+# extract wanted sequences
 for GENUS in $(cat genus.list); do
     echo 1>&2 "==> GENUS [${GENUS}]"
 
@@ -1488,33 +1491,69 @@ for GENUS in $(cat genus.list); do
             grep -Fx -f <(cut -f 1 DOMAINS/domains.tsv) \
             > IPS/${STRAIN}/wanted.list
         
-        faops some PROTEINS/all.replace.fa IPS/${STRAIN}/wanted.list stdout |
-            faops split-name stdin IPS/${STRAIN}
-
+        faops some PROTEINS/all.replace.fa IPS/${STRAIN}/wanted.list IPS/${STRAIN}/${STRAIN}.fa
     done
 done
 
+# scan proteins of each strain with InterProScan
+for GENUS in $(cat genus.list); do
+    echo 1>&2 "==> GENUS [${GENUS}]"
+
+    cat taxon/${GENUS} |
+        parallel --no-run-if-empty --linebuffer -k -j 4 "
+            if [[ -e IPS/{}/{}.tsv ]]; then
+                exit;
+            fi
+            
+            interproscan.sh -dp -f tsv,json,svg -i IPS/{}/{}.fa --output-file-base IPS/{}/{}
+            tar -xz -f IPS/{}/{}.svg.tar.gz -C IPS/{}
+            rm IPS/{}/{}.svg.tar.gz
+        "
+    
+    echo 1>&2
+done
+
+# IPS family
 for GENUS in $(cat genus.list); do
     echo 1>&2 "==> GENUS [${GENUS}]"
 
     for STRAIN in $(cat taxon/${GENUS}); do
-        echo 1>&2 "==> STRAIN [${STRAIN}]"
-
-        cat IPS/${STRAIN}/wanted.list |
-            parallel --no-run-if-empty --linebuffer -k -j 4 "
-                if [[ -e IPS/${STRAIN}/{}.tsv ]]; then
-                    exit;
-                fi
-                
-                interproscan.sh -dp -f tsv,json,svg -i IPS/${STRAIN}/{}.fa --output-file-base IPS/${STRAIN}/{}
-                tar -xvz -f IPS/${STRAIN}/{}.svg.tar.gz -C IPS/${STRAIN}
-                rm IPS/${STRAIN}/{}.svg.tar.gz
-            "
-
+        cat IPS/${STRAIN}/${STRAIN}.json |
+            jq .results |
+            jq -r -c '
+                .[] |
+                .xref as $name |
+                .matches[] |
+                .signature.entry |
+                select(.type == "FAMILY") |
+                [$name[0].name, .description] |
+                @tsv
+            ' | 
+            tsv-uniq -f 1
     done
-    
-    echo 1>&2
-done
+done |
+    (echo -e "#name\tfamily" && cat) \
+    > IPS/family.tsv
+
+tsv-join \
+    <(cut -f 1-3 DOMAINS/domains.tsv) \
+    --data-fields 1 \
+    -f IPS/family.tsv \
+    --key-fields 1 \
+    --append-fields 2 \
+    --write-all "" |
+    tsv-join \
+        --data-fields 1 \
+        -f DOMAINS/domains.tsv \
+        --key-fields 1 \
+        --append-fields 4-43 |
+     keep-header -- sort -k1,1 \
+    > IPS/predicts.tsv
+
+cut -f 4 IPS/predicts.tsv |
+    sort |
+    uniq -c |
+    sort -nr
 
 ```
 
