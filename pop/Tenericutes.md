@@ -1550,9 +1550,14 @@ tsv-join \
      keep-header -- sort -k1,1 \
     > IPS/predicts.tsv
 
+cut -f 3 IPS/predicts.tsv |
+    sort |
+    uniq -dc |
+    sort -nr
+
 cut -f 4 IPS/predicts.tsv |
     sort |
-    uniq -c |
+    uniq -dc |
     sort -nr
 
 ```
