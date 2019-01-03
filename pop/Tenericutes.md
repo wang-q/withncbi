@@ -912,57 +912,39 @@ https://www.uniprot.org/uniprot/?query=ribonuclease+AND+organism%3A%22Escherichi
     * PAP
 
 * rne
-    * RNE_ECOLI
     * Ribonuclease E
-    * https://www.uniprot.org/uniprot/P21513
-    * NP_415602
+    * https://www.uniprot.org/uniprot/RNE_ECOLI
     * S1, RNase_E_G
-    * TIGR00757 RNaseEG
 
 * rnb
-    * RNB_ECOLI
     * Exoribonuclease 2
-    * https://www.uniprot.org/uniprot/P30850
-    * NP_415802
+    * https://www.uniprot.org/uniprot/RNB_ECOLI
     * OB_RNB, CSD2, RNB, S1
 
 * rnr
-    * RNR_ECOLI
     * Ribonuclease R
-    * https://www.uniprot.org/uniprot/P21499
-    * NP_418600
+    * https://www.uniprot.org/uniprot/RNR_ECOLI
     * HTH_12, OB_RNB, CSD2, RNB, S1
 
 * pnp
-    * PNP_ECOLI
     * Polyribonucleotide nucleotidyltransferase
-    * https://www.uniprot.org/uniprot/P05055
-    * NP_417633
+    * https://www.uniprot.org/uniprot/PNP_ECOLI
     * RNase_PH, RNase_PH_C, PNPase, RNase_PH, RNase_PH_C, KH_1, S1
-    * TIGR03591 polynuc_phos
 
 * rhlB
-    * RHLB_ECOLI
     * ATP-dependent RNA helicase RhlB
-    * https://www.uniprot.org/uniprot/P0A8J8
-    * NP_418227
+    * https://www.uniprot.org/uniprot/RHLB_ECOLI
     * DEAD, Helicase_C
 
 * eno
-    * ENO_ECOLI
     * Enolase
-    * https://www.uniprot.org/uniprot/P0A6P9
-    * NP_417259
+    * https://www.uniprot.org/uniprot/ENO_ECOLI
     * Enolase_N, Enolase_C
-    * TIGR01060 eno
 
 * pcnB
-    * PCNB_ECOLI
     * Poly(A) polymerase I
-    * https://www.uniprot.org/uniprot/P0ABF1
-    * NP_414685
+    * https://www.uniprot.org/uniprot/PCNB_ECOLI
     * PolyA_pol, PolyA_pol_RNAbd, PolyA_pol_arg_C
-    * TIGR01942 pcnB
 
 RNE_ECOLI has binary interactions with 5 proteins:
 
@@ -973,19 +955,14 @@ RNE_ECOLI has binary interactions with 5 proteins:
 * ENO_ECOLI
 
 * srmB
-    * SRMB_ECOLI
     * ATP-dependent RNA helicase SrmB
-    * https://www.uniprot.org/uniprot/P21507
-    * NP_417071
+    * https://www.uniprot.org/uniprot/SRMB_ECOLI
     * DEAD, Helicase_C
 
 * dnaK
-    * DNAK_ECOLI
     * Chaperone protein DnaK
-    * https://www.uniprot.org/uniprot/P0A6Y8
-    * NP_414555
+    * https://www.uniprot.org/uniprot/DNAK_ECOLI
     * HSP70 (PF00012)
-    * TIGR02350 prok_dnaK
 
 ## The Gram-Positive Bacterial RNA Degradosome
 
@@ -999,78 +976,55 @@ https://www.uniprot.org/uniprot/?query=Ribonuclease+AND+organism%3A%22Bacillus+s
 * Enolase ==> Enolase and PFK
 
 * rny
-    * RNY_BACSU
     * Ribonuclease Y
-    * https://www.uniprot.org/uniprot/O31774
+    * https://www.uniprot.org/uniprot/RNY_BACSU
     * DUF3552, KH_1, HD
-    * TIGR03319 RNase_Y
 
 * rnjA
-    * RNJ1_BACSU
     * Ribonuclease J1
-    * https://www.uniprot.org/uniprot/Q45493
+    * https://www.uniprot.org/uniprot/RNJ1_BACSU
     * Lactamase_B, RMMBL, RNase_J_C
-    * TIGR00649 MG423
 
 * rnjB
-    * RNJ2_BACSU
     * Ribonuclease J2
-    * https://www.uniprot.org/uniprot/O31760
+    * https://www.uniprot.org/uniprot/RNJ2_BACSU
     * Lactamase_B, RMMBL, RNase_J_C
-    * TIGR00649 MG423
 
 * cshA
-    * CSHA_BACSU
     * DEAD-box ATP-dependent RNA helicase CshA
-    * https://www.uniprot.org/uniprot/P96614
+    * https://www.uniprot.org/uniprot/CSHA_BACSU
     * DEAD, Helicase_C
 
 * pfkA
-    * PFKA_BACSU
     * ATP-dependent 6-phosphofructokinase
-    * https://www.uniprot.org/uniprot/O34529
+    * https://www.uniprot.org/uniprot/PFKA_BACSU
     * PFK (PF00365)
-    * TIGR02482 PFKA_ATP
 
 * pnp
-    * PNP_BACSU
     * Polyribonucleotide nucleotidyltransferase
-    * https://www.uniprot.org/uniprot/P50849
-    * NP_389551
+    * https://www.uniprot.org/uniprot/PNP_BACSU
     * RNase_PH, RNase_PH_C, PNPase, RNase_PH, RNase_PH_C, KH_1, S1
-    * TIGR03591 polynuc_phos
 
 ## Proteins containing S1 domain in E. coli
 
 * rpsA
-    * RS1_ECOLI
     * 30S ribosomal protein S1
-    * https://www.uniprot.org/uniprot/P0AG67
-    * NP_415431
+    * https://www.uniprot.org/uniprot/RS1_ECOLI
     * 6 X S1
-    * TIGR00717 rpsA
 
 * rng
-    * RNG_ECOLI
     * Ribonuclease G
-    * https://www.uniprot.org/uniprot/P0A9J0
-    * NP_417713
+    * https://www.uniprot.org/uniprot/RNG_ECOLI
     * S1, RNase_E_G
-    * TIGR00757 RNaseEG
 
 * nusA
-    * NUSA_ECOLI
     * Transcription termination/antitermination protein NusA
-    * https://www.uniprot.org/uniprot/P0AFF6
-    * NP_417638
+    * https://www.uniprot.org/uniprot/NUSA_ECOLI
     * NusA_N, S1, KH_5, HHH_5
-    * TIGR01953 NusA
 
 * yhgF
-    * YHGF_ECOLI
     * Protein YhgF
-    * https://www.uniprot.org/uniprot/P46837
-    * NP_417866
+    * https://www.uniprot.org/uniprot/YHGF_ECOLI
     * Tex_N, Tex_YqgF, HHH_3, HHH_9, S1
 
 ## Other RNases
