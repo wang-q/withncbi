@@ -187,7 +187,8 @@ cat ${RANK_NAME}.assembly.tsv |
     sort -nr
 
 # Edit .tsv, remove unnecessary strains, check strain names and comment out poor assemblies.
-# vim ${GENUS}.assembly.tsv
+# vim ${RANK_NAME}.assembly.tsv
+# cp ${RANK_NAME}.assembly.tsv ~/Scripts/withncbi/pop
 
 # Cleaning
 rm raw*.*sv
