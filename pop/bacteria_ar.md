@@ -15,10 +15,10 @@
 | Group               | Species                     | Species ID | Comments      | Strains |
 |:--------------------|:----------------------------|-----------:|:--------------|--------:|
 | Gammaproteobacteria |                             |            |               |         |
-|                     | Acinetobacter junii         |      40215 | 琼氏不动杆菌    |         |
+|                     | Acinetobacter junii         |      40215 | 琼氏不动杆菌    |       6 |
 |                     | Citrobacter freundii        |        546 | 弗劳地枸橼酸杆菌 |       9 |
 |                     | Klebsiella aerogenes        |        548 | 产气肠杆菌      |      15 |
-|                     | Klebsiella oxytoca          |        571 | 产酸克雷伯菌    |         |
+|                     | Klebsiella oxytoca          |        571 | 产酸克雷伯菌    |      16 |
 |                     | Morganella morganii         |        582 | 摩根摩根菌      |       6 |
 |                     | Proteus mirabilis           |        584 | 奇异变形杆菌    |       7 |
 |                     | Serratia marcescens         |        615 | 粘质沙雷菌      |      26 |
@@ -108,7 +108,7 @@ bash ASSEMBLY/bacteria_ar.assembly.collect.sh
 # Count strains
 
 ```bash
-cd ~/data/alignment/Tenericutes
+cd ~/data/alignment/bacteria_ar
 
 parallel --no-run-if-empty --linebuffer -k -j 4 '
     n_species=$(cat ASSEMBLY/bacteria_ar.assembly.collect.csv |
@@ -129,10 +129,14 @@ parallel --no-run-if-empty --linebuffer -k -j 4 '
         wc -l)
     
     printf "%s\t%d\t%d\n" {} ${n_species} ${n_strains}
-    ' ::: "Citrobacter freundii" "Klebsiella aerogenes" "Morganella morganii" "Proteus mirabilis" "Serratia marcescens" "Staphylococcus capitis" "Staphylococcus haemolyticus" "Staphylococcus hominis" 
+    ' ::: "Acinetobacter junii" "Citrobacter freundii" "Klebsiella aerogenes" "Klebsiella oxytoca" \
+          "Morganella morganii" "Proteus mirabilis" "Serratia marcescens" \
+          "Staphylococcus capitis" "Staphylococcus haemolyticus" "Staphylococcus hominis" 
 
+#Acinetobacter junii     1       6
 #Citrobacter freundii    1       9
 #Klebsiella aerogenes    1       15
+#Klebsiella oxytoca      1       16
 #Morganella morganii     1       6
 #Proteus mirabilis       1       7
 #Serratia marcescens     1       26
@@ -148,7 +152,9 @@ parallel --no-run-if-empty --linebuffer -k -j 4 '
         grep "{}" |
         cut -d"," -f 1 \
         > taxon/{= $_ =~ s/ /_/g =} # replace spaces with underscore
-    ' ::: "Citrobacter freundii" "Klebsiella aerogenes" "Morganella morganii" "Proteus mirabilis" "Serratia marcescens" "Staphylococcus capitis" "Staphylococcus haemolyticus" "Staphylococcus hominis" 
+    ' ::: "Acinetobacter junii" "Citrobacter freundii" "Klebsiella aerogenes" "Klebsiella oxytoca" \
+          "Morganella morganii" "Proteus mirabilis" "Serratia marcescens" \
+          "Staphylococcus capitis" "Staphylococcus haemolyticus" "Staphylococcus hominis" 
 
 wc -l taxon/*
 
@@ -170,22 +176,25 @@ cd ~/data/alignment/bacteria_ar
 egaz template \
     ASSEMBLY \
     --prep -o GENOMES \
-    --perseq Cfre_CFNIH1 \
-    --perseq Kaer_KCTC_2190 \
-    --perseq Mmor_subsp_morganii_KT \
-    --perseq Pmir_HI4320 \
-    --perseq Smar_subsp_marcescens_Db11 \
-    --perseq Scap_subsp_capitis \
-    --perseq Shae_JCSC1435 \
-    --perseq Shom_subsp_hominis_C80 \
+    --perseq A_jun_SH205 \
+    --perseq C_fre_CFNIH1 \
+    --perseq K_aer_KCTC_2190 \
+    --perseq K_oxy_KONIH1 \
+    --perseq M_mor_morganii_KT \
+    --perseq P_mir_HI4320 \
+    --perseq Se_mar_marcescens_Db11 \
+    --perseq St_cap_capitis \
+    --perseq St_hae_JCSC1435 \
+    --perseq St_hom_hominis_C80 \
     --min 5000 --about 5000000 \
-    -v --repeatmasker "--parallel 8"
+    -v --repeatmasker "--parallel 12"
 
 bash GENOMES/0_prep.sh
 
 # gff
-for n in Cfre_CFNIH1 Kaer_KCTC_2190 Mmor_subsp_morganii_KT Pmir_HI4320 \
-         Smar_subsp_marcescens_Db11 Scap_subsp_capitis Shae_JCSC1435 Shom_subsp_hominis_C80; do
+for n in A_jun_SH205 C_fre_CFNIH1 K_aer_KCTC_2190 K_oxy_KONIH1 \
+         M_mor_morganii_KT P_mir_HI4320 Se_mar_marcescens_Db11 \
+         St_cap_capitis St_hae_JCSC1435 St_hom_hominis_C80; do
     FILE_GFF=$(find ASSEMBLY -type f -name "*_genomic.gff.gz" | grep "${n}")
     echo >&2 "==> Processing ${n}/${FILE_GFF}"
     
@@ -199,14 +208,16 @@ done
 ```bash
 # species and targets
 ARRAY=(
-    'Citrobacter_freundii::Cfre_CFNIH1'
-    'Klebsiella_aerogenes::Kaer_KCTC_2190'
-    'Morganella_morganii::Mmor_subsp_morganii_KT'
-    'Proteus_mirabilis::Pmir_HI4320'
-    'Serratia_marcescens::Smar_subsp_marcescens_Db11'
-    'Staphylococcus_capitis::Scap_subsp_capitis'
-    'Staphylococcus_haemolyticus::Shae_JCSC1435'
-    'Staphylococcus_hominis::Shom_subsp_hominis_C80'
+    'Acinetobacter_junii::A_jun_SH205'
+    'Citrobacter_freundii::C_fre_CFNIH1'
+    'Klebsiella_aerogenes::K_aer_KCTC_2190'
+    'Klebsiella_oxytoca::K_oxy_KONIH1'
+    'Morganella_morganii::M_mor_morganii_KT'
+    'Proteus_mirabilis::P_mir_HI4320'
+    'Serratia_marcescens::Se_mar_marcescens_Db11'
+    'Staphylococcus_capitis::St_cap_capitis'
+    'Staphylococcus_haemolyticus::St_hae_JCSC1435'
+    'Staphylococcus_hominis::St_hom_hominis_C80'
 )
 
 for item in "${ARRAY[@]}" ; do
@@ -219,7 +230,7 @@ for item in "${ARRAY[@]}" ; do
         GENOMES/${TARGET_NAME} \
         $(cat taxon/${SPECIES_NAME} | grep -v "${TARGET_NAME}" | parallel -r echo "GENOMES/{}") \
         --multi -o species/${SPECIES_NAME}/ \
-        --rawphylo --parallel 8 -v
+        --rawphylo --parallel 12 -v
 
     bash species/${SPECIES_NAME}/1_pair.sh
     bash species/${SPECIES_NAME}/2_rawphylo.sh
