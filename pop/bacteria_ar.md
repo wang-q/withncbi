@@ -14,12 +14,16 @@
 
 | Group               | Species                     | Species ID | Comments      | Strains |
 |:--------------------|:----------------------------|-----------:|:--------------|--------:|
-| Gammaproteobacteria | Citrobacter freundii        |        546 | 弗劳地枸橼酸杆菌 |       9 |
+| Gammaproteobacteria |                             |            |               |         |
+|                     | Acinetobacter junii         |      40215 | 琼氏不动杆菌    |         |
+|                     | Citrobacter freundii        |        546 | 弗劳地枸橼酸杆菌 |       9 |
 |                     | Klebsiella aerogenes        |        548 | 产气肠杆菌      |      15 |
+|                     | Klebsiella oxytoca          |        571 | 产酸克雷伯菌    |         |
 |                     | Morganella morganii         |        582 | 摩根摩根菌      |       6 |
 |                     | Proteus mirabilis           |        584 | 奇异变形杆菌    |       7 |
 |                     | Serratia marcescens         |        615 | 粘质沙雷菌      |      26 |
-| Firmicutes/Bacilli  | Staphylococcus capitis      |      29388 | 头状葡萄球菌    |       7 |
+| Firmicutes/Bacilli  |                             |            |               |         |
+|                     | Staphylococcus capitis      |      29388 | 头状葡萄球菌    |       7 |
 |                     | Staphylococcus haemolyticus |       1283 | 溶血葡萄球菌    |       3 |
 |                     | Staphylococcus hominis      |       1290 | 人葡萄球菌      |       6 |
 
@@ -35,43 +39,35 @@ cd ~/data/alignment/${RANK_NAME}
 
 mysql -ualignDB -palignDB ar_refseq -e "
     SELECT 
-        organism_name, species, ftp_path, assembly_level
+        organism_name, species, genus, ftp_path, assembly_level
     FROM ar 
     WHERE 1=1
         AND taxonomy_id != species_id               # no strain ID
-        AND species_id in (546, 548, 582, 584, 615, 29388, 1283, 1290)
+        AND species_id in (40215, 546, 548, 571, 582, 584, 615, 29388, 1283, 1290)
     " \
     > raw.tsv
 
 mysql -ualignDB -palignDB ar_genbank -e "
     SELECT 
-        organism_name, species, ftp_path, assembly_level
+        organism_name, species, genus, ftp_path, assembly_level
     FROM ar 
     WHERE 1=1
         AND taxonomy_id != species_id               # no strain ID
-        AND species_id in (546, 548, 582, 584, 615, 29388, 1283, 1290)
+        AND species_id in (40215, 546, 548, 571, 582, 584, 615, 29388, 1283, 1290)
     " \
     >> raw.tsv
 
 cat raw.tsv |
+    grep -v '^#' |
+    perl ~/Scripts/withncbi/taxon/abbr_name.pl -c "1,2,3" -s '\t' -m 3 --shortsub |
     (echo -e '#name\tftp_path\torganism\tassembly_level' && cat ) |
-    perl -nl -a -F"\t" -e '
+    perl -nl -a -F"," -e '
         BEGIN{my %seen}; 
         /^#/ and print and next;
         /^organism_name/i and next;
-        $n = $F[0];
-        $rx = quotemeta $F[1];
-        $n =~ s/$rx\s*//;
-        $n =~ s/\s+$//;
-        $n =~ s/\W+/_/g;
-        @O = split(/ /, $F[1]);
-        $name = substr($O[0],0,1) . substr($O[1],0,3);
-        $name .= q{_} . $n if $n;
-        $name =~ s/\W+/_/g;
-        $name =~ s/_+/_/g;
-        $seen{$name}++;
-        $seen{$name} > 1 and next;
-        printf qq{%s\t%s\t%s\t%s\n}, $name, $F[2], $F[1], $F[3];
+        $seen{$F[5]}++;
+        $seen{$F[5]} > 1 and next;
+        printf qq{%s\t%s\t%s\t%s\n}, $F[5], $F[3], $F[1], $F[4];
         ' |
     keep-header -- sort -k3,3 -k1,1 \
     > ${RANK_NAME}.assembly.tsv
