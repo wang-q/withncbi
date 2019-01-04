@@ -1570,7 +1570,7 @@ tsv-join \
         --data-fields 1 \
         -f DOMAINS/domains.tsv \
         --key-fields 1 \
-        --append-fields 4-43 |
+        --append-fields 4-44 |
      keep-header -- sort -k1,1 \
     > IPS/predicts.tsv
 
@@ -1592,43 +1592,58 @@ cut -f 4 IPS/predicts.tsv |
 
 | Item               | Count |
 |:-------------------|------:|
-| " ribonuclease R " |   292 |
+| "ribonuclease R "  |   295 |
+| "ribonuclease II " |     2 |
 | " RNB "            |     6 |
-| " RNase II "       |     1 |
 | " RNase R "        |     2 |
-| deduped            |   224 |
-| OB_RNB             |   187 |
-| CSD2               |   192 |
-| RNB                |   219 |
-| S1                 |   201 |
+| " RNase II "       |     1 |
+| deduped            |   229 |
+| OB_RNB             |   192 |
+| CSD2               |   196 |
+| RNB                |   224 |
+| S1                 |   206 |
 
 ```bash
 cd ~/data/alignment/Tenericutes
 
 mkdir -p RNaseR
 
+# Annotations containing RNB domain
+cat PROTEINS/all.pro.fa |
+    grep "^>" |
+    grep -f <(cut -f 1 DOMAINS/RNB.replace.tsv) |
+    perl -nl -e 's/^>\w+\.\d+\s+//g; print' |
+    perl -nl -e 's/\s+\[.+?\]$//g; print' |
+    perl -nl -e 's/MULTISPECIES: //g; print' |
+    sort |
+    uniq -c |
+    sort -nr
+
+cat PROTEINS/all.pro.fa |
+    grep "ribonuclease R " |
+    wc -l
+cat PROTEINS/all.pro.fa |
+    grep "ribonuclease II " |
+    wc -l
+cat PROTEINS/all.pro.fa |
+    grep " RNB " |
+    wc -l
+cat PROTEINS/all.pro.fa |
+    grep " RNase R " |
+    wc -l
+cat PROTEINS/all.pro.fa |
+    grep " RNase II " |
+    wc -l
+
 faops some PROTEINS/all.pro.fa \
     <(cat PROTEINS/all.pro.fa |
-        grep -e " ribonuclease R " -e " RNB " -e " RNase II " -e " RNase R " |
+        grep -e "ribonuclease R " -e "ribonuclease II " -e " RNB " -e " RNase R " -e " RNase II " |
         cut -d" " -f 1 |
         sed "s/^>//" |
         sort | uniq) \
     stdout |
     faops filter -u stdin stdout \
     > RNaseR/RNaseR.all.fa
-
-cat PROTEINS/all.pro.fa |
-    grep " ribonuclease R " |
-    wc -l
-cat PROTEINS/all.pro.fa |
-    grep " RNB " |
-    wc -l
-cat PROTEINS/all.pro.fa |
-    grep " RNase II " |
-    wc -l
-cat PROTEINS/all.pro.fa |
-    grep " RNase R " |
-    wc -l
 
 cat RNaseR/RNaseR.all.fa |
     grep "^>" |
@@ -1647,27 +1662,16 @@ find ASSEMBLY -maxdepth 1 -type d |
     grep 'ASSEMBLY/' |
     parallel --no-run-if-empty --linebuffer -k -j 4 '
         gzip -dcf {}/*_protein.faa.gz |
-            grep -e " ribonuclease R " -e " RNB " -e " RNase II " -e " RNase R " |
+            grep -e "ribonuclease R " -e "ribonuclease II " -e " RNB " -e " RNase R " -e " RNase II " |
             (echo {} && cat)
         echo
     ' \
     > RNaseR/strain_anno.txt
 
-# Annotations containing RNB domain
-cat PROTEINS/all.pro.fa |
-    grep "^>" |
-    grep -f <(cut -f 1 DOMAINS/RNB.replace.tsv) |
-    perl -nl -e 's/^>\w+\.\d+\s+//g; print' |
-    perl -nl -e 's/\s+\[.+?\]$//g; print' |
-    perl -nl -e 's/MULTISPECIES: //g; print' |
-    sort |
-    uniq -c |
-    sort -nr
-
 # Annotated as RNase R but lacking RNB domains:
 cat PROTEINS/all.pro.fa |
     grep "^>" |
-    grep -e " ribonuclease R " -e " RNB " -e " RNase II " -e " RNase R "|
+    grep -e "ribonuclease R " -e "ribonuclease II " -e " RNB " -e " RNase R " -e " RNase II " |
     grep -v -f <(cut -f 1 DOMAINS/RNB.replace.tsv)
 #>OAL10424.1 ribonuclease R [Candidatus Mycoplasma haemobos]
 #>AFO52271.1 ribonuclease R [Candidatus Mycoplasma haemolamae str. Purdue]
@@ -1688,7 +1692,7 @@ for GENUS in $(cat genus.list); do
 
     for STRAIN in $(cat taxon/${GENUS}); do
         gzip -dcf ASSEMBLY/${STRAIN}/*_protein.faa.gz |
-            grep -e " ribonuclease R " -e " RNB " -e " RNase II " -e " RNase R "|
+            grep -e "ribonuclease R " -e "ribonuclease II " -e " RNB " -e " RNase R " -e " RNase II " |
             cut -d" " -f 1 |
             sed "s/^>//" |
             STRAIN=${STRAIN} perl -nl -MPath::Tiny -e '
@@ -1712,7 +1716,7 @@ for GENUS in $(cat genus.list); do
         > RNaseR/${GENUS}.replace.tsv
 done
 
-# 296
+# 301
 cat RNaseR/*.replace.tsv | wc -l
 
 # extract sequences for each genus
