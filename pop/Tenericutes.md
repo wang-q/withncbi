@@ -17,6 +17,7 @@
     - [Align and concat marker genes to create species tree](#align-and-concat-marker-genes-to-create-species-tree)
     - [Tweak the concat tree](#tweak-the-concat-tree)
     - [TIGR](#tigr)
+- [Essential genes](#essential-genes)
 - [Bacteria degradosome](#bacteria-degradosome)
     - [Components of the RNA degradosome in E. coli](#components-of-the-rna-degradosome-in-e-coli)
     - [The Gram-Positive Bacterial RNA Degradosome](#the-gram-positive-bacterial-rna-degradosome)
@@ -885,6 +886,105 @@ parallel --no-run-if-empty --linebuffer -k -j 4 "
 
 ```
 
+# Essential genes
+
+
+```bash
+cd ~/data/alignment/Tenericutes
+
+mkdir -p ESS
+
+# Mycop_gen_G37
+for index in $(seq 1 7); do
+    curl -s "http://tubic.org/deg_bak/show.php?selfield=ac&term=DEG1006&page=${index}&sort=ac&db=p" |
+        pup 'table.geneList tr td table.geneList tr td text{}' |
+        grep '\S' |
+        paste -d $'\t' - - - - - 
+done |
+    tsv-uniq \
+    > ESS/Mycop_gen_G37.tsv
+
+for index in $(seq -f "%03g" 1 381); do
+    curl -s "http://tubic.org/deg_bak/information.php?ac=DEG10060${index}" |
+        pup 'table tr:last-child td pre text{}' |
+        (echo ">DEG10060${index}" && cat)
+done \
+    > ESS/Mycop_gen_G37.pro.fa
+
+# Ba_subt_subtilis_168
+for index in $(seq 1 5); do
+    curl -s "http://tubic.org/deg_bak/show.php?selfield=ac&term=DEG1001&page=${index}&sort=ac&db=p" |
+        pup 'table.geneList tr td table.geneList tr td text{}' |
+        grep '\S' |
+        paste -d $'\t' - - - - - 
+done |
+    tsv-uniq \
+    > ESS/Ba_subt_subtilis_168.tsv
+
+for index in $(seq -f "%03g" 1 381); do
+    curl -s "http://tubic.org/deg_bak/information.php?ac=DEG10010${index}" |
+        pup 'table tr:last-child td pre text{}' |
+        (echo ">DEG10010${index}" && cat)
+done \
+    > ESS/Ba_subt_subtilis_168.pro.fa
+
+# Es_coli_K_12_MG1655
+for index in $(seq 1 11); do
+    curl -s "http://tubic.org/deg_bak/show.php?selfield=ac&term=DEG1018&page=${index}&sort=ac&db=p" |
+        pup 'table.geneList tr td table.geneList tr td text{}' |
+        grep '\S' |
+        paste -d $'\t' - - - - - 
+done |
+    tsv-uniq \
+    > ESS/Es_coli_K_12_MG1655.tsv
+
+for index in $(seq -f "%03g" 1 609); do
+    curl -s "http://tubic.org/deg_bak/information.php?ac=DEG10180${index}" |
+        pup 'table tr:last-child td pre text{}' |
+        (echo ">DEG10180${index}" && cat)
+done \
+    > ESS/Es_coli_K_12_MG1655.pro.fa
+
+# Mycob_tub_H37Rv
+for index in $(seq 1 11); do
+    curl -s "http://tubic.org/deg_bak/show.php?selfield=ac&term=DEG1025&page=${index}&sort=ac&db=p" |
+        pup 'table.geneList tr td table.geneList tr td text{}' |
+        grep '\S' |
+        paste -d $'\t' - - - - - 
+done |
+    tsv-uniq \
+    > ESS/Mycob_tub_H37Rv.tsv
+
+for index in $(seq -f "%03g" 1 771); do
+    curl -s "http://tubic.org/deg_bak/information.php?ac=DEG10250${index}" |
+        pup 'table tr:last-child td pre text{}' |
+        (echo ">DEG10250${index}" && cat)
+done \
+    > ESS/Mycob_tub_H37Rv.pro.fa
+
+# St_aure_aureus_NCTC_8325
+for index in $(seq 1 6); do
+    curl -s "http://tubic.org/deg_bak/show.php?selfield=ac&term=DEG1017&page=${index}&sort=ac&db=p" |
+        pup 'table.geneList tr td table.geneList tr td text{}' |
+        grep '\S' |
+        paste -d $'\t' - - - - - 
+done |
+    tsv-uniq \
+    > ESS/St_aure_aureus_NCTC_8325.tsv
+
+for index in $(seq -f "%03g" 1 351); do
+    curl -s "http://tubic.org/deg_bak/information.php?ac=DEG10170${index}" |
+        pup 'table tr:last-child td pre text{}' |
+        (echo ">DEG10170${index}" && cat)
+done \
+    > ESS/St_aure_aureus_NCTC_8325.pro.fa
+
+
+# Visit https://www.uniprot.org/uniprot/?query=organism%3A%22243273%22&sort=score
+# Download Tab
+
+
+```
 
 # Bacteria degradosome
 
