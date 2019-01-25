@@ -36,7 +36,7 @@ Eukaryota (2759)                8746
 Use `taxon/id_seq_dom_select.pl` to extract Taxonomy ids and genbank accessions from all history
 pages.
 
-Got **217** accessions.
+Got **9355** accessions.
 
 ```bash
 mkdir -p ~/data/organelle/mito/GENOMES
@@ -68,7 +68,7 @@ perl ~/Scripts/withncbi/taxon/gb_taxon_locus.pl mitochondrion.genomic.gbff > ref
 
 rm mitochondrion.genomic.gbff
 
-# 9103
+# 9355
 cat refseq_id_seq.csv | grep -v "^#" | wc -l
 
 # combine
@@ -77,7 +77,7 @@ cat webpage_id_seq.csv refseq_id_seq.csv |
     sort -t, -k1,1 \
     > mitochondrion_id_seq.csv
 
-# 9132
+# 9355
 cat mitochondrion_id_seq.csv | grep -v "^#" | wc -l
 
 ```
@@ -93,7 +93,7 @@ cat mitochondrion_id_seq.csv |
     perl ~/Scripts/withncbi/taxon/id_restrict.pl -s "," -a 33090 \
     >> plant_mitochondrion_id_seq.csv
 
-# 232
+# 242
 cat plant_mitochondrion_id_seq.csv | grep -v "^#" | wc -l
 
 cat plant_mitochondrion_id_seq.csv |
@@ -102,12 +102,13 @@ cat plant_mitochondrion_id_seq.csv |
     uniq -c |
     grep -v -E '\s+1\s+'
 #      3 3659 Cucumis sativus has 3 chromosomes
-#      2 3702 Arabidopsis thaliana NC_001284.2 was removed by RefSeq staff
 #      2 3708 Brassica napus linear plasmid NC_004946
 #      2 39946 Oryza sativa indica plasmid B2 NC_001776
 #      2 39947 Oryza sativa japonica plasmid B1 NC_001751
 #      2 51329 Polytomella parva has 2 chromosomes
 #      2 351366 Polytomella sp. SAG 63-10 has 2 chromosomes
+
+#      2 3702 Arabidopsis thaliana NC_001284.2 was removed by RefSeq staff
 
 sed -i".bak" "/,NC_001284$/d" plant_mitochondrion_id_seq.csv # Arabidopsis thaliana
 sed -i".bak" "/,NC_004946$/d" plant_mitochondrion_id_seq.csv # Brassica napus
@@ -228,7 +229,7 @@ FIXME
 Species and genus should not be "NA" and genus has 2 or more members.
 
 ```text
-224 ---------> 218 ---------> 88 ---------> 116
+238 ---------> 231 ---------> 95 ---------> 126
         NA           genus         family
 ```
 
@@ -236,6 +237,9 @@ Species and genus should not be "NA" and genus has 2 or more members.
 ```bash
 mkdir -p ~/data/organelle/mito/summary
 cd ~/data/organelle/mito/summary
+
+# 238
+wc -l mitochondrion.CHECKME.csv
 
 # filter out accessions without linage information (strain, species, genus and family)
 cat mitochondrion.CHECKME.csv |
@@ -246,7 +250,7 @@ cat mitochondrion.CHECKME.csv |
     ' \
     > mitochondrion.tmp
 
-# 218
+# 231
 wc -l mitochondrion.tmp
 
 #----------------------------#
@@ -267,7 +271,7 @@ cat mitochondrion.tmp |
 # intersect between two files
 grep -F -f genus.tmp mitochondrion.tmp > mitochondrion.genus.tmp
 
-# 88
+# 95
 wc -l mitochondrion.genus.tmp
 
 #----------------------------#
@@ -281,7 +285,7 @@ cat mitochondrion.genus.tmp |
 # intersect between two files
 grep -F -f family.tmp mitochondrion.tmp > mitochondrion.family.tmp
 
-# 116
+# 126
 wc -l mitochondrion.family.tmp
 
 #----------------------------#
@@ -312,8 +316,11 @@ cat mitochondrion.DOWNLOAD.csv |
     sort
 
 #Beta vulgaris,2
+#Cucumis sativus,3
 #Oryza sativa,2
-#Zea mays,3
+#Polytomella parva,2
+#Polytomella piriformis,2
+#Zea mays,2
 
 # strain name not equal to species
 cat mitochondrion.DOWNLOAD.csv |
@@ -324,7 +331,7 @@ cat mitochondrion.DOWNLOAD.csv |
 #Beta vulgaris subsp. maritima
 #Beta vulgaris subsp. vulgaris
 #Brassica rapa subsp. oleifera
-#Calypogeia fissa subsp. neogaea
+#Marchantia polymorpha subsp. ruderalis
 #Oryza sativa Indica Group
 #Oryza sativa Japonica Group
 #Zea mays subsp. mays
@@ -358,16 +365,14 @@ cat ../summary/mitochondrion.ABBR.csv |
     sort \
     >> mitochondrion_name_acc_id.csv
 
-# local, Runtime 10 seconds.
-# with --entrez, Runtime 7 minutes and 23 seconds.
-# And which-can't-find is still which-can't-find.
+# Local, Runtime 4 seconds.
 cat ../summary/mitochondrion.ABBR.csv |
     grep -v '^#' |
     perl -nla -F"," -e 'print qq{$F[0],$F[9]}' |
     uniq |
     perl ~/Scripts/withncbi/taxon/strain_info.pl --stdin --withname --file mitochondrion_ncbi.csv
 
-# some warnings from bioperl, just ignore them
+# Some warnings about trans-splicing genes from BioPerl, just ignore them
 perl ~/Scripts/withncbi/taxon/batch_get_seq.pl \
     -f mitochondrion_name_acc_id.csv \
     2>&1 |
@@ -408,9 +413,7 @@ find . -maxdepth 1 -type d -path "*/*" |
 
 # Create alignment plans
 
-We got **116** accessions.
-
-Numbers for higher ranks are: 16 orders, 17 families, 29 genera and 84 species.
+Numbers for higher ranks are: 17 orders, 18 families, 31 genera and 88 species.
 
 ```bash
 cd ~/data/organelle/mito/summary
@@ -431,14 +434,14 @@ cat mitochondrion.ABBR.csv |
 # intersect between two files
 grep -F -f genus.tmp mitochondrion.ABBR.csv > mitochondrion.GENUS.csv
 
-# 88
+# 95
 wc -l mitochondrion.GENUS.csv
 
 # count every ranks
-#  16 order.list.tmp
-#  17 family.list.tmp
-#  29 genus.list.tmp
-#  84 species.list.tmp
+#  17 order.list.tmp
+#  18 family.list.tmp
+#  31 genus.list.tmp
+#  88 species.list.tmp
 cut -d',' -f 4 mitochondrion.GENUS.csv | sort | uniq > species.list.tmp
 cut -d',' -f 5 mitochondrion.GENUS.csv | sort | uniq > genus.list.tmp
 cut -d',' -f 6 mitochondrion.GENUS.csv | sort | uniq > family.list.tmp
@@ -456,8 +459,8 @@ cat mitochondrion.GENUS.tmp \
 
 # clean
 rm *.tmp *.bak
-```
 
+```
 
 Create `mitochondrion_OG.md` for picking outgroups.
 
