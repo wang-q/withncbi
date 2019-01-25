@@ -21,10 +21,10 @@
 Open browser and visit
 [NCBI mitochondrion page](http://www.ncbi.nlm.nih.gov/genomes/GenomesGroup.cgi?taxid=33090&opt=organelle).
 Save page to a local file, html only. In this case, it's
-`doc/green_plants_mitochondrion_180325.html`.
+`doc/green_plants_mitochondrion_181207.html`.
 
 All [Eukaryota](https://www.ncbi.nlm.nih.gov/genomes/GenomesGroup.cgi?taxid=2759&opt=organelle),
-`doc/eukaryota_mitochondrion_180325.html`.
+`doc/eukaryota_mitochondrion_181207.html`.
 
 ```text
 Eukaryota (2759)                8746
@@ -47,15 +47,9 @@ rm webpage_id_seq.csv
 perl ~/Scripts/withncbi/taxon/id_seq_dom_select.pl \
     ~/Scripts/withncbi/doc/eukaryota_mitochondrion_181207.html \
     >> webpage_id_seq.csv
-perl ~/Scripts/withncbi/taxon/id_seq_dom_select.pl \
-    ~/Scripts/withncbi/doc/eukaryota_mitochondrion_180325.html \
-    >> webpage_id_seq.csv
 
 perl ~/Scripts/withncbi/taxon/id_seq_dom_select.pl \
     ~/Scripts/withncbi/doc/green_plants_mitochondrion_181207.html \
-    >> webpage_id_seq.csv    
-perl ~/Scripts/withncbi/taxon/id_seq_dom_select.pl \
-    ~/Scripts/withncbi/doc/green_plants_mitochondrion_180325.html \
     >> webpage_id_seq.csv    
 
 ```
