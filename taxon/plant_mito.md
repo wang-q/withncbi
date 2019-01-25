@@ -7,13 +7,16 @@
     - [Can't get clear taxon information](#cant-get-clear-taxon-information)
 - [Filtering based on valid families and genera](#filtering-based-on-valid-families-and-genera)
 - [Find a way to name these](#find-a-way-to-name-these)
-- [Download sequences and regenerate lineage information.](#download-sequences-and-regenerate-lineage-information)
+- [Download sequences and regenerate lineage information](#download-sequences-and-regenerate-lineage-information)
 - [Prepare sequences for lastz](#prepare-sequences-for-lastz)
-- [Create alignment plans](#create-alignment-plans)
-- [Aligning](#aligning)
-    - [Batch running for groups](#batch-running-for-groups)
+- [Aligning without outgroups](#aligning-without-outgroups)
+    - [Create alignments plans without outgroups](#create-alignments-plans-without-outgroups)
+    - [Batch running for genera](#batch-running-for-genera)
     - [Alignments of families for outgroups.](#alignments-of-families-for-outgroups)
-    - [Self alignments](#self-alignments)
+- [Aligning with outgroups](#aligning-with-outgroups)
+    - [Create `mitochondrion_OG.md` for picking outgroups](#create-mitochondrion_ogmd-for-picking-outgroups)
+    - [Create alignments plans with outgroups](#create-alignments-plans-with-outgroups)
+- [Self alignments](#self-alignments)
 
 
 # Scrap id and acc from NCBI
@@ -150,8 +153,18 @@ cat ../GENOMES/plant_mitochondrion_id_seq.csv |
 
 ```
 
-Manually correct lineages. # FIXME
+Manually correct lineages.
 
+```bash
+cd ~/data/organelle/mito/summary
+
+# darwin (bsd) need "" for -i
+sed -i".bak" "s/\'//g" mitochondrion.CHECKME.csv
+
+# Anomodon attenuatus and Anomodon rugelii (Bryophytes) was grouped to Streptophyta.
+sed -i".bak" "s/Bryopsida,Streptophyta/Bryopsida,Bryophytes/" mitochondrion.CHECKME.csv
+
+```
 
 Split Streptophyta according to http://www.theplantlist.org/
 
@@ -353,7 +366,7 @@ cat mitochondrion.DOWNLOAD.csv |
 
 ```
 
-# Download sequences and regenerate lineage information.
+# Download sequences and regenerate lineage information
 
 ```bash
 cd ~/data/organelle/mito/GENOMES
@@ -382,36 +395,6 @@ perl ~/Scripts/withncbi/taxon/batch_get_seq.pl \
 find . -name "*.fa" | wc -l
 
 ```
-
-
-# Prepare sequences for lastz
-
-```bash
-cd ~/data/organelle/mito/GENOMES
-
-find . -maxdepth 1 -type d -path "*/*" |
-    sort |
-    parallel --no-run-if-empty --linebuffer -k -j 2 '
-        echo >&2 "==> {}"
-        
-        if [ -e {}/chr.fasta ]; then
-            echo >&2 "    {} has been processed"
-            exit;
-        fi
-
-        egaz prepseq \
-            {} \
-            --gi -v --repeatmasker " --gff --parallel 8"
-    '
-
-# restore to original states
-#for suffix in .2bit .fasta .fasta.fai .sizes .rm.out .rm.gff; do
-#    find . -name "*${suffix}" | parallel --no-run-if-empty rm 
-#done
-
-```
-
-# Create alignment plans
 
 Numbers for higher ranks are: 17 orders, 18 families, 31 genera and 88 species.
 
@@ -462,42 +445,37 @@ rm *.tmp *.bak
 
 ```
 
-Create `mitochondrion_OG.md` for picking outgroups.
-
-Manually edit it then move to `~/Scripts/withncbi/doc/mitochondrion_OG.md`.
+# Prepare sequences for lastz
 
 ```bash
-cd ~/data/organelle/mito/summary
+cd ~/data/organelle/mito/GENOMES
 
-cat mitochondrion.GENUS.csv |
-    grep -v "^#" |
-    perl -na -F"," -e '
-        BEGIN{
-            ($phylum, $family, $genus, ) = (q{}, q{}, q{});
-        }
+find . -maxdepth 1 -type d -path "*/*" |
+    sort |
+    parallel --no-run-if-empty --linebuffer -k -j 2 '
+        echo >&2 "==> {}"
+        
+        if [ -e {}/chr.fasta ]; then
+            echo >&2 "    {} has been processed"
+            exit;
+        fi
 
-        chomp for @F;
+        egaz prepseq \
+            {} \
+            --gi -v --repeatmasker " --gff --parallel 8"
+    '
 
-        if ($F[8] ne $phylum) {
-            $phylum = $F[8];
-            printf qq{\n# %s\n}, $phylum;
-        }
-        if ($F[5] ne $family) {
-            $family = $F[5];
-            printf qq{## %s\n}, $family;
-        }
-        $F[4] =~ s/\W+/_/g;
-        if ($F[4] ne $genus) {
-            $genus = $F[4];
-            printf qq{%s\n}, $genus;
-        }
-    ' \
-    > mitochondrion_OG.md
+# restore to original states
+#for suffix in .2bit .fasta .fasta.fai .sizes .rm.out .rm.gff; do
+#    find . -name "*${suffix}" | parallel --no-run-if-empty rm 
+#done
 
 ```
 
+# Aligning without outgroups
 
-Create alignments without/with outgroups.
+
+## Create alignments plans without outgroups
 
 ```bash
 cd ~/data/organelle/mito/summary
@@ -566,25 +544,6 @@ cat mitochondrion.ABBR.csv |
     ' \
     > family.tsv
 
-# name  t   qs  o
-cat genus.tsv |
-    perl -nla -F"\t" -MPath::Tiny -e '
-        BEGIN{
-            @ls = grep {/\S/}
-                  grep {!/^#/}
-                  path(q{~/Scripts/withncbi/doc/mitochondrion_OG.md})->lines({ chomp => 1});
-            for (@ls) {
-                @fs = split(/,/);
-                $h{$fs[0]}= $fs[1];
-            }
-        }
-
-        if (exists $h{$F[0]}) {
-            printf qq{%s\t%s\t%s\t%s\n}, $F[0] . q{_OG}, $F[1], $F[2], $h{$F[0]};
-        }
-    ' \
-    > genus_OG.tsv
-
 ```
 
 ```bash
@@ -652,69 +611,9 @@ cat family.tsv |
     ' \
     >> ../mitochondrion.family.cmd.txt
 
-# genera with outgroups
-echo "mkdir -p ~/data/organelle/mito/OG"  > ../mitochondrion.OG.cmd.txt
-echo "cd       ~/data/organelle/mito/OG" >> ../mitochondrion.OG.cmd.txt
-cat genus_OG.tsv |
-    TT_FILE=egaz_template_multi.tt perl -MTemplate -nla -F"\t" -e '
-        next unless scalar @F >= 3;
-        
-        my $tt = Template->new;
-        $tt->process(
-            $ENV{TT_FILE},
-            {
-                name       => $F[0],
-                t          => $F[1],
-                qs         => [ split /,/, $F[2] ],
-                o          => $F[3],
-            },
-            \*STDOUT
-        ) or die Template->error;
-
-    ' \
-    >> ../mitochondrion.OG.cmd.txt
-
-cat <<'EOF' > egaz_templates_self.tt
-
-# [% name %]
-egaz template \
-    ~/data/organelle/mito/GENOMES/[% t %] \
-[% FOREACH q IN qs -%]
-    ~/data/organelle/mito/GENOMES/[% q %] \
-[% END -%]
-    --self -o [% name %] \
-    --taxon ~/data/organelle/mito/GENOMES/mitochondrion_ncbi.csv \
-    --circos --aligndb --parallel 8 -v
-
-EOF
-
-# every genera
-echo "mkdir -p ~/data/organelle/mito/self"  > ../mitochondrion.self.cmd.txt
-echo "cd       ~/data/organelle/mito/self" >> ../mitochondrion.self.cmd.txt
-cat genus.tsv |
-    TT_FILE=egaz_templates_self.tt perl -MTemplate -nla -F"\t" -e '
-        next unless scalar @F >= 3;
-        
-        my $tt = Template->new;
-        $tt->process(
-            $ENV{TT_FILE},
-            {
-                name       => $F[0],
-                t          => $F[1],
-                qs         => [ split /,/, $F[2] ],
-            },
-            \*STDOUT
-        ) or die Template->error;
-
-    ' \
-    >> ../mitochondrion.self.cmd.txt
-
 ```
 
-
-# Aligning
-
-## Batch running for groups
+## Batch running for genera
 
 ```bash
 mkdir -p ~/data/organelle/mito/genus
@@ -765,6 +664,91 @@ find . -mindepth 1 -maxdepth 3 -type d -name "*_fasta" | parallel -r rm -fr
 
 ```
 
+# Aligning with outgroups
+
+## Create `mitochondrion_OG.md` for picking outgroups
+
+Manually edit it then move to `~/Scripts/withncbi/doc/mitochondrion_OG.md`.
+
+```bash
+cd ~/data/organelle/mito/summary
+
+cat mitochondrion.GENUS.csv |
+    grep -v "^#" |
+    perl -na -F"," -e '
+        BEGIN{
+            ($phylum, $family, $genus, ) = (q{}, q{}, q{});
+        }
+
+        chomp for @F;
+
+        if ($F[8] ne $phylum) {
+            $phylum = $F[8];
+            printf qq{\n# %s\n}, $phylum;
+        }
+        if ($F[5] ne $family) {
+            $family = $F[5];
+            printf qq{## %s\n}, $family;
+        }
+        $F[4] =~ s/\W+/_/g;
+        if ($F[4] ne $genus) {
+            $genus = $F[4];
+            printf qq{%s\n}, $genus;
+        }
+    ' \
+    > mitochondrion_OG.md
+
+```
+
+## Create alignments plans with outgroups
+
+
+```bash
+cd ~/data/organelle/mito/summary
+
+# name  t   qs  o
+cat genus.tsv |
+    perl -nla -F"\t" -MPath::Tiny -e '
+        BEGIN{
+            @ls = grep {/\S/}
+                  grep {!/^#/}
+                  path(q{~/Scripts/withncbi/doc/mitochondrion_OG.md})->lines({ chomp => 1});
+            for (@ls) {
+                @fs = split(/,/);
+                $h{$fs[0]}= $fs[1];
+            }
+        }
+
+        if (exists $h{$F[0]}) {
+            printf qq{%s\t%s\t%s\t%s\n}, $F[0] . q{_OG}, $F[1], $F[2], $h{$F[0]};
+        }
+    ' \
+    > genus_OG.tsv
+
+# genera with outgroups
+echo "mkdir -p ~/data/organelle/mito/OG"  > ../mitochondrion.OG.cmd.txt
+echo "cd       ~/data/organelle/mito/OG" >> ../mitochondrion.OG.cmd.txt
+cat genus_OG.tsv |
+    TT_FILE=egaz_template_multi.tt perl -MTemplate -nla -F"\t" -e '
+        next unless scalar @F >= 3;
+        
+        my $tt = Template->new;
+        $tt->process(
+            $ENV{TT_FILE},
+            {
+                name       => $F[0],
+                t          => $F[1],
+                qs         => [ split /,/, $F[2] ],
+                o          => $F[3],
+            },
+            \*STDOUT
+        ) or die Template->error;
+
+    ' \
+    >> ../mitochondrion.OG.cmd.txt
+
+```
+
 In previous steps, we have manually edited `~/Scripts/withncbi/doc/mitochondrion_OG.md` and
 generated `genus_OG.tsv`.
 
@@ -791,7 +775,47 @@ find . -mindepth 1 -maxdepth 3 -type d -name "*_fasta" | parallel -r rm -fr
 
 ```
 
-## Self alignments
+# Self alignments
+
+```bash
+cd ~/data/organelle/mito/summary
+
+cat <<'EOF' > egaz_templates_self.tt
+
+# [% name %]
+egaz template \
+    ~/data/organelle/mito/GENOMES/[% t %] \
+[% FOREACH q IN qs -%]
+    ~/data/organelle/mito/GENOMES/[% q %] \
+[% END -%]
+    --self -o [% name %] \
+    --taxon ~/data/organelle/mito/GENOMES/mitochondrion_ncbi.csv \
+    --circos --aligndb --parallel 8 -v
+
+EOF
+
+# every genera
+echo "mkdir -p ~/data/organelle/mito/self"  > ../mitochondrion.self.cmd.txt
+echo "cd       ~/data/organelle/mito/self" >> ../mitochondrion.self.cmd.txt
+cat genus.tsv |
+    TT_FILE=egaz_templates_self.tt perl -MTemplate -nla -F"\t" -e '
+        next unless scalar @F >= 3;
+        
+        my $tt = Template->new;
+        $tt->process(
+            $ENV{TT_FILE},
+            {
+                name       => $F[0],
+                t          => $F[1],
+                qs         => [ split /,/, $F[2] ],
+            },
+            \*STDOUT
+        ) or die Template->error;
+
+    ' \
+    >> ../mitochondrion.self.cmd.txt
+
+```
 
 ```bash
 mkdir -p ~/data/organelle/mito/self
@@ -799,7 +823,6 @@ cd ~/data/organelle/mito/self
 
 time bash ../mitochondrion.self.cmd.txt 2>&1 | tee log_cmd.txt
 
-# Don't need 6_feature_cmd.sh 7_pair_stat.sh
 for d in `find . -mindepth 1 -maxdepth 1 -type d | sort `;do
     echo "echo \"====> Processing ${d} <====\""
     echo bash ${d}/1_self.sh;

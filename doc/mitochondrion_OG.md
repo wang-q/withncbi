@@ -27,6 +27,8 @@ Solanum,Cap_annuum
 ## Grimmiaceae 紫萼藓科
 Niphotrichum,Di_laevigatum
 Racomitrium,Di_laevigatum
+## Anomodontaceae 牛舌藓科
+### Anomodon
 ## Calypogeiaceae 护蒴苔科
 ### Calypogeia
 ## Marchantiaceae 地钱科
@@ -50,7 +52,3 @@ Prototheca,Au_protothecoides
 ### Bracteacoccus
 ## Ulvaceae 石莼科
 ### Ulva
-
-# Streptophyta
-## Anomodontaceae 牛舌藓科
-### Anomodon
