@@ -386,10 +386,37 @@ cat ../summary/mitochondrion.ABBR.csv |
     perl ~/Scripts/withncbi/taxon/strain_info.pl --stdin --withname --file mitochondrion_ncbi.csv
 
 # Some warnings about trans-splicing genes from BioPerl, just ignore them
-perl ~/Scripts/withncbi/taxon/batch_get_seq.pl \
-    -f mitochondrion_name_acc_id.csv \
-    2>&1 |
-    tee mitochondrion_seq.log
+# eutils restricts 3 connections
+cat name_acc_id.csv |
+    grep -v '^#' |
+    2>&1 parallel --colsep ',' --no-run-if-empty --linebuffer -k -j 3 "
+        echo -e '==> id: [{1}]\tseq: [{2}]\n'
+        mkdir -p {1}
+        if [[ -e '{1}/{2}.gff' && -e '{1}/{2}.fa' ]] ; then
+            echo -e '    Sequence [{1}/{2}] exists, next\n'
+            exit
+        fi
+        
+        # gb
+        echo -e '    [{1}/{2}].gb'
+        curl -Ls \
+            'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=nucleotide&id={2}&rettype=gb&retmode=text' \
+            > {1}/{2}.gb
+        
+        # fasta
+        echo -e '    [{1}/{2}].fa'
+        curl -Ls \
+            'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=nucleotide&id={2}&rettype=fasta&retmode=text' \
+            > {1}/{2}.fa
+        
+        # gff
+        echo -e '    [{1}/{2}].gff'
+        perl ~/Scripts/withncbi/taxon/bp_genbank2gff3.pl {1}/{2}.gb -o stdout > {1}/{2}.gff
+        perl -i -nlp -e '/^\#\#FASTA/ and last' {1}/{2}.gff
+        
+        echo
+    " |
+    tee download_seq.log
 
 # count downloaded sequences
 find . -name "*.fa" | wc -l
