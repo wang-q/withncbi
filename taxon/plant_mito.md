@@ -2,7 +2,9 @@
 
 [TOC levels=1-3]: # " "
 - [Process plant mitochondrion genomes](#process-plant-mitochondrion-genomes)
+- [Update taxdmp](#update-taxdmp)
 - [Scrap id and acc from NCBI](#scrap-id-and-acc-from-ncbi)
+    - [Restrict taxonomy ids to green plants with `taxon/id_restrict.pl`.](#restrict-taxonomy-ids-to-green-plants-with-taxonid_restrictpl)
 - [Add lineage information](#add-lineage-information)
     - [Can't get clear taxon information](#cant-get-clear-taxon-information)
 - [Filtering based on valid families and genera](#filtering-based-on-valid-families-and-genera)
@@ -18,6 +20,10 @@
     - [Create alignments plans with outgroups](#create-alignments-plans-with-outgroups)
 - [Self alignments](#self-alignments)
 
+
+# Update taxdmp
+
+*Update `~/data/NCBI/taxdmp` before running `id_restrict.pl` or `id_project_to.pl`*.
 
 # Scrap id and acc from NCBI
 
@@ -65,11 +71,11 @@ cd ~/data/organelle/mito/GENOMES
 wget -N ftp://ftp.ncbi.nlm.nih.gov/genomes/refseq/mitochondrion/mitochondrion.1.genomic.gbff.gz
 wget -N ftp://ftp.ncbi.nlm.nih.gov/genomes/refseq/mitochondrion/mitochondrion.2.genomic.gbff.gz
 
-gzip -dcf mitochondrion.*.genomic.gbff.gz > mitochondrion.genomic.gbff
+gzip -dcf mitochondrion.*.genomic.gbff.gz > genomic.gbff
 
-perl ~/Scripts/withncbi/taxon/gb_taxon_locus.pl mitochondrion.genomic.gbff > refseq_id_seq.csv
+perl ~/Scripts/withncbi/taxon/gb_taxon_locus.pl genomic.gbff > refseq_id_seq.csv
 
-rm mitochondrion.genomic.gbff
+rm genomic.gbff
 
 # 9355
 cat refseq_id_seq.csv | grep -v "^#" | wc -l
@@ -78,28 +84,28 @@ cat refseq_id_seq.csv | grep -v "^#" | wc -l
 cat webpage_id_seq.csv refseq_id_seq.csv |
     sort -u | # duplicated id-seq pair
     sort -t, -k1,1 \
-    > mitochondrion_id_seq.csv
+    > id_seq.csv
 
 # 9355
-cat mitochondrion_id_seq.csv | grep -v "^#" | wc -l
+cat id_seq.csv | grep -v "^#" | wc -l
 
 ```
 
-Restrict taxonomy ids to green plants with `taxon/id_restrict.pl`.
+## Restrict taxonomy ids to green plants with `taxon/id_restrict.pl`.
 
 ```bash
 cd ~/data/organelle/mito/GENOMES
 
-echo '#strain_taxon_id,accession' > plant_mitochondrion_id_seq.csv
-cat mitochondrion_id_seq.csv |
+echo '#strain_taxon_id,accession' > plant_id_seq.csv
+cat id_seq.csv |
     grep -v "^#" |
     perl ~/Scripts/withncbi/taxon/id_restrict.pl -s "," -a 33090 \
-    >> plant_mitochondrion_id_seq.csv
+    >> plant_id_seq.csv
 
 # 242
-cat plant_mitochondrion_id_seq.csv | grep -v "^#" | wc -l
+cat plant_id_seq.csv | grep -v "^#" | wc -l
 
-cat plant_mitochondrion_id_seq.csv |
+cat plant_id_seq.csv |
     cut -d',' -f 1 |
     sort -n |
     uniq -c |
@@ -113,23 +119,21 @@ cat plant_mitochondrion_id_seq.csv |
 
 #      2 3702 Arabidopsis thaliana NC_001284.2 was removed by RefSeq staff
 
-sed -i".bak" "/,NC_001284$/d" plant_mitochondrion_id_seq.csv # Arabidopsis thaliana
-sed -i".bak" "/,NC_004946$/d" plant_mitochondrion_id_seq.csv # Brassica napus
-sed -i".bak" "/,NC_001751$/d" plant_mitochondrion_id_seq.csv # Oryza sativa japonica
-sed -i".bak" "/,NC_001776$/d" plant_mitochondrion_id_seq.csv # Oryza sativa indica
+sed -i".bak" "/,NC_001284$/d" plant_id_seq.csv # Arabidopsis thaliana
+sed -i".bak" "/,NC_004946$/d" plant_id_seq.csv # Brassica napus
+sed -i".bak" "/,NC_001751$/d" plant_id_seq.csv # Oryza sativa japonica
+sed -i".bak" "/,NC_001776$/d" plant_id_seq.csv # Oryza sativa indica
 
 # Vicia faba mitochondrial plasmid MtVFPL3 NC_011084
 # Zea mays mitochondrial plasmid pBMSmt1.9 NC_001400
-sed -i".bak" "/,NC_011084$/d" plant_mitochondrion_id_seq.csv
-sed -i".bak" "/,NC_001400$/d" plant_mitochondrion_id_seq.csv
+sed -i".bak" "/,NC_011084$/d" plant_id_seq.csv
+sed -i".bak" "/,NC_001400$/d" plant_id_seq.csv
 
 ```
 
 # Add lineage information
 
 Give ids better shapes for manually checking and automatic filtering.
-
-*Update `~/data/NCBI/taxdmp` before running `id_project_to.pl`*.
 
 If you sure, you can add or delete lines and contents in `mitochondrion.CHECKME.csv`.
 
@@ -138,8 +142,8 @@ mkdir -p ~/data/organelle/mito/summary
 cd ~/data/organelle/mito/summary
 
 # generate a .csv file for manually checking
-echo '#strain_taxon_id,accession,strain,species,genus,family,order,class,phylum' > mitochondrion.CHECKME.csv
-cat ../GENOMES/plant_mitochondrion_id_seq.csv |
+echo '#strain_taxon_id,accession,strain,species,genus,family,order,class,phylum' > CHECKME.csv
+cat ../GENOMES/plant_id_seq.csv |
     grep -v "^#" |
     perl ~/Scripts/withncbi/taxon/id_project_to.pl -s "," |
     perl ~/Scripts/withncbi/taxon/id_project_to.pl -s "," --rank species |
@@ -149,7 +153,7 @@ cat ../GENOMES/plant_mitochondrion_id_seq.csv |
     perl ~/Scripts/withncbi/taxon/id_project_to.pl -s "," --rank class |
     perl ~/Scripts/withncbi/taxon/id_project_to.pl -s "," --rank phylum |
     sort -t',' -k9,9 -k8,8 -k7,7 -k6,6 -k5,5 \
-    >> mitochondrion.CHECKME.csv
+    >> CHECKME.csv
 
 ```
 
@@ -159,10 +163,10 @@ Manually correct lineages.
 cd ~/data/organelle/mito/summary
 
 # darwin (bsd) need "" for -i
-sed -i".bak" "s/\'//g" mitochondrion.CHECKME.csv
+sed -i".bak" "s/\'//g" CHECKME.csv
 
 # Anomodon attenuatus and Anomodon rugelii (Bryophytes) was grouped to Streptophyta.
-sed -i".bak" "s/Bryopsida,Streptophyta/Bryopsida,Bryophytes/" mitochondrion.CHECKME.csv
+sed -i".bak" "s/Bryopsida,Streptophyta/Bryopsida,Bryophytes/" CHECKME.csv
 
 ```
 
@@ -188,7 +192,7 @@ cat Angiosperms.tmp |
     parallel -r -j 1 '
         perl -pi -e '\''
             s/({},\w+,\w+),Streptophyta/\1,Angiosperms/g
-        '\'' mitochondrion.CHECKME.csv
+        '\'' CHECKME.csv
     '
 
 # Gymnosperms
@@ -201,7 +205,7 @@ perl -Mojo -e '
     parallel -r -j 1 '
         perl -pi -e '\''
             s/({},\w+,\w+),Streptophyta/\1,Gymnosperms/g
-        '\'' mitochondrion.CHECKME.csv
+        '\'' CHECKME.csv
     '
 
 # Pteridophytes
@@ -214,7 +218,7 @@ perl -Mojo -e '
     parallel -r -j 1 '
         perl -pi -e '\''
             s/({},\w+,\w+),Streptophyta/\1,Pteridophytes/g
-        '\'' mitochondrion.CHECKME.csv
+        '\'' CHECKME.csv
     '
 
 # Bryophytes
@@ -226,7 +230,7 @@ perl -Mojo -e '
     parallel -r -j 1 '
         perl -pi -e '\''
             s/({},\w+,\w+),Streptophyta/\1,Bryophytes/g
-        '\'' mitochondrion.CHECKME.csv
+        '\'' CHECKME.csv
     '
 
 rm *.tmp *.bak
@@ -252,25 +256,25 @@ mkdir -p ~/data/organelle/mito/summary
 cd ~/data/organelle/mito/summary
 
 # 238
-wc -l mitochondrion.CHECKME.csv
+wc -l CHECKME.csv
 
 # filter out accessions without linage information (strain, species, genus and family)
-cat mitochondrion.CHECKME.csv |
+cat CHECKME.csv |
     perl -nla -F"," -e '
         /^#/ and next;
         ($F[2] eq q{NA} or $F[3] eq q{NA} or $F[4] eq q{NA} or $F[5] eq q{NA} ) and next;
         print
     ' \
-    > mitochondrion.tmp
+    > valid.tmp
 
 # 231
-wc -l mitochondrion.tmp
+wc -l valid.tmp
 
 #----------------------------#
 # Genus
 #----------------------------#
 # valid genera
-cat mitochondrion.tmp |
+cat valid.tmp |
     perl -nla -F"," -e '
         $seen{$F[4]}++; 
         END {
@@ -282,30 +286,30 @@ cat mitochondrion.tmp |
     > genus.tmp
 
 # intersect between two files
-grep -F -f genus.tmp mitochondrion.tmp > mitochondrion.genus.tmp
+grep -F -f genus.tmp valid.tmp > valid.genus.tmp
 
 # 95
-wc -l mitochondrion.genus.tmp
+wc -l valid.genus.tmp
 
 #----------------------------#
 # Family
 #----------------------------#
 # get some genera back as candidates for outgroup
-cat mitochondrion.genus.tmp |
+cat valid.genus.tmp |
     perl -nla -F"," -e 'printf qq{,$F[5],\n}' \
     > family.tmp
 
 # intersect between two files
-grep -F -f family.tmp mitochondrion.tmp > mitochondrion.family.tmp
+grep -F -f family.tmp valid.tmp > valid.family.tmp
 
-# 126
-wc -l mitochondrion.family.tmp
+# 125
+wc -l valid.family.tmp
 
 #----------------------------#
 # results produced in this step
 #----------------------------#
-head -n 1 mitochondrion.CHECKME.csv > mitochondrion.DOWNLOAD.csv
-cat mitochondrion.family.tmp >> mitochondrion.DOWNLOAD.csv
+head -n 1 CHECKME.csv > DOWNLOAD.csv
+cat valid.family.tmp >> DOWNLOAD.csv
 
 # clean
 rm *.tmp *.bak
@@ -317,8 +321,10 @@ rm *.tmp *.bak
 Seems it's OK to use species as names.
 
 ```bash
+cd ~/data/organelle/mito/summary
+
 # sub-species
-cat mitochondrion.DOWNLOAD.csv |
+cat DOWNLOAD.csv |
     perl -nl -a -F"," -e '
         /^#/i and next; 
         $seen{$F[3]}++; 
@@ -336,7 +342,7 @@ cat mitochondrion.DOWNLOAD.csv |
 #Zea mays,2
 
 # strain name not equal to species
-cat mitochondrion.DOWNLOAD.csv |
+cat DOWNLOAD.csv |
     grep -v '^#' |
     perl -nl -a -F"," -e '$F[2] ne $F[3] and print $F[2]' |
     sort
@@ -357,12 +363,12 @@ Create abbreviations.
 ```bash
 cd ~/data/organelle/mito/summary
 
-echo '#strain_taxon_id,accession,strain,species,genus,family,order,class,phylum,abbr' > mitochondrion.ABBR.csv
-cat mitochondrion.DOWNLOAD.csv |
+echo '#strain_taxon_id,accession,strain,species,genus,family,order,class,phylum,abbr' > ABBR.csv
+cat DOWNLOAD.csv |
     grep -v '^#' |
     perl ~/Scripts/withncbi/taxon/abbr_name.pl -c "3,4,5" -s "," -m 0 |
     sort -t',' -k9,9 -k7,7 -k6,6 -k10,10 \
-    >> mitochondrion.ABBR.csv
+    >> ABBR.csv
 
 ```
 
@@ -371,19 +377,19 @@ cat mitochondrion.DOWNLOAD.csv |
 ```bash
 cd ~/data/organelle/mito/GENOMES
 
-echo "#strain_name,accession,strain_taxon_id" > mitochondrion_name_acc_id.csv
-cat ../summary/mitochondrion.ABBR.csv |
+echo "#strain_name,accession,strain_taxon_id" > name_acc_id.csv
+cat ../summary/ABBR.csv |
     grep -v '^#' |
     perl -nl -a -F"," -e 'print qq{$F[9],$F[1],$F[0]}' |
     sort \
-    >> mitochondrion_name_acc_id.csv
+    >> name_acc_id.csv
 
 # Local, Runtime 4 seconds.
-cat ../summary/mitochondrion.ABBR.csv |
+cat ../summary/ABBR.csv |
     grep -v '^#' |
     perl -nla -F"," -e 'print qq{$F[0],$F[9]}' |
     uniq |
-    perl ~/Scripts/withncbi/taxon/strain_info.pl --stdin --withname --file mitochondrion_ncbi.csv
+    perl ~/Scripts/withncbi/taxon/strain_info.pl --stdin --withname --file taxon_ncbi.csv
 
 # Some warnings about trans-splicing genes from BioPerl, just ignore them
 # eutils restricts 3 connections
@@ -429,7 +435,7 @@ Numbers for higher ranks are: 17 orders, 18 families, 31 genera and 88 species.
 cd ~/data/organelle/mito/summary
 
 # valid genera
-cat mitochondrion.ABBR.csv |
+cat ABBR.csv |
     grep -v "^#" |
     perl -nl -a -F"," -e '
         $seen{$F[4]}++; 
@@ -442,30 +448,30 @@ cat mitochondrion.ABBR.csv |
     > genus.tmp
 
 # intersect between two files
-grep -F -f genus.tmp mitochondrion.ABBR.csv > mitochondrion.GENUS.csv
+grep -F -f genus.tmp ABBR.csv > GENUS.csv
 
 # 95
-wc -l mitochondrion.GENUS.csv
+wc -l GENUS.csv
 
 # count every ranks
 #  17 order.list.tmp
 #  18 family.list.tmp
 #  31 genus.list.tmp
 #  88 species.list.tmp
-cut -d',' -f 4 mitochondrion.GENUS.csv | sort | uniq > species.list.tmp
-cut -d',' -f 5 mitochondrion.GENUS.csv | sort | uniq > genus.list.tmp
-cut -d',' -f 6 mitochondrion.GENUS.csv | sort | uniq > family.list.tmp
-cut -d',' -f 7 mitochondrion.GENUS.csv | sort | uniq > order.list.tmp
+cut -d',' -f 4 GENUS.csv | sort | uniq > species.list.tmp
+cut -d',' -f 5 GENUS.csv | sort | uniq > genus.list.tmp
+cut -d',' -f 6 GENUS.csv | sort | uniq > family.list.tmp
+cut -d',' -f 7 GENUS.csv | sort | uniq > order.list.tmp
 wc -l order.list.tmp family.list.tmp genus.list.tmp species.list.tmp
 
 # create again with headers
-grep -F -f genus.tmp mitochondrion.ABBR.csv > mitochondrion.GENUS.tmp
+grep -F -f genus.tmp ABBR.csv > GENUS.tmp
 
 # sort by multiply columns, phylum, order, family, abbr
-head -n 1 mitochondrion.ABBR.csv > mitochondrion.GENUS.csv
-cat mitochondrion.GENUS.tmp \
+head -n 1 ABBR.csv > GENUS.csv
+cat GENUS.tmp \
     | sort -t',' -k9,9 -k7,7 -k6,6 -k10,10 \
-    >> mitochondrion.GENUS.csv
+    >> GENUS.csv
 
 # clean
 rm *.tmp *.bak
@@ -479,7 +485,7 @@ cd ~/data/organelle/mito/GENOMES
 
 find . -maxdepth 1 -type d -path "*/*" |
     sort |
-    parallel --no-run-if-empty --linebuffer -k -j 2 '
+    parallel --no-run-if-empty --linebuffer -k -j 4 '
         echo >&2 "==> {}"
         
         if [ -e {}/chr.fasta ]; then
@@ -509,7 +515,7 @@ cd ~/data/organelle/mito/summary
 
 # tab-separated
 # name  t   qs
-cat mitochondrion.GENUS.csv |
+cat GENUS.csv |
     grep -v "^#" |
     perl -na -F"," -e '
         BEGIN{
@@ -540,7 +546,7 @@ cat mitochondrion.GENUS.csv |
     ' \
     > genus.tsv
 
-cat mitochondrion.ABBR.csv |
+cat ABBR.csv |
     grep -v "^#" |
     perl -na -F"," -e '
         BEGIN{
@@ -589,14 +595,14 @@ egaz template \
     --outgroup [% o %] \
 [% END -%]
     --multi -o [% name %] \
-    --taxon ~/data/organelle/mito/GENOMES/mitochondrion_ncbi.csv \
+    --taxon ~/data/organelle/mito/GENOMES/taxon_ncbi.csv \
     --rawphylo --parallel 8 -v
 
 EOF
 
 # every genera
-echo "mkdir -p ~/data/organelle/mito/genus"  > ../mitochondrion.cmd.txt
-echo "cd       ~/data/organelle/mito/genus" >> ../mitochondrion.cmd.txt
+echo "mkdir -p ~/data/organelle/mito/genus"  > ../cmd.txt
+echo "cd       ~/data/organelle/mito/genus" >> ../cmd.txt
 cat genus.tsv |
     TT_FILE=egaz_template_multi.tt perl -MTemplate -nla -F"\t" -e '
         next unless scalar @F >= 3;
@@ -614,11 +620,11 @@ cat genus.tsv |
         ) or die Template->error;
 
     ' \
-    >> ../mitochondrion.cmd.txt
+    >> ../cmd.txt
 
 # this is for finding outgroups
-echo "mkdir -p ~/data/organelle/mito/family"  > ../mitochondrion.family.cmd.txt
-echo "cd       ~/data/organelle/mito/family" >> ../mitochondrion.family.cmd.txt
+echo "mkdir -p ~/data/organelle/mito/family"  > ../family.cmd.txt
+echo "cd       ~/data/organelle/mito/family" >> ../family.cmd.txt
 cat family.tsv |
     TT_FILE=egaz_template_multi.tt perl -MTemplate -nla -F"\t" -e '
         next unless scalar @F >= 3;
@@ -636,7 +642,7 @@ cat family.tsv |
         ) or die Template->error;
 
     ' \
-    >> ../mitochondrion.family.cmd.txt
+    >> ../family.cmd.txt
 
 ```
 
@@ -646,7 +652,7 @@ cat family.tsv |
 mkdir -p ~/data/organelle/mito/genus
 cd ~/data/organelle/mito/genus
 
-bash ../mitochondrion.cmd.txt 2>&1 | tee log_cmd.txt
+bash ../cmd.txt 2>&1 | tee log_cmd.txt
 
 for d in `find . -mindepth 1 -maxdepth 1 -type d | sort `;do
     echo "echo \"====> Processing ${d} <====\""
@@ -672,7 +678,7 @@ find . -mindepth 1 -maxdepth 3 -type d -name "*_fasta" | parallel -r rm -fr
 mkdir -p ~/data/organelle/mito/family
 cd ~/data/organelle/mito/family
 
-time bash ../mitochondrion.family.cmd.txt 2>&1 | tee log_cmd.txt
+time bash ../family.cmd.txt 2>&1 | tee log_cmd.txt
 
 for d in `find . -mindepth 1 -maxdepth 1 -type d | sort `;do
     echo "echo \"====> Processing ${d} <====\""
@@ -700,7 +706,7 @@ Manually edit it then move to `~/Scripts/withncbi/doc/mitochondrion_OG.md`.
 ```bash
 cd ~/data/organelle/mito/summary
 
-cat mitochondrion.GENUS.csv |
+cat GENUS.csv |
     grep -v "^#" |
     perl -na -F"," -e '
         BEGIN{
@@ -753,8 +759,8 @@ cat genus.tsv |
     > genus_OG.tsv
 
 # genera with outgroups
-echo "mkdir -p ~/data/organelle/mito/OG"  > ../mitochondrion.OG.cmd.txt
-echo "cd       ~/data/organelle/mito/OG" >> ../mitochondrion.OG.cmd.txt
+echo "mkdir -p ~/data/organelle/mito/OG"  > ../OG.cmd.txt
+echo "cd       ~/data/organelle/mito/OG" >> ../OG.cmd.txt
 cat genus_OG.tsv |
     TT_FILE=egaz_template_multi.tt perl -MTemplate -nla -F"\t" -e '
         next unless scalar @F >= 3;
@@ -772,7 +778,7 @@ cat genus_OG.tsv |
         ) or die Template->error;
 
     ' \
-    >> ../mitochondrion.OG.cmd.txt
+    >> ../OG.cmd.txt
 
 ```
 
@@ -785,7 +791,7 @@ generated `genus_OG.tsv`.
 mkdir -p ~/data/organelle/mito/OG
 cd ~/data/organelle/mito/OG
 
-time bash ../mitochondrion.OG.cmd.txt 2>&1 | tee log_cmd.txt
+time bash ../OG.cmd.txt 2>&1 | tee log_cmd.txt
 
 for d in `find . -mindepth 1 -maxdepth 1 -type d | sort `; do
     echo "echo \"====> Processing ${d} <====\""
@@ -816,14 +822,14 @@ egaz template \
     ~/data/organelle/mito/GENOMES/[% q %] \
 [% END -%]
     --self -o [% name %] \
-    --taxon ~/data/organelle/mito/GENOMES/mitochondrion_ncbi.csv \
+    --taxon ~/data/organelle/mito/GENOMES/taxon_ncbi.csv \
     --circos --aligndb --parallel 8 -v
 
 EOF
 
 # every genera
-echo "mkdir -p ~/data/organelle/mito/self"  > ../mitochondrion.self.cmd.txt
-echo "cd       ~/data/organelle/mito/self" >> ../mitochondrion.self.cmd.txt
+echo "mkdir -p ~/data/organelle/mito/self"  > ../self.cmd.txt
+echo "cd       ~/data/organelle/mito/self" >> ../self.cmd.txt
 cat genus.tsv |
     TT_FILE=egaz_templates_self.tt perl -MTemplate -nla -F"\t" -e '
         next unless scalar @F >= 3;
@@ -840,7 +846,7 @@ cat genus.tsv |
         ) or die Template->error;
 
     ' \
-    >> ../mitochondrion.self.cmd.txt
+    >> ../self.cmd.txt
 
 ```
 
@@ -848,7 +854,7 @@ cat genus.tsv |
 mkdir -p ~/data/organelle/mito/self
 cd ~/data/organelle/mito/self
 
-time bash ../mitochondrion.self.cmd.txt 2>&1 | tee log_cmd.txt
+time bash ../self.cmd.txt 2>&1 | tee log_cmd.txt
 
 for d in `find . -mindepth 1 -maxdepth 1 -type d | sort `;do
     echo "echo \"====> Processing ${d} <====\""
@@ -861,10 +867,6 @@ for d in `find . -mindepth 1 -maxdepth 1 -type d | sort `;do
 done  > runall.sh
 
 sh runall.sh 2>&1 | tee log_runall.txt
-
-# clean
-find . -mindepth 1 -maxdepth 2 -type d -name "*_raw" | parallel -r rm -fr
-find . -mindepth 1 -maxdepth 2 -type d -name "*_fasta" | parallel -r rm -fr
 
 ```
 
