@@ -12,19 +12,16 @@ id ---> lineage ---> filtering ---> naming ---> strain_info.pl   ---> egaz/multi
                                       |-------> batch_get_seq.pl -------|
 ```
 
-I'm sure there are no commas in names. So for convenient, don't use
-Text::CSV_XS.
+I'm sure there are no commas in names. So for convenient, don't use Text::CSV_XS.
 
 ## Scrap id and acc from NCBI
 
 Open browser and visit
 [NCBI plastid page](http://www.ncbi.nlm.nih.gov/genomes/GenomesGroup.cgi?taxid=33090&opt=plastid).
-Save page to a local file, html only. In this case, it's
-`doc/green_plants_plastid_160531.html`.
+Save page to a local file, html only. In this case, it's `doc/green_plants_plastid_181127.html`.
 
-All
-[Eukaryota](http://www.ncbi.nlm.nih.gov/genomes/GenomesGroup.cgi?opt=plastid&taxid=2759),
-`doc/eukaryota_plastid_160531.html`.
+All [Eukaryota](http://www.ncbi.nlm.nih.gov/genomes/GenomesGroup.cgi?opt=plastid&taxid=2759),
+`doc/eukaryota_plastid_181127.html`.
 
 Or [this link](http://www.ncbi.nlm.nih.gov/genome/browse/?report=5).
 
@@ -35,75 +32,65 @@ Eukaryota (2759)                2938
         Streptophyta (35493)    2606
 ```
 
-Use `taxon/id_seq_dom_select.pl` to extract Taxonomy ids and genbank
-accessions from all history pages.
+Use `taxon/id_seq_dom_select.pl` to extract Taxonomy ids and genbank accessions from all history
+pages.
 
 ```csv
 id,acc
 996148,NC_017006
 ```
 
-Got **2941** accessions.
+Got **3355** accessions.
 
 ```bash
-mkdir -p ~/data/organelle/plastid_genomes
-cd ~/data/organelle/plastid_genomes
+mkdir -p ~/data/organelle/plastid/GENOMES
+cd ~/data/organelle/plastid/GENOMES
 
 rm webpage_id_seq.csv
 perl ~/Scripts/withncbi/taxon/id_seq_dom_select.pl \
-    ~/Scripts/withncbi/doc/eukaryota_plastid_181125.html \
+    ~/Scripts/withncbi/doc/eukaryota_plastid_181127.html \
     >> webpage_id_seq.csv    
+
 perl ~/Scripts/withncbi/taxon/id_seq_dom_select.pl \
-    ~/Scripts/withncbi/doc/eukaryota_plastid_161106.html \
-    >> webpage_id_seq.csv
-perl ~/Scripts/withncbi/taxon/id_seq_dom_select.pl \
-    ~/Scripts/withncbi/doc/eukaryota_plastid_160531.html \
-    >> webpage_id_seq.csv
-perl ~/Scripts/withncbi/taxon/id_seq_dom_select.pl \
-    ~/Scripts/withncbi/doc/eukaryota_plastid_150826.html \
-    >> webpage_id_seq.csv
-perl ~/Scripts/withncbi/taxon/id_seq_dom_select.pl \
-    ~/Scripts/withncbi/doc/eukaryota_plastid_150806.html \
-    >> webpage_id_seq.csv
-perl ~/Scripts/withncbi/taxon/id_seq_dom_select.pl \
-    ~/Scripts/withncbi/doc/green_plants_plastid_181125.html \
+    ~/Scripts/withncbi/doc/green_plants_plastid_181127.html \
     >> webpage_id_seq.csv    
-perl ~/Scripts/withncbi/taxon/id_seq_dom_select.pl \
-    ~/Scripts/withncbi/doc/green_plants_plastid_161106.html \
-    >> webpage_id_seq.csv    
-perl ~/Scripts/withncbi/taxon/id_seq_dom_select.pl \
-    ~/Scripts/withncbi/doc/green_plants_plastid_160531.html \
-    >> webpage_id_seq.csv
-perl ~/Scripts/withncbi/taxon/id_seq_dom_select.pl \
-    ~/Scripts/withncbi/doc/green_plants_plastid_150725.html \
-    >> webpage_id_seq.csv
-perl ~/Scripts/withncbi/taxon/id_seq_dom_select.pl \
-    ~/Scripts/withncbi/doc/plant_plastid_141130.html \
-    >> webpage_id_seq.csv
+
 ```
 
-Use `taxon/gb_taxon_locus.pl` to extract information from refseq plastid
-file.
+Use `taxon/gb_taxon_locus.pl` to extract information from refseq plastid file.
 
 ```bash
-cd ~/data/organelle/plastid_genomes
+cd ~/data/organelle/plastid/GENOMES
 
 wget -N ftp://ftp.ncbi.nlm.nih.gov/genomes/refseq/plastid/plastid.1.genomic.gbff.gz
-gzip -c -d plastid.1.genomic.gbff.gz > plastid.1.genomic.gbff
+wget -N ftp://ftp.ncbi.nlm.nih.gov/genomes/refseq/plastid/plastid.2.genomic.gbff.gz
+wget -N ftp://ftp.ncbi.nlm.nih.gov/genomes/refseq/plastid/plastid.3.genomic.gbff.gz
 
-perl ~/Scripts/withncbi/taxon/gb_taxon_locus.pl plastid.1.genomic.gbff > refseq_id_seq.csv
+gzip -dcf plastid.*.genomic.gbff.gz > plastid.genomic.gbff
 
-rm plastid.1.genomic.gbff
+perl ~/Scripts/withncbi/taxon/gb_taxon_locus.pl plastid.genomic.gbff > refseq_id_seq.csv
 
-# 1612
+rm plastid.genomic.gbff
+
+# 3336
 cat refseq_id_seq.csv | grep -v "^#" | wc -l
+
+# combine
+cat webpage_id_seq.csv refseq_id_seq.csv |
+    sort -u | # duplicated id-seq pair
+    sort -t, -k1,1 \
+    > plastid_id_seq.csv
+
+# 3358
+cat plastid_id_seq.csv | grep -v "^#" | wc -l
 
 # combine
 cat webpage_id_seq.csv refseq_id_seq.csv \
     | sort -u -t, -k1,1 > plastid_id_seq.csv
 
-# 2961
+# 3355
 cat plastid_id_seq.csv | grep -v "^#" | wc -l
+
 ```
 
 ## Add lineage information
