@@ -1,10 +1,41 @@
 # Process plastid genomes
 
-The following command lines are about how I processed the plastid
-genomes of green plants. Many tools of `taxon/` are used here, which
-makes a good example for users.
+[TOC levels=1-3]: # " "
+- [Process plastid genomes](#process-plastid-genomes)
+- [Work flow.](#work-flow)
+- [Update taxdmp](#update-taxdmp)
+- [Scrap id and acc from NCBI](#scrap-id-and-acc-from-ncbi)
+- [Add lineage information](#add-lineage-information)
+    - [Can't get clear taxon information](#cant-get-clear-taxon-information)
+- [Filtering based on valid families and genera](#filtering-based-on-valid-families-and-genera)
+- [Find a way to name these](#find-a-way-to-name-these)
+- [Download sequences and regenerate lineage information](#download-sequences-and-regenerate-lineage-information)
+- [Prepare sequences for lastz](#prepare-sequences-for-lastz)
+- [Aligning without outgroups](#aligning-without-outgroups)
+    - [Create alignments plans without outgroups](#create-alignments-plans-without-outgroups)
+        - [Batch running for groups](#batch-running-for-groups)
+        - [Self alignments.](#self-alignments)
+        - [Alignments of families for outgroups.](#alignments-of-families-for-outgroups)
+        - [LSC and SSC](#lsc-and-ssc)
+- [there are 2 special strains which have no IR but a palindromic sequence.(Asa_sieboldii,Epipo_aphyllum)](#there-are-2-special-strains-which-have-no-ir-but-a-palindromic-sequenceasa_sieboldiiepipo_aphyllum)
+    - [Can't get clear ir information](#cant-get-clear-ir-information)
+    - [Slices of IR, LSC and SSC](#slices-of-ir-lsc-and-ssc)
+- [Cyanobacteria](#cyanobacteria)
+    - [Genus and Species counts](#genus-and-species-counts)
+    - [Use `bac_prepare.pl`](#use-bac_preparepl)
+- [Summary](#summary)
+    - [Copy xlsx files](#copy-xlsx-files)
+    - [Genome list](#genome-list)
+    - [Genome alignment statistics](#genome-alignment-statistics)
+    - [Groups](#groups)
+    - [Phylogenic trees of each genus with outgroup](#phylogenic-trees-of-each-genus-with-outgroup)
+    - [d1, d2](#d1-d2)
 
-## Work flow.
+
+The following command lines are about how I processed the plastid genomes of green plants. Many
+tools of `taxon/` are used here, which makes a good example for users.
+
+# Work flow.
 
 ```text
 id ---> lineage ---> filtering ---> naming ---> strain_info.pl   ---> egaz/multi_batch.pl
@@ -1042,32 +1073,6 @@ In previous steps, we have manually edited `~/Scripts/withncbi/doc/plastid_OG.md
 
 *D* between target and outgroup should be around **0.05**.
 
-```bash
-mkdir -p ~/data/organelle/plastid_OG
-cd ~/data/organelle/plastid_OG
-
-time bash ../plastid_OG.cmd.txt 2>&1 | tee log_cmd.txt
-
-for d in `find . -mindepth 1 -maxdepth 1 -type d | sort `; do
-    echo "echo \"====> Processing $d <====\""
-    echo bash $d/1_real_chr.sh ;
-    echo bash $d/2_file_rm.sh ;
-    echo bash $d/3_pair_cmd.sh ;
-    echo bash $d/4_rawphylo.sh ;
-    echo bash $d/5_multi_cmd.sh ;
-    echo bash $d/7_multi_db_only.sh ;
-    echo ;
-done  > runall.sh
-
-sh runall.sh 2>&1 | tee log_runall.txt
-
-find . -mindepth 1 -maxdepth 3 -type d -name "*_raw" | parallel -r rm -fr
-find . -mindepth 1 -maxdepth 3 -type d -name "*_fasta" | parallel -r rm -fr
-
-find . -mindepth 1 -maxdepth 4 -type f -name "*.phy" | parallel -r rm
-find . -mindepth 1 -maxdepth 4 -type f -name "*.phy.reduced" | parallel -r rm
-
-```
 
 ### LSC and SSC
 
@@ -1094,13 +1099,14 @@ Manually check strains not containing singular link.
 |     1 |     5 |
 |     1 |     8 |
 |     1 |    10 |
-#there are 2 special strains which have no IR but a palindromic sequence.(Asa_sieboldii,Epipo_aphyllum)
+
+# there are 2 special strains which have no IR but a palindromic sequence.(Asa_sieboldii,Epipo_aphyllum)
 
 Create `ir_lsc_ssc.tsv` for slicing alignments.
 
 Manually edit it then move to `~/Scripts/withncbi/doc/ir_lsc_ssc.tsv`.
 
-`#genus abbr    role    accession   chr_size    IR  LSC SSC`
+`#genus abbr role accession chr_size IR LSC SSC`
 
 * `NA` - not self-aligned
 * `MULTI` - multiply link records
@@ -1226,215 +1232,216 @@ cat plastid.ABBR.csv \
 
 ### Can't get clear ir information
 
-   * Grateloupia
-       *Grat_filicina
-       *Grat_taiwanensis
-   * Caulerpa
-       *Cau_cliftonii
-       *Cau_racemosa
-   * Caloglossa
-       *Calog_beccarii
-       *Calog_intermedia
-       *Calog_monosticha
-   * Pisum
-       *Pisum_fulvum
-       *Pisum_sativum
-       *Pisum_sativum_subsp_elatius
-   * Dasya
-       *Dasya_naccarioides
-   * Diplazium
-       *Diplazium_unilobum
-   * Bryopsis
-       *Bryop_plumosa
-       *Bryop_sp_HV04063
-       *Bry_sp_HV04063
-   * Medicago
-       *Med_falcata
-       *Med_hybrida
-       *Med_papillosa
-       *Med_truncatula
-   * Aegilops
-       *Aeg_cylindrica
-       *Aeg_geniculata
-       *Aeg_speltoides
-       *Aeg_tauschii
-   * Prototheca
-       *Prot_cutis
-       *Prot_stagnorum
-       *Prot_zopfii
-   * Cryptomonas
-       *Cryptomo_curvata
-       *Cryptomo_paramecium
-   * Monotropa
-       *Monotropa_hypopitys
-   * Liagora
-       *Liagora_brachyclada
-       *Liagora_harveyana
-   * Taiwania
-       *Tai_cryptomerioides
-       *Tai_flousiana
-   * Pinus
-       *Pinus_armandii
-       *Pinus_bungeana
-       *Pinus_contorta
-       *Pinus_gerardiana
-       *Pinus_greggii
-       *Pinus_jaliscana
-       *Pinus_koraiensis
-       *Pinus_krempfii
-       *Pinus_lambertiana
-       *Pinus_longaeva
-       *Pinus_massoniana
-       *Pinus_monophylla
-       *Pinus_nelsonii
-       *Pinus_oocarpa
-       *Pinus_pinea
-       *Pinus_sibirica
-       *Pinus_strobus
-       *Pinus_sylvestris
-       *Pinus_tabuliformis
-       *Pinus_taeda
-       *Pinus_taiwanensis
-       *Pinus_thunbergii
-   * Taxus
-       *Taxus_mairei
-   * Picea
-       *Pic_abies
-       *Pic_asperata
-       *Pic_crassifolia
-       *Pic_glauca
-       *Pic_jezoensis
-       *Pic_morrisonicola
-       *Pic_sitchensis
-   * Gracilariopsis
-       *Gracilario_chorda
-       *Gracilario_lemaneiformis
-   * Fragaria
-       *Frag_mandshurica
-       *Frag_vesca_subsp_bracteata
-   * Ulva
-       *Ulva_fasciata
-       *Ulva_flexuosa
-       *Ulva_linza
-       *Ulva_prolifera
-   * Monomorphina
-       *Monom_parapyrum
-   * Epipogium
-       *Epipo_aphyllum
-   * Euglena
-       *Euglena_archaeoplastidiata
-       *Euglena_viridis
-   * Chlorella
-       *Chlore_heliozoae
-       *Chlore_sorokiniana
-       *Chlore_variabilis
-       *Chlore_vulgaris
-   * Erodium
-       *Ero_carvifolium
-       *Ero_crassifolium
-       *Ero_manescavi
-       *Ero_rupestre
-   * Larix
-       *Lar_decidua
-       *Lar_sibirica
-   * Amentotaxus
-       *Ame_argotaenia
-       *Ame_formosana
-   * Pyropia
-       *Pyro_perforata
-   * Ceramium
-       *Ceram_cimbricum
-       *Ceram_japonicum
-       *Ceram_sungminbooi
-   * Hildenbrandia
-       *Hilde_rivularis
-       *Hilde_rubra
-   * Pilostyles
-       *Pilo_aethiopica
-       *Pilo_hamiltonii
-   * Codium
-       *Codi_decorticatum
-       *Codi_sp_arenicola
-   * Torreya
-       *Torreya_fargesii
-       *Torreya_grandis
-   * Vertebrata
-       *Vert_australis
-       *Vert_isogona
-       *Vert_lanosa
-       *Vert_thuyoides
-   * Wisteria
-       *Wis_floribunda
-       *Wis_sinensis
-   * Phelipanche
-       *Pheli_purpurea
-       *Pheli_ramosa
-   * Glycyrrhiza
-       *Glycy_glabra
-       *Glycy_lepidota
-   * Cephalotaxus
-       *Cephalo_wilsoniana
-   * Polysiphonia
-       *Polysi_brodiei
-       *Polysi_elongata
-       *Polysi_infestans
-       *Polysi_schneideri
-       *Polysi_scopulorum
-       *Polysi_sertularioides
-       *Polysi_stricta
-   * Lathyrus
-       *Lathy_clymenum
-       *Lathy_davidii
-       *Lathy_graminifolius
-       *Lathy_inconspicuus
-       *Lathy_littoralis
-       *Lathy_ochroleucus
-       *Lathy_odoratus
-       *Lathy_palustris
-       *Lathy_sativus
-       *Lathy_tingitanus
-   * Babesia
-       *Bab_orientalis
-   * Gelidium
-       *Gelidi_elegans
-       *Gelidi_vagum
-   * Bostrychia
-       *Bos_moritziana
-       *Bos_simpliciuscula
-       *Bos_tenella
-   * Membranoptera
-       *Mem_platyphylla
-       *Mem_tenuis
-       *Mem_weeksiae
-   * Astragalus
-       *Astra_mongholicus
-       *Astra_mongholicus_var_nakaianus
-   * Asarum
-       *Asa_minus
-       *Asa_sieboldii
-   * Gracilaria
-       *Gracilaria_changii
-       *Gracilaria_chilensis
-       *Gracilaria_firma
-       *Gracilaria_salicornia
-       *Gracilaria_tenuistipitata_var_liui
-       *Gracilaria_vermiculophylla
-   * Plasmodium
-       *Plas_chabaudi_chabaudi
-       *Plas_falciparum_HB3
-       *Plas_gallinaceum
-       *Plas_relictum
-       *Plas_vivax
-   * Triticum
-       *Trit_urartu
-   * Trifolium
-       *Trif_aureum
-       *Trif_boissieri
-       *Trif_glanduliferum
-       *Trif_grandiflorum
-       *Trif_strictum
+* Grateloupia
+    * Grat_filicina
+    * Grat_taiwanensis
+* Caulerpa
+    * Cau_cliftonii
+    * Cau_racemosa
+* Caloglossa
+    * Calog_beccarii
+    * Calog_intermedia
+    * Calog_monosticha
+* Pisum
+    * Pisum_fulvum
+    * Pisum_sativum
+    * Pisum_sativum_subsp_elatius
+* Dasya
+    * Dasya_naccarioides
+* Diplazium
+    * Diplazium_unilobum
+* Bryopsis
+    * Bryop_plumosa
+    * Bryop_sp_HV04063
+    * Bry_sp_HV04063
+* Medicago
+    * Med_falcata
+    * Med_hybrida
+    * Med_papillosa
+    * Med_truncatula
+* Aegilops
+    * Aeg_cylindrica
+    * Aeg_geniculata
+    * Aeg_speltoides
+    * Aeg_tauschii
+* Prototheca
+    * Prot_cutis
+    * Prot_stagnorum
+    * Prot_zopfii
+* Cryptomonas
+    * Cryptomo_curvata
+    * Cryptomo_paramecium
+* Monotropa
+    * Monotropa_hypopitys
+* Liagora
+    * Liagora_brachyclada
+    * Liagora_harveyana
+* Taiwania
+    * Tai_cryptomerioides
+    * Tai_flousiana
+* Pinus
+    * Pinus_armandii
+    * Pinus_bungeana
+    * Pinus_contorta
+    * Pinus_gerardiana
+    * Pinus_greggii
+    * Pinus_jaliscana
+    * Pinus_koraiensis
+    * Pinus_krempfii
+    * Pinus_lambertiana
+    * Pinus_longaeva
+    * Pinus_massoniana
+    * Pinus_monophylla
+    * Pinus_nelsonii
+    * Pinus_oocarpa
+    * Pinus_pinea
+    * Pinus_sibirica
+    * Pinus_strobus
+    * Pinus_sylvestris
+    * Pinus_tabuliformis
+    * Pinus_taeda
+    * Pinus_taiwanensis
+    * Pinus_thunbergii
+* Taxus
+    * Taxus_mairei
+* Picea
+    * Pic_abies
+    * Pic_asperata
+    * Pic_crassifolia
+    * Pic_glauca
+    * Pic_jezoensis
+    * Pic_morrisonicola
+    * Pic_sitchensis
+* Gracilariopsis
+    * Gracilario_chorda
+    * Gracilario_lemaneiformis
+* Fragaria
+    * Frag_mandshurica
+    * Frag_vesca_subsp_bracteata
+* Ulva
+    * Ulva_fasciata
+    * Ulva_flexuosa
+    * Ulva_linza
+    * Ulva_prolifera
+* Monomorphina
+    * Monom_parapyrum
+* Epipogium
+    * Epipo_aphyllum
+* Euglena
+    * Euglena_archaeoplastidiata
+    * Euglena_viridis
+* Chlorella
+    * Chlore_heliozoae
+    * Chlore_sorokiniana
+    * Chlore_variabilis
+    * Chlore_vulgaris
+* Erodium
+    * Ero_carvifolium
+    * Ero_crassifolium
+    * Ero_manescavi
+    * Ero_rupestre
+* Larix
+    * Lar_decidua
+    * Lar_sibirica
+* Amentotaxus
+    * Ame_argotaenia
+    * Ame_formosana
+* Pyropia
+    * Pyro_perforata
+* Ceramium
+    * Ceram_cimbricum
+    * Ceram_japonicum
+    * Ceram_sungminbooi
+* Hildenbrandia
+    * Hilde_rivularis
+    * Hilde_rubra
+* Pilostyles
+    * Pilo_aethiopica
+    * Pilo_hamiltonii
+* Codium
+    * Codi_decorticatum
+    * Codi_sp_arenicola
+* Torreya
+    * Torreya_fargesii
+    * Torreya_grandis
+* Vertebrata
+    * Vert_australis
+    * Vert_isogona
+    * Vert_lanosa
+    * Vert_thuyoides
+* Wisteria
+    * Wis_floribunda
+    * Wis_sinensis
+* Phelipanche
+    * Pheli_purpurea
+    * Pheli_ramosa
+* Glycyrrhiza
+    * Glycy_glabra
+    * Glycy_lepidota
+* Cephalotaxus
+    * Cephalo_wilsoniana
+* Polysiphonia
+    * Polysi_brodiei
+    * Polysi_elongata
+    * Polysi_infestans
+    * Polysi_schneideri
+    * Polysi_scopulorum
+    * Polysi_sertularioides
+    * Polysi_stricta
+* Lathyrus
+    * Lathy_clymenum
+    * Lathy_davidii
+    * Lathy_graminifolius
+    * Lathy_inconspicuus
+    * Lathy_littoralis
+    * Lathy_ochroleucus
+    * Lathy_odoratus
+    * Lathy_palustris
+    * Lathy_sativus
+    * Lathy_tingitanus
+* Babesia
+    * Bab_orientalis
+* Gelidium
+    * Gelidi_elegans
+    * Gelidi_vagum
+* Bostrychia
+    * Bos_moritziana
+    * Bos_simpliciuscula
+    * Bos_tenella
+* Membranoptera
+    * Mem_platyphylla
+    * Mem_tenuis
+    * Mem_weeksiae
+* Astragalus
+    * Astra_mongholicus
+    * Astra_mongholicus_var_nakaianus
+* Asarum
+    * Asa_minus
+    * Asa_sieboldii
+* Gracilaria
+    * Gracilaria_changii
+    * Gracilaria_chilensis
+    * Gracilaria_firma
+    * Gracilaria_salicornia
+    * Gracilaria_tenuistipitata_var_liui
+    * Gracilaria_vermiculophylla
+* Plasmodium
+    * Plas_chabaudi_chabaudi
+    * Plas_falciparum_HB3
+    * Plas_gallinaceum
+    * Plas_relictum
+    * Plas_vivax
+* Triticum
+    * Trit_urartu
+* Trifolium
+    * Trif_aureum
+    * Trif_boissieri
+    * Trif_glanduliferum
+    * Trif_grandiflorum
+    * Trif_strictum
 
-#*:there are 2 special strains which has only one palindromic sequence rather than IR.(as mentioned before)
+There are 2 special strains which has only one palindromic sequence rather than IR.(as mentioned
+before)
 
 ### Slices of IR, LSC and SSC
 
@@ -1699,8 +1706,7 @@ find  ~/data/organelle/plastid_OG -type f -name "*.common.xlsx" \
 
 ### Genome list
 
-Create `plastid.list.csv` from `plastid.GENUS.csv` with sequence
-lengths.
+Create `plastid.list.csv` from `plastid.GENUS.csv` with sequence lengths.
 
 ```bash
 mkdir -p ~/data/organelle/plastid_summary/table
@@ -2215,3 +2221,4 @@ cp ~/data/organelle/plastid_summary/xlsx/*.pdf ~/data/organelle/plastid_summary/
 # Coreldraw doesn't play well with computer modern fonts (latex math).
 # perl ~/Scripts/fig_table/tikz_chart.pl -i cmd_plastid_d1_A2A8_B2B8.group_1.csv -xl 'Distance to indels ($d_1$)' -yl 'Nucleotide divergence ($D$)' --y_min 0.0 --y_max 0.01 -x_min 0 -x_max 5 --style_dot --pdf
 ```
+

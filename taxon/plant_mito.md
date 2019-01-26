@@ -135,7 +135,7 @@ sed -i".bak" "/,NC_001400$/d" plant_id_seq.csv
 
 Give ids better shapes for manually checking and automatic filtering.
 
-If you sure, you can add or delete lines and contents in `mitochondrion.CHECKME.csv`.
+If you sure, you can add or delete lines and contents in `CHECKME.csv`.
 
 ```bash
 mkdir -p ~/data/organelle/mito/summary
@@ -182,10 +182,15 @@ perl -Mojo -e '
     ->each( sub { print shift->text . "\n" } );
     ' > Angiosperms.tmp
 echo Aceraceae >> Angiosperms.tmp
+echo Asphodelaceae >> Angiosperms.tmp
 echo Asteraceae >> Angiosperms.tmp
 echo Campynemataceae >> Angiosperms.tmp
 echo Chenopodiaceae >> Angiosperms.tmp
 echo Fabaceae >> Angiosperms.tmp
+echo Francoaceae >> Angiosperms.tmp
+echo Hyacinthaceae >> Angiosperms.tmp
+echo Nyssaceae >> Angiosperms.tmp
+echo Taccaceae >> Angiosperms.tmp
 echo Viscaceae >> Angiosperms.tmp
 
 cat Angiosperms.tmp |
@@ -256,7 +261,7 @@ mkdir -p ~/data/organelle/mito/summary
 cd ~/data/organelle/mito/summary
 
 # 238
-wc -l CHECKME.csv
+cat CHECKME.csv | grep -v "^#" | wc -l
 
 # filter out accessions without linage information (strain, species, genus and family)
 cat CHECKME.csv |
@@ -469,8 +474,8 @@ grep -F -f genus.tmp ABBR.csv > GENUS.tmp
 
 # sort by multiply columns, phylum, order, family, abbr
 head -n 1 ABBR.csv > GENUS.csv
-cat GENUS.tmp \
-    | sort -t',' -k9,9 -k7,7 -k6,6 -k10,10 \
+cat GENUS.tmp |
+    sort -t',' -k9,9 -k7,7 -k6,6 -k10,10 \
     >> GENUS.csv
 
 # clean
@@ -506,7 +511,6 @@ find . -maxdepth 1 -type d -path "*/*" |
 ```
 
 # Aligning without outgroups
-
 
 ## Create alignments plans without outgroups
 
