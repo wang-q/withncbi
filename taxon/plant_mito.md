@@ -668,9 +668,6 @@ done  > runall.sh
 
 sh runall.sh 2>&1 | tee log_runall.txt
 
-#----------------------------#
-# Clean
-#----------------------------#
 find . -mindepth 1 -maxdepth 3 -type d -name "*_raw" | parallel -r rm -fr
 find . -mindepth 1 -maxdepth 3 -type d -name "*_fasta" | parallel -r rm -fr
 
@@ -738,7 +735,6 @@ cat GENUS.csv |
 ```
 
 ## Create alignments plans with outgroups
-
 
 ```bash
 cd ~/data/organelle/mito/summary

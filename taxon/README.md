@@ -13,16 +13,17 @@
 - [Prepare sequences for lastz](#prepare-sequences-for-lastz)
 - [Aligning without outgroups](#aligning-without-outgroups)
     - [Create alignments plans without outgroups](#create-alignments-plans-without-outgroups)
-        - [Batch running for groups](#batch-running-for-groups)
-        - [Self alignments.](#self-alignments)
-        - [Alignments of families for outgroups.](#alignments-of-families-for-outgroups)
-        - [LSC and SSC](#lsc-and-ssc)
-- [there are 2 special strains which have no IR but a palindromic sequence.(Asa_sieboldii,Epipo_aphyllum)](#there-are-2-special-strains-which-have-no-ir-but-a-palindromic-sequenceasa_sieboldiiepipo_aphyllum)
+    - [Batch running for genera](#batch-running-for-genera)
+    - [Alignments of families for outgroups.](#alignments-of-families-for-outgroups)
+- [Aligning with outgroups](#aligning-with-outgroups)
+    - [Create `plastid_OG.md` for picking outgroups](#create-plastid_ogmd-for-picking-outgroups)
+    - [Create alignments plans with outgroups](#create-alignments-plans-with-outgroups)
+- [Self alignments](#self-alignments)
+- [LSC and SSC](#lsc-and-ssc)
     - [Can't get clear ir information](#cant-get-clear-ir-information)
     - [Slices of IR, LSC and SSC](#slices-of-ir-lsc-and-ssc)
 - [Cyanobacteria](#cyanobacteria)
     - [Genus and Species counts](#genus-and-species-counts)
-    - [Use `bac_prepare.pl`](#use-bac_preparepl)
 - [Summary](#summary)
     - [Copy xlsx files](#copy-xlsx-files)
     - [Genome list](#genome-list)
@@ -913,158 +914,165 @@ cat family.tsv |
 
 ```
 
-### Batch running for groups
-
-The old prepare_run.sh
+## Batch running for genera
 
 ```bash
-mkdir -p ~/data/organelle/plastid.working
-cd ~/data/organelle/plastid.working
+mkdir -p ~/data/organelle/plastid/genus
+cd ~/data/organelle/plastid/genus
 
-bash ../plastid.cmd.txt 2>&1 | tee log_cmd.txt
-# bash ../plastid.redo.cmd.txt 2>&1 | tee log_redo_cmd.txt # skip real_chr and repeatmasker
-
-#----------------------------#
-# Approach 1: one by one
-#----------------------------#
-for d in `find . -mindepth 1 -maxdepth 1 -type d | sort `;do
-    echo "echo \"====> Processing $d <====\""
-    echo bash $d/1_real_chr.sh ;
-    echo bash $d/2_file_rm.sh ;
-    echo bash $d/3_pair_cmd.sh ;
-    echo bash $d/4_rawphylo.sh ;
-    echo bash $d/5_multi_cmd.sh ;
-    echo bash $d/7_multi_db_only.sh ;
-    echo ;
-done  > runall.sh
-
-sh runall.sh 2>&1 | tee log_runall.txt
+bash ../cmd.txt 2>&1 | tee log_cmd.txt
 
 #----------------------------#
-# Approach 2: step by step
+# Step by step
 #----------------------------#
-# real_chr
-for f in `find . -mindepth 1 -maxdepth 2 -type f -name 1_real_chr.sh | sort `;do
-    echo bash $f ;
-    echo ;
-done  > run_1.sh
+# 1_pair
+for f in `find . -mindepth 1 -maxdepth 2 -type f -name 1_pair.sh | sort`; do
+    echo "bash $f"
+    echo
+done > run_1.sh
 
-# RepeatMasker
-for f in `find . -mindepth 1 -maxdepth 2 -type f -name 2_file_rm.sh | sort `;do
-    echo bash $f ;
-    echo ;
-done  > run_2.sh
+# 2_rawphylo
+for f in `find . -mindepth 1 -maxdepth 2 -type f -name 2_rawphylo.sh | sort`; do
+    echo "bash $f"
+    echo
+done > run_2.sh
 
-# pair
-for f in `find . -mindepth 1 -maxdepth 2 -type f -name 3_pair_cmd.sh | sort `;do
-    echo bash $f ;
-    echo ;
-done  > run_3.sh
+# 3_multi
+for f in `find . -mindepth 1 -maxdepth 2 -type f -name 3_multi.sh | sort`; do
+    echo "bash $f"
+    echo
+done > run_3.sh
 
-# rawphylo
-for f in `find . -mindepth 1 -maxdepth 2 -type f -name 4_rawphylo.sh | sort `;do
-    echo bash $f ;
-    echo ;
-done  > run_4.sh
+cat run_1.sh | grep . | parallel -r -j 4  2>&1 | tee log_1.txt
+cat run_2.sh | grep . | parallel -r -j 3  2>&1 | tee log_2.txt
+cat run_3.sh | grep . | parallel -r -j 3  2>&1 | tee log_3.txt
 
-# multi cmd
-for f in `find . -mindepth 1 -maxdepth 2 -type f -name 5_multi_cmd.sh | sort `;do
-    echo bash $f ;
-    echo ;
-done  > run_5.sh
-
-# multi db
-for f in `find . -mindepth 1 -maxdepth 2 -type f -name 7_multi_db_only.sh | sort `;do
-    echo bash $f ;
-    echo ;
-done  > run_7.sh
-
-# 24 cores
-cat run_1.sh | grep . | parallel -r -j 16 2>&1 | tee log_1.txt
-cat run_2.sh | grep . | parallel -r -j 8  2>&1 | tee log_2.txt
-cat run_3.sh | grep . | parallel -r -j 16 2>&1 | tee log_3.txt
-cat run_4.sh | grep . | parallel -r -j 4  2>&1 | tee log_4.txt
-cat run_5.sh | grep . | parallel -r -j 4  2>&1 | tee log_5.txt
-cat run_7.sh | grep . | parallel -r -j 16 2>&1 | tee log_7.txt
-
-#----------------------------#
-# Clean
-#----------------------------#
 find . -mindepth 1 -maxdepth 3 -type d -name "*_raw" | parallel -r rm -fr
 find . -mindepth 1 -maxdepth 3 -type d -name "*_fasta" | parallel -r rm -fr
 
-find . -mindepth 1 -maxdepth 4 -type f -name "*.phy" | parallel -r rm
-find . -mindepth 1 -maxdepth 4 -type f -name "*.phy.reduced" | parallel -r rm
 ```
 
-### Self alignments.
+## Alignments of families for outgroups.
 
 ```bash
-cd ~/data/organelle/
+mkdir -p ~/data/organelle/plastid/family
+cd ~/data/organelle/plastid/family
 
-perl -p -e '
-    s/plastid\.working/plastid_self.working/g;
-    s/multi_batch/self_batch/g;
-    s/(\-\-parallel)/--length 1000 \1/g;
-' plastid.cmd.txt > plastid_self.cmd.txt
-
-mkdir -p ~/data/organelle/plastid_self.working
-cd ~/data/organelle/plastid_self.working
-
-time bash ../plastid_self.cmd.txt 2>&1 | tee log_cmd.txt
-
-# Don't need 6_feature_cmd.sh
-for d in `find . -mindepth 1 -maxdepth 1 -type d | sort `;do
-    echo "echo \"====> Processing $d <====\""
-    echo bash $d/1_real_chr.sh ;
-    echo bash $d/2_file_rm.sh ;
-    echo bash $d/3_self_cmd.sh ;
-    echo bash $d/4_proc_cmd.sh ;
-    echo bash $d/5_circos_cmd.sh ;
-    echo bash $d/7_pair_stat.sh ;
-    echo ;
-done  > runall.sh
-
-sh runall.sh 2>&1 | tee log_runall.txt
-
-# clean
-find . -mindepth 1 -maxdepth 2 -type d -name "*_raw" | parallel -r rm -fr
-find . -mindepth 1 -maxdepth 2 -type d -name "*_fasta" | parallel -r rm -fr
-
-# clean mysql
-#find  /usr/local/var/mysql -type d -name "[A-Z]*" | parallel -r rm -fr
-```
-
-### Alignments of families for outgroups.
-
-```bash
-mkdir -p ~/data/organelle/plastid_families
-cd ~/data/organelle/plastid_families
-
-time bash ../plastid_families.cmd.txt 2>&1 | tee log_cmd.txt
-
-for d in `find . -mindepth 1 -maxdepth 1 -type d | sort `;do
-    echo "echo \"====> Processing $d <====\""
-    echo bash $d/1_real_chr.sh ;
-    echo bash $d/2_file_rm.sh ;
-    echo bash $d/3_pair_cmd.sh ;
-    echo bash $d/4_rawphylo.sh ;
-    echo bash $d/5_multi_cmd.sh ;
-    echo ;
-done  > runall.sh
-
-sh runall.sh 2>&1 | tee log_runall.txt
-
-find ~/data/organelle/plastid_families -type f -path "*_phylo*" -name "*.nwk"
+time bash ../family.cmd.txt 2>&1 | tee log_cmd.txt
 
 #----------------------------#
-# Clean
+# Step by step
 #----------------------------#
+# 1_pair
+for f in `find . -mindepth 1 -maxdepth 2 -type f -name 1_pair.sh | sort`; do
+    echo "bash $f"
+    echo
+done > run_1.sh
+
+# 2_rawphylo
+for f in `find . -mindepth 1 -maxdepth 2 -type f -name 2_rawphylo.sh | sort`; do
+    echo "bash $f"
+    echo
+done > run_2.sh
+
+# 3_multi
+for f in `find . -mindepth 1 -maxdepth 2 -type f -name 3_multi.sh | sort`; do
+    echo "bash $f"
+    echo
+done > run_3.sh
+
+cat run_1.sh | grep . | parallel -r -j 4  2>&1 | tee log_1.txt
+cat run_2.sh | grep . | parallel -r -j 3  2>&1 | tee log_2.txt
+cat run_3.sh | grep . | parallel -r -j 3  2>&1 | tee log_3.txt
+
+find ~/data/organelle/mito/family -type f -name "*.nwk"
+
 find . -mindepth 1 -maxdepth 3 -type d -name "*_raw" | parallel -r rm -fr
 find . -mindepth 1 -maxdepth 3 -type d -name "*_fasta" | parallel -r rm -fr
 
-find . -mindepth 1 -maxdepth 4 -type f -name "*.phy" | parallel -r rm
-find . -mindepth 1 -maxdepth 4 -type f -name "*.phy.reduced" | parallel -r rm
+```
+
+# Aligning with outgroups
+
+## Create `plastid_OG.md` for picking outgroups
+
+Manually edit it then move to `~/Scripts/withncbi/doc/plastid_OG.md`.
+
+```bash
+cd ~/data/organelle/plastid/summary
+
+cat GENUS.csv |
+    grep -v "^#" |
+    perl -na -F"," -e '
+        BEGIN{
+            ($phylum, $family, $genus, ) = (q{}, q{}, q{});
+        }
+
+        chomp for @F;
+
+        if ($F[8] ne $phylum) {
+            $phylum = $F[8];
+            printf qq{\n# %s\n}, $phylum;
+        }
+        if ($F[5] ne $family) {
+            $family = $F[5];
+            printf qq{## %s\n}, $family;
+        }
+        $F[4] =~ s/\W+/_/g;
+        if ($F[4] ne $genus) {
+            $genus = $F[4];
+            printf qq{%s\n}, $genus;
+        }
+    ' \
+    > plastid_OG.md
+
+```
+
+## Create alignments plans with outgroups
+
+```bash
+cd ~/data/organelle/plastid/summary
+
+# name  t   qs  o
+cat genus.tsv |
+    perl -nla -F"\t" -MPath::Tiny -e '
+        BEGIN{
+            @ls = grep {/\S/}
+                  grep {!/^#/}
+                  path(q{~/Scripts/withncbi/doc/plastid_OG.md})->lines({ chomp => 1});
+            for (@ls) {
+                @fs = split(/,/);
+                $h{$fs[0]}= $fs[1];
+            }
+        }
+
+        if (exists $h{$F[0]}) {
+            printf qq{%s\t%s\t%s\t%s\n}, $F[0] . q{_OG}, $F[1], $F[2], $h{$F[0]};
+        }
+    ' \
+    > genus_OG.tsv
+
+# genera with outgroups
+echo "mkdir -p ~/data/organelle/plastid/OG"  > ../OG.cmd.txt
+echo "cd       ~/data/organelle/plastid/OG" >> ../OG.cmd.txt
+cat genus_OG.tsv |
+    TT_FILE=egaz_template_multi.tt perl -MTemplate -nla -F"\t" -e '
+        next unless scalar @F >= 3;
+        
+        my $tt = Template->new;
+        $tt->process(
+            $ENV{TT_FILE},
+            {
+                name       => $F[0],
+                t          => $F[1],
+                qs         => [ split /,/, $F[2] ],
+                o          => $F[3],
+            },
+            \*STDOUT
+        ) or die Template->error;
+
+    ' \
+    >> ../OG.cmd.txt
 
 ```
 
@@ -1073,8 +1081,121 @@ In previous steps, we have manually edited `~/Scripts/withncbi/doc/plastid_OG.md
 
 *D* between target and outgroup should be around **0.05**.
 
+```bash
+mkdir -p ~/data/organelle/plastid/OG
+cd ~/data/organelle/plastid/OG
 
-### LSC and SSC
+time bash ../OG.cmd.txt 2>&1 | tee log_cmd.txt
+
+#----------------------------#
+# Step by step
+#----------------------------#
+# 1_pair
+for f in `find . -mindepth 1 -maxdepth 2 -type f -name 1_pair.sh | sort`; do
+    echo "bash $f"
+    echo
+done > run_1.sh
+
+# 2_rawphylo
+for f in `find . -mindepth 1 -maxdepth 2 -type f -name 2_rawphylo.sh | sort`; do
+    echo "bash $f"
+    echo
+done > run_2.sh
+
+# 3_multi
+for f in `find . -mindepth 1 -maxdepth 2 -type f -name 3_multi.sh | sort`; do
+    echo "bash $f"
+    echo
+done > run_3.sh
+
+cat run_1.sh | grep . | parallel -r -j 4  2>&1 | tee log_1.txt
+cat run_2.sh | grep . | parallel -r -j 3  2>&1 | tee log_2.txt
+cat run_3.sh | grep . | parallel -r -j 3  2>&1 | tee log_3.txt
+
+find . -mindepth 1 -maxdepth 3 -type d -name "*_raw" | parallel -r rm -fr
+find . -mindepth 1 -maxdepth 3 -type d -name "*_fasta" | parallel -r rm -fr
+
+```
+
+# Self alignments
+
+```bash
+cd ~/data/organelle/plastid/summary
+
+cat <<'EOF' > egaz_templates_self.tt
+
+# [% name %]
+egaz template \
+    ~/data/organelle/plastid/GENOMES/[% t %] \
+[% FOREACH q IN qs -%]
+    ~/data/organelle/plastid/GENOMES/[% q %] \
+[% END -%]
+    --self -o [% name %] \
+    --taxon ~/data/organelle/plastid/GENOMES/taxon_ncbi.csv \
+    --circos --aligndb --parallel 8 -v
+
+EOF
+
+# every genera
+echo "mkdir -p ~/data/organelle/plastid/self"  > ../self.cmd.txt
+echo "cd       ~/data/organelle/plastid/self" >> ../self.cmd.txt
+cat genus.tsv |
+    TT_FILE=egaz_templates_self.tt perl -MTemplate -nla -F"\t" -e '
+        next unless scalar @F >= 3;
+        
+        my $tt = Template->new;
+        $tt->process(
+            $ENV{TT_FILE},
+            {
+                name       => $F[0],
+                t          => $F[1],
+                qs         => [ split /,/, $F[2] ],
+            },
+            \*STDOUT
+        ) or die Template->error;
+
+    ' \
+    >> ../self.cmd.txt
+
+```
+
+```bash
+mkdir -p ~/data/organelle/plastid/self
+cd ~/data/organelle/plastid/self
+
+time bash ../self.cmd.txt 2>&1 | tee log_cmd.txt
+
+#----------------------------#
+# Step by step
+#----------------------------#
+# 1_self
+for f in `find . -mindepth 1 -maxdepth 2 -type f -name 1_self.sh | sort`; do
+    echo "bash $f"
+    echo
+done > run_1.sh
+
+# 3_proc
+for f in `find . -mindepth 1 -maxdepth 2 -type f -name 3_proc.sh | sort`; do
+    echo "bash $f"
+    echo
+done > run_2.sh
+
+# 4_circos
+for f in `find . -mindepth 1 -maxdepth 2 -type f -name 4_circos.sh | sort`; do
+    echo "bash $f"
+    echo
+done > run_3.sh
+
+cat run_1.sh | grep . | parallel -r -j 4  2>&1 | tee log_1.txt
+cat run_2.sh | grep . | parallel -r -j 4  2>&1 | tee log_2.txt
+cat run_3.sh | grep . | parallel -r -j 4  2>&1 | tee log_3.txt
+
+# clean mysql
+#find  /usr/local/var/mysql -type d -name "[A-Z]*" | parallel -r rm -fr
+
+```
+
+# LSC and SSC
 
 IRA and IRB are presented by `plastid_self.working/${GENUS}/Results/${STRAIN}/${STRAIN}.links.tsv`.
 
@@ -1100,7 +1221,8 @@ Manually check strains not containing singular link.
 |     1 |     8 |
 |     1 |    10 |
 
-# there are 2 special strains which have no IR but a palindromic sequence.(Asa_sieboldii,Epipo_aphyllum)
+There are 2 special strains which have no IR but a palindromic
+sequence.(Asa_sieboldii,Epipo_aphyllum)
 
 Create `ir_lsc_ssc.tsv` for slicing alignments.
 
@@ -1230,7 +1352,7 @@ cat plastid.ABBR.csv \
 
 ```
 
-### Can't get clear ir information
+### Can't get clear IR information
 
 * Grateloupia
     * Grat_filicina
@@ -1550,24 +1672,9 @@ bash slices.sh
 perl ~/Scripts/fig_table/collect_common_basic.pl -d .
 ```
 
-#### SNP t-test
+# Cyanobacteria
 
-```bash
-mkdir -p ~/data/organelle/plastid_summary/ttest
-cd ~/data/organelle/plastid_summary/ttest
-
-cat ~/Scripts/withncbi/doc/plastid_OG.md \
-    | grep -v "^#" | grep . \
-    | cut -d',' -f 1 \
-    | parallel echo perl ~/Scripts/alignDB/stat/multi_stat_factory.pl -d {}_OG -r 52 \
-    > plastid_og_ttest.cmd.txt
-
-sh plastid_og_ttest.cmd.txt
-```
-
-## Cyanobacteria
-
-### Genus and Species counts
+## Genus and Species counts
 
 ```sql
 # Genus
@@ -1621,74 +1728,9 @@ ORDER BY species
 |      32046 | Synechococcus elongatus    |            2 |
 |       1148 | Synechocystis sp. PCC 6803 |            4 |
 
-### Use `bac_prepare.pl`
+# Summary
 
-```bash
-mkdir -p ~/data/organelle/cyanobacteria
-cd ~/data/organelle/cyanobacteria
-
-perl ~/Scripts/withncbi/taxon/bac_prepare.pl --db gr_prok \
-    --seq_dir ~/data/organelle/cyanobacteria/bac_seq_dir \
-    -p 1218 --get_seq -n Prochlorococcus
-
-perl ~/Scripts/withncbi/taxon/bac_prepare.pl --db gr_prok \
-    --seq_dir ~/data/organelle/cyanobacteria/bac_seq_dir \
-    -p 74546,93060,146891,167546 --get_seq -t 74546 -n Prochlorococcus_marinus
-
-perl ~/Scripts/withncbi/taxon/bac_prepare.pl --db gr_prok \
-    --seq_dir ~/data/organelle/cyanobacteria/bac_seq_dir \
-    -p 74546,93060,146891,167546,59919 --get_seq -t 74546 -o 59919 -n Prochlorococcus_marinus_OG
-
-perl ~/Scripts/withncbi/taxon/bac_prepare.pl --db gr_prok \
-    --seq_dir ~/data/organelle/cyanobacteria/bac_seq_dir \
-    -p 1142 --get_seq -n Synechocystis
-
-perl ~/Scripts/withncbi/taxon/bac_prepare.pl --db gr_prok \
-    --seq_dir ~/data/organelle/cyanobacteria/bac_seq_dir \
-    -p 1148 --get_seq -n Synechocystis_sp_PCC_6803
-
-perl ~/Scripts/withncbi/taxon/bac_prepare.pl --db gr_prok \
-    --seq_dir ~/data/organelle/cyanobacteria/bac_seq_dir \
-    -p 1148,1147 -o 1147 --get_seq -n Synechocystis_sp_PCC_6803_OG
-
-export BAC_DIR=Prochlorococcus
-sh ${BAC_DIR}/prepare.sh
-sh ${BAC_DIR}/1_real_chr.sh
-sh ${BAC_DIR}/2_file_rm.sh
-sh ${BAC_DIR}/3_pair_cmd.sh
-sh ${BAC_DIR}/4_rawphylo.sh
-sh ${BAC_DIR}/5_multi_cmd.sh
-sh ${BAC_DIR}/7_multi_db_only.sh
-unset BAC_DIR
-
-sh Prochlorococcus/prepare.sh
-sh Prochlorococcus_marinus/prepare.sh
-sh Prochlorococcus_marinus_OG/prepare.sh
-sh Synechocystis/prepare.sh
-sh Synechocystis_sp_PCC_6803/prepare.sh
-sh Synechocystis_sp_PCC_6803_OG/prepare.sh
-
-for d in `find $PWD -mindepth 1 -maxdepth 1 -type d -not -path "*bac_seq_dir" | sort `;do \
-    echo bash $d/1_real_chr.sh ; \
-    echo bash $d/2_file_rm.sh ; \
-    echo bash $d/3_pair_cmd.sh ; \
-    echo bash $d/4_rawphylo.sh ; \
-    echo bash $d/5_multi_cmd.sh ; \
-    echo bash $d/7_multi_db_only.sh ; \
-    echo ; \
-done  > runall.sh
-
-
-find . -mindepth 1 -maxdepth 3 -type d -name "*_raw" | parallel -r rm -fr
-find . -mindepth 1 -maxdepth 3 -type d -name "*_fasta" | parallel -r rm -fr
-
-find . -mindepth 1 -maxdepth 4 -type f -name "*.phy" | parallel -r rm
-find . -mindepth 1 -maxdepth 4 -type f -name "*.phy.reduced" | parallel -r rm
-```
-
-## Summary
-
-### Copy xlsx files
+## Copy xlsx files
 
 ```bash
 mkdir -p ~/data/organelle/plastid_summary/xlsx
@@ -1704,7 +1746,7 @@ find  ~/data/organelle/plastid_OG -type f -name "*.common.xlsx" \
 
 ```
 
-### Genome list
+## Genome list
 
 Create `plastid.list.csv` from `plastid.GENUS.csv` with sequence lengths.
 
@@ -1787,7 +1829,7 @@ cat list.tmp \
 rm *.tmp
 ```
 
-### Genome alignment statistics
+## Genome alignment statistics
 
 Some genera will be filtered out here.
 
@@ -1946,7 +1988,7 @@ cp -f ~/data/organelle/plastid_summary/xlsx/Table_alignment.xlsx ~/data/organell
 cp -f ~/data/organelle/plastid_summary/xlsx/Table_alignment.csv ~/data/organelle/plastid_summary/table
 ```
 
-### Groups
+## Groups
 
 ```bash
 mkdir -p ~/data/organelle/plastid_summary/group
@@ -2023,7 +2065,7 @@ cat ~/data/organelle/plastid_summary/table/genus.lst \
 bash genera_tree.sh > genera.tree
 ```
 
-### Phylogenic trees of each genus with outgroup
+## Phylogenic trees of each genus with outgroup
 
 ```bash
 mkdir -p ~/data/organelle/plastid_summary/trees
@@ -2038,7 +2080,7 @@ find ~/data/organelle/plastid_OG -type f -path "*_phylo*" -name "*.nwk" \
     | parallel -j 1 cp {} ~/data/organelle/plastid_summary/trees
 ```
 
-### d1, d2
+## d1, d2
 
 `collect_xlsx.pl`
 
