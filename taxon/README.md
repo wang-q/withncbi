@@ -864,7 +864,7 @@ egaz template \
 [% END -%]
     --multi -o [% name %] \
     --taxon ~/data/organelle/plastid/GENOMES/taxon_ncbi.csv \
-    --rawphylo --parallel 8 -v
+    --rawphylo --aligndb --parallel 8 -v
 
 EOF
 
@@ -943,9 +943,23 @@ for f in `find . -mindepth 1 -maxdepth 2 -type f -name 3_multi.sh | sort`; do
     echo
 done > run_3.sh
 
+# 6_chr_length
+for f in `find . -mindepth 1 -maxdepth 2 -type f -name 6_chr_length.sh | sort`; do
+    echo "bash $f"
+    echo
+done > run_6.sh
+
+# 7_multi_aligndb
+for f in `find . -mindepth 1 -maxdepth 2 -type f -name 7_multi_aligndb.sh | sort`; do
+    echo "bash $f"
+    echo
+done > run_7.sh
+
 cat run_1.sh | grep . | parallel -r -j 4  2>&1 | tee log_1.txt
 cat run_2.sh | grep . | parallel -r -j 3  2>&1 | tee log_2.txt
 cat run_3.sh | grep . | parallel -r -j 3  2>&1 | tee log_3.txt
+cat run_6.sh | grep . | parallel -r -j 12 2>&1 | tee log_6.txt
+cat run_7.sh | grep . | parallel -r -j 3  2>&1 | tee log_7.txt
 
 find . -mindepth 1 -maxdepth 3 -type d -name "*_raw" | parallel -r rm -fr
 find . -mindepth 1 -maxdepth 3 -type d -name "*_fasta" | parallel -r rm -fr
