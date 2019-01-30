@@ -20,7 +20,7 @@
     - [Create alignments plans with outgroups](#create-alignments-plans-with-outgroups)
 - [Self alignments](#self-alignments)
 - [LSC and SSC](#lsc-and-ssc)
-    - [Can't get clear ir information](#cant-get-clear-ir-information)
+    - [Can't get clear IR information](#cant-get-clear-ir-information)
     - [Slices of IR, LSC and SSC](#slices-of-ir-lsc-and-ssc)
 - [Cyanobacteria](#cyanobacteria)
     - [Genus and Species counts](#genus-and-species-counts)
@@ -1211,18 +1211,31 @@ cat run_3.sh | grep . | parallel -r -j 4  2>&1 | tee log_3.txt
 
 # LSC and SSC
 
-IRA and IRB are presented by `plastid_self.working/${GENUS}/Results/${STRAIN}/${STRAIN}.links.tsv`.
+IRA and IRB are presented by `plastid/self/${GENUS}/Results/${STRAIN}/${STRAIN}.links.tsv`.
 
 ```bash
-find ~/data/organelle/plastid_self.working -type f -name "*.links.tsv" \
-    | xargs wc -l | sort -n \
-    | grep -v "total" \
-    | perl -nl -e 's/^\s*//g; /^(\d+)\s/ and print $1' \
-    | uniq -c
+find ~/data/organelle/plastid/self -type f -name "*.links.tsv" |
+    xargs wc -l |
+    sort -n |
+    grep -v "total" |
+    perl -nl -e 's/^\s*//g; /^(\d+)\s/ and print $1' |
+    uniq -c |
+    perl -nl -e '/^\s+(\d+)\s+(.+)$/ and print qq{$1\t$2}' |
+    (echo -e 'count\tlines' && cat) |
+    mlr --itsv --omd cat
 
 ```
 
 Manually check strains not containing singular link.
+
+| count | lines |
+|:------|:------|
+| 227   | 0     |
+| 1949  | 1     |
+| 44    | 2     |
+| 22    | 3     |
+| 4     | 4     |
+| 2     | 10    |
 
 | count | lines |
 |------:|------:|
@@ -1235,8 +1248,8 @@ Manually check strains not containing singular link.
 |     1 |     8 |
 |     1 |    10 |
 
-There are 2 special strains which have no IR but a palindromic
-sequence.(Asa_sieboldii,Epipo_aphyllum)
+There are 2 special strains (Asa_sieboldii, Epipo_aphyllum) which have no IR but a palindromic
+sequence.
 
 Create `ir_lsc_ssc.tsv` for slicing alignments.
 
@@ -1250,11 +1263,11 @@ Manually edit it then move to `~/Scripts/withncbi/doc/ir_lsc_ssc.tsv`.
 * `WRONG` - unexpected link records
 
 ```bash
-cd ~/data/organelle/plastid_summary
+cd ~/data/organelle/plastid/summary
 
-cat plastid.ABBR.csv \
-    | grep -v "^#" \
-    | perl -nla -F"," -MAlignDB::IntSpan -MPath::Tiny -e '
+cat ABBR.csv |
+    grep -v "^#" |
+    perl -nla -F"," -MAlignDB::IntSpan -MPath::Tiny -e '
         BEGIN {
             %seen = ();
             @ls = grep {/\S/}
@@ -1366,7 +1379,7 @@ cat plastid.ABBR.csv \
 
 ```
 
-### Can't get clear IR information
+## Can't get clear IR information
 
 * Grateloupia
     * Grat_filicina
@@ -1576,28 +1589,28 @@ cat plastid.ABBR.csv \
     * Trif_grandiflorum
     * Trif_strictum
 
-There are 2 special strains which has only one palindromic sequence rather than IR.(as mentioned
+There are 2 special strains which has only one palindromic sequence rather than IR. (as mentioned
 before)
 
-### Slices of IR, LSC and SSC
+## Slices of IR, LSC and SSC
 
 Without outgroups.
 
 Be cautious to alignments with low coverage.
 
 ```bash
-mkdir -p ~/data/organelle/plastid_slices
-cd ~/data/organelle/plastid_slices
+mkdir -p ~/data/organelle/plastid/slices
+cd ~/data/organelle/plastid/slices
 
-cat ~/Scripts/withncbi/doc/ir_lsc_ssc.tsv \
-    | perl -nla -F"\t" -MAlignDB::IntSpan -Mstrict -Mwarnings -e '
+cat ~/Scripts/withncbi/doc/ir_lsc_ssc.tsv |
+    perl -nla -F"\t" -MAlignDB::IntSpan -Mstrict -Mwarnings -e '
         /^#/ and next;
         $F[2] eq q{Target} or next;
         $F[5] =~ /\d+/ or next;
 
         print qq{# $F[0]};
 
-        next unless -e "$ENV{HOME}/data/organelle/plastid.working/$F[0]/$F[0]_refined/$F[3].synNet.maf.gz.fas.gz";
+        next unless -e "$ENV{HOME}/data/organelle/plastid/genus/$F[0]/$F[0]_refined/$F[3].synNet.maf.gz.fas.gz";
 
         my %rl_of = (
             IR  => $F[5],
@@ -1659,13 +1672,13 @@ cat ~/Scripts/withncbi/doc/ir_lsc_ssc.tsv \
         for my $key (sort keys %rl_of) {
             print qq{jrunlist cover <(echo $F[3]:$rl_of{$key}) -o $F[0].$key.yml};
             print qq{fasops slice -n $F[1] -o $F[0].$key.fas \\};
-            print qq{    ~/data/organelle/plastid.working/$F[0]/$F[0]_refined/$F[3].synNet.maf.gz.fas.gz \\};
+            print qq{    ~/data/organelle/plastid/genus/$F[0]/$F[0]_refined/$F[3].synNet.maf.gz.fas.gz \\};
             print qq{    $F[0].$key.yml};
             print qq{perl ~/Scripts/alignDB/alignDB.pl \\};
             print qq{    -d $F[0]_$key \\};
             print qq{    -da ~/data/organelle/plastid_slices/$F[0].$key.fas \\};
-            print qq{    -a ~/data/organelle/plastid.working/$F[0]/Stats/anno.yml \\};
-            print qq{    -chr ~/data/organelle/plastid.working/$F[0]/chr_length.csv \\};
+            print qq{    -a ~/data/organelle/plastid/genus/$F[0]/Stats/anno.yml \\};
+            print qq{    -chr ~/data/organelle/plastid/genus/$F[0]/chr_length.csv \\};
             print qq{    --lt 1000 --parallel 8 --batch 5 \\};
             print qq{    --run common};
             print qq{};
@@ -1684,6 +1697,7 @@ cd ~/data/organelle/plastid_slices
 
 bash slices.sh
 perl ~/Scripts/fig_table/collect_common_basic.pl -d .
+
 ```
 
 # Cyanobacteria
