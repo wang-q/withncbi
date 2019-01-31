@@ -959,7 +959,7 @@ cat run_1.sh | grep . | parallel -r -j 4  2>&1 | tee log_1.txt
 cat run_2.sh | grep . | parallel -r -j 3  2>&1 | tee log_2.txt
 cat run_3.sh | grep . | parallel -r -j 3  2>&1 | tee log_3.txt
 cat run_6.sh | grep . | parallel -r -j 12 2>&1 | tee log_6.txt
-cat run_7.sh | grep . | parallel -r -j 3  2>&1 | tee log_7.txt
+cat run_7.sh | grep . | parallel -r -j 8  2>&1 | tee log_7.txt
 
 find . -mindepth 1 -maxdepth 3 -type d -name "*_raw" | parallel -r rm -fr
 find . -mindepth 1 -maxdepth 3 -type d -name "*_fasta" | parallel -r rm -fr
@@ -1001,7 +1001,7 @@ cat run_3.sh | grep . | parallel -r -j 3  2>&1 | tee log_3.txt
 
 find ~/data/organelle/mito/family -type f -name "*.nwk"
 
-find . -mindepth 1 -maxdepth 3 -type d -name "*_raw" | parallel -r rm -fr
+find . -mindepth 1 -maxdepth 3 -type d -name "*_raw"   | parallel -r rm -fr
 find . -mindepth 1 -maxdepth 3 -type d -name "*_fasta" | parallel -r rm -fr
 
 ```
@@ -1122,11 +1122,25 @@ for f in `find . -mindepth 1 -maxdepth 2 -type f -name 3_multi.sh | sort`; do
     echo
 done > run_3.sh
 
+# 6_chr_length
+for f in `find . -mindepth 1 -maxdepth 2 -type f -name 6_chr_length.sh | sort`; do
+    echo "bash $f"
+    echo
+done > run_6.sh
+
+# 7_multi_aligndb
+for f in `find . -mindepth 1 -maxdepth 2 -type f -name 7_multi_aligndb.sh | sort`; do
+    echo "bash $f"
+    echo
+done > run_7.sh
+
 cat run_1.sh | grep . | parallel -r -j 4  2>&1 | tee log_1.txt
 cat run_2.sh | grep . | parallel -r -j 3  2>&1 | tee log_2.txt
 cat run_3.sh | grep . | parallel -r -j 3  2>&1 | tee log_3.txt
+cat run_6.sh | grep . | parallel -r -j 12 2>&1 | tee log_6.txt
+cat run_7.sh | grep . | parallel -r -j 8  2>&1 | tee log_7.txt
 
-find . -mindepth 1 -maxdepth 3 -type d -name "*_raw" | parallel -r rm -fr
+find . -mindepth 1 -maxdepth 3 -type d -name "*_raw"   | parallel -r rm -fr
 find . -mindepth 1 -maxdepth 3 -type d -name "*_fasta" | parallel -r rm -fr
 
 ```
@@ -1146,7 +1160,7 @@ egaz template \
 [% END -%]
     --self -o [% name %] \
     --taxon ~/data/organelle/plastid/GENOMES/taxon_ncbi.csv \
-    --circos --aligndb --parallel 8 -v
+    --circos --parallel 8 -v
 
 EOF
 
@@ -1764,23 +1778,23 @@ ORDER BY species
 mkdir -p ~/data/organelle/plastid_summary/xlsx
 cd ~/data/organelle/plastid_summary/xlsx
 
-find  ~/data/organelle/plastid.working -type f -name "*.common.xlsx" \
-    | grep -v "vs[A-Z]" \
-    | parallel cp {} .
+find  ~/data/organelle/plastid/genus -type f -name "*.common.xlsx" |
+    grep -v "vs[A-Z]" |
+    parallel cp {} .
 
-find  ~/data/organelle/plastid_OG -type f -name "*.common.xlsx" \
-    | grep -v "vs[A-Z]" \
-    | parallel cp {} .
+find  ~/data/organelle/plastid/OG -type f -name "*.common.xlsx" |
+    grep -v "vs[A-Z]" |
+    parallel cp {} .
 
 ```
 
 ## Genome list
 
-Create `plastid.list.csv` from `plastid.GENUS.csv` with sequence lengths.
+Create `list.csv` from `GENUS.csv` with sequence lengths.
 
 ```bash
-mkdir -p ~/data/organelle/plastid_summary/table
-cd ~/data/organelle/plastid_summary/table
+mkdir -p ~/data/organelle/plastid/summary/table
+cd ~/data/organelle/plastid/summary/table
 
 # manually set orders in `plastid_OG.md`
 echo "#genus" > genus_all.lst
@@ -1799,8 +1813,8 @@ perl -l -MPath::Tiny -e '
     >> genus_all.lst
 
 echo "#abbr,genus,accession,length" > length.tmp
-find ~/data/organelle/plastid.working -type f -name "chr.sizes" \
-    | parallel --jobs 1 --keep-order -r '
+find ~/data/organelle/plastid/genus -type f -name "chr.sizes" |
+    parallel --jobs 1 --keep-order -r '
         perl -nl -e '\''
             BEGIN {
                 %l = ();
@@ -1824,22 +1838,20 @@ find ~/data/organelle/plastid.working -type f -name "chr.sizes" \
     >> length.tmp
 
 echo "#abbr,phylum,family,genus,taxon_id" > abbr.tmp
-cat ~/data/organelle/plastid_summary/plastid.GENUS.csv \
-    | grep -v "^#" \
-    | perl -nla -F"," -e 'print qq{$F[9],$F[8],$F[5],$F[4],$F[0]}' \
+cat ~/data/organelle/plastid/summary/GENUS.csv |
+    perl -nla -F"," -e 'print qq{$F[9],$F[8],$F[5],$F[4],$F[0]}' \
     >> abbr.tmp
 
 # #abbr,genus,accession,length,phylum,family,genus,taxon_id
-cat length.tmp abbr.tmp \
-    | perl ~/Scripts/withncbi/util/merge_csv.pl \
-        -f 0 --concat -o stdout \
-    | perl -nl -a -F"," -e 'print qq{$F[4],$F[5],$F[6],$F[0],$F[7],$F[2],$F[3]}' \
+cat length.tmp abbr.tmp |
+    perl ~/Scripts/withncbi/util/merge_csv.pl -f 0 --concat -o stdout |
+    perl -nla -F"," -e 'print qq{$F[4],$F[5],$F[6],$F[0],$F[7],$F[2],$F[3]}' \
     > list.tmp
 
-echo "#phylum,family,genus,abbr,taxon_id,accession,length" > plastid.list.csv
-cat list.tmp \
-    | grep -v "#" \
-    | perl -nl -a -F',' -MPath::Tiny -e '
+echo "#phylum,family,genus,abbr,taxon_id,accession,length" > list.csv
+cat list.tmp |
+    grep -v "#" |
+    perl -nl -a -F',' -MPath::Tiny -e '
         BEGIN{
             %genus, %target;
             my @l1 = path(q{genus_all.lst})->lines({ chomp => 1});
@@ -1848,13 +1860,14 @@ cat list.tmp \
         my $idx = $genus{$F[2]};
         die qq{$_\n} unless defined $idx;
         print qq{$_,$idx};
-    ' \
-    | sort -n -t',' -k8,8 \
-    | cut -d',' -f 1-7 \
-    >> plastid.list.csv
+    ' |
+    sort -n -t',' -k8,8 |
+    cut -d',' -f 1-7 \
+    >> list.csv
 # 1905
 
 rm *.tmp
+
 ```
 
 ## Genome alignment statistics
