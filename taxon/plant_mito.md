@@ -168,6 +168,21 @@ sed -i".bak" "s/\'//g" CHECKME.csv
 # Anomodon attenuatus and Anomodon rugelii (Bryophytes) was grouped to Streptophyta.
 sed -i".bak" "s/Bryopsida,Streptophyta/Bryopsida,Bryophytes/" CHECKME.csv
 
+sed -i".bak" "s/Pycnococcaceae,NA/Pycnococcaceae,Pseudoscourfieldiales/" CHECKME.csv
+
+# Charophyta 轮藻门
+sed -i".bak" "s/Charophyceae,Streptophyta/Charophyceae,Charophyta/" CHECKME.csv
+sed -i".bak" "s/Chlorokybophyceae,Streptophyta/Chlorokybophyceae,Charophyta/" CHECKME.csv
+sed -i".bak" "s/Coleochaetophyceae,Streptophyta/Coleochaetophyceae,Charophyta/" CHECKME.csv
+sed -i".bak" "s/Zygnemophyceae,Streptophyta/Zygnemophyceae,Charophyta/" CHECKME.csv
+
+# Chlorophyta 绿藻门
+sed -i".bak" "s/Mesostigmatophyceae,Streptophyta/Mesostigmatophyceae,Chlorophyta/" CHECKME.csv
+
+# Bryophytes
+sed -i".bak" "s/Marchantiopsida,Streptophyta/Marchantiopsida,Bryophytes/" CHECKME.csv
+sed -i".bak" "s/Leiosporocerotopsida,Streptophyta/Leiosporocerotopsida,Bryophytes/" CHECKME.csv
+
 ```
 
 Split Streptophyta according to http://www.theplantlist.org/
@@ -260,7 +275,7 @@ Species and genus should not be "NA" and genus has 2 or more members.
 mkdir -p ~/data/organelle/mito/summary
 cd ~/data/organelle/mito/summary
 
-# 238
+# 237
 cat CHECKME.csv | grep -v "^#" | wc -l
 
 # filter out accessions without linage information (strain, species, genus and family)
@@ -600,7 +615,7 @@ egaz template \
 [% END -%]
     --multi -o [% name %] \
     --taxon ~/data/organelle/mito/GENOMES/taxon_ncbi.csv \
-    --rawphylo --parallel 8 -v
+    --rawphylo --aligndb --parallel 8 -v
 
 EOF
 
@@ -658,15 +673,44 @@ cd ~/data/organelle/mito/genus
 
 bash ../cmd.txt 2>&1 | tee log_cmd.txt
 
-for d in `find . -mindepth 1 -maxdepth 1 -type d | sort `;do
-    echo "echo \"====> Processing ${d} <====\""
-    echo bash ${d}/1_pair.sh;
-    echo bash ${d}/2_rawphylo.sh;
-    echo bash ${d}/3_multi.sh;
-    echo ;
-done  > runall.sh
+#----------------------------#
+# Step by step
+#----------------------------#
+# 1_pair
+for f in `find . -mindepth 1 -maxdepth 2 -type f -name 1_pair.sh | sort`; do
+    echo "bash $f"
+    echo
+done > run_1.sh
 
-sh runall.sh 2>&1 | tee log_runall.txt
+# 2_rawphylo
+for f in `find . -mindepth 1 -maxdepth 2 -type f -name 2_rawphylo.sh | sort`; do
+    echo "bash $f"
+    echo
+done > run_2.sh
+
+# 3_multi
+for f in `find . -mindepth 1 -maxdepth 2 -type f -name 3_multi.sh | sort`; do
+    echo "bash $f"
+    echo
+done > run_3.sh
+
+# 6_chr_length
+for f in `find . -mindepth 1 -maxdepth 2 -type f -name 6_chr_length.sh | sort`; do
+    echo "bash $f"
+    echo
+done > run_6.sh
+
+# 7_multi_aligndb
+for f in `find . -mindepth 1 -maxdepth 2 -type f -name 7_multi_aligndb.sh | sort`; do
+    echo "bash $f"
+    echo
+done > run_7.sh
+
+cat run_1.sh | grep . | parallel -r -j 4  2>&1 | tee log_1.txt
+cat run_2.sh | grep . | parallel -r -j 3  2>&1 | tee log_2.txt
+cat run_3.sh | grep . | parallel -r -j 3  2>&1 | tee log_3.txt
+cat run_6.sh | grep . | parallel -r -j 12 2>&1 | tee log_6.txt
+cat run_7.sh | grep . | parallel -r -j 8  2>&1 | tee log_7.txt
 
 find . -mindepth 1 -maxdepth 3 -type d -name "*_raw" | parallel -r rm -fr
 find . -mindepth 1 -maxdepth 3 -type d -name "*_fasta" | parallel -r rm -fr
@@ -693,16 +737,16 @@ sh runall.sh 2>&1 | tee log_runall.txt
 
 find ~/data/organelle/mito/family -type f -name "*.nwk"
 
-find . -mindepth 1 -maxdepth 3 -type d -name "*_raw" | parallel -r rm -fr
+find . -mindepth 1 -maxdepth 3 -type d -name "*_raw"   | parallel -r rm -fr
 find . -mindepth 1 -maxdepth 3 -type d -name "*_fasta" | parallel -r rm -fr
 
 ```
 
 # Aligning with outgroups
 
-## Create `mitochondrion_OG.md` for picking outgroups
+## Create `mito_OG.md` for picking outgroups
 
-Manually edit it then move to `~/Scripts/withncbi/doc/mitochondrion_OG.md`.
+Manually edit it then move to `~/Scripts/withncbi/doc/mito_OG.md`.
 
 ```bash
 cd ~/data/organelle/mito/summary
@@ -730,7 +774,7 @@ cat GENUS.csv |
             printf qq{%s\n}, $genus;
         }
     ' \
-    > mitochondrion_OG.md
+    > mito_OG.md
 
 ```
 
@@ -745,7 +789,7 @@ cat genus.tsv |
         BEGIN{
             @ls = grep {/\S/}
                   grep {!/^#/}
-                  path(q{~/Scripts/withncbi/doc/mitochondrion_OG.md})->lines({ chomp => 1});
+                  path(q{~/Scripts/withncbi/doc/mito_OG.md})->lines({ chomp => 1});
             for (@ls) {
                 @fs = split(/,/);
                 $h{$fs[0]}= $fs[1];
@@ -782,8 +826,8 @@ cat genus_OG.tsv |
 
 ```
 
-In previous steps, we have manually edited `~/Scripts/withncbi/doc/mitochondrion_OG.md` and
-generated `genus_OG.tsv`.
+In previous steps, we have manually edited `~/Scripts/withncbi/doc/mito_OG.md` and generated
+`genus_OG.tsv`.
 
 *D* between target and outgroup should be around **0.05**.
 
@@ -793,17 +837,46 @@ cd ~/data/organelle/mito/OG
 
 time bash ../OG.cmd.txt 2>&1 | tee log_cmd.txt
 
-for d in `find . -mindepth 1 -maxdepth 1 -type d | sort `; do
-    echo "echo \"====> Processing ${d} <====\""
-    echo bash ${d}/1_pair.sh;
-    echo bash ${d}/2_rawphylo.sh;
-    echo bash ${d}/3_multi.sh;
-    echo ;
-done  > runall.sh
+#----------------------------#
+# Step by step
+#----------------------------#
+# 1_pair
+for f in `find . -mindepth 1 -maxdepth 2 -type f -name 1_pair.sh | sort`; do
+    echo "bash $f"
+    echo
+done > run_1.sh
 
-sh runall.sh 2>&1 | tee log_runall.txt
+# 2_rawphylo
+for f in `find . -mindepth 1 -maxdepth 2 -type f -name 2_rawphylo.sh | sort`; do
+    echo "bash $f"
+    echo
+done > run_2.sh
 
-find . -mindepth 1 -maxdepth 3 -type d -name "*_raw" | parallel -r rm -fr
+# 3_multi
+for f in `find . -mindepth 1 -maxdepth 2 -type f -name 3_multi.sh | sort`; do
+    echo "bash $f"
+    echo
+done > run_3.sh
+
+# 6_chr_length
+for f in `find . -mindepth 1 -maxdepth 2 -type f -name 6_chr_length.sh | sort`; do
+    echo "bash $f"
+    echo
+done > run_6.sh
+
+# 7_multi_aligndb
+for f in `find . -mindepth 1 -maxdepth 2 -type f -name 7_multi_aligndb.sh | sort`; do
+    echo "bash $f"
+    echo
+done > run_7.sh
+
+cat run_1.sh | grep . | parallel -r -j 4  2>&1 | tee log_1.txt
+cat run_2.sh | grep . | parallel -r -j 3  2>&1 | tee log_2.txt
+cat run_3.sh | grep . | parallel -r -j 3  2>&1 | tee log_3.txt
+cat run_6.sh | grep . | parallel -r -j 12 2>&1 | tee log_6.txt
+cat run_7.sh | grep . | parallel -r -j 8  2>&1 | tee log_7.txt
+
+find . -mindepth 1 -maxdepth 3 -type d -name "*_raw"   | parallel -r rm -fr
 find . -mindepth 1 -maxdepth 3 -type d -name "*_fasta" | parallel -r rm -fr
 
 ```
@@ -823,7 +896,7 @@ egaz template \
 [% END -%]
     --self -o [% name %] \
     --taxon ~/data/organelle/mito/GENOMES/taxon_ncbi.csv \
-    --circos --aligndb --parallel 8 -v
+    --circos --parallel 8 -v
 
 EOF
 
