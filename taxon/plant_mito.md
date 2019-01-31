@@ -16,9 +16,16 @@
     - [Batch running for genera](#batch-running-for-genera)
     - [Alignments of families for outgroups.](#alignments-of-families-for-outgroups)
 - [Aligning with outgroups](#aligning-with-outgroups)
-    - [Create `mitochondrion_OG.md` for picking outgroups](#create-mitochondrion_ogmd-for-picking-outgroups)
+    - [Create `mito_OG.md` for picking outgroups](#create-mito_ogmd-for-picking-outgroups)
     - [Create alignments plans with outgroups](#create-alignments-plans-with-outgroups)
 - [Self alignments](#self-alignments)
+- [Summary](#summary)
+    - [Copy xlsx files](#copy-xlsx-files)
+    - [Genome list](#genome-list)
+    - [Statistics of genome alignments](#statistics-of-genome-alignments)
+    - [Groups](#groups)
+    - [Phylogenic trees of each genus with outgroup](#phylogenic-trees-of-each-genus-with-outgroup)
+    - [d1, d2](#d1-d2)
 
 
 # Update taxdmp
@@ -940,6 +947,461 @@ for d in `find . -mindepth 1 -maxdepth 1 -type d | sort `;do
 done  > runall.sh
 
 sh runall.sh 2>&1 | tee log_runall.txt
+
+```
+
+# Summary
+
+## Copy xlsx files
+
+```bash
+mkdir -p ~/data/organelle/mito/summary/xlsx
+cd ~/data/organelle/mito/summary/xlsx
+
+find ../../genus -type f -name "*.common.xlsx" |
+    grep -v "vs[A-Z]" |
+    parallel cp {} .
+
+find ../../OG -type f -name "*.common.xlsx" |
+    grep -v "vs[A-Z]" |
+    parallel cp {} .
+
+```
+
+## Genome list
+
+Create `list.csv` from `GENUS.csv` with sequence lengths.
+
+```bash
+mkdir -p ~/data/organelle/mito/summary/table
+cd ~/data/organelle/mito/summary/table
+
+# manually set orders in `mito_OG.md`
+perl -l -MPath::Tiny -e '
+    BEGIN {
+        @ls = map {/^#/ and s/^(#+\s*\w+).*/\1/; $_} 
+            map {s/,\w+//; $_} 
+            map {s/^###\s*//; $_} 
+            path(q{~/Scripts/withncbi/doc/mito_OG.md})->lines( { chomp => 1}); 
+    }
+    for (@ls) { 
+        (/^\s*$/ or /^##\s+/ or /^#\s+(\w+)/) and next; 
+        print $_
+    }
+    ' \
+    > genus_all.lst
+
+# abbr accession length
+find ../../genus -type f -name "chr_length.csv" |
+    parallel --jobs 1 --keep-order -r '
+        perl -nl -e '\''
+            BEGIN {
+                our $l = { }; # avoid parallel replace string
+            }
+            
+            next unless /\w+,\d+/;
+            my ($common_name, undef, $chr, $length) = split /,/;
+            if (exists $l->{$common_name}) {
+                $l->{$common_name}{$chr} = $length;
+            }
+            else {
+                $l->{$common_name} = {$chr => $length};
+            }
+            
+            END {
+                for my $common_name (keys %{$l}) {
+                    my $chrs = join "|", sort keys %{$l->{$common_name}};
+                    my $length = 0;
+                    $length += $_ for values %{$l->{$common_name}};
+                    print qq{$common_name\t$chrs\t$length}
+                }
+            }
+        '\'' {}
+    ' \
+    > length.tmp
+cat length.tmp | datamash check
+#90 lines, 3 fields
+
+# phylum family genus abbr taxon_id
+cat ~/data/organelle/mito/summary/GENUS.csv |
+    grep -v "^#" |
+    perl -nla -F"," -e 'print join qq{\t}, ($F[8], $F[5], $F[4], $F[9], $F[0], )' |
+    sort |
+    uniq \
+    > abbr.tmp
+cat abbr.tmp | datamash check
+#91 lines, 5 fields
+
+tsv-join \
+    abbr.tmp \
+    --data-fields 4 \
+    -f length.tmp \
+    --key-fields 1 \
+    --append-fields 2,3 \
+    > list.tmp
+cat list.tmp | datamash check
+#90 lines, 7 fields
+
+# sort as orders in mito_OG.md
+echo -e "#phylum,family,genus,abbr,ttaxon_id,accession,length" > list.csv
+cat list.tmp |
+    perl -nl -a -MPath::Tiny -e '
+        BEGIN{
+            %genus;
+            my @l1 = path(q{genus_all.lst})->lines({ chomp => 1});
+            $genus{$l1[$_]} = $_ for (0 .. $#l1);
+        }
+        my $idx = $genus{$F[2]};
+        die qq{$_\n} unless defined $idx;
+        print qq{$_\t$idx};
+    ' |
+    sort -n -k8,8 |
+    cut -f 1-7 |
+    tr $'\t' ',' \
+    >> list.csv
+cat list.csv | datamash check -t,
+#91 lines, 7 fields
+
+rm *.tmp
+
+```
+
+## Statistics of genome alignments
+
+Some genera will be filtered out here.
+
+Criteria:
+
+* Coverage >= 0.5
+* Total number of indels >= 100
+* Genome D < 0.05
+
+```bash
+cd ~/data/organelle/mito/summary/xlsx
+
+cat <<'EOF' > Table_alignment.tt
+---
+autofit: A:F
+texts:
+  - text: "Genus"
+    pos: A1
+  - text: "No. of genomes"
+    pos: B1
+  - text: "Aligned length (Mb)"
+    pos: C1
+  - text: "Indels Per 100 bp"
+    pos: D1
+  - text: "D on average"
+    pos: E1
+  - text: "GC-content"
+    pos: F1
+[% FOREACH item IN data -%]
+  - text: [% item.name %]
+    pos: A[% loop.index + 2 %]
+[% END -%]
+borders:
+  - range: A1:F1
+    top: 1
+  - range: A1:F1
+    bottom: 1
+ranges:
+[% FOREACH item IN data -%]
+  [% item.file %]:
+    basic:
+      - copy: B2
+        paste: B[% loop.index + 2 %]
+      - copy: B4
+        paste: C[% loop.index + 2 %]
+      - copy: B5
+        paste: D[% loop.index + 2 %]
+      - copy: B7
+        paste: E[% loop.index + 2 %]
+      - copy: B8
+        paste: F[% loop.index + 2 %]
+[% END -%]
+EOF
+
+cat ~/data/organelle/mito/summary/table/genus_all.lst |
+    grep -v "^#" |
+    TT_FILE=Table_alignment.tt perl -MTemplate -nl -e '
+        push @data, { name => $_, file => qq{$_.common.xlsx}, }; 
+        END {
+            $tt = Template->new;
+            $tt->process($ENV{TT_FILE}, { data => \@data, })
+                or die Template->error;
+        }
+    ' \
+    > Table_alignment_all.yml
+
+perl ~/Scripts/fig_table/xlsx_table.pl -i Table_alignment_all.yml
+perl ~/Scripts/fig_table/xlsx2csv.pl -f Table_alignment_all.xlsx > Table_alignment_all.csv
+
+cp -f Table_alignment_all.xlsx ~/data/organelle/mito/summary/table
+cp -f Table_alignment_all.csv ~/data/organelle/mito/summary/table
+
+```
+
+```bash
+cd ~/data/organelle/mito/summary/table
+
+echo "Genus,avg_size" > group_avg_size.csv
+cat list.csv |
+    grep -v "#" |
+    perl -nla -F, -e '
+        $count{$F[2]}++;
+        $sum{$F[2]} += $F[6];
+        END {
+            for $k (sort keys %count) {
+                printf qq{%s,%d\n}, $k, $sum{$k}/$count{$k};
+            }
+        }
+    ' \
+    >> group_avg_size.csv
+
+cat Table_alignment_all.csv group_avg_size.csv |
+    perl ~/Scripts/withncbi/util/merge_csv.pl -f 0 --concat -o stdout \
+    > Table_alignment_all.1.csv
+
+echo "Genus,coverage" > group_coverage.csv
+cat Table_alignment_all.1.csv |
+    perl -nla -F',' -e '
+        $F[2] =~ /[\.\d]+/ or next;
+        $F[6] =~ /[\.\d]+/ or next;
+        $c = $F[2] * 1000 * 1000 / $F[6];
+        print qq{$F[0],$c};
+    ' \
+    >> group_coverage.csv
+
+cat Table_alignment_all.1.csv group_coverage.csv |
+    perl ~/Scripts/withncbi/util/merge_csv.pl -f 0 --concat -o stdout \
+    > Table_alignment_all.2.csv
+
+echo "Genus,indels" > group_indels.csv
+cat Table_alignment_all.2.csv |
+    perl -nla -F',' -e '
+        $F[6] =~ /[\.\d]+/ or next;
+        $c = $F[3] / 100 * $F[2] * 1000 * 1000;
+        print qq{$F[0],$c};
+    ' \
+    >> group_indels.csv
+
+cat Table_alignment_all.2.csv group_indels.csv |
+    perl ~/Scripts/withncbi/util/merge_csv.pl -f 0 --concat -o stdout |
+    grep -v ',,' \
+    > Table_alignment_for_filter.csv
+
+# real filter
+cat Table_alignment_for_filter.csv |
+    perl -nla -F',' -e '
+        $F[6] =~ /[\.\d]+/ or next;
+        $F[0] =~ s/"//g;
+        print $F[0] if ($F[7] >= 0.5 and $F[8] >= 100 and $F[4] < 0.05);
+    ' \
+    > genus.lst
+
+rm ~/data/organelle/mito/summary/table/Table_alignment_all.[0-9].csv
+rm ~/data/organelle/mito/summary/table/group_*csv
+
+#
+cd ~/data/organelle/mito/summary/xlsx
+cat ~/data/organelle/mito/summary/table/genus.lst |
+    grep -v "^#" |
+    TT_FILE=Table_alignment.tt perl -MTemplate -nl -e '
+        push @data, { name => $_, file => qq{$_.common.xlsx}, };
+        END {
+            $tt = Template->new;
+            $tt->process($ENV{TT_FILE}, { data => \@data, })
+                or die Template->error;
+        }
+    ' \
+    > Table_alignment.yml
+
+perl ~/Scripts/fig_table/xlsx_table.pl -i Table_alignment.yml
+perl ~/Scripts/fig_table/xlsx2csv.pl -f Table_alignment.xlsx > Table_alignment.csv
+
+cp -f ~/data/organelle/mito/summary/xlsx/Table_alignment.xlsx ~/data/organelle/mito/summary/table
+cp -f ~/data/organelle/mito/summary/xlsx/Table_alignment.csv ~/data/organelle/mito/summary/table
+
+```
+
+## Groups
+
+NCBI Taxonomy tree
+
+```bash
+mkdir -p ~/data/organelle/mito/summary/group
+cd ~/data/organelle/mito/summary/group
+
+cat ~/data/organelle/mito/summary/table/genus.lst |
+    grep -v "^#" |
+    perl -e '
+        @ls = <>;
+        $str = qq{bp_taxonomy2tree.pl \\\n};
+        for (@ls) {
+            chomp;
+            $str .= qq{    -s "$_" \\\n};
+        }
+        $str .= qq{    -e \n};
+        print $str
+    ' \
+    > genera_tree.sh
+
+bash genera_tree.sh > genera.newick
+
+nw_display -w 600 -s genera.newick |
+    rsvg-convert -f pdf -o genera.pdf
+
+```
+
+## Phylogenic trees of each genus with outgroup
+
+```bash
+mkdir -p ~/data/organelle/mito/summary/trees
+
+cat ~/Scripts/withncbi/doc/mito_OG.md |
+    grep -v "^#" |
+    grep . |
+    cut -d',' -f 1 \
+    > ~/data/organelle/mito/summary/trees/list.txt
+
+find ~/data/organelle/mito/OG -type f -path "*Results*" -name "*.nwk" |
+    grep -v ".raw." |
+    parallel -j 1 cp {} ~/data/organelle/mito/summary/trees
+
+```
+
+## d1, d2
+
+`collect_xlsx.pl`
+
+```bash
+cd ~/data/organelle/mito/summary/xlsx
+
+cat <<'EOF' > cmd_collect_d1_d2.tt
+perl ~/Scripts/fig_table/collect_xlsx.pl \
+[% FOREACH item IN data -%]
+    -f [% item.name %].common.xlsx \
+    -s d1_pi_gc_cv \
+    -n [% item.name %] \
+[% END -%]
+    -o cmd_d1.xlsx
+
+perl ~/Scripts/fig_table/collect_xlsx.pl \
+[% FOREACH item IN data -%]
+    -f [% item.name %].common.xlsx \
+    -s d2_pi_gc_cv \
+    -n [% item.name %] \
+[% END -%]
+    -o cmd_d2.xlsx
+
+perl ~/Scripts/fig_table/collect_xlsx.pl \
+[% FOREACH item IN data -%]
+    -f [% item.name %].common.xlsx \
+    -s d1_comb_pi_gc_cv \
+    -n [% item.name %] \
+[% END -%] 
+    -o cmd_d1_comb.xlsx
+
+perl ~/Scripts/fig_table/collect_xlsx.pl \
+[% FOREACH item IN data -%]
+    -f [% item.name %].common.xlsx \
+    -s d2_comb_pi_gc_cv \
+    -n [% item.name %] \
+[% END -%] 
+    -o cmd_d2_comb.xlsx
+
+EOF
+
+cat ~/data/organelle/mito/summary/table/genus.lst |
+    grep -v "^#" |
+    TT_FILE=cmd_collect_d1_d2.tt perl -MTemplate -nl -e '
+        push @data, { name => $_, };
+        END {
+            $tt = Template->new;
+            $tt->process($ENV{TT_FILE}, { data => \@data, }) 
+                or die Template->error;
+        }
+    ' \
+    > cmd_collect_d1_d2.sh
+
+cd ~/data/organelle/mito/summary/xlsx
+bash cmd_collect_d1_d2.sh
+
+```
+
+`sep_chart.pl`
+
+```bash
+mkdir -p ~/data/organelle/mito/summary/fig
+
+cd ~/data/organelle/mito/summary/xlsx
+
+cat <<'EOF' > cmd_chart_d1_d2.tt
+perl ~/Scripts/fig_table/sep_chart.pl \
+    -i cmd_d1.xlsx \
+    -xl "Distance to indels ({italic(d)[1]})" \
+    -yl "Nucleotide divergence ({italic(D)})" \
+    -xr "A2:A8" -yr "B2:B8" \
+    --y_min 0.0 --y_max [% y_max %] \
+    -x_min 0 -x_max 5 \
+    -rb "^([% FOREACH item IN data %][% item.name %]|[% END %]NON_EXIST)$" \
+    -rs "NON_EXIST" \
+    --postfix [% postfix %] --style_dot -ms
+
+perl ~/Scripts/fig_table/sep_chart.pl \
+    -i cmd_d1_comb.xlsx \
+    -xl "Distance to indels ({italic(d)[1]})" \
+    -yl "Nucleotide divergence ({italic(D)})" \
+    -xr "A2:A8" -yr "B2:B8" \
+    --y_min 0.0 --y_max [% y_max %] \
+    -x_min 0 -x_max 5 \
+    -rb "^([% FOREACH item IN data %][% item.name %]|[% END %]NON_EXIST)$" \
+    -rs "NON_EXIST" \
+    --postfix [% postfix %] --style_dot
+
+perl ~/Scripts/fig_table/sep_chart.pl \
+    -i cmd_d2.xlsx \
+    -xl "Reciprocal of indel density ({italic(d)[2]})" \
+    -yl "Nucleotide divergence ({italic(D)})" \
+    -xr "A2:A23" -yr "B2:B23" \
+    --y_min 0.0 --y_max [% y_max2 %] \
+    -x_min 0 -x_max 20 \
+    -rb "^([% FOREACH item IN data %][% item.name %]|[% END %]NON_EXIST)$" \
+    -rs "NON_EXIST" \
+    --postfix [% postfix %] --style_dot -ms
+
+perl ~/Scripts/fig_table/sep_chart.pl \
+    -i cmd_d2_comb.xlsx \
+    -xl "Reciprocal of indel density ({italic(d)[2]})" \
+    -yl "Nucleotide divergence ({italic(D)})" \
+    -xr "A2:A23" -yr "B2:B23" \
+    --y_min 0.0 --y_max [% y_max2 %] \
+    -x_min 0 -x_max 20 \
+    -rb "^([% FOREACH item IN data %][% item.name %]|[% END %]NON_EXIST)$" \
+    -rs "NON_EXIST" \
+    --postfix [% postfix %] --style_dot
+
+EOF
+
+cat ~/data/organelle/mito/summary/table/genus.lst |
+    TT_FILE=cmd_chart_d1_d2.tt perl -MTemplate -nl -e '
+        push @data, { name => $_, };
+        END {
+            $tt = Template->new;
+            $tt->process($ENV{TT_FILE},
+                { data => \@data,
+                y_max => 0.03,
+                y_max2 => 0.03,
+                postfix => q{group_1}, }) 
+                or die Template->error;
+        }
+    ' \
+    > cmd_chart_genus.sh
+
+bash cmd_chart_genus.sh
+
+rm ~/data/organelle/mito/summary/xlsx/*.csv
+cp ~/data/organelle/mito/summary/xlsx/*.pdf ~/data/organelle/mito/summary/fig
 
 ```
 
