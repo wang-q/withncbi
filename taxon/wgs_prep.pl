@@ -183,6 +183,12 @@ $stopwatch->block_message("Generate .csv for info and .url.txt for downloading "
 BASE_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 cd ${BASE_DIR}
 
+signaled () {
+    echo Interrupted
+    exit 1
+}
+trap signaled TERM QUIT INT
+
 EOF
         );
 
