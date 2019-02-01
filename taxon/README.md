@@ -27,7 +27,7 @@
 - [Summary](#summary)
     - [Copy xlsx files](#copy-xlsx-files)
     - [Genome list](#genome-list)
-    - [Genome alignment statistics](#genome-alignment-statistics)
+    - [Statistics of genome alignments](#statistics-of-genome-alignments)
     - [Groups](#groups)
     - [Phylogenic trees of each genus with outgroup](#phylogenic-trees-of-each-genus-with-outgroup)
     - [d1, d2](#d1-d2)
@@ -692,8 +692,7 @@ cat name_acc_id.csv |
     " |
     tee download_seq.log
 
-
-# count downloaded sequences # 2577 #
+# count downloaded sequences
 find . -name "*.fa" | wc -l
 
 ```
@@ -722,7 +721,7 @@ grep -F -f genus.tmp ABBR.csv > GENUS.csv
 # 2253
 wc -l GENUS.csv
 
-#   count every ranks
+# count every ranks
 #   84 order.list.tmp
 #  165 family.list.tmp
 #  466 genus.list.tmp
@@ -999,7 +998,7 @@ cat run_1.sh | grep . | parallel -r -j 4  2>&1 | tee log_1.txt
 cat run_2.sh | grep . | parallel -r -j 3  2>&1 | tee log_2.txt
 cat run_3.sh | grep . | parallel -r -j 3  2>&1 | tee log_3.txt
 
-find ~/data/organelle/mito/family -type f -name "*.nwk"
+find ~/data/organelle/plastid/family -type f -name "*.nwk"
 
 find . -mindepth 1 -maxdepth 3 -type d -name "*_raw"   | parallel -r rm -fr
 find . -mindepth 1 -maxdepth 3 -type d -name "*_fasta" | parallel -r rm -fr
@@ -1775,14 +1774,14 @@ ORDER BY species
 ## Copy xlsx files
 
 ```bash
-mkdir -p ~/data/organelle/plastid_summary/xlsx
-cd ~/data/organelle/plastid_summary/xlsx
+mkdir -p ~/data/organelle/plastid/summary/xlsx
+cd ~/data/organelle/plastid/summary/xlsx
 
-find  ~/data/organelle/plastid/genus -type f -name "*.common.xlsx" |
+find ../../genus -type f -name "*.common.xlsx" |
     grep -v "vs[A-Z]" |
     parallel cp {} .
 
-find  ~/data/organelle/plastid/OG -type f -name "*.common.xlsx" |
+find ../../OG -type f -name "*.common.xlsx" |
     grep -v "vs[A-Z]" |
     parallel cp {} .
 
@@ -1797,7 +1796,6 @@ mkdir -p ~/data/organelle/plastid/summary/table
 cd ~/data/organelle/plastid/summary/table
 
 # manually set orders in `plastid_OG.md`
-echo "#genus" > genus_all.lst
 perl -l -MPath::Tiny -e '
     BEGIN {
         @ls = map {/^#/ and s/^(#+\s*\w+).*/\1/; $_} 
@@ -1810,80 +1808,96 @@ perl -l -MPath::Tiny -e '
         print $_
     }
     ' \
-    >> genus_all.lst
+    > genus_all.lst
 
-echo "#abbr,genus,accession,length" > length.tmp
-find ~/data/organelle/plastid/genus -type f -name "chr.sizes" |
+# abbr accession length
+find ../../genus -type f -name "chr_length.csv" |
     parallel --jobs 1 --keep-order -r '
         perl -nl -e '\''
             BEGIN {
-                %l = ();
+                our $l = { }; # avoid parallel replace string
             }
             
-            next unless /\w+\t\d+/;
-            my ($key, $value) = split /\t/;
-            $l{$key} = $value;
+            next unless /\w+,\d+/;
+            my ($common_name, undef, $chr, $length) = split /,/;
+            if (exists $l->{$common_name}) {
+                $l->{$common_name}{$chr} = $length;
+            }
+            else {
+                $l->{$common_name} = {$chr => $length};
+            }
             
             END {
-                my $chrs = join "|", sort keys %l;
-                my $length = 0;
-                $length += $_ for values %l;
-                
-                $ARGV =~ /working\/(\w+)\/(\w+)\/(\w+)/;
-                print qq{$3,$1,$chrs,$length}
+                for my $common_name (keys %{$l}) {
+                    my $chrs = join "|", sort keys %{$l->{$common_name}};
+                    my $length = 0;
+                    $length += $_ for values %{$l->{$common_name}};
+                    print qq{$common_name\t$chrs\t$length}
+                }
             }
-        '\'' \
-        {}
+        '\'' {}
     ' \
-    >> length.tmp
+    > length.tmp
+cat length.tmp | datamash check
+#2248 lines, 3 fields
 
-echo "#abbr,phylum,family,genus,taxon_id" > abbr.tmp
+# phylum family genus abbr taxon_id
 cat ~/data/organelle/plastid/summary/GENUS.csv |
-    perl -nla -F"," -e 'print qq{$F[9],$F[8],$F[5],$F[4],$F[0]}' \
-    >> abbr.tmp
+    grep -v "^#" |
+    perl -nla -F"," -e 'print join qq{\t}, ($F[8], $F[5], $F[4], $F[9], $F[0], )' |
+    sort |
+    uniq \
+    > abbr.tmp
+cat abbr.tmp | datamash check
+#2250 lines, 5 fields
 
-# #abbr,genus,accession,length,phylum,family,genus,taxon_id
-cat length.tmp abbr.tmp |
-    perl ~/Scripts/withncbi/util/merge_csv.pl -f 0 --concat -o stdout |
-    perl -nla -F"," -e 'print qq{$F[4],$F[5],$F[6],$F[0],$F[7],$F[2],$F[3]}' \
+tsv-join \
+    abbr.tmp \
+    --data-fields 4 \
+    -f length.tmp \
+    --key-fields 1 \
+    --append-fields 2,3 \
     > list.tmp
+cat list.tmp | datamash check
+#2248 lines, 7 fields
 
-echo "#phylum,family,genus,abbr,taxon_id,accession,length" > list.csv
+# sort as orders in plastid_OG.md
+echo -e "#phylum,family,genus,abbr,taxon_id,accession,length" > list.csv
 cat list.tmp |
-    grep -v "#" |
-    perl -nl -a -F',' -MPath::Tiny -e '
+    perl -nl -a -MPath::Tiny -e '
         BEGIN{
-            %genus, %target;
+            %genus;
             my @l1 = path(q{genus_all.lst})->lines({ chomp => 1});
             $genus{$l1[$_]} = $_ for (0 .. $#l1);
         }
         my $idx = $genus{$F[2]};
         die qq{$_\n} unless defined $idx;
-        print qq{$_,$idx};
+        print qq{$_\t$idx};
     ' |
-    sort -n -t',' -k8,8 |
-    cut -d',' -f 1-7 \
+    sort -n -k8,8 |
+    cut -f 1-7 |
+    tr $'\t' ',' \
     >> list.csv
-# 1905
+cat list.csv | datamash check -t,
+#2249 lines, 7 fields
 
 rm *.tmp
 
 ```
 
-## Genome alignment statistics
+## Statistics of genome alignments
 
 Some genera will be filtered out here.
 
 Criteria:
 
-* Coverage >= 0.4
+* Coverage >= 0.5
 * Total number of indels >= 100
-* Genome D < 0.2
+* Genome D < 0.05
 
 ```bash
-mkdir -p ~/data/organelle/plastid_summary/table
+cd ~/data/organelle/plastid/summary/xlsx
 
-cd ~/data/organelle/plastid_summary/xlsx
 cat <<'EOF' > Table_alignment.tt
 ---
 autofit: A:F
@@ -1926,9 +1940,9 @@ ranges:
 [% END -%]
 EOF
 
-cat ~/data/organelle/plastid_summary/table/genus_all.lst \
-    | grep -v "^#" \
-    | TT_FILE=Table_alignment.tt perl -MTemplate -nl -e '
+cat ~/data/organelle/plastid/summary/table/genus_all.lst |
+    grep -v "^#" |
+    TT_FILE=Table_alignment.tt perl -MTemplate -nl -e '
         push @data, { name => $_, file => qq{$_.common.xlsx}, }; 
         END {
             $tt = Template->new;
@@ -1941,15 +1955,18 @@ cat ~/data/organelle/plastid_summary/table/genus_all.lst \
 perl ~/Scripts/fig_table/xlsx_table.pl -i Table_alignment_all.yml
 perl ~/Scripts/fig_table/xlsx2csv.pl -f Table_alignment_all.xlsx > Table_alignment_all.csv
 
-cp -f Table_alignment_all.xlsx ~/data/organelle/plastid_summary/table
-cp -f Table_alignment_all.csv ~/data/organelle/plastid_summary/table
+cp -f Table_alignment_all.xlsx ~/data/organelle/plastid/summary/table
+cp -f Table_alignment_all.csv ~/data/organelle/plastid/summary/table
 
-cd ~/data/organelle/plastid_summary/table
+```
+
+```bash
+cd ~/data/organelle/plastid/summary/table
 
 echo "Genus,avg_size" > group_avg_size.csv
-cat plastid.list.csv \
-    | grep -v "#" \
-    | perl -nla -F"," -e '
+cat list.csv |
+    grep -v "#" |
+    perl -nla -F, -e '
         $count{$F[2]}++;
         $sum{$F[2]} += $F[6];
         END {
@@ -1960,14 +1977,13 @@ cat plastid.list.csv \
     ' \
     >> group_avg_size.csv
 
-cat Table_alignment_all.csv group_avg_size.csv \
-    | perl ~/Scripts/withncbi/util/merge_csv.pl \
-    -f 0 --concat -o stdout \
+cat Table_alignment_all.csv group_avg_size.csv |
+    perl ~/Scripts/withncbi/util/merge_csv.pl -f 0 --concat -o stdout \
     > Table_alignment_all.1.csv
 
 echo "Genus,coverage" > group_coverage.csv
-cat Table_alignment_all.1.csv \
-    | perl -nla -F',' -e '
+cat Table_alignment_all.1.csv |
+    perl -nla -F',' -e '
         $F[2] =~ /[\.\d]+/ or next;
         $F[6] =~ /[\.\d]+/ or next;
         $c = $F[2] * 1000 * 1000 / $F[6];
@@ -1975,44 +1991,41 @@ cat Table_alignment_all.1.csv \
     ' \
     >> group_coverage.csv
 
-cat Table_alignment_all.1.csv group_coverage.csv \
-    | perl ~/Scripts/withncbi/util/merge_csv.pl \
-    -f 0 --concat -o stdout \
+cat Table_alignment_all.1.csv group_coverage.csv |
+    perl ~/Scripts/withncbi/util/merge_csv.pl -f 0 --concat -o stdout \
     > Table_alignment_all.2.csv
 
 echo "Genus,indels" > group_indels.csv
-cat Table_alignment_all.2.csv \
-    | perl -nla -F',' -e '
+cat Table_alignment_all.2.csv |
+    perl -nla -F',' -e '
         $F[6] =~ /[\.\d]+/ or next;
         $c = $F[3] / 100 * $F[2] * 1000 * 1000;
         print qq{$F[0],$c};
     ' \
     >> group_indels.csv
 
-cat Table_alignment_all.2.csv group_indels.csv \
-    | perl ~/Scripts/withncbi/util/merge_csv.pl \
-    -f 0 --concat -o stdout \
+cat Table_alignment_all.2.csv group_indels.csv |
+    perl ~/Scripts/withncbi/util/merge_csv.pl -f 0 --concat -o stdout |
+    grep -v ',,' \
     > Table_alignment_for_filter.csv
 
 # real filter
-cat Table_alignment_for_filter.csv \
-    | perl -nla -F',' -e '
+cat Table_alignment_for_filter.csv |
+    perl -nla -F',' -e '
         $F[6] =~ /[\.\d]+/ or next;
         $F[0] =~ s/"//g;
-        print $F[0] if ($F[7] < 0.4 or $F[8] < 100 or $F[4] > 0.2);
+        print $F[0] if ($F[7] >= 0.5 and $F[8] >= 100 and $F[4] < 0.05);
     ' \
-    > genus_exclude.lst
+    > genus.lst
 
-grep -v -Fx -f genus_exclude.lst genus_all.lst > genus.lst
-
-rm ~/data/organelle/plastid_summary/table/Table_alignment_all.[0-9].csv
-rm ~/data/organelle/plastid_summary/table/group_*csv
+rm ~/data/organelle/plastid/summary/table/Table_alignment_all.[0-9].csv
+rm ~/data/organelle/plastid/summary/table/group_*csv
 
 #
-cd ~/data/organelle/plastid_summary/xlsx
-cat ~/data/organelle/plastid_summary/table/genus.lst \
-    | grep -v "^#" \
-    | TT_FILE=Table_alignment.tt perl -MTemplate -nl -e '
+cd ~/data/organelle/plastid/summary/xlsx
+cat ~/data/organelle/plastid/summary/table/genus.lst |
+    grep -v "^#" |
+    TT_FILE=Table_alignment.tt perl -MTemplate -nl -e '
         push @data, { name => $_, file => qq{$_.common.xlsx}, };
         END {
             $tt = Template->new;
@@ -2025,15 +2038,16 @@ cat ~/data/organelle/plastid_summary/table/genus.lst \
 perl ~/Scripts/fig_table/xlsx_table.pl -i Table_alignment.yml
 perl ~/Scripts/fig_table/xlsx2csv.pl -f Table_alignment.xlsx > Table_alignment.csv
 
-cp -f ~/data/organelle/plastid_summary/xlsx/Table_alignment.xlsx ~/data/organelle/plastid_summary/table
-cp -f ~/data/organelle/plastid_summary/xlsx/Table_alignment.csv ~/data/organelle/plastid_summary/table
+cp -f ~/data/organelle/plastid/summary/xlsx/Table_alignment.xlsx ~/data/organelle/plastid/summary/table
+cp -f ~/data/organelle/plastid/summary/xlsx/Table_alignment.csv ~/data/organelle/plastid/summary/table
+
 ```
 
 ## Groups
 
 ```bash
-mkdir -p ~/data/organelle/plastid_summary/group
-cd ~/data/organelle/plastid_summary/group
+mkdir -p ~/data/organelle/plastid/summary/group
+cd ~/data/organelle/plastid/summary/group
 
 perl -l -MPath::Tiny -e '
     BEGIN {
@@ -2053,45 +2067,45 @@ perl -l -MPath::Tiny -e '
     }
     '
 
-grep -Fx -f ~/data/organelle/plastid_summary/table/genus.lst Angiosperms.txt > Angiosperms.lst
-grep -Fx -f ~/data/organelle/plastid_summary/table/genus.lst Gymnosperms.txt > Gymnosperms.lst
+grep -Fx -f ../table/genus.lst Angiosperms.txt > Angiosperms.lst
 
-find . -type f -name "*.txt" \
-    | xargs cat \
-    | grep -Fx -f ~/data/organelle/plastid_summary/table/genus.lst \
+find . -type f -name "*.txt" |
+    xargs cat |
+    grep -v -Fx -f Angiosperms.txt |
+    grep -Fx -f ../table/genus.lst \
     > Others.lst
 
-cat ~/data/organelle/plastid_summary/table/Table_alignment.csv \
-    | cut -d, -f 1,5 \
-    | perl -nla -F',' -e '$F[1] > 0.05 and print $F[0];' \
-    > group_4.lst
-
-cat ~/data/organelle/plastid_summary/table/Table_alignment.csv \
-    | cut -d, -f 1,5 \
-    | perl -nla -F',' -e '$F[1] > 0.02 and $F[1] <= 0.05 and print $F[0];' \
+cat ../table/Table_alignment.csv |
+    cut -d, -f 1,5 |
+    perl -nla -F',' -e '$F[1] > 0.02 and $F[1] <= 0.05 and print $F[0];' |
+    grep -Fx -f Angiosperms.lst \
     > group_3.lst
 
-cat ~/data/organelle/plastid_summary/table/Table_alignment.csv \
-    | cut -d, -f 1,5 \
-    | perl -nla -F',' -e '$F[1] > 0.005 and $F[1] <= 0.02 and print $F[0];' \
+cat ../table/Table_alignment.csv |
+    cut -d, -f 1,5 |
+    perl -nla -F',' -e '$F[1] > 0.005 and $F[1] <= 0.02 and print $F[0];' |
+    grep -Fx -f Angiosperms.lst \
     > group_2.lst
 
-cat ~/data/organelle/plastid_summary/table/Table_alignment.csv \
-    | cut -d, -f 1,5 \
-    | perl -nla -F',' -e '$F[1] <= 0.005 and print $F[0];' \
+cat ../table/Table_alignment.csv |
+    cut -d, -f 1,5 |
+    perl -nla -F',' -e '$F[1] <= 0.005 and print $F[0];' |
+    grep -Fx -f Angiosperms.lst \
     > group_1.lst
 
 rm *.txt
+
 ```
 
 NCBI Taxonomy tree
 
 ```bash
-cd ~/data/organelle/plastid_summary/group
+mkdir -p ~/data/organelle/plastid/summary/group
+cd ~/data/organelle/plastid/summary/group
 
-cat ~/data/organelle/plastid_summary/table/genus.lst \
-    | grep -v "^#" \
-    | perl -e '
+cat Others.lst |
+    grep -v "^#" |
+    perl -e '
         @ls = <>;
         $str = qq{bp_taxonomy2tree.pl \\\n};
         for (@ls) {
@@ -2099,26 +2113,33 @@ cat ~/data/organelle/plastid_summary/table/genus.lst \
             $str .= qq{    -s "$_" \\\n};
         }
         $str .= qq{    -e \n};
-        print $str
+        print $str;
     ' \
-    > genera_tree.sh
+    > Others.tree.sh
 
-bash genera_tree.sh > genera.tree
+bash Others.tree.sh >Others.nwk
+
+nw_display -w 600 -s Others.nwk |
+    rsvg-convert -f pdf -o Others.pdf
+
 ```
 
 ## Phylogenic trees of each genus with outgroup
 
 ```bash
-mkdir -p ~/data/organelle/plastid_summary/trees
+mkdir -p ~/data/organelle/plastid/summary/trees
+cd ~/data/organelle/plastid/summary/trees
 
-cat ~/Scripts/withncbi/doc/plastid_OG.md \
-    | grep -v "^#" \
-    | grep . \
-    | cut -d',' -f 1 \
-    > ~/data/organelle/plastid_summary/trees/list.txt
+cat ~/Scripts/withncbi/doc/plastid_OG.md |
+    grep -v "^#" |
+    grep . |
+    cut -d',' -f 1 \
+    > list.txt
 
-find ~/data/organelle/plastid_OG -type f -path "*_phylo*" -name "*.nwk" \
-    | parallel -j 1 cp {} ~/data/organelle/plastid_summary/trees
+find ../../OG -type f -path "*Results*" -name "*.nwk" |
+    grep -v ".raw." |
+    parallel -j 1 cp {} trees
+
 ```
 
 ## d1, d2
@@ -2126,7 +2147,7 @@ find ~/data/organelle/plastid_OG -type f -path "*_phylo*" -name "*.nwk" \
 `collect_xlsx.pl`
 
 ```bash
-cd ~/data/organelle/plastid_summary/xlsx
+cd ~/data/organelle/plastid/summary/xlsx
 
 cat <<'EOF' > cmd_collect_d1_d2.tt
 perl ~/Scripts/fig_table/collect_xlsx.pl \
@@ -2163,9 +2184,9 @@ perl ~/Scripts/fig_table/collect_xlsx.pl \
 
 EOF
 
-cat ~/data/organelle/plastid_summary/table/genus.lst \
-    | grep -v "^#" \
-    | TT_FILE=cmd_collect_d1_d2.tt perl -MTemplate -nl -e '
+cat ../table/genus.lst |
+    grep -v "^#" |
+    TT_FILE=cmd_collect_d1_d2.tt perl -MTemplate -nl -e '
         push @data, { name => $_, };
         END {
             $tt = Template->new;
@@ -2175,16 +2196,16 @@ cat ~/data/organelle/plastid_summary/table/genus.lst \
     ' \
     > cmd_collect_d1_d2.sh
 
-cd ~/data/organelle/plastid_summary/xlsx
 bash cmd_collect_d1_d2.sh
+
 ```
 
 `sep_chart.pl`
 
 ```bash
-mkdir -p ~/data/organelle/plastid_summary/fig
+mkdir -p ~/data/organelle/plastid/summary/fig
 
-cd ~/data/organelle/plastid_summary/xlsx
+cd ~/data/organelle/plastid/summary/xlsx
 
 cat <<'EOF' > cmd_chart_d1_d2.tt
 perl ~/Scripts/fig_table/sep_chart.pl \
@@ -2233,8 +2254,8 @@ perl ~/Scripts/fig_table/sep_chart.pl \
 
 EOF
 
-cat ~/data/organelle/plastid_summary/group/group_1.lst \
-    | TT_FILE=cmd_chart_d1_d2.tt perl -MTemplate -nl -e '
+cat ../group/group_1.lst |
+    TT_FILE=cmd_chart_d1_d2.tt perl -MTemplate -nl -e '
         push @data, { name => $_, };
         END {
             $tt = Template->new;
@@ -2248,23 +2269,23 @@ cat ~/data/organelle/plastid_summary/group/group_1.lst \
     ' \
     > cmd_chart_group_1.sh
 
-cat ~/data/organelle/plastid_summary/group/group_2.lst \
-    | TT_FILE=cmd_chart_d1_d2.tt perl -MTemplate -nl -e '
+cat ../group/group_2.lst |
+    TT_FILE=cmd_chart_d1_d2.tt perl -MTemplate -nl -e '
         push @data, { name => $_, };
         END {
             $tt = Template->new;
             $tt->process($ENV{TT_FILE},
                 { data => \@data,
                 y_max => 0.03,
-                y_max2 => 0.04,
+                y_max2 => 0.03,
                 postfix => q{group_2}, }) 
                 or die Template->error;
         }
     ' \
     > cmd_chart_group_2.sh
 
-cat ~/data/organelle/plastid_summary/group/group_3.lst \
-    | TT_FILE=cmd_chart_d1_d2.tt perl -MTemplate -nl -e '
+cat ../group/group_3.lst |
+    TT_FILE=cmd_chart_d1_d2.tt perl -MTemplate -nl -e '
         push @data, { name => $_, };
         END {
             $tt = Template->new;
@@ -2278,8 +2299,8 @@ cat ~/data/organelle/plastid_summary/group/group_3.lst \
     ' \
     > cmd_chart_group_3.sh
 
-cat ~/data/organelle/plastid_summary/group/group_4.lst \
-    | TT_FILE=cmd_chart_d1_d2.tt perl -MTemplate -nl -e '
+cat ../group/Others.lst |
+    TT_FILE=cmd_chart_d1_d2.tt perl -MTemplate -nl -e '
         push @data, { name => $_, };
         END {
             $tt = Template->new;
@@ -2287,21 +2308,22 @@ cat ~/data/organelle/plastid_summary/group/group_4.lst \
                 { data => \@data,
                 y_max => 0.15,
                 y_max2 => 0.15,
-                postfix => q{group_4}, }) 
+                postfix => q{Others}, }) 
                 or die Template->error;
         }
     ' \
-    > cmd_chart_group_4.sh
+    > cmd_chart_Others.sh
 
 bash cmd_chart_group_1.sh
 bash cmd_chart_group_2.sh
 bash cmd_chart_group_3.sh
-bash cmd_chart_group_4.sh
+bash cmd_chart_Others.sh
 
-rm ~/data/organelle/plastid_summary/xlsx/*.csv
-cp ~/data/organelle/plastid_summary/xlsx/*.pdf ~/data/organelle/plastid_summary/fig
+rm ../xlsx/*.csv
+mv ../xlsx/*.pdf ../fig
 
 # Coreldraw doesn't play well with computer modern fonts (latex math).
 # perl ~/Scripts/fig_table/tikz_chart.pl -i cmd_plastid_d1_A2A8_B2B8.group_1.csv -xl 'Distance to indels ($d_1$)' -yl 'Nucleotide divergence ($D$)' --y_min 0.0 --y_max 0.01 -x_min 0 -x_max 5 --style_dot --pdf
+
 ```
 

@@ -1043,7 +1043,7 @@ cat list.tmp | datamash check
 #90 lines, 7 fields
 
 # sort as orders in mito_OG.md
-echo -e "#phylum,family,genus,abbr,ttaxon_id,accession,length" > list.csv
+echo -e "#phylum,family,genus,abbr,taxon_id,accession,length" > list.csv
 cat list.tmp |
     perl -nl -a -MPath::Tiny -e '
         BEGIN{
@@ -1257,16 +1257,17 @@ nw_display -w 600 -s genera.newick |
 
 ```bash
 mkdir -p ~/data/organelle/mito/summary/trees
+cd ~/data/organelle/plastid/summary/trees
 
 cat ~/Scripts/withncbi/doc/mito_OG.md |
     grep -v "^#" |
     grep . |
     cut -d',' -f 1 \
-    > ~/data/organelle/mito/summary/trees/list.txt
+    > list.txt
 
-find ~/data/organelle/mito/OG -type f -path "*Results*" -name "*.nwk" |
+find ../../OG -type f -path "*Results*" -name "*.nwk" |
     grep -v ".raw." |
-    parallel -j 1 cp {} ~/data/organelle/mito/summary/trees
+    parallel -j 1 cp {} trees
 
 ```
 
@@ -1312,7 +1313,7 @@ perl ~/Scripts/fig_table/collect_xlsx.pl \
 
 EOF
 
-cat ~/data/organelle/mito/summary/table/genus.lst |
+cat ../table/genus.lst |
     grep -v "^#" |
     TT_FILE=cmd_collect_d1_d2.tt perl -MTemplate -nl -e '
         push @data, { name => $_, };
@@ -1324,7 +1325,6 @@ cat ~/data/organelle/mito/summary/table/genus.lst |
     ' \
     > cmd_collect_d1_d2.sh
 
-cd ~/data/organelle/mito/summary/xlsx
 bash cmd_collect_d1_d2.sh
 
 ```
@@ -1383,7 +1383,7 @@ perl ~/Scripts/fig_table/sep_chart.pl \
 
 EOF
 
-cat ~/data/organelle/mito/summary/table/genus.lst |
+cat ../table/genus.lst |
     TT_FILE=cmd_chart_d1_d2.tt perl -MTemplate -nl -e '
         push @data, { name => $_, };
         END {
@@ -1400,8 +1400,8 @@ cat ~/data/organelle/mito/summary/table/genus.lst |
 
 bash cmd_chart_genus.sh
 
-rm ~/data/organelle/mito/summary/xlsx/*.csv
-cp ~/data/organelle/mito/summary/xlsx/*.pdf ~/data/organelle/mito/summary/fig
+rm ../xlsx/*.csv
+mv ../xlsx/*.pdf ../fig
 
 ```
 
