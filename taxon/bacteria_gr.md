@@ -56,19 +56,19 @@ perl ~/Scripts/alignDB/util/query_sql.pl --db gr_prok -q '
     ' -o stdout |
     cut -d ',' -f 1 |
     grep -v "^#" \
-    > bac.SPECIES.csv
-cat bac.SPECIES.csv | wc -l
+    > SPECIES_ID.lst
+cat SPECIES_ID.lst | wc -l
 
 ```
 
 * Expand species to strains. (Nested single quotes in bash should be '\'')
 
-    Got **2091** strains.
+    Got **2090** strains.
 
 ```bash
 cd ~/data/bacteria/summary
 
-cat bac.SPECIES.csv |
+cat SPECIES_ID.lst |
     parallel --keep-order -r -j 8 '
         perl ~/Scripts/alignDB/util/query_sql.pl --db gr_prok -q '\''
             SELECT  taxonomy_id `#strain_taxonomy_id`,
@@ -87,6 +87,7 @@ cat bac.SPECIES.csv |
             AND (chr IS NOT NULL OR LENGTH(CHR) > 0)    # has chromosome accession
             AND (LENGTH(wgs) = 0 OR wgs IS NULL)        # avoid bad assembly
             AND species_id = {}
+            AND LENGTH(chr) > 6
             ORDER BY released_date                      # oldest first
         '\'' -o stdout |
             grep -v "^#" |
@@ -101,8 +102,8 @@ cat bac.SPECIES.csv |
             datamash transpose -t,
     ' |
     grep -v "^#" \
-    > bac.STRAIN.csv
-cat bac.STRAIN.csv | wc -l
+    > STRAIN.csv
+cat STRAIN.csv | wc -l
 
 ```
 
@@ -111,12 +112,12 @@ cat bac.STRAIN.csv | wc -l
 ```bash
 cd ~/data/bacteria/summary
 
-echo '#strain_taxonomy_id,strain,species,genus,subgroup,code,accession,abbr' > bac.ABBR.csv
-cat bac.STRAIN.csv |
+echo '#strain_taxonomy_id,strain,species,genus,subgroup,code,accession,abbr' > ABBR.csv
+cat STRAIN.csv |
     grep -v '^#' |
     perl ~/Scripts/withncbi/taxon/abbr_name.pl -c "2,3,4" -s "," -m 0 --shortsub |
     sort -t',' -k5,5 -k4,4 -k3,3 -k6,6 \
-    >> bac.ABBR.csv
+    >> ABBR.csv
 
 ```
 
@@ -130,14 +131,14 @@ And create `bac_ncbi.csv` with abbr names as taxon file.
 mkdir -p ~/data/bacteria/GENOMES
 cd ~/data/bacteria/GENOMES
 
-cat ../summary/bac.ABBR.csv |
+cat ../summary/ABBR.csv |
     grep -v '^#' |
     perl -nla -F"," -e 'print qq{$F[0],$F[7]}' |
     uniq |
     perl ~/Scripts/withncbi/taxon/strain_info.pl --stdin --withname --file bac_ncbi.csv
 
 echo "#strain_name,accession,strain_taxon_id" > bac_name_acc_id.csv
-cat ../summary/bac.ABBR.csv |
+cat ../summary/ABBR.csv |
     grep -v '^#' |
     perl -nla -F"," -e '
         my $acc = $F[6];
@@ -203,9 +204,9 @@ cd ~/data/bacteria/summary/
 #  18 subgroup.list.tmp
 # 104 genus.list.tmp
 # 207 species.list.tmp
-cat bac.ABBR.csv | grep -v '^#'| cut -d',' -f 3 | sort | uniq > species.list.tmp
-cat bac.ABBR.csv | grep -v '^#'| cut -d',' -f 4 | sort | uniq > genus.list.tmp
-cat bac.ABBR.csv | grep -v '^#'| cut -d',' -f 5 | sort | uniq > subgroup.list.tmp
+cat ABBR.csv | grep -v '^#'| cut -d',' -f 3 | sort | uniq > species.list.tmp
+cat ABBR.csv | grep -v '^#'| cut -d',' -f 4 | sort | uniq > genus.list.tmp
+cat ABBR.csv | grep -v '^#'| cut -d',' -f 5 | sort | uniq > subgroup.list.tmp
 wc -l subgroup.list.tmp genus.list.tmp species.list.tmp
 
 rm *.tmp
@@ -227,9 +228,13 @@ rm *.tmp
 * 869312, Streptococcus pneumoniae SPN033038, 2010-07-29, Complete Genome,
 * 261317, Buchnera aphidicola (Cinara tujafilina), 2011-06-09, Complete Genome,
 * 372461, Buchnera aphidicola BCc, 2006-10-18, Complete Genome,
-
 * 1243591, Salmonella enterica subsp. enterica serovar Quebec str. S-1267
-* Exclude all strains of "NZ_*" in Salmonella enterica
+
+* 1385755,synthetic Escherichia coli C321.deltaA,Escherichia
+  coli,Escherichia,Gammaproteobacteria,,CP006698.1,Es_coli_synthetic_Escherichia_coli_C321_deltaA
+
+* Exclude all strains of "NZ_*" in Salmonella enterica, Escherichia coli, Listeria monocytogenes,
+  Helicobacter pylori, Chlamydia trachomatis, Staphylococcus aureus, and Mycobacterium tuberculosis
 
 ```sql
 SELECT taxonomy_id, organism_name, released_date, status, code
@@ -243,7 +248,13 @@ ORDER BY released_date, status, code
 ```bash
 cd ~/data/bacteria/summary
 
-cat bac.ABBR.csv |
+cat ABBR.csv |
+    cut -d, -f 3 |
+    uniq -c |
+    sort -nr |
+    head -n 10
+
+cat ABBR.csv |
     grep -v "391904," |
     grep -v "553190," |
     grep -v "1386087," |
@@ -258,13 +269,29 @@ cat bac.ABBR.csv |
     grep -v "261317," |
     grep -v "372461," |
     grep -v "1243591," |
+    grep -v "1385755," |
     perl -nla -F"," -e '
-        if ($F[2] eq q{Salmonella enterica}) {
+        if (
+            $F[2] eq q{Salmonella enterica}
+            or $F[2] eq q{Escherichia coli}
+            or $F[2] eq q{Listeria monocytogenes}
+            or $F[2] eq q{Helicobacter pylori}
+            or $F[2] eq q{Chlamydia trachomatis}
+            or $F[2] eq q{Staphylococcus aureus}
+            or $F[2] eq q{Mycobacterium tuberculosis}
+        ) {
             $F[6] =~ /^NZ_/ and next;
-        }
+        } 
+        
         print;
     ' \
-    > bac.WORKING.csv
+    > WORKING.csv
+
+cat WORKING.csv |
+    cut -d, -f 3 |
+    uniq -c |
+    sort -nr |
+    head -n 10
 
 ```
 
@@ -275,7 +302,7 @@ Manually edit it then move to `~/Scripts/withncbi/doc/bac_target_OG.md`.
 ```bash
 cd ~/data/bacteria/summary
 
-cat bac.ABBR.csv |
+cat ABBR.csv |
     grep -v "^#" |
     perl -na -F"," -e '
         BEGIN{
@@ -306,7 +333,7 @@ cat bac.ABBR.csv |
 ## Create alignments without outgroups.
 
 ```text
-bac.WORKING.csv
+WORKING.csv
 #strain_taxonomy_id,strain,species,genus,subgroup,code,accession,abbr
 ```
 
@@ -321,7 +348,7 @@ cat ~/Scripts/withncbi/doc/bac_target_OG.md |
 
 # tab-separated
 # name  t   qs
-cat bac.WORKING.csv |
+cat WORKING.csv |
     perl -nl -a -F"," -MPath::Tiny -e '
         BEGIN{
             $name = q{};
@@ -378,7 +405,7 @@ egaz template \
 [% END -%]
     --multi -o [% name %] \
     --taxon ~/data/bacteria/GENOMES/bac_ncbi.csv \
-    --rawphylo --parallel 8 -v
+    --rawphylo --aligndb --parallel 8 -v
 
 EOF
 
@@ -450,7 +477,7 @@ cat species.tsv |
 ```bash
 cd ~/data/bacteria/summary
 
-cat bac.WORKING.csv |
+cat WORKING.csv |
     grep -v "^#" |
     perl -na -F"," -e '
         BEGIN{
@@ -542,13 +569,24 @@ for f in `find . -mindepth 1 -maxdepth 2 -type f -name 3_multi.sh | sort`; do
     echo
 done > run_3.sh
 
+# 6_chr_length
+for f in `find . -mindepth 1 -maxdepth 2 -type f -name 6_chr_length.sh | sort`; do
+    echo "bash $f"
+    echo
+done > run_6.sh
+
+# 7_multi_aligndb
+for f in `find . -mindepth 1 -maxdepth 2 -type f -name 7_multi_aligndb.sh | sort`; do
+    echo "bash $f"
+    echo
+done > run_7.sh
+
 cat run_1.sh | grep . | parallel -r -j 4  2>&1 | tee log_1.txt
 cat run_2.sh | grep . | parallel -r -j 3  2>&1 | tee log_2.txt
 cat run_3.sh | grep . | parallel -r -j 3  2>&1 | tee log_3.txt
+cat run_6.sh | grep . | parallel -r -j 12 2>&1 | tee log_6.txt
+cat run_7.sh | grep . | parallel -r -j 8  2>&1 | tee log_7.txt
 
-#----------------------------#
-# Clean
-#----------------------------#
 find . -mindepth 1 -maxdepth 3 -type d -name "*_raw" | parallel -r rm -fr
 find . -mindepth 1 -maxdepth 3 -type d -name "*_fasta" | parallel -r rm -fr
 
