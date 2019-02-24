@@ -131,7 +131,7 @@ Microcystis_aeruginosa,Mi_aeruginosa_NIES_843
 ## Prochlorococcus 原绿球藻
 Prochlorococcus_marinus,Proc_marinus_marinus_CCMP1375
 ## Synechocystis 集胞藻属
-Synechocystis_sp_PCC_6803,Sy_sp_PCC_6803_substr_GT_I
+Synechocystis_sp_PCC_6803,Sy_sp_PCC_6803_GT_I
 
 # Deinococcus-Thermus 异常球菌-栖热菌门
 ## Thermus 栖热菌属
@@ -250,7 +250,7 @@ Dickeya_solani,Di_solani_IPO_2222
 Enterobacter_cloacae,Enterob_cloacae_cloacae_ATCC_13047
 Enterobacter_hormaechei,Enterob_hormaechei_hoffmannii_ECNIH3
 ## Escherichia 埃希氏杆菌属
-Escherichia_coli,Es_coli_K_12_substr_MG1655
+Escherichia_coli,Es_coli_K_12_MG1655
 ## Francisella 弗朗西斯氏菌属
 Francisella_noatunensis,Fr_noatunensis_orientalis_Toba_04
 Francisella_tularensis,Fr_tularensis_tularensis_SCHU_S4
