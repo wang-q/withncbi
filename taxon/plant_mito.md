@@ -629,6 +629,7 @@ EOF
 # every genera
 echo "mkdir -p ~/data/organelle/mito/genus"  > ../cmd.txt
 echo "cd       ~/data/organelle/mito/genus" >> ../cmd.txt
+
 cat genus.tsv |
     TT_FILE=egaz_template_multi.tt perl -MTemplate -nla -F"\t" -e '
         next unless scalar @F >= 3;
@@ -724,7 +725,7 @@ find . -mindepth 1 -maxdepth 3 -type d -name "*_fasta" | parallel -r rm -fr
 
 ```
 
-## Alignments of families for outgroups.
+## Alignments of families for outgroups
 
 ```bash
 mkdir -p ~/data/organelle/mito/family
@@ -732,7 +733,7 @@ cd ~/data/organelle/mito/family
 
 time bash ../family.cmd.txt 2>&1 | tee log_cmd.txt
 
-for d in `find . -mindepth 1 -maxdepth 1 -type d | sort `;do
+for d in `find . -mindepth 1 -maxdepth 1 -type d | sort `; do
     echo "echo \"====> Processing ${d} <====\""
     echo bash ${d}/1_pair.sh;
     echo bash ${d}/2_rawphylo.sh;

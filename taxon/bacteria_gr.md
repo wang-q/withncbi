@@ -330,7 +330,7 @@ cat ABBR.csv |
 
 ```
 
-## Create alignments without outgroups.
+## Create alignments plans without outgroups
 
 ```text
 WORKING.csv
@@ -349,6 +349,7 @@ cat ~/Scripts/withncbi/doc/bac_target_OG.md |
 # tab-separated
 # name  t   qs
 cat WORKING.csv |
+    grep -v "^#" |
     perl -nl -a -F"," -MPath::Tiny -e '
         BEGIN{
             $name = q{};
@@ -592,7 +593,7 @@ find . -mindepth 1 -maxdepth 3 -type d -name "*_fasta" | parallel -r rm -fr
 
 ```
 
-## Alignments of genera for outgroups.
+## Alignments of genera for outgroups
 
 ```bash
 mkdir -p ~/data/bacteria/genus
@@ -601,7 +602,7 @@ cd ~/data/bacteria/genus
 bash ../bac.genus.cmd.txt 2>&1 | tee log_cmd.txt
 
 for d in `find . -mindepth 1 -maxdepth 1 -type d | sort `; do
-    echo "echo \"==> Processing ${d} <==\""
+    echo "echo \"====> Processing ${d} <====\""
     echo bash ${d}/1_pair.sh;
     echo bash ${d}/2_rawphylo.sh;
     echo bash ${d}/3_multi.sh;

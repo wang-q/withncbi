@@ -333,7 +333,7 @@ Methanosarcina_mazei,Methanos_mazei_Go1
 Methanosarcina_siciliae,Methanos_siciliae_T4_M
 
 # Tenericutes 无壁菌门
-## Mycoplasma 枝原体属
+## Mycoplasma 支原体属
 Mycoplasma_bovis,Mycop_bovis_PG45
 Mycoplasma_capricolum,Mycop_capricolum_capricolum_ATCC_27343
 Mycoplasma_gallisepticum,Mycop_gallisepticum_R_low
