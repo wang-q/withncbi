@@ -9,11 +9,11 @@
     - [Numbers for higher ranks](#numbers-for-higher-ranks)
     - [Exclude diverged strains](#exclude-diverged-strains)
     - [Create `bac_target_OG.md` for picking target and outgroup.](#create-bac_target_ogmd-for-picking-target-and-outgroup)
-    - [Create alignments without outgroups.](#create-alignments-without-outgroups)
+    - [Create alignments plans without outgroups](#create-alignments-plans-without-outgroups)
     - [Align all representative strains of every genera.](#align-all-representative-strains-of-every-genera)
 - [Aligning](#aligning)
     - [Batch running for groups](#batch-running-for-groups)
-    - [Alignments of genera for outgroups.](#alignments-of-genera-for-outgroups)
+    - [Alignments of genera for outgroups](#alignments-of-genera-for-outgroups)
 - [Summary](#summary)
     - [Copy xlsx files](#copy-xlsx-files)
     - [Genome list](#genome-list)
@@ -216,6 +216,8 @@ rm *.tmp
 
 * 391904, Bifidobacterium longum subsp. infantis ATCC 15697 = JCM 1222 = DSM 20088, 2008-11-20,
   Complete Genome,
+* 1496303,Bacillus subtilis subsp. globigii,Bacillus
+  subtilis,Bacillus,Firmicutes,,NZ_CP014840.1,Baci_subtilis_globigii
 * 553190, Gardnerella vaginalis 409-05, 2010-01-07, Complete Genome, COM
 * 1386087, Neisseria meningitidis LNP21362, 2015-01-07, Complete Genome,
 * 935590, Neisseria meningitidis M0579, 2015-06-19, Complete Genome,
@@ -256,6 +258,7 @@ cat ABBR.csv |
 
 cat ABBR.csv |
     grep -v "391904," |
+    grep -v "1496303," |
     grep -v "553190," |
     grep -v "1386087," |
     grep -v "935590," |
@@ -411,8 +414,8 @@ egaz template \
 EOF
 
 # every species
-echo "mkdir -p ~/data/bacteria/species"  > ../bac.cmd.txt
-echo "cd       ~/data/bacteria/species" >> ../bac.cmd.txt
+echo "mkdir -p ~/data/bacteria/species"  > ../cmd.txt
+echo "cd       ~/data/bacteria/species" >> ../cmd.txt
 
 cat species.tsv |
     TT_FILE=egaz_template_multi.tt perl -MTemplate -nla -F"\t" -e '
@@ -431,7 +434,7 @@ cat species.tsv |
         ) or die Template->error;
 
     ' \
-    >> ../bac.cmd.txt
+    >> ../cmd.txt
 
 cat <<'EOF' > egaz_templates_self.tt
 
@@ -448,8 +451,8 @@ egaz template \
 EOF
 
 # every species
-echo "mkdir -p ~/data/bacteria/self"  > ../bac.self.cmd.txt
-echo "cd       ~/data/bacteria/self" >> ../bac.self.cmd.txt
+echo "mkdir -p ~/data/bacteria/self"  > ../self.cmd.txt
+echo "cd       ~/data/bacteria/self" >> ../self.cmd.txt
 
 cat species.tsv |
     TT_FILE=egaz_templates_self.tt perl -MTemplate -nla -F"\t" -e '
@@ -467,7 +470,7 @@ cat species.tsv |
         ) or die Template->error;
 
     ' \
-    >> ../bac.self.cmd.txt
+    >> ../self.cmd.txt
 
 ```
 
@@ -515,8 +518,8 @@ cat WORKING.csv |
 cat genus.tsv | wc -l
 
 # every genera
-echo "mkdir -p ~/data/bacteria/genus"  > ../bac.genus.cmd.txt
-echo "cd       ~/data/bacteria/genus" >> ../bac.genus.cmd.txt
+echo "mkdir -p ~/data/bacteria/genus"  > ../genus.cmd.txt
+echo "cd       ~/data/bacteria/genus" >> ../genus.cmd.txt
 
 cat genus.tsv |
     TT_FILE=egaz_template_multi.tt perl -MTemplate -nla -F"\t" -e '
@@ -535,7 +538,7 @@ cat genus.tsv |
         ) or die Template->error;
 
     ' \
-    >> ../bac.genus.cmd.txt
+    >> ../genus.cmd.txt
 
 ```
 
@@ -547,7 +550,7 @@ cat genus.tsv |
 mkdir -p ~/data/bacteria/species
 cd ~/data/bacteria/species
 
-bash ../bac.cmd.txt 2>&1 | tee log_cmd.txt
+bash ../cmd.txt 2>&1 | tee log_cmd.txt
 
 #----------------------------#
 # Step by step
@@ -588,7 +591,7 @@ cat run_3.sh | grep . | parallel -r -j 3  2>&1 | tee log_3.txt
 cat run_6.sh | grep . | parallel -r -j 12 2>&1 | tee log_6.txt
 cat run_7.sh | grep . | parallel -r -j 8  2>&1 | tee log_7.txt
 
-find . -mindepth 1 -maxdepth 3 -type d -name "*_raw" | parallel -r rm -fr
+find . -mindepth 1 -maxdepth 3 -type d -name "*_raw"   | parallel -r rm -fr
 find . -mindepth 1 -maxdepth 3 -type d -name "*_fasta" | parallel -r rm -fr
 
 ```
@@ -599,7 +602,7 @@ find . -mindepth 1 -maxdepth 3 -type d -name "*_fasta" | parallel -r rm -fr
 mkdir -p ~/data/bacteria/genus
 cd ~/data/bacteria/genus
 
-bash ../bac.genus.cmd.txt 2>&1 | tee log_cmd.txt
+bash ../genus.cmd.txt 2>&1 | tee log_cmd.txt
 
 for d in `find . -mindepth 1 -maxdepth 1 -type d | sort `; do
     echo "echo \"====> Processing ${d} <====\""
@@ -611,7 +614,11 @@ done  > runall.sh
 
 sh runall.sh 2>&1 | tee log_runall.txt
 
-# Clean
+find . -type f -name "*.nwk"
+
+find . -mindepth 1 -maxdepth 3 -type d -name "*_raw"   | parallel -r rm -fr
+find . -mindepth 1 -maxdepth 3 -type d -name "*_fasta" | parallel -r rm -fr
+
 ```
 
 # Summary

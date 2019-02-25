@@ -14,7 +14,7 @@
 - [Aligning without outgroups](#aligning-without-outgroups)
     - [Create alignments plans without outgroups](#create-alignments-plans-without-outgroups)
     - [Batch running for genera](#batch-running-for-genera)
-    - [Alignments of families for outgroups.](#alignments-of-families-for-outgroups)
+    - [Alignments of families for outgroups](#alignments-of-families-for-outgroups)
 - [Aligning with outgroups](#aligning-with-outgroups)
     - [Create `mito_OG.md` for picking outgroups](#create-mito_ogmd-for-picking-outgroups)
     - [Create alignments plans with outgroups](#create-alignments-plans-with-outgroups)
@@ -720,7 +720,7 @@ cat run_3.sh | grep . | parallel -r -j 3  2>&1 | tee log_3.txt
 cat run_6.sh | grep . | parallel -r -j 12 2>&1 | tee log_6.txt
 cat run_7.sh | grep . | parallel -r -j 8  2>&1 | tee log_7.txt
 
-find . -mindepth 1 -maxdepth 3 -type d -name "*_raw" | parallel -r rm -fr
+find . -mindepth 1 -maxdepth 3 -type d -name "*_raw"   | parallel -r rm -fr
 find . -mindepth 1 -maxdepth 3 -type d -name "*_fasta" | parallel -r rm -fr
 
 ```
@@ -743,7 +743,7 @@ done  > runall.sh
 
 sh runall.sh 2>&1 | tee log_runall.txt
 
-find ~/data/organelle/mito/family -type f -name "*.nwk"
+find . -type f -name "*.nwk"
 
 find . -mindepth 1 -maxdepth 3 -type d -name "*_raw"   | parallel -r rm -fr
 find . -mindepth 1 -maxdepth 3 -type d -name "*_fasta" | parallel -r rm -fr
