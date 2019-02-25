@@ -4,16 +4,16 @@
 - [Processing bacterial genomes species by species](#processing-bacterial-genomes-species-by-species)
 - [Init genome report database.](#init-genome-report-database)
 - [Download sequences and regenerate lineage information.](#download-sequences-and-regenerate-lineage-information)
-- [Prepare sequences for lastz](#prepare-sequences-for-lastz)
-- [Create alignment plans](#create-alignment-plans)
     - [Numbers for higher ranks](#numbers-for-higher-ranks)
     - [Exclude diverged strains](#exclude-diverged-strains)
-    - [Create `bac_target_OG.md` for picking target and outgroup.](#create-bac_target_ogmd-for-picking-target-and-outgroup)
+- [Prepare sequences for lastz](#prepare-sequences-for-lastz)
+- [Create alignment plans](#create-alignment-plans)
     - [Create alignments plans without outgroups](#create-alignments-plans-without-outgroups)
     - [Align all representative strains of every genera.](#align-all-representative-strains-of-every-genera)
 - [Aligning](#aligning)
     - [Batch running for groups](#batch-running-for-groups)
     - [Alignments of genera for outgroups](#alignments-of-genera-for-outgroups)
+    - [Create `bac_target_OG.md` for picking target and outgroup.](#create-bac_target_ogmd-for-picking-target-and-outgroup)
 - [Summary](#summary)
     - [Copy xlsx files](#copy-xlsx-files)
     - [Genome list](#genome-list)
@@ -164,35 +164,6 @@ find . -maxdepth 1 -type d | wc -l
 
 ```
 
-# Prepare sequences for lastz
-
-```bash
-cd ~/data/bacteria/GENOMES
-
-find . -maxdepth 1 -type d -path "*/*" |
-    sort |
-    parallel --no-run-if-empty --linebuffer -k -j 2 '
-        echo >&2 "==> {}"
-        
-        if [ -e {}/chr.fasta ]; then
-            echo >&2 "    {} has been processed"
-            exit;
-        fi
-
-        egaz prepseq \
-            {} \
-            --gi -v --repeatmasker " --gff --parallel 8"
-    '
-
-# restore to original states
-#for suffix in .2bit .fasta .fasta.fai .sizes .rm.out .rm.gff; do
-#    find . -name "*${suffix}" | parallel --no-run-if-empty rm 
-#done
-
-```
-
-# Create alignment plans
-
 ##  Numbers for higher ranks
 
 18 subgroups, 104 genera and 207 species.
@@ -298,40 +269,34 @@ cat WORKING.csv |
 
 ```
 
-## Create `bac_target_OG.md` for picking target and outgroup.
-
-Manually edit it then move to `~/Scripts/withncbi/doc/bac_target_OG.md`.
+# Prepare sequences for lastz
 
 ```bash
-cd ~/data/bacteria/summary
+cd ~/data/bacteria/GENOMES
 
-cat ABBR.csv |
-    grep -v "^#" |
-    perl -na -F"," -e '
-        BEGIN{
-            ($subgroup, $genus, $species,) = (q{}, q{}, q{});
-        }
+find . -maxdepth 1 -type d -path "*/*" |
+    sort |
+    parallel --no-run-if-empty --linebuffer -k -j 2 '
+        echo >&2 "==> {}"
+        
+        if [ -e {}/chr.fasta ]; then
+            echo >&2 "    {} has been processed"
+            exit;
+        fi
 
-        next if ! $F[5]; # code
-        chomp for @F;
+        egaz prepseq \
+            {} \
+            --gi -v --repeatmasker " --gff --parallel 8"
+    '
 
-        if ($F[4] ne $subgroup) {
-            $subgroup = $F[4];
-            printf qq{\n# %s\n}, $subgroup;
-        }
-        if ($F[3] ne $genus) {
-            $genus = $F[3];
-            printf qq{## %s\n}, $genus;
-        }
-        $F[2] =~ s/\W+/_/g;
-        if ($F[2] ne $species) {
-            $species = $F[2];
-        }
-        printf qq{%s,%s,%s\n}, $species, $F[7], $F[5];
-    ' \
-    > bac_target_OG.md
+# restore to original states
+#for suffix in .2bit .fasta .fasta.fai .sizes .rm.out .rm.gff; do
+#    find . -name "*${suffix}" | parallel --no-run-if-empty rm 
+#done
 
 ```
+
+# Create alignment plans
 
 ## Create alignments plans without outgroups
 
@@ -618,6 +583,41 @@ find . -type f -name "*.nwk"
 
 find . -mindepth 1 -maxdepth 3 -type d -name "*_raw"   | parallel -r rm -fr
 find . -mindepth 1 -maxdepth 3 -type d -name "*_fasta" | parallel -r rm -fr
+
+```
+
+## Create `bac_target_OG.md` for picking target and outgroup.
+
+Manually edit it then move to `~/Scripts/withncbi/doc/bac_target_OG.md`.
+
+```bash
+cd ~/data/bacteria/summary
+
+cat ABBR.csv |
+    grep -v "^#" |
+    perl -na -F"," -e '
+        BEGIN{
+            ($subgroup, $genus, $species,) = (q{}, q{}, q{});
+        }
+
+        next if ! $F[5]; # code
+        chomp for @F;
+
+        if ($F[4] ne $subgroup) {
+            $subgroup = $F[4];
+            printf qq{\n# %s\n}, $subgroup;
+        }
+        if ($F[3] ne $genus) {
+            $genus = $F[3];
+            printf qq{## %s\n}, $genus;
+        }
+        $F[2] =~ s/\W+/_/g;
+        if ($F[2] ne $species) {
+            $species = $F[2];
+        }
+        printf qq{%s,%s,%s\n}, $species, $F[7], $F[5];
+    ' \
+    > bac_target_OG.md
 
 ```
 
