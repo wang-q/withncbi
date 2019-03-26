@@ -731,8 +731,8 @@ cat species.tsv |
 ## Copy xlsx files
 
 ```bash
-mkdir -p ~/data/bacteria/bac_summary/xlsx
-cd ~/data/bacteria/bac_summary/xlsx
+mkdir -p ~/data/bacteria/summary/xlsx
+cd ~/data/bacteria/summary/xlsx
 
 find  ~/data/bacteria/bac.working -type f -name "*.common.xlsx" |
     grep -v "vs[A-Z]" |
@@ -749,8 +749,8 @@ find  ~/data/bacteria/bac.working -type f -name "*.gc.xlsx" |
 Create `list.csv` from `WORKING.csv` with sequence lengths.
 
 ```bash
-mkdir -p ~/data/bacteria/bac_summary/table
-cd ~/data/bacteria/bac_summary/table
+mkdir -p ~/data/bacteria/summary/table
+cd ~/data/bacteria/summary/table
 
 # manually set orders in `bac_target_OG.md`
 echo "#species" > species_all.lst
@@ -812,7 +812,7 @@ find ~/data/bacteria/bac.working -type f -name "chr.sizes" |
     >> length.tmp
 
 echo "#abbr,subgroup,genus,species,taxon_id" > abbr.tmp
-cat ~/data/bacteria/bac_summary/bac.WORKING.csv |
+cat ~/data/bacteria/summary/bac.WORKING.csv |
     grep -v "^#" |
     perl -nla -F"," -e 'print qq{$F[7],$F[4],$F[3],$F[2],$F[0]}' \
     >> abbr.tmp
@@ -859,9 +859,9 @@ Criteria:
 * D of multiple alignments < 0.2
 
 ```bash
-mkdir -p ~/data/bacteria/bac_summary/table
+mkdir -p ~/data/bacteria/summary/table
 
-cd ~/data/bacteria/bac_summary/xlsx
+cd ~/data/bacteria/summary/xlsx
 cat <<EOF > Table_alignment.tt
 ---
 autofit: A:F
@@ -919,7 +919,7 @@ ranges:
 [% END -%]
 EOF
 
-cat ~/data/bacteria/bac_summary/table/species_all.lst \
+cat ~/data/bacteria/summary/table/species_all.lst \
     | grep -v "^#" \
     | TT_FILE=Table_alignment.tt perl -MTemplate -nl -e '
         my $species = $_;
@@ -936,15 +936,15 @@ cat ~/data/bacteria/bac_summary/table/species_all.lst \
 perl ~/Scripts/fig_table/xlsx_table.pl -i Table_alignment_all.yml
 
 # Under Windows for Excel formula
-perl d:/Scripts/fig_table/xlsx2xls.pl --csv -d d:/data/bacteria/bac_summary/xlsx/Table_alignment_all.xlsx
+perl d:/Scripts/fig_table/xlsx2xls.pl --csv -d d:/data/bacteria/summary/xlsx/Table_alignment_all.xlsx
 
 # Back to Mac
 perl -pi -e 's/\r\n/\n/g;' Table_alignment_all.csv
-cp -f Table_alignment_all.xlsx ~/data/bacteria/bac_summary/table
-cp -f Table_alignment_all.csv ~/data/bacteria/bac_summary/table
+cp -f Table_alignment_all.xlsx ~/data/bacteria/summary/table
+cp -f Table_alignment_all.csv ~/data/bacteria/summary/table
 
 # real filter
-cd ~/data/bacteria/bac_summary/table
+cd ~/data/bacteria/summary/table
 cat Table_alignment_all.csv \
     | perl -nla -F',' -e '
         $F[0] =~ s/"//g;
@@ -963,8 +963,8 @@ grep -v -Fx -f species_exclude.lst species_all.lst > species.lst
 grep -Fx -f species_all_demo.lst species.lst > species_demo.lst
 
 #
-cd ~/data/bacteria/bac_summary/xlsx
-cat ~/data/bacteria/bac_summary/table/species.lst \
+cd ~/data/bacteria/summary/xlsx
+cat ~/data/bacteria/summary/table/species.lst \
     | grep -v "^#" \
     | TT_FILE=Table_alignment.tt perl -MTemplate -nl -e '
         my $species = $_;
@@ -980,13 +980,13 @@ cat ~/data/bacteria/bac_summary/table/species.lst \
 
 perl ~/Scripts/fig_table/xlsx_table.pl -i Table_alignment.yml
 
-cp -f Table_alignment.xlsx ~/data/bacteria/bac_summary/table
+cp -f Table_alignment.xlsx ~/data/bacteria/summary/table
 ```
 
 Table_S_bac for GC
 
 ```bash
-cd ~/data/bacteria/bac_summary/xlsx
+cd ~/data/bacteria/summary/xlsx
 
 cat <<'EOF' > Table_S_bac.tt
 ---
@@ -1109,7 +1109,7 @@ ranges:
 [% END -%]
 EOF
 
-cat ~/data/bacteria/bac_summary/table/species_all.lst \
+cat ~/data/bacteria/summary/table/species_all.lst \
     | grep -v "^#" \
     | TT_FILE=Table_S_bac.tt perl -MTemplate -nl -e '
         my $species = $_;
@@ -1128,7 +1128,7 @@ cat ~/data/bacteria/bac_summary/table/species_all.lst \
     > Table_S_bac_all.yml
 perl ~/Scripts/fig_table/xlsx_table.pl -i Table_S_bac_all.yml
 
-cat ~/data/bacteria/bac_summary/table/species.lst \
+cat ~/data/bacteria/summary/table/species.lst \
     | grep -v "^#" \
     | TT_FILE=Table_S_bac.tt perl -MTemplate -nl -e '
         my $species = $_;
@@ -1152,10 +1152,10 @@ perl ~/Scripts/fig_table/xlsx_table.pl -i Table_S_bac.yml
 NCBI Taxonomy tree
 
 ```bash
-mkdir -p ~/data/bacteria/bac_summary/group
-cd ~/data/bacteria/bac_summary/group
+mkdir -p ~/data/bacteria/summary/group
+cd ~/data/bacteria/summary/group
 
-cat ~/data/bacteria/bac_summary/table/species.lst \
+cat ~/data/bacteria/summary/table/species.lst \
     | grep -v "^#" \
     | perl -e '
         @ls = <>;
@@ -1178,7 +1178,7 @@ bash species_tree.sh > species.tree
 `collect_xlsx.pl`
 
 ```bash
-cd ~/data/bacteria/bac_summary/xlsx
+cd ~/data/bacteria/summary/xlsx
 
 cat <<'EOF' > cmd_collect_d1_d2.tt
 perl ~/Scripts/fig_table/collect_xlsx.pl \
@@ -1215,7 +1215,7 @@ perl ~/Scripts/fig_table/collect_xlsx.pl \
 
 EOF
 
-cat ~/data/bacteria/bac_summary/table/species.lst \
+cat ~/data/bacteria/summary/table/species.lst \
     | grep -v "^#" \
     | TT_FILE=cmd_collect_d1_d2.tt perl -MTemplate -nl -e '
         my $species = $_;
@@ -1229,7 +1229,7 @@ cat ~/data/bacteria/bac_summary/table/species.lst \
     ' \
     > cmd_collect_d1_d2.sh
 
-cd ~/data/bacteria/bac_summary/xlsx
+cd ~/data/bacteria/summary/xlsx
 bash cmd_collect_d1_d2.sh
 
 ```
@@ -1237,9 +1237,9 @@ bash cmd_collect_d1_d2.sh
 `sep_chart.pl`
 
 ```bash
-mkdir -p ~/data/bacteria/bac_summary/fig
+mkdir -p ~/data/bacteria/summary/fig
 
-cd ~/data/bacteria/bac_summary/xlsx
+cd ~/data/bacteria/summary/xlsx
 
 cat <<'EOF' > cmd_chart_d1_d2.tt
 perl ~/Scripts/fig_table/sep_chart.pl \
@@ -1288,7 +1288,7 @@ perl ~/Scripts/fig_table/sep_chart.pl \
 
 EOF
 
-cat ~/data/bacteria/bac_summary/table/species.lst \
+cat ~/data/bacteria/summary/table/species.lst \
     | TT_FILE=cmd_chart_d1_d2.tt perl -MTemplate -nl -e '
         my $species = $_;
         $species =~ s/ /_/g;
@@ -1306,15 +1306,15 @@ cat ~/data/bacteria/bac_summary/table/species.lst \
     > cmd_chart.sh
 
 bash cmd_chart.sh
-rm ~/data/bacteria/bac_summary/xlsx/*.csv
-cp ~/data/bacteria/bac_summary/xlsx/*.pdf ~/data/bacteria/bac_summary/fig
+rm ~/data/bacteria/summary/xlsx/*.csv
+cp ~/data/bacteria/summary/xlsx/*.pdf ~/data/bacteria/summary/fig
 
 ```
 
 ## CorelDRAW GC charts
 
 ```bash
-cd ~/data/bacteria/bac_summary/xlsx
+cd ~/data/bacteria/summary/xlsx
 
 # Fig_S_bac_d1_gc_cv
 cat <<'EOF' > Fig_S_bac_d1_gc_cv.tt
@@ -1340,7 +1340,7 @@ texts:
 [% END -%]
 EOF
 
-cat ~/data/bacteria/bac_summary/table/species.lst \
+cat ~/data/bacteria/summary/table/species.lst \
     | grep -v "^#" \
     | TT_FILE=Fig_S_bac_d1_gc_cv.tt perl -MTemplate -nl -e '
         my $species = $_;
@@ -1359,7 +1359,7 @@ cat ~/data/bacteria/bac_summary/table/species.lst \
     > Fig_S_bac_d1_gc_cv.yml
 
 # Under Windows
-perl d:/Scripts/fig_table/corel_fig.pl -i d:/data/bacteria/bac_summary/xlsx/Fig_S_bac_d1_gc_cv.yml
+perl d:/Scripts/fig_table/corel_fig.pl -i d:/data/bacteria/summary/xlsx/Fig_S_bac_d1_gc_cv.yml
 
 # Back to Mac
 # Fig_S_bac_gc_indel
@@ -1386,7 +1386,7 @@ texts:
 [% END -%]
 EOF
 
-cat ~/data/bacteria/bac_summary/table/species.lst \
+cat ~/data/bacteria/summary/table/species.lst \
     | grep -v "^#" \
     | TT_FILE=Fig_S_bac_gc_indel.tt perl -MTemplate -nl -e '
         my $species = $_;
@@ -1405,7 +1405,7 @@ cat ~/data/bacteria/bac_summary/table/species.lst \
     > Fig_S_bac_gc_indel.yml
 
 # Under Windows
-perl d:/Scripts/fig_table/corel_fig.pl -i d:/data/bacteria/bac_summary/xlsx/Fig_S_bac_gc_indel.yml
+perl d:/Scripts/fig_table/corel_fig.pl -i d:/data/bacteria/summary/xlsx/Fig_S_bac_gc_indel.yml
 
 # Back to Mac
 # Fig_S_bac_gc_indel_demo
@@ -1436,7 +1436,7 @@ texts:
 [% END -%]
 EOF
 
-cat ~/data/bacteria/bac_summary/table/species_demo.lst \
+cat ~/data/bacteria/summary/table/species_demo.lst \
     | grep -v "^#" \
     | sort \
     | TT_FILE=Fig_S_bac_gc_indel_demo.tt perl -MTemplate -nl -e '
@@ -1456,12 +1456,12 @@ cat ~/data/bacteria/bac_summary/table/species_demo.lst \
     > Fig_S_bac_gc_indel_demo.yml
 
 # Under Windows
-perl d:/Scripts/fig_table/corel_fig.pl -i d:/data/bacteria/bac_summary/xlsx/Fig_S_bac_gc_indel_demo.yml
+perl d:/Scripts/fig_table/corel_fig.pl -i d:/data/bacteria/summary/xlsx/Fig_S_bac_gc_indel_demo.yml
 
 # Back to Mac
-cp -f Fig_S_bac_d1_gc_cv.cdr ~/data/bacteria/bac_summary/fig
-cp -f Fig_S_bac_gc_indel.cdr ~/data/bacteria/bac_summary/fig
-cp -f Fig_S_bac_gc_indel_demo.cdr ~/data/bacteria/bac_summary/fig
+cp -f Fig_S_bac_d1_gc_cv.cdr ~/data/bacteria/summary/fig
+cp -f Fig_S_bac_gc_indel.cdr ~/data/bacteria/summary/fig
+cp -f Fig_S_bac_gc_indel_demo.cdr ~/data/bacteria/summary/fig
 
 ```
 
