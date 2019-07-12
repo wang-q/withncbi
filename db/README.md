@@ -143,10 +143,10 @@ cat ~/data/NCBI/genomes/ASSEMBLY_REPORTS/assembly_summary_refseq.txt \
     cut -d$'\t' -f 12 | # assembly_level
     sort |
     uniq -c
-#   5366 Chromosome
-#  44995 Complete Genome
-# 156577 Contig
-# 136948 Scaffold
+#   6591 Chromosome
+#  70133 Complete Genome
+# 312012 Contig
+# 167752 Scaffold
 
 ```
 
