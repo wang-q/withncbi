@@ -102,7 +102,8 @@ cat raw.0.assembly.tsv |
     sort -nr
 
 cat raw.0.assembly.tsv |
-    tsv-filter -H --str-ne 3:"Mycobacterium tuberculosis" \
+    tsv-filter -H --str-ne 3:"Mycobacterium tuberculosis" |
+    tsv-filter -H --str-ne 3:"Mycobacterium avium" \
     > raw.1.assembly.tsv
 
 cat raw.0.assembly.tsv |
@@ -110,13 +111,21 @@ cat raw.0.assembly.tsv |
     tsv-filter -H --str-in-fld 1:"_variant_" \
     > raw.2.assembly.tsv
 
+# Too many strains
 cat raw.0.assembly.tsv |
     tsv-filter -H --str-eq 3:"Mycobacterium tuberculosis" |
     tsv-filter -H --istr-ne 4:"Contig" |
     tsv-filter -H --istr-ne 4:"Scaffold" \
     > raw.3.assembly.tsv
 
-tsv-append -H raw.{1,2,3}.assembly.tsv |
+# Poor assembled GA II and IonTorrent reads
+cat raw.0.assembly.tsv |
+    tsv-filter -H --str-eq 3:"Mycobacterium avium" |
+    tsv-filter -H --istr-ne 4:"Contig" |
+    tsv-filter -H --istr-ne 4:"Scaffold" \
+    > raw.4.assembly.tsv
+
+tsv-append -H raw.{1,2,3,4}.assembly.tsv |
     tsv-uniq -H > ${RANK_NAME}.assembly.tsv
 
 # comment out unneeded assembly levels
@@ -219,7 +228,7 @@ parallel --no-run-if-empty --linebuffer -k -j 4 '
           "Mycobacterium kansasii" "Mycobacterium leprae" \
           "Mycobacterium marinum"
 
-#Mycobacterium   23      303
+#Mycobacterium   23      253
 #Mycobacterium canettii  1       9
 #Mycobacterium orygis    1       1
 #Mycobacterium tuberculosis      1       196
@@ -228,7 +237,7 @@ parallel --no-run-if-empty --linebuffer -k -j 4 '
 #Mycobacterium tuberculosis variant caprae       1       1
 #Mycobacterium tuberculosis variant microti      1       2
 #Mycobacterium tuberculosis variant pinnipedii   1       1
-#Mycobacterium avium     1       56
+#Mycobacterium avium     1       6
 #Mycobacterium colombiense       1       1
 #Mycobacterium intracellulare    1       9
 #Mycobacterium asiaticum 1       1
@@ -271,8 +280,8 @@ cat ASSEMBLY/MTBC.assembly.collect.csv |
     > taxon/Mycobacterium
 
 wc -l taxon/*
-#  20 taxon/Mycobacterium
-#  56 taxon/Mycobacterium_avium
+#  19 taxon/Mycobacterium
+#   6 taxon/Mycobacterium_avium
 #   9 taxon/Mycobacterium_canettii
 #   9 taxon/Mycobacterium_intracellulare
 #   4 taxon/Mycobacterium_kansasii
@@ -317,8 +326,7 @@ bash GENOMES/0_prep.sh
 # gff
 for n in M_avi_paratuberculosis_K_10 M_can_CIPT_140010059 \
          M_int_ATCC_13950 M_kan_ATCC_12478 \
-         M_lep_TN M_mar_E11 \
-         M_tub_H37Rv \
+         M_lep_TN M_mar_E11 M_tub_H37Rv \
          M_tub_variant_africanum_GM041182 M_tub_variant_bovis_AF2122_97; do
     FILE_GFF=$(find ASSEMBLY -type f -name "*_genomic.gff.gz" | grep "${n}/")
     echo >&2 "==> Processing ${n}/${FILE_GFF}"
