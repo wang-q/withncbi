@@ -56,48 +56,6 @@ Use `.fq` over `.fastq`
 
 # Concepts
 
-## IntSpans
-
-An IntSpan represents sets of integers as a number of inclusive ranges, for example '1-10,19,45-48'.
-
-The following picture is the schema of an IntSpan object. Jump lines are above the baseline; loop
-lines are below it.
-
-![intspans](doc/intspans.png)
-
-[AlignDB::IntSpan](https://github.com/wang-q/AlignDB-IntSpan) and
-[jintspan](https://github.com/egateam/jintspan) are implements of IntSpan objects in Perl and Java,
-respectively.
-
-## Positions
-
-Examples in [`S288c.txt`](https://github.com/wang-q/App-RL/blob/master/t/S288c.txt)
-
-```text
-I:1-100
-I(+):90-150
-S288c.I(-):190-200
-II:21294-22075
-II:23537-24097
-```
-
-![positions](doc/positions.png)
-
-Simple rules:
-
-* `chromosome` and `start` are required
-* `species`, `strand` and `end` are optional
-* `.` to separate `species` and `chromosome`
-* `strand` is one of `+` and `-` and surround by round brackets
-* `:` to separate names and digits
-* `-` to separate `start` and `end`
-* names should be alphanumeric and without spaces
-
-```text
-species.chromosome(strand):start-end
---------^^^^^^^^^^--------^^^^^^----
-```
-
 ## Runlists in YAML
 
 [App::RL](https://github.com/wang-q/App-RL)
