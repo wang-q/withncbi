@@ -137,7 +137,7 @@ if ( !$append ) {
     # COM = Community selected reference
     my %code_of;
     for my $line ( List::MoreUtils::PP::uniq(@references) ) {
-        my ( $name, $code ) = ( split /\t/, $line )[ 2, 7 ];
+        my ( $name, $code ) = ( split /\t/, $line )[ 2, 8 ];
 
         my @codes = split /\//, $code;
         if ( exists $code_of{$name} ) {
