@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use autodie;
 
-use Getopt::Long qw(HelpMessage);
+use Getopt::Long;
 use Config::Tiny;
 use FindBin;
 use YAML qw(Dump Load DumpFile LoadFile);
@@ -52,8 +52,8 @@ build_ensembl.pl - Build an ensembl database from mysqldump files
 
 =cut
 
-GetOptions(
-    'help|?' => sub { HelpMessage(0) },
+Getopt::Long::GetOptions(
+    'help|?' => sub { Getopt::Long::HelpMessage(0) },
     'server|s=s'   => \( my $server      = $Config->{database}{server} ),
     'port=i'       => \( my $port        = $Config->{database}{port} ),
     'username|u=s' => \( my $username    = $Config->{database}{username} ),
@@ -62,7 +62,7 @@ GetOptions(
     'ensembl=s'    => \my $ensembl_dir,
     'checksum'     => \( my $do_checksum = 0 ),
     'initdb'       => \( my $do_initdb   = 0 ),
-) or HelpMessage(1);
+) or Getopt::Long::HelpMessage(1);
 
 #----------------------------------------------------------#
 # run
