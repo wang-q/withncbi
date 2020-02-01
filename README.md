@@ -1,3 +1,8 @@
+# Name
+
+withncbi - [egaz](https://github.com/wang-q/egaz) and [alignDB](https://github.com/wang-q/alignDB)
+work with external (NCBI/EBI) data.
+
 [TOC levels=1-3]: #
 
 # Table of Contents
@@ -8,19 +13,12 @@
     - [fasta](#fasta)
     - [fastq](#fastq)
 - [Concepts](#concepts)
-    - [IntSpans](#intspans)
-    - [Positions](#positions)
     - [Runlists in YAML](#runlists-in-yaml)
     - [Blocked fasta files](#blocked-fasta-files)
     - [Ranges and links of ranges](#ranges-and-links-of-ranges)
 - [Author](#author)
 - [Copyright and license](#copyright-and-license)
 
-
-# Name
-
-withncbi - [egaz](https://github.com/wang-q/egaz) and [alignDB](https://github.com/wang-q/alignDB)
-work with external (NCBI/EBI) data.
 
 # Purpose
 
