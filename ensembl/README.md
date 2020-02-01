@@ -225,11 +225,11 @@ Or use `ensembl_batch.pl`, see [this](README.md#configurations).
 
 # Configurations
 
-Configurations stored in `ensembl_94.yml`.
+Configurations stored in `ensembl_98.yml`.
 
 ```bash
 cd ~/Scripts/withncbi/ensembl/
-perl ensembl_batch.pl -i ensembl_94.yml
+perl ensembl_batch.pl -i ensembl_98.yml
 
 bash ensembl.build.sh
 bash ensembl.fasta.sh
