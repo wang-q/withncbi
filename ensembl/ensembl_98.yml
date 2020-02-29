@@ -48,11 +48,10 @@ species:
     fasta:
       alias: Rhesus
       append: |
-        cat JSUE*.fa KQ*.fa > Un.fa
-        rm JSUE*.fa KQ*.fa
+        cat QNVO*.fa ML*.fa > Un.fa
+        rm QNVO*.fa ML*.fa
         mv Un.fa Un.fa.skip
         mv Y.fa Y.fa.skip
-        mv MT.fa MT.fa.skip
   "Mus musculus":
     core:
       aliases:
@@ -89,20 +88,20 @@ species:
     fasta:
       append: |
         cat scaffold*.fa > Un.fa
-        rm scaffold*.fa
         mv Un.fa Un.fa.skip
+        rm scaffold*.fa
   "Medicago truncatula":
     fasta:
       append: |
         cat scaffold*.fa > Un.fa
-        mv Un.fa Un.fa.skip
         rm scaffold*.fa
+        mv Un.fa Un.fa.skip
   "Glycine max":
     fasta:
       append: |
-        cat scaffold*.fa > Un.fa
+        cat KZ*.fa > Un.fa
+        rm KZ*.fa
         mv Un.fa Un.fa.skip
-        rm scaffold*.fa
   "Vitis vinifera":
     fasta:
       append: |
@@ -135,42 +134,44 @@ species:
     fasta:
       append: |
         cat Scaffold*.fa > Un.fa
-        mv Un.fa Un.fa.skip
         rm Scaffold*.fa
+        mv Un.fa Un.fa.skip
   "Brassica rapa":
     fasta:
       append: |
         cat Scaffold*.fa > Un.fa
-        mv Un.fa Un.fa.skip
         rm Scaffold*.fa
+        mv Un.fa Un.fa.skip
   "Solanum lycopersicum":
     fasta:
       append: |
-        cat SL2*.fa > Un.fa
+        cat SL*.fa > Un.fa
+        rm SL*.fa
         mv Un.fa Un.fa.skip
-        rm SL2*.fa
   "Solanum tuberosum":
     fasta: 1
   "Setaria italica":
     fasta:
       append: |
         cat KQ*.fa > Un.fa
-        mv Un.fa Un.fa.skip
         rm KQ*.fa
+        mv Un.fa Un.fa.skip
   "Sorghum bicolor":
     fasta:
       append: |
         cat super*.fa > Un.fa
-        mv Un.fa Un.fa.skip
         rm super*.fa
+        mv Un.fa Un.fa.skip
   "Brachypodium distachyon":
     fasta:
       append: |
-        cat KZ*.fa Bd1_*.fa > Un.fa
+        cat KZ*.fa Bd*.fa > Un.fa
+        rm KZ*.fa Bd*.fa
         mv Un.fa Un.fa.skip
-        rm KZ*.fa Bd1_*.fa
   "Musa acuminata":
-    fasta: 1
+    fasta:
+      append: |
+        mv chrUn_random.fa chrUn_random.fa.skip
   "Drosophila melanogaster":
     core: 1
     initrc: 1
@@ -189,10 +190,9 @@ species:
     fasta:
       append: |
         cat JPYS*.fa > Un.fa
-        mv Un.fa Un.fa.skip
         rm JPYS*.fa
+        mv Un.fa Un.fa.skip
         mv 4.fa 4.fa.skip
-        mv Y.fa Y.fa.skip
         mv MT.fa MT.fa.skip
   "Caenorhabditis elegans":
     core: 1
@@ -203,9 +203,9 @@ species:
   "Caenorhabditis briggsae":
     fasta:
       append: |
-        cat cb25*.fa > Un.fa
+        cat cb*.fa > Un.fa
+        rm cb*.fa
         mv Un.fa Un.fa.skip
-        rm cb25*.fa
   "Plasmodium falciparum":
     core: 1
     initrc: 1
@@ -216,8 +216,8 @@ species:
     fasta:
       append: |
         cat CH*.fa > Un.fa
-        mv Un.fa Un.fa.skip
         rm CH*.fa
+        mv Un.fa Un.fa.skip
   "Aspergillus fumigatus":
     core: 1
     initrc: 1
@@ -235,7 +235,11 @@ species:
   "Schizosaccharomyces pombe":
     core: 1
     initrc: 1
-    fasta: 1
+    fasta:
+      append: |
+        mv MT.fa MT.fa.skip
+        mv MTR.fa MTR.fa.skip
+        mv AB325691.fa AB325691.fa.skip
   "Fungi":
     skip: 1
     compara:

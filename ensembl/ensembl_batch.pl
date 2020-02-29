@@ -52,7 +52,7 @@ Getopt::Long::GetOptions(
     'port=i'       => \( my $port = $Config->{database}{port} ),
     'username|u=s' => \( my $username = $Config->{database}{username} ),
     'password|p=s' => \( my $password = $Config->{database}{password} ),
-    'file|i=s'     => \( my $yml_file = "$FindBin::Bin/ensembl_94.yml" ),
+    'file|i=s'     => \( my $yml_file = "$FindBin::Bin/ensembl_98.yml" ),
 ) or Getopt::Long::HelpMessage(1);
 
 #----------------------------------------------------------#
@@ -309,12 +309,12 @@ if [ -d [% dest %]/[% alias %] ]; then
             grep -v "abinitio.gff3" |
             grep -v "chr.gff3" |
             xargs gzip -d -c > chr.gff
-        runlist gff --tag CDS --remove chr.gff -o cds.yml
+        spanr gff chr.gff --tag CDS -o cds.yml
 
         faops masked *.fa |
             jrunlist cover stdin -o repeat.yml
 
-        runlist merge repeat.yml cds.yml -o anno.yml
+        spanr merge repeat.yml cds.yml -o anno.yml
         rm repeat.yml cds.yml
     fi
 else
