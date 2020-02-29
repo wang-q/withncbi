@@ -9,16 +9,16 @@ if [ -d /home/wangq/data/alignment/Ensembl/Alyr ]; then
     else
         cd /home/wangq/data/alignment/Ensembl/Alyr
 
-        find /home/wangq/data/ensembl94/gff3/arabidopsis_lyrata/ -name "*.gff3.gz" |
+        find /home/wangq/data/ensembl98/gff3/arabidopsis_lyrata/ -name "*.gff3.gz" |
             grep -v "abinitio.gff3" |
             grep -v "chr.gff3" |
             xargs gzip -d -c > chr.gff
-        runlist gff --tag CDS --remove chr.gff -o cds.yml
+        spanr gff chr.gff --tag CDS -o cds.yml
 
         faops masked *.fa |
             jrunlist cover stdin -o repeat.yml
 
-        runlist merge repeat.yml cds.yml -o anno.yml
+        spanr merge repeat.yml cds.yml -o anno.yml
         rm repeat.yml cds.yml
     fi
 else
@@ -34,16 +34,16 @@ if [ -d /home/wangq/data/alignment/Ensembl/Atha ]; then
     else
         cd /home/wangq/data/alignment/Ensembl/Atha
 
-        find /home/wangq/data/ensembl94/gff3/arabidopsis_thaliana/ -name "*.gff3.gz" |
+        find /home/wangq/data/ensembl98/gff3/arabidopsis_thaliana/ -name "*.gff3.gz" |
             grep -v "abinitio.gff3" |
             grep -v "chr.gff3" |
             xargs gzip -d -c > chr.gff
-        runlist gff --tag CDS --remove chr.gff -o cds.yml
+        spanr gff chr.gff --tag CDS -o cds.yml
 
         faops masked *.fa |
             jrunlist cover stdin -o repeat.yml
 
-        runlist merge repeat.yml cds.yml -o anno.yml
+        spanr merge repeat.yml cds.yml -o anno.yml
         rm repeat.yml cds.yml
     fi
 else
@@ -59,16 +59,16 @@ if [ -d /home/wangq/data/alignment/Ensembl/Afum ]; then
     else
         cd /home/wangq/data/alignment/Ensembl/Afum
 
-        find /home/wangq/data/ensembl94/gff3/aspergillus_fumigatus/ -name "*.gff3.gz" |
+        find /home/wangq/data/ensembl98/gff3/aspergillus_fumigatus/ -name "*.gff3.gz" |
             grep -v "abinitio.gff3" |
             grep -v "chr.gff3" |
             xargs gzip -d -c > chr.gff
-        runlist gff --tag CDS --remove chr.gff -o cds.yml
+        spanr gff chr.gff --tag CDS -o cds.yml
 
         faops masked *.fa |
             jrunlist cover stdin -o repeat.yml
 
-        runlist merge repeat.yml cds.yml -o anno.yml
+        spanr merge repeat.yml cds.yml -o anno.yml
         rm repeat.yml cds.yml
     fi
 else
@@ -84,16 +84,16 @@ if [ -d /home/wangq/data/alignment/Ensembl/Bdis ]; then
     else
         cd /home/wangq/data/alignment/Ensembl/Bdis
 
-        find /home/wangq/data/ensembl94/gff3/brachypodium_distachyon/ -name "*.gff3.gz" |
+        find /home/wangq/data/ensembl98/gff3/brachypodium_distachyon/ -name "*.gff3.gz" |
             grep -v "abinitio.gff3" |
             grep -v "chr.gff3" |
             xargs gzip -d -c > chr.gff
-        runlist gff --tag CDS --remove chr.gff -o cds.yml
+        spanr gff chr.gff --tag CDS -o cds.yml
 
         faops masked *.fa |
             jrunlist cover stdin -o repeat.yml
 
-        runlist merge repeat.yml cds.yml -o anno.yml
+        spanr merge repeat.yml cds.yml -o anno.yml
         rm repeat.yml cds.yml
     fi
 else
@@ -109,16 +109,16 @@ if [ -d /home/wangq/data/alignment/Ensembl/Bole ]; then
     else
         cd /home/wangq/data/alignment/Ensembl/Bole
 
-        find /home/wangq/data/ensembl94/gff3/brassica_oleracea/ -name "*.gff3.gz" |
+        find /home/wangq/data/ensembl98/gff3/brassica_oleracea/ -name "*.gff3.gz" |
             grep -v "abinitio.gff3" |
             grep -v "chr.gff3" |
             xargs gzip -d -c > chr.gff
-        runlist gff --tag CDS --remove chr.gff -o cds.yml
+        spanr gff chr.gff --tag CDS -o cds.yml
 
         faops masked *.fa |
             jrunlist cover stdin -o repeat.yml
 
-        runlist merge repeat.yml cds.yml -o anno.yml
+        spanr merge repeat.yml cds.yml -o anno.yml
         rm repeat.yml cds.yml
     fi
 else
@@ -134,16 +134,16 @@ if [ -d /home/wangq/data/alignment/Ensembl/Brap ]; then
     else
         cd /home/wangq/data/alignment/Ensembl/Brap
 
-        find /home/wangq/data/ensembl94/gff3/brassica_rapa/ -name "*.gff3.gz" |
+        find /home/wangq/data/ensembl98/gff3/brassica_rapa/ -name "*.gff3.gz" |
             grep -v "abinitio.gff3" |
             grep -v "chr.gff3" |
             xargs gzip -d -c > chr.gff
-        runlist gff --tag CDS --remove chr.gff -o cds.yml
+        spanr gff chr.gff --tag CDS -o cds.yml
 
         faops masked *.fa |
             jrunlist cover stdin -o repeat.yml
 
-        runlist merge repeat.yml cds.yml -o anno.yml
+        spanr merge repeat.yml cds.yml -o anno.yml
         rm repeat.yml cds.yml
     fi
 else
@@ -159,16 +159,16 @@ if [ -d /home/wangq/data/alignment/Ensembl/Cbri ]; then
     else
         cd /home/wangq/data/alignment/Ensembl/Cbri
 
-        find /home/wangq/data/ensembl94/gff3/caenorhabditis_briggsae/ -name "*.gff3.gz" |
+        find /home/wangq/data/ensembl98/gff3/caenorhabditis_briggsae/ -name "*.gff3.gz" |
             grep -v "abinitio.gff3" |
             grep -v "chr.gff3" |
             xargs gzip -d -c > chr.gff
-        runlist gff --tag CDS --remove chr.gff -o cds.yml
+        spanr gff chr.gff --tag CDS -o cds.yml
 
         faops masked *.fa |
             jrunlist cover stdin -o repeat.yml
 
-        runlist merge repeat.yml cds.yml -o anno.yml
+        spanr merge repeat.yml cds.yml -o anno.yml
         rm repeat.yml cds.yml
     fi
 else
@@ -184,16 +184,16 @@ if [ -d /home/wangq/data/alignment/Ensembl/Cele ]; then
     else
         cd /home/wangq/data/alignment/Ensembl/Cele
 
-        find /home/wangq/data/ensembl94/gff3/caenorhabditis_elegans/ -name "*.gff3.gz" |
+        find /home/wangq/data/ensembl98/gff3/caenorhabditis_elegans/ -name "*.gff3.gz" |
             grep -v "abinitio.gff3" |
             grep -v "chr.gff3" |
             xargs gzip -d -c > chr.gff
-        runlist gff --tag CDS --remove chr.gff -o cds.yml
+        spanr gff chr.gff --tag CDS -o cds.yml
 
         faops masked *.fa |
             jrunlist cover stdin -o repeat.yml
 
-        runlist merge repeat.yml cds.yml -o anno.yml
+        spanr merge repeat.yml cds.yml -o anno.yml
         rm repeat.yml cds.yml
     fi
 else
@@ -209,16 +209,16 @@ if [ -d /home/wangq/data/alignment/Ensembl/Ddis ]; then
     else
         cd /home/wangq/data/alignment/Ensembl/Ddis
 
-        find /home/wangq/data/ensembl94/gff3/dictyostelium_discoideum/ -name "*.gff3.gz" |
+        find /home/wangq/data/ensembl98/gff3/dictyostelium_discoideum/ -name "*.gff3.gz" |
             grep -v "abinitio.gff3" |
             grep -v "chr.gff3" |
             xargs gzip -d -c > chr.gff
-        runlist gff --tag CDS --remove chr.gff -o cds.yml
+        spanr gff chr.gff --tag CDS -o cds.yml
 
         faops masked *.fa |
             jrunlist cover stdin -o repeat.yml
 
-        runlist merge repeat.yml cds.yml -o anno.yml
+        spanr merge repeat.yml cds.yml -o anno.yml
         rm repeat.yml cds.yml
     fi
 else
@@ -234,16 +234,16 @@ if [ -d /home/wangq/data/alignment/Ensembl/Dmel ]; then
     else
         cd /home/wangq/data/alignment/Ensembl/Dmel
 
-        find /home/wangq/data/ensembl94/gff3/drosophila_melanogaster/ -name "*.gff3.gz" |
+        find /home/wangq/data/ensembl98/gff3/drosophila_melanogaster/ -name "*.gff3.gz" |
             grep -v "abinitio.gff3" |
             grep -v "chr.gff3" |
             xargs gzip -d -c > chr.gff
-        runlist gff --tag CDS --remove chr.gff -o cds.yml
+        spanr gff chr.gff --tag CDS -o cds.yml
 
         faops masked *.fa |
             jrunlist cover stdin -o repeat.yml
 
-        runlist merge repeat.yml cds.yml -o anno.yml
+        spanr merge repeat.yml cds.yml -o anno.yml
         rm repeat.yml cds.yml
     fi
 else
@@ -259,16 +259,16 @@ if [ -d /home/wangq/data/alignment/Ensembl/Dsim ]; then
     else
         cd /home/wangq/data/alignment/Ensembl/Dsim
 
-        find /home/wangq/data/ensembl94/gff3/drosophila_simulans/ -name "*.gff3.gz" |
+        find /home/wangq/data/ensembl98/gff3/drosophila_simulans/ -name "*.gff3.gz" |
             grep -v "abinitio.gff3" |
             grep -v "chr.gff3" |
             xargs gzip -d -c > chr.gff
-        runlist gff --tag CDS --remove chr.gff -o cds.yml
+        spanr gff chr.gff --tag CDS -o cds.yml
 
         faops masked *.fa |
             jrunlist cover stdin -o repeat.yml
 
-        runlist merge repeat.yml cds.yml -o anno.yml
+        spanr merge repeat.yml cds.yml -o anno.yml
         rm repeat.yml cds.yml
     fi
 else
@@ -284,16 +284,16 @@ if [ -d /home/wangq/data/alignment/Ensembl/Gmax ]; then
     else
         cd /home/wangq/data/alignment/Ensembl/Gmax
 
-        find /home/wangq/data/ensembl94/gff3/glycine_max/ -name "*.gff3.gz" |
+        find /home/wangq/data/ensembl98/gff3/glycine_max/ -name "*.gff3.gz" |
             grep -v "abinitio.gff3" |
             grep -v "chr.gff3" |
             xargs gzip -d -c > chr.gff
-        runlist gff --tag CDS --remove chr.gff -o cds.yml
+        spanr gff chr.gff --tag CDS -o cds.yml
 
         faops masked *.fa |
             jrunlist cover stdin -o repeat.yml
 
-        runlist merge repeat.yml cds.yml -o anno.yml
+        spanr merge repeat.yml cds.yml -o anno.yml
         rm repeat.yml cds.yml
     fi
 else
@@ -309,16 +309,16 @@ if [ -d /home/wangq/data/alignment/Ensembl/Gorilla ]; then
     else
         cd /home/wangq/data/alignment/Ensembl/Gorilla
 
-        find /home/wangq/data/ensembl94/gff3/gorilla_gorilla/ -name "*.gff3.gz" |
+        find /home/wangq/data/ensembl98/gff3/gorilla_gorilla/ -name "*.gff3.gz" |
             grep -v "abinitio.gff3" |
             grep -v "chr.gff3" |
             xargs gzip -d -c > chr.gff
-        runlist gff --tag CDS --remove chr.gff -o cds.yml
+        spanr gff chr.gff --tag CDS -o cds.yml
 
         faops masked *.fa |
             jrunlist cover stdin -o repeat.yml
 
-        runlist merge repeat.yml cds.yml -o anno.yml
+        spanr merge repeat.yml cds.yml -o anno.yml
         rm repeat.yml cds.yml
     fi
 else
@@ -334,16 +334,16 @@ if [ -d /home/wangq/data/alignment/Ensembl/Human ]; then
     else
         cd /home/wangq/data/alignment/Ensembl/Human
 
-        find /home/wangq/data/ensembl94/gff3/homo_sapiens/ -name "*.gff3.gz" |
+        find /home/wangq/data/ensembl98/gff3/homo_sapiens/ -name "*.gff3.gz" |
             grep -v "abinitio.gff3" |
             grep -v "chr.gff3" |
             xargs gzip -d -c > chr.gff
-        runlist gff --tag CDS --remove chr.gff -o cds.yml
+        spanr gff chr.gff --tag CDS -o cds.yml
 
         faops masked *.fa |
             jrunlist cover stdin -o repeat.yml
 
-        runlist merge repeat.yml cds.yml -o anno.yml
+        spanr merge repeat.yml cds.yml -o anno.yml
         rm repeat.yml cds.yml
     fi
 else
@@ -359,16 +359,16 @@ if [ -d /home/wangq/data/alignment/Ensembl/Rhesus ]; then
     else
         cd /home/wangq/data/alignment/Ensembl/Rhesus
 
-        find /home/wangq/data/ensembl94/gff3/macaca_mulatta/ -name "*.gff3.gz" |
+        find /home/wangq/data/ensembl98/gff3/macaca_mulatta/ -name "*.gff3.gz" |
             grep -v "abinitio.gff3" |
             grep -v "chr.gff3" |
             xargs gzip -d -c > chr.gff
-        runlist gff --tag CDS --remove chr.gff -o cds.yml
+        spanr gff chr.gff --tag CDS -o cds.yml
 
         faops masked *.fa |
             jrunlist cover stdin -o repeat.yml
 
-        runlist merge repeat.yml cds.yml -o anno.yml
+        spanr merge repeat.yml cds.yml -o anno.yml
         rm repeat.yml cds.yml
     fi
 else
@@ -384,16 +384,16 @@ if [ -d /home/wangq/data/alignment/Ensembl/Mtru ]; then
     else
         cd /home/wangq/data/alignment/Ensembl/Mtru
 
-        find /home/wangq/data/ensembl94/gff3/medicago_truncatula/ -name "*.gff3.gz" |
+        find /home/wangq/data/ensembl98/gff3/medicago_truncatula/ -name "*.gff3.gz" |
             grep -v "abinitio.gff3" |
             grep -v "chr.gff3" |
             xargs gzip -d -c > chr.gff
-        runlist gff --tag CDS --remove chr.gff -o cds.yml
+        spanr gff chr.gff --tag CDS -o cds.yml
 
         faops masked *.fa |
             jrunlist cover stdin -o repeat.yml
 
-        runlist merge repeat.yml cds.yml -o anno.yml
+        spanr merge repeat.yml cds.yml -o anno.yml
         rm repeat.yml cds.yml
     fi
 else
@@ -409,16 +409,16 @@ if [ -d /home/wangq/data/alignment/Ensembl/Mouse ]; then
     else
         cd /home/wangq/data/alignment/Ensembl/Mouse
 
-        find /home/wangq/data/ensembl94/gff3/mus_musculus/ -name "*.gff3.gz" |
+        find /home/wangq/data/ensembl98/gff3/mus_musculus/ -name "*.gff3.gz" |
             grep -v "abinitio.gff3" |
             grep -v "chr.gff3" |
             xargs gzip -d -c > chr.gff
-        runlist gff --tag CDS --remove chr.gff -o cds.yml
+        spanr gff chr.gff --tag CDS -o cds.yml
 
         faops masked *.fa |
             jrunlist cover stdin -o repeat.yml
 
-        runlist merge repeat.yml cds.yml -o anno.yml
+        spanr merge repeat.yml cds.yml -o anno.yml
         rm repeat.yml cds.yml
     fi
 else
@@ -434,16 +434,16 @@ if [ -d /home/wangq/data/alignment/Ensembl/Macu ]; then
     else
         cd /home/wangq/data/alignment/Ensembl/Macu
 
-        find /home/wangq/data/ensembl94/gff3/musa_acuminata/ -name "*.gff3.gz" |
+        find /home/wangq/data/ensembl98/gff3/musa_acuminata/ -name "*.gff3.gz" |
             grep -v "abinitio.gff3" |
             grep -v "chr.gff3" |
             xargs gzip -d -c > chr.gff
-        runlist gff --tag CDS --remove chr.gff -o cds.yml
+        spanr gff chr.gff --tag CDS -o cds.yml
 
         faops masked *.fa |
             jrunlist cover stdin -o repeat.yml
 
-        runlist merge repeat.yml cds.yml -o anno.yml
+        spanr merge repeat.yml cds.yml -o anno.yml
         rm repeat.yml cds.yml
     fi
 else
@@ -459,16 +459,16 @@ if [ -d /home/wangq/data/alignment/Ensembl/OsatInd ]; then
     else
         cd /home/wangq/data/alignment/Ensembl/OsatInd
 
-        find /home/wangq/data/ensembl94/gff3/oryza_indica/ -name "*.gff3.gz" |
+        find /home/wangq/data/ensembl98/gff3/oryza_indica/ -name "*.gff3.gz" |
             grep -v "abinitio.gff3" |
             grep -v "chr.gff3" |
             xargs gzip -d -c > chr.gff
-        runlist gff --tag CDS --remove chr.gff -o cds.yml
+        spanr gff chr.gff --tag CDS -o cds.yml
 
         faops masked *.fa |
             jrunlist cover stdin -o repeat.yml
 
-        runlist merge repeat.yml cds.yml -o anno.yml
+        spanr merge repeat.yml cds.yml -o anno.yml
         rm repeat.yml cds.yml
     fi
 else
@@ -484,16 +484,16 @@ if [ -d /home/wangq/data/alignment/Ensembl/OsatJap ]; then
     else
         cd /home/wangq/data/alignment/Ensembl/OsatJap
 
-        find /home/wangq/data/ensembl94/gff3/oryza_sativa/ -name "*.gff3.gz" |
+        find /home/wangq/data/ensembl98/gff3/oryza_sativa/ -name "*.gff3.gz" |
             grep -v "abinitio.gff3" |
             grep -v "chr.gff3" |
             xargs gzip -d -c > chr.gff
-        runlist gff --tag CDS --remove chr.gff -o cds.yml
+        spanr gff chr.gff --tag CDS -o cds.yml
 
         faops masked *.fa |
             jrunlist cover stdin -o repeat.yml
 
-        runlist merge repeat.yml cds.yml -o anno.yml
+        spanr merge repeat.yml cds.yml -o anno.yml
         rm repeat.yml cds.yml
     fi
 else
@@ -509,16 +509,16 @@ if [ -d /home/wangq/data/alignment/Ensembl/Chimp ]; then
     else
         cd /home/wangq/data/alignment/Ensembl/Chimp
 
-        find /home/wangq/data/ensembl94/gff3/pan_troglodytes/ -name "*.gff3.gz" |
+        find /home/wangq/data/ensembl98/gff3/pan_troglodytes/ -name "*.gff3.gz" |
             grep -v "abinitio.gff3" |
             grep -v "chr.gff3" |
             xargs gzip -d -c > chr.gff
-        runlist gff --tag CDS --remove chr.gff -o cds.yml
+        spanr gff chr.gff --tag CDS -o cds.yml
 
         faops masked *.fa |
             jrunlist cover stdin -o repeat.yml
 
-        runlist merge repeat.yml cds.yml -o anno.yml
+        spanr merge repeat.yml cds.yml -o anno.yml
         rm repeat.yml cds.yml
     fi
 else
@@ -534,16 +534,16 @@ if [ -d /home/wangq/data/alignment/Ensembl/Pfal ]; then
     else
         cd /home/wangq/data/alignment/Ensembl/Pfal
 
-        find /home/wangq/data/ensembl94/gff3/plasmodium_falciparum/ -name "*.gff3.gz" |
+        find /home/wangq/data/ensembl98/gff3/plasmodium_falciparum/ -name "*.gff3.gz" |
             grep -v "abinitio.gff3" |
             grep -v "chr.gff3" |
             xargs gzip -d -c > chr.gff
-        runlist gff --tag CDS --remove chr.gff -o cds.yml
+        spanr gff chr.gff --tag CDS -o cds.yml
 
         faops masked *.fa |
             jrunlist cover stdin -o repeat.yml
 
-        runlist merge repeat.yml cds.yml -o anno.yml
+        spanr merge repeat.yml cds.yml -o anno.yml
         rm repeat.yml cds.yml
     fi
 else
@@ -559,16 +559,16 @@ if [ -d /home/wangq/data/alignment/Ensembl/Orangutan ]; then
     else
         cd /home/wangq/data/alignment/Ensembl/Orangutan
 
-        find /home/wangq/data/ensembl94/gff3/pongo_abelii/ -name "*.gff3.gz" |
+        find /home/wangq/data/ensembl98/gff3/pongo_abelii/ -name "*.gff3.gz" |
             grep -v "abinitio.gff3" |
             grep -v "chr.gff3" |
             xargs gzip -d -c > chr.gff
-        runlist gff --tag CDS --remove chr.gff -o cds.yml
+        spanr gff chr.gff --tag CDS -o cds.yml
 
         faops masked *.fa |
             jrunlist cover stdin -o repeat.yml
 
-        runlist merge repeat.yml cds.yml -o anno.yml
+        spanr merge repeat.yml cds.yml -o anno.yml
         rm repeat.yml cds.yml
     fi
 else
@@ -584,16 +584,16 @@ if [ -d /home/wangq/data/alignment/Ensembl/Rat ]; then
     else
         cd /home/wangq/data/alignment/Ensembl/Rat
 
-        find /home/wangq/data/ensembl94/gff3/rattus_norvegicus/ -name "*.gff3.gz" |
+        find /home/wangq/data/ensembl98/gff3/rattus_norvegicus/ -name "*.gff3.gz" |
             grep -v "abinitio.gff3" |
             grep -v "chr.gff3" |
             xargs gzip -d -c > chr.gff
-        runlist gff --tag CDS --remove chr.gff -o cds.yml
+        spanr gff chr.gff --tag CDS -o cds.yml
 
         faops masked *.fa |
             jrunlist cover stdin -o repeat.yml
 
-        runlist merge repeat.yml cds.yml -o anno.yml
+        spanr merge repeat.yml cds.yml -o anno.yml
         rm repeat.yml cds.yml
     fi
 else
@@ -609,16 +609,16 @@ if [ -d /home/wangq/data/alignment/Ensembl/S288c ]; then
     else
         cd /home/wangq/data/alignment/Ensembl/S288c
 
-        find /home/wangq/data/ensembl94/gff3/saccharomyces_cerevisiae/ -name "*.gff3.gz" |
+        find /home/wangq/data/ensembl98/gff3/saccharomyces_cerevisiae/ -name "*.gff3.gz" |
             grep -v "abinitio.gff3" |
             grep -v "chr.gff3" |
             xargs gzip -d -c > chr.gff
-        runlist gff --tag CDS --remove chr.gff -o cds.yml
+        spanr gff chr.gff --tag CDS -o cds.yml
 
         faops masked *.fa |
             jrunlist cover stdin -o repeat.yml
 
-        runlist merge repeat.yml cds.yml -o anno.yml
+        spanr merge repeat.yml cds.yml -o anno.yml
         rm repeat.yml cds.yml
     fi
 else
@@ -634,16 +634,16 @@ if [ -d /home/wangq/data/alignment/Ensembl/Spom ]; then
     else
         cd /home/wangq/data/alignment/Ensembl/Spom
 
-        find /home/wangq/data/ensembl94/gff3/schizosaccharomyces_pombe/ -name "*.gff3.gz" |
+        find /home/wangq/data/ensembl98/gff3/schizosaccharomyces_pombe/ -name "*.gff3.gz" |
             grep -v "abinitio.gff3" |
             grep -v "chr.gff3" |
             xargs gzip -d -c > chr.gff
-        runlist gff --tag CDS --remove chr.gff -o cds.yml
+        spanr gff chr.gff --tag CDS -o cds.yml
 
         faops masked *.fa |
             jrunlist cover stdin -o repeat.yml
 
-        runlist merge repeat.yml cds.yml -o anno.yml
+        spanr merge repeat.yml cds.yml -o anno.yml
         rm repeat.yml cds.yml
     fi
 else
@@ -659,16 +659,16 @@ if [ -d /home/wangq/data/alignment/Ensembl/Sita ]; then
     else
         cd /home/wangq/data/alignment/Ensembl/Sita
 
-        find /home/wangq/data/ensembl94/gff3/setaria_italica/ -name "*.gff3.gz" |
+        find /home/wangq/data/ensembl98/gff3/setaria_italica/ -name "*.gff3.gz" |
             grep -v "abinitio.gff3" |
             grep -v "chr.gff3" |
             xargs gzip -d -c > chr.gff
-        runlist gff --tag CDS --remove chr.gff -o cds.yml
+        spanr gff chr.gff --tag CDS -o cds.yml
 
         faops masked *.fa |
             jrunlist cover stdin -o repeat.yml
 
-        runlist merge repeat.yml cds.yml -o anno.yml
+        spanr merge repeat.yml cds.yml -o anno.yml
         rm repeat.yml cds.yml
     fi
 else
@@ -684,16 +684,16 @@ if [ -d /home/wangq/data/alignment/Ensembl/Slyc ]; then
     else
         cd /home/wangq/data/alignment/Ensembl/Slyc
 
-        find /home/wangq/data/ensembl94/gff3/solanum_lycopersicum/ -name "*.gff3.gz" |
+        find /home/wangq/data/ensembl98/gff3/solanum_lycopersicum/ -name "*.gff3.gz" |
             grep -v "abinitio.gff3" |
             grep -v "chr.gff3" |
             xargs gzip -d -c > chr.gff
-        runlist gff --tag CDS --remove chr.gff -o cds.yml
+        spanr gff chr.gff --tag CDS -o cds.yml
 
         faops masked *.fa |
             jrunlist cover stdin -o repeat.yml
 
-        runlist merge repeat.yml cds.yml -o anno.yml
+        spanr merge repeat.yml cds.yml -o anno.yml
         rm repeat.yml cds.yml
     fi
 else
@@ -709,16 +709,16 @@ if [ -d /home/wangq/data/alignment/Ensembl/Stub ]; then
     else
         cd /home/wangq/data/alignment/Ensembl/Stub
 
-        find /home/wangq/data/ensembl94/gff3/solanum_tuberosum/ -name "*.gff3.gz" |
+        find /home/wangq/data/ensembl98/gff3/solanum_tuberosum/ -name "*.gff3.gz" |
             grep -v "abinitio.gff3" |
             grep -v "chr.gff3" |
             xargs gzip -d -c > chr.gff
-        runlist gff --tag CDS --remove chr.gff -o cds.yml
+        spanr gff chr.gff --tag CDS -o cds.yml
 
         faops masked *.fa |
             jrunlist cover stdin -o repeat.yml
 
-        runlist merge repeat.yml cds.yml -o anno.yml
+        spanr merge repeat.yml cds.yml -o anno.yml
         rm repeat.yml cds.yml
     fi
 else
@@ -734,16 +734,16 @@ if [ -d /home/wangq/data/alignment/Ensembl/Sbic ]; then
     else
         cd /home/wangq/data/alignment/Ensembl/Sbic
 
-        find /home/wangq/data/ensembl94/gff3/sorghum_bicolor/ -name "*.gff3.gz" |
+        find /home/wangq/data/ensembl98/gff3/sorghum_bicolor/ -name "*.gff3.gz" |
             grep -v "abinitio.gff3" |
             grep -v "chr.gff3" |
             xargs gzip -d -c > chr.gff
-        runlist gff --tag CDS --remove chr.gff -o cds.yml
+        spanr gff chr.gff --tag CDS -o cds.yml
 
         faops masked *.fa |
             jrunlist cover stdin -o repeat.yml
 
-        runlist merge repeat.yml cds.yml -o anno.yml
+        spanr merge repeat.yml cds.yml -o anno.yml
         rm repeat.yml cds.yml
     fi
 else
@@ -759,16 +759,16 @@ if [ -d /home/wangq/data/alignment/Ensembl/Vvin ]; then
     else
         cd /home/wangq/data/alignment/Ensembl/Vvin
 
-        find /home/wangq/data/ensembl94/gff3/vitis_vinifera/ -name "*.gff3.gz" |
+        find /home/wangq/data/ensembl98/gff3/vitis_vinifera/ -name "*.gff3.gz" |
             grep -v "abinitio.gff3" |
             grep -v "chr.gff3" |
             xargs gzip -d -c > chr.gff
-        runlist gff --tag CDS --remove chr.gff -o cds.yml
+        spanr gff chr.gff --tag CDS -o cds.yml
 
         faops masked *.fa |
             jrunlist cover stdin -o repeat.yml
 
-        runlist merge repeat.yml cds.yml -o anno.yml
+        spanr merge repeat.yml cds.yml -o anno.yml
         rm repeat.yml cds.yml
     fi
 else

@@ -21,16 +21,16 @@ my $pass = 'alignDB';
         -port    => $port,
         -species => 'Arabidopsis thaliana',
         -group   => 'core',
-        -dbname  => 'arabidopsis_thaliana_core_41_94_11',
+        -dbname  => 'arabidopsis_thaliana_core_45_98_11',
     );
 
     my @aliases = (
         'atha',
         'Atha',
         'Arabidopsis_thaliana',
-        'atha_core_94',
-        'atha_94',
-        'arabidopsis_thaliana_core_41_94_11',
+        'atha_core_98',
+        'atha_98',
+        'arabidopsis_thaliana_core_45_98_11',
     );
 
     Bio::EnsEMBL::Utils::ConfigRegistry->add_alias(
@@ -48,16 +48,16 @@ my $pass = 'alignDB';
         -port    => $port,
         -species => 'Aspergillus fumigatus',
         -group   => 'core',
-        -dbname  => 'aspergillus_fumigatus_core_41_94_1',
+        -dbname  => 'aspergillus_fumigatus_core_45_98_1',
     );
 
     my @aliases = (
         'afum',
         'Afum',
         'Aspergillus_fumigatus',
-        'afum_core_94',
-        'afum_94',
-        'aspergillus_fumigatus_core_41_94_1',
+        'afum_core_98',
+        'afum_98',
+        'aspergillus_fumigatus_core_45_98_1',
     );
 
     Bio::EnsEMBL::Utils::ConfigRegistry->add_alias(
@@ -75,16 +75,16 @@ my $pass = 'alignDB';
         -port    => $port,
         -species => 'Caenorhabditis elegans',
         -group   => 'core',
-        -dbname  => 'caenorhabditis_elegans_core_94_260',
+        -dbname  => 'caenorhabditis_elegans_core_98_269',
     );
 
     my @aliases = (
         'cele',
         'Cele',
         'Caenorhabditis_elegans',
-        'cele_core_94',
-        'cele_94',
-        'caenorhabditis_elegans_core_94_260',
+        'cele_core_98',
+        'cele_98',
+        'caenorhabditis_elegans_core_98_269',
     );
 
     Bio::EnsEMBL::Utils::ConfigRegistry->add_alias(
@@ -102,16 +102,16 @@ my $pass = 'alignDB';
         -port    => $port,
         -species => 'Dictyostelium discoideum',
         -group   => 'core',
-        -dbname  => 'dictyostelium_discoideum_core_41_94_1',
+        -dbname  => 'dictyostelium_discoideum_core_45_98_1',
     );
 
     my @aliases = (
         'ddis',
         'Ddis',
         'Dictyostelium_discoideum',
-        'ddis_core_94',
-        'ddis_94',
-        'dictyostelium_discoideum_core_41_94_1',
+        'ddis_core_98',
+        'ddis_98',
+        'dictyostelium_discoideum_core_45_98_1',
     );
 
     Bio::EnsEMBL::Utils::ConfigRegistry->add_alias(
@@ -129,16 +129,16 @@ my $pass = 'alignDB';
         -port    => $port,
         -species => 'Drosophila melanogaster',
         -group   => 'core',
-        -dbname  => 'drosophila_melanogaster_core_94_6',
+        -dbname  => 'drosophila_melanogaster_core_98_7',
     );
 
     my @aliases = (
         'dmel',
         'Dmel',
         'Drosophila_melanogaster',
-        'dmel_core_94',
-        'dmel_94',
-        'drosophila_melanogaster_core_94_6',
+        'dmel_core_98',
+        'dmel_98',
+        'drosophila_melanogaster_core_98_7',
     );
 
     Bio::EnsEMBL::Utils::ConfigRegistry->add_alias(
@@ -156,16 +156,16 @@ my $pass = 'alignDB';
         -port    => $port,
         -species => 'Homo sapiens',
         -group   => 'core',
-        -dbname  => 'homo_sapiens_core_94_37',
+        -dbname  => 'homo_sapiens_core_98_38',
     );
 
     my @aliases = (
         'hsap',
         'Hsap',
         'Homo_sapiens',
-        'hsap_core_94',
-        'hsap_94',
-        'homo_sapiens_core_94_37',
+        'hsap_core_98',
+        'hsap_98',
+        'homo_sapiens_core_98_38',
         'human',
     );
 
@@ -184,16 +184,16 @@ my $pass = 'alignDB';
         -port    => $port,
         -species => 'Mus musculus',
         -group   => 'core',
-        -dbname  => 'mus_musculus_core_94_38',
+        -dbname  => 'mus_musculus_core_98_38',
     );
 
     my @aliases = (
         'mmus',
         'Mmus',
         'Mus_musculus',
-        'mmus_core_94',
-        'mmus_94',
-        'mus_musculus_core_94_38',
+        'mmus_core_98',
+        'mmus_98',
+        'mus_musculus_core_98_38',
         'mouse',
     );
 
@@ -212,16 +212,16 @@ my $pass = 'alignDB';
         -port    => $port,
         -species => 'Oryza sativa',
         -group   => 'core',
-        -dbname  => 'oryza_sativa_core_41_94_7',
+        -dbname  => 'oryza_sativa_core_45_98_7',
     );
 
     my @aliases = (
         'osat',
         'Osat',
         'Oryza_sativa',
-        'osat_core_94',
-        'osat_94',
-        'oryza_sativa_core_41_94_7',
+        'osat_core_98',
+        'osat_98',
+        'oryza_sativa_core_45_98_7',
     );
 
     Bio::EnsEMBL::Utils::ConfigRegistry->add_alias(
@@ -239,16 +239,16 @@ my $pass = 'alignDB';
         -port    => $port,
         -species => 'Plasmodium falciparum',
         -group   => 'core',
-        -dbname  => 'plasmodium_falciparum_core_41_94_1',
+        -dbname  => 'plasmodium_falciparum_core_45_98_1',
     );
 
     my @aliases = (
         'pfal',
         'Pfal',
         'Plasmodium_falciparum',
-        'pfal_core_94',
-        'pfal_94',
-        'plasmodium_falciparum_core_41_94_1',
+        'pfal_core_98',
+        'pfal_98',
+        'plasmodium_falciparum_core_45_98_1',
     );
 
     Bio::EnsEMBL::Utils::ConfigRegistry->add_alias(
@@ -266,16 +266,16 @@ my $pass = 'alignDB';
         -port    => $port,
         -species => 'Saccharomyces cerevisiae',
         -group   => 'core',
-        -dbname  => 'saccharomyces_cerevisiae_core_94_4',
+        -dbname  => 'saccharomyces_cerevisiae_core_98_4',
     );
 
     my @aliases = (
         'scer',
         'Scer',
         'Saccharomyces_cerevisiae',
-        'scer_core_94',
-        'scer_94',
-        'saccharomyces_cerevisiae_core_94_4',
+        'scer_core_98',
+        'scer_98',
+        'saccharomyces_cerevisiae_core_98_4',
         'yeast',
         'S288c',
     );
@@ -295,16 +295,16 @@ my $pass = 'alignDB';
         -port    => $port,
         -species => 'Schizosaccharomyces pombe',
         -group   => 'core',
-        -dbname  => 'schizosaccharomyces_pombe_core_41_94_2',
+        -dbname  => 'schizosaccharomyces_pombe_core_45_98_2',
     );
 
     my @aliases = (
         'spom',
         'Spom',
         'Schizosaccharomyces_pombe',
-        'spom_core_94',
-        'spom_94',
-        'schizosaccharomyces_pombe_core_41_94_2',
+        'spom_core_98',
+        'spom_98',
+        'schizosaccharomyces_pombe_core_45_98_2',
     );
 
     Bio::EnsEMBL::Utils::ConfigRegistry->add_alias(

@@ -7,7 +7,7 @@ if [ ! -d /home/wangq/data/alignment/Ensembl/Alyr ]; then
     mkdir -p /home/wangq/data/alignment/Ensembl/Alyr
     cd /home/wangq/data/alignment/Ensembl/Alyr
     
-    find /home/wangq/data/ensembl94/fasta/arabidopsis_lyrata/dna/ -name "*dna_sm.toplevel*" |
+    find /home/wangq/data/ensembl98/fasta/arabidopsis_lyrata/dna/ -name "*dna_sm.toplevel*" |
         xargs gzip -d -c > toplevel.fa
     
     faops count toplevel.fa |
@@ -23,8 +23,8 @@ if [ ! -d /home/wangq/data/alignment/Ensembl/Alyr ]; then
     rm toplevel.fa listFile
 
     cat scaffold*.fa > Un.fa
-    rm scaffold*.fa
     mv Un.fa Un.fa.skip
+    rm scaffold*.fa
 
 else
     echo "==> /home/wangq/data/alignment/Ensembl/Alyr exists"
@@ -37,7 +37,7 @@ if [ ! -d /home/wangq/data/alignment/Ensembl/Atha ]; then
     mkdir -p /home/wangq/data/alignment/Ensembl/Atha
     cd /home/wangq/data/alignment/Ensembl/Atha
     
-    find /home/wangq/data/ensembl94/fasta/arabidopsis_thaliana/dna/ -name "*dna_sm.toplevel*" |
+    find /home/wangq/data/ensembl98/fasta/arabidopsis_thaliana/dna/ -name "*dna_sm.toplevel*" |
         xargs gzip -d -c > toplevel.fa
     
     faops count toplevel.fa |
@@ -66,7 +66,7 @@ if [ ! -d /home/wangq/data/alignment/Ensembl/Afum ]; then
     mkdir -p /home/wangq/data/alignment/Ensembl/Afum
     cd /home/wangq/data/alignment/Ensembl/Afum
     
-    find /home/wangq/data/ensembl94/fasta/aspergillus_fumigatus/dna/ -name "*dna_sm.toplevel*" |
+    find /home/wangq/data/ensembl98/fasta/aspergillus_fumigatus/dna/ -name "*dna_sm.toplevel*" |
         xargs gzip -d -c > toplevel.fa
     
     faops count toplevel.fa |
@@ -94,7 +94,7 @@ if [ ! -d /home/wangq/data/alignment/Ensembl/Bdis ]; then
     mkdir -p /home/wangq/data/alignment/Ensembl/Bdis
     cd /home/wangq/data/alignment/Ensembl/Bdis
     
-    find /home/wangq/data/ensembl94/fasta/brachypodium_distachyon/dna/ -name "*dna_sm.toplevel*" |
+    find /home/wangq/data/ensembl98/fasta/brachypodium_distachyon/dna/ -name "*dna_sm.toplevel*" |
         xargs gzip -d -c > toplevel.fa
     
     faops count toplevel.fa |
@@ -109,9 +109,9 @@ if [ ! -d /home/wangq/data/alignment/Ensembl/Bdis ]; then
         faops split-name stdin .
     rm toplevel.fa listFile
 
-    cat KZ*.fa Bd1_*.fa > Un.fa
+    cat KZ*.fa Bd*.fa > Un.fa
+    rm KZ*.fa Bd*.fa
     mv Un.fa Un.fa.skip
-    rm KZ*.fa Bd1_*.fa
 
 else
     echo "==> /home/wangq/data/alignment/Ensembl/Bdis exists"
@@ -124,7 +124,7 @@ if [ ! -d /home/wangq/data/alignment/Ensembl/Bole ]; then
     mkdir -p /home/wangq/data/alignment/Ensembl/Bole
     cd /home/wangq/data/alignment/Ensembl/Bole
     
-    find /home/wangq/data/ensembl94/fasta/brassica_oleracea/dna/ -name "*dna_sm.toplevel*" |
+    find /home/wangq/data/ensembl98/fasta/brassica_oleracea/dna/ -name "*dna_sm.toplevel*" |
         xargs gzip -d -c > toplevel.fa
     
     faops count toplevel.fa |
@@ -140,8 +140,8 @@ if [ ! -d /home/wangq/data/alignment/Ensembl/Bole ]; then
     rm toplevel.fa listFile
 
     cat Scaffold*.fa > Un.fa
-    mv Un.fa Un.fa.skip
     rm Scaffold*.fa
+    mv Un.fa Un.fa.skip
 
 else
     echo "==> /home/wangq/data/alignment/Ensembl/Bole exists"
@@ -154,7 +154,7 @@ if [ ! -d /home/wangq/data/alignment/Ensembl/Brap ]; then
     mkdir -p /home/wangq/data/alignment/Ensembl/Brap
     cd /home/wangq/data/alignment/Ensembl/Brap
     
-    find /home/wangq/data/ensembl94/fasta/brassica_rapa/dna/ -name "*dna_sm.toplevel*" |
+    find /home/wangq/data/ensembl98/fasta/brassica_rapa/dna/ -name "*dna_sm.toplevel*" |
         xargs gzip -d -c > toplevel.fa
     
     faops count toplevel.fa |
@@ -170,8 +170,8 @@ if [ ! -d /home/wangq/data/alignment/Ensembl/Brap ]; then
     rm toplevel.fa listFile
 
     cat Scaffold*.fa > Un.fa
-    mv Un.fa Un.fa.skip
     rm Scaffold*.fa
+    mv Un.fa Un.fa.skip
 
 else
     echo "==> /home/wangq/data/alignment/Ensembl/Brap exists"
@@ -184,7 +184,7 @@ if [ ! -d /home/wangq/data/alignment/Ensembl/Cbri ]; then
     mkdir -p /home/wangq/data/alignment/Ensembl/Cbri
     cd /home/wangq/data/alignment/Ensembl/Cbri
     
-    find /home/wangq/data/ensembl94/fasta/caenorhabditis_briggsae/dna/ -name "*dna_sm.toplevel*" |
+    find /home/wangq/data/ensembl98/fasta/caenorhabditis_briggsae/dna/ -name "*dna_sm.toplevel*" |
         xargs gzip -d -c > toplevel.fa
     
     faops count toplevel.fa |
@@ -199,9 +199,9 @@ if [ ! -d /home/wangq/data/alignment/Ensembl/Cbri ]; then
         faops split-name stdin .
     rm toplevel.fa listFile
 
-    cat cb25*.fa > Un.fa
+    cat cb*.fa > Un.fa
+    rm cb*.fa
     mv Un.fa Un.fa.skip
-    rm cb25*.fa
 
 else
     echo "==> /home/wangq/data/alignment/Ensembl/Cbri exists"
@@ -214,7 +214,7 @@ if [ ! -d /home/wangq/data/alignment/Ensembl/Cele ]; then
     mkdir -p /home/wangq/data/alignment/Ensembl/Cele
     cd /home/wangq/data/alignment/Ensembl/Cele
     
-    find /home/wangq/data/ensembl94/fasta/caenorhabditis_elegans/dna/ -name "*dna_sm.toplevel*" |
+    find /home/wangq/data/ensembl98/fasta/caenorhabditis_elegans/dna/ -name "*dna_sm.toplevel*" |
         xargs gzip -d -c > toplevel.fa
     
     faops count toplevel.fa |
@@ -242,7 +242,7 @@ if [ ! -d /home/wangq/data/alignment/Ensembl/Ddis ]; then
     mkdir -p /home/wangq/data/alignment/Ensembl/Ddis
     cd /home/wangq/data/alignment/Ensembl/Ddis
     
-    find /home/wangq/data/ensembl94/fasta/dictyostelium_discoideum/dna/ -name "*dna_sm.toplevel*" |
+    find /home/wangq/data/ensembl98/fasta/dictyostelium_discoideum/dna/ -name "*dna_sm.toplevel*" |
         xargs gzip -d -c > toplevel.fa
     
     faops count toplevel.fa |
@@ -258,8 +258,8 @@ if [ ! -d /home/wangq/data/alignment/Ensembl/Ddis ]; then
     rm toplevel.fa listFile
 
     cat CH*.fa > Un.fa
-    mv Un.fa Un.fa.skip
     rm CH*.fa
+    mv Un.fa Un.fa.skip
 
 else
     echo "==> /home/wangq/data/alignment/Ensembl/Ddis exists"
@@ -272,7 +272,7 @@ if [ ! -d /home/wangq/data/alignment/Ensembl/Dmel ]; then
     mkdir -p /home/wangq/data/alignment/Ensembl/Dmel
     cd /home/wangq/data/alignment/Ensembl/Dmel
     
-    find /home/wangq/data/ensembl94/fasta/drosophila_melanogaster/dna/ -name "*dna_sm.toplevel*" |
+    find /home/wangq/data/ensembl98/fasta/drosophila_melanogaster/dna/ -name "*dna_sm.toplevel*" |
         xargs gzip -d -c > toplevel.fa
     
     faops count toplevel.fa |
@@ -306,7 +306,7 @@ if [ ! -d /home/wangq/data/alignment/Ensembl/Dsim ]; then
     mkdir -p /home/wangq/data/alignment/Ensembl/Dsim
     cd /home/wangq/data/alignment/Ensembl/Dsim
     
-    find /home/wangq/data/ensembl94/fasta/drosophila_simulans/dna/ -name "*dna_sm.toplevel*" |
+    find /home/wangq/data/ensembl98/fasta/drosophila_simulans/dna/ -name "*dna_sm.toplevel*" |
         xargs gzip -d -c > toplevel.fa
     
     faops count toplevel.fa |
@@ -322,10 +322,9 @@ if [ ! -d /home/wangq/data/alignment/Ensembl/Dsim ]; then
     rm toplevel.fa listFile
 
     cat JPYS*.fa > Un.fa
-    mv Un.fa Un.fa.skip
     rm JPYS*.fa
+    mv Un.fa Un.fa.skip
     mv 4.fa 4.fa.skip
-    mv Y.fa Y.fa.skip
     mv MT.fa MT.fa.skip
 
 else
@@ -339,7 +338,7 @@ if [ ! -d /home/wangq/data/alignment/Ensembl/Gmax ]; then
     mkdir -p /home/wangq/data/alignment/Ensembl/Gmax
     cd /home/wangq/data/alignment/Ensembl/Gmax
     
-    find /home/wangq/data/ensembl94/fasta/glycine_max/dna/ -name "*dna_sm.toplevel*" |
+    find /home/wangq/data/ensembl98/fasta/glycine_max/dna/ -name "*dna_sm.toplevel*" |
         xargs gzip -d -c > toplevel.fa
     
     faops count toplevel.fa |
@@ -354,9 +353,9 @@ if [ ! -d /home/wangq/data/alignment/Ensembl/Gmax ]; then
         faops split-name stdin .
     rm toplevel.fa listFile
 
-    cat scaffold*.fa > Un.fa
+    cat KZ*.fa > Un.fa
+    rm KZ*.fa
     mv Un.fa Un.fa.skip
-    rm scaffold*.fa
 
 else
     echo "==> /home/wangq/data/alignment/Ensembl/Gmax exists"
@@ -369,7 +368,7 @@ if [ ! -d /home/wangq/data/alignment/Ensembl/Gorilla ]; then
     mkdir -p /home/wangq/data/alignment/Ensembl/Gorilla
     cd /home/wangq/data/alignment/Ensembl/Gorilla
     
-    find /home/wangq/data/ensembl94/fasta/gorilla_gorilla/dna/ -name "*dna_sm.toplevel*" |
+    find /home/wangq/data/ensembl98/fasta/gorilla_gorilla/dna/ -name "*dna_sm.toplevel*" |
         xargs gzip -d -c > toplevel.fa
     
     faops count toplevel.fa |
@@ -400,7 +399,7 @@ if [ ! -d /home/wangq/data/alignment/Ensembl/Human ]; then
     mkdir -p /home/wangq/data/alignment/Ensembl/Human
     cd /home/wangq/data/alignment/Ensembl/Human
     
-    find /home/wangq/data/ensembl94/fasta/homo_sapiens/dna/ -name "*dna_sm.primary_assembly*" |
+    find /home/wangq/data/ensembl98/fasta/homo_sapiens/dna/ -name "*dna_sm.primary_assembly*" |
         xargs gzip -d -c > toplevel.fa
     
     faops count toplevel.fa |
@@ -432,7 +431,7 @@ if [ ! -d /home/wangq/data/alignment/Ensembl/Rhesus ]; then
     mkdir -p /home/wangq/data/alignment/Ensembl/Rhesus
     cd /home/wangq/data/alignment/Ensembl/Rhesus
     
-    find /home/wangq/data/ensembl94/fasta/macaca_mulatta/dna/ -name "*dna_sm.toplevel*" |
+    find /home/wangq/data/ensembl98/fasta/macaca_mulatta/dna/ -name "*dna_sm.toplevel*" |
         xargs gzip -d -c > toplevel.fa
     
     faops count toplevel.fa |
@@ -447,11 +446,10 @@ if [ ! -d /home/wangq/data/alignment/Ensembl/Rhesus ]; then
         faops split-name stdin .
     rm toplevel.fa listFile
 
-    cat JSUE*.fa KQ*.fa > Un.fa
-    rm JSUE*.fa KQ*.fa
+    cat QNVO*.fa ML*.fa > Un.fa
+    rm QNVO*.fa ML*.fa
     mv Un.fa Un.fa.skip
     mv Y.fa Y.fa.skip
-    mv MT.fa MT.fa.skip
 
 else
     echo "==> /home/wangq/data/alignment/Ensembl/Rhesus exists"
@@ -464,7 +462,7 @@ if [ ! -d /home/wangq/data/alignment/Ensembl/Mtru ]; then
     mkdir -p /home/wangq/data/alignment/Ensembl/Mtru
     cd /home/wangq/data/alignment/Ensembl/Mtru
     
-    find /home/wangq/data/ensembl94/fasta/medicago_truncatula/dna/ -name "*dna_sm.toplevel*" |
+    find /home/wangq/data/ensembl98/fasta/medicago_truncatula/dna/ -name "*dna_sm.toplevel*" |
         xargs gzip -d -c > toplevel.fa
     
     faops count toplevel.fa |
@@ -480,8 +478,8 @@ if [ ! -d /home/wangq/data/alignment/Ensembl/Mtru ]; then
     rm toplevel.fa listFile
 
     cat scaffold*.fa > Un.fa
-    mv Un.fa Un.fa.skip
     rm scaffold*.fa
+    mv Un.fa Un.fa.skip
 
 else
     echo "==> /home/wangq/data/alignment/Ensembl/Mtru exists"
@@ -494,7 +492,7 @@ if [ ! -d /home/wangq/data/alignment/Ensembl/Mouse ]; then
     mkdir -p /home/wangq/data/alignment/Ensembl/Mouse
     cd /home/wangq/data/alignment/Ensembl/Mouse
     
-    find /home/wangq/data/ensembl94/fasta/mus_musculus/dna/ -name "*dna_sm.primary_assembly*" |
+    find /home/wangq/data/ensembl98/fasta/mus_musculus/dna/ -name "*dna_sm.primary_assembly*" |
         xargs gzip -d -c > toplevel.fa
     
     faops count toplevel.fa |
@@ -527,7 +525,7 @@ if [ ! -d /home/wangq/data/alignment/Ensembl/Macu ]; then
     mkdir -p /home/wangq/data/alignment/Ensembl/Macu
     cd /home/wangq/data/alignment/Ensembl/Macu
     
-    find /home/wangq/data/ensembl94/fasta/musa_acuminata/dna/ -name "*dna_sm.toplevel*" |
+    find /home/wangq/data/ensembl98/fasta/musa_acuminata/dna/ -name "*dna_sm.toplevel*" |
         xargs gzip -d -c > toplevel.fa
     
     faops count toplevel.fa |
@@ -542,7 +540,7 @@ if [ ! -d /home/wangq/data/alignment/Ensembl/Macu ]; then
         faops split-name stdin .
     rm toplevel.fa listFile
 
-
+    mv chrUn_random.fa chrUn_random.fa.skip
 
 else
     echo "==> /home/wangq/data/alignment/Ensembl/Macu exists"
@@ -555,7 +553,7 @@ if [ ! -d /home/wangq/data/alignment/Ensembl/OsatInd ]; then
     mkdir -p /home/wangq/data/alignment/Ensembl/OsatInd
     cd /home/wangq/data/alignment/Ensembl/OsatInd
     
-    find /home/wangq/data/ensembl94/fasta/oryza_indica/dna/ -name "*dna_sm.toplevel*" |
+    find /home/wangq/data/ensembl98/fasta/oryza_indica/dna/ -name "*dna_sm.toplevel*" |
         xargs gzip -d -c > toplevel.fa
     
     faops count toplevel.fa |
@@ -587,7 +585,7 @@ if [ ! -d /home/wangq/data/alignment/Ensembl/OsatJap ]; then
     mkdir -p /home/wangq/data/alignment/Ensembl/OsatJap
     cd /home/wangq/data/alignment/Ensembl/OsatJap
     
-    find /home/wangq/data/ensembl94/fasta/oryza_sativa/dna/ -name "*dna_sm.toplevel*" |
+    find /home/wangq/data/ensembl98/fasta/oryza_sativa/dna/ -name "*dna_sm.toplevel*" |
         xargs gzip -d -c > toplevel.fa
     
     faops count toplevel.fa |
@@ -621,7 +619,7 @@ if [ ! -d /home/wangq/data/alignment/Ensembl/Chimp ]; then
     mkdir -p /home/wangq/data/alignment/Ensembl/Chimp
     cd /home/wangq/data/alignment/Ensembl/Chimp
     
-    find /home/wangq/data/ensembl94/fasta/pan_troglodytes/dna/ -name "*dna_sm.toplevel*" |
+    find /home/wangq/data/ensembl98/fasta/pan_troglodytes/dna/ -name "*dna_sm.toplevel*" |
         xargs gzip -d -c > toplevel.fa
     
     faops count toplevel.fa |
@@ -653,7 +651,7 @@ if [ ! -d /home/wangq/data/alignment/Ensembl/Pfal ]; then
     mkdir -p /home/wangq/data/alignment/Ensembl/Pfal
     cd /home/wangq/data/alignment/Ensembl/Pfal
     
-    find /home/wangq/data/ensembl94/fasta/plasmodium_falciparum/dna/ -name "*dna_sm.toplevel*" |
+    find /home/wangq/data/ensembl98/fasta/plasmodium_falciparum/dna/ -name "*dna_sm.toplevel*" |
         xargs gzip -d -c > toplevel.fa
     
     faops count toplevel.fa |
@@ -681,7 +679,7 @@ if [ ! -d /home/wangq/data/alignment/Ensembl/Orangutan ]; then
     mkdir -p /home/wangq/data/alignment/Ensembl/Orangutan
     cd /home/wangq/data/alignment/Ensembl/Orangutan
     
-    find /home/wangq/data/ensembl94/fasta/pongo_abelii/dna/ -name "*dna_sm.toplevel*" |
+    find /home/wangq/data/ensembl98/fasta/pongo_abelii/dna/ -name "*dna_sm.toplevel*" |
         xargs gzip -d -c > toplevel.fa
     
     faops count toplevel.fa |
@@ -712,7 +710,7 @@ if [ ! -d /home/wangq/data/alignment/Ensembl/Rat ]; then
     mkdir -p /home/wangq/data/alignment/Ensembl/Rat
     cd /home/wangq/data/alignment/Ensembl/Rat
     
-    find /home/wangq/data/ensembl94/fasta/rattus_norvegicus/dna/ -name "*dna_sm.toplevel*" |
+    find /home/wangq/data/ensembl98/fasta/rattus_norvegicus/dna/ -name "*dna_sm.toplevel*" |
         xargs gzip -d -c > toplevel.fa
     
     faops count toplevel.fa |
@@ -745,7 +743,7 @@ if [ ! -d /home/wangq/data/alignment/Ensembl/S288c ]; then
     mkdir -p /home/wangq/data/alignment/Ensembl/S288c
     cd /home/wangq/data/alignment/Ensembl/S288c
     
-    find /home/wangq/data/ensembl94/fasta/saccharomyces_cerevisiae/dna/ -name "*dna_sm.toplevel*" |
+    find /home/wangq/data/ensembl98/fasta/saccharomyces_cerevisiae/dna/ -name "*dna_sm.toplevel*" |
         xargs gzip -d -c > toplevel.fa
     
     faops count toplevel.fa |
@@ -773,7 +771,7 @@ if [ ! -d /home/wangq/data/alignment/Ensembl/Spom ]; then
     mkdir -p /home/wangq/data/alignment/Ensembl/Spom
     cd /home/wangq/data/alignment/Ensembl/Spom
     
-    find /home/wangq/data/ensembl94/fasta/schizosaccharomyces_pombe/dna/ -name "*dna_sm.toplevel*" |
+    find /home/wangq/data/ensembl98/fasta/schizosaccharomyces_pombe/dna/ -name "*dna_sm.toplevel*" |
         xargs gzip -d -c > toplevel.fa
     
     faops count toplevel.fa |
@@ -788,7 +786,9 @@ if [ ! -d /home/wangq/data/alignment/Ensembl/Spom ]; then
         faops split-name stdin .
     rm toplevel.fa listFile
 
-
+    mv MT.fa MT.fa.skip
+    mv MTR.fa MTR.fa.skip
+    mv AB325691.fa AB325691.fa.skip
 
 else
     echo "==> /home/wangq/data/alignment/Ensembl/Spom exists"
@@ -801,7 +801,7 @@ if [ ! -d /home/wangq/data/alignment/Ensembl/Sita ]; then
     mkdir -p /home/wangq/data/alignment/Ensembl/Sita
     cd /home/wangq/data/alignment/Ensembl/Sita
     
-    find /home/wangq/data/ensembl94/fasta/setaria_italica/dna/ -name "*dna_sm.toplevel*" |
+    find /home/wangq/data/ensembl98/fasta/setaria_italica/dna/ -name "*dna_sm.toplevel*" |
         xargs gzip -d -c > toplevel.fa
     
     faops count toplevel.fa |
@@ -817,8 +817,8 @@ if [ ! -d /home/wangq/data/alignment/Ensembl/Sita ]; then
     rm toplevel.fa listFile
 
     cat KQ*.fa > Un.fa
-    mv Un.fa Un.fa.skip
     rm KQ*.fa
+    mv Un.fa Un.fa.skip
 
 else
     echo "==> /home/wangq/data/alignment/Ensembl/Sita exists"
@@ -831,7 +831,7 @@ if [ ! -d /home/wangq/data/alignment/Ensembl/Slyc ]; then
     mkdir -p /home/wangq/data/alignment/Ensembl/Slyc
     cd /home/wangq/data/alignment/Ensembl/Slyc
     
-    find /home/wangq/data/ensembl94/fasta/solanum_lycopersicum/dna/ -name "*dna_sm.toplevel*" |
+    find /home/wangq/data/ensembl98/fasta/solanum_lycopersicum/dna/ -name "*dna_sm.toplevel*" |
         xargs gzip -d -c > toplevel.fa
     
     faops count toplevel.fa |
@@ -846,9 +846,9 @@ if [ ! -d /home/wangq/data/alignment/Ensembl/Slyc ]; then
         faops split-name stdin .
     rm toplevel.fa listFile
 
-    cat SL2*.fa > Un.fa
+    cat SL*.fa > Un.fa
+    rm SL*.fa
     mv Un.fa Un.fa.skip
-    rm SL2*.fa
 
 else
     echo "==> /home/wangq/data/alignment/Ensembl/Slyc exists"
@@ -861,7 +861,7 @@ if [ ! -d /home/wangq/data/alignment/Ensembl/Stub ]; then
     mkdir -p /home/wangq/data/alignment/Ensembl/Stub
     cd /home/wangq/data/alignment/Ensembl/Stub
     
-    find /home/wangq/data/ensembl94/fasta/solanum_tuberosum/dna/ -name "*dna_sm.toplevel*" |
+    find /home/wangq/data/ensembl98/fasta/solanum_tuberosum/dna/ -name "*dna_sm.toplevel*" |
         xargs gzip -d -c > toplevel.fa
     
     faops count toplevel.fa |
@@ -889,7 +889,7 @@ if [ ! -d /home/wangq/data/alignment/Ensembl/Sbic ]; then
     mkdir -p /home/wangq/data/alignment/Ensembl/Sbic
     cd /home/wangq/data/alignment/Ensembl/Sbic
     
-    find /home/wangq/data/ensembl94/fasta/sorghum_bicolor/dna/ -name "*dna_sm.toplevel*" |
+    find /home/wangq/data/ensembl98/fasta/sorghum_bicolor/dna/ -name "*dna_sm.toplevel*" |
         xargs gzip -d -c > toplevel.fa
     
     faops count toplevel.fa |
@@ -905,8 +905,8 @@ if [ ! -d /home/wangq/data/alignment/Ensembl/Sbic ]; then
     rm toplevel.fa listFile
 
     cat super*.fa > Un.fa
-    mv Un.fa Un.fa.skip
     rm super*.fa
+    mv Un.fa Un.fa.skip
 
 else
     echo "==> /home/wangq/data/alignment/Ensembl/Sbic exists"
@@ -919,7 +919,7 @@ if [ ! -d /home/wangq/data/alignment/Ensembl/Vvin ]; then
     mkdir -p /home/wangq/data/alignment/Ensembl/Vvin
     cd /home/wangq/data/alignment/Ensembl/Vvin
     
-    find /home/wangq/data/ensembl94/fasta/vitis_vinifera/dna/ -name "*dna_sm.toplevel*" |
+    find /home/wangq/data/ensembl98/fasta/vitis_vinifera/dna/ -name "*dna_sm.toplevel*" |
         xargs gzip -d -c > toplevel.fa
     
     faops count toplevel.fa |
