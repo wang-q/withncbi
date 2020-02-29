@@ -1,13 +1,14 @@
 # Gene-paralog-repeats
 
-[TOC levels=1-3]: # " "
+[TOC levels=1-3]: # ""
+
 - [Gene-paralog-repeats](#gene-paralog-repeats)
 - [Sources](#sources)
 - [TODO](#todo)
 - [Stats](#stats)
 - [Repeats](#repeats)
-    - [MITE](#mite)
-    - [Other repeats](#other-repeats)
+  - [MITE](#mite)
+  - [Other repeats](#other-repeats)
 - [Scripts](#scripts)
 - [Create directories](#create-directories)
 - [Symlink ensembl gff files](#symlink-ensembl-gff-files)
@@ -24,8 +25,8 @@
 * Annotations from
   [Ensembl gff3 files](https://github.com/wang-q/withncbi/blob/master/ensembl/README.md#eg-gff3)
 * Annotations from JGI PhytozomeV12.1
-    * `PhytozomeV12_unrestricted/Athaliana`
-    * `PhytozomeV12_unrestricted/Osativa`
+  * `PhytozomeV12_unrestricted/Athaliana`
+  * `PhytozomeV12_unrestricted/Osativa`
 * Paralogs from
   [self-aligning](https://github.com/wang-q/withncbi/blob/master/paralog/OPs-selfalign.md)
 
@@ -38,11 +39,11 @@
 
 * Coverages on chromosomes of all feature types.
 * Paralogs and adjacent regions intersect with all repeat families.
-    * paralog
-    * paralog_adjacent: paralog + 2000 bp
-    * paralog_gene: intersections between paralogs and gene + 2000 bp
+  * paralog
+  * paralog_adjacent: paralog + 2000 bp
+  * paralog_gene: intersections between paralogs and gene + 2000 bp
 * Genes, upstreams, downstreams intersect with paralogs and all repeat families.
-    * Up/down-streams are 2000 bp.
+  * Up/down-streams are 2000 bp.
 * Exons, introns, CDSs, five_prime_UTRs and three_prime_UTRs intersect with paralogs and all repeat
   families.
 
@@ -62,24 +63,24 @@ So I rerun RepeatMasker on every genomes and get reports from `genome.fa.out`.
 
 1. RepeatMasker
 
-    Run RepeatMasker with `-species Viridiplantae`.
+   Run RepeatMasker with `-species Viridiplantae`.
 
-    Repeat families listed in `genome.fa.tbl`. Families with proportions less than **0.0005** were
-    dropped.
+   Repeat families listed in `genome.fa.tbl`. Families with proportions less than **0.0005** were
+   dropped.
 
-    * DNA: DNA transposons
-    * LINE
-    * LTR
-    * Low_complexity
-    * RC: Rolling-circles
-    * SINE
-    * Satellite
-    * Simple_repeat
+   * DNA: DNA transposons
+   * LINE
+   * LTR
+   * Low_complexity
+   * RC: Rolling-circles
+   * SINE
+   * Satellite
+   * Simple_repeat
 
 2. Ensembl gff3 repeats
 
-    * dust: Low-complexity regions
-    * trf: Tandem repeats
+   * dust: Low-complexity regions
+   * trf: Tandem repeats
 
 # Scripts
 
@@ -87,15 +88,15 @@ Same for each species.
 
 * `proc_prepare.sh`
 
-    Genome, RepeatMasker, dustmasker and gff3.
+  Genome, RepeatMasker, dustmasker and gff3.
 
 * `proc_repeat.sh`
 
-    Repeats from RepeatMasker and gff3. Create `repeat.family.txt`.
+  Repeats from RepeatMasker and gff3. Create `repeat.family.txt`.
 
 * `proc_mite.sh`
 
-    MITE. Append to `repeat.family.txt`.
+  MITE. Append to `repeat.family.txt`.
 
 * `proc_paralog.sh`
 
@@ -288,9 +289,9 @@ find Atha -type f -not -path "*/data/*" -print | zip Atha.zip -9 -@
 
 * [Data](OPs-selfalign.md#plants-full-chromosomes)
 
-    * Alyr
-    * OsatJap
-    * Sbic
+  * Alyr
+  * OsatJap
+  * Sbic
 
 ```bash
 # Prepare
@@ -358,8 +359,8 @@ done
 
 * [Data](OPs-selfalign.md#plants-full-chromosomes)
 
-    * AthaJGI
-    * OsatJapJGI
+  * AthaJGI
+  * OsatJapJGI
 
 ```bash
 # Prepare
@@ -446,14 +447,14 @@ done
 
 * [Data](OPs-selfalign.md#plants-partitioned-chromosomes)
 
-    * Mtru
-    * Gmax
-    * Brap
-    * Vvin
-    * Slyc
-    * Stub
+  * Mtru
+  * Gmax
+  * Brap
+  * Vvin
+  * Slyc
+  * Stub
 
-    * Bole (no mite)
+  * Bole (no mite)
 
 
 ```bash
