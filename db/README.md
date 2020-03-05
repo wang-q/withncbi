@@ -4,21 +4,24 @@ Turn NCBI genome reports and assembly reports into query-able MySQL databases.
 
 Also, taxonomy information are added to all items.
 
-[TOC levels=1-3]: # " "
+Downloading date: 2020-03-05
+
+[TOC levels=1-3]: # ""
+
 - [`db/`](#db)
 - [Get data from NCBI](#get-data-from-ncbi)
-- [Old Bacteria genomes.](#old-bacteria-genomes)
 - [Databases](#databases)
-    - [Genome reports](#genome-reports)
-    - [Assembly reports](#assembly-reports)
+  - [Genome reports](#genome-reports)
+  - [Assembly reports](#assembly-reports)
+- [Old Bacteria genomes](#old-bacteria-genomes)
 
 
 # Get data from NCBI
 
-Download paths from NCBI ftp:
+Paths in the NCBI ftp site:
 
-* ftp://ftp.ncbi.nlm.nih.gov/genomes/GENOME_REPORTS
-* ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS
+* <ftp://ftp.ncbi.nlm.nih.gov/genomes/GENOME_REPORTS>
+* <ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS>
 
 Local paths listed in `config.ini`.
 
@@ -71,39 +74,6 @@ tar xvfz ~/data/NCBI/taxonomy/taxdump.tar.gz -C ~/data/NCBI/taxdmp
 
 ```
 
-# Old Bacteria genomes.
-
-On 02 December 2015 these directories were moved to
-`ftp://ftp.ncbi.nlm.nih.gov/genomes/archive/old_refseq/`.
-
-```bash
-rsync -av -P ftp.ncbi.nlm.nih.gov::genomes/archive/old_refseq/Bacteria/ \
-    --exclude="all.*" \
-    --exclude=".tmp" \
-    --exclude=".old" \
-    ~/data/NCBI/genomes/Bacteria/
-
-rsync -av -P ftp.ncbi.nlm.nih.gov::genomes/archive/old_refseq/Bacteria_DRAFT/ \
-    --exclude=".tmp" \
-    --exclude=".old" \
-    ~/data/NCBI/genomes/Bacteria_DRAFT/
-
-rsync -av -P ftp.ncbi.nlm.nih.gov::genomes/archive/old_genbank/Bacteria/ \
-    --exclude=".tmp" \
-    --exclude=".old" \
-    ~/data/NCBI/genbank/genomes/Bacteria/
-
-rsync -av -P ftp.ncbi.nlm.nih.gov::genomes/archive/old_genbank/Bacteria_DRAFT/ \
-    --exclude=".tmp" \
-    --exclude=".old" \
-    ~/data/NCBI/genbank/genomes/Bacteria_DRAFT/
-
-```
-
-Newer genomes list in genomes/refseq/bacteria are just symlinks to genomes/all/*.
-
-So local mirrors are no longer needed.
-
 # Databases
 
 We will create 4 MySQL databases:
@@ -143,10 +113,10 @@ cat ~/data/NCBI/genomes/ASSEMBLY_REPORTS/assembly_summary_refseq.txt \
     cut -d$'\t' -f 12 | # assembly_level
     sort |
     uniq -c
-#   7133 Chromosome
-#  74290 Complete Genome
-# 424229 Contig
-# 177010 Scaffold
+#   9613 Chromosome
+#  77016 Complete Genome
+# 536296 Contig
+# 193222 Scaffold
 
 ```
 
@@ -167,3 +137,36 @@ perl ar_overview.pl --db ar_genbank
 
 ```
 
+
+# Old Bacteria genomes
+
+On 02 December 2015 these directories were moved to
+`ftp://ftp.ncbi.nlm.nih.gov/genomes/archive/old_refseq/`.
+
+```bash
+rsync -av -P ftp.ncbi.nlm.nih.gov::genomes/archive/old_refseq/Bacteria/ \
+    --exclude="all.*" \
+    --exclude=".tmp" \
+    --exclude=".old" \
+    ~/data/NCBI/genomes/Bacteria/
+
+rsync -av -P ftp.ncbi.nlm.nih.gov::genomes/archive/old_refseq/Bacteria_DRAFT/ \
+    --exclude=".tmp" \
+    --exclude=".old" \
+    ~/data/NCBI/genomes/Bacteria_DRAFT/
+
+rsync -av -P ftp.ncbi.nlm.nih.gov::genomes/archive/old_genbank/Bacteria/ \
+    --exclude=".tmp" \
+    --exclude=".old" \
+    ~/data/NCBI/genbank/genomes/Bacteria/
+
+rsync -av -P ftp.ncbi.nlm.nih.gov::genomes/archive/old_genbank/Bacteria_DRAFT/ \
+    --exclude=".tmp" \
+    --exclude=".old" \
+    ~/data/NCBI/genbank/genomes/Bacteria_DRAFT/
+
+```
+
+Newer genomes list in genomes/refseq/bacteria are just symlinks to genomes/all/*.
+
+So local mirrors are no longer needed.
