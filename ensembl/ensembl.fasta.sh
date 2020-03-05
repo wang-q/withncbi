@@ -6,10 +6,10 @@ if [ ! -d /home/wangq/data/alignment/Ensembl/Alyr ]; then
 
     mkdir -p /home/wangq/data/alignment/Ensembl/Alyr
     cd /home/wangq/data/alignment/Ensembl/Alyr
-    
+
     find /home/wangq/data/ensembl98/fasta/arabidopsis_lyrata/dna/ -name "*dna_sm.toplevel*" |
         xargs gzip -d -c > toplevel.fa
-    
+
     faops count toplevel.fa |
         perl -nla -e '
             next if $F[0] eq 'total';
@@ -36,10 +36,10 @@ if [ ! -d /home/wangq/data/alignment/Ensembl/Atha ]; then
 
     mkdir -p /home/wangq/data/alignment/Ensembl/Atha
     cd /home/wangq/data/alignment/Ensembl/Atha
-    
+
     find /home/wangq/data/ensembl98/fasta/arabidopsis_thaliana/dna/ -name "*dna_sm.toplevel*" |
         xargs gzip -d -c > toplevel.fa
-    
+
     faops count toplevel.fa |
         perl -nla -e '
             next if $F[0] eq 'total';
@@ -65,10 +65,10 @@ if [ ! -d /home/wangq/data/alignment/Ensembl/Afum ]; then
 
     mkdir -p /home/wangq/data/alignment/Ensembl/Afum
     cd /home/wangq/data/alignment/Ensembl/Afum
-    
+
     find /home/wangq/data/ensembl98/fasta/aspergillus_fumigatus/dna/ -name "*dna_sm.toplevel*" |
         xargs gzip -d -c > toplevel.fa
-    
+
     faops count toplevel.fa |
         perl -nla -e '
             next if $F[0] eq 'total';
@@ -93,10 +93,10 @@ if [ ! -d /home/wangq/data/alignment/Ensembl/Bdis ]; then
 
     mkdir -p /home/wangq/data/alignment/Ensembl/Bdis
     cd /home/wangq/data/alignment/Ensembl/Bdis
-    
+
     find /home/wangq/data/ensembl98/fasta/brachypodium_distachyon/dna/ -name "*dna_sm.toplevel*" |
         xargs gzip -d -c > toplevel.fa
-    
+
     faops count toplevel.fa |
         perl -nla -e '
             next if $F[0] eq 'total';
@@ -123,10 +123,10 @@ if [ ! -d /home/wangq/data/alignment/Ensembl/Bole ]; then
 
     mkdir -p /home/wangq/data/alignment/Ensembl/Bole
     cd /home/wangq/data/alignment/Ensembl/Bole
-    
+
     find /home/wangq/data/ensembl98/fasta/brassica_oleracea/dna/ -name "*dna_sm.toplevel*" |
         xargs gzip -d -c > toplevel.fa
-    
+
     faops count toplevel.fa |
         perl -nla -e '
             next if $F[0] eq 'total';
@@ -153,10 +153,10 @@ if [ ! -d /home/wangq/data/alignment/Ensembl/Brap ]; then
 
     mkdir -p /home/wangq/data/alignment/Ensembl/Brap
     cd /home/wangq/data/alignment/Ensembl/Brap
-    
+
     find /home/wangq/data/ensembl98/fasta/brassica_rapa/dna/ -name "*dna_sm.toplevel*" |
         xargs gzip -d -c > toplevel.fa
-    
+
     faops count toplevel.fa |
         perl -nla -e '
             next if $F[0] eq 'total';
@@ -183,10 +183,10 @@ if [ ! -d /home/wangq/data/alignment/Ensembl/Cbri ]; then
 
     mkdir -p /home/wangq/data/alignment/Ensembl/Cbri
     cd /home/wangq/data/alignment/Ensembl/Cbri
-    
+
     find /home/wangq/data/ensembl98/fasta/caenorhabditis_briggsae/dna/ -name "*dna_sm.toplevel*" |
         xargs gzip -d -c > toplevel.fa
-    
+
     faops count toplevel.fa |
         perl -nla -e '
             next if $F[0] eq 'total';
@@ -213,10 +213,10 @@ if [ ! -d /home/wangq/data/alignment/Ensembl/Cele ]; then
 
     mkdir -p /home/wangq/data/alignment/Ensembl/Cele
     cd /home/wangq/data/alignment/Ensembl/Cele
-    
+
     find /home/wangq/data/ensembl98/fasta/caenorhabditis_elegans/dna/ -name "*dna_sm.toplevel*" |
         xargs gzip -d -c > toplevel.fa
-    
+
     faops count toplevel.fa |
         perl -nla -e '
             next if $F[0] eq 'total';
@@ -241,10 +241,10 @@ if [ ! -d /home/wangq/data/alignment/Ensembl/Ddis ]; then
 
     mkdir -p /home/wangq/data/alignment/Ensembl/Ddis
     cd /home/wangq/data/alignment/Ensembl/Ddis
-    
+
     find /home/wangq/data/ensembl98/fasta/dictyostelium_discoideum/dna/ -name "*dna_sm.toplevel*" |
         xargs gzip -d -c > toplevel.fa
-    
+
     faops count toplevel.fa |
         perl -nla -e '
             next if $F[0] eq 'total';
@@ -271,10 +271,10 @@ if [ ! -d /home/wangq/data/alignment/Ensembl/Dmel ]; then
 
     mkdir -p /home/wangq/data/alignment/Ensembl/Dmel
     cd /home/wangq/data/alignment/Ensembl/Dmel
-    
+
     find /home/wangq/data/ensembl98/fasta/drosophila_melanogaster/dna/ -name "*dna_sm.toplevel*" |
         xargs gzip -d -c > toplevel.fa
-    
+
     faops count toplevel.fa |
         perl -nla -e '
             next if $F[0] eq 'total';
@@ -305,10 +305,10 @@ if [ ! -d /home/wangq/data/alignment/Ensembl/Dsim ]; then
 
     mkdir -p /home/wangq/data/alignment/Ensembl/Dsim
     cd /home/wangq/data/alignment/Ensembl/Dsim
-    
+
     find /home/wangq/data/ensembl98/fasta/drosophila_simulans/dna/ -name "*dna_sm.toplevel*" |
         xargs gzip -d -c > toplevel.fa
-    
+
     faops count toplevel.fa |
         perl -nla -e '
             next if $F[0] eq 'total';
@@ -337,10 +337,10 @@ if [ ! -d /home/wangq/data/alignment/Ensembl/Gmax ]; then
 
     mkdir -p /home/wangq/data/alignment/Ensembl/Gmax
     cd /home/wangq/data/alignment/Ensembl/Gmax
-    
+
     find /home/wangq/data/ensembl98/fasta/glycine_max/dna/ -name "*dna_sm.toplevel*" |
         xargs gzip -d -c > toplevel.fa
-    
+
     faops count toplevel.fa |
         perl -nla -e '
             next if $F[0] eq 'total';
@@ -367,10 +367,10 @@ if [ ! -d /home/wangq/data/alignment/Ensembl/Gorilla ]; then
 
     mkdir -p /home/wangq/data/alignment/Ensembl/Gorilla
     cd /home/wangq/data/alignment/Ensembl/Gorilla
-    
+
     find /home/wangq/data/ensembl98/fasta/gorilla_gorilla/dna/ -name "*dna_sm.toplevel*" |
         xargs gzip -d -c > toplevel.fa
-    
+
     faops count toplevel.fa |
         perl -nla -e '
             next if $F[0] eq 'total';
@@ -398,10 +398,10 @@ if [ ! -d /home/wangq/data/alignment/Ensembl/Human ]; then
 
     mkdir -p /home/wangq/data/alignment/Ensembl/Human
     cd /home/wangq/data/alignment/Ensembl/Human
-    
+
     find /home/wangq/data/ensembl98/fasta/homo_sapiens/dna/ -name "*dna_sm.primary_assembly*" |
         xargs gzip -d -c > toplevel.fa
-    
+
     faops count toplevel.fa |
         perl -nla -e '
             next if $F[0] eq 'total';
@@ -430,10 +430,10 @@ if [ ! -d /home/wangq/data/alignment/Ensembl/Rhesus ]; then
 
     mkdir -p /home/wangq/data/alignment/Ensembl/Rhesus
     cd /home/wangq/data/alignment/Ensembl/Rhesus
-    
+
     find /home/wangq/data/ensembl98/fasta/macaca_mulatta/dna/ -name "*dna_sm.toplevel*" |
         xargs gzip -d -c > toplevel.fa
-    
+
     faops count toplevel.fa |
         perl -nla -e '
             next if $F[0] eq 'total';
@@ -461,10 +461,10 @@ if [ ! -d /home/wangq/data/alignment/Ensembl/Mtru ]; then
 
     mkdir -p /home/wangq/data/alignment/Ensembl/Mtru
     cd /home/wangq/data/alignment/Ensembl/Mtru
-    
+
     find /home/wangq/data/ensembl98/fasta/medicago_truncatula/dna/ -name "*dna_sm.toplevel*" |
         xargs gzip -d -c > toplevel.fa
-    
+
     faops count toplevel.fa |
         perl -nla -e '
             next if $F[0] eq 'total';
@@ -491,10 +491,10 @@ if [ ! -d /home/wangq/data/alignment/Ensembl/Mouse ]; then
 
     mkdir -p /home/wangq/data/alignment/Ensembl/Mouse
     cd /home/wangq/data/alignment/Ensembl/Mouse
-    
+
     find /home/wangq/data/ensembl98/fasta/mus_musculus/dna/ -name "*dna_sm.primary_assembly*" |
         xargs gzip -d -c > toplevel.fa
-    
+
     faops count toplevel.fa |
         perl -nla -e '
             next if $F[0] eq 'total';
@@ -524,10 +524,10 @@ if [ ! -d /home/wangq/data/alignment/Ensembl/Macu ]; then
 
     mkdir -p /home/wangq/data/alignment/Ensembl/Macu
     cd /home/wangq/data/alignment/Ensembl/Macu
-    
+
     find /home/wangq/data/ensembl98/fasta/musa_acuminata/dna/ -name "*dna_sm.toplevel*" |
         xargs gzip -d -c > toplevel.fa
-    
+
     faops count toplevel.fa |
         perl -nla -e '
             next if $F[0] eq 'total';
@@ -552,10 +552,10 @@ if [ ! -d /home/wangq/data/alignment/Ensembl/OsatInd ]; then
 
     mkdir -p /home/wangq/data/alignment/Ensembl/OsatInd
     cd /home/wangq/data/alignment/Ensembl/OsatInd
-    
+
     find /home/wangq/data/ensembl98/fasta/oryza_indica/dna/ -name "*dna_sm.toplevel*" |
         xargs gzip -d -c > toplevel.fa
-    
+
     faops count toplevel.fa |
         perl -nla -e '
             next if $F[0] eq 'total';
@@ -584,10 +584,10 @@ if [ ! -d /home/wangq/data/alignment/Ensembl/OsatJap ]; then
 
     mkdir -p /home/wangq/data/alignment/Ensembl/OsatJap
     cd /home/wangq/data/alignment/Ensembl/OsatJap
-    
+
     find /home/wangq/data/ensembl98/fasta/oryza_sativa/dna/ -name "*dna_sm.toplevel*" |
         xargs gzip -d -c > toplevel.fa
-    
+
     faops count toplevel.fa |
         perl -nla -e '
             next if $F[0] eq 'total';
@@ -618,10 +618,10 @@ if [ ! -d /home/wangq/data/alignment/Ensembl/Chimp ]; then
 
     mkdir -p /home/wangq/data/alignment/Ensembl/Chimp
     cd /home/wangq/data/alignment/Ensembl/Chimp
-    
+
     find /home/wangq/data/ensembl98/fasta/pan_troglodytes/dna/ -name "*dna_sm.toplevel*" |
         xargs gzip -d -c > toplevel.fa
-    
+
     faops count toplevel.fa |
         perl -nla -e '
             next if $F[0] eq 'total';
@@ -650,10 +650,10 @@ if [ ! -d /home/wangq/data/alignment/Ensembl/Pfal ]; then
 
     mkdir -p /home/wangq/data/alignment/Ensembl/Pfal
     cd /home/wangq/data/alignment/Ensembl/Pfal
-    
+
     find /home/wangq/data/ensembl98/fasta/plasmodium_falciparum/dna/ -name "*dna_sm.toplevel*" |
         xargs gzip -d -c > toplevel.fa
-    
+
     faops count toplevel.fa |
         perl -nla -e '
             next if $F[0] eq 'total';
@@ -678,10 +678,10 @@ if [ ! -d /home/wangq/data/alignment/Ensembl/Orangutan ]; then
 
     mkdir -p /home/wangq/data/alignment/Ensembl/Orangutan
     cd /home/wangq/data/alignment/Ensembl/Orangutan
-    
+
     find /home/wangq/data/ensembl98/fasta/pongo_abelii/dna/ -name "*dna_sm.toplevel*" |
         xargs gzip -d -c > toplevel.fa
-    
+
     faops count toplevel.fa |
         perl -nla -e '
             next if $F[0] eq 'total';
@@ -709,10 +709,10 @@ if [ ! -d /home/wangq/data/alignment/Ensembl/Rat ]; then
 
     mkdir -p /home/wangq/data/alignment/Ensembl/Rat
     cd /home/wangq/data/alignment/Ensembl/Rat
-    
+
     find /home/wangq/data/ensembl98/fasta/rattus_norvegicus/dna/ -name "*dna_sm.toplevel*" |
         xargs gzip -d -c > toplevel.fa
-    
+
     faops count toplevel.fa |
         perl -nla -e '
             next if $F[0] eq 'total';
@@ -742,10 +742,10 @@ if [ ! -d /home/wangq/data/alignment/Ensembl/S288c ]; then
 
     mkdir -p /home/wangq/data/alignment/Ensembl/S288c
     cd /home/wangq/data/alignment/Ensembl/S288c
-    
+
     find /home/wangq/data/ensembl98/fasta/saccharomyces_cerevisiae/dna/ -name "*dna_sm.toplevel*" |
         xargs gzip -d -c > toplevel.fa
-    
+
     faops count toplevel.fa |
         perl -nla -e '
             next if $F[0] eq 'total';
@@ -770,10 +770,10 @@ if [ ! -d /home/wangq/data/alignment/Ensembl/Spom ]; then
 
     mkdir -p /home/wangq/data/alignment/Ensembl/Spom
     cd /home/wangq/data/alignment/Ensembl/Spom
-    
+
     find /home/wangq/data/ensembl98/fasta/schizosaccharomyces_pombe/dna/ -name "*dna_sm.toplevel*" |
         xargs gzip -d -c > toplevel.fa
-    
+
     faops count toplevel.fa |
         perl -nla -e '
             next if $F[0] eq 'total';
@@ -800,10 +800,10 @@ if [ ! -d /home/wangq/data/alignment/Ensembl/Sita ]; then
 
     mkdir -p /home/wangq/data/alignment/Ensembl/Sita
     cd /home/wangq/data/alignment/Ensembl/Sita
-    
+
     find /home/wangq/data/ensembl98/fasta/setaria_italica/dna/ -name "*dna_sm.toplevel*" |
         xargs gzip -d -c > toplevel.fa
-    
+
     faops count toplevel.fa |
         perl -nla -e '
             next if $F[0] eq 'total';
@@ -830,10 +830,10 @@ if [ ! -d /home/wangq/data/alignment/Ensembl/Slyc ]; then
 
     mkdir -p /home/wangq/data/alignment/Ensembl/Slyc
     cd /home/wangq/data/alignment/Ensembl/Slyc
-    
+
     find /home/wangq/data/ensembl98/fasta/solanum_lycopersicum/dna/ -name "*dna_sm.toplevel*" |
         xargs gzip -d -c > toplevel.fa
-    
+
     faops count toplevel.fa |
         perl -nla -e '
             next if $F[0] eq 'total';
@@ -860,10 +860,10 @@ if [ ! -d /home/wangq/data/alignment/Ensembl/Stub ]; then
 
     mkdir -p /home/wangq/data/alignment/Ensembl/Stub
     cd /home/wangq/data/alignment/Ensembl/Stub
-    
+
     find /home/wangq/data/ensembl98/fasta/solanum_tuberosum/dna/ -name "*dna_sm.toplevel*" |
         xargs gzip -d -c > toplevel.fa
-    
+
     faops count toplevel.fa |
         perl -nla -e '
             next if $F[0] eq 'total';
@@ -888,10 +888,10 @@ if [ ! -d /home/wangq/data/alignment/Ensembl/Sbic ]; then
 
     mkdir -p /home/wangq/data/alignment/Ensembl/Sbic
     cd /home/wangq/data/alignment/Ensembl/Sbic
-    
+
     find /home/wangq/data/ensembl98/fasta/sorghum_bicolor/dna/ -name "*dna_sm.toplevel*" |
         xargs gzip -d -c > toplevel.fa
-    
+
     faops count toplevel.fa |
         perl -nla -e '
             next if $F[0] eq 'total';
@@ -918,10 +918,10 @@ if [ ! -d /home/wangq/data/alignment/Ensembl/Vvin ]; then
 
     mkdir -p /home/wangq/data/alignment/Ensembl/Vvin
     cd /home/wangq/data/alignment/Ensembl/Vvin
-    
+
     find /home/wangq/data/ensembl98/fasta/vitis_vinifera/dna/ -name "*dna_sm.toplevel*" |
         xargs gzip -d -c > toplevel.fa
-    
+
     faops count toplevel.fa |
         perl -nla -e '
             next if $F[0] eq 'total';

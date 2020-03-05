@@ -230,10 +230,10 @@ if [ ! -d [% dest %]/[% alias %] ]; then
 
     mkdir -p [% dest %]/[% alias %]
     cd [% dest %]/[% alias %]
-    
+
     find [% dir %]/dna/ -name "[% pattern %]" |
         xargs gzip -d -c > toplevel.fa
-    
+
     faops count toplevel.fa |
         perl -nla -e '
             next if $F[0] eq 'total';
@@ -312,7 +312,7 @@ if [ -d [% dest %]/[% alias %] ]; then
         spanr gff chr.gff --tag CDS -o cds.yml
 
         faops masked *.fa |
-            jrunlist cover stdin -o repeat.yml
+            spanr cover stdin -o repeat.yml
 
         spanr merge repeat.yml cds.yml -o anno.yml
         rm repeat.yml cds.yml

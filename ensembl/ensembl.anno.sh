@@ -16,7 +16,7 @@ if [ -d /home/wangq/data/alignment/Ensembl/Alyr ]; then
         spanr gff chr.gff --tag CDS -o cds.yml
 
         faops masked *.fa |
-            jrunlist cover stdin -o repeat.yml
+            spanr cover stdin -o repeat.yml
 
         spanr merge repeat.yml cds.yml -o anno.yml
         rm repeat.yml cds.yml
@@ -41,7 +41,7 @@ if [ -d /home/wangq/data/alignment/Ensembl/Atha ]; then
         spanr gff chr.gff --tag CDS -o cds.yml
 
         faops masked *.fa |
-            jrunlist cover stdin -o repeat.yml
+            spanr cover stdin -o repeat.yml
 
         spanr merge repeat.yml cds.yml -o anno.yml
         rm repeat.yml cds.yml
@@ -66,7 +66,7 @@ if [ -d /home/wangq/data/alignment/Ensembl/Afum ]; then
         spanr gff chr.gff --tag CDS -o cds.yml
 
         faops masked *.fa |
-            jrunlist cover stdin -o repeat.yml
+            spanr cover stdin -o repeat.yml
 
         spanr merge repeat.yml cds.yml -o anno.yml
         rm repeat.yml cds.yml
@@ -91,7 +91,7 @@ if [ -d /home/wangq/data/alignment/Ensembl/Bdis ]; then
         spanr gff chr.gff --tag CDS -o cds.yml
 
         faops masked *.fa |
-            jrunlist cover stdin -o repeat.yml
+            spanr cover stdin -o repeat.yml
 
         spanr merge repeat.yml cds.yml -o anno.yml
         rm repeat.yml cds.yml
@@ -116,7 +116,7 @@ if [ -d /home/wangq/data/alignment/Ensembl/Bole ]; then
         spanr gff chr.gff --tag CDS -o cds.yml
 
         faops masked *.fa |
-            jrunlist cover stdin -o repeat.yml
+            spanr cover stdin -o repeat.yml
 
         spanr merge repeat.yml cds.yml -o anno.yml
         rm repeat.yml cds.yml
@@ -141,7 +141,7 @@ if [ -d /home/wangq/data/alignment/Ensembl/Brap ]; then
         spanr gff chr.gff --tag CDS -o cds.yml
 
         faops masked *.fa |
-            jrunlist cover stdin -o repeat.yml
+            spanr cover stdin -o repeat.yml
 
         spanr merge repeat.yml cds.yml -o anno.yml
         rm repeat.yml cds.yml
@@ -166,7 +166,7 @@ if [ -d /home/wangq/data/alignment/Ensembl/Cbri ]; then
         spanr gff chr.gff --tag CDS -o cds.yml
 
         faops masked *.fa |
-            jrunlist cover stdin -o repeat.yml
+            spanr cover stdin -o repeat.yml
 
         spanr merge repeat.yml cds.yml -o anno.yml
         rm repeat.yml cds.yml
@@ -191,7 +191,7 @@ if [ -d /home/wangq/data/alignment/Ensembl/Cele ]; then
         spanr gff chr.gff --tag CDS -o cds.yml
 
         faops masked *.fa |
-            jrunlist cover stdin -o repeat.yml
+            spanr cover stdin -o repeat.yml
 
         spanr merge repeat.yml cds.yml -o anno.yml
         rm repeat.yml cds.yml
@@ -216,7 +216,7 @@ if [ -d /home/wangq/data/alignment/Ensembl/Ddis ]; then
         spanr gff chr.gff --tag CDS -o cds.yml
 
         faops masked *.fa |
-            jrunlist cover stdin -o repeat.yml
+            spanr cover stdin -o repeat.yml
 
         spanr merge repeat.yml cds.yml -o anno.yml
         rm repeat.yml cds.yml
@@ -241,7 +241,7 @@ if [ -d /home/wangq/data/alignment/Ensembl/Dmel ]; then
         spanr gff chr.gff --tag CDS -o cds.yml
 
         faops masked *.fa |
-            jrunlist cover stdin -o repeat.yml
+            spanr cover stdin -o repeat.yml
 
         spanr merge repeat.yml cds.yml -o anno.yml
         rm repeat.yml cds.yml
@@ -266,7 +266,7 @@ if [ -d /home/wangq/data/alignment/Ensembl/Dsim ]; then
         spanr gff chr.gff --tag CDS -o cds.yml
 
         faops masked *.fa |
-            jrunlist cover stdin -o repeat.yml
+            spanr cover stdin -o repeat.yml
 
         spanr merge repeat.yml cds.yml -o anno.yml
         rm repeat.yml cds.yml
@@ -291,7 +291,7 @@ if [ -d /home/wangq/data/alignment/Ensembl/Gmax ]; then
         spanr gff chr.gff --tag CDS -o cds.yml
 
         faops masked *.fa |
-            jrunlist cover stdin -o repeat.yml
+            spanr cover stdin -o repeat.yml
 
         spanr merge repeat.yml cds.yml -o anno.yml
         rm repeat.yml cds.yml
@@ -316,7 +316,7 @@ if [ -d /home/wangq/data/alignment/Ensembl/Gorilla ]; then
         spanr gff chr.gff --tag CDS -o cds.yml
 
         faops masked *.fa |
-            jrunlist cover stdin -o repeat.yml
+            spanr cover stdin -o repeat.yml
 
         spanr merge repeat.yml cds.yml -o anno.yml
         rm repeat.yml cds.yml
@@ -341,7 +341,7 @@ if [ -d /home/wangq/data/alignment/Ensembl/Human ]; then
         spanr gff chr.gff --tag CDS -o cds.yml
 
         faops masked *.fa |
-            jrunlist cover stdin -o repeat.yml
+            spanr cover stdin -o repeat.yml
 
         spanr merge repeat.yml cds.yml -o anno.yml
         rm repeat.yml cds.yml
@@ -366,7 +366,7 @@ if [ -d /home/wangq/data/alignment/Ensembl/Rhesus ]; then
         spanr gff chr.gff --tag CDS -o cds.yml
 
         faops masked *.fa |
-            jrunlist cover stdin -o repeat.yml
+            spanr cover stdin -o repeat.yml
 
         spanr merge repeat.yml cds.yml -o anno.yml
         rm repeat.yml cds.yml
@@ -391,7 +391,7 @@ if [ -d /home/wangq/data/alignment/Ensembl/Mtru ]; then
         spanr gff chr.gff --tag CDS -o cds.yml
 
         faops masked *.fa |
-            jrunlist cover stdin -o repeat.yml
+            spanr cover stdin -o repeat.yml
 
         spanr merge repeat.yml cds.yml -o anno.yml
         rm repeat.yml cds.yml
@@ -416,7 +416,7 @@ if [ -d /home/wangq/data/alignment/Ensembl/Mouse ]; then
         spanr gff chr.gff --tag CDS -o cds.yml
 
         faops masked *.fa |
-            jrunlist cover stdin -o repeat.yml
+            spanr cover stdin -o repeat.yml
 
         spanr merge repeat.yml cds.yml -o anno.yml
         rm repeat.yml cds.yml
@@ -441,7 +441,7 @@ if [ -d /home/wangq/data/alignment/Ensembl/Macu ]; then
         spanr gff chr.gff --tag CDS -o cds.yml
 
         faops masked *.fa |
-            jrunlist cover stdin -o repeat.yml
+            spanr cover stdin -o repeat.yml
 
         spanr merge repeat.yml cds.yml -o anno.yml
         rm repeat.yml cds.yml
@@ -466,7 +466,7 @@ if [ -d /home/wangq/data/alignment/Ensembl/OsatInd ]; then
         spanr gff chr.gff --tag CDS -o cds.yml
 
         faops masked *.fa |
-            jrunlist cover stdin -o repeat.yml
+            spanr cover stdin -o repeat.yml
 
         spanr merge repeat.yml cds.yml -o anno.yml
         rm repeat.yml cds.yml
@@ -491,7 +491,7 @@ if [ -d /home/wangq/data/alignment/Ensembl/OsatJap ]; then
         spanr gff chr.gff --tag CDS -o cds.yml
 
         faops masked *.fa |
-            jrunlist cover stdin -o repeat.yml
+            spanr cover stdin -o repeat.yml
 
         spanr merge repeat.yml cds.yml -o anno.yml
         rm repeat.yml cds.yml
@@ -516,7 +516,7 @@ if [ -d /home/wangq/data/alignment/Ensembl/Chimp ]; then
         spanr gff chr.gff --tag CDS -o cds.yml
 
         faops masked *.fa |
-            jrunlist cover stdin -o repeat.yml
+            spanr cover stdin -o repeat.yml
 
         spanr merge repeat.yml cds.yml -o anno.yml
         rm repeat.yml cds.yml
@@ -541,7 +541,7 @@ if [ -d /home/wangq/data/alignment/Ensembl/Pfal ]; then
         spanr gff chr.gff --tag CDS -o cds.yml
 
         faops masked *.fa |
-            jrunlist cover stdin -o repeat.yml
+            spanr cover stdin -o repeat.yml
 
         spanr merge repeat.yml cds.yml -o anno.yml
         rm repeat.yml cds.yml
@@ -566,7 +566,7 @@ if [ -d /home/wangq/data/alignment/Ensembl/Orangutan ]; then
         spanr gff chr.gff --tag CDS -o cds.yml
 
         faops masked *.fa |
-            jrunlist cover stdin -o repeat.yml
+            spanr cover stdin -o repeat.yml
 
         spanr merge repeat.yml cds.yml -o anno.yml
         rm repeat.yml cds.yml
@@ -591,7 +591,7 @@ if [ -d /home/wangq/data/alignment/Ensembl/Rat ]; then
         spanr gff chr.gff --tag CDS -o cds.yml
 
         faops masked *.fa |
-            jrunlist cover stdin -o repeat.yml
+            spanr cover stdin -o repeat.yml
 
         spanr merge repeat.yml cds.yml -o anno.yml
         rm repeat.yml cds.yml
@@ -616,7 +616,7 @@ if [ -d /home/wangq/data/alignment/Ensembl/S288c ]; then
         spanr gff chr.gff --tag CDS -o cds.yml
 
         faops masked *.fa |
-            jrunlist cover stdin -o repeat.yml
+            spanr cover stdin -o repeat.yml
 
         spanr merge repeat.yml cds.yml -o anno.yml
         rm repeat.yml cds.yml
@@ -641,7 +641,7 @@ if [ -d /home/wangq/data/alignment/Ensembl/Spom ]; then
         spanr gff chr.gff --tag CDS -o cds.yml
 
         faops masked *.fa |
-            jrunlist cover stdin -o repeat.yml
+            spanr cover stdin -o repeat.yml
 
         spanr merge repeat.yml cds.yml -o anno.yml
         rm repeat.yml cds.yml
@@ -666,7 +666,7 @@ if [ -d /home/wangq/data/alignment/Ensembl/Sita ]; then
         spanr gff chr.gff --tag CDS -o cds.yml
 
         faops masked *.fa |
-            jrunlist cover stdin -o repeat.yml
+            spanr cover stdin -o repeat.yml
 
         spanr merge repeat.yml cds.yml -o anno.yml
         rm repeat.yml cds.yml
@@ -691,7 +691,7 @@ if [ -d /home/wangq/data/alignment/Ensembl/Slyc ]; then
         spanr gff chr.gff --tag CDS -o cds.yml
 
         faops masked *.fa |
-            jrunlist cover stdin -o repeat.yml
+            spanr cover stdin -o repeat.yml
 
         spanr merge repeat.yml cds.yml -o anno.yml
         rm repeat.yml cds.yml
@@ -716,7 +716,7 @@ if [ -d /home/wangq/data/alignment/Ensembl/Stub ]; then
         spanr gff chr.gff --tag CDS -o cds.yml
 
         faops masked *.fa |
-            jrunlist cover stdin -o repeat.yml
+            spanr cover stdin -o repeat.yml
 
         spanr merge repeat.yml cds.yml -o anno.yml
         rm repeat.yml cds.yml
@@ -741,7 +741,7 @@ if [ -d /home/wangq/data/alignment/Ensembl/Sbic ]; then
         spanr gff chr.gff --tag CDS -o cds.yml
 
         faops masked *.fa |
-            jrunlist cover stdin -o repeat.yml
+            spanr cover stdin -o repeat.yml
 
         spanr merge repeat.yml cds.yml -o anno.yml
         rm repeat.yml cds.yml
@@ -766,7 +766,7 @@ if [ -d /home/wangq/data/alignment/Ensembl/Vvin ]; then
         spanr gff chr.gff --tag CDS -o cds.yml
 
         faops masked *.fa |
-            jrunlist cover stdin -o repeat.yml
+            spanr cover stdin -o repeat.yml
 
         spanr merge repeat.yml cds.yml -o anno.yml
         rm repeat.yml cds.yml
