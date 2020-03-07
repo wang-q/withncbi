@@ -12,64 +12,150 @@ JGI recommends using Globus, but it's blocked by GFW.
 Check identities between Ensembl and JGI assemblies. Then use gff3 files from JGI to replace ones
 from Ensembl.
 
-## Scripts
+## Organism
 
-Same for each species.
+| Organism                      | Version   | JGI abbrev.       | Taxon ID | Restricted |
+|:------------------------------|:----------|:------------------|:---------|:----------:|
+| Arabidopsis thaliana columbia | TAIR10    | Athaliana         | 3702     |            |
+| Arabidopsis lyrata            | v2.1      | Alyrata           | 81972    |            |
+| Arabidopsis halleri           | v1.1      | Ahalleri          | 81970    |     o      |
+| Capsella grandiflora          | v1.1      | Cgrandiflora      | 264402   |            |
+| Capsella rubella              | v1.0      | Crubella          | 81985    |            |
+| Boechera stricta              | v1.2      | Bstricta          | 72658    |            |
+| Brassica rapa FPsc            | v1.3      | BrapaFPsc         | 3711     |     o      |
+| Brassica oleracea capitata    | v1.0      | Boleraceacapitata | 3716     |            |
+| Eutrema salsugineum           | v1.0      | Esalsugineum      | 72664    |            |
+| Carica papaya                 | ASGPBv0.4 | Cpapaya           | 3649     |            |
+| Gossypium raimondii           | v2.1      | Graimondii        | 29730    |            |
+| Theobroma cacao               | v1.1      | Tcacao            | 3641     |            |
+| Oryza sativa                  | v7.0      | Osativa           | 39947    |            |
+| Oryza sativa Kitaake          | v3.1 (ER) | OsativaKitaake    |          |            |
+| Brachypodium stacei           | v1.1      | Bstacei           | 1071399  |            |
+| Brachypodium distachyon       | v3.1      | Bdistachyon       | 15368    |            |
 
-### `jgi_fasta.sh`
-
-Genome and gff3.
+## Stats
 
 ```bash
 
-cat <<'EOF' > ~/data/alignment/JGI/jgi_fasta.sh
-#!/bin/bash
-
-USAGE="Usage: $0 GENOME_NAME"
-
-if [ "$#" -lt 1 ]; then
-    echo "$USAGE"
-    exit 1
-fi
-
-echo "==> parameters <=="
-echo "    " $@
-
-GENOME_NAME=$1
-
-if [ ! -d ~/data/alignment/JGI/${GENOME_NAME} ]
-then
-    echo "==> ${GENOME_NAME}"
-
-    mkdir -p ~/data/alignment/JGI/${GENOME_NAME}
-    cd ~/data/alignment/JGI/${GENOME_NAME}
+for name in \
+    Athaliana Alyrata Ahalleri \
+    Cgrandiflora Crubella Bstricta \
+    BrapaFPsc Boleraceacapitata \
+    Esalsugineum Cpapaya \
+    Graimondii Tcacao \
+    Osativa  OsativaKitaake \
+    Bstacei Bdistachyon \
+    ; do
+    1>&2 echo "==> ${name}"
     
-    find ~/data/PhytozomeV12/${GENOME_NAME}/assembly -type f -name "*.fa.gz" -not -name "*masked" |
-        xargs gzip -d -c > toplevel.fa
-    
-    faops count toplevel.fa |
-        perl -aln -e '
-            next if $F[0] eq 'total';
-            print $F[0] if $F[1] > 50000;
-            print $F[0] if $F[1] > 5000  and $F[6]/$F[1] < 0.05;
-        ' |
-        uniq > listFile
-    faops some toplevel.fa listFile toplevel.filtered.fa
-    faops split-name toplevel.filtered.fa .
-    rm toplevel.fa toplevel.filtered.fa listFile
-
-    cat scaffold*.fa > Un.fa
-    rm scaffold*.fa
-    mv Un.fa Un.fa.skip
-else
-    echo "==> ~/data/alignment/JGI/${GENOME_NAME} exists"
-fi
-
-EOF
+    find ~/data/PhytozomeV12/${name}/assembly -type f -name "*.fa.gz" -not -name "*masked*" |
+        xargs cat |
+        faops n50 -C -S stdin |
+        (echo -e "Name\t${name}" && cat) |
+        datamash transpose
+done |
+    tsv-uniq |
+    mlr --itsv --omd cat
 
 ```
 
-## Athaliana 
+| Name              | N50      | S         | C     |
+|:------------------|:---------|:----------|:------|
+| Athaliana         | 23459830 | 119667750 | 7     |
+| Alyrata           | 24464547 | 206667935 | 695   |
+| Ahalleri          | 29271    | 127615339 | 11241 |
+| Cgrandiflora      | 112041   | 105346052 | 4997  |
+| Crubella          | 15060676 | 134834574 | 853   |
+| Bstricta          | 2187891  | 189344188 | 1990  |
+| BrapaFPsc         | 28488603 | 315053614 | 5713  |
+| Boleraceacapitata | 40895475 | 385006588 | 9     |
+| Esalsugineum      | 13441892 | 243117811 | 639   |
+| Cpapaya           | 1182040  | 342680090 | 5901  |
+| Graimondii        | 62175169 | 761406121 | 1033  |
+| Tcacao            | 34397752 | 346164918 | 713   |
+| Osativa           | 29958434 | 374471240 | 14    |
+| OsativaKitaake    | 30273398 | 381570803 | 33    |
+| Bstacei           | 23060899 | 234142426 | 112   |
+| Bdistachyon       | 59130575 | 271163419 | 10    |
+
+## prepseq
+
+Skip Ahalleri, Cgrandiflora.
+
+```bash
+mkdir -p ~/data/alignment/JGI
+cd ~/data/alignment/JGI
+
+for name in \
+    Athaliana Alyrata \
+    Crubella Bstricta \
+    BrapaFPsc Boleraceacapitata \
+    Esalsugineum Cpapaya \
+    Graimondii Tcacao \
+    Osativa  OsativaKitaake \
+    Bstacei Bdistachyon \
+    ; do
+    
+    if [ ! -d ~/data/alignment/JGI/${name} ]; then
+        1>&2 echo "==> ${name}"
+    
+        mkdir -p ~/data/alignment/JGI/${name}
+        pushd ~/data/alignment/JGI/${name} > /dev/null
+        
+        find ~/data/PhytozomeV12/${name}/assembly -type f -name "*.fa.gz" -not -name "*masked*" |
+            xargs gzip -dc > toplevel.fa
+        
+        faops count toplevel.fa |
+            perl -nla -e '
+                next if $F[0] eq 'total';
+                print $F[0] if $F[1] > 1000000;
+                print $F[0] if $F[1] > 100000 and $F[6]/$F[1] < 0.05;
+            ' |
+            uniq > listFile
+        faops some toplevel.fa listFile toplevel.filtered.fa
+        faops split-name toplevel.filtered.fa .
+        rm toplevel.fa toplevel.filtered.fa listFile
+
+        popd  > /dev/null
+    else
+        1>&2 echo "==> ~/data/alignment/JGI/${name} exists"
+    fi
+
+done
+
+rsync -avP ~/data/alignment/JGI/ wangq@202.119.37.251:data/alignment/JGI
+
+for name in \
+    Athaliana Alyrata \
+    Crubella Bstricta \
+    BrapaFPsc Boleraceacapitata \
+    Esalsugineum Cpapaya \
+    Graimondii Tcacao \
+    Osativa  OsativaKitaake \
+    Bstacei Bdistachyon \
+    ; do
+    
+    if [ ! -f ~/data/alignment/JGI/${name}/chr.2bit ]; then
+        1>&2 echo "==> ${name}"
+    
+#        egaz prepseq \
+#            --repeatmasker '--species Viridiplantae --gff --parallel 8' -v \
+#            ~/data/alignment/JGI/${name}
+        bsub -q mpi -n 24 -J "prep-${name}" \
+            "egaz prepseq --repeatmasker '--species Viridiplantae --gff --parallel 24' -v ~/data/alignment/JGI/${name}"
+    fi
+
+done
+
+# bjobs -w
+# bkill -J "prep-*"
+
+rsync -avP wangq@202.119.37.251:data/alignment/JGI/ ~/data/alignment/JGI
+
+```
+
+
+## Athaliana
 
 ```bash
 mkdir -p ~/data/alignment/JGI
@@ -90,5 +176,4 @@ for chr in 1 2 3 4 5 ; do
 done
 
 ```
-
 
