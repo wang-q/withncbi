@@ -86,6 +86,7 @@ Skip Ahalleri, Cgrandiflora.
 mkdir -p ~/data/alignment/JGI
 cd ~/data/alignment/JGI
 
+# sequences
 for name in \
     Athaliana Alyrata \
     Crubella Bstricta \
@@ -123,6 +124,7 @@ for name in \
 
 done
 
+# RepeatMasker
 rsync -avP ~/data/alignment/JGI/ wangq@202.119.37.251:data/alignment/JGI
 
 for name in \
@@ -151,6 +153,36 @@ done
 # bkill -J "prep-*"
 
 rsync -avP wangq@202.119.37.251:data/alignment/JGI/ ~/data/alignment/JGI
+
+# gff
+for name in \
+    Athaliana Alyrata \
+    Crubella Bstricta \
+    BrapaFPsc Boleraceacapitata \
+    Esalsugineum Cpapaya \
+    Graimondii Tcacao \
+    Osativa  OsativaKitaake \
+    Bstacei Bdistachyon \
+    ; do
+
+    1>&2 echo "==> ${name}"
+
+    pushd ~/data/alignment/JGI/${name} > /dev/null
+
+    find ~/data/PhytozomeV12/${name}/annotation/ -name "*.gff3.gz" |
+        grep "gene_exons" |
+        xargs gzip -dcf > chr.gff
+    
+    # create anno.yml
+    spanr gff --tag CDS chr.gff -o cds.yml
+    spanr gff *.rm.gff -o repeat.yml
+    spanr merge repeat.yml cds.yml -o anno.yml
+
+    rm -f repeat.yml cds.yml
+
+    popd  > /dev/null
+
+done
 
 ```
 
