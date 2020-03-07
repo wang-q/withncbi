@@ -1,22 +1,23 @@
 # Self-aligning steps for each groups
 
 
-[TOC levels=1-3]: # " "
+[TOC levels=1-3]: # ""
+
 - [Self-aligning steps for each groups](#self-aligning-steps-for-each-groups)
 - [Taxonomy for Ensembl species](#taxonomy-for-ensembl-species)
-    - [Plants](#plants)
+  - [Plants](#plants)
 - [Model organisms](#model-organisms)
-    - [Ecoli K-12 MG1655](#ecoli-k-12-mg1655)
-    - [Yeast S288c](#yeast-s288c)
-    - [Dmel](#dmel)
-    - [Cele](#cele)
-    - [Ddis](#ddis)
-    - [Human](#human)
-    - [Mouse](#mouse)
+  - [E. coli K-12 MG1655](#e-coli-k-12-mg1655)
+  - [Yeast S288c](#yeast-s288c)
+  - [Dmel](#dmel)
+  - [Cele](#cele)
+  - [Ddis](#ddis)
+  - [Human](#human)
+  - [Mouse](#mouse)
 - [All plants](#all-plants)
-    - [Arabidopsis](#arabidopsis)
-    - [Plants: full chromosomes](#plants-full-chromosomes)
-    - [Plants: partitioned chromosomes](#plants-partitioned-chromosomes)
+  - [Arabidopsis](#arabidopsis)
+  - [Plants: full chromosomes](#plants-full-chromosomes)
+  - [Plants: partitioned chromosomes](#plants-partitioned-chromosomes)
 
 
 # Taxonomy for Ensembl species
@@ -99,11 +100,11 @@ perl        ~/Scripts/withncbi/taxon/strain_info.pl \
 TODO:
 
 * Sequencing strategy and coverage: BAC, WGS, Illumina
-    * N50 of contigs and scaffolds
+  * N50 of contigs and scaffolds
 
 # Model organisms
 
-## Ecoli K-12 MG1655
+## E. coli K-12 MG1655
 
 Pretend to be an Ensembl project.
 
@@ -129,12 +130,18 @@ mv MG1655/U00096.gff .
 mv U00096.gff chr.gff
 
 # create anno.yml
-runlist gff --tag CDS --remove chr.gff -o cds.yml
-runlist gff --remove U00096.rm.gff -o repeat.yml
-runlist merge repeat.yml cds.yml -o anno.yml
+spanr gff --tag CDS chr.gff -o cds.yml
+spanr gff U00096.rm.gff -o repeat.yml
+spanr merge repeat.yml cds.yml -o anno.yml
 
 rm repeat.yml cds.yml U00096.rm.gff U00096.rm.out
 rm -fr MG1655
+
+faops masked *.fa |
+    spanr cover stdin |
+    spanr stat --all chr.sizes stdin
+#chrLength,size,coverage
+#4641652,21767,0.0047
 
 ```
 
@@ -161,6 +168,12 @@ bash ecoli/9_pack_up.sh
 ```bash
 cd ~/data/alignment/self
 
+faops masked ~/data/alignment/Ensembl/S288c/*.fa |
+    spanr cover stdin |
+    spanr stat --all ~/data/alignment/Ensembl/S288c/chr.sizes stdin
+#chrLength,size,coverage
+#12071326,729220,0.0604
+
 egaz template \
     ~/data/alignment/Ensembl/S288c/ \
     --self -o yeast \
@@ -171,6 +184,10 @@ bash yeast/1_self.sh
 bash yeast/3_proc.sh
 bash yeast/4_circos.sh
 
+cat yeast/Results/S288c/S288c.cover.csv |
+    grep "^all"
+#all,12071326,695510,0.0576
+
 ```
 
 ## Dmel
@@ -178,23 +195,25 @@ bash yeast/4_circos.sh
 ```bash
 cd ~/data/alignment/self
 
+faops masked ~/data/alignment/Ensembl/Dmel/*.fa |
+    spanr cover stdin |
+    spanr stat --all ~/data/alignment/Ensembl/Dmel/chr.sizes stdin
+#chrLength,size,coverage
+#132532477,8124132,0.0613
+
 egaz template \
     ~/data/alignment/Ensembl/Dmel/ \
     --self -o fly \
     --taxon ~/data/alignment/self/ensembl_taxon.csv \
-    --circos --parallel 8 -v
+    --circos --parallel 16 -v
 
-time bash fly/1_self.sh
-#real    20m4.269s
-#user    139m8.359s
-#sys     1m42.665s
-
-time bash fly/3_proc.sh
-#real    6m16.450s
-#user    16m32.193s
-#sys     5m26.875s
-
+bash fly/1_self.sh
+bash fly/3_proc.sh
 bash fly/4_circos.sh
+
+cat fly/Results/Dmel/Dmel.cover.csv |
+    grep "^all"
+#all,132532477,13971696,0.1054
 
 ```
 
@@ -203,15 +222,25 @@ bash fly/4_circos.sh
 ```bash
 cd ~/data/alignment/self
 
+faops masked ~/data/alignment/Ensembl/Cele/*.fa |
+    spanr cover stdin |
+    spanr stat --all ~/data/alignment/Ensembl/Cele/chr.sizes stdin
+#chrLength,size,coverage
+#100272607,22008206,0.2195
+
 egaz template \
     ~/data/alignment/Ensembl/Cele/ \
     --self -o worm \
     --taxon ~/data/alignment/self/ensembl_taxon.csv \
-    --circos --parallel 8 -v
+    --circos --parallel 16 -v
 
 bash worm/1_self.sh
 bash worm/3_proc.sh
 bash worm/4_circos.sh
+
+cat worm/Results/Cele/Cele.cover.csv |
+    grep "^all"
+#all,100272607,4702767,0.0469
 
 ```
 
@@ -224,24 +253,20 @@ rm -fr  ~/data/alignment/Ensembl/Ddis/
 
 egaz prepseq \
     --repeatmasker '--gff --parallel 8' --min 50000 -v \
-    ~/data/ensembl94/fasta/dictyostelium_discoideum/dna/Dictyostelium_discoideum.dicty_2.7.dna_sm.toplevel.fa.gz \
+    ~/data/ensembl98/fasta/dictyostelium_discoideum/dna/Dictyostelium_discoideum.dicty_2.7.dna_sm.toplevel.fa.gz \
     -o ~/data/alignment/Ensembl/Ddis/
 
 cd ~/data/alignment/Ensembl/Ddis/
 
-find ~/data/ensembl94/gff3/dictyostelium_discoideum/ -name "*.gff3.gz" |
+find ~/data/ensembl98/gff3/dictyostelium_discoideum/ -name "*.gff3.gz" |
     grep -v "abinitio.gff3" |
     grep -v "chr.gff3" |
     xargs gzip -d -c > chr.gff
-runlist gff --tag CDS --remove chr.gff -o cds.yml
-
-runlist gff --remove \
-    *.rm.gff \
-    -o repeat.yml
-
-runlist merge \
-    cds.yml repeat.yml \
-    -o anno.yml
+    
+# create anno.yml
+spanr gff --tag CDS chr.gff -o cds.yml
+spanr gff *.rm.gff -o repeat.yml
+spanr merge repeat.yml cds.yml -o anno.yml
 
 rm -f repeat.yml cds.yml
 
@@ -250,19 +275,29 @@ rm -f repeat.yml cds.yml
 ```bash
 cd ~/data/alignment/self
 
+faops masked ~/data/alignment/Ensembl/Ddis/*.fa |
+    spanr cover stdin |
+    spanr stat --all ~/data/alignment/Ensembl/Ddis/chr.sizes stdin
+#chrLength,size,coverage
+#33943072,7442427,0.2193
+
 egaz template \
     ~/data/alignment/Ensembl/Ddis/ \
     --self -o dicty \
     --taxon ~/data/alignment/self/ensembl_taxon.csv \
-    --circos --parallel 8 -v
+    --circos --parallel 16 -v
 
 time bash dicty/1_self.sh
-#real    7m32.264s
-#user    54m42.929s
-#sys     0m30.717s
+#real    5m31.495s
+#user    68m13.782s
+#sys     1m22.881s
 
 bash dicty/3_proc.sh
 bash dicty/4_circos.sh
+
+cat dicty/Results/Ddis/Ddis.cover.csv |
+    grep "^all"
+#all,33943072,4568080,0.1346
 
 ```
 
@@ -275,7 +310,7 @@ egaz template \
     ~/data/alignment/Ensembl/Human/ \
     --self -o human \
     --taxon ~/data/alignment/self/ensembl_taxon.csv \
-    --circos --parallel 8 -v
+    --circos --parallel 16 -v
 
 time bash human/1_self.sh
 #real    3158m12.839s
@@ -300,7 +335,7 @@ egaz template \
     ~/data/alignment/Ensembl/Mouse/ \
     --self -o mouse \
     --taxon ~/data/alignment/self/ensembl_taxon.csv \
-    --circos --parallel 8 -v
+    --circos --parallel 16 -v
 
 time bash mouse/1_self.sh
 #real    2948m46.920s
@@ -320,29 +355,39 @@ bash mouse/4_circos.sh
 
 ## Arabidopsis
 
-Comparison: **9.69% vs 9.34%**. Use full chromosomes if the running time is acceptable.
+Comparison: **9.58% vs 8.65%**. Use full chromosomes if the running time is acceptable.
 
 ```bash
 cd ~/data/alignment/self
+
+faops masked ~/data/alignment/Ensembl/Atha/*.fa |
+    spanr cover stdin |
+    spanr stat --all ~/data/alignment/Ensembl/Atha/chr.sizes stdin
+#chrLength,size,coverage
+#119146348,28109149,0.2359
 
 # full chromosomes
 egaz template \
     ~/data/alignment/Ensembl/Atha/ \
     --self -o arabidopsis \
     --taxon ~/data/alignment/self/ensembl_taxon.csv \
-    --circos --parallel 8 -v
+    --circos --parallel 16 -v
 
 time bash arabidopsis/1_self.sh
-#real    17m35.952s
-#user    121m5.877s
-#sys     0m23.514s
+#real    14m46.549s
+#user    166m24.298s
+#sys     1m38.050s
 
 time bash arabidopsis/3_proc.sh
-#real    8m59.367s
-#user    23m0.583s
-#sys     14m46.156s
+#real    7m22.867s
+#user    27m4.939s
+#sys     14m4.978s
 
 bash arabidopsis/4_circos.sh
+
+cat arabidopsis/Results/Atha/Atha.cover.csv |
+    grep "^all"
+#all,119146348,11413522,0.0958
 
 # partitioned chromosomes
 find ~/data/alignment/Ensembl/Atha/ -type f -name "*.fa" |
@@ -356,19 +401,23 @@ egaz template \
     ~/data/alignment/Ensembl/Atha/ \
     --self -o arabidopsis_par \
     --taxon ~/data/alignment/self/ensembl_taxon.csv \
-    --circos --partition --parallel 8 -v
+    --circos --partition --parallel 16 -v
 
 time bash arabidopsis_par/1_self.sh
-#real    16m47.681s
-#user    128m26.793s
-#sys     0m56.079s
+#real    11m27.779s
+#user    168m57.061s
+#sys     4m52.982s
 
 time bash arabidopsis_par/3_proc.sh
-#real    9m5.014s
-#user    21m50.142s
-#sys     13m54.494s
+#real    6m11.381s
+#user    23m23.330s
+#sys     12m57.028s
 
 bash arabidopsis_par/4_circos.sh
+
+cat arabidopsis_par/Results/Atha/Atha.cover.csv |
+    grep "^all"
+#all,119146348,10305900,0.0865
 
 ```
 
@@ -377,6 +426,25 @@ bash arabidopsis_par/4_circos.sh
 ```bash
 cd ~/data/alignment/self
 
+for name in Atha Alyr OsatJap Sbic; do
+    echo ${name}
+    faops masked ~/data/alignment/Ensembl/${name}/*.fa |
+        spanr cover stdin |
+        spanr stat --all ~/data/alignment/Ensembl/${name}/chr.sizes stdin
+done
+#Atha
+#chrLength,size,coverage
+#119146348,28109149,0.2359
+#Alyr
+#chrLength,size,coverage
+#194182311,82250191,0.4236
+#OsatJap
+#chrLength,size,coverage
+#373245519,190136060,0.5094
+#Sbic
+#chrLength,size,coverage
+#683645045,468096621,0.6847
+
 egaz template \
     ~/data/alignment/Ensembl/Atha/ \
     ~/data/alignment/Ensembl/Alyr/ \
@@ -384,7 +452,7 @@ egaz template \
     ~/data/alignment/Ensembl/Sbic/ \
     --self -o plants \
     --taxon ~/data/alignment/self/ensembl_taxon.csv \
-    --circos --parallel 12 -v
+    --circos --parallel 16 -v
 
 time bash plants/1_self.sh
 #real    133m47.288s
@@ -392,6 +460,7 @@ time bash plants/1_self.sh
 #sys     16m55.046s
 
 time bash plants/3_proc.sh
+
 bash plants/4_circos.sh
 
 ```
@@ -400,6 +469,55 @@ bash plants/4_circos.sh
 
 ```bash
 cd ~/data/alignment/self
+
+for name in Atha Alyr OsatJap Sbic Mtru Gmax Bole Brap Vvin Slyc Stub Macu Sita Bdis; do
+    echo ${name}
+    faops masked ~/data/alignment/Ensembl/${name}/*.fa |
+        spanr cover stdin |
+        spanr stat --all ~/data/alignment/Ensembl/${name}/chr.sizes stdin
+done
+#Atha
+#chrLength,size,coverage
+#119146348,28109149,0.2359
+#Alyr
+#chrLength,size,coverage
+#194182311,82250191,0.4236
+#OsatJap
+#chrLength,size,coverage
+#373245519,190136060,0.5094
+#Sbic
+#chrLength,size,coverage
+#683645045,468096621,0.6847
+#Mtru
+#chrLength,size,coverage
+#384466993,145484881,0.3784
+#Gmax
+#chrLength,size,coverage
+#949183385,478117318,0.5037
+#Bole
+#chrLength,size,coverage
+#446885882,133157067,0.2980
+#Brap
+#chrLength,size,coverage
+#256240462,55286796,0.2158
+#Vvin
+#chrLength,size,coverage
+#426176009,184418981,0.4327
+#Slyc
+#chrLength,size,coverage
+#807224664,493504368,0.6114
+#Stub
+#chrLength,size,coverage
+#810654046,527639148,0.6509
+#Macu
+#chrLength,size,coverage
+#331812599,88618121,0.2671
+#Sita
+#chrLength,size,coverage
+#401296418,107338036,0.2675
+#Bdis
+#chrLength,size,coverage
+#271067295,11899938,0.0439
 
 for name in Atha Alyr OsatJap Sbic Mtru Gmax Bole Brap Vvin Slyc Stub Macu Sita Bdis; do
     echo "==> ${name}"
@@ -426,7 +544,7 @@ egaz template \
     ~/data/alignment/Ensembl/Bdis/ \
     --self -o plants_par \
     --taxon ~/data/alignment/self/ensembl_taxon.csv \
-    --circos --partition --parallel 12 -v
+    --circos --partition --parallel 16 -v
 
 time bash plants_par/1_self.sh
 #real    3780m34.746s
@@ -478,3 +596,4 @@ $ du -hs ~/data/alignment/self/plants_parted/Pairwise/*
 9.3G    /home/wangq/data/alignment/self/plants_parted/Pairwise/Vvinvsselfalign
 
 ```
+
