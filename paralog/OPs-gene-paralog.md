@@ -23,10 +23,10 @@
 # Sources
 
 * Annotations from
-  [Ensembl gff3 files](https://github.com/wang-q/withncbi/blob/master/ensembl/README.md#eg-gff3)
+  [Ensembl gff3 files](https://github.com/wang-q/withncbi/blob/master/ensembl/README.md#gff3)
 * Annotations from JGI PhytozomeV12.1
-  * `PhytozomeV12_unrestricted/Athaliana`
-  * `PhytozomeV12_unrestricted/Osativa`
+  * `PhytozomeV12/Athaliana`
+  * `PhytozomeV12/Osativa`
 * Paralogs from
   [self-aligning](https://github.com/wang-q/withncbi/blob/master/paralog/OPs-selfalign.md)
 
@@ -52,7 +52,7 @@
 ## MITE
 
 * [Plant MITE database](http://pmite.hzau.edu.cn/download_mite/)
-* http://pmite.hzau.edu.cn/MITE/MITE-SEQ-V2/
+* <http://pmite.hzau.edu.cn/MITE/MITE-SEQ-V2/>
 
 ## Other repeats
 

@@ -24,7 +24,7 @@ rmout2runlist.pl - Convert RepeatMasker .out file to chromosome runlists
 
 =head1 SYNOPSIS
 
-    perl gff2runlist.pl [options]
+    perl rmout2runlist.pl [options]
       Options:
         --help          -?          brief help message
         --file          -f  STR     one gff3 file, gzipped file is supported
