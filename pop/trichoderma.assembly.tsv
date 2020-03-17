@@ -1,11 +1,11 @@
 #name	ftp_path	organism	assembly_level
-Tree_QM6a	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/167/675/GCA_000167675.2_v2.0	Trichoderma reesei	Scaffold
-Tvir_Gv29_8	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/170/995/GCA_000170995.2_TRIVI_v2.0	Trichoderma virens	Scaffold
-Tatr_IMI_206040	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/171/015/GCA_000171015.2_TRIAT_v2.0	Trichoderma atroviride	Contig
+Tree_QM6a	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/167/675/GCF_000167675.1_v2.0	Trichoderma reesei	Scaffold
+Tvir_Gv29_8	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/170/995/GCF_000170995.1_TRIVI_v2.0	Trichoderma virens	Scaffold
+Thar_CBS_226_95	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/003/025/095/GCF_003025095.1_Triha_v1.0	Trichoderma harzianum	Scaffold
+Tasp_CBS_433_97	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/003/025/105/GCF_003025105.1_Trias_v._1.0	Trichoderma asperellum	Scaffold
+Tatr_IMI_206040	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/171/015/GCF_000171015.1_TRIAT_v2.0	Trichoderma atroviride	Contig
 Tlon_SMF2	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/332/775/GCA_000332775.1_smf2.v1.0	Trichoderma longibrachiatum	Scaffold
 Tree_RUT_C_30	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/513/815/GCA_000513815.1_TrireRUTC30_1	Trichoderma reesei	Scaffold
-Tvir_FT_333	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/800/515/GCA_000800515.1_ASM80051v1	Trichoderma virens	Contig
 Tham_GD12	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/331/835/GCA_000331835.2_GD12v2	Trichoderma hamatum	Scaffold
-Thar_CBS_226_95	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/003/025/095/GCA_003025095.1_Allpaths-LG_v._01_03_12	Trichoderma harzianum	Scaffold
-Tasp_CBS_433_97	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/003/025/105/GCA_003025105.1_Trias_v._1.0	Trichoderma asperellum	Scaffold
 Tlon_ATCC_18648	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/003/025/155/GCA_003025155.1_Trilo3	Trichoderma longibrachiatum	Scaffold
+Tvir_FT_333	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/800/515/GCA_000800515.1_ASM80051v1	Trichoderma virens	Contig

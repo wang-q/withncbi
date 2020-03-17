@@ -45,7 +45,9 @@ wgs_prep.pl - prepare WGS materials
 
         trichoderma.wgs.csv
         trichoderma.wgs.rsync.sh
+        trichoderma.wgs.aria2.sh
         trichoderma.wgs.data.yml
+        trichoderma.wgs.master.yml
 
 =cut
 
