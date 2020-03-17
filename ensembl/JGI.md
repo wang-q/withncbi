@@ -78,6 +78,68 @@ done |
 | Bstacei           | 23060899 | 234142426 | 112   |
 | Bdistachyon       | 59130575 | 271163419 | 10    |
 
+## MinHash
+
+```bash
+mkdir -p ~/data/alignment/JGI/mash
+cd ~/data/alignment/JGI/mash
+
+for name in \
+    Athaliana Alyrata Ahalleri \
+    Cgrandiflora Crubella Bstricta \
+    BrapaFPsc Boleraceacapitata \
+    Esalsugineum Cpapaya \
+    Graimondii Tcacao \
+    Osativa  OsativaKitaake \
+    Bstacei Bdistachyon \
+    ; do
+    1>&2 echo "==> ${name}"
+    
+    find ~/data/PhytozomeV12/${name}/assembly -type f -name "*.fa.gz" -not -name "*masked*" |
+        xargs cat |
+        mash sketch -k 21 -s 100000 -p 4 - -I "${name}" -o ${name}
+
+done
+
+mash triangle -E -l <( find . -maxdepth 1 -type f -name "*.msh" | sort ) > dist.tsv
+
+tsv-select -f 1-3 dist.tsv |
+    (tsv-select -f 2,1,3 dist.tsv && cat) |
+    (
+        cut -f 1 dist.tsv |
+            tsv-uniq |
+            parallel -j 1 --keep-order 'echo -e "{}\t{}\t0"' &&
+        cat
+    ) \
+    > dist_full.tsv
+
+cat dist_full.tsv |
+    Rscript -e '
+        library(readr);
+        library(tidyr);
+        library(ape);
+        pair_dist <- read_tsv(file("stdin"), col_names=F); 
+        tmp <- pair_dist %>%
+            pivot_wider( names_from = X2, values_from = X3, values_fill = list(X3 = 1.0) )
+        tmp <- as.matrix(tmp)
+        mat <- tmp[,-1]
+        rownames(mat) <- tmp[,1]
+        
+        dist_mat <- as.dist(mat)
+        clusters <- hclust(dist_mat, method = "ward.D2")
+        tree <- as.phylo(clusters) 
+        write.tree(phy=tree, file="tree.nwk")
+        
+        group <- cutree(clusters, k=2) # h=0.2
+        groups <- as.data.frame(group)
+        groups$ids <- rownames(groups)
+        rownames(groups) <- NULL
+        groups <- groups[order(groups$group), ]
+        cat(format_tsv(groups))
+    '
+
+```
+
 ## prepseq
 
 Skip Ahalleri, Cgrandiflora.
@@ -185,7 +247,6 @@ for name in \
 done
 
 ```
-
 
 ## Athaliana
 
