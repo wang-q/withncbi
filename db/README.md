@@ -4,7 +4,7 @@ Turn NCBI genome reports and assembly reports into query-able MySQL databases.
 
 Also, taxonomy information are added to all items.
 
-Downloading date: 2020-03-05
+Downloading date: 2020-03-17
 
 [TOC levels=1-3]: # ""
 
@@ -113,10 +113,10 @@ cat ~/data/NCBI/genomes/ASSEMBLY_REPORTS/assembly_summary_refseq.txt \
     cut -d$'\t' -f 12 | # assembly_level
     sort |
     uniq -c
-#   9613 Chromosome
-#  77016 Complete Genome
-# 536296 Contig
-# 193222 Scaffold
+#   9699 Chromosome
+#  77232 Complete Genome
+# 550383 Contig
+# 193791 Scaffold
 
 ```
 
