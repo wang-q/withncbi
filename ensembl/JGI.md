@@ -1,5 +1,15 @@
 # JGI data
 
+[TOC levels=1-3]: # ""
+
+- [JGI data](#jgi-data)
+  - [Organism](#organism)
+  - [Stats](#stats)
+  - [MinHash](#minhash)
+  - [prepseq](#prepseq)
+  - [Athaliana](#athaliana)
+
+
 Login [phytozome portal](https://phytozome.jgi.doe.gov/pz/portal.html).
 
 Select needed species in *PhytozomeV12*
