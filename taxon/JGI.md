@@ -260,13 +260,6 @@ done
 
 ## Athaliana
 
-```bash
-mkdir -p ~/data/alignment/JGI
-cd ~/data/alignment/JGI
-
-bash ~/data/alignment/JGI/jgi_fasta.sh Athaliana
-```
-
 Check assemblies with Ensembl version. Set `-l 100000` to avoid reverse matches.
 
 **Assemblies matched.**
