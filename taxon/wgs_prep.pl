@@ -109,7 +109,7 @@ my $master = {};
 #----------------------------#
 # csv and rsync
 #----------------------------#
-$stopwatch->block_message("Generate .csv for info and .url.txt for downloading ");
+$stopwatch->block_message("Generate .csv for info and .rsync.sh for downloading ");
 {
     mkdir $outdir unless -d $outdir;
 
@@ -172,12 +172,18 @@ $stopwatch->block_message("Generate .csv for info and .url.txt for downloading "
     print "\n", "=" x 20, "\n";
     print ".csv generated.\n";
 
-    if ( !$csvonly ) {
-        my $file_rsync = Path::Tiny::path( $outdir, "$basename.rsync.sh" );
-        $file_rsync->remove if $file_rsync->is_file;
+}
 
-        $file_rsync->append(
-            <<'EOF'
+#----------------------------#
+# .rsync.sh and .aria2.sh
+#----------------------------#
+if ( !defined $csvonly ) {
+    # rsync
+    my $file_rsync = Path::Tiny::path( $outdir, "$basename.rsync.sh" );
+    $file_rsync->remove if $file_rsync->is_file;
+
+    $file_rsync->append(
+        <<'EOF'
 #!/bin/bash
 
 BASE_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
@@ -190,42 +196,78 @@ signaled () {
 trap signaled TERM QUIT INT
 
 EOF
-        );
+    );
 
-        for my $key (@orig_orders) {
-            my %info = %{ $master->{$key} };
+    for my $key (@orig_orders) {
+        my %info = %{ $master->{$key} };
 
-            my ($ftp) = grep {/\.fsa_nt\.gz/} @{ $info{download} };
+        my ($url) = grep {/\.fsa_nt\.gz/} @{ $info{download} };
+        $url =~ s/\/[\w.]+fsa_nt\.gz$//;
+        $url =~ /wgs_aux\/(.+)$/;
+        my $rsync = $1;
+        $rsync = "ftp.ncbi.nlm.nih.gov::sra/wgs_aux/" . $rsync;
 
-            # ftp   - ftp://ftp.ncbi.nlm.nih.gov/sra/wgs_aux/JY/NM/JYNM02/JYNM02.1.fsa_nt.gz
-            # rsync - ftp.ncbi.nlm.nih.gov::sra/wgs_aux/JY/NM/JYNM02/JYNM02.1.fsa_nt.gz
+        # ftp   - ftp://ftp.ncbi.nlm.nih.gov/sra/wgs_aux/JY/NM/JYNM02/JYNM02.1.fsa_nt.gz
+        # rsync - ftp.ncbi.nlm.nih.gov::sra/wgs_aux/JY/NM/JYNM02/JYNM02.1.fsa_nt.gz
+        # https://sra-download.ncbi.nlm.nih.gov/traces/wgs03/wgs_aux/BC/GH/BCGH01/BCGH01.1.fsa_nt.gz
 
-            my $rsync = $ftp;
-            $rsync =~ s/ftp:\/\/ftp.ncbi.nlm.nih.gov\//ftp.ncbi.nlm.nih.gov::/;
-            if ( $rsync eq $ftp ) {
-                die "Check the ftp url: [$key] $ftp\n";
-            }
-
-            $rsync =~ s/\/[\w.]+fsa_nt\.gz$//;
-
-            $file_rsync->append(
-                <<"EOF"
+        $file_rsync->append(
+            <<"EOF"
 echo >&2
 echo >&2 "==> $key"
 mkdir -p $key
 rsync -avP $rsync/ $key/
 
 EOF
-            );
-        }
+        );
     }
+
+    # aria2 for missing files
+    my $file_aria2 = Path::Tiny::path( $outdir, "$basename.aria2.sh" );
+    $file_aria2->remove if $file_rsync->is_file;
+
+    $file_aria2->append(
+        <<'EOF'
+#!/bin/bash
+
+BASE_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+cd ${BASE_DIR}
+
+signaled () {
+    echo Interrupted
+    exit 1
+}
+trap signaled TERM QUIT INT
+
+EOF
+    );
+
+    for my $key (@orig_orders) {
+        my %info = %{ $master->{$key} };
+
+        my ($url) = grep {/\.fsa_nt\.gz/} @{ $info{download} };
+        $url =~ /\/([\w.]+fsa_nt\.gz)$/;
+        my $filename = $1;
+
+        $file_aria2->append(
+            <<"EOF"
+echo >&2
+echo >&2 "==> $key"
+if [ ! -e $key/$filename ]; then
+    aria2c -UWget -x 6 -s 3 -c $url -d $key
+fi
+
+EOF
+        );
+    }
+
 }
 
 #----------------------------#
 # @data yaml
 #----------------------------#
-if ( !$csvonly ) {
-    $stopwatch->block_message("Generate .data.yml");
+if ( !defined $csvonly ) {
+    $stopwatch->block_message("Generate .yml");
 
     my $file_data = Path::Tiny::path( $outdir, "$basename.data.yml" )->stringify;
 
@@ -249,6 +291,9 @@ EOF
         or die Template->error;
 
     print ".data.yml generated.\n";
+
+    YAML::Syck::DumpFile( Path::Tiny::path( $outdir, "$basename.master.yml" )->stringify, $master );
+    print ".master.yml generated.\n";
 }
 
 $stopwatch->end_message;
@@ -341,7 +386,7 @@ sub wgs_worker {
     {    # downloads
         my @links = $mech->find_all_links(
             text_regex => qr{$term},
-            url_regex  => qr{ftp},
+            url_regex  => qr{\.gz$},
         );
         $info->{download} = [ map { $_->url } @links ];
     }
