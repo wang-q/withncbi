@@ -1,0 +1,21 @@
+#name	ftp_path	organism	assembly_level
+Prub_Wisconsin_54_1255	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/226/395/GCF_000226395.1_PenChr_Nov2007	Penicillium rubens	Scaffold
+Pdig_Pd1	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/315/645/GCF_000315645.1_PdigPd1_v1	Penicillium digitatum	Scaffold
+Pdig_PHI26	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/315/665/GCA_000315665.1_PdigPHI26_v1	Penicillium digitatum	Scaffold
+Poxa_114_2	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/346/795/GCA_000346795.1_pde_v1.0	Penicillium oxalicum	Scaffold
+Ppax_ATCC_26601	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/347/475/GCA_000347475.1_Ppaxilli_v.1.0	Penicillium paxilli	Scaffold
+Poxa_JU_A10_T	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/383/025/GCA_000383025.1_pdt_v1.0	Penicillium oxalicum	Scaffold
+Proq_FM164	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/513/255/GCA_000513255.1_PROQFM164_20130607	Penicillium roqueforti	Scaffold
+Pcam_FM_013	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/513/335/GCA_000513335.1_PCAMFM013_20131106	Penicillium camemberti	Scaffold
+Pchr_NCPC10086	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/523/475/GCA_000523475.1_Penc1.0	Penicillium chrysogenum	Scaffold
+Pfus_FM041	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/576/735/GCA_000576735.1_PFUSFM041_20131217	Penicillium fuscoglaucum	Scaffold
+Pnal_FM193	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/577/395/GCA_000577395.2_PNALFM193_20131217	Penicillium nalgiovense	Scaffold
+Pcar_LCP05634	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/577/495/GCA_000577495.1_PCARLCP05634_20131217	Penicillium carneum	Scaffold
+Ppan_FM227	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/577/715/GCA_000577715.1_PPANFM227_20131217	Penicillium paneum	Scaffold
+Pbif_FM169	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/577/785/GCA_000577785.1_PBIFFM169_20131217	Penicillium biforme	Scaffold
+Pchr_KF_25	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/816/005/GCA_000816005.1_KF-25_v1	Penicillium chrysogenum	Scaffold
+Pdig_PDC_102	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/001/307/865/GCA_001307865.1_ASM130786v1	Penicillium digitatum	Scaffold
+Pexp_YT02	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/072/455/GCA_002072455.1_Pexp1.0	Penicillium expansum	Scaffold
+Pdig_Pd01_ZJU	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/485/865/GCA_000485865.1_Pendig1.0	Penicillium digitatum	Contig
+Pexp_NRRL_62431	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/584/915/GCA_000584915.1_PenAur1.0	Penicillium expansum	Contig
+Pexp_T01	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/001/008/385/GCA_001008385.1_ASM100838v1	Penicillium expansum	Contig

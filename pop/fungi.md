@@ -207,14 +207,16 @@ bsub  -w "ended(candida-3_proc)" \
 
 # *Penicillium*
 
-* http://www.ncbi.nlm.nih.gov/Traces/wgs/?page=1&term=penicillium&order=organism
-* http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?mode=Info&id=5073
-* http://www.ncbi.nlm.nih.gov/assembly?term=txid5073[Organism:exp]
-* http://www.ncbi.nlm.nih.gov/genome/?term=txid5073[Organism:exp]
+* https://www.ncbi.nlm.nih.gov/Traces/wgs/?view=wgs&search=penicillium
+* https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?mode=Info&id=5073
+* https://www.ncbi.nlm.nih.gov/assembly?term=txid5073[Organism:exp]
+* https://www.ncbi.nlm.nih.gov/genome/?term=txid5073[Organism:exp]
+
+Prub_Wisconsin_54_1255 as target (9.8x sanger).
 
 ## penicillium: wgs
 
-Same as [here](README.md#poptrichodermawgstsv)
+Same as [here](README.md#wgstsv)
 
 ```bash
 export RANK_LEVEL=genus
@@ -239,10 +241,10 @@ cd ~/data/alignment/penicillium
 perl ~/Scripts/withncbi/taxon/wgs_prep.pl \
     -f ~/Scripts/withncbi/pop/penicillium.wgs.tsv \
     --fix \
-    -o WGS \
-    -a
+    -o WGS
 
-aria2c -UWget -x 6 -s 3 -c -i WGS/penicillium.wgs.url.txt
+bash WGS/penicillium.wgs.rsync.sh
+bash WGS/penicillium.wgs.aria2.sh
 
 find WGS -name "*.gz" | xargs gzip -t
 
@@ -250,7 +252,7 @@ find WGS -name "*.gz" | xargs gzip -t
 
 ## penicillium: assembly
 
-Same as [here](README.md#assembly_preppl)
+Same as [here](README.md#assemblytsv)
 
 ```bash
 cd ~/data/alignment/${RANK_NAME}
@@ -266,11 +268,29 @@ unset RANK_NAME
 ```bash
 cd ~/data/alignment/penicillium
 
+perl ~/Scripts/withncbi/taxon/assembly_prep.pl \
+    -f ~/Scripts/withncbi/pop/penicillium.assembly.tsv \
+    -o ASSEMBLY
+
 bash ASSEMBLY/penicillium.assembly.rsync.sh
 
 bash ASSEMBLY/penicillium.assembly.collect.sh
 
 ```
 
-There're no good target. Pchr_P2niaD18 is the only one on chromosome level, but is not de novo
-assembled and hasn't annotations.
+## penicillium: phylo
+
+Same as [here](README.md#mash)
+
+```bash
+mkdir -p ~/data/alignment/penicillium/mash
+cd ~/data/alignment/penicillium/mash
+
+... # paste codes from README.md
+
+
+nw_display -w 600 -b 'visibility:hidden' -s tree.nwk |
+    rsvg-convert -o ~/Scripts/withncbi/image/Penicillium.png
+
+```
+
