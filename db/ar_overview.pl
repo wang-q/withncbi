@@ -141,7 +141,7 @@ my $group = sub {
     {    # write contents
         my $query_name = 'superkingdom';
         my $sql_query  = q{
-            SELECT 
+            SELECT
                 superkingdom group_name,
                 COUNT(DISTINCT genus_id) genus_member,
                 COUNT(DISTINCT species_id) species_member,
@@ -161,7 +161,7 @@ my $group = sub {
     {    # write contents
         my $query_name = 'Euk subgroup';
         my $sql_query  = q{
-            SELECT 
+            SELECT
                 (CONCAT(`group`, ', ', subgroup)) group_name,
                 COUNT(DISTINCT genus_id) genus_member,
                 COUNT(DISTINCT species_id) species_member,
@@ -181,7 +181,7 @@ my $group = sub {
     {    # write contents
         my $query_name = 'Prok group';
         my $sql_query  = q{
-            SELECT 
+            SELECT
                 `group` group_name,
                 COUNT(DISTINCT genus_id) genus_member,
                 COUNT(DISTINCT species_id) species_member,
@@ -218,7 +218,7 @@ my $euk_group = sub {
 
     {    # write contents
         my $sql_query = q{
-            SELECT 
+            SELECT
                 t0.group_name,
                 t0.genus_member,
                 t0.species_member,
@@ -228,7 +228,7 @@ my $euk_group = sub {
                 t3.strain_member,
                 t4.strain_member
             FROM
-                (SELECT 
+                (SELECT
                     (CONCAT(`group`, ', ', subgroup)) group_name,
                         COUNT(DISTINCT genus_id) genus_member,
                         COUNT(DISTINCT species_id) species_member,
@@ -237,7 +237,7 @@ my $euk_group = sub {
                 WHERE superkingdom = 'Eukaryota'
                 GROUP BY group_name) t0
                     LEFT JOIN
-                (SELECT 
+                (SELECT
                     (CONCAT(`group`, ', ', subgroup)) group_name,
                         COUNT(DISTINCT taxonomy_id) strain_member
                 FROM ar
@@ -245,7 +245,7 @@ my $euk_group = sub {
                         AND assembly_level LIKE '%Genome%'
                 GROUP BY group_name) t1 ON t0.group_name = t1.group_name
                     LEFT JOIN
-                (SELECT 
+                (SELECT
                     (CONCAT(`group`, ', ', subgroup)) group_name,
                         COUNT(DISTINCT taxonomy_id) strain_member
                 FROM ar
@@ -253,7 +253,7 @@ my $euk_group = sub {
                         AND assembly_level LIKE '%Chromosome%'
                 GROUP BY group_name) t2 ON t0.group_name = t2.group_name
                     LEFT JOIN
-                (SELECT 
+                (SELECT
                     (CONCAT(`group`, ', ', subgroup)) group_name,
                         COUNT(DISTINCT taxonomy_id) strain_member
                 FROM ar
@@ -261,7 +261,7 @@ my $euk_group = sub {
                         AND assembly_level = 'Scaffold'
                 GROUP BY group_name) t3 ON t0.group_name = t3.group_name
                     LEFT JOIN
-                (SELECT 
+                (SELECT
                     (CONCAT(`group`, ', ', subgroup)) group_name,
                         COUNT(DISTINCT taxonomy_id) strain_member
                 FROM ar
@@ -285,15 +285,16 @@ my $subgroup_query = sub {
     $to_xlsx->column(0);
 
     {    # write header
-        my @names = qw{ genus species_member strain_member
+        my @names = qw{ genus genus_id species_member strain_member
             genome chromosome scaffold contig };
         $sheet = $to_xlsx->write_header( $sheet_name, { header => \@names } );
     }
 
     {    # write contents
         my $sql_query = qq{
-            SELECT 
+            SELECT
                 t0.genus,
+                t0.genus_id,
                 t0.species_member,
                 t0.strain_member,
                 t1.strain_member,
@@ -301,15 +302,16 @@ my $subgroup_query = sub {
                 t3.strain_member,
                 t4.strain_member
             FROM
-                (SELECT 
+                (SELECT
                     genus,
+                    genus_id,
                     COUNT(DISTINCT species_id) species_member,
                     COUNT(DISTINCT taxonomy_id) strain_member
                 FROM ar
                 WHERE subgroup = '$subgroup'
                 GROUP BY genus) t0
                     LEFT JOIN
-                (SELECT 
+                (SELECT
                     genus,
                     COUNT(DISTINCT taxonomy_id) strain_member
                 FROM ar
@@ -317,7 +319,7 @@ my $subgroup_query = sub {
                         AND assembly_level LIKE '%Genome%'
                 GROUP BY genus) t1 ON t0.genus = t1.genus
                     LEFT JOIN
-                (SELECT 
+                (SELECT
                     genus,
                     COUNT(DISTINCT taxonomy_id) strain_member
                 FROM ar
@@ -325,7 +327,7 @@ my $subgroup_query = sub {
                         AND assembly_level LIKE '%Chromosome%'
                 GROUP BY genus) t2 ON t0.genus = t2.genus
                     LEFT JOIN
-                (SELECT 
+                (SELECT
                     genus,
                     COUNT(DISTINCT taxonomy_id) strain_member
                 FROM ar
@@ -333,7 +335,7 @@ my $subgroup_query = sub {
                         AND assembly_level = 'Scaffold'
                 GROUP BY genus) t3 ON t0.genus = t3.genus
                     LEFT JOIN
-                (SELECT 
+                (SELECT
                     genus,
                     COUNT(DISTINCT taxonomy_id) strain_member
                 FROM ar
@@ -365,7 +367,7 @@ my $genus_query = sub {
 
     {    # write contents
         my $sql_query = qq{
-            SELECT 
+            SELECT
                 t0.species,
                 t0.strain_member,
                 t1.strain_member,
@@ -373,14 +375,14 @@ my $genus_query = sub {
                 t3.strain_member,
                 t4.strain_member
             FROM
-                (SELECT 
+                (SELECT
                     species,
                     COUNT(DISTINCT taxonomy_id) strain_member
                 FROM ar
                 WHERE genus = '$genus'
                 GROUP BY species) t0
                     LEFT JOIN
-                (SELECT 
+                (SELECT
                     species,
                     COUNT(DISTINCT taxonomy_id) strain_member
                 FROM ar
@@ -388,7 +390,7 @@ my $genus_query = sub {
                         AND assembly_level LIKE '%Genome%'
                 GROUP BY species) t1 ON t0.species = t1.species
                     LEFT JOIN
-                (SELECT 
+                (SELECT
                     species,
                     COUNT(DISTINCT taxonomy_id) strain_member
                 FROM ar
@@ -396,7 +398,7 @@ my $genus_query = sub {
                         AND assembly_level LIKE '%Chromosome%'
                 GROUP BY species) t2 ON t0.species = t2.species
                     LEFT JOIN
-                (SELECT 
+                (SELECT
                     species,
                     COUNT(DISTINCT taxonomy_id) strain_member
                 FROM ar
@@ -404,7 +406,7 @@ my $genus_query = sub {
                         AND assembly_level = 'Scaffold'
                 GROUP BY species) t3 ON t0.species = t3.species
                     LEFT JOIN
-                (SELECT 
+                (SELECT
                     species,
                     COUNT(DISTINCT taxonomy_id) strain_member
                 FROM ar
@@ -424,10 +426,9 @@ my $genus_query = sub {
     &$group;
     &$euk_group;
     $subgroup_query->("Ascomycetes");
+    $subgroup_query->("Basidiomycetes");
     $genus_query->("Saccharomyces");
     $genus_query->("Dictyostelium");
-    $genus_query->("Aspergillus");
-    $genus_query->("Candida");
     $genus_query->("Oryza");
 }
 
