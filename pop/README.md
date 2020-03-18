@@ -12,6 +12,7 @@ Genus *Trichoderma* as example.
     - [`wgs_prep.pl`](#wgs_preppl)
     - [`assembly_prep.pl`](#assembly_preppl)
   - [Section 2: create a raw phylogenetic tree by MinHash](#section-2-create-a-raw-phylogenetic-tree-by-minhash)
+    - [`mash`](#mash)
   - [Section 3: prepare sequences for `egaz`](#section-3-prepare-sequences-for-egaz)
     - [Manually](#manually)
     - [`egaz template --prep`](#egaz-template---prep)
@@ -339,6 +340,8 @@ bash ASSEMBLY/trichoderma.assembly.collect.sh
 ```
 
 ## Section 2: create a raw phylogenetic tree by MinHash
+
+### `mash`
 
 ```bash
 mkdir -p ~/data/alignment/trichoderma/mash
