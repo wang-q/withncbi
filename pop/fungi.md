@@ -4,24 +4,32 @@ Less detailed than *Trichoderma* in
 [README.md](https://github.com/wang-q/withncbi/blob/master/pop/README.md).
 
 
-[TOC levels=1-3]: # " "
+[TOC levels=1-3]: # ""
+
 - [Aligning various genera from Fungi](#aligning-various-genera-from-fungi)
 - [*Candida*](#candida)
-    - [candida: wgs](#candida-wgs)
-    - [candida: assembly](#candida-assembly)
-    - [candida: run](#candida-run)
+  - [candida: wgs](#candida-wgs)
+  - [candida: assembly](#candida-assembly)
+  - [candida: phylo](#candida-phylo)
+  - [candida: run](#candida-run)
 - [*Penicillium*](#penicillium)
-    - [penicillium: wgs](#penicillium-wgs)
-    - [penicillium: assembly](#penicillium-assembly)
+  - [penicillium: wgs](#penicillium-wgs)
+  - [penicillium: assembly](#penicillium-assembly)
+  - [penicillium: phylo](#penicillium-phylo)
 
 
 # *Candida*
 
 Check NCBI pages
 
-* http://www.ncbi.nlm.nih.gov/Traces/wgs/?page=1&term=Candida*&order=organism
-* http://www.ncbi.nlm.nih.gov/assembly?term=txid1535326[Organism:exp]
-* http://www.ncbi.nlm.nih.gov/genome/?term=txid1535326[Organism:exp]
+* https://www.ncbi.nlm.nih.gov/Traces/wgs/?page=1&term=Candida*&order=organism
+* https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?mode=Info&id=1535326
+* https://www.ncbi.nlm.nih.gov/assembly?term=txid1535326[Organism:exp]
+* https://www.ncbi.nlm.nih.gov/genome/?term=txid1535326[Organism:exp]
+
+Candida dubliniensis CD36 (11x sanger)
+Candida albicans WO-1 as target (10x sanger)
+Candida tropicalis MYA-3404 (8.85x sanger)
 
 ## candida: wgs
 
@@ -53,6 +61,7 @@ perl ~/Scripts/withncbi/taxon/wgs_prep.pl \
     -o WGS
 
 bash WGS/candida.wgs.rsync.sh
+bash WGS/candida.wgs.aria2.sh
 
 find WGS -name "*.gz" | parallel -j 4 gzip -t
 
@@ -86,6 +95,24 @@ bash ASSEMBLY/candida.assembly.collect.sh
 
 ```
 
+## candida: phylo
+
+Same as [here](README.md#mash)
+
+```bash
+mkdir -p ~/data/alignment/candida/mash
+cd ~/data/alignment/candida/mash
+
+... # paste codes from README.md
+
+
+nw_display -w 600 -b 'visibility:hidden' -s tree.nwk |
+    rsvg-convert -o ~/Scripts/withncbi/image/Candida.png
+
+```
+
+![Candida.png](../image/Candida.png)
+
 ## candida: run
 
 * Rsync to hpcc
@@ -99,7 +126,7 @@ rsync -avP \
 
 ```
 
-`--perseq` for Chromosome-level assemblies; Calb_WO_1 is not soo good.
+`--perseq` for Chromosome-level assemblies.
 
 ```bash
 cd ~/data/alignment/candida
@@ -108,9 +135,9 @@ cd ~/data/alignment/candida
 egaz template \
     ASSEMBLY WGS \
     --prep -o GENOMES \
-    --perseq Calb_SC5314 \
+    --perseq Calb_WO_1 \
     --perseq Cdub_CD36 \
-    --perseq Cort_Co_90_125 \
+    --perseq Ctro_MYA_3404 \
     --min 5000 --about 5000000 \
     -v --repeatmasker "--species Fungi --parallel 24"
 
@@ -119,40 +146,54 @@ bsub -q mpi -n 24 -J "candida-0_prep" "bash GENOMES/0_prep.sh"
 ls -t output.* | head -n 1 | xargs tail -f | grep "==>"
 
 # gff
-for n in Calb_SC5314 Cdub_CD36 Cort_Co_90_125; do
+for n in Calb_WO_1 Cdub_CD36 Ctro_MYA_3404; do
     FILE_GFF=$(find ASSEMBLY -type f -name "*_genomic.gff.gz" | grep "${n}")
     echo >&2 "==> Processing ${n}/${FILE_GFF}"
     
     gzip -d -c ${FILE_GFF} > GENOMES/${n}/chr.gff
 done
 
-# multi
+# sanger
 egaz template \
-    GENOMES/Calb_SC5314 \
-    $(find GENOMES -maxdepth 1 -type d -path "*/????*" | grep -v "Calb_SC5314") \
+    GENOMES/Calb_WO_1 \
+    GENOMES/Cdub_CD36 \
+    GENOMES/Ctro_MYA_3404 \
     --multi -o multi/ \
-    --rawphylo --parallel 24 -v
+    --multiname sanger --order \
+    --parallel 24 -v
 
 bsub -q mpi -n 24 -J "candida-1_pair" "bash multi/1_pair.sh"
-bsub -w "ended(candida-1_pair)" \
-    -q mpi -n 24 -J "candida-2_rawphylo" "bash multi/2_rawphylo.sh"
-bsub  -w "ended(candida-2_rawphylo)" \
+bsub  -w "ended(candida-1_pair)" \
+    -q mpi -n 24 -J "candida-3_multi" "bash multi/3_multi.sh"
+
+# multi
+egaz template \
+    GENOMES/Calb_WO_1 \
+    $(find GENOMES -maxdepth 1 -mindepth 1 -type d | grep -v "Calb_WO_1") \
+    --multi -o multi/ \
+    --tree mash/tree.nwk \
+    --parallel 24 -v
+
+bsub -q mpi -n 24 -J "candida-1_pair" "bash multi/1_pair.sh"
+bsub  -w "ended(candida-1_pair)" \
     -q mpi -n 24 -J "candida-3_multi" "bash multi/3_multi.sh"
 
 # multi_Calb
 egaz template \
-    GENOMES/Calb_SC5314 \
-    $(find GENOMES -maxdepth 1 -type d -path "*/????*" | grep "Calb_" | grep -v "Calb_SC5314") \
+    GENOMES/Calb_WO_1 \
+    $(find GENOMES -maxdepth 1 -mindepth 1 -type d | grep "Calb_" | grep -v "Calb_SC5314") \
     GENOMES/Cdub_CD36 \
     --multi -o multi/ \
-    --multiname multi_Calb --tree multi/Results/multi.nwk --outgroup Cdub_CD36 \
+    --multiname Calb --tree mash/tree.nwk --outgroup Cdub_CD36 \
     --parallel 24 -v
 
 bsub -q mpi -n 24 -J "candida-3_multi" "bash multi/3_multi.sh"
 
 # self
 egaz template \
-    GENOMES/Calb_SC5314 GENOMES/Cdub_CD36 GENOMES/Cort_Co_90_125  \
+    GENOMES/Calb_WO_1 \
+    GENOMES/Cdub_CD36 \
+    GENOMES/Ctro_MYA_3404 \
     --self -o self/ \
     --circos --parallel 24 -v
 

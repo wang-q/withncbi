@@ -1,9 +1,8 @@
 #name	prefix	organism	contigs
-Cpar_CDC317	CABE01	Candida parapsilosis CDC317	24
+Cmet_ATCC_96143	PQNC01	Candida metapsilosis	19
+Cvis_ATCC_20962	QLNQ01	Candida viswanathii	30
 Cpar_CBS6318	CBZQ02	Candida parapsilosis	37
 Calb_P76055	AJJD01	Candida albicans P76055	38
-Calb_SC5314	AJJF01	Candida albicans SC5314	38
-Cpar_CBS1954	CBZP02	Candida parapsilosis	43
 Calb_P87	AJIT01	Candida albicans P87	44
 Calb_P37005	AJIU01	Candida albicans P37005	45
 Calb_P57072	AJIY01	Candida albicans P57072	45
@@ -23,15 +22,12 @@ Calb_P78048	AJIX01	Candida albicans P78048	59
 Calb_19F	AJIV01	Candida albicans 19F	60
 Calb_P78042	JPEW01	Candida albicans P78042	70
 Calb_GC75	AJIW01	Candida albicans GC75	73
-Calb_SC5314	JTBX01	Candida albicans SC5314	77
 Calb_Ca6	AJJG01	Candida albicans Ca6	82
 Calb_WO_1	AAFO01	Candida albicans WO-1	86
-Cmet_CANME	CBZN02	Candida metapsilosis	96
-Cpar_GA1	CBZX02	Candida parapsilosis	98
 Ctro_MYA_3404	AAFN02	Candida tropicalis MYA-3404	128
 Cort_MCO456	CBZO02	Candida orthopsilosis	140
+Ccor_NRRL_Y_27910	PPLL02	Candida corydali	157
 Calb_A20	AVAX01	Candida albicans A20	213
-Calb_UAB040_W3D3	NETO01	Candida albicans	225
 Calb_A92	AVAS01	Candida albicans A92	249
 Calb_A67	AVAU01	Candida albicans A67	260
 Calb_A203	AVAT01	Candida albicans A203	278
@@ -39,18 +35,12 @@ Calb_A123	AVAR01	Candida albicans A123	279
 Calb_A155	AVAZ01	Candida albicans A155	284
 Calb_3153A	AVAY01	Candida albicans 3153A	287
 Calb_A84	AVBA01	Candida albicans A84	295
-Calb_UAB012_W3D5	NETM01	Candida albicans	308
-Calb_UAB012_W7D4	NETN01	Candida albicans	319
 Calb_A48	AVAV01	Candida albicans A48	320
 Calb_CHN1	AVAW01	Candida albicans CHN1	342
 Ctro_121	JGYC01	Candida tropicalis	350
-Csp_LDI48194	LBNG01	Candida sp. LDI48194	367
-Calb_UAB090_W2D7	NETQ01	Candida albicans	429
+Csp__LDI48194	LBNG01	Candida sp. LDI48194	367
 Csoj_GF41	LMTL01	Candida sojae	511
 Calb_Ca529L	ASHC01	Candida albicans Ca529L	608
 Cdub_UOB319	JFFX01	Candida dubliniensis	778
-Cdub_UOB320	JFFY01	Candida dubliniensis	892
-#Ctro	PKKZ01	Candida tropicalis	1221
-#Calb_ATCC_10231	MUZS01	Candida albicans	2219
-#Cmal_Xu316	AOGT01	Candida maltosa Xu316	2947
+#Cmal	AOGT01	Candida maltosa Xu316	2947
 #Cort_AY2	AMDC01	Candida orthopsilosis AY2	4152
