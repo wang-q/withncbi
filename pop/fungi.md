@@ -13,7 +13,8 @@ Less detailed than *Trichoderma* in
   - [Raw phylogenetic tree by MinHash](#raw-phylogenetic-tree-by-minhash)
   - [Groups and targets](#groups-and-targets)
   - [Fungi: prepare](#fungi-prepare)
-  - [Ca_alb: run](#ca_alb-run)
+  - [candida: run](#candida-run)
+  - [Fungi: run](#fungi-run)
 
 ## Strain info
 
@@ -51,7 +52,7 @@ Less detailed than *Trichoderma* in
 |                | Puccinia         |     5296 | 柄锈菌属           |       4 |       6 |
 |                | Rhodotorula      |     5533 | 红酵母属           |       2 |       4 |
 |                | Ustilago         |     5269 | 黑粉菌属           |       1 |       1 |
-| Basidiomycetes |                  |          |                   |         |         |
+| Other          |                  |          |                   |         |         |
 |                | Mucor            |     4830 | 毛霉菌属           |       2 |       4 |
 
 * https://patient.info/doctor/fungal-lung-infections
@@ -259,24 +260,6 @@ parallel --no-run-if-empty --linebuffer -k -j 4 '
 #Yarrowia        1       3
 #Zymoseptoria    4       16
 
-mkdir -p taxon
-
-parallel --no-run-if-empty --linebuffer -k -j 4 '
-    cat ASSEMBLY/Fungi.assembly.pass.csv |
-        cut -d"," -f 1,2 |
-        grep "{}" |
-        cut -d"," -f 1 \
-        > taxon/{= $_ =~ s/ /_/g =} # replace spaces with underscore
-    ' ::: "Acinetobacter junii" "Citrobacter freundii" "Klebsiella aerogenes" "Klebsiella oxytoca" \
-          "Morganella morganii" "Proteus mirabilis" "Serratia marcescens" \
-          "Staphylococcus capitis" "Staphylococcus haemolyticus" "Staphylococcus hominis" 
-
-wc -l taxon/*
-
-find taxon -maxdepth 1 -type f -not -name "*.replace.tsv" |
-    sort |
-    xargs -i basename {} \
-    > genus.list
 
 ```
 
@@ -349,7 +332,7 @@ nw_display -s -b 'visibility:hidden' -w 600 -v 30 tree.nwk |
 
 Review `ASSEMBLY/Fungi.assembly.pass.csv` and `mash/groups.tsv`
 
-| #Serial | Group             | Count | Target                      | Sequencing technology  |
+| #Serial | Group             | Count | Target                      | Sequencing             |
 |:--------|:------------------|------:|:----------------------------|:-----------------------|
 | 1       | A_aculeati        |    10 | A_aculeati_CBS_121060       | 95.8X Illumina         |
 | 2       | A_nig             |    22 | A_nig_CBS_513_88            | 7.5X Sanger, BAC       |
@@ -440,7 +423,7 @@ ARRAY=(
     'Zymoseptoria::Z_tritici_IPO323' # 32
 )
 
-echo -e "#Serial\tGroup\tCount\tTarget" > group_target.tsv
+echo -e "#Serial\tGroup\tCount\tTarget\tSequencing" > group_target.tsv
 
 for item in "${ARRAY[@]}" ; do
     GROUP_NAME="${item%%::*}"
@@ -459,11 +442,24 @@ for item in "${ARRAY[@]}" ; do
 
     COUNT=$(cat ${GROUP_NAME} | wc -l )
 
-    echo -e "${SERIAL}\t${GROUP_NAME}\t${COUNT}\t${TARGET_NAME}" >> group_target.tsv
+    echo -e "${SERIAL}\t${GROUP_NAME}\t${COUNT}\t${TARGET_NAME}\t" >> group_target.tsv
 
 done
 
 mlr --itsv --omd cat group_target.tsv
+
+cat <<'EOF' > chr-level.list
+Ca_dub_CD36
+Ca_ort_Co_90_125
+Cr_neof_neoformans_JEC21
+F_fuj_IMI_58289
+F_gramine_PH_1
+F_vert_7600
+Hi_cap_G186AR
+K_afr_CBS_2517
+Pa_bras_Pb18
+Sa_cerevisiae_Sigma1278b
+EOF
 
 ```
 
@@ -490,16 +486,7 @@ egaz template \
     ASSEMBLY \
     --prep -o GENOMES \
     $( cat taxon/group_target.tsv | sed -e '1d' | cut -f 4 | parallel -j 1 echo " --perseq {} " ) \
-    --perseq Ca_dub_CD36 \
-    --perseq Ca_ort_Co_90_125 \
-    --perseq Cr_neof_neoformans_JEC21 \
-    --perseq F_fuj_IMI_58289 \
-    --perseq F_gramine_PH_1 \
-    --perseq F_vert_7600 \
-    --perseq Hi_cap_G186AR \
-    --perseq K_afr_CBS_2517 \
-    --perseq Pa_bras_Pb18 \
-    --perseq Sa_cerevisiae_Sigma1278b \
+    $( cat taxon/chr-level.list | parallel -j 1 echo " --perseq {} " ) \
     --min 5000 --about 5000000 \
     -v --repeatmasker "--species Fungi --parallel 24"
 
@@ -508,7 +495,9 @@ bsub -q mpi -n 24 -J "Fungi-0_prep" "bash GENOMES/0_prep.sh"
 ls -t output.* | head -n 1 | xargs tail -f | grep "==>"
 
 # gff
-for n in Calb_WO_1 Cdub_CD36 Ctro_MYA_3404; do
+for n in $(cat taxon/group_target.tsv | sed -e '1d' | cut -f 4 ) \
+    $( cat taxon/chr-level.list ) \
+    ; do
     FILE_GFF=$(find ASSEMBLY -type f -name "*_genomic.gff.gz" | grep "${n}")
     echo >&2 "==> Processing ${n}/${FILE_GFF}"
     
@@ -517,58 +506,67 @@ done
 
 ```
 
-## Ca_alb: run
+## candida: run
+
+`Ca_ort_Co_90_125` is on another branch
 
 ```bash
+cd ~/data/alignment/Fungi/
+
 # sanger
 egaz template \
-    GENOMES/Calb_WO_1 \
-    GENOMES/Cdub_CD36 \
-    GENOMES/Ctro_MYA_3404 \
-    --multi -o multi/ \
-    --multiname sanger --order \
+    GENOMES/Ca_alb_WO_1 \
+    GENOMES/Ca_dub_CD36 \
+    GENOMES/Ca_tro_MYA_3404 \
+    GENOMES/Ca_ort_Co_90_125 \
+    --multi -o groups/candida/ \
+    --multiname sanger \
+    --tree taxon/tree.nwk \
     --parallel 24 -v
 
-bsub -q mpi -n 24 -J "candida-1_pair" "bash multi/1_pair.sh"
+bsub -q mpi -n 24 -J "candida-1_pair" "bash groups/candida/1_pair.sh"
 bsub  -w "ended(candida-1_pair)" \
-    -q mpi -n 24 -J "candida-3_multi" "bash multi/3_multi.sh"
+    -q mpi -n 24 -J "candida-3_multi" "bash groups/candida/3_multi.sh"
 
 # multi
 egaz template \
-    GENOMES/Calb_WO_1 \
-    $(find GENOMES -maxdepth 1 -mindepth 1 -type d | grep -v "Calb_WO_1") \
-    --multi -o multi/ \
-    --tree mash/tree.nwk \
+    GENOMES/Ca_alb_WO_1 \
+    $(cat taxon/Ca_alb | grep -v -x "Ca_alb_WO_1" | parallel -j 1 echo "GENOMES/{}") \
+    --multi -o groups/candida/ \
+    --tree taxon/tree.nwk \
     --parallel 24 -v
 
-bsub -q mpi -n 24 -J "candida-1_pair" "bash multi/1_pair.sh"
-bsub  -w "ended(candida-1_pair)" \
-    -q mpi -n 24 -J "candida-3_multi" "bash multi/3_multi.sh"
+bsub -q mpi -n 24 -J "candida-1_pair" "bash groups/candida/1_pair.sh"
+bsub -w "ended(candida-1_pair)" \
+    -q mpi -n 24 -J "candida-3_multi" "bash groups/candida/3_multi.sh"
 
-# multi_Calb
-egaz template \
-    GENOMES/Calb_WO_1 \
-    $(find GENOMES -maxdepth 1 -mindepth 1 -type d | grep "Calb_" | grep -v "Calb_SC5314") \
-    GENOMES/Cdub_CD36 \
-    --multi -o multi/ \
-    --multiname Calb --tree mash/tree.nwk --outgroup Cdub_CD36 \
-    --parallel 24 -v
+```
 
-bsub -q mpi -n 24 -J "candida-3_multi" "bash multi/3_multi.sh"
+## Fungi: run
 
-# self
-egaz template \
-    GENOMES/Calb_WO_1 \
-    GENOMES/Cdub_CD36 \
-    GENOMES/Ctro_MYA_3404 \
-    --self -o self/ \
-    --circos --parallel 24 -v
+```bash
+cd ~/data/alignment/Fungi/
 
-bsub -q mpi -n 24 -J "candida-1_self" "bash self/1_self.sh"
-bsub -w "ended(candida-1_self)" \
-    -q mpi -n 24 -J "candida-3_proc" "bash self/3_proc.sh"
-bsub  -w "ended(candida-3_proc)" \
-    -q mpi -n 24 -J "candida-4_circos" "bash self/4_circos.sh"
+cat taxon/group_target.tsv |
+    sed -e '1d' |
+    parallel --colsep '\t' --no-run-if-empty --linebuffer -k -j 1 '
+        echo -e "==> Group: [{2}]\tTarget: [{4}]\n"
+        
+        egaz template \
+            GENOMES/{4} \
+            $(cat taxon/{2} | grep -v -x "{4}" | xargs -I[] echo "GENOMES/[]") \
+            --multi -o groups/{2}/ \
+            --tree taxon/tree.nwk \
+            --parallel 24 -v
+
+        bsub -q mpi -n 24 -J "{2}-1_pair" "bash groups/{2}/1_pair.sh"
+        bsub -w "ended({2}-1_pair)" \
+            -q mpi -n 24 -J "{2}-3_multi" "bash groups/{2}/3_multi.sh"
+    '
+
+# clean
+find group -mindepth 1 -maxdepth 3 -type d -name "*_raw" | parallel -r rm -fr
+find group -mindepth 1 -maxdepth 3 -type d -name "*_fasta" | parallel -r rm -fr
 
 ```
 
