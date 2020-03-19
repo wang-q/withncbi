@@ -296,11 +296,15 @@ for name in $(cat ../ASSEMBLY/Fungi.assembly.pass.csv | sed -e '1d' | cut -d"," 
     find ../ASSEMBLY/${name} -name "*.fsa_nt.gz" -or -name "*_genomic.fna.gz" |
         grep -v "_from_" |
         xargs cat |
-        mash sketch -k 21 -s 100000 -p 4 - -I "${name}" -o ${name}
+        mash sketch -k 21 -s 100000 -p 8 - -I "${name}" -o ${name}
 done
 
-mash triangle -E -p 4 -l <( find . -maxdepth 1 -type f -name "*.msh" | sort ) > dist.tsv
+mash triangle -E -p 8 -l <(
+    cat ../ASSEMBLY/Fungi.assembly.pass.csv | sed -e '1d' | cut -d"," -f 1 | parallel echo "{}.msh"
+    ) \
+    > dist.tsv
 
+# fill matrix with lower triangle
 tsv-select -f 1-3 dist.tsv |
     (tsv-select -f 2,1,3 dist.tsv && cat) |
     (
@@ -336,7 +340,7 @@ cat dist_full.tsv |
         write_tsv(groups, "groups.tsv")
     '
 
-nw_display -w 600 -b 'visibility:hidden' -s tree.nwk |
+nw_display -s -b 'visibility:hidden' -w 600 -v 30 tree.nwk |
     rsvg-convert -o ~/Scripts/withncbi/image/Fungi.png
 
 ```
@@ -345,63 +349,78 @@ nw_display -w 600 -b 'visibility:hidden' -s tree.nwk |
 
 Review `ASSEMBLY/Fungi.assembly.pass.csv` and `mash/groups.tsv`
 
-| #Serial | Group             | Count | Target                                   | Sequencing technology  |
-|:--------|:------------------|------:|:-----------------------------------------|:-----------------------|
-| 4       | A_fum             |     9 | A_fum_Af293                              | 10.5X Sanger, WGS      |
-| 2       | A_nig             |    22 | A_nig_CBS_513_88                         | 7.5X Sanger, BAC       |
-| 5       | A_ory             |    10 | A_ory_RIB40                              | 9X Sanger, WGS         |
-| 3       | A_nid             |    12 | A_nid_FGSC_A4                            | 13X Sanger, BAC        |
-| 6       | B_Hi_Pa           |    12 | B_der_ER_3                               | 9.4X Sanger, WGS       |
-|         |                   |       | Hi_cap_G186AR                            | 10X Sanger             |
-|         |                   |       | Pa_bras_Pb18                             | 9.8X Sanger, WGS       |
-| 7       | Ca_alb            |    35 | Ca_alb_WO_1                              | 10X Sanger, WGS        |
-| 8       | Ca_Ha_K_Me_O_Pi_U |    15 | U_may_521                                | 10X Sanger, WGS        |
-|         |                   |       | Ca_ort_Co_90_125                         | 10X 454, fosmid        |
-|         |                   |       | K_afr_CBS_2517                           | 20X 454                |
-| 9       | Coccidioides      |    14 | Coc_imm_RS                               | 14.4X Sanger, WGS      |
-| 10      | Colletotrichum    |     6 | Col_hig_IMI_349063                       | 133.0X PacBio          |
-| 11      | Cr_gattii         |    17 | Cr_gattii_WM276                          | 6X Sanger, fosmid, BAC |
-| 14      | Cr_neof           |    31 | Cr_neof_var_grubii_H99                   | 11X Sanger, WGS        |
-|         |                   |       | Cr_neof_var_neoformans_JEC21             | 12.5X Sanger, WGS      |
-| 15      | Epichloe          |     3 | E_fes_Fl1                                | 210.0X PacBio          |
-| 16      | Fusarium          |    40 | F_oxy_f_sp_lycopersici_4287              | 6X Sanger, WGS         |
-|         |                   |       | F_gramine_PH_1                           | 10X Sanger, WGS        |
-|         |                   |       | F_vert_7600                              | 8X Sanger, WGS         |
-| 17      | Malassezia        |     3 | Ma_glob_CBS_7966                         | 7X Sanger              |
-| 18      | Mucor             |     4 | Mu_lus_CBS_277_49                        | 9.49X Sanger           |
-| 19      | Penicillium       |    14 | Pe_rubens_Wisconsin_54_1255              | 9.8X Sanger, WGS       |
-| 21      | Pneumocystis      |     3 | Pn_jir_RU7                               | 241.4X Illumina        |
-| 22      | Puccinia          |     6 | Pu_graminis_f_sp_tritici_CRL_75_36_700_3 | 7.88X Sanger, WGS      |
-| 23      | Pyricularia       |     7 | Py_ory_70_15                             | 7X Sanger, WGS         |
-| 24      | Rhodotorula       |     4 | R_graminis_WP1                           | 8.55X Sanger, WGS      |
-| 25      | Saccharomyces     |    50 | Sa_cerevisiae_S288C                      | Reference              |
-| 26      | Sporothrix        |     4 | Sp_ins_RCEF_264                          | 7037.0X HiSeq          |
-| 27      | Talaromyces       |     3 | Ta_mar_ATCC_18224                        | 8.8X Sanger            |
-| 28      | Trichoderma       |    10 | Trichod_atr_IMI_206040                   | 8.26X Sanger           |
-| 29      | Trichophyton      |    16 | Trichop_rubr_CBS_118892                  | 8.19X Sanger, WGS      |
-| 30      | Verticillium      |     6 | V_alf_VaMs_102                           | 4.08X Sanger, WGS      |
-| 31      | Yarrowia          |     3 | Y_lip_CLIB122                            | 10X Sanger, WGS        |
-| 32      | Zymoseptoria      |    16 | Z_tritici_IPO323                         | 8.9X Sanger, WGS       |
+| #Serial | Group             | Count | Target                      | Sequencing technology  |
+|:--------|:------------------|------:|:----------------------------|:-----------------------|
+| 1       | A_aculeati        |    10 | A_aculeati_CBS_121060       | 95.8X Illumina         |
+| 2       | A_nig             |    22 | A_nig_CBS_513_88            | 7.5X Sanger, BAC       |
+| 3       | A_nid             |    12 | A_nid_FGSC_A4               | 13X Sanger, BAC        |
+| 4       | A_fum             |     9 | A_fum_Af293                 | 10.5X Sanger, WGS      |
+| 5       | A_ory             |    10 | A_ory_RIB40                 | 9X Sanger, WGS         |
+| 6       | B_Hi_Pa           |    12 | B_der_ER_3                  | 9.4X Sanger, WGS       |
+|         |                   |       | Hi_cap_G186AR               | 10X Sanger             |
+|         |                   |       | Pa_bras_Pb18                | 9.8X Sanger, WGS       |
+| 7       | Ca_alb            |    35 | Ca_alb_WO_1                 | 10X Sanger, WGS        |
+| 8       | Ca_Ha_K_Me_O_Pi_U |    15 | U_may_521                   | 10X Sanger, WGS        |
+|         |                   |       | Ca_ort_Co_90_125            | 10X 454, fosmid        |
+|         |                   |       | K_afr_CBS_2517              | 20X 454                |
+| 9       | Coccidioides      |    14 | Coc_imm_RS                  | 14.4X Sanger, WGS      |
+| 10      | Colletotrichum    |     6 | Col_hig_IMI_349063          | 133.0X PacBio          |
+| 11      | Cr_amy            |     5 | Cr_amy_CBS_6039             | 117.0X Illumina        |
+| 12      | Cr_gattii         |    17 | Cr_gattii_WM276             | 6X Sanger, fosmid, BAC |
+| 14      | Cr_neof           |    31 | Cr_neof_grubii_H99          | 11X Sanger, WGS        |
+|         |                   |       | Cr_neof_neoformans_JEC21    | 12.5X Sanger, WGS      |
+| 15      | Epichloe          |     3 | E_fes_Fl1                   | 210.0X PacBio          |
+| 16      | Fusarium          |    40 | F_oxy_f_sp_lycopersici_4287 | 6X Sanger, WGS         |
+|         |                   |       | F_gramine_PH_1              | 10X Sanger, WGS        |
+|         |                   |       | F_vert_7600                 | 8X Sanger, WGS         |
+| 17      | Malassezia        |     3 | Ma_glob_CBS_7966            | 7X Sanger              |
+| 18      | Mucor             |     4 | Mu_lus_CBS_277_49           | 9.49X Sanger           |
+| 19      | Penicillium       |    14 | Pe_rubens_Wisconsin_54_1255 | 9.8X Sanger, WGS       |
+| 21      | Pneumocystis      |     3 | Pn_jir_RU7                  | 241.4X Illumina        |
+| 22      | Puccinia          |     6 | Pu_graminis_CRL_75_36_700_3 | 7.88X Sanger, WGS      |
+| 23      | Pyricularia       |     7 | Py_ory_70_15                | 7X Sanger, WGS         |
+| 24      | Rhodotorula       |     4 | R_graminis_WP1              | 8.55X Sanger, WGS      |
+| 25      | Saccharomyces     |    50 | Sa_cerevisiae_S288C         | Reference              |
+| 26      | Sporothrix        |     4 | Sp_ins_RCEF_264             | 7037.0X HiSeq          |
+| 27      | Talaromyces       |     3 | Ta_mar_ATCC_18224           | 8.8X Sanger            |
+| 28      | Trichoderma       |    10 | Trichod_atr_IMI_206040      | 8.26X Sanger           |
+| 29      | Trichophyton      |    16 | Trichop_rubr_CBS_118892     | 8.19X Sanger, WGS      |
+| 30      | Verticillium      |     6 | V_alf_VaMs_102              | 4.08X Sanger, WGS      |
+| 31      | Yarrowia          |     3 | Y_lip_CLIB122               | 10X Sanger, WGS        |
+| 32      | Zymoseptoria      |    16 | Z_tritici_IPO323            | 8.9X Sanger, WGS       |
 
 ```bash
 mkdir -p ~/data/alignment/Fungi/taxon
 cd ~/data/alignment/Fungi/taxon
 
 cp ../mash/tree.nwk .
-cp ../mash/groups.tsv .
+
+# manually combine Cr_amy and Cr_dep
+cat ../mash/groups.tsv |
+    grep -v "Cr_amy_" |
+    grep -v "Cr_win_" |
+    grep -v "Cr_dep_" \
+    > groups.tsv
+echo -e "11\tCr_amy_CBS_6039" >> groups.tsv
+echo -e "11\tCr_amy_CBS_6273" >> groups.tsv
+echo -e "11\tCr_win_CBS_7118" >> groups.tsv
+echo -e "11\tCr_dep_CBS_7841" >> groups.tsv
+echo -e "11\tCr_dep_CBS_7855" >> groups.tsv
 
 ARRAY=(
-    'A_fum::A_fum_Af293' # group 4
+    'A_aculeati::A_aculeati_CBS_121060' # group 1
     'A_nig::A_nig_CBS_513_88' # group 2
-    'A_ory::A_ory_RIB40' # group 5
     'A_nid::A_nid_FGSC_A4' # group 3
+    'A_fum::A_fum_Af293' # group 4
+    'A_ory::A_ory_RIB40' # group 5
     'B_Hi_Pa::B_der_ER_3' # 6
     'Ca_alb::Ca_alb_WO_1' # 7
     'Ca_Ha_K_Me_O_Pi_U::U_may_521' # 8
     'Coccidioides::Coc_imm_RS' # 9
     'Colletotrichum::Col_hig_IMI_349063' # 10
-    'Cr_gattii::Cr_gattii_WM276' # 11
-    'Cr_neof::Cr_neof_var_grubii_H99' # 14
+    'Cr_amy::Cr_amy_CBS_6039' # 11
+    'Cr_gattii::Cr_gattii_WM276' # 12
+    'Cr_neof::Cr_neof_grubii_H99' # 14
     'Epichloe::E_fes_Fl1' # 15
     'Fusarium::F_oxy_f_sp_lycopersici_4287' # 16
     'Malassezia::Ma_glob_CBS_7966' # 17
@@ -470,32 +489,17 @@ cd ~/data/alignment/Fungi/
 egaz template \
     ASSEMBLY \
     --prep -o GENOMES \
-    --perseq A_fum_Af293 \
-    --perseq A_ory_RIB40 \
-    --perseq Ca_alb_WO_1 \
+    $( cat taxon/group_target.tsv | sed -e '1d' | cut -f 4 | parallel -j 1 echo " --perseq {} " ) \
     --perseq Ca_dub_CD36 \
     --perseq Ca_ort_Co_90_125 \
-    --perseq Cr_gattii_VGI_Cryptococcus_gattii_WM276 \
-    --perseq Cr_neof_var_grubii_H99 \
-    --perseq Cr_neof_var_neoformans_B_3501A \
-    --perseq Cr_neof_var_neoformans_JEC21 \
+    --perseq Cr_neof_neoformans_JEC21 \
     --perseq F_fuj_IMI_58289 \
     --perseq F_gramine_PH_1 \
-    --perseq F_oxy_f_sp_lycopersici_4287 \
     --perseq F_vert_7600 \
+    --perseq Hi_cap_G186AR \
     --perseq K_afr_CBS_2517 \
-    --perseq K_nag_CBS_8797 \
-    --perseq Py_ory_70_15 \
-    --perseq Sa_cerevisiae_S288C \
+    --perseq Pa_bras_Pb18 \
     --perseq Sa_cerevisiae_Sigma1278b \
-    --perseq U_may_521 \
-    --perseq Y_lip_CLIB122 \
-    --perseq Y_lip_WSH_Z06 \
-    --perseq Z_tritici_IPO323 \
-    --perseq Z_tritici_ST99CH_1A5 \
-    --perseq Z_tritici_ST99CH_1E4 \
-    --perseq Z_tritici_ST99CH_3D1 \
-    --perseq Z_tritici_ST99CH_3D7 \
     --min 5000 --about 5000000 \
     -v --repeatmasker "--species Fungi --parallel 24"
 
