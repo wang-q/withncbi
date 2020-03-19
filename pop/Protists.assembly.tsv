@@ -16,7 +16,7 @@ A_qui	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/826/445/GCA_000826445.1_Aca
 A_rhy	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/826/385/GCA_000826385.1_Acanthamoeba_rhysodes	Acanthamoeba rhysodes	Scaffold
 A_roy	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/826/365/GCA_000826365.1_Acanthamoeba_royreba	Acanthamoeba royreba	Scaffold
 Ba_big	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/981/445/GCF_000981445.1_Bbig001	Babesia bigemina	Chromosome
-Ba_bov	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/165/395/GCA_000165395.1_ASM16539v1	Babesia bovis	Chromosome
+#Ba_bov	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/165/395/GCA_000165395.1_ASM16539v1	Babesia bovis	Chromosome
 Ba_bov_T2Bo	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/165/395/GCF_000165395.1_ASM16539v1	Babesia bovis	Chromosome
 Ba_dive	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/001/077/455/GCA_001077455.2_ASM107745v2	Babesia divergens	Scaffold
 Ba_mic	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/001/650/055/GCA_001650055.1_ASM165005v1	Babesia microti	Contig
@@ -81,7 +81,7 @@ G_intes	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/002/435/GCA_000002435.2_U
 G_intes_assemblage_A	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/001/493/575/GCA_001493575.1_GIAS175	Giardia intestinalis	Contig
 G_intes_assemblage_B	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/001/543/975/GCA_001543975.1_G_duodenalis_AssB_BAH15c1	Giardia intestinalis	Scaffold
 G_intes_ATCC_50581	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/182/405/GCA_000182405.1_ASM18240v1	Giardia intestinalis	Contig
-G_intes_Giardia_lamblia_ATCC_50803	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/002/435/GCF_000002435.1_GL2	Giardia intestinalis	Scaffold
+#G_intes_Giardia_lamblia_ATCC_50803	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/002/435/GCF_000002435.1_GL2	Giardia intestinalis	Scaffold
 G_intes_Giardia_lamblia_P15	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/182/665/GCA_000182665.1_ASM18266v1	Giardia intestinalis	Contig
 G_mur	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/006/247/105/GCA_006247105.1_UU_GM_1.1	Giardia muris	Chromosome
 L_adl	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/902/369/305/GCA_902369305.1_Lad	Leishmania adleri	Complete Genome
@@ -254,7 +254,7 @@ Th_equi	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/189/625/GCA_002189625.1_A
 Th_equi_WA	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/342/415/GCF_000342415.1_JCVI-bewag-v1.1	Theileria equi	Chromosome
 Th_ori	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/003/072/525/GCA_003072525.1_ASM307252v1	Theileria orientalis	Scaffold
 Th_ori_Shintoku	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/740/895/GCF_000740895.1_ASM74089v1	Theileria orientalis	Complete Genome
-Th_parva	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/165/365/GCA_000165365.1_ASM16536v1	Theileria parva	Chromosome
+#Th_parva	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/165/365/GCA_000165365.1_ASM16536v1	Theileria parva	Chromosome
 Th_parva_Muguga	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/165/365/GCF_000165365.1_ASM16536v1	Theileria parva	Chromosome
 To_gondii	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/009/761/385/GCA_009761385.1_ASM976138v1	Toxoplasma gondii	Chromosome
 To_gondii_ARI	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/250/965/GCA_000250965.2_TGARI_v2	Toxoplasma gondii	Scaffold

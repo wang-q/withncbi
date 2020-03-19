@@ -7,42 +7,42 @@ Less detailed than *Trichoderma* in
 [TOC levels=1-3]: # ""
 
 - [Aligning various genera from Protists](#aligning-various-genera-from-protists)
-- [*Plasmodium*](#plasmodium)
-  - [plasmodium: wgs](#plasmodium-wgs)
-  - [plasmodium: assembly](#plasmodium-assembly)
+  - [Strain info](#strain-info)
+  - [NCBI Assembly](#ncbi-assembly)
+  - [Count strains](#count-strains)
+  - [Raw phylogenetic tree by MinHash](#raw-phylogenetic-tree-by-minhash)
+  - [Groups and targets](#groups-and-targets)
+  - [Protists: prepare](#protists-prepare)
   - [plasmodium: run](#plasmodium-run)
 
 
 ## Strain info
 
-| Group             | Genus           | Genus ID | Comments | Species | Strains |
-|:------------------|:----------------|---------:|:---------|--------:|--------:|
-| Apicomplexans     |                 |          | 顶复虫    |         |         |
-|                   | Plasmodium      |     5820 | 疟原虫属   |         |         |
-|                   | Toxoplasma      |     5810 | 弓形虫属   |         |         |
-|                   | Cryptosporidium |     5806 | 隐孢子虫属 |         |         |
-|                   | Eimeria         |     5800 | 艾美球虫   |         |         |
-|                   | Theileria       |     5873 | 泰勒虫属   |         |         |
-|                   | Babesia         |     5864 | 巴倍虫属   |         |         |
-| Oomycete          |                 |          | 卵菌      |         |         |
-|                   | Phytophthora    |     4783 | 疫霉属    |         |         |
-|                   | Pythium         |     4797 | 腐霉属    |         |         |
-| Kinetoplastida    |                 |          | 动基体目   |         |         |
-|                   | Leishmania      |     5658 | 利什曼虫属 |         |         |
-|                   | Trypanosoma     |     5690 | 锥虫属    |         |         |
-| Amoebozoa         |                 |          | 变形虫    |         |         |
-|                   | Acanthamoeba    |     5754 | 棘阿米巴属 |         |         |
-|                   | Entamoeba       |     5758 | 内阿米巴属 |         |         |
-|                   | Dictyostelium   |     5782 | 网柄菌属   |         |         |
-| Eustigmatophyceae |                 |          | 大眼藻纲   |         |         |
-|                   | Nannochloropsis |     5748 | 微拟球藻   |         |         |
-| Opalinata         |                 |          | 蛙片总纲   |         |         |
-|                   | Blastocystis    |    12967 | 芽囊原虫属 |         |         |
-| Metamonada        |                 |          | 后滴门    |         |         |
-|                   | Giardia         |     5740 | 贾第虫属   |         |         |
-| Euglenozoa        |                 |          | 眼虫门    |         |         |
-|                   | Crithidia       |     5655 | 短膜虫属   |         |         |
-
+| Group          | Genus           | Genus ID | Comments          | Species | Strains |
+|:---------------|:----------------|---------:|:------------------|--------:|--------:|
+| Alveolata      |                 |          | 囊泡虫类 (顶复虫)    |         |         |
+|                | Plasmodium      |     5820 | 疟原虫属            |      20 |      60 |
+|                | Toxoplasma      |     5810 | 弓形虫属            |       1 |      16 |
+|                | Cryptosporidium |     5806 | 隐孢子虫属          |      13 |      16 |
+|                | Eimeria         |     5800 | 艾美球虫            |       2 |       2 |
+|                | Theileria       |     5873 | 泰勒虫属            |       4 |       6 |
+|                | Babesia         |     5864 | 巴倍虫属            |       6 |       7 |
+| Amoebozoa      |                 |          | 变形虫              |         |         |
+|                | Acanthamoeba    |     5754 | 棘阿米巴属          |       1 |       2 |
+|                | Entamoeba       |     5758 | 内阿米巴属          |       2 |       3 |
+|                | Dictyostelium   |     5782 | 网柄菌属            |       4 |       4 |
+| Kinetoplastida |                 |          | 动基体目            |         |         |
+|                | Leishmania      |     5658 | 利什曼虫属          |      17 |      25 |
+|                | Trypanosoma     |     5690 | 锥虫属              |       8 |      13 |
+| Stramenopiles  |                 |          | 不等鞭毛类          |         |         |
+|                | Blastocystis    |    12967 | 芽囊原虫属 (蛙片总纲) |       2 |       8 |
+|                | Nannochloropsis |     5748 | 微拟球藻  (大眼藻纲)  |       4 |       8 |
+|                | Phytophthora    |     4783 | 疫霉属 (卵菌)       |      11 |      14 |
+|                | Pythium         |     4797 | 腐霉属 (卵菌)       |       4 |       4 |
+| Euglenozoa     |                 |          | 眼虫门              |         |         |
+|                | Crithidia       |     5655 | 短膜虫属            |       2 |       2 |
+| Other          |                 |          |                   |         |         |
+|                | Giardia         |     5740 | 贾第虫属            |       3 |       6 |
 
 ## NCBI Assembly
 
@@ -60,13 +60,11 @@ mysql -ualignDB -palignDB ar_refseq -e "
         AND genus_id in (
             5820, 5810, 5806, 5800, 5873,
             5864,
-            4783, 4797,
-            5658, 5690,
             5754, 5758, 5782, 
-            5748, 
-            12967,
-            5740,
-            5655
+            5658, 5690,
+            12967, 5748, 4783, 4797,
+            5655,
+            5740
         )
     " \
     > raw.tsv
@@ -79,13 +77,11 @@ mysql -ualignDB -palignDB ar_genbank -e "
         AND genus_id in (
             5820, 5810, 5806, 5800, 5873,
             5864,
-            4783, 4797,
-            5658, 5690,
             5754, 5758, 5782, 
-            5748, 
-            12967,
-            5740,
-            5655
+            5658, 5690,
+            12967, 5748, 4783, 4797,
+            5655,
+            5740
         )
     " \
     >> raw.tsv
@@ -108,7 +104,7 @@ cat raw.tsv |
 
 # comment out unneeded assembly levels
 
-# find potential duplicated strains or assemblies
+# find potential duplicated strains names
 cat ${RANK_NAME}.assembly.tsv |
     cut -f 1 |
     sort |
@@ -126,91 +122,333 @@ unset RANK_NAME
 
 ```
 
-# *Plasmodium*
-
-
-| name                      | taxon |
-|:--------------------------|:------|
-| Plasmodium                | 5820  |
-| Plasmodium falciparum     | 5833  |
-| Plasmodium falciparum 3D7 | 36329 |
-
-Check NCBI pages
-
-* http://www.ncbi.nlm.nih.gov/Traces/wgs/?page=1&term=plasmodium&order=organism
-* http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?mode=Info&id=5820
-* http://www.ncbi.nlm.nih.gov/assembly?term=txid5820[Organism:exp]
-* http://www.ncbi.nlm.nih.gov/genome/?term=txid5820[Organism:exp]
-* http://www.ncbi.nlm.nih.gov/genome/genomes/33
-
-## plasmodium: wgs
-
-Same as [here](README.md#wgstsv)
-
 ```bash
-export RANK_LEVEL=genus
-export RANK_ID=5820
-export RANK_NAME=plasmodium
-
-mkdir -p ~/data/alignment/${RANK_NAME}            # Working directory
-cd ~/data/alignment/${RANK_NAME}
-
-... # paste codes from README.md
-
-# Cleaning
-rm raw*.*sv
-
-```
-
-Edit them to fix names and comment out bad strains.
-
-```bash
-cd ~/data/alignment/plasmodium
-
-perl ~/Scripts/withncbi/taxon/wgs_prep.pl \
-    -f ~/Scripts/withncbi/pop/plasmodium.wgs.tsv \
-    --fix \
-    -o WGS
-
-bash WGS/plasmodium.wgs.rsync.sh
-
-find WGS -name "*.gz" | parallel -j 4 gzip -t
-
-```
-
-## plasmodium: assembly
-
-Same as [here](README.md#assemblytsv)
-
-```bash
-cd ~/data/alignment/${RANK_NAME}
-
-... # paste codes from README.md
-
-unset RANK_LEVEL
-unset RANK_ID
-unset RANK_NAME
-
-```
-
-```bash
-cd ~/data/alignment/plasmodium
+cd ~/data/alignment/Protists
 
 perl ~/Scripts/withncbi/taxon/assembly_prep.pl \
-    -f ~/Scripts/withncbi/pop/plasmodium.assembly.tsv \
+    -f ~/Scripts/withncbi/pop/Protists.assembly.tsv \
     -o ASSEMBLY
 
-bash ASSEMBLY/plasmodium.assembly.rsync.sh
+bash ASSEMBLY/Protists.assembly.rsync.sh
 
-bash ASSEMBLY/plasmodium.assembly.collect.sh
+bash ASSEMBLY/Protists.assembly.collect.sh
+
+```
+
+## Count strains
+
+```bash
+cd ~/data/alignment/Protists
+
+for dir in $(find ASSEMBLY -maxdepth 1 -mindepth 1 -type d | sort); do
+    1>&2 echo "==> ${dir}"
+    name=$(basename ${dir})
+    
+    find ${dir} -type f -name "*_genomic.fna.gz" |
+        grep -v "_from_" | # exclude CDS and rna
+        xargs cat |
+        faops n50 -C -S stdin |
+        (echo -e "name\t${name}" && cat) |
+        datamash transpose
+done |
+    tsv-uniq |
+    tee ASSEMBLY/n50.tsv
+
+cat ASSEMBLY/n50.tsv |
+    tsv-filter \
+        -H --or \
+        --le 4:3000 \
+        --ge 2:100000 |
+    tsv-filter -H --ge 3:1000000 |
+    tr "\t" "," \
+    > ASSEMBLY/n50.pass.csv
+        
+wc -l ASSEMBLY/n50*
+#  204 ASSEMBLY/n50.pass.csv
+#  296 ASSEMBLY/n50.tsv
+
+tsv-join \
+    ASSEMBLY/Protists.assembly.collect.csv \
+    --delimiter "," -H --key-fields 1 \
+    --filter-file ASSEMBLY/n50.pass.csv \
+    > ASSEMBLY/Protists.assembly.pass.csv
+
+wc -l ASSEMBLY/Protists.assembly*csv
+#   293 ASSEMBLY/Protists.assembly.collect.csv
+#   201 ASSEMBLY/Protists.assembly.pass.csv
+
+# find potential duplicated strains names
+cat ASSEMBLY/Protists.assembly.pass.csv |
+    cut -d, -f 7 |
+    sort |
+    uniq -c |
+    sort -nr
+
+```
+
+```bash
+cd ~/data/alignment/Protists
+
+parallel --no-run-if-empty --linebuffer -k -j 4 '
+    n_species=$(cat ASSEMBLY/Protists.assembly.pass.csv |
+        cut -d"," -f 2 |
+        grep -v "Candidatus" |
+        grep "{}" |
+        cut -d" " -f 1,2 |
+        sort |
+        uniq |
+        wc -l)
+    
+    n_strains=$(cat ASSEMBLY/Protists.assembly.pass.csv |
+        cut -d"," -f 2 |
+        grep -v "Candidatus" |
+        grep "{}" |
+        cut -d" " -f 1,2 |
+        sort |
+        wc -l)
+    
+    printf "%s\t%d\t%d\n" {} ${n_species} ${n_strains}
+    ' ::: $(
+        cat ASSEMBLY/Protists.assembly.pass.csv |
+            sed -e '1d' |
+            cut -d"," -f 2 |
+            grep -v "Candidatus" |
+            cut -d" " -f 1 |
+            sort |
+            uniq
+    )
+
+#Acanthamoeba    1       2
+#Babesia 6       7
+#Blastocystis    2       8
+#Crithidia       2       2
+#Cryptosporidium 13      16
+#Dictyostelium   4       4
+#Eimeria 2       2
+#Entamoeba       2       3
+#Giardia 3       6
+#Leishmania      17      25
+#Nannochloropsis 4       8
+#Phytophthora    11      14
+#Plasmodium      20      60
+#Pythium 4       4
+#Theileria       4       6
+#Toxoplasma      1       16
+#Trypanosoma     8       13
+
+```
+
+## Raw phylogenetic tree by MinHash
+
+```bash
+mkdir -p ~/data/alignment/Protists/mash
+cd ~/data/alignment/Protists/mash
+
+for name in $(cat ../ASSEMBLY/Protists.assembly.pass.csv | sed -e '1d' | cut -d"," -f 1 ); do
+    2>&1 echo "==> ${name}"
+    
+    if [[ -e ${name}.msh ]]; then
+        continue
+    fi
+    
+    find ../ASSEMBLY/${name} -name "*.fsa_nt.gz" -or -name "*_genomic.fna.gz" |
+        grep -v "_from_" |
+        xargs cat |
+        mash sketch -k 21 -s 100000 -p 8 - -I "${name}" -o ${name}
+done
+
+mash triangle -E -p 8 -l <(
+    cat ../ASSEMBLY/Protists.assembly.pass.csv | sed -e '1d' | cut -d"," -f 1 | parallel echo "{}.msh"
+    ) \
+    > dist.tsv
+
+# fill matrix with lower triangle
+tsv-select -f 1-3 dist.tsv |
+    (tsv-select -f 2,1,3 dist.tsv && cat) |
+    (
+        cut -f 1 dist.tsv |
+            tsv-uniq |
+            parallel -j 1 --keep-order 'echo -e "{}\t{}\t0"' &&
+        cat
+    ) \
+    > dist_full.tsv
+
+cat dist_full.tsv |
+    Rscript -e '
+        library(readr);
+        library(tidyr);
+        library(ape);
+        pair_dist <- read_tsv(file("stdin"), col_names=F); 
+        tmp <- pair_dist %>%
+            pivot_wider( names_from = X2, values_from = X3, values_fill = list(X3 = 1.0) )
+        tmp <- as.matrix(tmp)
+        mat <- tmp[,-1]
+        rownames(mat) <- tmp[,1]
+        
+        dist_mat <- as.dist(mat)
+        clusters <- hclust(dist_mat, method = "ward.D2")
+        tree <- as.phylo(clusters) 
+        write.tree(phy=tree, file="tree.nwk")
+        
+        group <- cutree(clusters, h=0.5) # k=3
+        groups <- as.data.frame(group)
+        groups$ids <- rownames(groups)
+        rownames(groups) <- NULL
+        groups <- groups[order(groups$group), ]
+        write_tsv(groups, "groups.tsv")
+    '
+
+nw_display -s -b 'visibility:hidden' -w 600 -v 30 tree.nwk |
+    rsvg-convert -o ~/Scripts/withncbi/image/Protists.png
+
+```
+
+## Groups and targets
+
+Review `ASSEMBLY/Protists.assembly.pass.csv` and `mash/groups.tsv`
+
+| #Serial | Group           | Count | Target             | Sequencing     |
+|:--------|:----------------|:------|:-------------------|:---------------|
+| 1       | A_Ei            | 4     | A_cas              |                |
+| 2       | Babesia         | 7     | Ba_bov_T2Bo        | 8X Sanger, WGS |
+| 8       | Cryptosporidium | 11    | Cry_parvum_Iowa_II |                |
+| 7       | Dictyostelium   | 11    | D_disc_AX4         |                |
+| 11      | Leishmania      | 24    | L_maj_Friedlin     |                |
+| 16      | Pl_kno_viv      | 12    | Pl_viv             |                |
+| 17      | Pl_falcip       | 31    | Pl_falcip_3D7      |                |
+| 19      | Theileria       | 6     | Th_parva_Muguga    |                |
+
+```bash
+mkdir -p ~/data/alignment/Protists/taxon
+cd ~/data/alignment/Protists/taxon
+
+cp ../mash/tree.nwk .
+
+# manually combine Ba_mic
+# manually remove bad assemblies
+cat ../mash/groups.tsv |
+    grep -v "Ba_mic" |
+    grep -v "Cry_bai" |
+    grep -v "En_inv_IP1" |
+    grep -v "L_sp_A" \
+    > groups.tsv
+echo -e "2\tBa_mic" >> groups.tsv
+echo -e "2\tBa_mic_RI" >> groups.tsv
+#echo -e "11\tCr_win_CBS_7118" >> groups.tsv
+#echo -e "11\tCr_dep_CBS_7841" >> groups.tsv
+#echo -e "11\tCr_dep_CBS_7855" >> groups.tsv
+
+ARRAY=(
+    'A_Ei::A_cas'
+    'Babesia::Ba_bov_T2Bo' 
+    'Blastocystis::Bl_hom' 
+    'Cryptosporidium::Cry_parvum_Iowa_II' 
+    'Dictyostelium::D_disc_AX4' 
+    'Leishmania::L_maj_Friedlin' 
+    'Pl_kno_viv::Pl_viv' 
+    'Pl_falcip::Pl_falcip_3D7' 
+    'Theileria::Th_parva_Muguga' 
+)
+
+echo -e "#Serial\tGroup\tCount\tTarget\tSequencing" > group_target.tsv
+
+for item in "${ARRAY[@]}" ; do
+    GROUP_NAME="${item%%::*}"
+    TARGET_NAME="${item##*::}"
+    
+    SERIAL=$(
+        cat ../mash/groups.tsv |
+            tsv-filter --str-eq 2:${TARGET_NAME} |
+            tsv-select -f 1
+    )
+
+    cat groups.tsv |
+        tsv-filter --str-eq 1:${SERIAL} |
+        tsv-select -f 2 \
+        > ${GROUP_NAME}
+
+    COUNT=$(cat ${GROUP_NAME} | wc -l )
+
+    echo -e "${SERIAL}\t${GROUP_NAME}\t${COUNT}\t${TARGET_NAME}\t" >> group_target.tsv
+
+done
+
+mlr --itsv --omd cat group_target.tsv
+
+cat <<'EOF' > chr-level.list
+Ba_big
+Ba_bov_T2Bo
+Ba_mic_RI
+Cry_parvum_Iowa_II
+D_disc_AX4
+L_braz_MHOM_BR_75_M2904
+L_don
+L_infa_JPCM5
+L_maj_Friedlin
+L_mex_MHOM_GT_2001_U1103
+Pl_falcip_3D7
+Pl_kno_H
+Pl_viv
+Th_ann
+Th_equi_WA
+Th_ori_Shintoku
+Th_parva
+Th_parva_Muguga
+Tr_bruc_brucei_TREU927
+Tr_bruc_gambiense_DAL972
+EOF
+
+```
+
+## Protists: prepare
+
+* Rsync to hpcc
+
+```bash
+rsync -avP \
+    ~/data/alignment/Protists/ \
+    wangq@202.119.37.251:data/alignment/Protists
+
+# rsync -avP wangq@202.119.37.251:data/alignment/Protists/ ~/data/alignment/Protists
+
+```
+
+`--perseq` for Chromosome-level assemblies and targets
+
+```bash
+cd ~/data/alignment/Protists/
+
+$(brew --prefix repeatmasker)/libexec/util/queryRepeatDatabase.pl \
+    -species Eukaryota -stat
+
+# prep
+egaz template \
+    ASSEMBLY \
+    --prep -o GENOMES \
+    $( cat taxon/group_target.tsv | sed -e '1d' | cut -f 4 | parallel -j 1 echo " --perseq {} " ) \
+    $( cat taxon/chr-level.list | parallel -j 1 echo " --perseq {} " ) \
+    --min 5000 --about 5000000 \
+    -v --repeatmasker "--species Eukaryota --parallel 24"
+
+bsub -q mpi -n 24 -J "Protists-0_prep" "bash GENOMES/0_prep.sh"
+
+ls -t output.* | head -n 1 | xargs tail -f | grep "==>"
+
+# gff
+for n in $(cat taxon/group_target.tsv | sed -e '1d' | cut -f 4 ) \
+    $( cat taxon/chr-level.list ) \
+    ; do
+    FILE_GFF=$(find ASSEMBLY -type f -name "*_genomic.gff.gz" | grep "${n}")
+    echo >&2 "==> Processing ${n}/${FILE_GFF}"
+    
+    gzip -d -c ${FILE_GFF} > GENOMES/${n}/chr.gff
+done
 
 ```
 
 ## plasmodium: run
 
 ```bash
-$(brew --prefix)/Cellar/$(brew list --versions repeatmasker | sed 's/ /\//')/libexec/util/queryRepeatDatabase.pl \
-    -species Alveolata -stat
 ```
 
 * Rsync to hpcc
@@ -266,29 +504,6 @@ bsub -w "ended(plasmodium-1_pair)" \
 bsub  -w "ended(plasmodium-2_rawphylo)" \
     -q mpi -n 24 -J "plasmodium-3_multi" "bash multi/3_multi.sh"
 
-# multi_Pfal
-egaz template \
-    GENOMES/Pfal_3D7 \
-    $(find GENOMES -maxdepth 1 -type d -path "*/????*" | grep "Pfal_" | grep -v "Pfal_3D7") \
-    GENOMES/Prei_SY57 \
-    --multi -o multi/ \
-    --multiname multi_Pfal --tree multi/Results/multi.nwk --outgroup Prei_SY57 \
-    --parallel 24 -v
-
-bsub -q mpi -n 24 -J "plasmodium-3_multi" "bash multi/3_multi.sh"
-
-# self
-egaz template \
-    GENOMES/Pfal_3D7 GENOMES/Pber_ANKA GENOMES/Pcha_chabaudi \
-    GENOMES/Pcyn_strain_B GENOMES/Pkno_strain_H \
-    --self -o self/ \
-    --circos --parallel 24 -v
-
-bsub -q mpi -n 24 -J "plasmodium-1_self" "bash self/1_self.sh"
-bsub -w "ended(plasmodium-1_self)" \
-    -q mpi -n 24 -J "plasmodium-3_proc" "bash self/3_proc.sh"
-bsub  -w "ended(plasmodium-3_proc)" \
-    -q mpi -n 24 -J "plasmodium-4_circos" "bash self/4_circos.sh"
 
 ```
 
