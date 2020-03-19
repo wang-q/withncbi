@@ -4,13 +4,127 @@ Less detailed than *Trichoderma* in
 [README.md](https://github.com/wang-q/withncbi/blob/master/pop/README.md).
 
 
-[TOC levels=1-3]: # " "
+[TOC levels=1-3]: # ""
+
 - [Aligning various genera from Protists](#aligning-various-genera-from-protists)
 - [*Plasmodium*](#plasmodium)
-    - [plasmodium: wgs](#plasmodium-wgs)
-    - [plasmodium: assembly](#plasmodium-assembly)
-    - [plasmodium: run](#plasmodium-run)
+  - [plasmodium: wgs](#plasmodium-wgs)
+  - [plasmodium: assembly](#plasmodium-assembly)
+  - [plasmodium: run](#plasmodium-run)
 
+
+## Strain info
+
+| Group             | Genus           | Genus ID | Comments | Species | Strains |
+|:------------------|:----------------|---------:|:---------|--------:|--------:|
+| Apicomplexans     |                 |          | 顶复虫    |         |         |
+|                   | Plasmodium      |     5820 | 疟原虫属   |         |         |
+|                   | Toxoplasma      |     5810 | 弓形虫属   |         |         |
+|                   | Cryptosporidium |     5806 | 隐孢子虫属 |         |         |
+|                   | Eimeria         |     5800 | 艾美球虫   |         |         |
+|                   | Theileria       |     5873 | 泰勒虫属   |         |         |
+|                   | Babesia         |     5864 | 巴倍虫属   |         |         |
+| Oomycete          |                 |          | 卵菌      |         |         |
+|                   | Phytophthora    |     4783 | 疫霉属    |         |         |
+|                   | Pythium         |     4797 | 腐霉属    |         |         |
+| Kinetoplastida    |                 |          | 动基体目   |         |         |
+|                   | Leishmania      |     5658 | 利什曼虫属 |         |         |
+|                   | Trypanosoma     |     5690 | 锥虫属    |         |         |
+| Amoebozoa         |                 |          | 变形虫    |         |         |
+|                   | Acanthamoeba    |     5754 | 棘阿米巴属 |         |         |
+|                   | Entamoeba       |     5758 | 内阿米巴属 |         |         |
+|                   | Dictyostelium   |     5782 | 网柄菌属   |         |         |
+| Eustigmatophyceae |                 |          | 大眼藻纲   |         |         |
+|                   | Nannochloropsis |     5748 | 微拟球藻   |         |         |
+| Opalinata         |                 |          | 蛙片总纲   |         |         |
+|                   | Blastocystis    |    12967 | 芽囊原虫属 |         |         |
+| Metamonada        |                 |          | 后滴门    |         |         |
+|                   | Giardia         |     5740 | 贾第虫属   |         |         |
+| Euglenozoa        |                 |          | 眼虫门    |         |         |
+|                   | Crithidia       |     5655 | 短膜虫属   |         |         |
+
+
+## NCBI Assembly
+
+```bash
+export RANK_NAME=Protists
+
+mkdir -p ~/data/alignment/${RANK_NAME}        # Working directory
+cd ~/data/alignment/${RANK_NAME}
+
+mysql -ualignDB -palignDB ar_refseq -e "
+    SELECT 
+        organism_name, species, genus, ftp_path, assembly_level
+    FROM ar 
+    WHERE 1=1
+        AND genus_id in (
+            5820, 5810, 5806, 5800, 5873,
+            5864,
+            4783, 4797,
+            5658, 5690,
+            5754, 5758, 5782, 
+            5748, 
+            12967,
+            5740,
+            5655
+        )
+    " \
+    > raw.tsv
+
+mysql -ualignDB -palignDB ar_genbank -e "
+    SELECT 
+        organism_name, species, genus, ftp_path, assembly_level
+    FROM ar 
+    WHERE 1=1
+        AND genus_id in (
+            5820, 5810, 5806, 5800, 5873,
+            5864,
+            4783, 4797,
+            5658, 5690,
+            5754, 5758, 5782, 
+            5748, 
+            12967,
+            5740,
+            5655
+        )
+    " \
+    >> raw.tsv
+
+cat raw.tsv |
+    grep -v '^#' |
+    tsv-filter --not-regex "1:\[.+\]" |
+    perl ~/Scripts/withncbi/taxon/abbr_name.pl -c "1,2,3" -s '\t' -m 3 --shortsub |
+    (echo -e '#name\tftp_path\torganism\tassembly_level' && cat ) |
+    perl -nl -a -F"," -e '
+        BEGIN{my %seen}; 
+        /^#/ and print and next;
+        /^organism_name/i and next;
+        $seen{$F[5]}++;
+        $seen{$F[5]} > 1 and next;
+        printf qq{%s\t%s\t%s\t%s\n}, $F[5], $F[3], $F[1], $F[4];
+        ' |
+    keep-header -- sort -k3,3 -k1,1 \
+    > ${RANK_NAME}.assembly.tsv
+
+# comment out unneeded assembly levels
+
+# find potential duplicated strains or assemblies
+cat ${RANK_NAME}.assembly.tsv |
+    cut -f 1 |
+    sort |
+    uniq -c |
+    sort -nr
+
+# Edit .tsv, remove unnecessary strains, check strain names and comment out poor assemblies.
+# vim ${RANK_NAME}.assembly.tsv
+# cp ${RANK_NAME}.assembly.tsv ~/Scripts/withncbi/pop
+
+# Cleaning
+rm raw*.*sv
+
+unset RANK_NAME
+
+```
 
 # *Plasmodium*
 
