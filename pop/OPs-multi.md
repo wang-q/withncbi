@@ -83,23 +83,6 @@ perl ~/Scripts/alignDB/alignDB.pl \
 perl ~/Scripts/alignDB/util/dup_db.pl --yes -d Cele_n41_pop -f ~/data/dumps/mysql/Cele_n41_pop.sql.gz
 ```
 
-## Ddis
-
-```bash
-cd ~/data/alignment/xlsx
-
-perl ~/Scripts/alignDB/alignDB.pl \
-    -d Ddis_n18_pop \
-    --da ~/data/alignment/Protists/Ddis/Ddis_n18_pop_refined \
-    -a ~/data/alignment/Ensembl/Ddis/anno.yml \
-    -e dictyostelium_discoideum_core_29_82_1 \
-    --chr ~/data/alignment/Protists/Ddis/chr_length.csv \
-    --lt 5000 --parallel 12 \
-    --run all
-
-perl ~/Scripts/alignDB/util/dup_db.pl --yes -d Ddis_n18_pop -f ~/data/dumps/mysql/Ddis_n18_pop.sql.gz
-```
-
 ## Human (complete genomics data)
 
 ```bash
@@ -178,23 +161,5 @@ perl ~/Scripts/alignDB/alignDB.pl \
     --run all
 
 perl ~/Scripts/alignDB/util/dup_db.pl --yes -d Mouse_n11_pop -f ~/data/dumps/mysql/Mouse_n11_pop.sql.gz
-
-```
-
-## Pfal
-
-```bash
-cd ~/data/alignment/xlsx
-
-perl ~/Scripts/alignDB/alignDB.pl \
-    -d Pfal_n7_pop \
-    --da ~/data/alignment/Protists/pfal/Pfal_n7_pop_refined  \
-    -a ~/data/alignment/Ensembl/Pfal/anno.yml \
-    -e plasmodium_falciparum_core_29_82_3 \
-    --chr ~/data/alignment/Protists/pfal/chr_length.csv \
-    --lt 5000 --parallel 12 \
-    --run all
-
-perl ~/Scripts/alignDB/util/dup_db.pl --yes -d Pfal_n7_pop -f ~/data/dumps/mysql/Pfal_n7_pop.sql.gz
 
 ```
