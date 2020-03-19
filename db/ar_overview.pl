@@ -36,10 +36,10 @@ ar_overview_tx.pl - Overviews for NCBI ASSEMBLY_REPORTS
 =cut
 
 GetOptions(
-    'help|?' => sub { Getopt::Long::HelpMessage(0) },
-    'server|s=s'   => \( my $server   = $Config->{database}{server} ),
-    'port|P=i'     => \( my $port     = $Config->{database}{port} ),
-    'db|d=s'       => \( my $db_name  = $Config->{database}{db} ),
+    'help|?'       => sub { Getopt::Long::HelpMessage(0) },
+    'server|s=s'   => \( my $server = $Config->{database}{server} ),
+    'port|P=i'     => \( my $port = $Config->{database}{port} ),
+    'db|d=s'       => \( my $db_name = $Config->{database}{db} ),
     'username|u=s' => \( my $username = $Config->{database}{username} ),
     'password|p=s' => \( my $password = $Config->{database}{password} ),
     'output|o=s'   => \my $outfile,
@@ -127,7 +127,7 @@ my $species = sub {
 #----------------------------------------------------------#
 # worksheet -- group
 #----------------------------------------------------------#
-my $group = sub {
+my $all_group = sub {
     my $sheet_name = 'group';
     my $sheet;
     $to_xlsx->row(0);
@@ -278,8 +278,9 @@ my $euk_group = sub {
 # worksheets -- subgroup_XXX
 #----------------------------------------------------------#
 my $subgroup_query = sub {
+    my $group      = shift;
     my $subgroup   = shift;
-    my $sheet_name = "subgroup_$subgroup";
+    my $sheet_name = "subgroup_${group}_${subgroup}";
     my $sheet;
     $to_xlsx->row(0);
     $to_xlsx->column(0);
@@ -308,14 +309,14 @@ my $subgroup_query = sub {
                     COUNT(DISTINCT species_id) species_member,
                     COUNT(DISTINCT taxonomy_id) strain_member
                 FROM ar
-                WHERE subgroup = '$subgroup'
+                WHERE `group` = '$group' AND subgroup = '$subgroup'
                 GROUP BY genus) t0
                     LEFT JOIN
                 (SELECT
                     genus,
                     COUNT(DISTINCT taxonomy_id) strain_member
                 FROM ar
-                WHERE subgroup = '$subgroup'
+                WHERE `group` = '$group' AND subgroup = '$subgroup'
                         AND assembly_level LIKE '%Genome%'
                 GROUP BY genus) t1 ON t0.genus = t1.genus
                     LEFT JOIN
@@ -323,7 +324,7 @@ my $subgroup_query = sub {
                     genus,
                     COUNT(DISTINCT taxonomy_id) strain_member
                 FROM ar
-                WHERE subgroup = '$subgroup'
+                WHERE `group` = '$group' AND subgroup = '$subgroup'
                         AND assembly_level LIKE '%Chromosome%'
                 GROUP BY genus) t2 ON t0.genus = t2.genus
                     LEFT JOIN
@@ -331,7 +332,7 @@ my $subgroup_query = sub {
                     genus,
                     COUNT(DISTINCT taxonomy_id) strain_member
                 FROM ar
-                WHERE subgroup = '$subgroup'
+                WHERE `group` = '$group' AND subgroup = '$subgroup'
                         AND assembly_level = 'Scaffold'
                 GROUP BY genus) t3 ON t0.genus = t3.genus
                     LEFT JOIN
@@ -339,7 +340,7 @@ my $subgroup_query = sub {
                     genus,
                     COUNT(DISTINCT taxonomy_id) strain_member
                 FROM ar
-                WHERE subgroup = '$subgroup'
+                WHERE `group` = '$group' AND subgroup = '$subgroup'
                         AND assembly_level = 'Contig'
                 GROUP BY genus) t4 ON t0.genus = t4.genus
             ORDER BY t0.strain_member DESC
@@ -421,12 +422,15 @@ my $genus_query = sub {
 };
 
 {
-    &$strains;
+    # &$strains;
     &$species;
-    &$group;
+    &$all_group;
     &$euk_group;
-    $subgroup_query->("Ascomycetes");
-    $subgroup_query->("Basidiomycetes");
+    $subgroup_query->( "Fungi",    "Ascomycetes" );
+    $subgroup_query->( "Fungi",    "Basidiomycetes" );
+    $subgroup_query->( "Fungi",    "Other" );
+    $subgroup_query->( "Protists", "Apicomplexans" );
+    $subgroup_query->( "Protists", "Other" );
     $genus_query->("Saccharomyces");
     $genus_query->("Dictyostelium");
     $genus_query->("Oryza");
