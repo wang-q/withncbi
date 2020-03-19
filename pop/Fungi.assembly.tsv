@@ -127,58 +127,58 @@ Col_graminic_M1_001	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/149/035/GCF_0
 Col_hig_IMI_349063	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/672/515/GCF_001672515.1_ASM167251v1	Colletotrichum higginsianum	Chromosome
 Col_nym_SA_01	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/001/563/115/GCA_001563115.1_CNYM01	Colletotrichum nymphaeae	Scaffold
 Col_orb_MAFF_240422	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/350/065/GCA_000350065.2_KSG_Corb_v2	Colletotrichum orbiculare	Scaffold
-Cr_2001_935_1	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/835/815/GCA_000835815.1_Cryp_gatt_2001_935-1_V1	Cryptococcus gattii VGII	Scaffold
-Cr_99_473	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/836/455/GCA_000836455.1_Cryp_gatt_99_473_V1	Cryptococcus gattii VGII	Scaffold
 Cr_amy_CBS_6039	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/720/205/GCF_001720205.1_Cryp_amyl_CBS6039_V3	Cryptococcus amylolentus	Scaffold
 Cr_amy_CBS_6273	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/001/720/235/GCA_001720235.1_Cryp_amyl_CBS6273_V2	Cryptococcus amylolentus	Scaffold
-Cr_CA1014	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/875/795/GCA_000875795.1_Cryp_gatt_CA1014_V1	Cryptococcus gattii VGII	Scaffold
-Cr_CBS_10090	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/835/765/GCA_000835765.1_Cryp_gatt_CBS10090_V1	Cryptococcus gattii VGII	Scaffold
-Cr_CBS_7750	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/499/585/GCA_000499585.1_CBS7750	Cryptococcus gattii VGII	Scaffold
-Cr_Cryptococcus_gattii_CA1280	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/836/335/GCA_000836335.1_Cryp_gatt_CA1280_V1	Cryptococcus gattii VGIII	Scaffold
-Cr_Cryptococcus_gattii_CA1873	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/855/695/GCA_000855695.1_Cryp_gatt_CA1873_V1	Cryptococcus gattii VGIII	Scaffold
+Cr_gattii_CA1014	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/875/795/GCA_000875795.1_Cryp_gatt_CA1014_V1	Cryptococcus gattii VGII	Scaffold
+Cr_gattii_2001_935_1	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/835/815/GCA_000835815.1_Cryp_gatt_2001_935-1_V1	Cryptococcus gattii VGII	Scaffold
+Cr_gattii_99_473	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/836/455/GCA_000836455.1_Cryp_gatt_99_473_V1	Cryptococcus gattii VGII	Scaffold
+Cr_gattii_CBS_10090	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/835/765/GCA_000835765.1_Cryp_gatt_CBS10090_V1	Cryptococcus gattii VGII	Scaffold
+Cr_gattii_CBS_7750	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/499/585/GCA_000499585.1_CBS7750	Cryptococcus gattii VGII	Scaffold
+Cr_gattii_CA1280	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/836/335/GCA_000836335.1_Cryp_gatt_CA1280_V1	Cryptococcus gattii VGIII	Scaffold
+Cr_gattii_CA1873	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/855/695/GCA_000855695.1_Cryp_gatt_CA1873_V1	Cryptococcus gattii VGIII	Scaffold
 Cr_dep_CBS_7841	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/001/720/195/GCA_001720195.1_Filo_depa_CBS7841_V1	Cryptococcus depauperatus	Scaffold
 Cr_dep_CBS_7855	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/001/720/245/GCA_001720245.1_Filo_depa_CBS7855_V2	Cryptococcus depauperatus	Scaffold
-Cr_gattii_VGI_Cryptococcus_gattii_E566	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/875/815/GCA_000875815.1_Cryp_gatt_E566_V1	Cryptococcus gattii VGI	Scaffold
-Cr_gattii_VGI_Cryptococcus_gattii_EJB2	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/835/745/GCA_000835745.1_Cryp_gatt_EJB2_V1	Cryptococcus gattii VGI	Scaffold
-Cr_gattii_VGI_Cryptococcus_gattii_NT_10	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/935/105/GCA_000935105.1_Cryp_gatt_NT-10_V1	Cryptococcus gattii VGI	Scaffold
-Cr_gattii_VGI_Cryptococcus_gattii_Ru294	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/836/355/GCA_000836355.1_Cryp_gatt_Ru294_V1	Cryptococcus gattii VGI	Scaffold
-Cr_gattii_VGI_Cryptococcus_gattii_WM276	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/185/945/GCF_000185945.1_ASM18594v1	Cryptococcus gattii VGI	Chromosome
-Cr_gattii_VGIV_IND107	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/835/755/GCA_000835755.1_Cryp_gatt_IND107_V2	Cryptococcus gattii VGIV	Scaffold
-Cr_LA55	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/836/315/GCA_000836315.1_Cryp_gatt_LA55_V1	Cryptococcus gattii VGII	Scaffold
-Cr_MMRL2647	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/875/855/GCA_000875855.1_Cryp_gatt_MMRL2647_V2	Cryptococcus gattii VGII	Scaffold
-Cr_neof_var_grubii	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/216/725/GCA_002216725.1_ASM221672v1	Cryptococcus neoformans	Chromosome
-Cr_neof_var_grubii_125_91	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/215/885/GCA_002215885.1_Cryp_neof_125_91_V1	Cryptococcus neoformans	Scaffold
-Cr_neof_var_grubii_A1_35_8	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/221/985/GCA_002221985.1_Cryp_neof_grubii_A1-35-8_V1	Cryptococcus neoformans	Scaffold
-Cr_neof_var_grubii_A2_102_5	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/222/375/GCA_002222375.1_Cryp_neof_A2_102_5_V1	Cryptococcus neoformans	Scaffold
-Cr_neof_var_grubii_A5_35_17	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/222/215/GCA_002222215.1_Cryp_neof_grubii_A5-35-17_V1	Cryptococcus neoformans	Scaffold
-Cr_neof_var_grubii_AD1_7a	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/220/445/GCA_002220445.1_Cryp_neof_AD1_7a_V1	Cryptococcus neoformans	Contig
-Cr_neof_var_grubii_AD1_83a	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/215/765/GCA_002215765.1_Cryp_neof_AD1_83a_V1	Cryptococcus neoformans	Scaffold
-Cr_neof_var_grubii_AD2_60a	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/215/775/GCA_002215775.1_Cryp_neof_AD2_60a_V1	Cryptococcus neoformans	Scaffold
-Cr_neof_var_grubii_Br795	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/222/225/GCA_002222225.1_Cryp_neof_Br795_V1	Cryptococcus neoformans	Contig
-Cr_neof_var_grubii_Bt1	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/215/705/GCA_002215705.1_Cryp_neof_Bt1_V1	Cryptococcus neoformans	Scaffold
-Cr_neof_var_grubii_Bt120	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/222/465/GCA_002222465.1_Cryp_neof_Bt120_V1	Cryptococcus neoformans	Scaffold
-Cr_neof_var_grubii_Bt15	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/222/335/GCA_002222335.1_Cryp_neof_Bt15_V1	Cryptococcus neoformans	Scaffold
-Cr_neof_var_grubii_Bt63	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/234/625/GCA_002234625.1_Cryp_neof_Bt63_V1	Cryptococcus neoformans	Scaffold
-Cr_neof_var_grubii_Bt85	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/215/835/GCA_002215835.1_Cryp_neof_Bt85_V1	Cryptococcus neoformans	Scaffold
-Cr_neof_var_grubii_C23	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/215/825/GCA_002215825.1_Cryp_neof_C23_V1	Cryptococcus neoformans	Scaffold
-Cr_neof_var_grubii_c45	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/215/855/GCA_002215855.1_Cryp_neof_C45_V1	Cryptococcus neoformans	Scaffold
-Cr_neof_var_grubii_c8	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/222/405/GCA_002222405.1_Cryp_neof_C8_V1	Cryptococcus neoformans	Scaffold
-Cr_neof_var_grubii_CHC193	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/222/295/GCA_002222295.1_Cryp_neof_CHC193_V1	Cryptococcus neoformans	Contig
-Cr_neof_var_grubii_D17_1	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/222/255/GCA_002222255.1_Cryp_neof_D17_1_V1	Cryptococcus neoformans	Scaffold
-Cr_neof_var_grubii_Gb118	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/224/005/GCA_002224005.1_Cryp_neof_Gb118_V1	Cryptococcus neoformans	Scaffold
-Cr_neof_var_grubii_H99	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/149/245/GCF_000149245.1_CNA3	Cryptococcus neoformans	Chromosome
-Cr_neof_var_grubii_MW_RSA1955	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/222/455/GCA_002222455.1_Cryp_neof_MW_RSA1955_V1	Cryptococcus neoformans	Contig
-Cr_neof_var_grubii_MW_RSA36	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/222/395/GCA_002222395.1_Cryp_neof_MW_RSA36_V1	Cryptococcus neoformans	Scaffold
-Cr_neof_var_grubii_MW_RSA852	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/220/035/GCA_002220035.1_Cryp_neof_MW_RSA852_V1	Cryptococcus neoformans	Contig
-Cr_neof_var_grubii_Th84	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/222/315/GCA_002222315.1_Cryp_neof_Th84_V1	Cryptococcus neoformans	Scaffold
-Cr_neof_var_grubii_Tu259_1	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/222/325/GCA_002222325.1_Cryp_neof_Tu259_1_V1	Cryptococcus neoformans	Scaffold
-Cr_neof_var_grubii_Tu401_1	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/222/475/GCA_002222475.1_Cryp_neof_Tu401_1_V1	Cryptococcus neoformans	Scaffold
-Cr_neof_var_grubii_Ze90_1	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/222/385/GCA_002222385.1_Cryp_neof_Ze90_1_V1	Cryptococcus neoformans	Scaffold
-Cr_neof_var_neoformans_B_3501A	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/149/385/GCF_000149385.1_ASM14938v1	Cryptococcus neoformans	Chromosome
-Cr_neof_var_neoformans_JEC21	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/091/045/GCF_000091045.1_ASM9104v1	Cryptococcus neoformans	Chromosome
-Cr_neof_var_neoformans_XL280	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/216/205/GCA_002216205.1_ASM221620v1	Cryptococcus neoformans	Chromosome
-Cr_R265	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/149/475/GCA_000149475.3_CNB2	Cryptococcus gattii VGII	Scaffold
-Cr_Ram5	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/836/375/GCA_000836375.1_Cryp_gatt_Ram5_V1	Cryptococcus gattii VGII	Scaffold
+Cr_gattii_E566	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/875/815/GCA_000875815.1_Cryp_gatt_E566_V1	Cryptococcus gattii VGI	Scaffold
+Cr_gattii_EJB2	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/835/745/GCA_000835745.1_Cryp_gatt_EJB2_V1	Cryptococcus gattii VGI	Scaffold
+Cr_gattii_NT_10	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/935/105/GCA_000935105.1_Cryp_gatt_NT-10_V1	Cryptococcus gattii VGI	Scaffold
+Cr_gattii_Ru294	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/836/355/GCA_000836355.1_Cryp_gatt_Ru294_V1	Cryptococcus gattii VGI	Scaffold
+Cr_gattii_WM276	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/185/945/GCF_000185945.1_ASM18594v1	Cryptococcus gattii VGI	Chromosome
+Cr_gattii_IND107	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/835/755/GCA_000835755.1_Cryp_gatt_IND107_V2	Cryptococcus gattii VGIV	Scaffold
+Cr_gattii_LA55	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/836/315/GCA_000836315.1_Cryp_gatt_LA55_V1	Cryptococcus gattii VGII	Scaffold
+Cr_gattii_MMRL2647	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/875/855/GCA_000875855.1_Cryp_gatt_MMRL2647_V2	Cryptococcus gattii VGII	Scaffold
+Cr_gattii_R265	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/149/475/GCA_000149475.3_CNB2	Cryptococcus gattii VGII	Scaffold
+Cr_gattii_Ram5	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/836/375/GCA_000836375.1_Cryp_gatt_Ram5_V1	Cryptococcus gattii VGII	Scaffold
+Cr_neof_grubii	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/216/725/GCA_002216725.1_ASM221672v1	Cryptococcus neoformans	Chromosome
+Cr_neof_grubii_125_91	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/215/885/GCA_002215885.1_Cryp_neof_125_91_V1	Cryptococcus neoformans	Scaffold
+Cr_neof_grubii_A1_35_8	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/221/985/GCA_002221985.1_Cryp_neof_grubii_A1-35-8_V1	Cryptococcus neoformans	Scaffold
+Cr_neof_grubii_A2_102_5	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/222/375/GCA_002222375.1_Cryp_neof_A2_102_5_V1	Cryptococcus neoformans	Scaffold
+Cr_neof_grubii_A5_35_17	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/222/215/GCA_002222215.1_Cryp_neof_grubii_A5-35-17_V1	Cryptococcus neoformans	Scaffold
+Cr_neof_grubii_AD1_7a	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/220/445/GCA_002220445.1_Cryp_neof_AD1_7a_V1	Cryptococcus neoformans	Contig
+Cr_neof_grubii_AD1_83a	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/215/765/GCA_002215765.1_Cryp_neof_AD1_83a_V1	Cryptococcus neoformans	Scaffold
+Cr_neof_grubii_AD2_60a	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/215/775/GCA_002215775.1_Cryp_neof_AD2_60a_V1	Cryptococcus neoformans	Scaffold
+Cr_neof_grubii_Br795	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/222/225/GCA_002222225.1_Cryp_neof_Br795_V1	Cryptococcus neoformans	Contig
+Cr_neof_grubii_Bt1	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/215/705/GCA_002215705.1_Cryp_neof_Bt1_V1	Cryptococcus neoformans	Scaffold
+Cr_neof_grubii_Bt120	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/222/465/GCA_002222465.1_Cryp_neof_Bt120_V1	Cryptococcus neoformans	Scaffold
+Cr_neof_grubii_Bt15	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/222/335/GCA_002222335.1_Cryp_neof_Bt15_V1	Cryptococcus neoformans	Scaffold
+Cr_neof_grubii_Bt63	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/234/625/GCA_002234625.1_Cryp_neof_Bt63_V1	Cryptococcus neoformans	Scaffold
+Cr_neof_grubii_Bt85	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/215/835/GCA_002215835.1_Cryp_neof_Bt85_V1	Cryptococcus neoformans	Scaffold
+Cr_neof_grubii_C23	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/215/825/GCA_002215825.1_Cryp_neof_C23_V1	Cryptococcus neoformans	Scaffold
+Cr_neof_grubii_c45	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/215/855/GCA_002215855.1_Cryp_neof_C45_V1	Cryptococcus neoformans	Scaffold
+Cr_neof_grubii_c8	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/222/405/GCA_002222405.1_Cryp_neof_C8_V1	Cryptococcus neoformans	Scaffold
+Cr_neof_grubii_CHC193	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/222/295/GCA_002222295.1_Cryp_neof_CHC193_V1	Cryptococcus neoformans	Contig
+Cr_neof_grubii_D17_1	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/222/255/GCA_002222255.1_Cryp_neof_D17_1_V1	Cryptococcus neoformans	Scaffold
+Cr_neof_grubii_Gb118	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/224/005/GCA_002224005.1_Cryp_neof_Gb118_V1	Cryptococcus neoformans	Scaffold
+Cr_neof_grubii_H99	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/149/245/GCF_000149245.1_CNA3	Cryptococcus neoformans	Chromosome
+Cr_neof_grubii_MW_RSA1955	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/222/455/GCA_002222455.1_Cryp_neof_MW_RSA1955_V1	Cryptococcus neoformans	Contig
+Cr_neof_grubii_MW_RSA36	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/222/395/GCA_002222395.1_Cryp_neof_MW_RSA36_V1	Cryptococcus neoformans	Scaffold
+Cr_neof_grubii_MW_RSA852	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/220/035/GCA_002220035.1_Cryp_neof_MW_RSA852_V1	Cryptococcus neoformans	Contig
+Cr_neof_grubii_Th84	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/222/315/GCA_002222315.1_Cryp_neof_Th84_V1	Cryptococcus neoformans	Scaffold
+Cr_neof_grubii_Tu259_1	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/222/325/GCA_002222325.1_Cryp_neof_Tu259_1_V1	Cryptococcus neoformans	Scaffold
+Cr_neof_grubii_Tu401_1	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/222/475/GCA_002222475.1_Cryp_neof_Tu401_1_V1	Cryptococcus neoformans	Scaffold
+Cr_neof_grubii_Ze90_1	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/222/385/GCA_002222385.1_Cryp_neof_Ze90_1_V1	Cryptococcus neoformans	Scaffold
+Cr_neof_neoformans_B_3501A	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/149/385/GCF_000149385.1_ASM14938v1	Cryptococcus neoformans	Chromosome
+Cr_neof_neoformans_JEC21	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/091/045/GCF_000091045.1_ASM9104v1	Cryptococcus neoformans	Chromosome
+Cr_neof_neoformans_XL280	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/216/205/GCA_002216205.1_ASM221620v1	Cryptococcus neoformans	Chromosome
 Cr_win_CBS_7118	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/720/155/GCF_001720155.1_Tsuc_wing_CBS7118_V1	Cryptococcus wingfieldii	Scaffold
 E_ama_E4668	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/877/375/GCA_000877375.1_EamaE4668v1	Epichloe amarillans	Contig
 E_ama_E57	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/223/075/GCA_000223075.2_EpiAma_1.0	Epichloe amarillans	Contig
@@ -294,7 +294,7 @@ Pn_mur_B123	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/349/005/GCF_000349005
 Pu_1_1_BBBD_Race_1	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/151/525/GCA_000151525.2_P_triticina_1_1_V2	Puccinia triticina	Scaffold
 Pu_cor_var_avenae_f_sp_avenae	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/873/125/GCA_002873125.1_ASM287312v1	Puccinia coronata	Contig
 Pu_graminis_f_sp_tritici	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/762/355/GCA_002762355.1_ASM276235v1	Puccinia graminis	Scaffold
-Pu_graminis_f_sp_tritici_CRL_75_36_700_3	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/149/925/GCF_000149925.1_ASM14992v1	Puccinia graminis	Scaffold
+Pu_graminis_CRL_75_36_700_3	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/149/925/GCF_000149925.1_ASM14992v1	Puccinia graminis	Scaffold
 Pu_Race_106	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/001/706/785/GCA_001706785.1_PuccTri106_1.0	Puccinia triticina	Contig
 Pu_Race_77	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/001/706/745/GCA_001706745.1_ASM170674v1	Puccinia triticina	Contig
 Pu_str_f_sp_tritici	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/001/936/605/GCA_001936605.2_ASM193660v2	Puccinia striiformis	Scaffold
