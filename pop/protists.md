@@ -307,16 +307,24 @@ nw_display -s -b 'visibility:hidden' -w 600 -v 30 tree.nwk |
 
 Review `ASSEMBLY/Protists.assembly.pass.csv` and `mash/groups.tsv`
 
-| #Serial | Group           | Count | Target             | Sequencing     |
-|:--------|:----------------|:------|:-------------------|:---------------|
-| 1       | A_Ei            | 4     | A_cas              |                |
-| 2       | Babesia         | 7     | Ba_bov_T2Bo        | 8X Sanger, WGS |
-| 8       | Cryptosporidium | 11    | Cry_parvum_Iowa_II |                |
-| 7       | Dictyostelium   | 11    | D_disc_AX4         |                |
-| 11      | Leishmania      | 24    | L_maj_Friedlin     |                |
-| 16      | Pl_kno_viv      | 12    | Pl_viv             |                |
-| 17      | Pl_falcip       | 31    | Pl_falcip_3D7      |                |
-| 19      | Theileria       | 6     | Th_parva_Muguga    |                |
+| #Serial | Group              | Count | Target                 | Sequencing     |
+|:--------|:-------------------|:------|:-----------------------|:---------------|
+| 1       | A_Ei               | 4     | A_cas                  |                |
+| 2       | Babesia            | 7     | Ba_bov_T2Bo            | 8X Sanger, WGS |
+| 4       | Blastocystis       | 8     | Bl_hom                 |                |
+| 8       | Cryptosporidium    | 11    | Cry_parvum_Iowa_II     |                |
+| 7       | Dictyostelium      | 11    | D_disc_AX4             |                |
+| 10      | Giardia            | 6     | G_intes                |                |
+| 11      | Leishmania         | 24    | L_maj_Friedlin         |                |
+| 12      | Nannochloropsis    | 8     | N_oce                  |                |
+| 13      | Phytophthora       | 10    | Ph_soj                 |                |
+| 15      | Pl_ber_cha_vin_yoe | 10    | Pl_yoe                 |                |
+| 16      | Pl_kno_viv         | 12    | Pl_viv                 |                |
+| 17      | Pl_falcip          | 31    | Pl_falcip_3D7          |                |
+| 18      | Pythium            | 4     | Py_gui                 |                |
+| 19      | Theileria          | 6     | Th_parva_Muguga        |                |
+| 20      | Toxoplasma         | 16    | To_gondii_ME49         |                |
+| 21      | Trypanosoma        | 5     | Tr_bruc_brucei_TREU927 |                |
 
 ```bash
 mkdir -p ~/data/alignment/Protists/taxon
@@ -344,10 +352,17 @@ ARRAY=(
     'Blastocystis::Bl_hom' 
     'Cryptosporidium::Cry_parvum_Iowa_II' 
     'Dictyostelium::D_disc_AX4' 
+    'Giardia::G_intes' 
     'Leishmania::L_maj_Friedlin' 
+    'Nannochloropsis::N_oce' 
+    'Phytophthora::Ph_soj' 
+    'Pl_ber_cha_vin_yoe::Pl_yoe' 
     'Pl_kno_viv::Pl_viv' 
     'Pl_falcip::Pl_falcip_3D7' 
-    'Theileria::Th_parva_Muguga' 
+    'Pythium::Py_gui' 
+    'Theileria::Th_parva_Muguga'
+    'Toxoplasma::To_gondii_ME49'
+    'Trypanosoma::Tr_bruc_brucei_TREU927'
 )
 
 echo -e "#Serial\tGroup\tCount\tTarget\tSequencing" > group_target.tsv
@@ -413,13 +428,35 @@ rsync -avP \
 
 ```
 
-`--perseq` for Chromosome-level assemblies and targets
+* `--perseq` for Chromosome-level assemblies and targets
+* Use `Stramenopiles` as `Eukaryota` takes too long to compute
 
 ```bash
 cd ~/data/alignment/Protists/
 
 $(brew --prefix repeatmasker)/libexec/util/queryRepeatDatabase.pl \
     -species Eukaryota -stat
+#174 ancestral and ubiquitous sequence(s) with a total length of 45804 bp
+#0 eukaryota specific repeats with a total length of 0 bp
+#31314 lineage specific sequence(s) with a total length of 81842705 bp
+
+$(brew --prefix repeatmasker)/libexec/util/queryRepeatDatabase.pl \
+    -species Alveolata -stat
+#174 ancestral and ubiquitous sequence(s) with a total length of 45804 bp
+#3 alveolata specific repeats with a total length of 7681 bp
+#30 lineage specific sequence(s) with a total length of 81127 bp
+
+$(brew --prefix repeatmasker)/libexec/util/queryRepeatDatabase.pl \
+    -species Kinetoplastida -stat
+#176 ancestral and ubiquitous sequence(s) with a total length of 48931 bp
+#0 kinetoplastida specific repeats with a total length of 0 bp
+#44 lineage specific sequence(s) with a total length of 67956 bp
+
+$(brew --prefix repeatmasker)/libexec/util/queryRepeatDatabase.pl \
+    -species Stramenopiles -stat
+#174 ancestral and ubiquitous sequence(s) with a total length of 45804 bp
+#3 stramenopiles specific repeats with a total length of 6250 bp
+#620 lineage specific sequence(s) with a total length of 2090320 bp
 
 # prep
 egaz template \
@@ -428,7 +465,7 @@ egaz template \
     $( cat taxon/group_target.tsv | sed -e '1d' | cut -f 4 | parallel -j 1 echo " --perseq {} " ) \
     $( cat taxon/chr-level.list | parallel -j 1 echo " --perseq {} " ) \
     --min 5000 --about 5000000 \
-    -v --repeatmasker "--species Eukaryota --parallel 24"
+    -v --repeatmasker "--species Stramenopiles --parallel 24"
 
 bsub -q mpi -n 24 -J "Protists-0_prep" "bash GENOMES/0_prep.sh"
 
@@ -446,64 +483,61 @@ done
 
 ```
 
+
 ## plasmodium: run
 
+Plasmodium distributed on many branches.
+
 ```bash
+cd ~/data/alignment/Protists/
+
+# sanger
+egaz template \
+    GENOMES/Pl_falcip_3D7 \
+    GENOMES/Pl_yoe \
+    GENOMES/Pl_viv \
+    GENOMES/Pl_ber_ANKA \
+    GENOMES/Pl_cha_chabaudi \
+    GENOMES/Pl_cyn_B \
+    GENOMES/Pl_kno_H \
+    GENOMES/Pl_ovale \
+    GENOMES/Pl_rel \
+    --multi -o groups/plasmodium/ \
+    --multiname sanger \
+    --tree taxon/tree.nwk \
+    --parallel 24 -v
+
+bsub -q mpi -n 24 -J "plasmodium-1_pair" "bash groups/plasmodium/1_pair.sh"
+bsub  -w "ended(plasmodium-1_pair)" \
+    -q mpi -n 24 -J "plasmodium-3_multi" "bash groups/plasmodium/3_multi.sh"
+
 ```
 
-* Rsync to hpcc
+## Protists: run
 
 ```bash
-rsync -avP \
-    ~/data/alignment/plasmodium/ \
-    wangq@202.119.37.251:data/alignment/plasmodium
+cd ~/data/alignment/Protists/
 
-# rsync -avP wangq@202.119.37.251:data/alignment/plasmodium/ ~/data/alignment/plasmodium
+cat taxon/group_target.tsv |
+    sed -e '1d' |
+    parallel --colsep '\t' --no-run-if-empty --linebuffer -k -j 1 '
+        echo -e "==> Group: [{2}]\tTarget: [{4}]\n"
+        
+        egaz template \
+            GENOMES/{4} \
+            $(cat taxon/{2} | grep -v -x "{4}" | xargs -I[] echo "GENOMES/[]") \
+            --multi -o groups/{2}/ \
+            --tree taxon/tree.nwk \
+            --parallel 24 -v
 
-```
+        bsub -q mpi -n 24 -J "{2}-1_pair" "bash groups/{2}/1_pair.sh"
+        bsub -w "ended({2}-1_pair)" \
+            -q mpi -n 24 -J "{2}-3_multi" "bash groups/{2}/3_multi.sh"
+    '
 
-`--perseq` for RefSeq Chromosome-level assemblies.
-
-```bash
-cd ~/data/alignment/plasmodium
-
-# prep
-egaz template \
-    ASSEMBLY WGS \
-    --prep -o GENOMES \
-    --perseq Pfal_3D7 \
-    --perseq Pber_ANKA \
-    --perseq Pcha_chabaudi \
-    --perseq Pcyn_strain_B \
-    --perseq Pkno_strain_H \
-    --min 5000 --about 5000000 \
-    -v --repeatmasker "--species Alveolata --parallel 24"
-
-bsub -q mpi -n 24 -J "plasmodium-0_prep" "bash GENOMES/0_prep.sh"
-
-ls -t output.* | head -n 1 | xargs tail -f | grep "==>"
-
-# gff
-for n in Pfal_3D7 Pber_ANKA Pcha_adami Pcha_chabaudi Pcyn_strain_B Pkno_strain_H; do
-    FILE_GFF=$(find ASSEMBLY -type f -name "*_genomic.gff.gz" | grep "${n}")
-    echo >&2 "==> Processing ${n}/${FILE_GFF}"
-    
-    gzip -d -c ${FILE_GFF} > GENOMES/${n}/chr.gff
-done
-
-# multi
-egaz template \
-    GENOMES/Pfal_3D7 \
-    $(find GENOMES -maxdepth 1 -type d -path "*/????*" | grep -v "Pfal_3D7") \
-    --multi -o multi/ \
-    --rawphylo --parallel 24 -v
-
-bsub -q mpi -n 24 -J "plasmodium-1_pair" "bash multi/1_pair.sh"
-bsub -w "ended(plasmodium-1_pair)" \
-    -q mpi -n 24 -J "plasmodium-2_rawphylo" "bash multi/2_rawphylo.sh"
-bsub  -w "ended(plasmodium-2_rawphylo)" \
-    -q mpi -n 24 -J "plasmodium-3_multi" "bash multi/3_multi.sh"
-
+# clean
+find groups -mindepth 1 -maxdepth 3 -type d -name "*_raw" | parallel -r rm -fr
+find groups -mindepth 1 -maxdepth 3 -type d -name "*_fasta" | parallel -r rm -fr
 
 ```
 
