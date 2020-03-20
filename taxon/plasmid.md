@@ -314,13 +314,19 @@ cat ../nr/connected_components.tsv |
 
 wc -l subgroup/* |
     sort -nr |
-    head -n 50
+    head -n 100
 
 wc -l subgroup/* |
     perl -pe 's/^\s+//' |
     tsv-filter -d" " --ge 1:50 |
     wc -l
 #76
+
+wc -l subgroup/* |
+    perl -pe 's/^\s+//' |
+    tsv-filter -d" " --le 1:2 |
+    wc -l
+#249
 
 ```
 
