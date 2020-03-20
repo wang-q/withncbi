@@ -565,8 +565,8 @@ cat taxon/group_target.tsv |
     '
 
 # clean
-find group -mindepth 1 -maxdepth 3 -type d -name "*_raw" | parallel -r rm -fr
-find group -mindepth 1 -maxdepth 3 -type d -name "*_fasta" | parallel -r rm -fr
+find groups -mindepth 1 -maxdepth 3 -type d -name "*_raw" | parallel -r rm -fr
+find groups -mindepth 1 -maxdepth 3 -type d -name "*_fasta" | parallel -r rm -fr
 
 ```
 
