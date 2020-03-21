@@ -312,21 +312,188 @@ cat ../nr/connected_components.tsv |
         echo {} | tr "[:blank:]" "\n" >> ${file}
     '
 
+# remove duplicates
+find subgroup -name "*.lst" | sort |
+    parallel -j 1 '
+        cat {} | sort | uniq > tmp.lst
+        mv tmp.lst {}
+    '
+
 wc -l subgroup/* |
     sort -nr |
     head -n 100
 
 wc -l subgroup/* |
     perl -pe 's/^\s+//' |
-    tsv-filter -d" " --ge 1:50 |
-    wc -l
-#76
-
-wc -l subgroup/* |
-    perl -pe 's/^\s+//' |
     tsv-filter -d" " --le 1:2 |
     wc -l
 #249
+
+wc -l subgroup/* |
+    perl -pe 's/^\s+//' |
+    tsv-filter -d" " --ge 1:50 |
+    tsv-filter -d " " --regex '2:\d+' |
+    sort -nr \
+    > next.tsv
+
+wc -l next.tsv
+#67
+
+rm -fr job
+
+```
+
+## Plasmid: prepare
+
+* Rsync to hpcc
+
+```bash
+rsync -avP \
+    ~/data/plasmid/ \
+    wangq@202.119.37.251:data/plasmid
+
+# rsync -avP wangq@202.119.37.251:data/plasmid/ ~/data/plasmid
+
+```
+
+* Split sequences
+
+```bash
+mkdir ~/data/plasmid/GENOMES
+mkdir ~/data/plasmid/taxon
+
+cd ~/data/plasmid/grouping
+
+echo -e "#Serial\tGroup\tCount\tTarget" > ../taxon/group_target.tsv
+
+cat next.tsv |
+    cut -d" " -f 2 |
+    parallel -j 4 -k --line-buffer '
+        echo >&2 "==> {}"
+
+        GROUP_NAME={/.}
+        TARGET_NAME=$(head -n 1 {} | perl -pe "s/\.\d+//g")
+        
+        SERIAL={#}
+        COUNT=$(cat {} | wc -l)
+        
+        echo -e "${SERIAL}\t${GROUP_NAME}\t${COUNT}\t${TARGET_NAME}" >> ../taxon/group_target.tsv
+    
+        faops order ../nr/refseq.fa {} stdout |
+            faops filter -s stdin stdout \
+            > ../GENOMES/${GROUP_NAME}.fa
+    '
+
+cat next.tsv |
+    cut -d" " -f 2 |
+    parallel -j 4 -k --line-buffer '
+        echo >&2 "==> {}"
+        GROUP_NAME={/.}
+        faops size ../GENOMES/${GROUP_NAME}.fa > ../taxon/${GROUP_NAME}.sizes
+    '
+
+# RepeatMasker
+egaz repeatmasker -p 16 ../GENOMES/*.fa -o ../GENOMES/
+
+# split-name
+find ../GENOMES -maxdepth 1 -type f -name "*.fa" | sort |
+    parallel -j 4 '
+        faops split-name {} {.}
+    '
+
+# mv to dir of basename
+find ../GENOMES -maxdepth 2 -mindepth 2 -type f -name "*.fa" | sort |
+    parallel -j 4 '
+        mkdir -p {.}
+        mv {} {.}
+    '
+
+```
+
+* `prepseq`
+
+```bash
+cd ~/data/plasmid/
+
+cat taxon/group_target.tsv |
+    sed -e '1d' |
+    parallel --colsep '\t' --no-run-if-empty --linebuffer -k -j 4 '
+        echo -e "==> Group: [{2}]\tTarget: [{4}]\n"
+        
+        for name in $(cat taxon/{2}.sizes | cut -f 1); do
+            egaz prepseq GENOMES/{2}/${name}
+        done
+    '
+
+```
+
+* Check outliers of lengths
+
+```bash
+cd ~/data/plasmid/
+
+cat taxon/*.sizes | cut -f 1 | wc -l
+#6862
+
+cat taxon/*.sizes | cut -f 2 | paste -sd+ | bc
+#693860223
+
+cat taxon/group_target.tsv |
+    sed -e '1d' |
+    parallel --colsep '\t' --no-run-if-empty --linebuffer -k -j 4 '
+        echo -e "==> Group: [{2}]\tTarget: [{4}]"
+        
+        median=$(cat taxon/{2}.sizes | datamash median 2)
+        mad=$(cat taxon/{2}.sizes | datamash mad 2)
+        lower_limit=$( bc <<< " (${median} - 2 * ${mad}) / 2" )
+        
+#        echo $median $mad $lower_limit
+        lines=$(tsv-filter taxon/{2}.sizes --le "2:${lower_limit}" | wc -l)
+        
+        if (( lines > 0 )); then
+            echo >&2 "    $lines lines to be filtered"
+            tsv-join taxon/{2}.sizes -e -f <(
+                    tsv-filter taxon/{2}.sizes --le "2:${lower_limit}"
+                ) \
+                > taxon/{2}.filtered.sizes
+            mv taxon/{2}.filtered.sizes taxon/{2}.sizes
+        fi
+    '
+
+cat taxon/*.sizes | cut -f 1 | wc -l
+#6792
+
+cat taxon/*.sizes | cut -f 2 | paste -sd+ | bc
+#692147763
+
+```
+
+## Plasmid: run
+
+```bash
+cd ~/data/plasmid/
+
+cat taxon/group_target.tsv |
+    sed -e '1d' |
+    parallel --colsep '\t' --no-run-if-empty --linebuffer -k -j 4 '
+        echo -e "==> Group: [{2}]\tTarget: [{4}]\n"
+        
+        egaz template \
+            GENOMES/{2}/{4} \
+            $(cat taxon/{2}.sizes | cut -f 1 | grep -v -x "{4}" | xargs -I[] echo "GENOMES/{2}/[]") \
+            --multi -o groups/{2}/ \
+            --order \
+            --parallel 4 -v
+
+        bsub -q mpi -n 24 -J "{2}-1_pair" "bash groups/{2}/1_pair.sh"
+        bsub -w "ended({2}-1_pair)" \
+            -q mpi -n 24 -J "{2}-3_multi" "bash groups/{2}/3_multi.sh"
+    '
+
+# clean
+find groups -mindepth 1 -maxdepth 3 -type d -name "*_raw" | parallel -r rm -fr
+find groups -mindepth 1 -maxdepth 3 -type d -name "*_fasta" | parallel -r rm -fr
+find . -mindepth 1 -maxdepth 3 -type f -name "output.*" | parallel -r rm
 
 ```
 
