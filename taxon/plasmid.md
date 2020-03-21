@@ -152,51 +152,24 @@ find job -maxdepth 1 -type f -name "[0-9]??" | sort |
 
 find job -maxdepth 1 -type f -name "[0-9]??" | sort |
     parallel -j 1 '
-        cat {}.tsv |
-            tsv-select -f 1-3
+        cat {}.tsv
     ' \
     > dist_full.tsv
 
-# 40 min
-#cat dist_full.tsv |
-#    Rscript -e '
-#        library(readr);
-#        library(tidyr);
-#        library(ape);
-#        pair_dist <- read_tsv(file("stdin"), col_names=F); 
-#        tmp <- pair_dist %>%
-#            pivot_wider( names_from = X2, values_from = X3, values_fill = list(X3 = 1.0) )
-#        tmp <- as.matrix(tmp)
-#        mat <- tmp[,-1]
-#        rownames(mat) <- tmp[,1]
-#        
-#        dist_mat <- as.dist(mat)
-#        clusters <- hclust(dist_mat, method = "ward.D2")
-#        tree <- as.phylo(clusters) 
-#        write.tree(phy=tree, file="tree.nwk")
-#        
-#        group <- cutree(clusters, h=0.5) # k=3
-#        groups <- as.data.frame(group)
-#        groups$ids <- rownames(groups)
-#        rownames(groups) <- NULL
-#        groups <- groups[order(groups$group), ]
-#        write_tsv(groups, "groups.tsv")
-#    '
-
-# distance < 0.1
+# distance < 0.05
 cat dist_full.tsv |
-    tsv-filter --ff-str-ne 1:2 --le 3:0.1 \
+    tsv-filter --ff-str-ne 1:2 --le 3:0.05 \
     > connected.tsv
 
 head -n 5 connected.tsv
-#NZ_CP044448.1   NC_006994.1     0.0920479       0       78/1000
-#NZ_CP030113.1   NC_002487.1     0.0974869       0       69/1000
-#NC_017210.1     NC_009034.1     0.0955937       0       72/1000
-#NZ_CP029748.1   NC_006671.1     0.0733545       0       120/1000
-#NZ_CP011064.1   NC_006671.1     0.0579033       0       174/1000
+#NC_019347.1     NC_000906.2     0.0321972       0       341/1000
+#NC_004847.1     NC_000906.2     0.0458408       0       236/1000
+#NC_002111.1     NC_002130.1     0.0375603       0       294/1000
+#NC_002636.1     NC_006994.1     0.0284057       0       380/1000
+#NC_002524.1     NC_006994.1     0.0444041       0       245/1000
 
-cat connected.tsv | wc -l 
-#337156
+cat connected.tsv | wc -l
+#60618
 
 mkdir -p group
 cat connected.tsv |
@@ -238,18 +211,17 @@ faops some -i ../nr/refseq.nr.fa grouped.lst stdout |
     > group/lonely.lst
 
 wc -l group/*
-#  2527 group/00.lst
-#  4974 group/1.lst
-#   198 group/2.lst
-#   148 group/3.lst
-#    93 group/4.lst
-#    74 group/5.lst
-#    73 group/6.lst
-#    63 group/7.lst
-#    52 group/8.lst
-#    51 group/9.lst
-#  3946 group/lonely.lst
-# 12199 total
+#  3333 group/00.lst
+#  1644 group/1.lst
+#   359 group/2.lst
+#    94 group/3.lst
+#    69 group/4.lst
+#    65 group/5.lst
+#    55 group/6.lst
+#    51 group/7.lst
+#    51 group/8.lst
+#  6477 group/lonely.lst
+# 12198 total
 
 find group -maxdepth 1 -type f -name "[0-9]*.lst" | sort |
     parallel -j 4 --line-buffer '
@@ -283,7 +255,7 @@ find group -maxdepth 1 -type f -name "[0-9]*.lst.tsv" | sort |
                 tree <- as.phylo(clusters) 
                 write.tree(phy=tree, file="{.}.tree.nwk")
                 
-                group <- cutree(clusters, h=0.5) # k=3
+                group <- cutree(clusters, h=0.2) # k=3
                 groups <- as.data.frame(group)
                 groups$ids <- rownames(groups)
                 rownames(groups) <- NULL
@@ -304,7 +276,19 @@ find group -name "*.groups.tsv" | sort |
     perl -na -F"\t" -MPath::Tiny -e '
         path(qq{subgroup/$F[0].lst})->append(qq{$F[1]});
     '
-    
+
+# ignore small subgroups
+find subgroup -name "*.lst" | sort |
+    parallel -j 1 -k '
+        lines=$(cat {} | wc -l)
+        
+        if (( lines < 5 )); then
+            echo -e "{}\t$lines"
+            cat {} >> subgroup/lonely.lst
+            rm {}
+        fi
+    '
+
 # append ccs
 cat ../nr/connected_components.tsv |
     parallel -j 1 --colsep "\t" '
@@ -325,9 +309,9 @@ wc -l subgroup/* |
 
 wc -l subgroup/* |
     perl -pe 's/^\s+//' |
-    tsv-filter -d" " --le 1:2 |
+    tsv-filter -d" " --le 1:10 |
     wc -l
-#249
+#132
 
 wc -l subgroup/* |
     perl -pe 's/^\s+//' |
@@ -337,24 +321,13 @@ wc -l subgroup/* |
     > next.tsv
 
 wc -l next.tsv
-#67
+#53
 
-rm -fr job
+# rm -fr job
 
 ```
 
 ## Plasmid: prepare
-
-* Rsync to hpcc
-
-```bash
-rsync -avP \
-    ~/data/plasmid/ \
-    wangq@202.119.37.251:data/plasmid
-
-# rsync -avP wangq@202.119.37.251:data/plasmid/ ~/data/plasmid
-
-```
 
 * Split sequences
 
@@ -392,8 +365,8 @@ cat next.tsv |
         faops size ../GENOMES/${GROUP_NAME}.fa > ../taxon/${GROUP_NAME}.sizes
     '
 
-# RepeatMasker
-egaz repeatmasker -p 16 ../GENOMES/*.fa -o ../GENOMES/
+# Optional: RepeatMasker
+#egaz repeatmasker -p 16 ../GENOMES/*.fa -o ../GENOMES/
 
 # split-name
 find ../GENOMES -maxdepth 1 -type f -name "*.fa" | sort |
@@ -433,10 +406,10 @@ cat taxon/group_target.tsv |
 cd ~/data/plasmid/
 
 cat taxon/*.sizes | cut -f 1 | wc -l
-#6862
+#4816
 
 cat taxon/*.sizes | cut -f 2 | paste -sd+ | bc
-#693860223
+#466119084
 
 cat taxon/group_target.tsv |
     sed -e '1d' |
@@ -461,10 +434,21 @@ cat taxon/group_target.tsv |
     '
 
 cat taxon/*.sizes | cut -f 1 | wc -l
-#6792
+#4780
 
 cat taxon/*.sizes | cut -f 2 | paste -sd+ | bc
-#692147763
+#464908146
+
+```
+
+* Rsync to hpcc
+
+```bash
+rsync -avP \
+    ~/data/plasmid/ \
+    wangq@202.119.37.251:data/plasmid
+
+# rsync -avP wangq@202.119.37.251:data/plasmid/ ~/data/plasmid
 
 ```
 
@@ -474,8 +458,8 @@ cat taxon/*.sizes | cut -f 2 | paste -sd+ | bc
 cd ~/data/plasmid/
 
 cat taxon/group_target.tsv |
-    sed -e '1d' |
-    parallel --colsep '\t' --no-run-if-empty --linebuffer -k -j 4 '
+    sed -e '1d' | grep "^53" |
+    parallel --colsep '\t' --no-run-if-empty --linebuffer -k -j 1 '
         echo -e "==> Group: [{2}]\tTarget: [{4}]\n"
         
         egaz template \
@@ -483,7 +467,10 @@ cat taxon/group_target.tsv |
             $(cat taxon/{2}.sizes | cut -f 1 | grep -v -x "{4}" | xargs -I[] echo "GENOMES/{2}/[]") \
             --multi -o groups/{2}/ \
             --order \
-            --parallel 4 -v
+            --parallel 24 -v
+
+#        bash groups/{2}/1_pair.sh
+#        bash groups/{2}/3_multi.sh
 
         bsub -q mpi -n 24 -J "{2}-1_pair" "bash groups/{2}/1_pair.sh"
         bsub -w "ended({2}-1_pair)" \
@@ -494,6 +481,10 @@ cat taxon/group_target.tsv |
 find groups -mindepth 1 -maxdepth 3 -type d -name "*_raw" | parallel -r rm -fr
 find groups -mindepth 1 -maxdepth 3 -type d -name "*_fasta" | parallel -r rm -fr
 find . -mindepth 1 -maxdepth 3 -type f -name "output.*" | parallel -r rm
+
+echo \
+    $(find groups -mindepth 1 -maxdepth 1 -type d | wc -l) \
+    $(find groups -mindepth 1 -maxdepth 3 -type f -name "*.nwk.pdf" | wc -l)
 
 ```
 
