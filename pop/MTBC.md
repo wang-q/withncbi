@@ -461,6 +461,8 @@ nw_display -s -b 'visibility:hidden' -w 600 -v 30 ncbi.nwk |
 
 ![Mycobacterium.ncbi.png](../image/Mycobacterium.ncbi.png)
 
+![Mycobacterium.raxml.png](../image/Mycobacterium.raxml.png)
+
 ## Groups and targets
 
 Review `ASSEMBLY/MTBC.assembly.pass.csv` and `mash/groups.tsv`
@@ -697,6 +699,9 @@ egaz template \
     --parallel 16 -v
 
 bash groups/Mycobacterium/3_multi.sh
+
+nw_display -s -b 'visibility:hidden' -w 600 -v 30 groups/Mycobacterium/Results/OG.nwk |
+    rsvg-convert -o ~/Scripts/withncbi/image/Mycobacterium.raxml.png
 
 ```
 
