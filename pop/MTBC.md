@@ -679,6 +679,24 @@ cat taxon/group_target.tsv |
 # clean
 find groups -mindepth 1 -maxdepth 3 -type d -name "*_raw" | parallel -r rm -fr
 find groups -mindepth 1 -maxdepth 3 -type d -name "*_fasta" | parallel -r rm -fr
+find . -mindepth 1 -maxdepth 3 -type f -name "output.*" | parallel -r rm
+
+```
+
+* C_dip_NCTC_13129 as outgroup
+
+```bash
+cd ~/data/alignment/MTBC/
+
+egaz template \
+    GENOMES/M_tub_H37Rv \
+    $(cat taxon/Mycobacterium | grep -v -x "M_tub_H37Rv" | xargs -I[] echo "GENOMES/[]") \
+    --multi -o groups/Mycobacterium/ \
+    --multiname OG --outgroup C_dip_NCTC_13129 \
+    --tree groups/Mycobacterium/Results/Mycobacterium.nwk \
+    --parallel 16 -v
+
+bash groups/Mycobacterium/3_multi.sh
 
 ```
 
