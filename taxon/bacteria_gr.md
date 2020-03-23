@@ -1,26 +1,25 @@
 # Processing bacterial genomes species by species
 
-[TOC levels=1-3]: # " "
+[TOC levels=1-3]: # ""
+
 - [Processing bacterial genomes species by species](#processing-bacterial-genomes-species-by-species)
 - [Init genome report database.](#init-genome-report-database)
 - [Download sequences and regenerate lineage information.](#download-sequences-and-regenerate-lineage-information)
-    - [Numbers for higher ranks](#numbers-for-higher-ranks)
-    - [Exclude diverged strains](#exclude-diverged-strains)
+  - [Numbers for higher ranks](#numbers-for-higher-ranks)
+  - [Raw phylogenetic tree by MinHash](#raw-phylogenetic-tree-by-minhash)
+  - [Exclude diverged strains](#exclude-diverged-strains)
 - [Prepare sequences for lastz](#prepare-sequences-for-lastz)
-- [Create alignment plans](#create-alignment-plans)
-    - [Create alignments plans without outgroups](#create-alignments-plans-without-outgroups)
-    - [Batch running for groups](#batch-running-for-groups)
-    - [Alignments of genera for outgroups](#alignments-of-genera-for-outgroups)
-- [Aligning with outgroups](#aligning-with-outgroups)
-    - [Create `bac_target_OG.md` for picking target and outgroup.](#create-bac_target_ogmd-for-picking-target-and-outgroup)
-    - [Create alignments plans with outgroups](#create-alignments-plans-with-outgroups)
-- [Self alignments](#self-alignments)
+- [Alignments](#alignments)
+  - [Create `bac_target_OG.md` for picking targets and outgroups.](#create-bac_target_ogmd-for-picking-targets-and-outgroups)
+  - [Create alignments plans without outgroups](#create-alignments-plans-without-outgroups)
+  - [Aligning with outgroups](#aligning-with-outgroups)
+  - [Self alignments](#self-alignments)
 - [Summary](#summary)
-    - [Copy xlsx files](#copy-xlsx-files)
-    - [Genome list](#genome-list)
-    - [Statistics of genome alignments](#statistics-of-genome-alignments)
-    - [sep_chart of d1, d2](#sep_chart-of-d1-d2)
-    - [CorelDRAW GC charts](#coreldraw-gc-charts)
+  - [Copy xlsx files](#copy-xlsx-files)
+  - [Genome list](#genome-list)
+  - [Statistics of genome alignments](#statistics-of-genome-alignments)
+  - [sep_chart of d1, d2](#sep_chart-of-d1-d2)
+  - [CorelDRAW GC charts](#coreldraw-gc-charts)
 
 
 # Init genome report database.
@@ -30,8 +29,18 @@
 
 * Find valid species.
 
-    * Got **207** species.
-    * 40 species have no `species_code`
+  * Got **229** species.
+  * 69 species have `species_code`
+  * Some species have huge numbers of strains, we will exclude `NZ_*` sequences
+
+    * Salmonella enterica
+    * Escherichia coli
+    * Listeria monocytogenes
+    * Helicobacter pylori
+    * Chlamydia trachomatis
+    * Staphylococcus aureus
+    * Mycobacterium tuberculosis
+
 
 ```bash
 mkdir -p ~/data/bacteria/summary
@@ -43,7 +52,8 @@ perl ~/Scripts/alignDB/util/query_sql.pl --db gr_prok -q '
                 MAX(CHAR_LENGTH(code)) species_code
         FROM gr
         WHERE   1 = 1
-        AND status LIKE "%Complete%"                # complete genomes
+        AND (status LIKE "%Complete%"               # complete genomes
+            OR status LIKE "%Chromosome%")
         AND species NOT LIKE "%Candidatus%"         # uncertainty classification
         AND taxonomy_id != species_id               # no strain ID
         AND organism_name NOT LIKE "%,%"            # avoid commas in names
@@ -52,7 +62,7 @@ perl ~/Scripts/alignDB/util/query_sql.pl --db gr_prok -q '
         AND species_member > 2
         AND genus IS NOT NULL
         GROUP BY species_id
-        HAVING count > 2 #AND species_code > 0       # having enough and representative member
+        HAVING count > 2 # AND species_code > 0       # having enough and representative member
         ORDER BY subgroup, species_id
     ' -o stdout |
     cut -d ',' -f 1 |
@@ -64,7 +74,7 @@ cat SPECIES_ID.lst | wc -l
 
 * Expand species to strains. (Nested single quotes in bash should be '\'')
 
-    Got **2090** strains.
+  Got **2632** strains.
 
 ```bash
 cd ~/data/bacteria/summary
@@ -81,7 +91,8 @@ cat SPECIES_ID.lst |
                     chr
             FROM gr
             WHERE 1 = 1
-            AND status LIKE "%Complete%"                # complete genomes
+            AND (status LIKE "%Complete%"               # complete genomes
+                OR status LIKE "%Chromosome%")
             AND species NOT LIKE "%Candidatus%"         # uncertainty classification
             AND taxonomy_id != species_id               # no strain ID
             AND organism_name NOT LIKE "%,%"            # avoid commas in names
@@ -92,6 +103,12 @@ cat SPECIES_ID.lst |
             ORDER BY released_date                      # oldest first
         '\'' -o stdout |
             grep -v "^#" |
+            perl -nla -F"," -e '\''
+                $F[4] =~ s/\W+/_/g;
+                $F[4] =~ s/^_//g;
+                $F[4] =~ s/_$//g;
+                print join q{,}, @F;            
+            '\'' |
             datamash transpose -t, |
             perl -MList::MoreUtils -e '\''
                 my @lines = <>;
@@ -124,7 +141,7 @@ cat STRAIN.csv |
 
 # Download sequences and regenerate lineage information.
 
-We don't rename sequences here, so the file has three columns. **2231** accessions.
+We don't rename sequences here, so the file has three columns. **2786** accessions.
 
 And create `bac_ncbi.csv` with abbr names as taxon file.
 
@@ -165,26 +182,132 @@ find . -maxdepth 1 -type d | wc -l
 
 ```
 
-##  Numbers for higher ranks
+## Numbers for higher ranks
 
-18 subgroups, 104 genera and 207 species.
+18 subgroups, 111 genera and 229 species.
 
 ```bash
 cd ~/data/bacteria/summary/
 
 # count every ranks
-#  18 subgroup.list.tmp
-# 104 genus.list.tmp
-# 207 species.list.tmp
-cat ABBR.csv | grep -v '^#'| cut -d',' -f 3 | sort | uniq > species.list.tmp
-cat ABBR.csv | grep -v '^#'| cut -d',' -f 4 | sort | uniq > genus.list.tmp
-cat ABBR.csv | grep -v '^#'| cut -d',' -f 5 | sort | uniq > subgroup.list.tmp
-wc -l subgroup.list.tmp genus.list.tmp species.list.tmp
+cat ABBR.csv | sed -e '1d' | cut -d',' -f 3 | sort | uniq > species.list
+cat ABBR.csv | sed -e '1d' | cut -d',' -f 4 | sort | uniq > genus.list.tmp
+cat ABBR.csv | sed -e '1d' | cut -d',' -f 5 | sort | uniq > subgroup.list
+wc -l subgroup.list genus.list.tmp species.list
 
 rm *.tmp
+
+```
+
+## Raw phylogenetic tree by MinHash
+
+```bash
+mkdir -p ~/data/bacteria/mash
+cd ~/data/bacteria/mash
+
+for name in $(cat ../summary/ABBR.csv | sed -e '1d' | cut -d"," -f 8 | sort); do
+    2>&1 echo "==> ${name}"
+    
+    if [[ -e ${name}.msh ]]; then
+        continue
+    fi
+    
+    find ../GENOMES/${name} -name "*.fa" |
+        xargs cat |
+        mash sketch -k 21 -s 100000 -p 8 - -I "${name}" -o ${name}
+done
+
+mkdir -p ~/data/bacteria/summary/subgroup
+cd ~/data/bacteria/summary/subgroup
+
+for subgroup in $(cat ~/data/bacteria/summary/subgroup.list); do
+    echo >&2 "==> ${subgroup}"
+
+    mash triangle -E -p 8 -l <(
+            cat ../ABBR.csv |
+                tsv-filter -d, --str-eq "5:${subgroup}" |
+                cut -d, -f 8 |
+                parallel echo "../../mash/{}.msh"
+        ) \
+        > dist.tsv
+    
+    # fill matrix with lower triangle
+    tsv-select -f 1-3 dist.tsv |
+        (tsv-select -f 2,1,3 dist.tsv && cat) |
+        (
+            cut -f 1 dist.tsv |
+                tsv-uniq |
+                parallel -j 1 --keep-order 'echo -e "{}\t{}\t0"' &&
+            cat
+        ) \
+        > dist_full.tsv
+
+    cat dist_full.tsv |
+        Rscript -e '
+            library(readr);
+            library(tidyr);
+            library(ape);
+            pair_dist <- read_tsv(file("stdin"), col_names=F); 
+            tmp <- pair_dist %>%
+                pivot_wider( names_from = X2, values_from = X3, values_fill = list(X3 = 1.0) )
+            tmp <- as.matrix(tmp)
+            mat <- tmp[,-1]
+            rownames(mat) <- tmp[,1]
+            
+            dist_mat <- as.dist(mat)
+            clusters <- hclust(dist_mat, method = "ward.D2")
+            tree <- as.phylo(clusters) 
+            write.tree(phy=tree, file="tree.nwk")
+            
+            group <- cutree(clusters, h=0.5) # k=3
+            groups <- as.data.frame(group)
+            groups$ids <- rownames(groups)
+            rownames(groups) <- NULL
+            groups <- groups[order(groups$group), ]
+            write_tsv(groups, "groups.tsv")
+        '
+    
+    nw_display -s -b 'visibility:hidden' -w 600 -v 30 tree.nwk |
+        rsvg-convert -o ${subgroup}.png
+        
+    mv tree.nwk ${subgroup}.nwk
+    mv groups.tsv ${subgroup}.groups.tsv
+
+done
+
+```
+
+* Abnormal strains in Species
+
+```bash
+cd ~/data/bacteria/summary
+find ~/data/bacteria/summary/subgroup -name "*.groups.tsv" |
+    sort |
+    parallel -j 1 -k '
+        cat {} | sed -e "1d" | xargs -I[] echo "{/.}_[]"
+    ' |
+    sed -e 's/.groups_/_/' \
+    > all.groups.tsv
+
+cat species.list |
+    parallel -j 1 -k '
+        group=$(
+            tsv-join all.groups.tsv -d 2 \
+                -f <(cat ABBR.csv | grep -w {} | cut -d, -f 8) \
+                -k 1 |
+                cut -f 1 |
+                sort |
+                uniq
+        )
+        number=$(echo group | wc -l)
+        echo -e "{}\t$number"
+    '
+
 ```
 
 ## Exclude diverged strains
+
+Check raw trees generated by previous step.
 
 * 391904, Bifidobacterium longum subsp. infantis ATCC 15697 = JCM 1222 = DSM 20088, 2008-11-20,
   Complete Genome,
@@ -275,7 +398,7 @@ cat WORKING.csv |
 ```bash
 cd ~/data/bacteria/GENOMES
 
-find . -maxdepth 1 -type d -path "*/*" |
+find . -maxdepth 1 -mindepth 1 -type d |
     sort |
     parallel --no-run-if-empty --linebuffer -k -j 2 '
         echo >&2 "==> {}"
@@ -297,260 +420,20 @@ find . -maxdepth 1 -type d -path "*/*" |
 
 ```
 
-# Create alignment plans
+# Alignments
 
-## Create alignments plans without outgroups
-
-```text
-WORKING.csv
-#strain_taxonomy_id,strain,species,genus,subgroup,code,accession,abbr
-```
-
-**207** species and **44** genera.
-
-```bash
-cd ~/data/bacteria/summary
-
-# tab-separated
-# name  t   qs
-cat WORKING.csv |
-    grep -v "^#" |
-    perl -nl -a -F"," -MPath::Tiny -e '
-        BEGIN{
-            $name = q{};
-            %id_of = ();
-            %h = ();
-            @ls = grep {/\S/}
-                  grep {!/^#/}
-                  path(q{~/Scripts/withncbi/doc/bac_target_OG.md})->lines({chomp => 1});
-            for (@ls) {
-                @fs = split(/,/);
-                $h{$fs[0]}= $fs[1];
-            }
-            undef @ls;
-        }
-
-        chomp for @F;
-        $F[2] =~ s/\W+/_/g;
-        if ($F[2] ne $name) {
-            if ($name) {
-                if (exists $h{$name}) {
-                    my @s = sort {$id_of{$a} <=> $id_of{$b}} keys %id_of;
-                    my $t = $h{$name};
-                    my $qs = join(q{,}, grep {$_ ne $h{$name}} @s);
-                    printf qq{%s\t%s\t%s\n}, $name, $t, $qs;
-                }
-            }
-            $name = $F[2];
-            %id_of = ();
-        }
-        $id_of{$F[7]} = $F[0]; # same strain multiple chromosomes collapsed here
-
-        END {
-            my @s = sort {$id_of{$a} <=> $id_of{$b}} keys %id_of;
-            my $t = $h{$name};
-            my $qs = join(q{,}, grep {$_ ne $h{$name}} @s);
-            printf qq{%s\t%s\t%s\n}, $name, $t, $qs;
-        }' \
-    > species.tsv
-
-cat WORKING.csv |
-    grep -v "^#" |
-    perl -na -F"," -e '
-        BEGIN{
-            $name = q{};
-            %id_of = ();
-        }
-
-        chomp for @F;
-        next if ! $F[5]; # code
-        my $genus = $F[3];
-        $genus =~ s/\W+/_/g;
-        if ($genus ne $name) {
-            if ($name) {
-                # sort by taxonomy_id
-                my @s = sort {$id_of{$a} <=> $id_of{$b}} keys %id_of;
-                my $t = shift @s;
-                my $qs = join(q{,}, @s);
-                printf qq{%s\t%s\t%s\n}, $name, $t, $qs;
-            }
-            $name = $genus;
-            %id_of = ();
-        }
-        $id_of{$F[7]} = $F[0]; # multiple chromosomes collapsed here
-
-        END {
-            my @s = sort {$id_of{$a} <=> $id_of{$b}} keys %id_of;
-            my $t = shift @s;
-            my $qs = join(q{,}, @s);
-            printf qq{%s\t%s\t%s\n}, $name, $t, $qs;
-        }
-    ' |
-    perl -nl -e '/\w+\t\w+\t\w+/ and print' \
-    > genus.tsv
-    
-cat species.tsv | wc -l
-cat genus.tsv | wc -l
-
-```
-
-```bash
-cd ~/data/bacteria/summary
-
-cat <<'EOF' > egaz_template_multi.tt
-
-# [% name %]
-egaz template \
-    ~/data/bacteria/GENOMES/[% t %] \
-[% FOREACH q IN qs -%]
-    ~/data/bacteria/GENOMES/[% q %] \
-[% END -%]
-[% IF o -%]
-    ~/data/bacteria/GENOMES/[% o %] \
-    --outgroup [% o %] \
-[% END -%]
-    --multi -o [% name %] \
-    --taxon ~/data/bacteria/GENOMES/bac_ncbi.csv \
-    --rawphylo --aligndb --parallel 8 -v
-
-EOF
-
-# every species
-echo "mkdir -p ~/data/bacteria/species"  > ../cmd.txt
-echo "cd       ~/data/bacteria/species" >> ../cmd.txt
-
-cat species.tsv |
-    TT_FILE=egaz_template_multi.tt perl -MTemplate -nla -F"\t" -e '
-        next unless scalar @F >= 3;
-        
-        my $tt = Template->new;
-        $tt->process(
-            $ENV{TT_FILE},
-            {
-                name       => $F[0],
-                t          => $F[1],
-                qs         => [ split /,/, $F[2] ],
-                o          => $F[3],
-            },
-            \*STDOUT
-        ) or die Template->error;
-
-    ' \
-    >> ../cmd.txt
-
-# Align all representative strains of every genera.
-# this is for finding outgroups
-echo "mkdir -p ~/data/bacteria/genus"  > ../genus.cmd.txt
-echo "cd       ~/data/bacteria/genus" >> ../genus.cmd.txt
-
-cat genus.tsv |
-    TT_FILE=egaz_template_multi.tt perl -MTemplate -nla -F"\t" -e '
-        next unless scalar @F >= 3;
-        
-        my $tt = Template->new;
-        $tt->process(
-            $ENV{TT_FILE},
-            {
-                name       => $F[0],
-                t          => $F[1],
-                qs         => [ split /,/, $F[2] ],
-                o          => $F[3],
-            },
-            \*STDOUT
-        ) or die Template->error;
-
-    ' \
-    >> ../genus.cmd.txt
-
-```
-
-## Batch running for groups
-
-```bash
-mkdir -p ~/data/bacteria/species
-cd ~/data/bacteria/species
-
-bash ../cmd.txt 2>&1 | tee log_cmd.txt
-
-#----------------------------#
-# Step by step
-#----------------------------#
-# 1_pair
-for f in `find . -mindepth 1 -maxdepth 2 -type f -name 1_pair.sh | sort`; do
-    echo "bash $f"
-    echo
-done > run_1.sh
-
-# 2_rawphylo
-for f in `find . -mindepth 1 -maxdepth 2 -type f -name 2_rawphylo.sh | sort`; do
-    echo "bash $f"
-    echo
-done > run_2.sh
-
-# 3_multi
-for f in `find . -mindepth 1 -maxdepth 2 -type f -name 3_multi.sh | sort`; do
-    echo "bash $f"
-    echo
-done > run_3.sh
-
-# 6_chr_length
-for f in `find . -mindepth 1 -maxdepth 2 -type f -name 6_chr_length.sh | sort`; do
-    echo "bash $f"
-    echo
-done > run_6.sh
-
-# 7_multi_aligndb
-for f in `find . -mindepth 1 -maxdepth 2 -type f -name 7_multi_aligndb.sh | sort`; do
-    echo "bash $f"
-    echo
-done > run_7.sh
-
-cat run_1.sh | grep . | parallel -r -j 4  2>&1 | tee log_1.txt
-cat run_2.sh | grep . | parallel -r -j 3  2>&1 | tee log_2.txt
-cat run_3.sh | grep . | parallel -r -j 3  2>&1 | tee log_3.txt
-cat run_6.sh | grep . | parallel -r -j 12 2>&1 | tee log_6.txt
-cat run_7.sh | grep . | parallel -r -j 8  2>&1 | tee log_7.txt
-
-find . -mindepth 1 -maxdepth 3 -type d -name "*_raw"   | parallel -r rm -fr
-find . -mindepth 1 -maxdepth 3 -type d -name "*_fasta" | parallel -r rm -fr
-
-```
-
-## Alignments of genera for outgroups
-
-```bash
-mkdir -p ~/data/bacteria/genus
-cd ~/data/bacteria/genus
-
-bash ../genus.cmd.txt 2>&1 | tee log_cmd.txt
-
-for d in `find . -mindepth 1 -maxdepth 1 -type d | sort `; do
-    echo "echo \"====> Processing ${d} <====\""
-    echo bash ${d}/1_pair.sh;
-    echo bash ${d}/2_rawphylo.sh;
-    echo bash ${d}/3_multi.sh;
-    echo ;
-done  > runall.sh
-
-sh runall.sh 2>&1 | tee log_runall.txt
-
-find . -type f -name "*.nwk"
-
-find . -mindepth 1 -maxdepth 3 -type d -name "*_raw"   | parallel -r rm -fr
-find . -mindepth 1 -maxdepth 3 -type d -name "*_fasta" | parallel -r rm -fr
-
-```
-
-# Aligning with outgroups
-
-## Create `bac_target_OG.md` for picking target and outgroup.
+## Create `bac_target_OG.md` for picking targets and outgroups.
 
 Manually edit it then move to `~/Scripts/withncbi/doc/bac_target_OG.md`.
 
+Listed targets were well curated.
+
+Outgroups can be changes with less intentions.
+
 ```bash
 cd ~/data/bacteria/summary
 
-cat ABBR.csv |
+cat WORKING.csv |
     grep -v "^#" |
     perl -na -F"," -e '
         BEGIN{
@@ -576,15 +459,173 @@ cat ABBR.csv |
     ' \
     > bac_target_OG.md
 
-# 207
-cat ~/Scripts/withncbi/doc/bac_target_OG.md |
+# 229
+cat bac_target_OG.md |
     grep -v '^#' |
     grep -E '\S+' |
     wc -l
 
 ```
 
-## Create alignments plans with outgroups
+## Create alignments plans without outgroups
+
+```text
+WORKING.csv
+#strain_taxonomy_id,strain,species,genus,subgroup,code,accession,abbr
+```
+
+**205** species and **21** genera.
+
+```bash
+mkdir -p ~/data/bacteria/taxon
+cd ~/data/bacteria/taxon
+
+echo -e "#Serial\tGroup\tCount\tTarget\tOutgroup" > group_target.tsv
+
+cat ../summary/WORKING.csv |
+    grep -v "^#" |
+    SERIAL=1 perl -na -F"," -MPath::Tiny -e '
+        BEGIN{
+            $name = q{};
+            %id_of = ();
+            %h = ();
+            @ls = grep {/\S/}
+                  grep {!/^#/}
+                  path(q{~/Scripts/withncbi/doc/bac_target_OG.md})->lines({chomp => 1});
+            for (@ls) {
+                @fs = split(/,/);
+                $h{$fs[0]}= $fs[1];
+            }
+            undef @ls;
+        }
+
+        chomp for @F;
+        $F[2] =~ s/\W+/_/g;
+        if ($F[2] ne $name) {
+            if ($name) {
+                if (exists $h{$name}) {
+                    my @s = sort {$id_of{$a} <=> $id_of{$b}} keys %id_of;
+                    my $t = $h{$name};
+                    printf qq{%s\t%s\t%s\t%s\t\n}, $ENV{SERIAL}, $name, scalar @s, $t;
+                    path(qq{$name})->spew(map {qq{$_\n}} @s);
+                    $ENV{SERIAL}++;
+                }
+            }
+            $name = $F[2];
+            %id_of = ();
+        }
+        $id_of{$F[7]} = $F[0]; # same strain multiple chromosomes collapsed here
+
+        END {
+            my @s = sort {$id_of{$a} <=> $id_of{$b}} keys %id_of;
+            my $t = $h{$name};
+            printf qq{%s\t%s\t%s\t%s\t\n}, $ENV{SERIAL}, $name, scalar @s, $t;
+            path(qq{$name})->spew(map {qq{$_\n}} @s);
+        }' \
+    >> group_target.tsv
+
+cat ../summary/WORKING.csv |
+    grep -v "^#" |
+    SERIAL=901 perl -na -F"," -MPath::Tiny -e '
+        BEGIN{
+            our $name = q{};
+            our %id_of = ();
+        }
+
+        chomp for @F;
+        next if ! $F[5]; # code
+        my $genus = $F[3];
+        $genus =~ s/\W+/_/g;
+        if ($genus ne $name) {
+            if ($name) {
+                # sort by taxonomy_id
+                my @s = sort {$id_of{$a} <=> $id_of{$b}} keys %id_of;
+                my $t = shift @s;
+                if (scalar @s > 1) {
+                    printf qq{%s\t%s\t%s\t%s\t\n}, $ENV{SERIAL}, $name, scalar @s, $t;
+                    path(qq{$name})->spew(map {qq{$_\n}} @s);
+                    $ENV{SERIAL}++;
+                }
+            }
+            $name = $genus;
+            %id_of = ();
+        }
+        $id_of{$F[7]} = $F[0]; # multiple chromosomes collapsed here
+
+        END {
+            my @s = sort {$id_of{$a} <=> $id_of{$b}} keys %id_of;
+            my $t = shift @s;
+            if (scalar @s > 1) {
+                printf qq{%s\t%s\t%s\t%s\t\n}, $ENV{SERIAL}, $name, scalar @s, $t;
+                path(qq{$name})->spew(map {qq{$_\n}} @s);
+            }
+        }
+    '  \
+    >> group_target.tsv
+
+```
+
+```bash
+cd ~/data/bacteria/
+
+cat taxon/group_target.tsv |
+    tsv-filter -H --le 1:500 |
+    sed -e '1d' | grep "^200" |
+    parallel --colsep '\t' --no-run-if-empty --linebuffer -k -j 1 '
+        echo -e "==> Group: [{2}]\tTarget: [{4}]\n"
+        
+        egaz template \
+            GENOMES/{4} \
+            $(cat taxon/{2} | grep -v -x "{4}" | xargs -I[] echo "GENOMES/[]") \
+            --multi -o species/{2} \
+            --taxon ~/data/bacteria/GENOMES/bac_ncbi.csv \
+            --rawphylo --aligndb --parallel 24 -v
+
+        bash species/{2}/1_pair.sh
+        bash species/{2}/2_rawphylo.sh
+        bash species/{2}/3_multi.sh
+
+#        bsub -q mpi -n 24 -J "{2}-1_pair" "bash species/{2}/1_pair.sh"
+#        bsub -w "ended({2}-1_pair)" \
+#            -q mpi -n 24 -J "{2}-3_multi" "bash species/{2}/3_multi.sh"
+    '
+
+cat taxon/group_target.tsv |
+    tsv-filter -H --ge 1:501 |
+    sed -e '1d' | grep "^903" |
+    parallel --colsep '\t' --no-run-if-empty --linebuffer -k -j 1 '
+        echo -e "==> Group: [{2}]\tTarget: [{4}]\n"
+        
+        egaz template \
+            GENOMES/{4} \
+            $(cat taxon/{2} | grep -v -x "{4}" | xargs -I[] echo "GENOMES/[]") \
+            --multi -o genus/{2} \
+            --taxon ~/data/bacteria/GENOMES/bac_ncbi.csv \
+            --rawphylo --aligndb --parallel 24 -v
+
+        bash genus/{2}/1_pair.sh
+        bash genus/{2}/2_rawphylo.sh
+        bash genus/{2}/3_multi.sh
+
+#        bsub -q mpi -n 24 -J "{2}-1_pair" "bash genus/{2}/1_pair.sh"
+#        bsub -w "ended({2}-1_pair)" \
+#            -q mpi -n 24 -J "{2}-3_multi" "bash genus/{2}/3_multi.sh"
+    '
+
+# clean
+find groups -mindepth 1 -maxdepth 3 -type d -name "*_raw" | parallel -r rm -fr
+find groups -mindepth 1 -maxdepth 3 -type d -name "*_fasta" | parallel -r rm -fr
+find . -mindepth 1 -maxdepth 3 -type f -name "output.*" | parallel -r rm
+
+echo \
+    $(find groups -mindepth 1 -maxdepth 1 -type d | wc -l) \
+    $(find groups -mindepth 1 -maxdepth 3 -type f -name "*.nwk.pdf" | wc -l)
+
+```
+
+## Aligning with outgroups
+
+Add outgroups to `bac_target_OG.md` manually.
 
 ```bash
 cd ~/data/bacteria/summary
@@ -608,121 +649,34 @@ cat species.tsv |
     ' \
     > species_OG.tsv
 
-# genera with outgroups
-echo "mkdir -p ~/data/bacteria/OG"  > ../OG.cmd.txt
-echo "cd       ~/data/bacteria/OG" >> ../OG.cmd.txt
-cat species_OG.tsv |
-    TT_FILE=egaz_template_multi.tt perl -MTemplate -nla -F"\t" -e '
-        next unless scalar @F >= 3;
-        
-        my $tt = Template->new;
-        $tt->process(
-            $ENV{TT_FILE},
-            {
-                name       => $F[0],
-                t          => $F[1],
-                qs         => [ split /,/, $F[2] ],
-                o          => $F[3],
-            },
-            \*STDOUT
-        ) or die Template->error;
-
-    ' \
-    >> ../OG.cmd.txt
-
 ```
 
+## Self alignments
 
 ```bash
-mkdir -p ~/data/bacteria/OG
-cd ~/data/bacteria/OG
+cd ~/data/bacteria/
 
-bash ../OG.cmd.txt 2>&1 | tee log_cmd.txt
-
-#----------------------------#
-# Step by step
-#----------------------------#
-# 1_pair
-for f in `find . -mindepth 1 -maxdepth 2 -type f -name 1_pair.sh | sort`; do
-    echo "bash $f"
-    echo
-done > run_1.sh
-
-# 2_rawphylo
-for f in `find . -mindepth 1 -maxdepth 2 -type f -name 2_rawphylo.sh | sort`; do
-    echo "bash $f"
-    echo
-done > run_2.sh
-
-# 3_multi
-for f in `find . -mindepth 1 -maxdepth 2 -type f -name 3_multi.sh | sort`; do
-    echo "bash $f"
-    echo
-done > run_3.sh
-
-# 6_chr_length
-for f in `find . -mindepth 1 -maxdepth 2 -type f -name 6_chr_length.sh | sort`; do
-    echo "bash $f"
-    echo
-done > run_6.sh
-
-# 7_multi_aligndb
-for f in `find . -mindepth 1 -maxdepth 2 -type f -name 7_multi_aligndb.sh | sort`; do
-    echo "bash $f"
-    echo
-done > run_7.sh
-
-cat run_1.sh | grep . | parallel -r -j 4  2>&1 | tee log_1.txt
-cat run_2.sh | grep . | parallel -r -j 3  2>&1 | tee log_2.txt
-cat run_3.sh | grep . | parallel -r -j 3  2>&1 | tee log_3.txt
-cat run_6.sh | grep . | parallel -r -j 12 2>&1 | tee log_6.txt
-cat run_7.sh | grep . | parallel -r -j 8  2>&1 | tee log_7.txt
-
-find . -mindepth 1 -maxdepth 3 -type d -name "*_raw"   | parallel -r rm -fr
-find . -mindepth 1 -maxdepth 3 -type d -name "*_fasta" | parallel -r rm -fr
-
-```
-
-# Self alignments
-
-```bash
-cd ~/data/bacteria/summary
-
-cat <<'EOF' > egaz_templates_self.tt
-
-# [% name %]
-egaz template \
-    ~/data/bacteria/GENOMES/[% t %] \
-[% FOREACH q IN qs -%]
-    ~/data/bacteria/GENOMES/[% q %] \
-[% END -%]
-    --self -o [% name %] \
-    --taxon ~/data/bacteria/GENOMES/bac_ncbi.csv \
-    --circos --aligndb --parallel 8 -v
-
-EOF
-
-# every species
-echo "mkdir -p ~/data/bacteria/self"  > ../self.cmd.txt
-echo "cd       ~/data/bacteria/self" >> ../self.cmd.txt
-
-cat species.tsv |
-    TT_FILE=egaz_templates_self.tt perl -MTemplate -nla -F"\t" -e '
-        next unless scalar @F >= 3;
+cat taxon/group_target.tsv |
+    tsv-filter -H --le 1:500 |
+    sed -e '1d' | grep "^200" |
+    parallel --colsep '\t' --no-run-if-empty --linebuffer -k -j 1 '
+        echo -e "==> Group: [{2}]\tTarget: [{4}]\n"
         
-        my $tt = Template->new;
-        $tt->process(
-            $ENV{TT_FILE},
-            {
-                name       => $F[0],
-                t          => $F[1],
-                qs         => [ split /,/, $F[2] ],
-            },
-            \*STDOUT
-        ) or die Template->error;
+        egaz template \
+            GENOMES/{4} \
+            $(cat taxon/{2} | grep -v -x "{4}" | xargs -I[] echo "GENOMES/[]") \
+            --self -o self/{2} \
+            --taxon ~/data/bacteria/GENOMES/bac_ncbi.csv \
+            --circos --aligndb --parallel 24 -v
 
-    ' \
-    >> ../self.cmd.txt
+        bash self/{2}/1_self.sh
+        bash self/{2}/3_proc.sh
+        bash self/{2}/4_circos.sh
+
+#        bsub -q mpi -n 24 -J "{2}-1_pair" "bash species/{2}/1_pair.sh"
+#        bsub -w "ended({2}-1_pair)" \
+#            -q mpi -n 24 -J "{2}-3_multi" "bash species/{2}/3_multi.sh"
+    '
 
 ```
 
@@ -752,7 +706,7 @@ Create `list.csv` from `WORKING.csv` with sequence lengths.
 mkdir -p ~/data/bacteria/summary/table
 cd ~/data/bacteria/summary/table
 
-# manually set orders in `bac_target_OG.md`
+# manually adjust orders in `bac_target_OG.md`
 echo "#species" > species_all.lst
 perl -l -MPath::Tiny -e '
     BEGIN {

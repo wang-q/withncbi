@@ -5,6 +5,7 @@ Amycolatopsis_mediterranei,Am_mediterranei_U32
 Bifidobacterium_animalis,Bif_animalis_lactis_AD011,Bif_breve_ACS_071_V_Sch8b
 Bifidobacterium_bifidum,Bif_bifidum_PRL2010,Bif_breve_ACS_071_V_Sch8b
 Bifidobacterium_breve,Bif_breve_ACS_071_V_Sch8b,Bif_longum_DJO10A
+###Bifidobacterium_catenulatum,Bif_catenulatum_Bifidobacterium_kashiwanohense_PV20_2,first
 Bifidobacterium_longum,Bif_longum_DJO10A,Bif_breve_ACS_071_V_Sch8b
 ## Clavibacter 棍状杆菌属
 Clavibacter_michiganensis,Cla_michiganensis_michiganensis_NCPPB_382
@@ -16,15 +17,17 @@ Corynebacterium_ulcerans,Cor_ulcerans_BR_AD22,Cor_diphtheriae_HC02
 ## Cutibacterium
 Cutibacterium_acnes,Cu_acnes_KPA171202
 ## Gardnerella 加特纳菌属
-Gardnerella_vaginalis,Ga_vaginalis_409_05
+###Gardnerella_vaginalis,Ga_vaginalis_409_05
 ## Mycobacterium 分枝杆菌属
-Mycobacterium_avium,Mycobacteri_avium_paratuberculosis_K_10,Mycobacteri_kansasii_ATCC_12478
-Mycobacterium_intracellulare,Mycobacteri_intracellulare_ATCC_13950,Mycobacteri_kansasii_ATCC_12478
-Mycobacterium_kansasii,Mycobacteri_kansasii_ATCC_12478,Mycobacteri_tuberculosis_H37Rv
-Mycobacterium_leprae,Mycobacteri_leprae_TN,Mycobacteri_kansasii_ATCC_12478
-Mycobacterium_tuberculosis,Mycobacteri_tuberculosis_H37Rv,Mycobacteri_kansasii_ATCC_12478
+Mycobacterium_avium,Mycobacteri_avium_paratuberculosis_K_10,Mycobacteri_tuberculosis_H37Rv
+###Mycobacterium_canettii,Mycobacteri_canettii_CIPT_140010059
+Mycobacterium_intracellulare,Mycobacteri_intracellulare_ATCC_13950,Mycobacteri_tuberculosis_H37Rv
+###Mycobacterium_kansasii,Mycobacteri_kansasii_ATCC_12478,Mycobacteri_tuberculosis_H37Rv
+Mycobacterium_leprae,Mycobacteri_leprae_TN,Mycobacteri_tuberculosis_H37Rv
+Mycobacterium_tuberculosis,Mycobacteri_tuberculosis_H37Rv,Mycobacteri_avium_paratuberculosis_K_10
 ## Mycobacteroides
 Mycobacteroides_abscessus,Mycobactero_abscessus_ATCC_19977
+###Mycobacteroides_chelonae,Mycobactero_chelonae_CCUG_47445,TYS
 ## Propionibacterium 丙酸杆菌属
 Propionibacterium_freudenreichii,Prop_freudenreichii_shermanii_CIRM_BIA1
 ## Rhodococcus 马红球菌
@@ -36,9 +39,11 @@ Streptomyces_hygroscopicus,Streptom_hygroscopicus_jinggangensis_5008
 ## Acetobacter 醋酸细菌属
 Acetobacter_pasteurianus,Ace_pasteurianus_IFO_3283_01
 ## Anaplasma 无形体属
+###Anaplasma_marginale,An_marginale_St_Maries
 Anaplasma_phagocytophilum,An_phagocytophilum_HZ
 ## Brucella 布鲁氏菌属
 Brucella_abortus,Bru_abortus_bv_1_9_941,Bru_suis_1330
+###Brucella_canis,Bru_canis_ATCC_23365
 Brucella_melitensis,Bru_melitensis_bv_1_16M,Bru_abortus_bv_1_9_941
 Brucella_suis,Bru_suis_1330,Bru_abortus_bv_1_9_941
 ## Ehrlichia 埃利希体属
@@ -67,6 +72,7 @@ Sinorhizobium_meliloti,Si_meliloti_1021,Si_fredii_NGR234
 Wolbachia_endosymbiont_of_Drosophila_simulans,W_endosymbiont_of_Drosophila_simulans_wHa
 ## Zymomonas 发酵单胞菌属
 Zymomonas_mobilis,Z_mobilis_mobilis_ZM4_ATCC_31821
+###Zymomonas_mobilis,Z_mobilis_pomaceae_ATCC_29192,TYS
 
 # Bacteroidetes/Chlorobi group 拟杆菌门/绿菌门
 ## Bacteroides 拟杆菌属
@@ -86,7 +92,7 @@ Tannerella_forsythia,Ta_forsythia_92A2
 
 # Betaproteobacteria β-变形菌
 ## Achromobacter 无色杆菌属
-Achromobacter_xylosoxidans,Ach_xylosoxidans_A8
+###Achromobacter_xylosoxidans,Ach_xylosoxidans_A8
 ## Bordetella 博德特菌属
 Bordetella_bronchiseptica,Bord_bronchiseptica_253,Bord_pertussis_Tohama_I
 Bordetella_holmesii,Bord_holmesii_F627,Bord_pertussis_Tohama_I
@@ -94,6 +100,7 @@ Bordetella_pertussis,Bord_pertussis_Tohama_I,Bord_bronchiseptica_253
 ## Burkholderia 伯克霍尔德菌
 Burkholderia_cenocepacia,Bur_cenocepacia_HI2424,Bur_thailandensis_E264
 Burkholderia_cepacia,Bur_cepacia_GG4,Bur_thailandensis_E264
+###Burkholderia_glumae,Bur_glumae_BGR1,first
 Burkholderia_mallei,Bur_mallei_ATCC_23344,Bur_thailandensis_E264
 Burkholderia_pseudomallei,Bur_pseudomallei_K96243,Bur_thailandensis_E264
 Burkholderia_thailandensis,Bur_thailandensis_E264,Bur_mallei_ATCC_23344
@@ -123,26 +130,31 @@ Dehalococcoides_mccartyi,Deh_mccartyi_195
 Sulfolobus_acidocaldarius,Su_acidocaldarius_DSM_639,Su_islandicus_M_14_25
 Sulfolobus_islandicus,Su_islandicus_M_14_25,Su_acidocaldarius_DSM_639
 
-# Cyanobacteria/Melainabacteria group 蓝菌门
+# Cyanobacteria_Melainabacteria_group 蓝菌门
 ## Leptolyngbya 鞘丝藻属
 Leptolyngbya_boryana,Leptol_boryana_dg5
 ## Microcystis 微胞藻属
 Microcystis_aeruginosa,Mi_aeruginosa_NIES_843
 ## Prochlorococcus 原绿球藻
 Prochlorococcus_marinus,Proc_marinus_marinus_CCMP1375
+## Synechococcus
+Synechococcus_elongatus,Synechoco_elongatus_PCC_6301
 ## Synechocystis 集胞藻属
 Synechocystis_sp_PCC_6803,Sy_sp_PCC_6803_GT_I
+## Trichormus
+###Trichormus_variabilis,Tri_variabilis_ATCC_29413,first
 
 # Deinococcus-Thermus 异常球菌-栖热菌门
 ## Thermus 栖热菌属
 Thermus_thermophilus,Thermus_thermophilus_HB27
 
-# delta/epsilon subdivisions δ/ε-变形菌
+# delta_epsilon_subdivisions δ/ε-变形菌
 ## Arcobacter 弓形杆菌属
 Arcobacter_butzleri,Ar_butzleri_RM4018
 ## Campylobacter 弯曲菌属
 Campylobacter_coli,Ca_coli_CVM_N29710,Ca_lari_RM2100
 Campylobacter_fetus,Ca_fetus_fetus_82_40,Ca_lari_RM2100
+###Campylobacter_hyointestinalis,Ca_hyointestinalis_hyointestinalis_LMG_9260
 Campylobacter_jejuni,Ca_jejuni_jejuni_NCTC_11168_ATCC_700819,Ca_lari_RM2100
 Campylobacter_lari,Ca_lari_RM2100,Ca_jejuni_jejuni_NCTC_11168_ATCC_700819
 Campylobacter_sputorum,Ca_sputorum_bv_faecalis_CCUG_20703,Ca_lari_RM2100
@@ -155,6 +167,7 @@ Helicobacter_pylori,He_pylori_26695
 ## Bacillus 芽孢杆菌
 Bacillus_amyloliquefaciens,Baci_amyloliquefaciens_DSM_7,Baci_subtilis_subtilis_168
 Bacillus_anthracis,Baci_anthracis_Ames,Baci_cereus_ATCC_14579
+###Bacillus_atrophaeus,Baci_atrophaeus_1942,first
 Bacillus_cereus,Baci_cereus_ATCC_14579,Baci_anthracis_Ames
 Bacillus_coagulans,Baci_coagulans_2_6,Baci_subtilis_subtilis_168
 Bacillus_megaterium,Baci_megaterium_DSM_319,Baci_subtilis_subtilis_168
@@ -171,9 +184,13 @@ Clostridium_perfringens,Clostridium_perfringens_13,Clostridium_acetobutylicum_AT
 ## Enterococcus 肠球菌
 Enterococcus_faecalis,Enteroc_faecalis_V583,Enteroc_faecium_DO
 Enterococcus_faecium,Enteroc_faecium_DO,Enteroc_faecalis_V583
+## Faecalibacterium
+###Faecalibacterium_prausnitzii,Fa_prausnitzii_SL3_3,first
 ## Hungateiclostridium
 Hungateiclostridium_thermocellum,Hu_thermocellum_ATCC_27405
 ## Lactobacillus 乳杆菌属
+###Lactobacillus_amylovorus,Lactob_amylovorus_GRL_1112,first
+###Lactobacillus_brevis,Lactob_brevis_ATCC_367,first
 Lactobacillus_casei,Lactob_casei_BL23
 Lactobacillus_delbrueckii,Lactob_delbrueckii_bulgaricus_ATCC_11842_JCM_1002,Lactob_helveticus_DPC_4571
 Lactobacillus_fermentum,Lactob_fermentum_IFO_3956,Lactob_delbrueckii_bulgaricus_ATCC_11842_JCM_1002
@@ -192,10 +209,14 @@ Leuconostoc_mesenteroides,Leu_mesenteroides_mesenteroides_ATCC_8293,Leu_gelidum_
 ## Listeria 李斯特菌属
 Listeria_ivanovii,Li_ivanovii_ivanovii_PAM_55,Li_monocytogenes_EGD_e
 Listeria_monocytogenes,Li_monocytogenes_EGD_e,Li_ivanovii_ivanovii_PAM_55
+## Melissococcus
+###Melissococcus_plutonius,Mel_plutonius_ATCC_35311,first
 ## Paenibacillus 类芽孢杆菌
 Paenibacillus_larvae,Pae_larvae_larvae_DSM_25430
 Paenibacillus_mucilaginosus,Pae_mucilaginosus_KNP414
 Paenibacillus_polymyxa,Pae_polymyxa_E681
+## Roseburia
+###Roseburia_intestinalis,Ro_intestinalis_L1_82,TYS
 ## Staphylococcus 葡萄球菌属
 Staphylococcus_aureus,Sta_aureus_aureus_N315,Sta_epidermidis_ATCC_12228
 Staphylococcus_epidermidis,Sta_epidermidis_ATCC_12228,Sta_aureus_aureus_N315
@@ -208,6 +229,7 @@ Streptococcus_equi,Streptoc_equi_zooepidemicus_MGCS10565,Streptoc_dysgalactiae_e
 Streptococcus_gallolyticus,Streptoc_gallolyticus_UCN34,Streptoc_dysgalactiae_equisimilis_GGS_124
 Streptococcus_intermedius,Streptoc_intermedius_JTH08,Streptoc_dysgalactiae_equisimilis_GGS_124
 Streptococcus_mutans,Streptoc_mutans_UA159,Streptoc_dysgalactiae_equisimilis_GGS_124
+###Streptococcus_oralis,Streptoc_oralis_Uo5,first
 Streptococcus_pneumoniae,Streptoc_pneumoniae_TIGR4,Streptoc_dysgalactiae_equisimilis_GGS_124
 Streptococcus_pyogenes,Streptoc_pyogenes_M1_GAS,Streptoc_dysgalactiae_equisimilis_GGS_124
 Streptococcus_salivarius,Streptoc_salivarius_JIM8777,Streptoc_dysgalactiae_equisimilis_GGS_124
@@ -274,12 +296,15 @@ Pasteurella_multocida,Pas_multocida_multocida_Pm70
 Pectobacterium_carotovorum,Pe_carotovorum_carotovorum_PC1
 ## Pseudomonas 假单胞菌属
 Pseudomonas_aeruginosa,Ps_aeruginosa_PAO1,Ps_putida_KT2440
+###Pseudomonas_amygdali,Ps_amygdali_pv_lachrymans,first
+###Pseudomonas_chlororaphis,Ps_chlororaphis_aurantiaca,first
 Pseudomonas_fluorescens,Ps_fluorescens_Pf0_1,Ps_putida_KT2440
 Pseudomonas_mendocina,Ps_mendocina_ymp,Ps_putida_KT2440
 Pseudomonas_protegens,Ps_protegens_Pf_5,Ps_putida_KT2440
 Pseudomonas_putida,Ps_putida_KT2440,Ps_syringae_pv_syringae_B728a
 Pseudomonas_stutzeri,Ps_stutzeri_A1501,Ps_putida_KT2440
 Pseudomonas_syringae,Ps_syringae_pv_syringae_B728a,Ps_putida_KT2440
+###Pseudomonas_syringae_group_genomosp_3,Ps_syringae_group_genomosp_3_Pseudomonas_syringae_pv_tomato_DC3000,TYS
 ## Salmonella 沙门氏菌
 Salmonella_bongori,Sa_bongori_NCTC_12419,Sa_enterica_enterica_Typhimurium_LT2
 Salmonella_enterica,Sa_enterica_enterica_Typhimurium_LT2,Sa_bongori_NCTC_12419
@@ -300,6 +325,7 @@ Vibrio_vulnificus,Vi_vulnificus_CMCP6,Vi_cholerae_O1_El_Tor_N16961
 Xanthomonas_campestris,Xa_campestris_pv_campestris_ATCC_33913,Xa_oryzae_pv_oryzae_KACC_10331
 Xanthomonas_citri,Xa_citri_pv_citri_306,Xa_oryzae_pv_oryzae_KACC_10331
 Xanthomonas_oryzae,Xa_oryzae_pv_oryzae_KACC_10331,Xa_citri_pv_citri_306
+###Xanthomonas_translucens,Xa_translucens_pv_undulosa,first
 ## Xylella 木杆菌属
 Xylella_fastidiosa,Xy_fastidiosa_9a5c
 ## Yersinia 鼠疫杆菌属
@@ -307,7 +333,7 @@ Yersinia_enterocolitica,Y_enterocolitica_enterocolitica_8081,Y_pestis_CO92
 Yersinia_pestis,Y_pestis_CO92,Y_enterocolitica_enterocolitica_8081
 Yersinia_pseudotuberculosis,Y_pseudotuberculosis_IP_32953,Y_pestis_CO92
 
-# Methanomada group
+# Methanomada_group
 ## Methanococcus 甲烷球菌属
 Methanococcus_maripaludis,Methanoc_maripaludis_S2
 
@@ -316,6 +342,8 @@ Methanococcus_maripaludis,Methanoc_maripaludis_S2
 Bdellovibrio_bacteriovorus,Bd_bacteriovorus_Tiberius
 
 # Spirochaetia 螺旋体门
+## Borrelia
+###Borrelia_hermsii,Borrelia_hermsii_DAH,first
 ## Borreliella
 Borreliella_afzelii,Borr_afzelii_PKo,Borr_burgdorferi_B31
 Borreliella_burgdorferi,Borr_burgdorferi_B31,Borr_afzelii_PKo
@@ -325,6 +353,8 @@ Brachyspira_pilosicoli,Bra_pilosicoli_95_1000
 ## Leptospira 细螺旋体属
 Leptospira_borgpetersenii,Leptos_borgpetersenii_Hardjo_bovis_L550,Leptos_interrogans_Lai_56601
 Leptospira_interrogans,Leptos_interrogans_Lai_56601,Leptos_borgpetersenii_Hardjo_bovis_L550
+## Treponema
+###Treponema_pallidum,Tre_pallidum_pallidum_Nichols,first
 
 # Stenosarchaea group
 ## Methanosarcina 甲烷八叠球菌属
@@ -336,6 +366,7 @@ Methanosarcina_siciliae,Methanos_siciliae_T4_M,Methanos_mazei_Go1
 ## Mycoplasma 支原体属
 Mycoplasma_bovis,Mycop_bovis_PG45
 Mycoplasma_capricolum,Mycop_capricolum_capricolum_ATCC_27343
+###Mycoplasma_fermentans,Mycop_fermentans_PG18,first
 Mycoplasma_gallisepticum,Mycop_gallisepticum_R_low
 Mycoplasma_genitalium,Mycop_genitalium_G37
 Mycoplasma_hyopneumoniae,Mycop_hyopneumoniae_232
