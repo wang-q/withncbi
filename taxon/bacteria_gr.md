@@ -624,7 +624,7 @@ rsync -avP \
     ~/Scripts/withncbi/ \
     wangq@202.119.37.251:Scripts/withncbi
 
-# rsync -avP wangq@202.119.37.251:data/plasmid/ ~/data/plasmid
+# rsync -avP wangq@202.119.37.251:data/bacteria/ ~/data/bacteria
 
 ```
 
@@ -791,11 +791,6 @@ cat taxon/group_target.tsv |
     sed -e '1d' | # grep "^200" |
     parallel --colsep '\t' --no-run-if-empty --linebuffer -k -j 1 '
         echo -e "==> Group: [{2}]\tTarget: [{4}]\n"
-
-        lines=$(bjobs -w | grep -w {2} | wc -l)
-        if [ $lines -eq 0 ]; then
-            exit;
-        fi
 
         egaz template \
             GENOMES/{4} \
