@@ -620,6 +620,10 @@ rsync -avP \
     ~/data/bacteria/ \
     wangq@202.119.37.251:data/bacteria
 
+rsync -avP \
+    ~/Scripts/withncbi/ \
+    wangq@202.119.37.251:Scripts/withncbi
+
 # rsync -avP wangq@202.119.37.251:data/plasmid/ ~/data/plasmid
 
 ```
@@ -710,10 +714,22 @@ find groups -mindepth 1 -maxdepth 3 -type d -name "*_raw" | parallel -r rm -fr
 find groups -mindepth 1 -maxdepth 3 -type d -name "*_fasta" | parallel -r rm -fr
 find . -mindepth 1 -maxdepth 3 -type f -name "output.*" | parallel -r rm
 
+# check status
 echo \
     $(find groups/species -mindepth 1 -maxdepth 1 -type d | wc -l) \
-    $(find groups/species -mindepth 1 -maxdepth 3 -type f -name "*.nwk.pdf" | grep -w raw | wc -l) \
-    $(find groups/species -mindepth 1 -maxdepth 3 -type f -name "*.nwk.pdf" | grep -v -w raw | wc -l)
+    $(find groups/species -mindepth 1 -maxdepth 3 -type f -name "*.nwk.pdf" | grep -w raw -v | wc -l)
+
+find groups/species -mindepth 1 -maxdepth 1 -type d |
+    parallel -j 4 '
+        lines=$(find {} -type f -name "*.nwk.pdf" | grep -w raw -v | wc -l)
+        if [ $lines -eq 0 ]; then
+            lines=$(find {} -type d -name "mafSynNet" | wc -l)
+            if [ $lines -gt 2 ]; then
+                echo {}
+            fi
+        fi
+    ' |
+    sort
 
 ```
 
@@ -726,10 +742,10 @@ echo \
 ```bash
 cd ~/data/bacteria/
 
-# species
+# species_og
 cat taxon/group_target.tsv |
     tsv-filter -H --le 1:500 |
-    sed -e '1d' | grep "^163" |
+    sed -e '1d' | #grep "^163" |
     parallel --colsep '\t' --no-run-if-empty --linebuffer -k -j 1 '
         outgroup=$(
             cat ~/Scripts/withncbi/doc/bac_target_OG.md |
@@ -752,15 +768,15 @@ cat taxon/group_target.tsv |
             GENOMES/{4} \
             $(cat taxon/{2} | grep -v -x "{4}" | xargs -I[] echo "GENOMES/[]") \
             GENOMES/${outgroup} \
-            --multi -o species_og/{2} \
+            --multi -o groups/species_og/{2} \
             --outgroup ${outgroup} \
-            --taxon ~/data/bacteria/GENOMES/bac_ncbi.csv \
-            --rawphylo --aligndb --parallel 24 -v
+            --rawphylo --parallel 24 -v
 
-        bash species_og/{2}/1_pair.sh
-        bash species_og/{2}/2_rawphylo.sh
-        bash species_og/{2}/3_multi.sh
-
+        bsub -q mpi -n 24 -J "{2}-og" "
+            bash groups/species_og/{2}/1_pair.sh
+            bash groups/species_og/{2}/2_rawphylo.sh
+            bash groups/species_og/{2}/3_multi.sh
+            "
     '
 
 ```
@@ -772,24 +788,26 @@ cd ~/data/bacteria/
 
 cat taxon/group_target.tsv |
     tsv-filter -H --le 1:500 |
-    sed -e '1d' | grep "^200" |
+    sed -e '1d' | # grep "^200" |
     parallel --colsep '\t' --no-run-if-empty --linebuffer -k -j 1 '
         echo -e "==> Group: [{2}]\tTarget: [{4}]\n"
-        
+
+        lines=$(bjobs -w | grep -w {2} | wc -l)
+        if [ $lines -eq 0 ]; then
+            exit;
+        fi
+
         egaz template \
             GENOMES/{4} \
             $(cat taxon/{2} | grep -v -x "{4}" | xargs -I[] echo "GENOMES/[]") \
-            --self -o self/{2} \
-            --taxon ~/data/bacteria/GENOMES/bac_ncbi.csv \
-            --circos --aligndb --parallel 24 -v
+            --self -o groups/self/{2} \
+            --circos --parallel 24 -v
 
-        bash self/{2}/1_self.sh
-        bash self/{2}/3_proc.sh
-        bash self/{2}/4_circos.sh
-
-#        bsub -q mpi -n 24 -J "{2}-1_pair" "bash species/{2}/1_pair.sh"
-#        bsub -w "ended({2}-1_pair)" \
-#            -q mpi -n 24 -J "{2}-3_multi" "bash species/{2}/3_multi.sh"
+        bsub -q mpi -n 24 -J "{2}-self" "
+            bash groups/self/{2}/1_self.sh
+            bash groups/self/{2}/3_proc.sh
+            bash groups/self/{2}/4_circos.sh
+            "
     '
 
 ```
