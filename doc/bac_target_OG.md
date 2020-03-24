@@ -121,7 +121,7 @@ Chlamydia_pneumoniae,Ch_pneumoniae_CWL029,Ch_pecorum_E58
 Chlamydia_psittaci,Ch_psittaci_6BC,Ch_pneumoniae_CWL029
 Chlamydia_trachomatis,Ch_trachomatis_D_UW_3_CX,Ch_pneumoniae_CWL029
 
-# Chloroflexi
+# Chloroflexi 绿弯菌门
 ## Dehalococcoides
 Dehalococcoides_mccartyi,Deh_mccartyi_195
 
@@ -137,7 +137,7 @@ Leptolyngbya_boryana,Leptol_boryana_dg5
 Microcystis_aeruginosa,Mi_aeruginosa_NIES_843
 ## Prochlorococcus 原绿球藻
 Prochlorococcus_marinus,Proc_marinus_marinus_CCMP1375
-## Synechococcus
+## Synechococcus 聚球藻属
 Synechococcus_elongatus,Synechoco_elongatus_PCC_6301
 ## Synechocystis 集胞藻属
 Synechocystis_sp_PCC_6803,Sy_sp_PCC_6803_GT_I
@@ -184,7 +184,7 @@ Clostridium_perfringens,Clostridium_perfringens_13,Clostridium_acetobutylicum_AT
 ## Enterococcus 肠球菌
 Enterococcus_faecalis,Enteroc_faecalis_V583,Enteroc_faecium_DO
 Enterococcus_faecium,Enteroc_faecium_DO,Enteroc_faecalis_V583
-## Faecalibacterium
+## Faecalibacterium 粪杆菌属
 ###Faecalibacterium_prausnitzii,Fa_prausnitzii_SL3_3,first
 ## Hungateiclostridium
 Hungateiclostridium_thermocellum,Hu_thermocellum_ATCC_27405
@@ -209,13 +209,13 @@ Leuconostoc_mesenteroides,Leu_mesenteroides_mesenteroides_ATCC_8293,Leu_gelidum_
 ## Listeria 李斯特菌属
 Listeria_ivanovii,Li_ivanovii_ivanovii_PAM_55,Li_monocytogenes_EGD_e
 Listeria_monocytogenes,Li_monocytogenes_EGD_e,Li_ivanovii_ivanovii_PAM_55
-## Melissococcus
+## Melissococcus 蜜球菌属
 ###Melissococcus_plutonius,Mel_plutonius_ATCC_35311,first
 ## Paenibacillus 类芽孢杆菌
 Paenibacillus_larvae,Pae_larvae_larvae_DSM_25430
 Paenibacillus_mucilaginosus,Pae_mucilaginosus_KNP414
 Paenibacillus_polymyxa,Pae_polymyxa_E681
-## Roseburia
+## Roseburia 罗氏菌属
 ###Roseburia_intestinalis,Ro_intestinalis_L1_82,TYS
 ## Staphylococcus 葡萄球菌属
 Staphylococcus_aureus,Sta_aureus_aureus_N315,Sta_epidermidis_ATCC_12228
@@ -342,18 +342,18 @@ Methanococcus_maripaludis,Methanoc_maripaludis_S2
 Bdellovibrio_bacteriovorus,Bd_bacteriovorus_Tiberius
 
 # Spirochaetia 螺旋体门
-## Borrelia
+## Borrelia 包柔氏螺旋体属
 ###Borrelia_hermsii,Borrelia_hermsii_DAH,first
 ## Borreliella
-Borreliella_afzelii,Borr_afzelii_PKo,Borr_burgdorferi_B31
-Borreliella_burgdorferi,Borr_burgdorferi_B31,Borr_afzelii_PKo
-Borreliella_garinii,Borr_garinii_BgVir,Borr_afzelii_PKo
+Borreliella_afzelii,Borrelie_afzelii_PKo,Borrelie_burgdorferi_B31
+Borreliella_burgdorferi,Borrelie_burgdorferi_B31,Borrelie_afzelii_PKo
+Borreliella_garinii,Borrelie_garinii_BgVir,Borrelie_afzelii_PKo
 ## Brachyspira 短螺菌属
 Brachyspira_pilosicoli,Bra_pilosicoli_95_1000
 ## Leptospira 细螺旋体属
 Leptospira_borgpetersenii,Leptos_borgpetersenii_Hardjo_bovis_L550,Leptos_interrogans_Lai_56601
 Leptospira_interrogans,Leptos_interrogans_Lai_56601,Leptos_borgpetersenii_Hardjo_bovis_L550
-## Treponema
+## Treponema 密螺旋体属
 ###Treponema_pallidum,Tre_pallidum_pallidum_Nichols,first
 
 # Stenosarchaea group

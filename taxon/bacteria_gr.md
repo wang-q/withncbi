@@ -628,7 +628,7 @@ rsync -avP \
 cd ~/data/bacteria/
 
 # species
-# HPCC restricts total job number as 200.
+# HPCC restricts total jobs to 200.
 #   ERROR: Number of submitted parallel jobs exceeds! Exit.
 cat taxon/group_target.tsv |
     tsv-filter -H  --ge 1:1 --le 1:500 |
@@ -636,12 +636,15 @@ cat taxon/group_target.tsv |
     parallel --colsep '\t' --no-run-if-empty --linebuffer -k -j 1 '
         echo -e "==> Group: [{2}]\tTarget: [{4}]\n"
         
+        if bjobs -w | grep -w {2}; then
+            exit;
+        fi
+        
         egaz template \
             GENOMES/{4} \
             $(cat taxon/{2} | grep -v -x "{4}" | xargs -I[] echo "GENOMES/[]") \
             --multi -o groups/species/{2} \
-            --taxon ~/data/bacteria/GENOMES/bac_ncbi.csv \
-            --rawphylo --aligndb --parallel 24 -v
+            --rawphylo --parallel 24 -v
 
 #        bash groups/species/{2}/1_pair.sh
 #        bash groups/species/{2}/2_rawphylo.sh
@@ -708,8 +711,9 @@ find groups -mindepth 1 -maxdepth 3 -type d -name "*_fasta" | parallel -r rm -fr
 find . -mindepth 1 -maxdepth 3 -type f -name "output.*" | parallel -r rm
 
 echo \
-    $(find groups -mindepth 2 -maxdepth 2 -type d | wc -l) \
-    $(find groups -mindepth 1 -maxdepth 4 -type f -name "*.nwk.pdf" | wc -l)
+    $(find groups/species -mindepth 1 -maxdepth 1 -type d | wc -l) \
+    $(find groups/species -mindepth 1 -maxdepth 3 -type f -name "*.nwk.pdf" | grep -w raw | wc -l) \
+    $(find groups/species -mindepth 1 -maxdepth 3 -type f -name "*.nwk.pdf" | grep -v -w raw | wc -l)
 
 ```
 
