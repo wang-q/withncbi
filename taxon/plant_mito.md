@@ -1,31 +1,32 @@
 # Process plant mitochondrion genomes
 
-[TOC levels=1-3]: # " "
+[TOC levels=1-3]: # ""
+
 - [Process plant mitochondrion genomes](#process-plant-mitochondrion-genomes)
 - [Update taxdmp](#update-taxdmp)
 - [Scrap id and acc from NCBI](#scrap-id-and-acc-from-ncbi)
-    - [Restrict taxonomy ids to green plants with `taxon/id_restrict.pl`.](#restrict-taxonomy-ids-to-green-plants-with-taxonid_restrictpl)
+  - [Restrict taxonomy ids to green plants with `taxon/id_restrict.pl`.](#restrict-taxonomy-ids-to-green-plants-with-taxonid_restrictpl)
 - [Add lineage information](#add-lineage-information)
-    - [Can't get clear taxon information](#cant-get-clear-taxon-information)
+  - [Can't get clear taxonomy](#cant-get-clear-taxonomy)
 - [Filtering based on valid families and genera](#filtering-based-on-valid-families-and-genera)
 - [Find a way to name these](#find-a-way-to-name-these)
 - [Download sequences and regenerate lineage information](#download-sequences-and-regenerate-lineage-information)
 - [Prepare sequences for lastz](#prepare-sequences-for-lastz)
 - [Aligning without outgroups](#aligning-without-outgroups)
-    - [Create alignments plans without outgroups](#create-alignments-plans-without-outgroups)
-    - [Batch running for genera](#batch-running-for-genera)
-    - [Alignments of families for outgroups](#alignments-of-families-for-outgroups)
+  - [Create alignments plans without outgroups](#create-alignments-plans-without-outgroups)
+  - [Batch running for genera](#batch-running-for-genera)
+  - [Alignments of families for outgroups](#alignments-of-families-for-outgroups)
 - [Aligning with outgroups](#aligning-with-outgroups)
-    - [Create `mito_OG.md` for picking outgroups](#create-mito_ogmd-for-picking-outgroups)
-    - [Create alignments plans with outgroups](#create-alignments-plans-with-outgroups)
+  - [Create `mito_OG.md` for picking outgroups](#create-mito_ogmd-for-picking-outgroups)
+  - [Create alignments plans with outgroups](#create-alignments-plans-with-outgroups)
 - [Self alignments](#self-alignments)
 - [Summary](#summary)
-    - [Copy xlsx files](#copy-xlsx-files)
-    - [Genome list](#genome-list)
-    - [Statistics of genome alignments](#statistics-of-genome-alignments)
-    - [Groups](#groups)
-    - [Phylogenic trees of each genus with outgroup](#phylogenic-trees-of-each-genus-with-outgroup)
-    - [d1, d2](#d1-d2)
+  - [Copy xlsx files](#copy-xlsx-files)
+  - [Genome list](#genome-list)
+  - [Statistics of genome alignments](#statistics-of-genome-alignments)
+  - [Groups](#groups)
+  - [Phylogenic trees of each genus with outgroup](#phylogenic-trees-of-each-genus-with-outgroup)
+  - [d1, d2](#d1-d2)
 
 
 # Update taxdmp
@@ -52,7 +53,7 @@ Eukaryota (2759)                8746
 Use `taxon/id_seq_dom_select.pl` to extract Taxonomy ids and genbank accessions from all history
 pages.
 
-Got **9355** accessions.
+Got **10277** accessions.
 
 ```bash
 mkdir -p ~/data/organelle/mito/GENOMES
@@ -84,8 +85,8 @@ perl ~/Scripts/withncbi/taxon/gb_taxon_locus.pl genomic.gbff > refseq_id_seq.csv
 
 rm genomic.gbff
 
-# 9355
 cat refseq_id_seq.csv | grep -v "^#" | wc -l
+# 10277
 
 # combine
 cat webpage_id_seq.csv refseq_id_seq.csv |
@@ -93,8 +94,8 @@ cat webpage_id_seq.csv refseq_id_seq.csv |
     sort -t, -k1,1 \
     > id_seq.csv
 
-# 9355
 cat id_seq.csv | grep -v "^#" | wc -l
+# 10277
 
 ```
 
@@ -109,7 +110,7 @@ cat id_seq.csv |
     perl ~/Scripts/withncbi/taxon/id_restrict.pl -s "," -a 33090 \
     >> plant_id_seq.csv
 
-# 242
+# 293
 cat plant_id_seq.csv | grep -v "^#" | wc -l
 
 cat plant_id_seq.csv |
@@ -264,7 +265,7 @@ rm *.tmp *.bak
 
 ```
 
-## Can't get clear taxon information
+## Can't get clear taxonomy
 
 FIXME
 

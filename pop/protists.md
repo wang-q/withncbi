@@ -14,6 +14,7 @@ Less detailed than *Trichoderma* in
   - [Groups and targets](#groups-and-targets)
   - [Protists: prepare](#protists-prepare)
   - [plasmodium: run](#plasmodium-run)
+  - [Protists: run](#protists-run)
 
 
 ## Strain info
@@ -21,28 +22,28 @@ Less detailed than *Trichoderma* in
 | Group          | Genus           | Genus ID | Comments          | Species | Strains |
 |:---------------|:----------------|---------:|:------------------|--------:|--------:|
 | Alveolata      |                 |          | 囊泡虫类 (顶复虫)    |         |         |
-|                | Plasmodium      |     5820 | 疟原虫属            |      20 |      60 |
-|                | Toxoplasma      |     5810 | 弓形虫属            |       1 |      16 |
+|                | Plasmodium      |     5820 | 疟原虫属           |      20 |      60 |
+|                | Toxoplasma      |     5810 | 弓形虫属           |       1 |      16 |
 |                | Cryptosporidium |     5806 | 隐孢子虫属          |      13 |      16 |
-|                | Eimeria         |     5800 | 艾美球虫            |       2 |       2 |
-|                | Theileria       |     5873 | 泰勒虫属            |       4 |       6 |
-|                | Babesia         |     5864 | 巴倍虫属            |       6 |       7 |
-| Amoebozoa      |                 |          | 变形虫              |         |         |
+|                | Eimeria         |     5800 | 艾美球虫           |       2 |       2 |
+|                | Theileria       |     5873 | 泰勒虫属           |       4 |       6 |
+|                | Babesia         |     5864 | 巴倍虫属           |       6 |       7 |
+| Amoebozoa      |                 |          | 变形虫             |         |         |
 |                | Acanthamoeba    |     5754 | 棘阿米巴属          |       1 |       2 |
 |                | Entamoeba       |     5758 | 内阿米巴属          |       2 |       3 |
-|                | Dictyostelium   |     5782 | 网柄菌属            |       4 |       4 |
-| Kinetoplastida |                 |          | 动基体目            |         |         |
+|                | Dictyostelium   |     5782 | 网柄菌属           |       4 |       4 |
+| Kinetoplastida |                 |          | 动基体目           |         |         |
 |                | Leishmania      |     5658 | 利什曼虫属          |      17 |      25 |
-|                | Trypanosoma     |     5690 | 锥虫属              |       8 |      13 |
+|                | Trypanosoma     |     5690 | 锥虫属             |       8 |      13 |
 | Stramenopiles  |                 |          | 不等鞭毛类          |         |         |
-|                | Blastocystis    |    12967 | 芽囊原虫属 (蛙片总纲) |       2 |       8 |
-|                | Nannochloropsis |     5748 | 微拟球藻  (大眼藻纲)  |       4 |       8 |
+|                | Blastocystis    |    12967 | 芽囊原虫属          |       2 |       8 |
+|                | Nannochloropsis |     5748 | 微拟球藻  (大眼藻纲) |       4 |       8 |
 |                | Phytophthora    |     4783 | 疫霉属 (卵菌)       |      11 |      14 |
 |                | Pythium         |     4797 | 腐霉属 (卵菌)       |       4 |       4 |
-| Euglenozoa     |                 |          | 眼虫门              |         |         |
-|                | Crithidia       |     5655 | 短膜虫属            |       2 |       2 |
+| Euglenozoa     |                 |          | 眼虫门             |         |         |
+|                | Crithidia       |     5655 | 短膜虫属           |       2 |       2 |
 | Other          |                 |          |                   |         |         |
-|                | Giardia         |     5740 | 贾第虫属            |       3 |       6 |
+|                | Giardia         |     5740 | 贾第虫属           |       3 |       6 |
 
 ## NCBI Assembly
 
