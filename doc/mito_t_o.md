@@ -18,7 +18,7 @@ Salix,Sal_suchowensis,Pop_davidiana
 Corchorus,Cor_capsularis,Bo_ceiba
 Gossypium,Go_hirsutum,Bo_ceiba
 ## Poaceae 禾本科
-Oryza,Ory_sativa_Indica_Group,Sor_bicolor
+Oryza,Ory_sativa_Indica,Sor_bicolor
 Triticum,Trit_timopheevii,Sor_bicolor
 Zea,Zea_mays_mays,Sor_bicolor
 ## Anacardiaceae 漆树科

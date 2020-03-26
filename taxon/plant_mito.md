@@ -20,7 +20,7 @@
   - [Plans for align-able targets](#plans-for-align-able-targets)
   - [Aligning w/o outgroups](#aligning-wo-outgroups)
   - [Aligning with outgroups](#aligning-with-outgroups)
-- [Self alignments](#self-alignments)
+  - [Self alignments](#self-alignments)
 - [Summary](#summary)
   - [Copy xlsx files](#copy-xlsx-files)
   - [Genome list](#genome-list)
@@ -39,35 +39,35 @@
 Open browser and visit
 [NCBI mitochondrion page](http://www.ncbi.nlm.nih.gov/genomes/GenomesGroup.cgi?taxid=33090&opt=organelle).
 Save page to a local file, html only. In this case, it's
-`doc/green_plants_mitochondrion_181207.html`.
+`doc/green_plants_mitochondrion_200326.html`.
 
 All [Eukaryota](https://www.ncbi.nlm.nih.gov/genomes/GenomesGroup.cgi?taxid=2759&opt=organelle),
-`doc/eukaryota_mitochondrion_181207.html`.
+`doc/eukaryota_mitochondrion_200326.html`.
 
 ```text
-Eukaryota (2759)                8746
-    Viridiplantae (33090)       221
-        Chlorophyta (3041)      51
-        Streptophyta (35493)    170
+Eukaryota (2759)                10151
+    Viridiplantae (33090)       278
+        Chlorophyta (3041)      70
+        Streptophyta (35493)    208
 ```
 
 Use `taxon/id_seq_dom_select.pl` to extract Taxonomy ids and genbank accessions from all history
 pages.
 
-Got **10277** accessions.
+Got **10320** accessions.
 
 ```bash
-mkdir -p ~/data/organelle/mito/GENOMES
-cd ~/data/organelle/mito/GENOMES
+mkdir -p ~/data/mito/GENOMES
+cd ~/data/mito/GENOMES
 
 rm webpage_id_seq.csv
 
 perl ~/Scripts/withncbi/taxon/id_seq_dom_select.pl \
-    ~/Scripts/withncbi/doc/eukaryota_mitochondrion_181207.html \
+    ~/Scripts/withncbi/doc/eukaryota_mitochondrion_200326.html \
     >> webpage_id_seq.csv
 
 perl ~/Scripts/withncbi/taxon/id_seq_dom_select.pl \
-    ~/Scripts/withncbi/doc/green_plants_mitochondrion_181207.html \
+    ~/Scripts/withncbi/doc/green_plants_mitochondrion_200326.html \
     >> webpage_id_seq.csv
 
 ```
@@ -75,7 +75,7 @@ perl ~/Scripts/withncbi/taxon/id_seq_dom_select.pl \
 Use `taxon/gb_taxon_locus.pl` to extract information from refseq genbank files.
 
 ```bash
-cd ~/data/organelle/mito/GENOMES
+cd ~/data/mito/GENOMES
 
 wget -N ftp://ftp.ncbi.nlm.nih.gov/genomes/refseq/mitochondrion/mitochondrion.1.genomic.gbff.gz
 wget -N ftp://ftp.ncbi.nlm.nih.gov/genomes/refseq/mitochondrion/mitochondrion.2.genomic.gbff.gz
@@ -85,6 +85,7 @@ gzip -dcf mitochondrion.*.genomic.gbff.gz > genomic.gbff
 perl ~/Scripts/withncbi/taxon/gb_taxon_locus.pl genomic.gbff > refseq_id_seq.csv
 
 rm genomic.gbff
+rm *.genomic.gbff.gz
 
 cat refseq_id_seq.csv | grep -v "^#" | wc -l
 # 10277
@@ -96,14 +97,14 @@ cat webpage_id_seq.csv refseq_id_seq.csv |
     > id_seq.csv
 
 cat id_seq.csv | grep -v "^#" | wc -l
-# 10277
+# 10320
 
 ```
 
 ## Restrict taxonomy ids to green plants with `taxon/id_restrict.pl`.
 
 ```bash
-cd ~/data/organelle/mito/GENOMES
+cd ~/data/mito/GENOMES
 
 # Viridiplantae 33090
 echo '#strain_taxon_id,accession' > plant_id_seq.csv
@@ -112,8 +113,8 @@ cat id_seq.csv |
     perl ~/Scripts/withncbi/taxon/id_restrict.pl -s "," -a 33090 \
     >> plant_id_seq.csv
 
-# 293
 cat plant_id_seq.csv | grep -v "^#" | wc -l
+# 295
 
 cat plant_id_seq.csv |
     cut -d',' -f 1 |
@@ -148,8 +149,8 @@ Give ids better shapes for manually checking and automatic filtering.
 If you sure, you can add or delete lines and contents in `CHECKME.csv`.
 
 ```bash
-mkdir -p ~/data/organelle/mito/summary
-cd ~/data/organelle/mito/summary
+mkdir -p ~/data/mito/summary
+cd ~/data/mito/summary
 
 # generate a .csv file for manually checking
 echo '#strain_taxon_id,accession,strain,species,genus,family,order,class,phylum' > CHECKME.csv
@@ -170,7 +171,7 @@ cat ../GENOMES/plant_id_seq.csv |
 Manually correct lineages.
 
 ```bash
-cd ~/data/organelle/mito/summary
+cd ~/data/mito/summary
 
 # darwin (bsd) need "" for -i
 sed -i".bak" "s/\'//g" CHECKME.csv
@@ -212,7 +213,7 @@ Split Streptophyta according to classical plant classification.
       * Marchantiophyta 3195 - liverworts
 
 ```bash
-cd ~/data/organelle/mito/summary
+cd ~/data/mito/summary
 
 #perl -Mojo -e '
 #    g(q{http://www.theplantlist.org/browse/A/})->dom
@@ -288,17 +289,17 @@ rm *.tmp *.bak
 Species and genus should not be "NA" and genus has 2 or more members.
 
 ```text
-289 ---------> 286 ---------> 113 ---------> 158
+291 ---------> 287 ---------> 113 ---------> 158
         NA           genus         family
 ```
 
 
 ```bash
-mkdir -p ~/data/organelle/mito/summary
-cd ~/data/organelle/mito/summary
+mkdir -p ~/data/mito/summary
+cd ~/data/mito/summary
 
 cat CHECKME.csv | grep -v "^#" | wc -l
-# 289
+# 291
 
 # filter out accessions without linage information (strain, species, genus and family)
 cat CHECKME.csv |
@@ -310,7 +311,7 @@ cat CHECKME.csv |
     > valid.tmp
 
 wc -l valid.tmp
-# 286
+# 287
 
 #----------------------------#
 # Genus
@@ -363,7 +364,7 @@ rm *.tmp *.bak
 Seems it's OK to use species as names.
 
 ```bash
-cd ~/data/organelle/mito/summary
+cd ~/data/mito/summary
 
 # sub-species
 cat DOWNLOAD.csv |
@@ -385,7 +386,8 @@ cat DOWNLOAD.csv |
 # strain name not equal to species
 cat DOWNLOAD.csv |
     grep -v '^#' |
-    perl -nl -a -F"," -e '$F[2] ne $F[3] and print $F[2]' |
+    tsv-filter -d"," --ff-str-ne 3:4 |
+    tsv-select -d"," -f 3 |
     sort
 #Aegilops speltoides var. ligustica
 #Beta vulgaris subsp. maritima
@@ -402,7 +404,7 @@ cat DOWNLOAD.csv |
 Create abbreviations.
 
 ```bash
-cd ~/data/organelle/mito/summary
+cd ~/data/mito/summary
 
 echo '#strain_taxon_id,accession,strain,species,genus,family,order,class,phylum,abbr' > ABBR.csv
 cat DOWNLOAD.csv |
@@ -416,7 +418,7 @@ cat DOWNLOAD.csv |
 # Download sequences and regenerate lineage information
 
 ```bash
-cd ~/data/organelle/mito/GENOMES
+cd ~/data/mito/GENOMES
 
 echo "#strain_name,accession,strain_taxon_id" > name_acc_id.csv
 cat ../summary/ABBR.csv |
@@ -475,7 +477,7 @@ find . -name "*.fa" | wc -l
 21 orders, 22 families, 36 genera and 106 species.
 
 ```bash
-cd ~/data/organelle/mito/summary
+cd ~/data/mito/summary
 
 # valid genera
 cat ABBR.csv |
@@ -488,10 +490,10 @@ cat ABBR.csv |
             }
         }
     ' \
-    > genus.tmp
+    > genus.valid.tmp
 
 # intersect between two files
-grep -F -f genus.tmp ABBR.csv > GENUS.csv
+grep -F -f genus.valid.tmp ABBR.csv > GENUS.csv
 
 wc -l GENUS.csv
 # 113
@@ -507,14 +509,13 @@ wc -l order.list.tmp family.list.tmp genus.list.tmp species.list.tmp
 #  36 genus.list.tmp
 # 106 species.list.tmp
 
-# create again with headers
-grep -F -f genus.tmp ABBR.csv > GENUS.tmp
-
 # sort by multiply columns, phylum, order, family, genus, accession
-head -n 1 ABBR.csv > GENUS.csv
-cat GENUS.tmp |
+head -n 1 ABBR.csv > GENUS.tmp
+cat GENUS.csv |
     sort -t',' -k9,9 -k7,7 -k6,6 -k5,5 -k2,2 \
-    >> GENUS.csv
+    >> GENUS.tmp
+
+mv GENUS.tmp GENUS.csv
 
 # clean
 rm *.tmp *.bak
@@ -524,8 +525,8 @@ rm *.tmp *.bak
 ## Raw phylogenetic tree by MinHash
 
 ```bash
-mkdir -p ~/data/organelle/mito/mash
-cd ~/data/organelle/mito/mash
+mkdir -p ~/data/mito/mash
+cd ~/data/mito/mash
 
 for name in $(cat ../summary/ABBR.csv | sed -e '1d' | cut -d"," -f 10 | sort); do
     2>&1 echo "==> ${name}"
@@ -536,10 +537,10 @@ for name in $(cat ../summary/ABBR.csv | sed -e '1d' | cut -d"," -f 10 | sort); d
 
     find ../GENOMES/${name} -name "*.fa" |
         xargs cat |
-        mash sketch -k 21 -s 100000 -p 8 - -I "${name}" -o ${name}
+        mash sketch -k 21 -s 100000 -p 4 - -I "${name}" -o ${name}
 done
 
-cd ~/data/organelle/mito/summary
+cd ~/data/mito/summary
 mash triangle -E -p 8 -l <(
         cat ABBR.csv |
             sed '1d' |
@@ -592,11 +593,11 @@ nw_display -s -b 'visibility:hidden' -w 600 -v 30 tree.nwk |
 # Prepare sequences for lastz
 
 ```bash
-cd ~/data/organelle/mito/GENOMES
+cd ~/data/mito/GENOMES
 
 find . -maxdepth 1 -mindepth 1 -type d |
     sort |
-    parallel --no-run-if-empty --linebuffer -k -j 4 '
+    parallel --no-run-if-empty --linebuffer -k -j 1 '
         echo >&2 "==> {}"
 
         if [ -e {}/chr.fasta ]; then
@@ -606,7 +607,7 @@ find . -maxdepth 1 -mindepth 1 -type d |
 
         egaz prepseq \
             {} \
-            --gi -v --repeatmasker " --gff --parallel 8"
+            --gi -v --repeatmasker " --gff --parallel 4"
     '
 
 # restore to original states
@@ -622,8 +623,12 @@ find . -maxdepth 1 -mindepth 1 -type d |
 
 Manually edit it then move to `~/Scripts/withncbi/doc/mito_t_o.md`.
 
+* Listed targets were well curated.
+
+* Outgroups can be changes with less intentions.
+
 ```bash
-cd ~/data/organelle/mito/summary
+cd ~/data/mito/summary
 
 cat GENUS.csv |
     grep -v "^#" |
@@ -670,8 +675,8 @@ GENUS.csv
 **36** genera and **15** families.
 
 ```bash
-mkdir -p ~/data/organelle/mito/taxon
-cd ~/data/organelle/mito/taxon
+mkdir -p ~/data/mito/taxon
+cd ~/data/mito/taxon
 
 echo -e "#Serial\tGroup\tCount\tTarget" > group_target.tsv
 
@@ -760,7 +765,7 @@ cat ../summary/GENUS.csv |
 ## Plans for align-able targets
 
 ```bash
-cd ~/data/organelle/mito/taxon
+cd ~/data/mito/taxon
 
 cat ~/Scripts/withncbi/doc/mito_t_o.md |
     grep -v "^#" |
@@ -803,7 +808,7 @@ rm *.tmp
 ## Aligning w/o outgroups
 
 ```bash
-cd ~/data/organelle/mito/
+cd ~/data/mito/
 
 # genus
 cat taxon/group_target.tsv |
@@ -820,11 +825,14 @@ cat taxon/group_target.tsv |
             GENOMES/{4} \
             $(cat taxon/{2} | grep -v -x "{4}" | xargs -I[] echo "GENOMES/[]") \
             --multi -o groups/genus/{2} \
-            --rawphylo --parallel 4 -v
+            --taxon ~/data/organelle/plastid/GENOMES/taxon_ncbi.csv \
+            --rawphylo --aligndb --parallel 4 -v
 
         bash groups/genus/{2}/1_pair.sh
         bash groups/genus/{2}/2_rawphylo.sh
         bash groups/genus/{2}/3_multi.sh
+        bash groups/genus/{2}/6_chr_length.sh
+        bash groups/genus/{2}/7_multi_aligndb.sh
     '
 
 # family
@@ -845,7 +853,7 @@ cat taxon/group_target.tsv |
         bash groups/family/{2}/3_multi.sh
     '
 
-# group
+# mash
 cat taxon/group_target.tsv |
     tsv-filter -H --ge 1:901 |
     sed -e '1d' | #grep "^915" |
@@ -855,12 +863,12 @@ cat taxon/group_target.tsv |
         egaz template \
             GENOMES/{4} \
             $(cat taxon/{2} | grep -v -x "{4}" | xargs -I[] echo "GENOMES/[]") \
-            --multi -o groups/group/{2} \
+            --multi -o groups/mash/{2} \
             --rawphylo --parallel 4 -v
 
-        bash groups/group/{2}/1_pair.sh
-        bash groups/group/{2}/2_rawphylo.sh
-        bash groups/group/{2}/3_multi.sh
+        bash groups/mash/{2}/1_pair.sh
+        bash groups/mash/{2}/2_rawphylo.sh
+        bash groups/mash/{2}/3_multi.sh
     '
 
 # clean
@@ -895,13 +903,13 @@ find groups/genus -mindepth 1 -maxdepth 1 -type d |
 * *D* between target and outgroup should be around **0.05**.
 
 ```bash
-cd ~/data/organelle/mito/
+cd ~/data/mito/
 
-# species_og
+# genus_og
 cat taxon/group_target.tsv |
     tsv-filter -H --le 1:500 |
     sed -e '1d' | #grep "^163" |
-    parallel --colsep '\t' --no-run-if-empty --linebuffer -k -j 1 '
+    parallel --colsep '\t' --no-run-if-empty --linebuffer -k -j 6 '
         outgroup=$(
             cat ~/Scripts/withncbi/doc/mito_t_o.md |
                 grep -v "^#" |
@@ -923,76 +931,41 @@ cat taxon/group_target.tsv |
             GENOMES/{4} \
             $(cat taxon/{2} | grep -v -x "{4}" | xargs -I[] echo "GENOMES/[]") \
             GENOMES/${outgroup} \
-            --multi -o groups/genus_og/{2} \
+            --multi -o groups/genus_og/{2}_og \
             --outgroup ${outgroup} \
-            --rawphylo --parallel 4 -v
+            --taxon ~/data/organelle/plastid/GENOMES/taxon_ncbi.csv \
+            --rawphylo --aligndb --parallel 4 -v
 
-        bash groups/genus_og/{2}/1_pair.sh
-        bash groups/genus_og/{2}/2_rawphylo.sh
-        bash groups/genus_og/{2}/3_multi.sh
+        bash groups/genus_og/{2}_og/1_pair.sh
+        bash groups/genus_og/{2}_og/2_rawphylo.sh
+        bash groups/genus_og/{2}_og/3_multi.sh
+        bash groups/genus_og/{2}_og/6_chr_length.sh
+        bash groups/genus_og/{2}_og/7_multi_aligndb.sh
     '
 
 ```
 
-# Self alignments
+## Self alignments
 
 ```bash
-cd ~/data/organelle/mito/summary
+cd ~/data/mito/
 
-cat <<'EOF' > egaz_templates_self.tt
+cat taxon/group_target.tsv |
+    tsv-filter -H --le 1:500 |
+    sed -e '1d' | # grep "^200" |
+    parallel --colsep '\t' --no-run-if-empty --linebuffer -k -j 1 '
+        echo -e "==> Group: [{2}]\tTarget: [{4}]\n"
 
-# [% name %]
-egaz template \
-    ~/data/organelle/mito/GENOMES/[% t %] \
-[% FOREACH q IN qs -%]
-    ~/data/organelle/mito/GENOMES/[% q %] \
-[% END -%]
-    --self -o [% name %] \
-    --taxon ~/data/organelle/mito/GENOMES/taxon_ncbi.csv \
-    --circos --parallel 8 -v
+        egaz template \
+            GENOMES/{4} \
+            $(cat taxon/{2} | grep -v -x "{4}" | xargs -I[] echo "GENOMES/[]") \
+            --self -o groups/self/{2} \
+            --circos --parallel 4 -v
 
-EOF
-
-# every genera
-echo "mkdir -p ~/data/organelle/mito/self"  > ../self.cmd.txt
-echo "cd       ~/data/organelle/mito/self" >> ../self.cmd.txt
-cat genus.tsv |
-    TT_FILE=egaz_templates_self.tt perl -MTemplate -nla -F"\t" -e '
-        next unless scalar @F >= 3;
-
-        my $tt = Template->new;
-        $tt->process(
-            $ENV{TT_FILE},
-            {
-                name       => $F[0],
-                t          => $F[1],
-                qs         => [ split /,/, $F[2] ],
-            },
-            \*STDOUT
-        ) or die Template->error;
-
-    ' \
-    >> ../self.cmd.txt
-
-```
-
-```bash
-mkdir -p ~/data/organelle/mito/self
-cd ~/data/organelle/mito/self
-
-time bash ../self.cmd.txt 2>&1 | tee log_cmd.txt
-
-for d in `find . -mindepth 1 -maxdepth 1 -type d | sort `;do
-    echo "echo \"====> Processing ${d} <====\""
-    echo bash ${d}/1_self.sh;
-    echo bash ${d}/3_proc.sh;
-    echo bash ${d}/4_circos.sh;
-    echo bash ${d}/6_chr_length.sh;
-    echo bash ${d}/7_self_aligndb.sh;
-    echo ;
-done  > runall.sh
-
-sh runall.sh 2>&1 | tee log_runall.txt
+        bash groups/self/{2}/1_self.sh
+        bash groups/self/{2}/3_proc.sh
+        bash groups/self/{2}/4_circos.sh
+    '
 
 ```
 
@@ -1001,16 +974,16 @@ sh runall.sh 2>&1 | tee log_runall.txt
 ## Copy xlsx files
 
 ```bash
-mkdir -p ~/data/organelle/mito/summary/xlsx
-cd ~/data/organelle/mito/summary/xlsx
+mkdir -p ~/data/mito/summary/xlsx
+cd ~/data/mito/summary/xlsx
 
-find ../../genus -type f -name "*.common.xlsx" |
+find ../../groups/genus -type f -name "*.common.xlsx" |
     grep -v "vs[A-Z]" |
-    parallel cp {} .
+    parallel 'cp {} .'
 
-find ../../OG -type f -name "*.common.xlsx" |
+find ../../groups/genus_og -type f -name "*.common.xlsx" |
     grep -v "vs[A-Z]" |
-    parallel cp {} .
+    parallel 'cp {} .'
 
 ```
 
@@ -1019,16 +992,16 @@ find ../../OG -type f -name "*.common.xlsx" |
 Create `list.csv` from `GENUS.csv` with sequence lengths.
 
 ```bash
-mkdir -p ~/data/organelle/mito/summary/table
-cd ~/data/organelle/mito/summary/table
+mkdir -p ~/data/mito/summary/table
+cd ~/data/mito/summary/table
 
-# manually set orders in `mito_OG.md`
+# manually set orders in `mito_t_o.md`
 perl -l -MPath::Tiny -e '
     BEGIN {
         @ls = map {/^#/ and s/^(#+\s*\w+).*/\1/; $_}
-            map {s/,\w+//; $_}
+            map {s/,.+$//; $_}
             map {s/^###\s*//; $_}
-            path(q{~/Scripts/withncbi/doc/mito_OG.md})->lines( { chomp => 1});
+            path(q{~/Scripts/withncbi/doc/mito_t_o.md})->lines({chomp => 1});
     }
     for (@ls) {
         (/^\s*$/ or /^##\s+/ or /^#\s+(\w+)/) and next;
@@ -1038,7 +1011,7 @@ perl -l -MPath::Tiny -e '
     > genus_all.lst
 
 # abbr accession length
-find ../../genus -type f -name "chr_length.csv" |
+find ../../groups/genus -type f -name "chr_length.csv" |
     parallel --jobs 1 --keep-order -r '
         perl -nl -e '\''
             BEGIN {
@@ -1066,10 +1039,10 @@ find ../../genus -type f -name "chr_length.csv" |
     ' \
     > length.tmp
 cat length.tmp | datamash check
-#90 lines, 3 fields
+#108 lines, 3 fields
 
 # phylum family genus abbr taxon_id
-cat ~/data/organelle/mito/summary/GENUS.csv |
+cat ~/data/mito/summary/GENUS.csv |
     grep -v "^#" |
     perl -nla -F"," -e 'print join qq{\t}, ($F[8], $F[5], $F[4], $F[9], $F[0], )' |
     sort |
@@ -1086,9 +1059,9 @@ tsv-join \
     --append-fields 2,3 \
     > list.tmp
 cat list.tmp | datamash check
-#90 lines, 7 fields
+#108 lines, 7 fields
 
-# sort as orders in mito_OG.md
+# sort as orders in mito_t_o.md
 echo -e "#phylum,family,genus,abbr,taxon_id,accession,length" > list.csv
 cat list.tmp |
     perl -nl -a -MPath::Tiny -e '
@@ -1106,7 +1079,7 @@ cat list.tmp |
     tr $'\t' ',' \
     >> list.csv
 cat list.csv | datamash check -t,
-#91 lines, 7 fields
+#109 lines, 7 fields
 
 rm *.tmp
 
@@ -1120,10 +1093,10 @@ Criteria:
 
 * Coverage >= 0.5
 * Total number of indels >= 100
-* Genome D < 0.05
+* D of multiple alignments < 0.05
 
 ```bash
-cd ~/data/organelle/mito/summary/xlsx
+cd ~/data/mito/summary/xlsx
 
 cat <<'EOF' > Table_alignment.tt
 ---
@@ -1167,7 +1140,7 @@ ranges:
 [% END -%]
 EOF
 
-cat ~/data/organelle/mito/summary/table/genus_all.lst |
+cat ~/data/mito/summary/table/genus_all.lst |
     grep -v "^#" |
     TT_FILE=Table_alignment.tt perl -MTemplate -nl -e '
         push @data, { name => $_, file => qq{$_.common.xlsx}, };
@@ -1182,13 +1155,13 @@ cat ~/data/organelle/mito/summary/table/genus_all.lst |
 perl ~/Scripts/fig_table/xlsx_table.pl -i Table_alignment_all.yml
 perl ~/Scripts/fig_table/xlsx2csv.pl -f Table_alignment_all.xlsx > Table_alignment_all.csv
 
-cp -f Table_alignment_all.xlsx ~/data/organelle/mito/summary/table
-cp -f Table_alignment_all.csv ~/data/organelle/mito/summary/table
+cp -f Table_alignment_all.xlsx ~/data/mito/summary/table
+cp -f Table_alignment_all.csv ~/data/mito/summary/table
 
 ```
 
 ```bash
-cd ~/data/organelle/mito/summary/table
+cd ~/data/mito/summary/table
 
 echo "Genus,avg_size" > group_avg_size.csv
 cat list.csv |
@@ -1245,12 +1218,12 @@ cat Table_alignment_for_filter.csv |
     ' \
     > genus.lst
 
-rm ~/data/organelle/mito/summary/table/Table_alignment_all.[0-9].csv
-rm ~/data/organelle/mito/summary/table/group_*csv
+rm ~/data/mito/summary/table/Table_alignment_all.[0-9].csv
+rm ~/data/mito/summary/table/group_*csv
 
 #
-cd ~/data/organelle/mito/summary/xlsx
-cat ~/data/organelle/mito/summary/table/genus.lst |
+cd ~/data/mito/summary/xlsx
+cat ~/data/mito/summary/table/genus.lst |
     grep -v "^#" |
     TT_FILE=Table_alignment.tt perl -MTemplate -nl -e '
         push @data, { name => $_, file => qq{$_.common.xlsx}, };
@@ -1265,8 +1238,8 @@ cat ~/data/organelle/mito/summary/table/genus.lst |
 perl ~/Scripts/fig_table/xlsx_table.pl -i Table_alignment.yml
 perl ~/Scripts/fig_table/xlsx2csv.pl -f Table_alignment.xlsx > Table_alignment.csv
 
-cp -f ~/data/organelle/mito/summary/xlsx/Table_alignment.xlsx ~/data/organelle/mito/summary/table
-cp -f ~/data/organelle/mito/summary/xlsx/Table_alignment.csv ~/data/organelle/mito/summary/table
+cp -f ~/data/mito/summary/xlsx/Table_alignment.xlsx ~/data/mito/summary/table
+cp -f ~/data/mito/summary/xlsx/Table_alignment.csv ~/data/mito/summary/table
 
 ```
 
@@ -1275,10 +1248,10 @@ cp -f ~/data/organelle/mito/summary/xlsx/Table_alignment.csv ~/data/organelle/mi
 NCBI Taxonomy tree
 
 ```bash
-mkdir -p ~/data/organelle/mito/summary/group
-cd ~/data/organelle/mito/summary/group
+mkdir -p ~/data/mito/summary/group
+cd ~/data/mito/summary/group
 
-cat ~/data/organelle/mito/summary/table/genus.lst |
+cat ~/data/mito/summary/table/genus.lst |
     grep -v "^#" |
     perl -e '
         @ls = <>;
@@ -1294,26 +1267,26 @@ cat ~/data/organelle/mito/summary/table/genus.lst |
 
 bash genera_tree.sh > genera.newick
 
-nw_display -w 600 -s genera.newick |
-    rsvg-convert -f pdf -o genera.pdf
+nw_display -s -b 'visibility:hidden' -w 600 -v 30 genera.newick |
+    rsvg-convert -o genera.png
 
 ```
 
 ## Phylogenic trees of each genus with outgroup
 
 ```bash
-mkdir -p ~/data/organelle/mito/summary/trees
-cd ~/data/organelle/plastid/summary/trees
+mkdir -p ~/data/mito/summary/trees
+cd ~/data/mito/summary/trees
 
-cat ~/Scripts/withncbi/doc/mito_OG.md |
+cat ~/Scripts/withncbi/doc/mito_t_o.md |
     grep -v "^#" |
     grep . |
     cut -d',' -f 1 \
     > list.txt
 
-find ../../OG -type f -path "*Results*" -name "*.nwk" |
+find ../../groups/genus_og -type f -path "*Results*" -name "*.nwk" |
     grep -v ".raw." |
-    parallel -j 1 cp {} trees
+    parallel -j 1 'cp {} .'
 
 ```
 
@@ -1322,7 +1295,7 @@ find ../../OG -type f -path "*Results*" -name "*.nwk" |
 `collect_xlsx.pl`
 
 ```bash
-cd ~/data/organelle/mito/summary/xlsx
+cd ~/data/mito/summary/xlsx
 
 cat <<'EOF' > cmd_collect_d1_d2.tt
 perl ~/Scripts/fig_table/collect_xlsx.pl \
@@ -1378,9 +1351,9 @@ bash cmd_collect_d1_d2.sh
 `sep_chart.pl`
 
 ```bash
-mkdir -p ~/data/organelle/mito/summary/fig
+mkdir -p ~/data/mito/summary/fig
 
-cd ~/data/organelle/mito/summary/xlsx
+cd ~/data/mito/summary/xlsx
 
 cat <<'EOF' > cmd_chart_d1_d2.tt
 perl ~/Scripts/fig_table/sep_chart.pl \
