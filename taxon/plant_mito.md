@@ -104,6 +104,7 @@ cat id_seq.csv | grep -v "^#" | wc -l
 ```bash
 cd ~/data/organelle/mito/GENOMES
 
+# Viridiplantae 33090
 echo '#strain_taxon_id,accession' > plant_id_seq.csv
 cat id_seq.csv |
     grep -v "^#" |
@@ -193,30 +194,33 @@ sed -i".bak" "s/Leiosporocerotopsida,Streptophyta/Leiosporocerotopsida,Bryophyte
 
 ```
 
-Split Streptophyta according to http://www.theplantlist.org/
+Split Streptophyta according to classical plant classification.
+
+* Streptophyta
+  * Streptophytina
+    * Embryophyta
+      * Tracheophyta
+        * Euphyllophyta
+          * Spermatophyta
+            * Magnoliopsida (flowering plants) 3398 - Angiosperm
+            * Acrogymnospermae 1437180 - Gymnosperm
+          * Polypodiopsida 241806 - ferns
+        * Lycopodiopsida 1521260 - clubmosses
+      * Anthocerotophyta 13809 - hornworts
+      * Bryophyta 3208 - mosses
+      * Marchantiophyta 3195 - liverworts
 
 ```bash
 cd ~/data/organelle/mito/summary
 
-# Angiosperms
-perl -Mojo -e '
-    g(q{http://www.theplantlist.org/browse/A/})->dom
-    ->find(q{li > a > i[class=family]})
-    ->each( sub { print shift->text . "\n" } );
-    ' > Angiosperms.tmp
-echo Aceraceae >> Angiosperms.tmp
-echo Asphodelaceae >> Angiosperms.tmp
-echo Asteraceae >> Angiosperms.tmp
-echo Campynemataceae >> Angiosperms.tmp
-echo Chenopodiaceae >> Angiosperms.tmp
-echo Fabaceae >> Angiosperms.tmp
-echo Francoaceae >> Angiosperms.tmp
-echo Hyacinthaceae >> Angiosperms.tmp
-echo Nyssaceae >> Angiosperms.tmp
-echo Taccaceae >> Angiosperms.tmp
-echo Viscaceae >> Angiosperms.tmp
+#perl -Mojo -e '
+#    g(q{http://www.theplantlist.org/browse/A/})->dom
+#    ->find(q{li > a > i[class=family]})
+#    ->each( sub { print shift->text . "\n" } );
+#    ' > Angiosperms.tmp
 
-cat Angiosperms.tmp |
+# Angiosperms
+perl ~/Scripts/withncbi/taxon/id_members.pl 3398 --rank family |
     parallel -r -j 1 '
         perl -pi -e '\''
             s/({},\w+,\w+),Streptophyta/\1,Angiosperms/g
@@ -224,12 +228,7 @@ cat Angiosperms.tmp |
     '
 
 # Gymnosperms
-perl -Mojo -e '
-    g(q{http://www.theplantlist.org/browse/G/})->dom
-    ->find(q{li > a > i[class=family]})
-    ->each( sub { print shift->text . "\n" } );
-    ' |
-    (echo Sciadopityaceae && cat) |
+perl ~/Scripts/withncbi/taxon/id_members.pl 1437180 --rank family |
     parallel -r -j 1 '
         perl -pi -e '\''
             s/({},\w+,\w+),Streptophyta/\1,Gymnosperms/g
@@ -237,12 +236,14 @@ perl -Mojo -e '
     '
 
 # Pteridophytes
-perl -Mojo -e '
-    g(q{http://www.theplantlist.org/browse/P/})->dom
-    ->find(q{li > a > i[class=family]})
-    ->each( sub { print shift->text . "\n" } );
-    ' |
-    (echo Lygodiaceae && cat) |
+perl ~/Scripts/withncbi/taxon/id_members.pl 241806 --rank family |
+    parallel -r -j 1 '
+        perl -pi -e '\''
+            s/({},\w+,\w+),Streptophyta/\1,Pteridophytes/g
+        '\'' CHECKME.csv
+    '
+
+perl ~/Scripts/withncbi/taxon/id_members.pl 1521260 --rank family |
     parallel -r -j 1 '
         perl -pi -e '\''
             s/({},\w+,\w+),Streptophyta/\1,Pteridophytes/g
@@ -250,11 +251,21 @@ perl -Mojo -e '
     '
 
 # Bryophytes
-perl -Mojo -e '
-    g(q{http://www.theplantlist.org/browse/B/})->dom
-    ->find(q{li > a > i[class=family]})
-    ->each( sub { print shift->text . "\n" } );
-    ' |
+perl ~/Scripts/withncbi/taxon/id_members.pl 13809 --rank family |
+    parallel -r -j 1 '
+        perl -pi -e '\''
+            s/({},\w+,\w+),Streptophyta/\1,Bryophytes/g
+        '\'' CHECKME.csv
+    '
+
+perl ~/Scripts/withncbi/taxon/id_members.pl 3208 --rank family |
+    parallel -r -j 1 '
+        perl -pi -e '\''
+            s/({},\w+,\w+),Streptophyta/\1,Bryophytes/g
+        '\'' CHECKME.csv
+    '
+
+perl ~/Scripts/withncbi/taxon/id_members.pl 3195 --rank family |
     parallel -r -j 1 '
         perl -pi -e '\''
             s/({},\w+,\w+),Streptophyta/\1,Bryophytes/g
