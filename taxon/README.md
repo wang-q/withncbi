@@ -55,18 +55,18 @@ I'm sure there are no commas in names. So for convenient, don't use Text::CSV_XS
 
 Open browser and visit
 [NCBI plastid page](http://www.ncbi.nlm.nih.gov/genomes/GenomesGroup.cgi?taxid=33090&opt=plastid).
-Save page to a local file, html only. In this case, it's `doc/green_plants_plastid_181127.html`.
+Save page to a local file, html only. In this case, it's `doc/green_plants_plastid_200326.html`.
 
 All [Eukaryota](http://www.ncbi.nlm.nih.gov/genomes/GenomesGroup.cgi?opt=plastid&taxid=2759),
-`doc/eukaryota_plastid_181127.html`.
+`doc/eukaryota_plastid_200326.html`.
 
 Or [this link](http://www.ncbi.nlm.nih.gov/genome/browse/?report=5).
 
 ```text
-Eukaryota (2759)                2938
-    Viridiplantae (33090)       2727
-        Chlorophyta (3041)      121
-        Streptophyta (35493)    2606
+Eukaryota (2759)                4711
+    Viridiplantae (33090)       4437
+        Chlorophyta (3041)      151
+        Streptophyta (35493)    4284
 ```
 
 Use `taxon/id_seq_dom_select.pl` to extract Taxonomy ids and genbank accessions from all history
@@ -77,27 +77,28 @@ id,acc
 996148,NC_017006
 ```
 
-Got **3358** accessions.
+Got **4755** accessions.
 
 ```bash
-mkdir -p ~/data/organelle/plastid/GENOMES
-cd ~/data/organelle/plastid/GENOMES
+mkdir -p ~/data/plastid/GENOMES
+cd ~/data/plastid/GENOMES
 
 rm webpage_id_seq.csv
-perl ~/Scripts/withncbi/taxon/id_seq_dom_select.pl \
-    ~/Scripts/withncbi/doc/eukaryota_plastid_181127.html \
-    >> webpage_id_seq.csv    
 
 perl ~/Scripts/withncbi/taxon/id_seq_dom_select.pl \
-    ~/Scripts/withncbi/doc/green_plants_plastid_181127.html \
-    >> webpage_id_seq.csv    
+    ~/Scripts/withncbi/doc/eukaryota_plastid_200326.html \
+    >> webpage_id_seq.csv
+
+perl ~/Scripts/withncbi/taxon/id_seq_dom_select.pl \
+    ~/Scripts/withncbi/doc/green_plants_plastid_200326.html \
+    >> webpage_id_seq.csv
 
 ```
 
 Use `taxon/gb_taxon_locus.pl` to extract information from refseq genbank files.
 
 ```bash
-cd ~/data/organelle/plastid/GENOMES
+cd ~/data/plastid/GENOMES
 
 wget -N ftp://ftp.ncbi.nlm.nih.gov/genomes/refseq/plastid/plastid.1.genomic.gbff.gz
 wget -N ftp://ftp.ncbi.nlm.nih.gov/genomes/refseq/plastid/plastid.2.genomic.gbff.gz
@@ -108,9 +109,10 @@ gzip -dcf plastid.*.genomic.gbff.gz > genomic.gbff
 perl ~/Scripts/withncbi/taxon/gb_taxon_locus.pl genomic.gbff > refseq_id_seq.csv
 
 rm genomic.gbff
+#rm *.genomic.gbff.gz
 
-# 4722
 cat refseq_id_seq.csv | grep -v "^#" | wc -l
+# 4722
 
 # combine
 cat webpage_id_seq.csv refseq_id_seq.csv |
@@ -118,8 +120,8 @@ cat webpage_id_seq.csv refseq_id_seq.csv |
     sort -t, -k1,1 \
     > id_seq.csv
 
-# 4745
 cat id_seq.csv | grep -v "^#" | wc -l
+# 4755
 
 ```
 
@@ -130,8 +132,8 @@ Give ids better shapes for manually checking and automatic filtering.
 If you sure, you can add or delete lines and contents in `CHECKME.csv`.
 
 ```bash
-mkdir -p ~/data/organelle/plastid/summary
-cd ~/data/organelle/plastid/summary
+mkdir -p ~/data/plastid/summary
+cd ~/data/plastid/summary
 
 # generate a .csv file for manually checking
 echo '#strain_taxon_id,accession,strain,species,genus,family,order,class,phylum' > CHECKME.csv
@@ -155,7 +157,7 @@ Taxonomy information from [AlgaeBase](http://www.algaebase.org),
 [Wikipedia](https://www.wikipedia.org/) and [Encyclopedia of Life](http://eol.org/).
 
 ```bash
-cd ~/data/organelle/plastid/summary
+cd ~/data/plastid/summary
 
 # darwin (bsd) need "" for -i
 sed -i".bak" "s/\'//g" CHECKME.csv
@@ -220,11 +222,11 @@ sed -i".bak" "s/Pleurastrum,NA,NA/Pleurastrum,NA,Chlamydomonadales/" CHECKME.csv
 sed -i".bak" "s/Leptocylindraceae,NA/Leptocylindraceae,Chaetocerotales/" CHECKME.csv
 sed -i".bak" "s/Rhizosoleniaceae,NA/Rhizosoleniaceae,Rhizosoleniales/" CHECKME.csv
 sed -i".bak" "s/Babesiidae,NA/Babesiidae,Piroplasmida/" CHECKME.csv
-sed -i".bak" "s/Theileriidae,NA/Theileriidae,Piroplasmida/" CHECKME.csv 	
-sed -i".bak" "s/Treubariaceae,NA/Treubariaceae,Chlorococcales/" CHECKME.csv 
-sed -i".bak" "s/Oltmannsiellopsidaceae,NA/Oltmannsiellopsidaceae,Oltmannsiellopsidales/" CHECKME.csv 
-sed -i".bak" "s/Pycnococcaceae,NA/Pycnococcaceae,Pseudoscourfieldiales/" CHECKME.csv 
-sed -i".bak" "s/Coccomyxaceae,NA/Coccomyxaceae,Chlorococcales/" CHECKME.csv 	
+sed -i".bak" "s/Theileriidae,NA/Theileriidae,Piroplasmida/" CHECKME.csv
+sed -i".bak" "s/Treubariaceae,NA/Treubariaceae,Chlorococcales/" CHECKME.csv
+sed -i".bak" "s/Oltmannsiellopsidaceae,NA/Oltmannsiellopsidaceae,Oltmannsiellopsidales/" CHECKME.csv
+sed -i".bak" "s/Pycnococcaceae,NA/Pycnococcaceae,Pseudoscourfieldiales/" CHECKME.csv
+sed -i".bak" "s/Coccomyxaceae,NA/Coccomyxaceae,Chlorococcales/" CHECKME.csv
 
 # missing classes and phylums
 sed -i".bak" "s/Glaucocystophyceae,NA/Glaucocystophyceae,Glaucophyta/" CHECKME.csv
@@ -316,25 +318,27 @@ sed -i".bak" "s/Pavlovales,NA,NA/Pavlovales,Pavlovophyceae,Haptophyta/" CHECKME.
 sed -i".bak" "s/Phaeocystales,NA,NA/Phaeocystales,Coccolithophyceae,Haptophyta/" CHECKME.csv
 
 # Ochrophyta 褐藻门
-sed -i".bak" "s/Phaeophyceae,NA/Phaeophyceae,Ochrophyta/" CHECKME.csv
-sed -i".bak" "s/Eustigmatophyceae,NA/Eustigmatophyceae,Ochrophyta/" CHECKME.csv
-sed -i".bak" "s/Xanthophyceae,NA/Xanthophyceae,Ochrophyta/" CHECKME.csv
-sed -i".bak" "s/Pelagophyceae,NA/Pelagophyceae,Ochrophyta/" CHECKME.csv
-sed -i".bak" "s/Raphidophyceae,NA/Raphidophyceae,Ochrophyta/" CHECKME.csv
-sed -i".bak" "s/Synurophyceae,NA/Synurophyceae,Ochrophyta/" CHECKME.csv
-sed -i".bak" "s/NA,Phaeophyceae/Phaeophyceae,Ochrophyta/" CHECKME.csv
+parallel -j 1 '
+    sed -i".bak" "s/{},NA/{},Ochrophyta/" CHECKME.csv
+    ' ::: \
+        Bolidophyceae Dictyochophyceae Eustigmatophyceae \
+        Pelagophyceae Phaeophyceae Raphidophyceae \
+        Synurophyceae Xanthophyceae
 
 # Rhodophyta 红藻门
-sed -i".bak" "s/Bangiophyceae,NA/Bangiophyceae,Rhodophyta/" CHECKME.csv
-sed -i".bak" "s/Compsopogonophyceae,NA/Compsopogonophyceae,Rhodophyta/" CHECKME.csv
-sed -i".bak" "s/Florideophyceae,NA/Florideophyceae,Rhodophyta/" CHECKME.csv
-sed -i".bak" "s/Rhodellophyceae,NA/Rhodellophyceae,Rhodophyta/" CHECKME.csv
-sed -i".bak" "s/Stylonematophyceae,NA/Stylonematophyceae,Rhodophyta/" CHECKME.csv
+parallel -j 1 '
+    sed -i".bak" "s/{},NA/{},Rhodophyta/" CHECKME.csv
+    ' ::: \
+        Bangiophyceae Compsopogonophyceae Florideophyceae \
+        Rhodellophyceae Stylonematophyceae
 
 # Cryptophyta 隐藻门
+parallel -j 1 '
+    sed -i".bak" "s/{},NA/{},Cryptophyta/" CHECKME.csv
+    ' ::: \
+        Cryptophyta Cryptophyceae
 sed -i".bak" "s/Cryptomonadales,NA,NA/Cryptomonadales,Cryptophyceae,Cryptophyta/" CHECKME.csv
 sed -i".bak" "s/Pyrenomonadales,NA,NA/Pyrenomonadales,Cryptophyceae,Cryptophyta/" CHECKME.csv
-sed -i".bak" "s/Cryptophyta,NA/Cryptophyta,Cryptophyta/" CHECKME.csv
 
 # Charophyta 轮藻门
 sed -i".bak" "s/Charophyceae,Streptophyta/Charophyceae,Charophyta/" CHECKME.csv
@@ -345,45 +349,29 @@ sed -i".bak" "s/Zygnemophyceae,Streptophyta/Zygnemophyceae,Charophyta/" CHECKME.
 # Chlorophyta 绿藻门
 sed -i".bak" "s/Mesostigmatophyceae,Streptophyta/Mesostigmatophyceae,Chlorophyta/" CHECKME.csv
 
-# Bryophytes
-sed -i".bak" "s/Marchantiopsida,Streptophyta/Marchantiopsida,Bryophytes/" CHECKME.csv
-sed -i".bak" "s/Leiosporocerotopsida,Streptophyta/Leiosporocerotopsida,Bryophytes/" CHECKME.csv
-
-# Pteridophytes
-sed -i".bak" "s/Polypodiopsida,Streptophyta/Polypodiopsida,Pteridophytes/" CHECKME.csv
-
-# Angiosperms
-sed -i".bak" "s/Magnoliopsida,Streptophyta/Magnoliopsida,Angiosperms/" CHECKME.csv
-sed -i".bak" "s/Liliopsida,Streptophyta/Liliopsida,Angiosperms/" CHECKME.csv
-sed -i".bak" "s/eudicots,Streptophyta/eudicots,Angiosperms/" CHECKME.csv
-sed -i".bak" "s/Boraginales,NA,Streptophyta/Boraginales,NA,Angiosperms/" CHECKME.csv
-
 ```
 
-Split Streptophyta according to http://www.theplantlist.org/
+Split Streptophyta according to classical plant classification.
+
+* Streptophyta
+  * Streptophytina
+    * Embryophyta
+      * Tracheophyta
+        * Euphyllophyta
+          * Spermatophyta
+            * Magnoliopsida (flowering plants) 3398 - Angiosperm
+            * Acrogymnospermae 1437180 - Gymnosperm
+          * Polypodiopsida 241806 - ferns
+        * Lycopodiopsida 1521260 - clubmosses
+      * Anthocerotophyta 13809 - hornworts
+      * Bryophyta 3208 - mosses
+      * Marchantiophyta 3195 - liverworts
 
 ```bash
-cd ~/data/organelle/plastid/summary
+cd ~/data/plastid/summary
 
 # Angiosperms
-perl -Mojo -e '
-    g(q{http://www.theplantlist.org/browse/A/})->dom
-    ->find(q{li > a > i[class=family]})
-    ->each( sub { print shift->text . "\n" } );
-    ' > Angiosperms.tmp
-echo Aceraceae >> Angiosperms.tmp
-echo Asphodelaceae >> Angiosperms.tmp
-echo Asteraceae >> Angiosperms.tmp
-echo Campynemataceae >> Angiosperms.tmp
-echo Chenopodiaceae >> Angiosperms.tmp
-echo Fabaceae >> Angiosperms.tmp
-echo Francoaceae >> Angiosperms.tmp
-echo Hyacinthaceae >> Angiosperms.tmp
-echo Nyssaceae >> Angiosperms.tmp
-echo Taccaceae >> Angiosperms.tmp
-echo Viscaceae >> Angiosperms.tmp
-
-cat Angiosperms.tmp |
+perl ~/Scripts/withncbi/taxon/id_members.pl 3398 --rank family |
     parallel -r -j 1 '
         perl -pi -e '\''
             s/({},\w+,\w+),Streptophyta/\1,Angiosperms/g
@@ -391,12 +379,7 @@ cat Angiosperms.tmp |
     '
 
 # Gymnosperms
-perl -Mojo -e '
-    g(q{http://www.theplantlist.org/browse/G/})->dom
-    ->find(q{li > a > i[class=family]})
-    ->each( sub { print shift->text . "\n" } );
-    ' |
-    (echo Sciadopityaceae && cat) |
+perl ~/Scripts/withncbi/taxon/id_members.pl 1437180 --rank family |
     parallel -r -j 1 '
         perl -pi -e '\''
             s/({},\w+,\w+),Streptophyta/\1,Gymnosperms/g
@@ -404,12 +387,14 @@ perl -Mojo -e '
     '
 
 # Pteridophytes
-perl -Mojo -e '
-    g(q{http://www.theplantlist.org/browse/P/})->dom
-    ->find(q{li > a > i[class=family]})
-    ->each( sub { print shift->text . "\n" } );
-    ' |
-    (echo Lygodiaceae && cat) |
+perl ~/Scripts/withncbi/taxon/id_members.pl 241806 --rank family |
+    parallel -r -j 1 '
+        perl -pi -e '\''
+            s/({},\w+,\w+),Streptophyta/\1,Pteridophytes/g
+        '\'' CHECKME.csv
+    '
+
+perl ~/Scripts/withncbi/taxon/id_members.pl 1521260 --rank family |
     parallel -r -j 1 '
         perl -pi -e '\''
             s/({},\w+,\w+),Streptophyta/\1,Pteridophytes/g
@@ -417,11 +402,21 @@ perl -Mojo -e '
     '
 
 # Bryophytes
-perl -Mojo -e '
-    g(q{http://www.theplantlist.org/browse/B/})->dom
-    ->find(q{li > a > i[class=family]})
-    ->each( sub { print shift->text . "\n" } );
-    ' |
+perl ~/Scripts/withncbi/taxon/id_members.pl 13809 --rank family |
+    parallel -r -j 1 '
+        perl -pi -e '\''
+            s/({},\w+,\w+),Streptophyta/\1,Bryophytes/g
+        '\'' CHECKME.csv
+    '
+
+perl ~/Scripts/withncbi/taxon/id_members.pl 3208 --rank family |
+    parallel -r -j 1 '
+        perl -pi -e '\''
+            s/({},\w+,\w+),Streptophyta/\1,Bryophytes/g
+        '\'' CHECKME.csv
+    '
+
+perl ~/Scripts/withncbi/taxon/id_members.pl 3195 --rank family |
     parallel -r -j 1 '
         perl -pi -e '\''
             s/({},\w+,\w+),Streptophyta/\1,Bryophytes/g
@@ -453,16 +448,16 @@ rm *.tmp *.bak
 Species and genus should not be "NA" and genus has 2 or more members.
 
 ```text
-3356 ---------> 3337 ---------> 2253 ---------> 2940
+4754 ---------> 4733 ---------> 3338 ---------> 4292
         NA             genus          family
 ```
 
 ```bash
-mkdir -p ~/data/organelle/plastid/summary
-cd ~/data/organelle/plastid/summary
+mkdir -p ~/data/plastid/summary
+cd ~/data/plastid/summary
 
-# 3356
 cat CHECKME.csv | grep -v "^#" | wc -l
+# 4754
 
 # filter out accessions without linage information (strain, species, genus and family)
 cat CHECKME.csv |
@@ -473,8 +468,8 @@ cat CHECKME.csv |
     ' \
     > valid.tmp
 
-# 3337
 wc -l valid.tmp
+# 4733
 
 #----------------------------#
 # Genus
@@ -482,7 +477,7 @@ wc -l valid.tmp
 # valid genera
 cat valid.tmp |
     perl -nla -F"," -e '
-        $seen{$F[4]}++; 
+        $seen{$F[4]}++;
         END {
             for $k (sort keys %seen) {
                 printf qq{,%s,\n}, $k if $seen{$k} > 1
@@ -494,8 +489,8 @@ cat valid.tmp |
 # intersect between two files
 grep -F -f genus.tmp valid.tmp > valid.genus.tmp
 
-# 2253
 wc -l valid.genus.tmp
+# 3338
 
 #----------------------------#
 # Family
@@ -508,8 +503,8 @@ cat valid.genus.tmp |
 # intersect between two files
 grep -F -f family.tmp valid.tmp > valid.family.tmp
 
-# 2940
 wc -l valid.family.tmp
+# 4292
 
 #----------------------------#
 # results produced in this step
@@ -527,56 +522,78 @@ rm *.tmp *.bak
 Seems it's OK to use species as names.
 
 ```bash
-cd ~/data/organelle/plastid/summary
+cd ~/data/plastid/summary
 
 # sub-species
 cat DOWNLOAD.csv |
     perl -nl -a -F"," -e '
-        /^#/i and next; 
-        $seen{$F[3]}++; 
+        /^#/i and next;
+        $seen{$F[3]}++;
         END {
             for $k (keys %seen){printf qq{%s,%d\n}, $k, $seen{$k} if $seen{$k} > 1}
         };
     ' |
     sort
-
+#Allium cyathophorum,2
+#Anemone hepatica,2
 #Arabidopsis lyrata,2
 #Astragalus mongholicus,2
+#Brassica rapa,2
 #Cannabis sativa,2
 #Capsicum baccatum,3
+#Changiostyrax dolichocarpus,2
+#Corallorhiza striata,2
+#Corylus ferox,2
 #Fragaria vesca,2
 #Gossypium herbaceum,2
+#Hippophae rhamnoides,2
+#Hordeum vulgare,2
 #Magnolia officinalis,2
+#Marchantia polymorpha,2
 #Musa balbisiana,2
 #Olea europaea,4
 #Oryza sativa,4
+#Panax japonicus,2
 #Paris polyphylla,2
 #Physcomitrella patens,2
 #Pisum sativum,2
 #Plasmodium falciparum,2
 #Saccharum hybrid cultivar,3
+#Sanguisorba tenuifolia,2
 #Sinalliaria limprichtiana,2
+#Solanum bukasovii,2
 #Solanum lycopersicum,2
+#Solanum stenotomum,2
+#Sophora alopecuroides,2
 #Vitis aestivalis,2
 #Vitis cinerea,4
 #Vitis rotundifolia,2
+#Wurfbainia villosa,2
 
 # strain name not equal to species
 cat DOWNLOAD.csv |
     grep -v '^#' |
     perl -nl -a -F"," -e '$F[2] ne $F[3] and print $F[2]' |
     sort
-
+#Actinidia callosa var. henryi
+#Allium cyathophorum var. farreri
+#Anemone cernua var. koreana
+#Anemone hepatica var. asiatica
+#Anemone hepatica var. japonica
 #Arabidopsis lyrata subsp. lyrata
 #Astragalus mongholicus var. nakaianus
 #Babesia bovis T2Bo
 #Babesia microti strain RI
+#Betula pendula var. carelica
 #Brassica rapa subsp. pekinensis
 #Calycanthus floridus var. glaucus
+#Calypso bulbosa var. occidentalis
 #Capsicum baccatum var. baccatum
 #Capsicum baccatum var. pendulum
 #Capsicum baccatum var. praetermissum
 #Caragana rosea var. rosea
+#Corallorhiza striata var. involuta
+#Corallorhiza striata var. striata
 #Corylus ferox var. thibetica
 #Cucumis melo subsp. melo
 #Eucalyptus globulus subsp. globulus
@@ -585,6 +602,8 @@ cat DOWNLOAD.csv |
 #Fragaria vesca subsp. vesca
 #Gossypium herbaceum subsp. africanum
 #Gracilaria tenuistipitata var. liui
+#Hippophae rhamnoides subsp. yunnanensis
+#Hordeum vulgare subsp. spontaneum
 #Hordeum vulgare subsp. vulgare
 #Lilium martagon var. pilosiusculum
 #Magnolia macrophylla var. dealbata
@@ -599,9 +618,11 @@ cat DOWNLOAD.csv |
 #Oryza sativa f. spontanea
 #Oryza sativa Indica Group
 #Oryza sativa Japonica Group
+#Panax japonicus var. bipinnatifidus
 #Paris polyphylla var. chinensis
 #Paris polyphylla var. yunnanensis
 #Phalaenopsis aphrodite subsp. formosana
+#Phryma leptostachya subsp. asiatica
 #Phyllostachys nigra var. henonis
 #Pisum sativum subsp. elatius
 #Plasmodium chabaudi chabaudi
@@ -611,25 +632,32 @@ cat DOWNLOAD.csv |
 #Rosa chinensis var. spontanea
 #Saccharum hybrid cultivar NCo 310
 #Saccharum hybrid cultivar SP80-3280
+#Sanguisorba tenuifolia var. alba
 #Sinalliaria limprichtiana var. grandifolia
+#Solanum bukasovii f. multidissectum
+#Solanum stenotomum subsp. goniocalyx
+#Sophora alopecuroides var. alopecuroides
+#Styphnolobium japonicum var. japonicum
 #Thalassiosira oceanica CCMP1005
+#Trichopus zeylanicus subsp. travancoricus
 #Vitis aestivalis var. linsecomii
 #Vitis cinerea var. cinerea
 #Vitis cinerea var. floridana
 #Vitis cinerea var. helleri
 #Vitis rotundifolia var. munsoniana
+#Wurfbainia villosa var. xanthioides
 
 ```
 
 Create abbreviations.
 
 ```bash
-cd ~/data/organelle/plastid/summary
+cd ~/data/plastid/summary
 
 echo '#strain_taxon_id,accession,strain,species,genus,family,order,class,phylum,abbr' > ABBR.csv
 cat DOWNLOAD.csv |
     grep -v '^#' |
-    perl ~/Scripts/withncbi/taxon/abbr_name.pl -c "3,4,5" -s "," -m 0 |
+    perl ~/Scripts/withncbi/taxon/abbr_name.pl -c "3,4,5" -s "," -m 0 --shortsub |
     sort -t',' -k9,9 -k7,7 -k6,6 -k10,10 \
     >> ABBR.csv
 
