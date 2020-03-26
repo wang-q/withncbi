@@ -1261,7 +1261,7 @@ cat ~/data/mito/summary/table/genus.lst |
             $str .= qq{    -s "$_" \\\n};
         }
         $str .= qq{    -e \n};
-        print $str
+        print $str;
     ' \
     > genera_tree.sh
 

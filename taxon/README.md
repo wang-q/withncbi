@@ -11,15 +11,14 @@
 - [Filtering based on valid families and genera](#filtering-based-on-valid-families-and-genera)
 - [Find a way to name these](#find-a-way-to-name-these)
 - [Download sequences and regenerate lineage information](#download-sequences-and-regenerate-lineage-information)
+  - [Numbers for higher ranks](#numbers-for-higher-ranks)
+  - [Raw phylogenetic tree by MinHash](#raw-phylogenetic-tree-by-minhash)
 - [Prepare sequences for lastz](#prepare-sequences-for-lastz)
 - [Aligning without outgroups](#aligning-without-outgroups)
+  - [Create `plastid_t_o.md` for picking targets and outgroups.](#create-plastid_t_omd-for-picking-targets-and-outgroups)
   - [Create alignments plans without outgroups](#create-alignments-plans-without-outgroups)
-  - [Batch running for genera](#batch-running-for-genera)
-  - [Alignments of families for outgroups.](#alignments-of-families-for-outgroups)
-- [Aligning with outgroups](#aligning-with-outgroups)
-  - [Create `plastid_OG.md` for picking outgroups](#create-plastid_ogmd-for-picking-outgroups)
-  - [Create alignments plans with outgroups](#create-alignments-plans-with-outgroups)
-- [Self alignments](#self-alignments)
+  - [Plans for align-able targets](#plans-for-align-able-targets)
+  - [Aligning w/o outgroups](#aligning-wo-outgroups)
 - [LSC and SSC](#lsc-and-ssc)
   - [Can't get clear IR information](#cant-get-clear-ir-information)
   - [Slices of IR, LSC and SSC](#slices-of-ir-lsc-and-ssc)
@@ -670,7 +669,7 @@ We don't rename sequences here, so the file has three columns.
 And create `taxon_ncbi.csv` with abbr names as taxon file.
 
 ```bash
-cd ~/data/organelle/plastid/GENOMES
+cd ~/data/plastid/GENOMES
 
 echo "#strain_name,accession,strain_taxon_id" > name_acc_id.csv
 cat ../summary/ABBR.csv |
@@ -699,24 +698,24 @@ cat name_acc_id.csv |
             echo -e '    Sequence [{1}/{2}] exists, next\n'
             exit
         fi
-        
+
         # gb
         echo -e '    [{1}/{2}].gb'
         curl -Ls \
             'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=nucleotide&id={2}&rettype=gb&retmode=text' \
             > {1}/{2}.gb
-        
+
         # fasta
         echo -e '    [{1}/{2}].fa'
         curl -Ls \
             'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=nucleotide&id={2}&rettype=fasta&retmode=text' \
             > {1}/{2}.fa
-        
+
         # gff
         echo -e '    [{1}/{2}].gff'
         perl ~/Scripts/withncbi/taxon/bp_genbank2gff3.pl {1}/{2}.gb -o stdout > {1}/{2}.gff
         perl -i -nlp -e '/^\#\#FASTA/ and last' {1}/{2}.gff
-        
+
         echo
     " |
     tee download_seq.log
@@ -726,322 +725,164 @@ find . -name "*.fa" | wc -l
 
 ```
 
-Numbers for higher ranks are: 84 orders, 165 families, 466 genera and 2225 species.
+## Numbers for higher ranks
+
+92 orders, 202 families, 636 genera and 3295 species.
 
 ```bash
-cd ~/data/organelle/plastid/summary
+cd ~/data/plastid/summary
 
 # valid genera
 cat ABBR.csv |
     grep -v "^#" |
     perl -nl -a -F"," -e '
-        $seen{$F[4]}++; 
+        $seen{$F[4]}++;
         END {
             for $k (sort keys %seen) {
                 printf qq{,%s,\n}, $k if $seen{$k} > 1
             }
         }
     ' \
-    > genus.tmp
+    > genus.valid.tmp
 
 # intersect between two files
-grep -F -f genus.tmp ABBR.csv > GENUS.csv
+grep -F -f genus.valid.tmp ABBR.csv > GENUS.csv
 
-# 2253
 wc -l GENUS.csv
+# 113
 
 # count every ranks
-#   84 order.list.tmp
-#  165 family.list.tmp
-#  466 genus.list.tmp
-# 2225 species.list.tmp
 cut -d',' -f 4 GENUS.csv | sort | uniq > species.list.tmp
 cut -d',' -f 5 GENUS.csv | sort | uniq > genus.list.tmp
 cut -d',' -f 6 GENUS.csv | sort | uniq > family.list.tmp
 cut -d',' -f 7 GENUS.csv | sort | uniq > order.list.tmp
 wc -l order.list.tmp family.list.tmp genus.list.tmp species.list.tmp
+#   92 order.list.tmp
+#  202 family.list.tmp
+#  636 genus.list.tmp
+# 3295 species.list.tmp
 
-# create again with headers
-grep -F -f genus.tmp ABBR.csv > GENUS.tmp
+# sort by multiply columns, phylum, order, family, genus, accession
+# oldest accession will be the target
+head -n 1 ABBR.csv > GENUS.tmp
+cat GENUS.csv |
+    sort -t',' -k9,9 -k7,7 -k6,6 -k5,5 -k2,2 \
+    >> GENUS.tmp
 
-# sort by multiply columns, phylum, order, family, abbr
-head -n 1 ABBR.csv > GENUS.csv
-cat GENUS.tmp |
-    sort -t',' -k9,9 -k7,7 -k6,6 -k10,10 \
-    >> GENUS.csv
+mv GENUS.tmp GENUS.csv
 
 # clean
 rm *.tmp *.bak
 
 ```
 
+## Raw phylogenetic tree by MinHash
+
+```bash
+mkdir -p ~/data/plastid/mash
+cd ~/data/plastid/mash
+
+for name in $(cat ../summary/ABBR.csv | sed -e '1d' | cut -d"," -f 10 | sort); do
+    2>&1 echo "==> ${name}"
+
+    if [[ -e ${name}.msh ]]; then
+        continue
+    fi
+
+    find ../GENOMES/${name} -name "*.fa" |
+        xargs cat |
+        mash sketch -k 21 -s 100000 -p 4 - -I "${name}" -o ${name}
+done
+
+cd ~/data/plastid/summary
+mash triangle -E -p 8 -l <(
+        cat ABBR.csv |
+            sed '1d' |
+            cut -d"," -f 10 |
+            parallel echo "../mash/{}.msh"
+    ) \
+    > dist.tsv
+
+# fill matrix with lower triangle
+tsv-select -f 1-3 dist.tsv |
+    (tsv-select -f 2,1,3 dist.tsv && cat) |
+    (
+        cut -f 1 dist.tsv |
+            tsv-uniq |
+            parallel -j 1 --keep-order 'echo -e "{}\t{}\t0"' &&
+        cat
+    ) \
+    > dist_full.tsv
+
+cat dist_full.tsv |
+    Rscript -e '
+        library(readr);
+        library(tidyr);
+        library(ape);
+        pair_dist <- read_tsv(file("stdin"), col_names=F);
+        tmp <- pair_dist %>%
+            pivot_wider( names_from = X2, values_from = X3, values_fill = list(X3 = 1.0), values_fn = list(X3 = mean) )
+        tmp <- as.matrix(tmp)
+        mat <- tmp[,-1]
+        rownames(mat) <- tmp[,1]
+
+        dist_mat <- as.dist(mat)
+        clusters <- hclust(dist_mat, method = "ward.D2")
+        tree <- as.phylo(clusters)
+        write.tree(phy=tree, file="tree.nwk")
+
+        group <- cutree(clusters, h=0.3) # k=3
+        groups <- as.data.frame(group)
+        groups$ids <- rownames(groups)
+        rownames(groups) <- NULL
+        groups <- groups[order(groups$group), ]
+        write_tsv(groups, "groups.tsv")
+    '
+
+nw_display -s -b 'visibility:hidden' -w 600 -v 30 tree.nwk |
+    rsvg-convert -o plant_plastid.png
+
+```
+
 # Prepare sequences for lastz
 
 ```bash
-cd ~/data/organelle/plastid/GENOMES
+cd ~/data/plastid/GENOMES
 
-find . -maxdepth 1 -type d -path "*/*" |
+find . -maxdepth 1 -mindepth 1 -type d |
     sort |
-    parallel --no-run-if-empty --linebuffer -k -j 4 '
+    parallel --no-run-if-empty --linebuffer -k -j 6 '
         echo >&2 "==> {}"
-        
+
         if [ -e {}/chr.fasta ]; then
-            echo >&2 "    {} has been processed"
+            echo >&2 "    {} has been processed";
             exit;
         fi
 
         egaz prepseq \
             {} \
-            --gi -v --repeatmasker " --gff --parallel 8"
+            --gi -v --repeatmasker " --gff --parallel 4"
     '
 
 # restore to original states
 #for suffix in .2bit .fasta .fasta.fai .sizes .rm.out .rm.gff; do
-#    find . -name "*${suffix}" | parallel --no-run-if-empty rm 
+#    find . -name "*${suffix}" | parallel --no-run-if-empty rm
 #done
 
 ```
 
 # Aligning without outgroups
 
-## Create alignments plans without outgroups
+## Create `plastid_t_o.md` for picking targets and outgroups.
+
+Manually edit it then move to `~/Scripts/withncbi/doc/plastid_t_o.md`.
+
+* Listed targets were well curated.
+
+* Outgroups can be changes with less intentions.
 
 ```bash
-cd ~/data/organelle/plastid/summary
-
-# tab-separated
-# name  t   qs
-cat GENUS.csv |
-    grep -v "^#" |
-    perl -na -F"," -e '
-        BEGIN{
-            $name = q{};
-            %id_of = ();
-        }
-
-        chomp for @F;
-        $F[4] =~ s/\W+/_/g;
-        if ($F[4] ne $name) {
-            if ($name) {
-                my @s = sort {$id_of{$a} <=> $id_of{$b}} keys %id_of;
-                my $t = shift @s;
-                my $qs = join(q{,}, @s);
-                printf qq{%s\t%s\t%s\n}, $name, $t, $qs;
-            }
-            $name = $F[4];
-            %id_of = ();
-        }
-        $id_of{$F[9]} = $F[0];
-
-        END {
-            my @s = sort {$id_of{$a} <=> $id_of{$b}} keys %id_of;
-            my $t = shift @s;
-            my $qs = join(q{,}, @s);
-            printf qq{%s\t%s\t%s\n}, $name, $t, $qs;
-        }
-    ' \
-    > genus.tsv
-
-cat ABBR.csv |
-    grep -v "^#" |
-    perl -na -F"," -e '
-        BEGIN{
-            $name = q{};
-            %id_of = ();
-        }
-
-        chomp for @F;
-        $F[5] =~ s/\W+/_/g;
-        if ($F[5] ne $name) {
-            if ($name) {
-                my @s = sort {$id_of{$a} <=> $id_of{$b}} keys %id_of;
-                my $t = shift @s;
-                my $qs = join(q{,}, @s);
-                printf qq{%s\t%s\t%s\n}, $name, $t, $qs;
-            }
-            $name = $F[5];
-            %id_of = ();
-        }
-        $id_of{$F[9]} = $F[0]; # multiple chromosomes collapsed here
-
-        END {
-            my @s = sort {$id_of{$a} <=> $id_of{$b}} keys %id_of;
-            my $t = shift @s;
-            my $qs = join(q{,}, @s);
-            printf qq{%s\t%s\t%s\n}, $name, $t, $qs;
-        }
-    ' \
-    > family.tsv
-
-```
-
-```bash
-cd ~/data/organelle/plastid/summary
-
-cat <<'EOF' > egaz_template_multi.tt
-
-# [% name %]
-egaz template \
-    ~/data/organelle/plastid/GENOMES/[% t %] \
-[% FOREACH q IN qs -%]
-    ~/data/organelle/plastid/GENOMES/[% q %] \
-[% END -%]
-[% IF o -%]
-    ~/data/organelle/plastid/GENOMES/[% o %] \
-    --outgroup [% o %] \
-[% END -%]
-    --multi -o [% name %] \
-    --taxon ~/data/organelle/plastid/GENOMES/taxon_ncbi.csv \
-    --rawphylo --aligndb --parallel 8 -v
-
-EOF
-
-# every genera
-echo "mkdir -p ~/data/organelle/plastid/genus"  > ../cmd.txt
-echo "cd       ~/data/organelle/plastid/genus" >> ../cmd.txt
-cat genus.tsv |
-    TT_FILE=egaz_template_multi.tt perl -MTemplate -nla -F"\t" -e '
-        next unless scalar @F >= 3;
-        
-        my $tt = Template->new;
-        $tt->process(
-            $ENV{TT_FILE},
-            {
-                name       => $F[0],
-                t          => $F[1],
-                qs         => [ split /,/, $F[2] ],
-                o          => $F[3],
-            },
-            \*STDOUT
-        ) or die Template->error;
-
-    ' \
-    >> ../cmd.txt
-
-# this is for finding outgroups
-echo "mkdir -p ~/data/organelle/plastid/family"  > ../family.cmd.txt
-echo "cd       ~/data/organelle/plastid/family" >> ../family.cmd.txt
-cat family.tsv |
-    TT_FILE=egaz_template_multi.tt perl -MTemplate -nla -F"\t" -e '
-        next unless scalar @F >= 3;
-        
-        my $tt = Template->new;
-        $tt->process(
-            $ENV{TT_FILE},
-            {
-                name       => $F[0],
-                t          => $F[1],
-                qs         => [ split /,/, $F[2] ],
-                o          => $F[3],
-            },
-            \*STDOUT
-        ) or die Template->error;
-
-    ' \
-    >> ../family.cmd.txt
-
-```
-
-## Batch running for genera
-
-```bash
-mkdir -p ~/data/organelle/plastid/genus
-cd ~/data/organelle/plastid/genus
-
-bash ../cmd.txt 2>&1 | tee log_cmd.txt
-
-#----------------------------#
-# Step by step
-#----------------------------#
-# 1_pair
-for f in `find . -mindepth 1 -maxdepth 2 -type f -name 1_pair.sh | sort`; do
-    echo "bash $f"
-    echo
-done > run_1.sh
-
-# 2_rawphylo
-for f in `find . -mindepth 1 -maxdepth 2 -type f -name 2_rawphylo.sh | sort`; do
-    echo "bash $f"
-    echo
-done > run_2.sh
-
-# 3_multi
-for f in `find . -mindepth 1 -maxdepth 2 -type f -name 3_multi.sh | sort`; do
-    echo "bash $f"
-    echo
-done > run_3.sh
-
-# 6_chr_length
-for f in `find . -mindepth 1 -maxdepth 2 -type f -name 6_chr_length.sh | sort`; do
-    echo "bash $f"
-    echo
-done > run_6.sh
-
-# 7_multi_aligndb
-for f in `find . -mindepth 1 -maxdepth 2 -type f -name 7_multi_aligndb.sh | sort`; do
-    echo "bash $f"
-    echo
-done > run_7.sh
-
-cat run_1.sh | grep . | parallel -r -j 4  2>&1 | tee log_1.txt
-cat run_2.sh | grep . | parallel -r -j 3  2>&1 | tee log_2.txt
-cat run_3.sh | grep . | parallel -r -j 3  2>&1 | tee log_3.txt
-cat run_6.sh | grep . | parallel -r -j 12 2>&1 | tee log_6.txt
-cat run_7.sh | grep . | parallel -r -j 8  2>&1 | tee log_7.txt
-
-find . -mindepth 1 -maxdepth 3 -type d -name "*_raw" | parallel -r rm -fr
-find . -mindepth 1 -maxdepth 3 -type d -name "*_fasta" | parallel -r rm -fr
-
-```
-
-## Alignments of families for outgroups.
-
-```bash
-mkdir -p ~/data/organelle/plastid/family
-cd ~/data/organelle/plastid/family
-
-time bash ../family.cmd.txt 2>&1 | tee log_cmd.txt
-
-#----------------------------#
-# Step by step
-#----------------------------#
-# 1_pair
-for f in `find . -mindepth 1 -maxdepth 2 -type f -name 1_pair.sh | sort`; do
-    echo "bash $f"
-    echo
-done > run_1.sh
-
-# 2_rawphylo
-for f in `find . -mindepth 1 -maxdepth 2 -type f -name 2_rawphylo.sh | sort`; do
-    echo "bash $f"
-    echo
-done > run_2.sh
-
-# 3_multi
-for f in `find . -mindepth 1 -maxdepth 2 -type f -name 3_multi.sh | sort`; do
-    echo "bash $f"
-    echo
-done > run_3.sh
-
-cat run_1.sh | grep . | parallel -r -j 4  2>&1 | tee log_1.txt
-cat run_2.sh | grep . | parallel -r -j 3  2>&1 | tee log_2.txt
-cat run_3.sh | grep . | parallel -r -j 3  2>&1 | tee log_3.txt
-
-find ~/data/organelle/plastid/family -type f -name "*.nwk"
-
-find . -mindepth 1 -maxdepth 3 -type d -name "*_raw"   | parallel -r rm -fr
-find . -mindepth 1 -maxdepth 3 -type d -name "*_fasta" | parallel -r rm -fr
-
-```
-
-# Aligning with outgroups
-
-## Create `plastid_OG.md` for picking outgroups
-
-Manually edit it then move to `~/Scripts/withncbi/doc/plastid_OG.md`.
-
-```bash
-cd ~/data/organelle/plastid/summary
+cd ~/data/plastid/summary
 
 cat GENUS.csv |
     grep -v "^#" |
@@ -1063,191 +904,322 @@ cat GENUS.csv |
         $F[4] =~ s/\W+/_/g;
         if ($F[4] ne $genus) {
             $genus = $F[4];
-            printf qq{%s\n}, $genus;
+            printf qq{%s,%s\n}, $genus, $F[9];
         }
     ' \
-    > plastid_OG.md
+    > plastid_t_o.md
+
+cat plastid_t_o.md |
+    grep -v '^#' |
+    grep -E '\S+' |
+    wc -l
+# 636
+
+# mv plastid_t_o.md ~/Scripts/withncbi/doc/plastid_t_o.md
 
 ```
 
-## Create alignments plans with outgroups
+## Create alignments plans without outgroups
+
+```text
+GENUS.csv
+#strain_taxon_id,accession,strain,species,genus,family,order,class,phylum,abbr
+```
+
+**636** genera and **142** families.
 
 ```bash
-cd ~/data/organelle/plastid/summary
+mkdir -p ~/data/plastid/taxon
+cd ~/data/plastid/taxon
 
-# name  t   qs  o
-cat genus.tsv |
-    perl -nla -F"\t" -MPath::Tiny -e '
+echo -e "#Serial\tGroup\tCount\tTarget" > group_target.tsv
+
+cat ../summary/GENUS.csv |
+    grep -v "^#" |
+    SERIAL=1 perl -na -F"," -MPath::Tiny -e '
         BEGIN{
+            $name = q{};
+            %id_of = ();
+            %h = ();
             @ls = grep {/\S/}
                   grep {!/^#/}
-                  path(q{~/Scripts/withncbi/doc/plastid_OG.md})->lines({ chomp => 1});
+                  path(q{~/Scripts/withncbi/doc/plastid_t_o.md})->lines({chomp => 1});
             for (@ls) {
                 @fs = split(/,/);
                 $h{$fs[0]}= $fs[1];
             }
+            undef @ls;
         }
 
-        if (exists $h{$F[0]}) {
-            printf qq{%s\t%s\t%s\t%s\n}, $F[0] . q{_OG}, $F[1], $F[2], $h{$F[0]};
+        chomp for @F;
+        $F[4] =~ s/\W+/_/g;
+        if ($F[4] ne $name) {
+            if ($name) {
+                if (exists $h{$name}) {
+                    my @s = sort {$id_of{$a} <=> $id_of{$b}} keys %id_of;
+                    my $t = $h{$name};
+                    printf qq{%s\t%s\t%s\t%s\n}, $ENV{SERIAL}, $name, scalar @s, $t;
+                    path(qq{$name})->spew(map {qq{$_\n}} @s);
+                    $ENV{SERIAL}++;
+                }
+            }
+            $name = $F[4];
+            %id_of = ();
         }
-    ' \
-    > genus_OG.tsv
+        $id_of{$F[9]} = $F[0]; # same strain multiple chromosomes collapsed here
 
-# genera with outgroups
-echo "mkdir -p ~/data/organelle/plastid/OG"  > ../OG.cmd.txt
-echo "cd       ~/data/organelle/plastid/OG" >> ../OG.cmd.txt
-cat genus_OG.tsv |
-    TT_FILE=egaz_template_multi.tt perl -MTemplate -nla -F"\t" -e '
-        next unless scalar @F >= 3;
-        
-        my $tt = Template->new;
-        $tt->process(
-            $ENV{TT_FILE},
-            {
-                name       => $F[0],
-                t          => $F[1],
-                qs         => [ split /,/, $F[2] ],
-                o          => $F[3],
-            },
-            \*STDOUT
-        ) or die Template->error;
+        END {
+            my @s = sort {$id_of{$a} <=> $id_of{$b}} keys %id_of;
+            my $t = $h{$name};
+            printf qq{%s\t%s\t%s\t%s\n}, $ENV{SERIAL}, $name, scalar @s, $t;
+            path(qq{$name})->spew(map {qq{$_\n}} @s);
+        }' \
+    >> group_target.tsv
 
-    ' \
-    >> ../OG.cmd.txt
+cat ../summary/GENUS.csv |
+    grep -v "^#" |
+    SERIAL=1001 perl -na -F"," -MPath::Tiny -e '
+        BEGIN{
+            our $name = q{};
+            our %id_of = ();
+        }
 
-```
+        chomp for @F;
+        my $family = $F[5];
+        $family =~ s/\W+/_/g;
+        if ($family ne $name) {
+            if ($name) {
+                # sort by taxonomy_id
+                my @s = sort {$id_of{$a} <=> $id_of{$b}} keys %id_of;
+                my $t = $s[0];
+                if (scalar @s > 2) {
+                    printf qq{%s\t%s\t%s\t%s\n}, $ENV{SERIAL}, $name, scalar @s, $t;
+                    path(qq{$name})->spew(map {qq{$_\n}} @s);
+                    $ENV{SERIAL}++;
+                }
+            }
+            $name = $family;
+            %id_of = ();
+        }
+        $id_of{$F[9]} = $F[0]; # multiple chromosomes collapsed here
 
-In previous steps, we have manually edited `~/Scripts/withncbi/doc/plastid_OG.md` and generated
-`genus_OG.tsv`.
-
-*D* between target and outgroup should be around **0.05**.
-
-```bash
-mkdir -p ~/data/organelle/plastid/OG
-cd ~/data/organelle/plastid/OG
-
-time bash ../OG.cmd.txt 2>&1 | tee log_cmd.txt
-
-#----------------------------#
-# Step by step
-#----------------------------#
-# 1_pair
-for f in `find . -mindepth 1 -maxdepth 2 -type f -name 1_pair.sh | sort`; do
-    echo "bash $f"
-    echo
-done > run_1.sh
-
-# 2_rawphylo
-for f in `find . -mindepth 1 -maxdepth 2 -type f -name 2_rawphylo.sh | sort`; do
-    echo "bash $f"
-    echo
-done > run_2.sh
-
-# 3_multi
-for f in `find . -mindepth 1 -maxdepth 2 -type f -name 3_multi.sh | sort`; do
-    echo "bash $f"
-    echo
-done > run_3.sh
-
-# 6_chr_length
-for f in `find . -mindepth 1 -maxdepth 2 -type f -name 6_chr_length.sh | sort`; do
-    echo "bash $f"
-    echo
-done > run_6.sh
-
-# 7_multi_aligndb
-for f in `find . -mindepth 1 -maxdepth 2 -type f -name 7_multi_aligndb.sh | sort`; do
-    echo "bash $f"
-    echo
-done > run_7.sh
-
-cat run_1.sh | grep . | parallel -r -j 4  2>&1 | tee log_1.txt
-cat run_2.sh | grep . | parallel -r -j 3  2>&1 | tee log_2.txt
-cat run_3.sh | grep . | parallel -r -j 3  2>&1 | tee log_3.txt
-cat run_6.sh | grep . | parallel -r -j 12 2>&1 | tee log_6.txt
-cat run_7.sh | grep . | parallel -r -j 8  2>&1 | tee log_7.txt
-
-find . -mindepth 1 -maxdepth 3 -type d -name "*_raw"   | parallel -r rm -fr
-find . -mindepth 1 -maxdepth 3 -type d -name "*_fasta" | parallel -r rm -fr
+        END {
+            my @s = sort {$id_of{$a} <=> $id_of{$b}} keys %id_of;
+            my $t = $s[0];
+            if (scalar @s > 2) {
+                printf qq{%s\t%s\t%s\t%s\n}, $ENV{SERIAL}, $name, scalar @s, $t;
+                path(qq{$name})->spew(map {qq{$_\n}} @s);
+            }
+        }
+    '  \
+    >> group_target.tsv
 
 ```
 
-# Self alignments
+## Plans for align-able targets
 
 ```bash
-cd ~/data/organelle/plastid/summary
+cd ~/data/plastid/taxon
 
-cat <<'EOF' > egaz_templates_self.tt
+cat ~/Scripts/withncbi/doc/plastid_t_o.md |
+    grep -v "^#" |
+    grep . |
+    perl -nla -F"," -e 'print $F[1] ' \
+    > targets.tmp
 
-# [% name %]
-egaz template \
-    ~/data/organelle/plastid/GENOMES/[% t %] \
-[% FOREACH q IN qs -%]
-    ~/data/organelle/plastid/GENOMES/[% q %] \
-[% END -%]
-    --self -o [% name %] \
-    --taxon ~/data/organelle/plastid/GENOMES/taxon_ncbi.csv \
-    --circos --parallel 8 -v
+cat ../summary/groups.tsv |
+    grep -F -w -f targets.tmp |
+    perl -nla -F"\t" -e '($g, $s) = split q{_}, $F[1]; print qq{$F[0]\t${g}_${s}}' |
+    tsv-summarize --group-by 1 --count |
+    tsv-filter --ge 2:2 |
+    cut -f 1 \
+    > groups.tmp
 
-EOF
+cat ../summary/groups.tsv |
+    grep -F -w -f targets.tmp |
+    grep -F -w -f groups.tmp |
+    tsv-summarize --group-by 1 --values 2 \
+    > groups.lst.tmp
 
-# every genera
-echo "mkdir -p ~/data/organelle/plastid/self"  > ../self.cmd.txt
-echo "cd       ~/data/organelle/plastid/self" >> ../self.cmd.txt
-cat genus.tsv |
-    TT_FILE=egaz_templates_self.tt perl -MTemplate -nla -F"\t" -e '
-        next unless scalar @F >= 3;
-        
-        my $tt = Template->new;
-        $tt->process(
-            $ENV{TT_FILE},
-            {
-                name       => $F[0],
-                t          => $F[1],
-                qs         => [ split /,/, $F[2] ],
-            },
-            \*STDOUT
-        ) or die Template->error;
+cat groups.lst.tmp |
+    grep -v "^#" |
+    SERIAL=2001 perl -na -F"\t" -MPath::Tiny -e '
+        chomp for @F;
+        my $group = $F[0];
+        $group = "group_${group}";
+        my @targets = split /\|/, $F[1];
 
-    ' \
-    >> ../self.cmd.txt
+        printf qq{%s\t%s\t%s\t%s\n}, $ENV{SERIAL}, $group, scalar @targets, $targets[0];
+        path(qq{$group})->spew(map {qq{$_\n}} @targets);
+        $ENV{SERIAL}++;
+    '  \
+    >> group_target.tsv
+
+rm *.tmp
 
 ```
 
+## Aligning w/o outgroups
+
 ```bash
-mkdir -p ~/data/organelle/plastid/self
-cd ~/data/organelle/plastid/self
+cd ~/data/plastid/
 
-time bash ../self.cmd.txt 2>&1 | tee log_cmd.txt
+# genus
+cat taxon/group_target.tsv |
+    tsv-filter -H  --ge 1:1 --le 1:1000 |
+    sed -e '1d' | grep -w "^24" |
+    parallel --colsep '\t' --no-run-if-empty --linebuffer -k -j 6 '
+        echo -e "==> Group: [{2}]\tTarget: [{4}]\n"
 
-#----------------------------#
-# Step by step
-#----------------------------#
-# 1_self
-for f in `find . -mindepth 1 -maxdepth 2 -type f -name 1_self.sh | sort`; do
-    echo "bash $f"
-    echo
-done > run_1.sh
+        if bjobs -w | grep -w {2}; then
+            exit;
+        fi
 
-# 3_proc
-for f in `find . -mindepth 1 -maxdepth 2 -type f -name 3_proc.sh | sort`; do
-    echo "bash $f"
-    echo
-done > run_2.sh
+        egaz template \
+            GENOMES/{4} \
+            $(cat taxon/{2} | grep -v -x "{4}" | xargs -I[] echo "GENOMES/[]") \
+            --multi -o groups/genus/{2} \
+            --taxon ~/data/organelle/plastid/GENOMES/taxon_ncbi.csv \
+            --rawphylo --aligndb --parallel 4 -v
 
-# 4_circos
-for f in `find . -mindepth 1 -maxdepth 2 -type f -name 4_circos.sh | sort`; do
-    echo "bash $f"
-    echo
-done > run_3.sh
+        bash groups/genus/{2}/1_pair.sh
+        bash groups/genus/{2}/2_rawphylo.sh
+        bash groups/genus/{2}/3_multi.sh
+        bash groups/genus/{2}/6_chr_length.sh
+        bash groups/genus/{2}/7_multi_aligndb.sh
+    '
 
-cat run_1.sh | grep . | parallel -r -j 4  2>&1 | tee log_1.txt
-cat run_2.sh | grep . | parallel -r -j 4  2>&1 | tee log_2.txt
-cat run_3.sh | grep . | parallel -r -j 4  2>&1 | tee log_3.txt
+# family
+cat taxon/group_target.tsv |
+    tsv-filter -H --ge 1:1001 --le 1:2000 |
+    sed -e '1d' | grep -w "^1008" |
+    parallel --colsep '\t' --no-run-if-empty --linebuffer -k -j 6 '
+        echo -e "==> Group: [{2}]\tTarget: [{4}]\n"
 
-# clean mysql
-#find  /usr/local/var/mysql -type d -name "[A-Z]*" | parallel -r rm -fr
+        egaz template \
+            GENOMES/{4} \
+            $(cat taxon/{2} | grep -v -x "{4}" | xargs -I[] echo "GENOMES/[]") \
+            --multi -o groups/family/{2} \
+            --rawphylo --parallel 4 -v
+
+        bash groups/family/{2}/1_pair.sh
+        bash groups/family/{2}/2_rawphylo.sh
+        bash groups/family/{2}/3_multi.sh
+    '
+
+# mash
+cat taxon/group_target.tsv |
+    tsv-filter -H --ge 1:2001 |
+    sed -e '1d' | #grep -w "^915" |
+    parallel --colsep '\t' --no-run-if-empty --linebuffer -k -j 6 '
+        echo -e "==> Group: [{2}]\tTarget: [{4}]\n"
+
+        egaz template \
+            GENOMES/{4} \
+            $(cat taxon/{2} | grep -v -x "{4}" | xargs -I[] echo "GENOMES/[]") \
+            --multi -o groups/mash/{2} \
+            --rawphylo --parallel 4 -v
+
+        bash groups/mash/{2}/1_pair.sh
+        bash groups/mash/{2}/2_rawphylo.sh
+        bash groups/mash/{2}/3_multi.sh
+    '
+
+# clean
+find groups -mindepth 1 -maxdepth 3 -type d -name "*_raw" | parallel -r rm -fr
+find groups -mindepth 1 -maxdepth 3 -type d -name "*_fasta" | parallel -r rm -fr
+
+# check status
+echo \
+    $(find groups/genus -mindepth 1 -maxdepth 1 -type d | wc -l) \
+    $(find groups/genus -mindepth 1 -maxdepth 3 -type f -name "*.nwk.pdf" | grep -w raw -v | wc -l)
+
+find groups/genus -mindepth 1 -maxdepth 1 -type d |
+    parallel -j 4 '
+        lines=$(find {} -type f -name "*.nwk.pdf" | grep -w raw -v | wc -l)
+        if [ $lines -eq 0 ]; then
+            lines=$(find {} -type d -name "mafSynNet" | wc -l)
+            if [ $lines -gt 2 ]; then
+                echo {}
+            fi
+        fi
+    ' |
+    sort
+
+```
+
+## Aligning with outgroups
+
+* Review alignments and phylogenetic trees generated in `groups/family/` and `groups/group/`
+
+* Add outgroups to `plastid_t_o.md` manually.
+
+* *D* between target and outgroup should be around **0.05**.
+
+```bash
+cd ~/data/plastid/
+
+# genus_og
+cat taxon/group_target.tsv |
+    tsv-filter -H --le 1:1000 |
+    sed -e '1d' | grep -w "^24" |
+    parallel --colsep '\t' --no-run-if-empty --linebuffer -k -j 6 '
+        outgroup=$(
+            cat ~/Scripts/withncbi/doc/plastid_t_o.md |
+                grep -v "^#" |
+                grep . |
+                perl -nl -e '\'' m/{2},{4},(\w+)/ and print $1 '\''
+            )
+
+        if [ "${outgroup}" = "" ]; then
+            exit;
+        fi
+
+        if [ ! -d "GENOMES/${outgroup}" ]; then
+            exit;
+        fi
+
+        echo -e "==> Group: [{2}]\tTarget: [{4}]\tOutgroup: [${outgroup}]\n"
+
+        egaz template \
+            GENOMES/{4} \
+            $(cat taxon/{2} | grep -v -x "{4}" | xargs -I[] echo "GENOMES/[]") \
+            GENOMES/${outgroup} \
+            --multi -o groups/genus_og/{2}_og \
+            --outgroup ${outgroup} \
+            --taxon ~/data/organelle/plastid/GENOMES/taxon_ncbi.csv \
+            --rawphylo --aligndb --parallel 4 -v
+
+        bash groups/genus_og/{2}_og/1_pair.sh
+        bash groups/genus_og/{2}_og/2_rawphylo.sh
+        bash groups/genus_og/{2}_og/3_multi.sh
+        bash groups/genus_og/{2}_og/6_chr_length.sh
+        bash groups/genus_og/{2}_og/7_multi_aligndb.sh
+    '
+
+```
+
+## Self alignments
+
+```bash
+cd ~/data/plastid/
+
+cat taxon/group_target.tsv |
+    tsv-filter -H --le 1:1000 |
+    sed -e '1d' | grep -w "^24" |
+    parallel --colsep '\t' --no-run-if-empty --linebuffer -k -j 6 '
+        echo -e "==> Group: [{2}]\tTarget: [{4}]\n"
+
+        egaz template \
+            GENOMES/{4} \
+            $(cat taxon/{2} | grep -v -x "{4}" | xargs -I[] echo "GENOMES/[]") \
+            --self -o groups/self/{2} \
+            --circos --parallel 4 -v
+
+        bash groups/self/{2}/1_self.sh
+        bash groups/self/{2}/3_proc.sh
+        bash groups/self/{2}/4_circos.sh
+    '
 
 ```
 
@@ -1256,7 +1228,7 @@ cat run_3.sh | grep . | parallel -r -j 4  2>&1 | tee log_3.txt
 IRA and IRB are presented by `plastid/self/${GENUS}/Results/${STRAIN}/${STRAIN}.links.tsv`.
 
 ```bash
-find ~/data/organelle/plastid/self -type f -name "*.links.tsv" |
+find ~/data/plastid/self -type f -name "*.links.tsv" |
     xargs wc -l |
     sort -n |
     grep -v "total" |
@@ -1305,7 +1277,7 @@ Manually edit it then move to `~/Scripts/withncbi/doc/ir_lsc_ssc.tsv`.
 * `WRONG` - unexpected link records
 
 ```bash
-cd ~/data/organelle/plastid/summary
+cd ~/data/plastid/summary
 
 cat ABBR.csv |
     grep -v "^#" |
@@ -1356,8 +1328,8 @@ cat ABBR.csv |
             $role = "Outgroup";
         }
 
-        my $size_file = qq{$ENV{HOME}/data/organelle/plastid_self.working/$genus/Genomes/$abbr/chr.sizes};
-        my $link_file = qq{$ENV{HOME}/data/organelle/plastid_self.working/$genus/Results/$abbr/$abbr.links.tsv};
+        my $size_file = qq{$ENV{HOME}/data/plastid_self.working/$genus/Genomes/$abbr/chr.sizes};
+        my $link_file = qq{$ENV{HOME}/data/plastid_self.working/$genus/Results/$abbr/$abbr.links.tsv};
 
         if (! -e $size_file or ! -e $link_file) {
             if ($outgroup{$abbr}) {
@@ -1641,8 +1613,8 @@ Without outgroups.
 Be cautious to alignments with low coverage.
 
 ```bash
-mkdir -p ~/data/organelle/plastid/slices
-cd ~/data/organelle/plastid/slices
+mkdir -p ~/data/plastid/slices
+cd ~/data/plastid/slices
 
 cat ~/Scripts/withncbi/doc/ir_lsc_ssc.tsv |
     perl -nla -F"\t" -MAlignDB::IntSpan -Mstrict -Mwarnings -e '
@@ -1652,7 +1624,7 @@ cat ~/Scripts/withncbi/doc/ir_lsc_ssc.tsv |
 
         print qq{# $F[0]};
 
-        next unless -e "$ENV{HOME}/data/organelle/plastid/genus/$F[0]/$F[0]_refined/$F[3].synNet.maf.gz.fas.gz";
+        next unless -e "$ENV{HOME}/data/plastid/genus/$F[0]/$F[0]_refined/$F[3].synNet.maf.gz.fas.gz";
 
         my %rl_of = (
             IR  => $F[5],
@@ -1714,13 +1686,13 @@ cat ~/Scripts/withncbi/doc/ir_lsc_ssc.tsv |
         for my $key (sort keys %rl_of) {
             print qq{jrunlist cover <(echo $F[3]:$rl_of{$key}) -o $F[0].$key.yml};
             print qq{fasops slice -n $F[1] -o $F[0].$key.fas \\};
-            print qq{    ~/data/organelle/plastid/genus/$F[0]/$F[0]_refined/$F[3].synNet.maf.gz.fas.gz \\};
+            print qq{    ~/data/plastid/genus/$F[0]/$F[0]_refined/$F[3].synNet.maf.gz.fas.gz \\};
             print qq{    $F[0].$key.yml};
             print qq{perl ~/Scripts/alignDB/alignDB.pl \\};
             print qq{    -d $F[0]_$key \\};
-            print qq{    -da ~/data/organelle/plastid_slices/$F[0].$key.fas \\};
-            print qq{    -a ~/data/organelle/plastid/genus/$F[0]/Stats/anno.yml \\};
-            print qq{    -chr ~/data/organelle/plastid/genus/$F[0]/chr_length.csv \\};
+            print qq{    -da ~/data/plastid_slices/$F[0].$key.fas \\};
+            print qq{    -a ~/data/plastid/genus/$F[0]/Stats/anno.yml \\};
+            print qq{    -chr ~/data/plastid/genus/$F[0]/chr_length.csv \\};
             print qq{    --lt 1000 --parallel 8 --batch 5 \\};
             print qq{    --run common};
             print qq{};
@@ -1735,7 +1707,7 @@ cat ~/Scripts/withncbi/doc/ir_lsc_ssc.tsv |
 Run the generated bash file.
 
 ```bash
-cd ~/data/organelle/plastid_slices
+cd ~/data/plastid_slices
 
 bash slices.sh
 perl ~/Scripts/fig_table/collect_common_basic.pl -d .
@@ -1803,16 +1775,16 @@ ORDER BY species
 ## Copy xlsx files
 
 ```bash
-mkdir -p ~/data/organelle/plastid/summary/xlsx
-cd ~/data/organelle/plastid/summary/xlsx
+mkdir -p ~/data/plastid/summary/xlsx
+cd ~/data/plastid/summary/xlsx
 
-find ../../genus -type f -name "*.common.xlsx" |
+find ../../groups/genus -type f -name "*.common.xlsx" |
     grep -v "vs[A-Z]" |
-    parallel cp {} .
+    parallel 'cp {} .'
 
-find ../../OG -type f -name "*.common.xlsx" |
+find ../../groups/genus_og -type f -name "*.common.xlsx" |
     grep -v "vs[A-Z]" |
-    parallel cp {} .
+    parallel 'cp {} .'
 
 ```
 
@@ -1821,32 +1793,32 @@ find ../../OG -type f -name "*.common.xlsx" |
 Create `list.csv` from `GENUS.csv` with sequence lengths.
 
 ```bash
-mkdir -p ~/data/organelle/plastid/summary/table
-cd ~/data/organelle/plastid/summary/table
+mkdir -p ~/data/plastid/summary/table
+cd ~/data/plastid/summary/table
 
 # manually set orders in `plastid_OG.md`
 perl -l -MPath::Tiny -e '
     BEGIN {
-        @ls = map {/^#/ and s/^(#+\s*\w+).*/\1/; $_} 
-            map {s/,\w+//; $_} 
-            map {s/^###\s*//; $_} 
-            path(q{~/Scripts/withncbi/doc/plastid_OG.md})->lines( { chomp => 1}); 
+        @ls = map {/^#/ and s/^(#+\s*\w+).*/\1/; $_}
+            map {s/,.+$//; $_}
+            map {s/^###\s*//; $_}
+            path(q{~/Scripts/withncbi/doc/plastid_t_o.md})->lines({chomp => 1});
     }
-    for (@ls) { 
-        (/^\s*$/ or /^##\s+/ or /^#\s+(\w+)/) and next; 
+    for (@ls) {
+        (/^\s*$/ or /^##\s+/ or /^#\s+(\w+)/) and next;
         print $_
     }
     ' \
     > genus_all.lst
 
 # abbr accession length
-find ../../genus -type f -name "chr_length.csv" |
+find ../../groups/genus -type f -name "chr_length.csv" |
     parallel --jobs 1 --keep-order -r '
         perl -nl -e '\''
             BEGIN {
                 our $l = { }; # avoid parallel replace string
             }
-            
+
             next unless /\w+,\d+/;
             my ($common_name, undef, $chr, $length) = split /,/;
             if (exists $l->{$common_name}) {
@@ -1855,7 +1827,7 @@ find ../../genus -type f -name "chr_length.csv" |
             else {
                 $l->{$common_name} = {$chr => $length};
             }
-            
+
             END {
                 for my $common_name (keys %{$l}) {
                     my $chrs = join "|", sort keys %{$l->{$common_name}};
@@ -1871,7 +1843,7 @@ cat length.tmp | datamash check
 #2248 lines, 3 fields
 
 # phylum family genus abbr taxon_id
-cat ~/data/organelle/plastid/summary/GENUS.csv |
+cat ~/data/plastid/summary/GENUS.csv |
     grep -v "^#" |
     perl -nla -F"," -e 'print join qq{\t}, ($F[8], $F[5], $F[4], $F[9], $F[0], )' |
     sort |
@@ -1890,7 +1862,7 @@ tsv-join \
 cat list.tmp | datamash check
 #2248 lines, 7 fields
 
-# sort as orders in plastid_OG.md
+# sort as orders in plastid_t_o.md
 echo -e "#phylum,family,genus,abbr,taxon_id,accession,length" > list.csv
 cat list.tmp |
     perl -nl -a -MPath::Tiny -e '
@@ -1922,10 +1894,10 @@ Criteria:
 
 * Coverage >= 0.5
 * Total number of indels >= 100
-* Genome D < 0.05
+* D of multiple alignments < 0.05
 
 ```bash
-cd ~/data/organelle/plastid/summary/xlsx
+cd ~/data/plastid/summary/xlsx
 
 cat <<'EOF' > Table_alignment.tt
 ---
@@ -1969,10 +1941,10 @@ ranges:
 [% END -%]
 EOF
 
-cat ~/data/organelle/plastid/summary/table/genus_all.lst |
+cat ~/data/plastid/summary/table/genus_all.lst |
     grep -v "^#" |
     TT_FILE=Table_alignment.tt perl -MTemplate -nl -e '
-        push @data, { name => $_, file => qq{$_.common.xlsx}, }; 
+        push @data, { name => $_, file => qq{$_.common.xlsx}, };
         END {
             $tt = Template->new;
             $tt->process($ENV{TT_FILE}, { data => \@data, })
@@ -1984,13 +1956,13 @@ cat ~/data/organelle/plastid/summary/table/genus_all.lst |
 perl ~/Scripts/fig_table/xlsx_table.pl -i Table_alignment_all.yml
 perl ~/Scripts/fig_table/xlsx2csv.pl -f Table_alignment_all.xlsx > Table_alignment_all.csv
 
-cp -f Table_alignment_all.xlsx ~/data/organelle/plastid/summary/table
-cp -f Table_alignment_all.csv ~/data/organelle/plastid/summary/table
+cp -f Table_alignment_all.xlsx ~/data/plastid/summary/table
+cp -f Table_alignment_all.csv ~/data/plastid/summary/table
 
 ```
 
 ```bash
-cd ~/data/organelle/plastid/summary/table
+cd ~/data/plastid/summary/table
 
 echo "Genus,avg_size" > group_avg_size.csv
 cat list.csv |
@@ -2047,12 +2019,12 @@ cat Table_alignment_for_filter.csv |
     ' \
     > genus.lst
 
-rm ~/data/organelle/plastid/summary/table/Table_alignment_all.[0-9].csv
-rm ~/data/organelle/plastid/summary/table/group_*csv
+rm ~/data/plastid/summary/table/Table_alignment_all.[0-9].csv
+rm ~/data/plastid/summary/table/group_*csv
 
 #
-cd ~/data/organelle/plastid/summary/xlsx
-cat ~/data/organelle/plastid/summary/table/genus.lst |
+cd ~/data/plastid/summary/xlsx
+cat ~/data/plastid/summary/table/genus.lst |
     grep -v "^#" |
     TT_FILE=Table_alignment.tt perl -MTemplate -nl -e '
         push @data, { name => $_, file => qq{$_.common.xlsx}, };
@@ -2067,16 +2039,16 @@ cat ~/data/organelle/plastid/summary/table/genus.lst |
 perl ~/Scripts/fig_table/xlsx_table.pl -i Table_alignment.yml
 perl ~/Scripts/fig_table/xlsx2csv.pl -f Table_alignment.xlsx > Table_alignment.csv
 
-cp -f ~/data/organelle/plastid/summary/xlsx/Table_alignment.xlsx ~/data/organelle/plastid/summary/table
-cp -f ~/data/organelle/plastid/summary/xlsx/Table_alignment.csv ~/data/organelle/plastid/summary/table
+cp -f ~/data/plastid/summary/xlsx/Table_alignment.xlsx ~/data/plastid/summary/table
+cp -f ~/data/plastid/summary/xlsx/Table_alignment.csv ~/data/plastid/summary/table
 
 ```
 
 ## Groups
 
 ```bash
-mkdir -p ~/data/organelle/plastid/summary/group
-cd ~/data/organelle/plastid/summary/group
+mkdir -p ~/data/plastid/summary/group
+cd ~/data/plastid/summary/group
 
 perl -l -MPath::Tiny -e '
     BEGIN {
@@ -2129,10 +2101,10 @@ rm *.txt
 NCBI Taxonomy tree
 
 ```bash
-mkdir -p ~/data/organelle/plastid/summary/group
-cd ~/data/organelle/plastid/summary/group
+mkdir -p ~/data/plastid/summary/group
+cd ~/data/plastid/summary/group
 
-cat Others.lst |
+cat ~/data/plastid/summary/table/genus.lst |
     grep -v "^#" |
     perl -e '
         @ls = <>;
@@ -2144,30 +2116,30 @@ cat Others.lst |
         $str .= qq{    -e \n};
         print $str;
     ' \
-    > Others.tree.sh
+    > genera_tree.sh
 
-bash Others.tree.sh >Others.nwk
+bash genera_tree.sh > genera.newick
 
-nw_display -w 600 -s Others.nwk |
-    rsvg-convert -f pdf -o Others.pdf
+nw_display -s -b 'visibility:hidden' -w 600 -v 30 genera.newick |
+    rsvg-convert -o genera.png
 
 ```
 
 ## Phylogenic trees of each genus with outgroup
 
 ```bash
-mkdir -p ~/data/organelle/plastid/summary/trees
-cd ~/data/organelle/plastid/summary/trees
+mkdir -p ~/data/plastid/summary/trees
+cd ~/data/plastid/summary/trees
 
-cat ~/Scripts/withncbi/doc/plastid_OG.md |
+cat ~/Scripts/withncbi/doc/plastid_t_o.md |
     grep -v "^#" |
     grep . |
     cut -d',' -f 1 \
     > list.txt
 
-find ../../OG -type f -path "*Results*" -name "*.nwk" |
+find ../../groups/genus_og -type f -path "*Results*" -name "*.nwk" |
     grep -v ".raw." |
-    parallel -j 1 cp {} trees
+    parallel -j 1 'cp {} .'
 
 ```
 
@@ -2176,7 +2148,7 @@ find ../../OG -type f -path "*Results*" -name "*.nwk" |
 `collect_xlsx.pl`
 
 ```bash
-cd ~/data/organelle/plastid/summary/xlsx
+cd ~/data/plastid/summary/xlsx
 
 cat <<'EOF' > cmd_collect_d1_d2.tt
 perl ~/Scripts/fig_table/collect_xlsx.pl \
@@ -2200,7 +2172,7 @@ perl ~/Scripts/fig_table/collect_xlsx.pl \
     -f [% item.name %].common.xlsx \
     -s d1_comb_pi_gc_cv \
     -n [% item.name %] \
-[% END -%] 
+[% END -%]
     -o cmd_d1_comb.xlsx
 
 perl ~/Scripts/fig_table/collect_xlsx.pl \
@@ -2208,7 +2180,7 @@ perl ~/Scripts/fig_table/collect_xlsx.pl \
     -f [% item.name %].common.xlsx \
     -s d2_comb_pi_gc_cv \
     -n [% item.name %] \
-[% END -%] 
+[% END -%]
     -o cmd_d2_comb.xlsx
 
 EOF
@@ -2219,7 +2191,7 @@ cat ../table/genus.lst |
         push @data, { name => $_, };
         END {
             $tt = Template->new;
-            $tt->process($ENV{TT_FILE}, { data => \@data, }) 
+            $tt->process($ENV{TT_FILE}, { data => \@data, })
                 or die Template->error;
         }
     ' \
@@ -2232,9 +2204,9 @@ bash cmd_collect_d1_d2.sh
 `sep_chart.pl`
 
 ```bash
-mkdir -p ~/data/organelle/plastid/summary/fig
+mkdir -p ~/data/plastid/summary/fig
 
-cd ~/data/organelle/plastid/summary/xlsx
+cd ~/data/plastid/summary/xlsx
 
 cat <<'EOF' > cmd_chart_d1_d2.tt
 perl ~/Scripts/fig_table/sep_chart.pl \
@@ -2292,7 +2264,7 @@ cat ../group/group_1.lst |
                 { data => \@data,
                 y_max => 0.01,
                 y_max2 => 0.01,
-                postfix => q{group_1}, }) 
+                postfix => q{group_1}, })
                 or die Template->error;
         }
     ' \
@@ -2307,7 +2279,7 @@ cat ../group/group_2.lst |
                 { data => \@data,
                 y_max => 0.03,
                 y_max2 => 0.03,
-                postfix => q{group_2}, }) 
+                postfix => q{group_2}, })
                 or die Template->error;
         }
     ' \
@@ -2322,7 +2294,7 @@ cat ../group/group_3.lst |
                 { data => \@data,
                 y_max => 0.05,
                 y_max2 => 0.05,
-                postfix => q{group_3}, }) 
+                postfix => q{group_3}, })
                 or die Template->error;
         }
     ' \
@@ -2337,7 +2309,7 @@ cat ../group/Others.lst |
                 { data => \@data,
                 y_max => 0.15,
                 y_max2 => 0.15,
-                postfix => q{Others}, }) 
+                postfix => q{Others}, })
                 or die Template->error;
         }
     ' \
