@@ -3,10 +3,9 @@ use strict;
 use warnings;
 use autodie;
 
-use Getopt::Long;
-use Config::Tiny;
+use Getopt::Long qw();
 use FindBin;
-use YAML::Syck;
+use YAML::Syck qw();
 
 use List::MoreUtils::PP;
 
@@ -41,23 +40,23 @@ abbr_name.pl - Abbreviate strain scientific names.
         | perl abbr_name.pl -s ',' -c "1,1,2"
     H_sap
     H_ere
-    
+
     $ echo -e 'Homo sapiens,Homo\nHomo erectus,Homo\n' \
         | perl abbr_name.pl -s ',' -c "1,1,2" --tight
     Hsap
     Here
-    
+
     $ echo -e 'Homo sapiens sapiens,Homo sapiens,Homo\nHomo erectus,Homo erectus,Homo\n' \
         | perl abbr_name.pl -s ',' -c "1,2,3" --tight
     Hsap_sapiens
     Here
-    
+
 =cut
 
-GetOptions(
-    'help|?' => sub { Getopt::Long::HelpMessage(0) },
-    'column|c=s'    => \( my $column      = '1,2,3' ),
-    'separator|s=s' => \( my $separator   = '\s+' ),
+Getopt::Long::GetOptions(
+    'help|?'        => sub { Getopt::Long::HelpMessage(0) },
+    'column|c=s'    => \( my $column = '1,2,3' ),
+    'separator|s=s' => \( my $separator = '\s+' ),
     'min|m=i'       => \( my $min_species = 3 ),
     'tight'         => \my $tight,
     'shortsub'      => \my $shortsub,
@@ -76,7 +75,7 @@ my @fields;
 my @rows;
 while ( my $line = <> ) {
     chomp $line;
-    next unless $line;
+    next if $line eq '';
     my @row = split /$separator/, $line;
     s/"|'//g for @row;
 
@@ -93,7 +92,7 @@ while ( my $line = <> ) {
         }
     }
     else {
-        $strain =~ s/^$species ?//;
+        $strain  =~ s/^$species ?//;
         $species =~ s/^$genus //;
     }
 
@@ -101,7 +100,7 @@ while ( my $line = <> ) {
     $genus =~ s/\bCandidatus \b/C/g;
 
     # Clean long subspecies names
-    if ($shortsub) {
+    if ( defined $shortsub ) {
         $strain =~ s/\bsubsp\b//g;
         $strain =~ s/\bserovar\b//g;
         $strain =~ s/\bstr\b//g;
@@ -109,6 +108,7 @@ while ( my $line = <> ) {
         $strain =~ s/\bsubstr\b//g;
         $strain =~ s/\bserotype\b//g;
         $strain =~ s/\bbiovar\b//g;
+        $strain =~ s/\bvar\b//g;
     }
 
     s/\W+/_/g for ( $strain, $species, $genus );
@@ -132,8 +132,9 @@ my $sp_of = MyUtil::abbr_most( [ List::MoreUtils::PP::uniq(@sp) ], $min_species,
 
 for my $i ( 0 .. $count - 1 ) {
     my $spacer = $tight ? '' : '_';
-    my $ge_sp = join $spacer, grep { defined and length } $ge_of->{ $ge[$i] }, $sp_of->{ $sp[$i] };
-    my $organism = join "_", grep { defined and length } $ge_sp, $st[$i];
+    my $ge_sp  = join $spacer, grep { defined $_ and length $_ } $ge_of->{ $ge[$i] },
+        $sp_of->{ $sp[$i] };
+    my $organism = join "_", grep { defined $_ and length $_ } $ge_sp, $st[$i];
 
     print join( ",", @{ $rows[$i] }, $organism ), "\n";
 }
