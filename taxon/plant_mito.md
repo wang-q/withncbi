@@ -85,7 +85,7 @@ gzip -dcf mitochondrion.*.genomic.gbff.gz > genomic.gbff
 perl ~/Scripts/withncbi/taxon/gb_taxon_locus.pl genomic.gbff > refseq_id_seq.csv
 
 rm genomic.gbff
-rm *.genomic.gbff.gz
+#rm *.genomic.gbff.gz
 
 cat refseq_id_seq.csv | grep -v "^#" | wc -l
 # 10277
