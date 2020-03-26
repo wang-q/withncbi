@@ -18,7 +18,7 @@ my $html = Path::Tiny::path($file)->slurp;
 
 my $dom = Mojo::DOM->new($html);
 
-my $ref = $dom->find('#Tbl1 tr[bgcolor=#F0F0F0] > td > a')->map(
+my $ref = $dom->find('tr[bgcolor=#F0F0F0] > td > a')->map(
     sub {
         my $el = shift;
         if ( $el->text =~ /NC_\d+/ ) {

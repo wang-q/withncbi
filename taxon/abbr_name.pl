@@ -97,18 +97,19 @@ while ( my $line = <> ) {
     }
 
     # Remove `Candidatus`
-    $genus =~ s/\bCandidatus \b/C/g;
+    $genus =~ s/\bCandidatus \b/C/gi;
 
     # Clean long subspecies names
     if ( defined $shortsub ) {
-        $strain =~ s/\bsubsp\b//g;
-        $strain =~ s/\bserovar\b//g;
-        $strain =~ s/\bstr\b//g;
-        $strain =~ s/\bstrain\b//g;
-        $strain =~ s/\bsubstr\b//g;
-        $strain =~ s/\bserotype\b//g;
-        $strain =~ s/\bbiovar\b//g;
-        $strain =~ s/\bvar\b//g;
+        $strain =~ s/\bsubsp\b//gi;
+        $strain =~ s/\bserovar\b//gi;
+        $strain =~ s/\bstr\b//gi;
+        $strain =~ s/\bstrain\b//gi;
+        $strain =~ s/\bsubstr\b//gi;
+        $strain =~ s/\bserotype\b//gi;
+        $strain =~ s/\bbiovar\b//gi;
+        $strain =~ s/\bvar\b//gi;
+        $strain =~ s/\bgroup\b//gi;
     }
 
     s/\W+/_/g for ( $strain, $species, $genus );
