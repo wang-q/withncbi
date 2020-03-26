@@ -579,7 +579,7 @@ cat ~/Scripts/withncbi/doc/bac_target_OG.md |
     grep . |
     perl -nla -F"," -e 'print $F[1] ' \
     > targets.tmp
-    
+
 cat ../summary/all.groups.tsv |
     grep -F -w -f targets.tmp |
     perl -nla -F"\t" -e '($g, $s) = split q{_}, $F[1]; print qq{$F[0]\t${g}_${s}}' |
@@ -587,7 +587,7 @@ cat ../summary/all.groups.tsv |
     tsv-filter --ge 2:2 |
     cut -f 1 \
     > subgroups.tmp
-    
+
 cat ../summary/all.groups.tsv |
     grep -F -w -f targets.tmp |
     grep -F -w -f subgroups.tmp |
