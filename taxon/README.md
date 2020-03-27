@@ -1032,7 +1032,7 @@ GENUS.csv
 #strain_taxon_id,accession,strain,species,genus,family,order,class,phylum,abbr
 ```
 
-**636** genera, **142** families, and **83** groups.
+**636** genera, **142** families, and **83** mash groups.
 
 ```bash
 mkdir -p ~/data/plastid/taxon
@@ -1173,7 +1173,7 @@ cd ~/data/plastid/
 # genus
 cat taxon/group_target.tsv |
     tsv-filter -H  --ge 1:1 --le 1:1000 |
-    sed -e '1d' | grep -w "^24" |
+    sed -e '1d' | #grep -w "^24" |
     parallel --colsep '\t' --no-run-if-empty --linebuffer -k -j 6 '
         echo -e "==> Group: [{2}]\tTarget: [{4}]\n"
 
@@ -1216,7 +1216,7 @@ cat taxon/group_target.tsv |
 # mash
 cat taxon/group_target.tsv |
     tsv-filter -H --ge 1:2001 |
-    sed -e '1d' | #grep -w "^915" |
+    sed -e '1d' | #grep -w "^2001" |
     parallel --colsep '\t' --no-run-if-empty --linebuffer -k -j 6 '
         echo -e "==> Group: [{2}]\tTarget: [{4}]\n"
 
@@ -1254,6 +1254,74 @@ find groups/genus -mindepth 1 -maxdepth 1 -type d |
 
 ```
 
+* Abnormal groups
+
+```bash
+cd ~/data/plastid/
+
+find groups/ -name "pairwise.coverage.csv" | sort |
+    parallel -j 4 -k '
+        cover=$(cat {} | grep -w "intersect" | cut -d, -f 4)
+
+        if [[ "$cover" == "" ]]; then
+            cover=$(cat {} | cut -d, -f 4 | tsv-summarize -H --mean 1 | sed -e "1d")
+        fi
+
+        if [ $(bc <<< "${cover} < 0.5") -eq 1 ]; then
+            echo -e "{//}\t${cover}"
+        fi
+    ' |
+    sed -e 's/^groups\///g' |
+    sed -e 's/\/Results//g'
+
+#family/Aristolochiaceae 0.0664
+#family/Bracteacoccaceae 0.1735
+#family/Burmanniaceae    0.1446
+#family/Campanulaceae    0.3017
+#family/Caulerpaceae     0.0650
+#family/Chlorellaceae    0.191975
+#family/Chloropicaceae   0.1312
+#family/Convolvulaceae   0.0975
+#family/Delesseriaceae   0.4860
+#family/Droseraceae      0.4614
+#family/Ericaceae        0.0452
+#family/Euglenaceae      0.1454
+#family/Fabaceae 0.2608
+#family/Geraniaceae      0.1933
+#family/Gracilariaceae   0.4676
+#family/Hydrodictyaceae  0.0923
+#family/Orchidaceae      0.0173
+#family/Orobanchaceae    0.1413
+#family/Phacaceae        0.0794
+#family/Pinaceae 0.4811
+#family/Pteridaceae      0.4495
+#family/Ranunculaceae    0.4578
+#family/Rhodomelaceae    0.1624
+#family/Selaginellaceae  0.1974
+#family/Udoteaceae       0.1209
+#genus/Asarum    0.0768
+#genus/Burmannia 0.1359
+#genus/Drosera   0.3388
+#genus/Erodium   0.4704
+#genus/Lobelia   0.4908
+#genus/Monotropa 0.2901
+#mash/group_11   0.2059
+#mash/group_131  0.1918
+#mash/group_1    0.4718
+#mash/group_20   0.4292
+#mash/group_99   0.4305
+
+```
+
+* Locate a target in groups
+
+```bash
+cd ~/data/plastid/
+
+rg -F -l "Arabid_thaliana" taxon
+
+```
+
 ## Aligning with outgroups
 
 * Review alignments and phylogenetic trees generated in `groups/family/` and `groups/group/`
@@ -1268,8 +1336,8 @@ cd ~/data/plastid/
 # genus_og
 cat taxon/group_target.tsv |
     tsv-filter -H --le 1:1000 |
-    sed -e '1d' | grep -w "^24" |
-    parallel --colsep '\t' --no-run-if-empty --linebuffer -k -j 6 '
+    sed -e '1d' | #grep -w "^24" |
+    parallel --colsep '\t' --no-run-if-empty --linebuffer -k -j 1 '
         outgroup=$(
             cat ~/Scripts/withncbi/doc/plastid_t_o.md |
                 grep -v "^#" |
