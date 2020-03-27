@@ -19,11 +19,11 @@
   - [Create alignments plans without outgroups](#create-alignments-plans-without-outgroups)
   - [Plans for align-able targets](#plans-for-align-able-targets)
   - [Aligning w/o outgroups](#aligning-wo-outgroups)
+  - [Aligning with outgroups](#aligning-with-outgroups)
+  - [Self alignments](#self-alignments)
 - [LSC and SSC](#lsc-and-ssc)
   - [Can't get clear IR information](#cant-get-clear-ir-information)
   - [Slices of IR, LSC and SSC](#slices-of-ir-lsc-and-ssc)
-- [Cyanobacteria](#cyanobacteria)
-  - [Genus and Species counts](#genus-and-species-counts)
 - [Summary](#summary)
   - [Copy xlsx files](#copy-xlsx-files)
   - [Genome list](#genome-list)
@@ -782,17 +782,18 @@ rm *.tmp *.bak
 mkdir -p ~/data/plastid/mash
 cd ~/data/plastid/mash
 
-for name in $(cat ../summary/ABBR.csv | sed -e '1d' | cut -d"," -f 10 | sort); do
-    2>&1 echo "==> ${name}"
+cat ../summary/ABBR.csv | sed -e '1d' | cut -d"," -f 10 | sort |
+    parallel --no-run-if-empty --linebuffer -k -j 6 '
+        2>&1 echo "==> {}"
 
-    if [[ -e ${name}.msh ]]; then
-        continue
-    fi
+        if [[ -e {}.msh ]]; then
+            exit;
+        fi
 
-    find ../GENOMES/${name} -name "*.fa" |
-        xargs cat |
-        mash sketch -k 21 -s 100000 -p 4 - -I "${name}" -o ${name}
-done
+        find ../GENOMES/{} -name "*.fa" |
+            xargs cat |
+            mash sketch -k 21 -s 100000 -p 4 - -I "{}" -o {}
+    '
 
 cd ~/data/plastid/summary
 mash triangle -E -p 8 -l <(
@@ -831,7 +832,7 @@ cat dist_full.tsv |
         tree <- as.phylo(clusters)
         write.tree(phy=tree, file="tree.nwk")
 
-        group <- cutree(clusters, h=0.3) # k=3
+        group <- cutree(clusters, h=0.2)
         groups <- as.data.frame(group)
         groups$ids <- rownames(groups)
         rownames(groups) <- NULL
@@ -840,7 +841,112 @@ cat dist_full.tsv |
     '
 
 nw_display -s -b 'visibility:hidden' -w 600 -v 30 tree.nwk |
-    rsvg-convert -o plant_plastid.png
+    rsvg-convert -o plastid.png
+
+```
+
+* Abnormal strains
+
+```bash
+cd ~/data/plastid/summary
+
+# genus
+cut -d',' -f 5 GENUS.csv | sed -e '1d' | sort | uniq |
+    parallel -j 1 -k '
+        group=$(
+            tsv-join groups.tsv -d 2 \
+                -f <(cat GENUS.csv | grep -w {} | cut -d, -f 10) \
+                -k 1 |
+                cut -f 1 |
+                sort |
+                uniq
+        )
+        number=$(echo "${group}" | wc -l)
+        echo -e "{},${number}"
+    ' |
+    tsv-join --delimiter ","  -d 1 -f GENUS.csv -k 5 -a 9 |
+    tr "," "\t" |
+    sort -k3,3 -k 1,1 |
+    tsv-filter --ne 2:1
+#Actaea  2       Angiosperms
+#Adenophora      2       Angiosperms
+#Asarum  2       Angiosperms
+#Cuscuta 2       Angiosperms
+#Cypripedium     2       Angiosperms
+#Eragrostis      2       Angiosperms
+#Heritiera       2       Angiosperms
+#Ipomoea 2       Angiosperms
+#Lagerstroemia   2       Angiosperms
+#Lobelia 2       Angiosperms
+#Pilostyles      2       Angiosperms
+#Torricellia     2       Angiosperms
+#Babesia 2       Apicomplexa
+#Boodleopsis     2       Chlorophyta
+#Koliella        2       Chlorophyta
+#Nephroselmis    2       Chlorophyta
+#Prototheca      3       Chlorophyta
+#Cryptomonas     2       Cryptophyta
+#Euglena 3       Euglenozoa
+#Paulinella      2       Imbricatea
+#Selaginella     4       Pteridophytes
+#Bostrychia      2       Rhodophyta
+#Gracilaria      3       Rhodophyta
+#Polysiphonia    2       Rhodophyta
+
+# family
+cut -d',' -f 6 GENUS.csv | sed -e '1d' | sort | uniq |
+    parallel -j 1 -k '
+        group=$(
+            tsv-join groups.tsv -d 2 \
+                -f <(cat GENUS.csv | grep -w {} | cut -d, -f 10) \
+                -k 1 |
+                cut -f 1 |
+                sort |
+                uniq
+        )
+        number=$(echo "${group}" | wc -l)
+        echo -e "{},${number}"
+    ' |
+    tsv-join --delimiter ","  -d 1 -f GENUS.csv -k 6 -a 9 |
+    tr "," "\t" |
+    sort -k3,3 -k 1,1 |
+    tsv-filter --ne 2:1
+#Amaryllidaceae  2       Angiosperms
+#Apodanthaceae   2       Angiosperms
+#Araceae 2       Angiosperms
+#Aristolochiaceae        3       Angiosperms
+#Asteraceae      2       Angiosperms
+#Berberidaceae   2       Angiosperms
+#Campanulaceae   4       Angiosperms
+#Convolvulaceae  3       Angiosperms
+#Ericaceae       2       Angiosperms
+#Fabaceae        5       Angiosperms
+#Geraniaceae     2       Angiosperms
+#Lythraceae      2       Angiosperms
+#Malvaceae       2       Angiosperms
+#Orchidaceae     4       Angiosperms
+#Orobanchaceae   4       Angiosperms
+#Poaceae 6       Angiosperms
+#Ranunculaceae   3       Angiosperms
+#Rosaceae        2       Angiosperms
+#Torricelliaceae 2       Angiosperms
+#Babesiidae      2       Apicomplexa
+#Chlorellaceae   4       Chlorophyta
+#Chloropicaceae  2       Chlorophyta
+#Klebsormidiaceae        2       Chlorophyta
+#Nephroselmidaceae       2       Chlorophyta
+#Udoteaceae      3       Chlorophyta
+#Cryptomonadaceae        2       Cryptophyta
+#Euglenaceae     3       Euglenozoa
+#Phacaceae       2       Euglenozoa
+#Pinaceae        2       Gymnosperms
+#Taxaceae        2       Gymnosperms
+#Paulinellidae   2       Imbricatea
+#Pteridaceae     2       Pteridophytes
+#Selaginellaceae 4       Pteridophytes
+#Delesseriaceae  2       Rhodophyta
+#Gracilariaceae  4       Rhodophyta
+#Rhodomelaceae   4       Rhodophyta
 
 ```
 
@@ -926,7 +1032,7 @@ GENUS.csv
 #strain_taxon_id,accession,strain,species,genus,family,order,class,phylum,abbr
 ```
 
-**636** genera and **142** families.
+**636** genera, **142** families, and **83** groups.
 
 ```bash
 mkdir -p ~/data/plastid/taxon
@@ -1092,7 +1198,7 @@ cat taxon/group_target.tsv |
 # family
 cat taxon/group_target.tsv |
     tsv-filter -H --ge 1:1001 --le 1:2000 |
-    sed -e '1d' | grep -w "^1008" |
+    sed -e '1d' | #grep -w "^1008" |
     parallel --colsep '\t' --no-run-if-empty --linebuffer -k -j 6 '
         echo -e "==> Group: [{2}]\tTarget: [{4}]\n"
 
@@ -1713,62 +1819,6 @@ bash slices.sh
 perl ~/Scripts/fig_table/collect_common_basic.pl -d .
 
 ```
-
-# Cyanobacteria
-
-## Genus and Species counts
-
-```sql
-# Genus
-SELECT
-    genus_id, genus, COUNT(*) strain_count
-FROM
-    gr_prok.gr
-WHERE
-    `group` = 'Cyanobacteria'
-        AND status NOT IN ('Contig' , 'Scaffold')
-GROUP BY genus_id
-HAVING strain_count > 1
-ORDER BY genus
-```
-
-| genus_id | genus               | strain_count |
-|---------:|:--------------------|-------------:|
-|     1163 | Anabaena            |            3 |
-|    35823 | Arthrospira         |            2 |
-|     1186 | Calothrix           |            3 |
-|   102234 | Cyanobacterium      |            2 |
-|    43988 | Cyanothece          |            6 |
-|    33071 | Gloeobacter         |            2 |
-|     1125 | Microcystis         |            2 |
-|     1177 | Nostoc              |            4 |
-|     1158 | Oscillatoria        |            2 |
-|     1218 | Prochlorococcus     |           14 |
-|     1129 | Synechococcus       |           20 |
-|     1142 | Synechocystis       |            5 |
-|   146785 | Thermosynechococcus |            2 |
-
-```sql
-# Species
-SELECT
-    species_id, species, COUNT(*) strain_count
-FROM
-    gr_prok.gr
-WHERE
-    `group` = 'Cyanobacteria'
-        AND status NOT IN ('Contig' , 'Scaffold')
-GROUP BY species_id
-HAVING strain_count > 1
-ORDER BY species
-```
-
-| species_id | species                    | strain_count |
-|-----------:|:---------------------------|-------------:|
-|     118562 | Arthrospira platensis      |            2 |
-|       1126 | Microcystis aeruginosa     |            2 |
-|       1219 | Prochlorococcus marinus    |           12 |
-|      32046 | Synechococcus elongatus    |            2 |
-|       1148 | Synechocystis sp. PCC 6803 |            4 |
 
 # Summary
 
