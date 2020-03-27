@@ -9,24 +9,24 @@ Spathiphyllum,Spa_kochii
 Symplocarpus,Symploca_renifolius
 Zantedeschia,Zante_aethiopica
 ## Apiaceae 伞形科
-Angelica,Angeli_acutiloba,Cicu_virosa
-Bupleurum,Bup_falcatum,Cicu_virosa
-Hansenia,Hans_weberbaueriana,Cicu_virosa
-Heracleum,Hera_moellendorffii,Cicu_virosa
-Ligusticum,Ligusti_tenuissimum,Cicu_virosa
-Peucedanum,Peu_insolens,Cicu_virosa
-Semenovia,Seme_gyirongensis,Cicu_virosa
+Angelica,Angeli_acutiloba
+Bupleurum,Bup_falcatum
+Hansenia,Hans_weberbaueriana
+Heracleum,Hera_moellendorffii
+Ligusticum,Ligusti_tenuissimum
+Peucedanum,Peu_insolens
+Semenovia,Seme_gyirongensis
 ## Araliaceae 五加科
 Aralia,Aral_undulata
 Dendropanax,Dendropa_dentiger
 Hydrocotyle,Hydroco_verticillata
 Panax,Panax_ginseng
 Schefflera,Sche_delavayi
-## Torricelliaceae
+## Torricelliaceae 鞘柄木科
 Torricellia,Torri_angulata
 ## Aquifoliaceae 冬青科
 Ilex,Ilex_paraguariensis
-## Arecaceae
+## Arecaceae 槟榔科
 Arenga,Aren_caudata
 Astrocaryum,Astro_murumuru
 Brahea,Brah_brandegeei
@@ -107,7 +107,7 @@ Lobelia,Lobe_anceps
 Monopsis,Monop_alba
 Pratia,Prat_angulata
 Sclerotheca,Sclerot_longistigmata
-## Menyanthaceae
+## Menyanthaceae 睡菜科
 Nymphoides,Nympho_simulans
 ## Schisandraceae 五味子科
 Illicium,Ill_oligandrum
@@ -160,7 +160,7 @@ Calandrinia,Caland_eremaea
 Cistanthe,Cistant_longiscapa
 ## Nepenthaceae 猪笼草科
 Nepenthes,Nepe_mirabilis
-## Physenaceae
+## Physenaceae 非洲桐科
 Physena,Physe_sessiliflora
 ## Phytolaccaceae 非洲桐科
 Phytolacca,Phyto_acinosa
@@ -187,12 +187,12 @@ Grubbia,Gru_tomentosa
 Hydrangea,Hydran_serrata
 ## Hydrostachyaceae
 Hydrostachys,Hydros_imbricata
-## Loasaceae
+## Loasaceae 刺莲花科
 Caiophora,Cai_cirsiifolia
 Loasa,Loa_nana
 Mentzelia,Mentz_albicaulis
 Nasa,Nasa_triphylla
-## Nyssaceae
+## Nyssaceae 蓝果树科
 Nyssa,Nys_yunnanensis
 ## Apodanthaceae 离花科
 Pilostyles,Pilo_aethiopica
@@ -221,7 +221,7 @@ Weigela,Wei_florida
 Zabelia,Zab_triflora
 ## Actinidiaceae 猕猴桃科
 Actinidia,Actini_chinensis
-## Balsaminaceae
+## Balsaminaceae 凤仙花科
 Impatiens,Impa_piufanensis
 ## Ebenaceae 柿树科
 Diospyros,Diosp_glaucifolia
@@ -308,7 +308,7 @@ Swertia,Swe_mussotii
 Coffea,Cof_arabica
 Galium,Galium_aparine
 Gynochthodes,Gynoc_officinalis
-## Geraniaceae
+## Geraniaceae 牻牛儿苗科
 Erodium,Ero_texanum
 Geranium,Gera_palmatum
 Monsonia,Mons_speciosa
