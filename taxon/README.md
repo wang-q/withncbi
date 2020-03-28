@@ -1032,7 +1032,7 @@ GENUS.csv
 #strain_taxon_id,accession,strain,species,genus,family,order,class,phylum,abbr
 ```
 
-**636** genera, **142** families, and **83** mash groups.
+**636** genera, **174** families, and **83** mash groups.
 
 ```bash
 mkdir -p ~/data/plastid/taxon
@@ -1040,6 +1040,7 @@ cd ~/data/plastid/taxon
 
 echo -e "#Serial\tGroup\tCount\tTarget" > group_target.tsv
 
+# genus
 cat ../summary/GENUS.csv |
     grep -v "^#" |
     SERIAL=1 perl -na -F"," -MPath::Tiny -e '
@@ -1082,7 +1083,8 @@ cat ../summary/GENUS.csv |
         }' \
     >> group_target.tsv
 
-cat ../summary/GENUS.csv |
+# family
+cat ../summary/ABBR.csv |
     grep -v "^#" |
     SERIAL=1001 perl -na -F"," -MPath::Tiny -e '
         BEGIN{
@@ -1199,14 +1201,14 @@ cat taxon/group_target.tsv |
 cat taxon/group_target.tsv |
     tsv-filter -H --ge 1:1001 --le 1:2000 |
     sed -e '1d' | #grep -w "^1008" |
-    parallel --colsep '\t' --no-run-if-empty --linebuffer -k -j 6 '
+    parallel --colsep '\t' --no-run-if-empty --linebuffer -k -j 3 '
         echo -e "==> Group: [{2}]\tTarget: [{4}]\n"
 
         egaz template \
             GENOMES/{4} \
             $(cat taxon/{2} | grep -v -x "{4}" | xargs -I[] echo "GENOMES/[]") \
             --multi -o groups/family/{2} \
-            --rawphylo --parallel 4 -v
+            --rawphylo --parallel 8 -v
 
         bash groups/family/{2}/1_pair.sh
         bash groups/family/{2}/2_rawphylo.sh
@@ -1318,7 +1320,10 @@ find groups/ -name "pairwise.coverage.csv" | sort |
 ```bash
 cd ~/data/plastid/
 
-rg -F -l "Arabid_thaliana" taxon
+rg -F -l Ilex_paraguariensis taxon
+
+rg -F -l Ilex_paraguariensis taxon | grep -v ".tsv" | grep "group_" |
+    parallel -j 1 -k 'echo {}; cat {};'
 
 ```
 
