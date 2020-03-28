@@ -1167,6 +1167,42 @@ rm *.tmp
 
 ```
 
+## Plans for diverged families in Angiosperms and Gymnosperms
+
+```bash
+cd ~/data/plastid/taxon
+
+SERIAL=3001
+for family in \
+    Aristolochiaceae Campanulaceae Convolvulaceae \
+    Ericaceae Fabaceae Geraniaceae \
+    Orchidaceae Orobanchaceae Poaceae \
+    Pinaceae Ranunculaceae \
+    ; do
+
+    tsv-join ../summary/groups.tsv -d 2 \
+        -f ${family} -k 1 |
+        tsv-summarize --group-by 1 --count --unique-values 2 |
+        tsv-filter --ge 2:3 |
+        SERIAL=${SERIAL} FAMILY=${family} perl -na -F"\t" -MPath::Tiny -e '
+            chomp for @F;
+            my $group = $F[0];
+            $group = "$ENV{FAMILY}_${group}";
+            my @members = split /\|/, $F[2];
+
+            printf qq{%s\t%s\t%s\t%s\n}, $ENV{SERIAL}, $group, scalar @members, $members[0];
+            path(qq{$group})->spew(map {qq{$_\n}} @members);
+            $ENV{SERIAL}++;
+        '  \
+        >> group_target.tsv
+
+    SERIAL=$(tail -n 1 group_target.tsv | cut -f 1)
+    ((SERIAL++))
+done
+unset SERIAL
+
+```
+
 ## Aligning w/o outgroups
 
 ```bash
@@ -1217,7 +1253,7 @@ cat taxon/group_target.tsv |
 
 # mash
 cat taxon/group_target.tsv |
-    tsv-filter -H --ge 1:2001 |
+    tsv-filter -H --ge 1:2001 --le 1:3000 |
     sed -e '1d' | #grep -w "^2001" |
     parallel --colsep '\t' --no-run-if-empty --linebuffer -k -j 6 '
         echo -e "==> Group: [{2}]\tTarget: [{4}]\n"
@@ -1231,6 +1267,24 @@ cat taxon/group_target.tsv |
         bash groups/mash/{2}/1_pair.sh
         bash groups/mash/{2}/2_rawphylo.sh
         bash groups/mash/{2}/3_multi.sh
+    '
+
+# diverged families
+cat taxon/group_target.tsv |
+    tsv-filter -H --ge 1:3001 --le 1:4000 |
+    sed -e '1d' | #grep -w "^3001" |
+    parallel --colsep '\t' --no-run-if-empty --linebuffer -k -j 3 '
+        echo -e "==> Group: [{2}]\tTarget: [{4}]\n"
+
+        egaz template \
+            GENOMES/{4} \
+            $(cat taxon/{2} | grep -v -x "{4}" | xargs -I[] echo "GENOMES/[]") \
+            --multi -o groups/family/{2} \
+            --rawphylo --parallel 8 -v
+
+        bash groups/family/{2}/1_pair.sh
+        bash groups/family/{2}/2_rawphylo.sh
+        bash groups/family/{2}/3_multi.sh
     '
 
 # clean
@@ -1315,15 +1369,23 @@ find groups/ -name "pairwise.coverage.csv" | sort |
 
 ```
 
-* Locate a target in groups
+* Locate a target in mash groups
 
 ```bash
 cd ~/data/plastid/
 
-rg -F -l Ilex_paraguariensis taxon
+rg -F -l Epipo_roseum taxon
 
-rg -F -l Ilex_paraguariensis taxon | grep -v ".tsv" | grep "group_" |
+rg -F -l Ble_striata taxon | grep -v ".tsv" | grep "group_" |
     parallel -j 1 -k 'echo {}; cat {};'
+
+cat taxon/Orchidaceae |
+    parallel -j 1 -k 'rg -F -l {} taxon/group_*' |
+    grep -v ".tsv" |
+    sort |
+    uniq |
+    parallel -j 1 -k 'echo {}; cat {};'
+
 
 ```
 
