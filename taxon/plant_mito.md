@@ -680,6 +680,7 @@ cd ~/data/mito/taxon
 
 echo -e "#Serial\tGroup\tCount\tTarget" > group_target.tsv
 
+# genus
 cat ../summary/GENUS.csv |
     grep -v "^#" |
     SERIAL=1 perl -na -F"," -MPath::Tiny -e '
@@ -722,9 +723,10 @@ cat ../summary/GENUS.csv |
         }' \
     >> group_target.tsv
 
-cat ../summary/GENUS.csv |
+# family
+cat ../summary/ABBR.csv |
     grep -v "^#" |
-    SERIAL=501 perl -na -F"," -MPath::Tiny -e '
+    SERIAL=1001 perl -na -F"," -MPath::Tiny -e '
         BEGIN{
             our $name = q{};
             our %id_of = ();
@@ -789,7 +791,7 @@ cat ../summary/groups.tsv |
 
 cat groups.lst.tmp |
     grep -v "^#" |
-    SERIAL=901 perl -na -F"\t" -MPath::Tiny -e '
+    SERIAL=2001 perl -na -F"\t" -MPath::Tiny -e '
         chomp for @F;
         my $group = $F[0];
         $group = "group_${group}";
@@ -812,8 +814,8 @@ cd ~/data/mito/
 
 # genus
 cat taxon/group_target.tsv |
-    tsv-filter -H  --ge 1:1 --le 1:500 |
-    sed -e '1d' | #grep "^200" |
+    tsv-filter -H  --ge 1:1 --le 1:1000 |
+    sed -e '1d' | #grep -w "^24" |
     parallel --colsep '\t' --no-run-if-empty --linebuffer -k -j 1 '
         echo -e "==> Group: [{2}]\tTarget: [{4}]\n"
 
@@ -837,8 +839,8 @@ cat taxon/group_target.tsv |
 
 # family
 cat taxon/group_target.tsv |
-    tsv-filter -H --ge 1:501 --le 1:900 |
-    sed -e '1d' | #grep "^503" |
+    tsv-filter -H --ge 1:1001 --le 1:2000 |
+    sed -e '1d' | #grep -w "^1008" |
     parallel --colsep '\t' --no-run-if-empty --linebuffer -k -j 1 '
         echo -e "==> Group: [{2}]\tTarget: [{4}]\n"
 
@@ -855,8 +857,8 @@ cat taxon/group_target.tsv |
 
 # mash
 cat taxon/group_target.tsv |
-    tsv-filter -H --ge 1:901 |
-    sed -e '1d' | #grep "^915" |
+    tsv-filter -H --ge 1:2001 |
+    sed -e '1d' | #grep -w "^2001" |
     parallel --colsep '\t' --no-run-if-empty --linebuffer -k -j 1 '
         echo -e "==> Group: [{2}]\tTarget: [{4}]\n"
 
@@ -907,9 +909,9 @@ cd ~/data/mito/
 
 # genus_og
 cat taxon/group_target.tsv |
-    tsv-filter -H --le 1:500 |
-    sed -e '1d' | #grep "^163" |
-    parallel --colsep '\t' --no-run-if-empty --linebuffer -k -j 6 '
+    tsv-filter -H --le 1:1000 |
+    sed -e '1d' | #grep -w "^24" |
+    parallel --colsep '\t' --no-run-if-empty --linebuffer -k -j 1 '
         outgroup=$(
             cat ~/Scripts/withncbi/doc/mito_t_o.md |
                 grep -v "^#" |
@@ -951,8 +953,8 @@ cat taxon/group_target.tsv |
 cd ~/data/mito/
 
 cat taxon/group_target.tsv |
-    tsv-filter -H --le 1:500 |
-    sed -e '1d' | # grep "^200" |
+    tsv-filter -H --le 1:1000 |
+    sed -e '1d' | # grep -w "^24" |
     parallel --colsep '\t' --no-run-if-empty --linebuffer -k -j 1 '
         echo -e "==> Group: [{2}]\tTarget: [{4}]\n"
 
