@@ -52,68 +52,6 @@ Lobelia,Hypsela_tridens
 Monopsis,Hypsela_tridens
 Pratia,Hypsela_tridens
 Sclerotheca,Hypsela_tridens
-## Schisandraceae 五味子科
-Illicium,Schisa_chinensis
-Kadsura,Ill_anisatum
-Schisandra,Ill_anisatum
-## Brassicaceae 十字花科
-Aethionema,Aly_desertorum
-Arabidopsis,Aly_desertorum
-Arabis,Aly_desertorum
-Biscutella,Aly_desertorum
-Brassica,Aly_desertorum
-Bunias,Aly_desertorum
-Capsella,Aly_desertorum
-Cardamine,Aly_desertorum
-Cochlearia,Aly_desertorum
-Draba,Aly_desertorum
-Eutrema,Aly_desertorum
-Hesperis,Aly_desertorum
-Lepidium,Aly_desertorum
-Lobularia,Aly_desertorum
-Orychophragmus,Aly_desertorum
-Pachycladon,Aly_desertorum
-Pugionium,Aly_desertorum
-Ricotia,Aly_desertorum
-Sinalliaria,Aly_desertorum
-## Caryophyllaceae 石竹科
-Colobanthus,Agroste_githago
-Pseudostellaria,Agroste_githago
-Silene,Agroste_githago
-## Chenopodiaceae 藜科
-Chenopodium,Spi_oleracea
-Haloxylon,Spi_oleracea
-Salicornia,Spi_oleracea
-## Polygonaceae 蓼科
-Fagopyrum,Rhe_wittrockii
-Rheum,Fago_tataricum
-## Cucurbitaceae 葫芦科
-Citrullus,Hems_lijiangensis
-Cucumis,Hems_lijiangensis
-Cucurbita,Hems_lijiangensis
-Gynostemma,Hems_lijiangensis
-## Nartheciaceae 纳茜菜科
-Aletris,Metan_luteoviride
-## Adoxaceae 五福花科
-Viburnum,Samb_williamsii
-## Caprifoliaceae 忍冬科
-Dipsacus,Wei_florida
-Lonicera,Wei_florida
-## Pentaphylacaceae 五列木科
-Adinandra,Pentap_euryoides
-## Primulaceae 报春花科
-Androsace,Lysim_coreana
-Primula,Lysim_coreana
-## Styracaceae 野茉莉科
-Sinojackia,Alni_eberhardtii
-Styrax,Alni_eberhardtii
-## Theaceae 山茶科
-Camellia,Fran_alatamaha
-### Gordonia
-Polyspora,Fran_alatamaha
-Pyrenaria,Fran_alatamaha
-Schima,Apt_oblata
-Stewartia,Apt_oblata
 ## Fabaceae 豆科
 Acacia,Indi_tinctoria
 Ammopiptanthus,Indi_tinctoria
@@ -133,26 +71,6 @@ Vachellia,Indi_tinctoria
 Vicia,Lens_culinaris
 Vigna,Indi_tinctoria
 Wisteria,Indi_tinctoria
-## Betulaceae 桦木科
-Alnus,Ostrya_japonica
-Betula,Alnus_japonica
-Carpinus,Alnus_japonica
-Corylus,Alnus_japonica
-Ostrya,Alnus_japonica
-Ostryopsis,Alnus_japonica
-## Fagaceae 壳斗科
-Castanea,Fagus_engleriana
-Castanopsis,Fagus_engleriana
-Quercus,Fagus_engleriana
-## Apocynaceae 夹竹桃科
-Asclepias,Oncin_tenuiloba
-Cynanchum,Oncin_tenuiloba
-## Gentianaceae 龙胆科
-Gentiana,Swe_mussotii
-## Rubiaceae 茜草科
-Coffea,Mit_speciosa
-Galium,Mit_speciosa
-Gynochthodes,Mit_speciosa
 ## Geraniaceae 牻牛儿苗科
 Erodium,Hypseo_bilobata
 Geranium,Hypseo_bilobata
@@ -420,10 +338,6 @@ Taxus,Torreya_grandis
 Torreya,Cephalo_oliveri
 ## Cycadaceae 苏铁科
 Cycas,Bow_serrulata
-## Ephedraceae 麻黄科
-### Ephedra
-## Gnetaceae 买麻藤科
-### Gnetum
 ## Pinaceae 松科
 Abies,Cedrus_deodara
 Larix,Cedrus_deodara

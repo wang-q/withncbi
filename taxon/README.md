@@ -1323,12 +1323,24 @@ find groups/ -name "pairwise.coverage.csv" | sort |
             cover=$(cat {} | cut -d, -f 4 | tsv-summarize -H --mean 1 | sed -e "1d")
         fi
 
+        taxon=$(
+            echo {//} |
+                sed -e "s/^groups\///g" |
+                sed -e "s/\/Results//g" |
+                sed -e "s/^family\///g" |
+                sed -e "s/^genus\///g"
+            )
+        phylum=$(
+            cat summary/ABBR.csv |
+                grep -w ${taxon} |
+                cut -d, -f 9 |
+                head -n 1
+            )
+
         if [ $(bc <<< "${cover} < 0.5") -eq 1 ]; then
-            echo -e "{//}\t${cover}"
+            echo -e "${taxon}\t${cover}\t${phylum}"
         fi
-    ' |
-    sed -e 's/^groups\///g' |
-    sed -e 's/\/Results//g'
+    '
 
 #family/Aristolochiaceae 0.0664
 #family/Bracteacoccaceae 0.1735
@@ -1376,7 +1388,7 @@ cd ~/data/plastid/
 
 rg -F -l Epipo_roseum taxon
 
-rg -F -l Ble_striata taxon | grep -v ".tsv" | grep "group_" |
+rg -F -l Portu_oleracea taxon | grep -v ".tsv" | grep "group_" |
     parallel -j 1 -k 'echo {}; cat {};'
 
 cat taxon/Orchidaceae |
@@ -1386,6 +1398,11 @@ cat taxon/Orchidaceae |
     uniq |
     parallel -j 1 -k 'echo {}; cat {};'
 
+# no outgroups
+cat ~/Scripts/withncbi/doc/plastid_t_o.md |
+    grep -v "^#" |
+    grep . |
+    grep -v ",.*,"
 
 ```
 
