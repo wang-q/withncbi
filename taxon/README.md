@@ -18,6 +18,7 @@
   - [Create `plastid_t_o.md` for picking targets and outgroups.](#create-plastid_t_omd-for-picking-targets-and-outgroups)
   - [Create alignments plans without outgroups](#create-alignments-plans-without-outgroups)
   - [Plans for align-able targets](#plans-for-align-able-targets)
+  - [Plans for diverged families in Angiosperms and Gymnosperms](#plans-for-diverged-families-in-angiosperms-and-gymnosperms)
   - [Aligning w/o outgroups](#aligning-wo-outgroups)
   - [Aligning with outgroups](#aligning-with-outgroups)
   - [Self alignments](#self-alignments)
@@ -39,12 +40,10 @@ tools of `taxon/` are used here, which makes a good example for users.
 # Work flow.
 
 ```text
-id ---> lineage ---> filtering ---> naming ---> strain_info.pl   ---> egaz/multi_batch.pl
+id ---> lineage ---> filtering ---> naming ---> strain_info.pl   ---> mash ---> egaz
                                       |                                 ^
-                                      |-------> batch_get_seq.pl -------|
+                                      |-------> downloads        -------|
 ```
-
-I'm sure there are no commas in names. So for convenient, don't use Text::CSV_XS.
 
 # Update taxdmp
 
@@ -1174,10 +1173,11 @@ cd ~/data/plastid/taxon
 
 SERIAL=3001
 for family in \
-    Aristolochiaceae Campanulaceae Convolvulaceae \
-    Ericaceae Fabaceae Geraniaceae \
+    Aristolochiaceae Burmanniaceae Campanulaceae Convolvulaceae \
+    Droseraceae Ericaceae Fabaceae Geraniaceae \
     Orchidaceae Orobanchaceae Poaceae \
-    Pinaceae Ranunculaceae \
+    Ranunculaceae \
+    Cupressaceae Pinaceae Podocarpaceae \
     ; do
 
     tsv-join ../summary/groups.tsv -d 2 \
@@ -1325,10 +1325,8 @@ find groups/ -name "pairwise.coverage.csv" | sort |
 
         taxon=$(
             echo {//} |
-                sed -e "s/^groups\///g" |
-                sed -e "s/\/Results//g" |
-                sed -e "s/^family\///g" |
-                sed -e "s/^genus\///g"
+                sed -e "s/^groups\///g" -e "s/\/Results//g" |
+                sed -e "s/^family\///g" -e "s/^genus\///g" -e "s/^mash\///g"
             )
         phylum=$(
             cat summary/ABBR.csv |
@@ -1336,48 +1334,53 @@ find groups/ -name "pairwise.coverage.csv" | sort |
                 cut -d, -f 9 |
                 head -n 1
             )
+        group=$(
+            echo {//} |
+                sed -e "s/^groups\///g" -e "s/\/Results//g" |
+                sed -E "s/\/.+//g"
+            )
 
         if [ $(bc <<< "${cover} < 0.5") -eq 1 ]; then
-            echo -e "${taxon}\t${cover}\t${phylum}"
+            echo -e "${taxon}\t${cover}\t${phylum}\t${group}"
         fi
-    '
+    ' | tsv-filter --or --str-eq 3:Angiosperms --str-eq 3:Gymnosperms --empty 3
 
-#family/Aristolochiaceae 0.0664
-#family/Bracteacoccaceae 0.1735
-#family/Burmanniaceae    0.1446
-#family/Campanulaceae    0.3017
-#family/Caulerpaceae     0.0650
-#family/Chlorellaceae    0.191975
-#family/Chloropicaceae   0.1312
-#family/Convolvulaceae   0.0975
-#family/Delesseriaceae   0.4860
-#family/Droseraceae      0.4614
-#family/Ericaceae        0.0452
-#family/Euglenaceae      0.1454
-#family/Fabaceae 0.2608
-#family/Geraniaceae      0.1933
-#family/Gracilariaceae   0.4676
-#family/Hydrodictyaceae  0.0923
-#family/Orchidaceae      0.0173
-#family/Orobanchaceae    0.1413
-#family/Phacaceae        0.0794
-#family/Pinaceae 0.4811
-#family/Pteridaceae      0.4495
-#family/Ranunculaceae    0.4578
-#family/Rhodomelaceae    0.1624
-#family/Selaginellaceae  0.1974
-#family/Udoteaceae       0.1209
-#genus/Asarum    0.0768
-#genus/Burmannia 0.1359
-#genus/Drosera   0.3388
-#genus/Erodium   0.4704
-#genus/Lobelia   0.4908
-#genus/Monotropa 0.2901
-#mash/group_11   0.2059
-#mash/group_131  0.1918
-#mash/group_1    0.4718
-#mash/group_20   0.4292
-#mash/group_99   0.4305
+#Burmanniaceae   0.1446  Angiosperms     family
+#Campanulaceae_16        0.4914          family
+#Campanulaceae_17        0.4357          family
+#Campanulaceae   0.2860  Angiosperms     family
+#Convolvulaceae_92       0.4354          family
+#Convolvulaceae  0.0975  Angiosperms     family
+#Cupressaceae    0.4870  Gymnosperms     family
+#Droseraceae     0.4092  Angiosperms     family
+#Ericaceae_34    0.1654          family
+#Ericaceae       0.0287  Angiosperms     family
+#Fabaceae_39     0.4557          family
+#Fabaceae        0.2040  Angiosperms     family
+#Geraniaceae_45  0.2517          family
+#Geraniaceae     0.1921  Angiosperms     family
+#Orchidaceae_10  0.3925          family
+#Orchidaceae_11  0.1555          family
+#Orchidaceae_12  0.1632          family
+#Orchidaceae     0.0160  Angiosperms     family
+#Orobanchaceae_51        0.1533          family
+#Orobanchaceae   0.1098  Angiosperms     family
+#Pinaceae        0.3881  Gymnosperms     family
+#Poaceae 0.4518  Angiosperms     family
+#Podocarpaceae   0.3130  Gymnosperms     family
+#Ranunculaceae   0.4627  Angiosperms     family
+#Asarum  0.0768  Angiosperms     genus
+#Burmannia       0.1359  Angiosperms     genus
+#Cuscuta 0.2077  Angiosperms     genus
+#Drosera 0.3388  Angiosperms     genus
+#Erodium 0.4704  Angiosperms     genus
+#Lobelia 0.4908  Angiosperms     genus
+#Monotropa       0.2901  Angiosperms     genus
+#group_11        0.2059          mash
+#group_131       0.1918          mash
+#group_1 0.4718          mash
+#group_20        0.4292          mash
+#group_99        0.4305          mash
 
 ```
 
