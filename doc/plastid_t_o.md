@@ -135,7 +135,7 @@ Ricotia,Rico_aucheri,Aly_desertorum
 Sinalliaria,Sinal_limprichtiana_grandifolia,Aly_desertorum
 Sinapis,Sinap_arvensis,Aly_desertorum
 ## Achatocarpaceae
-Achatocarpus,Acha_nigricans
+Achatocarpus,Acha_nigricans,Steg_cubense
 ## Aizoaceae 番杏科
 Mesembryanthemum,Mese_crystallinum,Tetrag_tetragonoides
 ## Amaranthaceae 苋科
@@ -172,7 +172,7 @@ Rheum,Rheum_palmatum,Fal_multiflora
 ## Portulacaceae 马齿苋科
 Portulaca,Portu_oleracea
 ## Stegnospermataceae
-Stegnosperma,Steg_cubense
+Stegnosperma,Steg_cubense,Acha_nigricans
 ## Celastraceae 卫矛科
 Euonymus,Euo_japonicus,Parn_trinervis
 Parnassia,Parn_trinervis,Euo_japonicus
@@ -182,9 +182,9 @@ Chloranthus,Chlora_spicatus,Sarc_glabra
 Alangium,Ala_kurzii,Corn_controversa
 Cornus,Corn_controversa,Ala_kurzii
 ## Grubbiaceae 假石南科
-Grubbia,Gru_tomentosa
+Grubbia,Gru_tomentosa,Ala_kurzii
 ## Hydrangeaceae 绣球花科
-Hydrangea,Hydran_serrata,Jam_americana
+Hydrangea,Hydran_serrata,Cai_cirsiifolia
 ## Hydrostachyaceae
 Hydrostachys,Hydros_imbricata
 ## Loasaceae 刺莲花科
@@ -226,10 +226,10 @@ Impatiens,Impa_piufanensis,Hydroce_triflora
 ## Ebenaceae 柿树科
 Diospyros,Diosp_glaucifolia
 ## Ericaceae 杜鹃花科
-Monotropa,Monotropa_hypopitys
+Monotropa,Monotropa_hypopitys,Pityo_californicus
 Vaccinium,Vacc_macrocarpon
 ## Lecythidaceae 玉蕊科
-Barringtonia,Barr_fusicarpa
+Barringtonia,Barr_fusicarpa,Adin_angustifolia
 ## Pentaphylacaceae 五列木科
 Adinandra,Adin_angustifolia,Pentap_euryoides
 ## Primulaceae 报春花科
@@ -249,7 +249,7 @@ Pterostyrax,Pterost_psilophyllus,Huo_biaristatum
 Sinojackia,Sinoj_xylocarpa,Huo_biaristatum
 Styrax,Styr_grandiflorus,Huo_biaristatum
 ## Symplocaceae 山矾科
-Symplocos,Symplocos_paniculata
+Symplocos,Symplocos_paniculata,Adin_angustifolia
 ## Theaceae 山茶科
 Camellia,Camell_sinensis,Apt_oblata
 Gordonia,Gor_brandegeei,Apt_oblata
@@ -336,7 +336,7 @@ Stenogyne,Stenog_haliakalae,Caryop_mongholica
 Genlisea,Genl_margaretae,Ping_ehlersiae
 Utricularia,Ut_gibba,Ping_ehlersiae
 ## Linderniaceae
-Torenia,Tore_concolor
+Torenia,Tore_concolor,Paulo_coreana
 ## Oleaceae 木犀科
 Chionanthus,Chiona_retusus,Jas_nudiflorum
 Forestiera,Fore_isabelae,Jas_nudiflorum
@@ -361,7 +361,7 @@ Pedicularis,Pedic_ishidoyana
 Phelipanche,Pheli_purpurea
 Rehmannia,Rehm_chingii
 ## Paulowniaceae 泡桐科
-Paulownia,Paulo_coreana
+Paulownia,Paulo_coreana,Tore_concolor
 ## Phrymaceae 透骨草科
 Lancea,Lan_hirsuta,Erythra_lutea
 ## Plantaginaceae 车前草科
@@ -727,8 +727,8 @@ Pedinomonas,Pedin_minor
 ## Bracteacoccaceae
 Bracteacoccus,Bract_giganteus
 ## Hydrodictyaceae 水网藻科
-Pediastrum,Pedia_duplex
-Pseudopediastrum,Pseudope_boryanum
+Pediastrum,Pedia_duplex,Hydrod_reticulatum
+Pseudopediastrum,Pseudope_boryanum,Hydrod_reticulatum
 ## Mychonastaceae
 Mychonastes,Myc_jurisii
 ## Ulvaceae 石莼科
@@ -754,7 +754,7 @@ Cyanophora,Cyano_paradoxa
 ## Araucariaceae 南洋杉科
 Araucaria,Arau_heterophylla,Woll_nobilis
 ## Podocarpaceae 罗汉松科
-Podocarpus,Podoca_totara,Ret_piresii
+Podocarpus,Podoca_totara,Dacryc_imbricatus
 ## Cupressaceae 柏科
 Callitropsis,Callitro_nootkatensis
 Calocedrus,Caloc_formosana

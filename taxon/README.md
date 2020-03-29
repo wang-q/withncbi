@@ -794,6 +794,11 @@ cat ../summary/ABBR.csv | sed -e '1d' | cut -d"," -f 10 | sort |
             mash sketch -k 21 -s 100000 -p 4 - -I "{}" -o {}
     '
 
+```
+
+* h=0.1 as we need outgroup ~ 0.05
+
+```bash
 cd ~/data/plastid/summary
 mash triangle -E -p 8 -l <(
         cat ABBR.csv |
@@ -831,7 +836,7 @@ cat dist_full.tsv |
         tree <- as.phylo(clusters)
         write.tree(phy=tree, file="tree.nwk")
 
-        group <- cutree(clusters, h=0.2)
+        group <- cutree(clusters, h=0.1)
         groups <- as.data.frame(group)
         groups$ids <- rownames(groups)
         rownames(groups) <- NULL
@@ -870,27 +875,73 @@ cut -d',' -f 5 GENUS.csv | sed -e '1d' | sort | uniq |
 #Actaea  2       Angiosperms
 #Adenophora      2       Angiosperms
 #Asarum  2       Angiosperms
-#Cuscuta 2       Angiosperms
+#Burmannia       3       Angiosperms
+#Cuscuta 4       Angiosperms
 #Cypripedium     2       Angiosperms
+#Dendrobium      2       Angiosperms
+#Epipogium       2       Angiosperms
 #Eragrostis      2       Angiosperms
+#Erodium 2       Angiosperms
+#Genlisea        2       Angiosperms
+#Gordonia        2       Angiosperms
+#Gossypium       2       Angiosperms
+#Gynochthodes    2       Angiosperms
 #Heritiera       2       Angiosperms
 #Ipomoea 2       Angiosperms
 #Lagerstroemia   2       Angiosperms
-#Lobelia 2       Angiosperms
+#Lobelia 3       Angiosperms
+#Monotropa       2       Angiosperms
+#Neottia 2       Angiosperms
+#Passiflora      2       Angiosperms
+#Pedicularis     2       Angiosperms
+#Pelargonium     2       Angiosperms
 #Pilostyles      2       Angiosperms
 #Torricellia     2       Angiosperms
-#Babesia 2       Apicomplexa
+#Babesia 3       Apicomplexa
+#Plasmodium      4       Apicomplexa
+#Biddulphia      2       Bacillariophyta
+#Halamphora      2       Bacillariophyta
+#Rhizosolenia    2       Bacillariophyta
+#Thalassiosira   2       Bacillariophyta
 #Boodleopsis     2       Chlorophyta
+#Bracteacoccus   3       Chlorophyta
+#Bryopsis        2       Chlorophyta
+#Caulerpa        4       Chlorophyta
+#Chlamydomonas   2       Chlorophyta
+#Chlorella       4       Chlorophyta
+#Chloroparvula   2       Chlorophyta
+#Chloropicon     2       Chlorophyta
+#Codium  2       Chlorophyta
 #Koliella        2       Chlorophyta
 #Nephroselmis    2       Chlorophyta
+#Pedinomonas     2       Chlorophyta
 #Prototheca      3       Chlorophyta
+#Udotea  2       Chlorophyta
 #Cryptomonas     2       Cryptophyta
-#Euglena 3       Euglenozoa
+#Euglena 6       Euglenozoa
+#Lepocinclis     4       Euglenozoa
+#Monomorphina    2       Euglenozoa
+#Phacus  2       Euglenozoa
+#Cyanophora      2       Glaucophyta
+#Pinus   2       Gymnosperms
 #Paulinella      2       Imbricatea
-#Selaginella     4       Pteridophytes
-#Bostrychia      2       Rhodophyta
-#Gracilaria      3       Rhodophyta
-#Polysiphonia    2       Rhodophyta
+#Nannochloropsis 2       Ochrophyta
+#Adiantum        2       Pteridophytes
+#Selaginella     9       Pteridophytes
+#Agarophyton     2       Rhodophyta
+#Bostrychia      3       Rhodophyta
+#Caloglossa      3       Rhodophyta
+#Ceramium        2       Rhodophyta
+#Crassa  2       Rhodophyta
+#Dasya   2       Rhodophyta
+#Gelidium        3       Rhodophyta
+#Gracilaria      6       Rhodophyta
+#Gracilariopsis  2       Rhodophyta
+#Hildenbrandia   2       Rhodophyta
+#Polysiphonia    7       Rhodophyta
+#Porphyridium    2       Rhodophyta
+#Pyropia 3       Rhodophyta
+#Vertebrata      4       Rhodophyta
 
 # family
 cut -d',' -f 6 GENUS.csv | sed -e '1d' | sort | uniq |
@@ -914,38 +965,46 @@ cut -d',' -f 6 GENUS.csv | sed -e '1d' | sort | uniq |
 #Apodanthaceae   2       Angiosperms
 #Araceae 2       Angiosperms
 #Aristolochiaceae        3       Angiosperms
-#Asteraceae      2       Angiosperms
-#Berberidaceae   2       Angiosperms
-#Campanulaceae   4       Angiosperms
-#Convolvulaceae  3       Angiosperms
-#Ericaceae       2       Angiosperms
-#Fabaceae        5       Angiosperms
-#Geraniaceae     2       Angiosperms
+#Asparagaceae    3       Angiosperms
+#Asteraceae      5       Angiosperms
+#Berberidaceae   4       Angiosperms
+#Brassicaceae    2       Angiosperms
+#Burmanniaceae   3       Angiosperms
+#Campanulaceae   7       Angiosperms
+#Caprifoliaceae  2       Angiosperms
+#Caryophyllaceae 2       Angiosperms
+#Chenopodiaceae  2       Angiosperms
+#Convolvulaceae  6       Angiosperms
+#Cucurbitaceae   2       Angiosperms
+#Ericaceae       3       Angiosperms
+#Fabaceae        12      Angiosperms
+#Geraniaceae     6       Angiosperms
+#Lamiaceae       3       Angiosperms
+#Lentibulariaceae        2       Angiosperms
+#Liliaceae       2       Angiosperms
 #Lythraceae      2       Angiosperms
-#Malvaceae       2       Angiosperms
-#Orchidaceae     4       Angiosperms
-#Orobanchaceae   4       Angiosperms
-#Poaceae 6       Angiosperms
-#Ranunculaceae   3       Angiosperms
-#Rosaceae        2       Angiosperms
+#Malvaceae       3       Angiosperms
+#Melanthiaceae   2       Angiosperms
+#Oleaceae        2       Angiosperms
+#Orchidaceae     14      Angiosperms
+#Orobanchaceae   7       Angiosperms
+#Passifloraceae  2       Angiosperms
+#Plantaginaceae  2       Angiosperms
+#Poaceae 14      Angiosperms
+#Primulaceae     2       Angiosperms
+#Ranunculaceae   6       Angiosperms
+#Rosaceae        3       Angiosperms
+#Rubiaceae       3       Angiosperms
+#Solanaceae      2       Angiosperms
+#Styracaceae     2       Angiosperms
+#Theaceae        2       Angiosperms
 #Torricelliaceae 2       Angiosperms
-#Babesiidae      2       Apicomplexa
-#Chlorellaceae   4       Chlorophyta
-#Chloropicaceae  2       Chlorophyta
-#Klebsormidiaceae        2       Chlorophyta
-#Nephroselmidaceae       2       Chlorophyta
-#Udoteaceae      3       Chlorophyta
-#Cryptomonadaceae        2       Cryptophyta
-#Euglenaceae     3       Euglenozoa
-#Phacaceae       2       Euglenozoa
-#Pinaceae        2       Gymnosperms
-#Taxaceae        2       Gymnosperms
-#Paulinellidae   2       Imbricatea
-#Pteridaceae     2       Pteridophytes
-#Selaginellaceae 4       Pteridophytes
-#Delesseriaceae  2       Rhodophyta
-#Gracilariaceae  4       Rhodophyta
-#Rhodomelaceae   4       Rhodophyta
+#...
+#Cyanophoraceae  2       Glaucophyta
+#Cupressaceae    3       Gymnosperms
+#Pinaceae        5       Gymnosperms
+#Taxaceae        3       Gymnosperms
+#...
 
 ```
 
@@ -1031,7 +1090,7 @@ GENUS.csv
 #strain_taxon_id,accession,strain,species,genus,family,order,class,phylum,abbr
 ```
 
-**636** genera, **174** families, and **83** mash groups.
+**636** genera, **174** families, **117** mash groups, and **74** sub-families.
 
 ```bash
 mkdir -p ~/data/plastid/taxon
@@ -1384,6 +1443,14 @@ find groups/ -name "pairwise.coverage.csv" | sort |
 
 ```
 
+## Aligning with outgroups
+
+* Review alignments and phylogenetic trees generated in `groups/family/` and `groups/group/`
+
+* Add outgroups to `plastid_t_o.md` manually.
+
+* *D* between target and outgroup should be around **0.05**.
+
 * Locate a target in mash groups
 
 ```bash
@@ -1409,13 +1476,81 @@ cat ~/Scripts/withncbi/doc/plastid_t_o.md |
 
 ```
 
-## Aligning with outgroups
+* Check branch length between target and outgroup
 
-* Review alignments and phylogenetic trees generated in `groups/family/` and `groups/group/`
+```bash
+cd ~/data/plastid/
 
-* Add outgroups to `plastid_t_o.md` manually.
+cat ~/Scripts/withncbi/doc/plastid_t_o.md |
+    grep -v "^#" |
+    grep . |
+    grep ",.*," | #head -n 35 |
+    parallel -j 3 -k --col-sep "," '
+        echo "==> {2}"
+        files=$(
+            rg -F -l {2} groups -g "*.nwk" -g "!fake*" -g "!*.raw.*" |
+                xargs -I[] rg -F -l {3} []
+            )
 
-* *D* between target and outgroup should be around **0.05**.
+        for file in $files; do
+            distance=$(
+                cat ${file} |
+                    nw_distance -m matrix -n - {2} {3} |
+                    tsv-select -f 2 |
+                    tsv-filter -H --ne 1:0 |
+                    sed "1d"
+                )
+
+            # avoid
+            if [ $(bc <<< "${distance} < 1") -eq 1 ]; then
+                echo -e "{2}\t{3}\t${distance}\t${file}"
+            fi
+        done
+    ' |
+    tee /dev/stderr |
+    grep -v "^==" > summary/outgroups.tsv
+
+tsv-summarize summary/outgroups.tsv \
+    --mean 3 --min 3 --max 3
+
+tsv-filter summary/outgroups.tsv \
+    --le 3:0.01
+#Camell_sinensis Apt_oblata      0.00523033      groups/family/Theaceae/Results/Theaceae.nwk
+#Polysp_speciosa Apt_oblata      0.00558832      groups/family/Theaceae/Results/Theaceae.nwk
+#Pyre_menglaensis        Apt_oblata      0.00609491      groups/family/Theaceae/Results/Theaceae.nwk
+
+tsv-filter summary/outgroups.tsv \
+    --ge 3:0.1
+#Dro_rotundifolia        Ald_vesiculosa  0.111839        groups/family/Droseraceae/Results/Droseraceae.nwk
+#Dro_rotundifolia        Ald_vesiculosa  0.109336        groups/family/Droseraceae_52/Results/Droseraceae_52.nwk
+#Galium_aparine  Mitr_speciosa   0.108056        groups/family/Rubiaceae/Results/Rubiaceae.nwk
+#Epim_sagittatum Nand_domestica  0.103843        groups/family/Berberidaceae/Results/Berberidaceae.nwk
+#Acta_racemosa   Calt_palustris  0.156385        groups/family/Ranunculaceae/Results/Ranunculaceae.nwk
+#Cephalo_wilsoniana      Torreya_fargesii        0.10857 groups/family/Taxaceae/Results/Taxaceae.nwk
+#Aspl_pekinense  Hym_unilaterale 0.136455        groups/family/Aspleniaceae/Results/Aspleniaceae.nwk
+
+parallel -j 1 -k '
+    echo "==> {}"
+
+    files=$(
+        rg -F -l {} groups -g "*.nwk" -g "!fake*" -g "!*.raw.*"
+        )
+
+    for file in $files; do
+        echo "    ${file}"
+        cat ${file} |
+            nw_distance -m matrix -n - ${TARGET} |
+            sed "s/^\t/name\t/" |
+            mlr --itsv --otsv cut -o -f "name,{}" |
+            tsv-filter -H --le 2:0.07 --ge 2:0.03 |
+            sed "1d"
+    done
+    ' ::: \
+        Apos_odorata \
+        Camell_sinensis Polysp_speciosa Pyre_menglaensis \
+        Dro_rotundifolia Ald_vesiculosa Galium_aparine
+
+```
 
 ```bash
 cd ~/data/plastid/

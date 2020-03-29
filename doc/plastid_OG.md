@@ -165,18 +165,3 @@ Abies,Cedrus_deodara
 Larix,Cedrus_deodara
 Picea,Cedrus_deodara
 Pinus,Cedrus_deodara
-
-# Pteridophytes 蕨类植物 (Fern)
-## Diplaziopsidaceae 肠蕨科
-Diplaziopsis,Homa_pycnocarpos
-## Pteridaceae 凤尾蕨科
-Adiantum,Hemio_subcordata
-Myriopteris,Hemio_subcordata
-
-# Chlorophyta 绿藻门 (Green Algae)
-## Chlorellaceae 小球藻科
-Chlorella,Dicl_acuatus
-Prototheca,Dicl_acuatus
-## Hydrodictyaceae 水网藻科
-Pediastrum,Hydrod_reticulatum
-Pseudopediastrum,Hydrod_reticulatum
