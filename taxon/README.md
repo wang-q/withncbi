@@ -855,7 +855,7 @@ nw_display -s -b 'visibility:hidden' -w 600 -v 30 tree.nwk |
 cd ~/data/plastid/summary
 
 # genus
-cut -d',' -f 5 GENUS.csv | sed -e '1d' | sort | uniq |
+cut -d',' -f 5 GENUS.csv | sed -e '1d' | uniq |
     parallel -j 1 -k '
         group=$(
             tsv-join groups.tsv -d 2 \
@@ -870,7 +870,6 @@ cut -d',' -f 5 GENUS.csv | sed -e '1d' | sort | uniq |
     ' |
     tsv-join --delimiter ","  -d 1 -f GENUS.csv -k 5 -a 9 |
     tr "," "\t" |
-    sort -k3,3 -k 1,1 |
     tsv-filter --ne 2:1
 #Actaea  2       Angiosperms
 #Adenophora      2       Angiosperms
@@ -897,54 +896,12 @@ cut -d',' -f 5 GENUS.csv | sed -e '1d' | sort | uniq |
 #Pelargonium     2       Angiosperms
 #Pilostyles      2       Angiosperms
 #Torricellia     2       Angiosperms
-#Babesia 3       Apicomplexa
-#Plasmodium      4       Apicomplexa
-#Biddulphia      2       Bacillariophyta
-#Halamphora      2       Bacillariophyta
-#Rhizosolenia    2       Bacillariophyta
-#Thalassiosira   2       Bacillariophyta
-#Boodleopsis     2       Chlorophyta
-#Bracteacoccus   3       Chlorophyta
-#Bryopsis        2       Chlorophyta
-#Caulerpa        4       Chlorophyta
-#Chlamydomonas   2       Chlorophyta
-#Chlorella       4       Chlorophyta
-#Chloroparvula   2       Chlorophyta
-#Chloropicon     2       Chlorophyta
-#Codium  2       Chlorophyta
-#Koliella        2       Chlorophyta
-#Nephroselmis    2       Chlorophyta
-#Pedinomonas     2       Chlorophyta
-#Prototheca      3       Chlorophyta
-#Udotea  2       Chlorophyta
-#Cryptomonas     2       Cryptophyta
-#Euglena 6       Euglenozoa
-#Lepocinclis     4       Euglenozoa
-#Monomorphina    2       Euglenozoa
-#Phacus  2       Euglenozoa
-#Cyanophora      2       Glaucophyta
+#...
 #Pinus   2       Gymnosperms
-#Paulinella      2       Imbricatea
-#Nannochloropsis 2       Ochrophyta
-#Adiantum        2       Pteridophytes
-#Selaginella     9       Pteridophytes
-#Agarophyton     2       Rhodophyta
-#Bostrychia      3       Rhodophyta
-#Caloglossa      3       Rhodophyta
-#Ceramium        2       Rhodophyta
-#Crassa  2       Rhodophyta
-#Dasya   2       Rhodophyta
-#Gelidium        3       Rhodophyta
-#Gracilaria      6       Rhodophyta
-#Gracilariopsis  2       Rhodophyta
-#Hildenbrandia   2       Rhodophyta
-#Polysiphonia    7       Rhodophyta
-#Porphyridium    2       Rhodophyta
-#Pyropia 3       Rhodophyta
-#Vertebrata      4       Rhodophyta
+#...
 
 # family
-cut -d',' -f 6 GENUS.csv | sed -e '1d' | sort | uniq |
+cut -d',' -f 6 GENUS.csv | sed -e '1d' | uniq |
     parallel -j 1 -k '
         group=$(
             tsv-join groups.tsv -d 2 \
@@ -959,51 +916,49 @@ cut -d',' -f 6 GENUS.csv | sed -e '1d' | sort | uniq |
     ' |
     tsv-join --delimiter ","  -d 1 -f GENUS.csv -k 6 -a 9 |
     tr "," "\t" |
-    sort -k3,3 -k 1,1 |
     tsv-filter --ne 2:1
-#Amaryllidaceae  2       Angiosperms
-#Apodanthaceae   2       Angiosperms
 #Araceae 2       Angiosperms
-#Aristolochiaceae        3       Angiosperms
+#Torricelliaceae 2       Angiosperms
+#Amaryllidaceae  2       Angiosperms
 #Asparagaceae    3       Angiosperms
+#Orchidaceae     14      Angiosperms
 #Asteraceae      5       Angiosperms
-#Berberidaceae   4       Angiosperms
-#Brassicaceae    2       Angiosperms
-#Burmanniaceae   3       Angiosperms
 #Campanulaceae   7       Angiosperms
-#Caprifoliaceae  2       Angiosperms
+#Brassicaceae    2       Angiosperms
 #Caryophyllaceae 2       Angiosperms
 #Chenopodiaceae  2       Angiosperms
-#Convolvulaceae  6       Angiosperms
+#Apodanthaceae   2       Angiosperms
 #Cucurbitaceae   2       Angiosperms
+#Burmanniaceae   3       Angiosperms
+#Caprifoliaceae  2       Angiosperms
 #Ericaceae       3       Angiosperms
+#Primulaceae     2       Angiosperms
+#Styracaceae     2       Angiosperms
+#Theaceae        2       Angiosperms
 #Fabaceae        12      Angiosperms
+#Rubiaceae       3       Angiosperms
 #Geraniaceae     6       Angiosperms
 #Lamiaceae       3       Angiosperms
 #Lentibulariaceae        2       Angiosperms
-#Liliaceae       2       Angiosperms
-#Lythraceae      2       Angiosperms
-#Malvaceae       3       Angiosperms
-#Melanthiaceae   2       Angiosperms
 #Oleaceae        2       Angiosperms
-#Orchidaceae     14      Angiosperms
 #Orobanchaceae   7       Angiosperms
-#Passifloraceae  2       Angiosperms
 #Plantaginaceae  2       Angiosperms
+#Liliaceae       2       Angiosperms
+#Melanthiaceae   2       Angiosperms
+#Passifloraceae  2       Angiosperms
+#Malvaceae       3       Angiosperms
+#Lythraceae      2       Angiosperms
+#Aristolochiaceae        3       Angiosperms
 #Poaceae 14      Angiosperms
-#Primulaceae     2       Angiosperms
+#Berberidaceae   4       Angiosperms
 #Ranunculaceae   6       Angiosperms
 #Rosaceae        3       Angiosperms
-#Rubiaceae       3       Angiosperms
+#Convolvulaceae  6       Angiosperms
 #Solanaceae      2       Angiosperms
-#Styracaceae     2       Angiosperms
-#Theaceae        2       Angiosperms
-#Torricelliaceae 2       Angiosperms
 #...
-#Cyanophoraceae  2       Glaucophyta
 #Cupressaceae    3       Gymnosperms
-#Pinaceae        5       Gymnosperms
 #Taxaceae        3       Gymnosperms
+#Pinaceae        5       Gymnosperms
 #...
 
 ```

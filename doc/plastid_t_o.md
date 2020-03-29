@@ -569,7 +569,7 @@ Akebia,Ak_trifoliata,Dec_insignis
 Papaver,Papa_somniferum,Macl_microcarpa
 ## Ranunculaceae 毛茛科
 Aconitum,Acon_chiisanense,Calt_palustris
-Actaea,Acta_racemosa,Calt_palustris
+Actaea,Acta_racemosa
 Anemone,Anemone_tomentosa,Calt_palustris
 Aquilegia,Aquile_coerulea,Calt_palustris
 Asteropyrum,cavaleriei,Calt_palustris
