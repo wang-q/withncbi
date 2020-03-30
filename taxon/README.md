@@ -287,7 +287,7 @@ rm *.tmp *.bak
 Species and genus should not be "NA" and genus has 2 or more members.
 
 ```text
-4754 ---------> 4733 ---------> 3338 ---------> 4292
+4754 ---------> 4725 ---------> 3338 ---------> 4292
         NA             genus          family
 ```
 
@@ -308,7 +308,7 @@ cat CHECKME.csv |
     > valid.tmp
 
 wc -l valid.tmp
-# 4733
+# 4725
 
 #----------------------------#
 # Genus
