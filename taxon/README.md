@@ -40,9 +40,9 @@ tools of `taxon/` are used here, which makes a good example for users.
 # Work flow.
 
 ```text
-id ---> lineage ---> filtering ---> naming ---> strain_info.pl   ---> mash ---> egaz
-                                      |                                 ^
-                                      |-------> downloads        -------|
+id ---> lineage ---> filtering ---> naming ---> strain_info.pl ---> mash ---> egaz
+                                      |                              ^
+                                      |-------> downloads      ------|
 ```
 
 # Update taxdmp
@@ -1359,25 +1359,18 @@ find groups/ -name "pairwise.coverage.csv" | sort |
         fi
     ' | tsv-filter --or --str-eq 3:Angiosperms --str-eq 3:Gymnosperms --empty 3
 
+#Burmanniaceae_69        0.4590          family
 #Burmanniaceae   0.1446  Angiosperms     family
-#Campanulaceae_16        0.4914          family
-#Campanulaceae_17        0.4357          family
 #Campanulaceae   0.2860  Angiosperms     family
-#Convolvulaceae_92       0.4354          family
 #Convolvulaceae  0.0975  Angiosperms     family
+#Cupressaceae_332        0.4688          family
 #Cupressaceae    0.4870  Gymnosperms     family
+#Droseraceae_52  0.4033          family
 #Droseraceae     0.4092  Angiosperms     family
-#Ericaceae_34    0.1654          family
 #Ericaceae       0.0287  Angiosperms     family
-#Fabaceae_39     0.4557          family
 #Fabaceae        0.2040  Angiosperms     family
-#Geraniaceae_45  0.2517          family
 #Geraniaceae     0.1921  Angiosperms     family
-#Orchidaceae_10  0.3925          family
-#Orchidaceae_11  0.1555          family
-#Orchidaceae_12  0.1632          family
 #Orchidaceae     0.0160  Angiosperms     family
-#Orobanchaceae_51        0.1533          family
 #Orobanchaceae   0.1098  Angiosperms     family
 #Pinaceae        0.3881  Gymnosperms     family
 #Poaceae 0.4518  Angiosperms     family
@@ -1390,11 +1383,6 @@ find groups/ -name "pairwise.coverage.csv" | sort |
 #Erodium 0.4704  Angiosperms     genus
 #Lobelia 0.4908  Angiosperms     genus
 #Monotropa       0.2901  Angiosperms     genus
-#group_11        0.2059          mash
-#group_131       0.1918          mash
-#group_1 0.4718          mash
-#group_20        0.4292          mash
-#group_99        0.4305          mash
 
 ```
 
@@ -1406,28 +1394,18 @@ find groups/ -name "pairwise.coverage.csv" | sort |
 
 * *D* between target and outgroup should be around **0.05**.
 
-* Locate a target in mash groups
+* Locate targets of a family in mash groups
 
 ```bash
 cd ~/data/plastid/
 
-rg -F -l Epipo_roseum taxon
-
-rg -F -l Portu_oleracea taxon | grep -v ".tsv" | grep "group_" |
-    parallel -j 1 -k 'echo {}; cat {};'
-
+# family
 cat taxon/Orchidaceae |
     parallel -j 1 -k 'rg -F -l {} taxon/group_*' |
     grep -v ".tsv" |
     sort |
     uniq |
     parallel -j 1 -k 'echo {}; cat {};'
-
-# no outgroups
-cat ~/Scripts/withncbi/doc/plastid_t_o.md |
-    grep -v "^#" |
-    grep . |
-    grep -v ",.*,"
 
 ```
 
@@ -1440,7 +1418,7 @@ cat ~/Scripts/withncbi/doc/plastid_t_o.md |
     grep -v "^#" |
     grep . |
     grep ",.*," | #head -n 35 |
-    parallel -j 3 -k --col-sep "," '
+    parallel -j 6 -k --col-sep "," '
         echo "==> {2}"
         files=$(
             rg -F -l {2} groups -g "*.nwk" -g "!fake*" -g "!*.raw.*" |
@@ -1466,23 +1444,31 @@ cat ~/Scripts/withncbi/doc/plastid_t_o.md |
     grep -v "^==" > summary/outgroups.tsv
 
 tsv-summarize summary/outgroups.tsv \
+    --group-by 1,2 --count |
+    wc -l
+
+# no outgroups
+cat ~/Scripts/withncbi/doc/plastid_t_o.md |
+    head -n 674 | # Angiosperms
+    grep -v "^#" |
+    grep . |
+    grep -v ",.*," | wc -l
+
+tsv-summarize summary/outgroups.tsv \
     --mean 3 --min 3 --max 3
 
 tsv-filter summary/outgroups.tsv \
     --le 3:0.01
-#Camell_sinensis Apt_oblata      0.00523033      groups/family/Theaceae/Results/Theaceae.nwk
-#Polysp_speciosa Apt_oblata      0.00558832      groups/family/Theaceae/Results/Theaceae.nwk
-#Pyre_menglaensis        Apt_oblata      0.00609491      groups/family/Theaceae/Results/Theaceae.nwk
 
 tsv-filter summary/outgroups.tsv \
     --ge 3:0.1
-#Dro_rotundifolia        Ald_vesiculosa  0.111839        groups/family/Droseraceae/Results/Droseraceae.nwk
-#Dro_rotundifolia        Ald_vesiculosa  0.109336        groups/family/Droseraceae_52/Results/Droseraceae_52.nwk
-#Galium_aparine  Mitr_speciosa   0.108056        groups/family/Rubiaceae/Results/Rubiaceae.nwk
-#Epim_sagittatum Nand_domestica  0.103843        groups/family/Berberidaceae/Results/Berberidaceae.nwk
-#Acta_racemosa   Calt_palustris  0.156385        groups/family/Ranunculaceae/Results/Ranunculaceae.nwk
-#Cephalo_wilsoniana      Torreya_fargesii        0.10857 groups/family/Taxaceae/Results/Taxaceae.nwk
-#Aspl_pekinense  Hym_unilaterale 0.136455        groups/family/Aspleniaceae/Results/Aspleniaceae.nwk
+
+```
+
+* Find a suitable outgroup
+
+```bash
+cd ~/data/plastid/
 
 parallel -j 1 -k '
     echo "==> {}"
@@ -1501,9 +1487,7 @@ parallel -j 1 -k '
             sed "1d"
     done
     ' ::: \
-        Apos_odorata \
-        Camell_sinensis Polysp_speciosa Pyre_menglaensis \
-        Dro_rotundifolia Ald_vesiculosa Galium_aparine
+        Apos_odorata
 
 ```
 

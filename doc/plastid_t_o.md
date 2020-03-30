@@ -27,9 +27,9 @@ Torricellia,Torri_angulata
 ## Aquifoliaceae 冬青科
 Ilex,Ilex_paraguariensis,Aral_undulata
 ## Arecaceae 槟榔科
-Arenga,Aren_caudata,Nypa_fruticans
-Astrocaryum,Astro_murumuru,Nypa_fruticans
-Brahea,Brah_brandegeei,Nypa_fruticans
+Arenga,Aren_caudata,Eugei_tristis
+Astrocaryum,Astro_murumuru,Eugei_tristis
+Brahea,Brah_brandegeei,Eugei_tristis
 ## Amaryllidaceae 石蒜科
 Allium,Alli_cepa,Agap_coddii
 Lycoris,Lycor_squamigera,Agap_coddii
@@ -49,32 +49,32 @@ Aloe,Aloe_maculata,Xanthor_preissii
 Crocus,Croc_cartwrightianus,Ir_gatesii
 Iris,Ir_gatesii,Croc_cartwrightianus
 ## Orchidaceae 兰科
-Apostasia,Apos_odorata
-Bletilla,Ble_striata
-Calanthe,Calant_triplicata
-Cattleya,Catt_crispata
-Cephalanthera,Cephala_longifolia
-Corallorhiza,Corallo_bulbosa
-Cymbidium,Cymbi_aloifolium
-Cypripedium,Cypr_macranthos
-Dendrobium,Dendrob_officinale
-Epipactis,Epipa_mairei
+Apostasia,Apos_odorata,Vani_planifolia
+Bletilla,Ble_striata,Vani_planifolia
+Calanthe,Calant_triplicata,Vani_planifolia
+Cattleya,Catt_crispata,Vani_planifolia
+Cephalanthera,Cephala_longifolia,Vani_planifolia
+Corallorhiza,Corallo_bulbosa,Vani_planifolia
+Cymbidium,Cymbi_aloifolium,Vani_planifolia
+Cypripedium,Cypr_macranthos,Vani_planifolia
+Dendrobium,Dendrob_officinale,Vani_planifolia
+Epipactis,Epipa_mairei,Vani_planifolia
 Epipogium,Epipo_roseum
-Gastrochilus,Gastroc_fuscopunctatus
-Goodyera,Goo_fumata
-Habenaria,Haben_pantlingiana
-Holcoglossum,Holco_lingulatum
-Masdevallia,Mas_coccinea
-Neofinetia,Neof_falcata
-Neottia,Neott_nidus_avis
-Oncidium,Oncid_hybrid_cultivar
-Paphiopedilum,Paph_niveum
-Phalaenopsis,Phalae_aphrodite_formosana
-Platanthera,Plata_japonica
-Pleione,Pleione_bulbocodioides
-Sobralia,Sob_callosa
-Tainia,Tain_cordifolia
-Vanilla,Vani_planifolia
+Gastrochilus,Gastroc_fuscopunctatus,Vani_planifolia
+Goodyera,Goo_fumata,Vani_planifolia
+Habenaria,Haben_pantlingiana,Vani_planifolia
+Holcoglossum,Holco_lingulatum,Vani_planifolia
+Masdevallia,Mas_coccinea,Vani_planifolia
+Neofinetia,Neof_falcata,Vani_planifolia
+Neottia,Neott_nidus_avis,Vani_planifolia
+Oncidium,Oncid_hybrid_cultivar,Vani_planifolia
+Paphiopedilum,Paph_niveum,Vani_planifolia
+Phalaenopsis,Phalae_aphrodite_formosana,Vani_planifolia
+Platanthera,Plata_japonica,Vani_planifolia
+Pleione,Pleione_bulbocodioides,Vani_planifolia
+Sobralia,Sob_callosa,Vani_planifolia
+Tainia,Tain_cordifolia,Vani_planifolia
+Vanilla,Vani_planifolia,Ob_japonica
 ## Asteraceae 菊科
 Ambrosia,Amb_artemisiifolia,Pluc_indica
 Artemisia,Arte_frigida,Pluc_indica
@@ -96,17 +96,17 @@ Saussurea,Saus_involucrata,Pluc_indica
 Sonchus,Sonc_boulosii,Pluc_indica
 Taraxacum,Tar_officinale,Pluc_indica
 ## Campanulaceae 桔梗科
-Adenophora,Adenop_remotiflora
-Burmeistera,Burme_sodiroana
-Campanula,Campa_takesimana
-Centropogon,Centropog_granulosus
-Cyanea,Cyanea_fissa
-Cyphia,Cyph_angustiloba
+Adenophora,Adenop_remotiflora,Gram_bergiana
+Burmeistera,Burme_sodiroana,Gram_bergiana
+Campanula,Campa_takesimana,Gram_bergiana
+Centropogon,Centropog_granulosus,Gram_bergiana
+Cyanea,Cyanea_fissa,Gram_bergiana
+Cyphia,Cyph_angustiloba,Gram_bergiana
 Downingia,Dow_cuspidata
 Lobelia,Lobe_anceps
-Monopsis,Monop_alba
-Pratia,Prat_angulata
-Sclerotheca,Sclerot_longistigmata
+Monopsis,Monop_alba,Gram_bergiana
+Pratia,Prat_angulata,Gram_bergiana
+Sclerotheca,Sclerot_longistigmata,Gram_bergiana
 ## Menyanthaceae 睡菜科
 Nymphoides,Nympho_simulans,Meny_trifoliata
 ## Schisandraceae 五味子科
@@ -152,7 +152,7 @@ Haloxylon,Halox_ammodendron,Spin_oleracea
 Salicornia,Salic_brachiata,Spin_oleracea
 Suaeda,Su_malacosperma,Spin_oleracea
 ## Droseraceae 茅膏菜科
-Drosera,Dro_rotundifolia,Ald_vesiculosa
+Drosera,Dro_rotundifolia
 ## Frankeniaceae 瓣鳞花科
 Frankenia,Franke_laevis
 ## Montiaceae
@@ -226,7 +226,7 @@ Impatiens,Impa_piufanensis,Hydroce_triflora
 ## Ebenaceae 柿树科
 Diospyros,Diosp_glaucifolia
 ## Ericaceae 杜鹃花科
-Monotropa,Monotropa_hypopitys,Pityo_californicus
+Monotropa,Monotropa_hypopitys
 Vaccinium,Vacc_macrocarpon
 ## Lecythidaceae 玉蕊科
 Barringtonia,Barr_fusicarpa,Adin_angustifolia
@@ -251,36 +251,36 @@ Styrax,Styr_grandiflorus,Huo_biaristatum
 ## Symplocaceae 山矾科
 Symplocos,Symplocos_paniculata,Adin_angustifolia
 ## Theaceae 山茶科
-Camellia,Camell_sinensis,Apt_oblata
-Gordonia,Gor_brandegeei,Apt_oblata
-Polyspora,Polysp_speciosa,Apt_oblata
-Pyrenaria,Pyre_menglaensis,Apt_oblata
+Camellia,Camell_sinensis,Stew_sinensis
+Gordonia,Gor_brandegeei,Stew_sinensis
+Polyspora,Polysp_speciosa,Stew_sinensis
+Pyrenaria,Pyre_menglaensis,Stew_sinensis
 Schima,Schima_argentea,Apt_oblata
 Stewartia,Stew_sinensis,Apt_oblata
 ## Fabaceae 豆科
-Acacia,Acac_ligulata
-Ammopiptanthus,Ammopi_mongolicus
-Astragalus,Astra_mongholicus_nakaianus
-Bauhinia,Bau_acuminata
-Caragana,Carag_microphylla
-Dalbergia,Dal_hainanensis
-Glycine,Glyci_max
-Glycyrrhiza,Glycy_glabra
-Lathyrus,Lathy_sativus
-Lespedeza,Lesp_floribunda
-Lupinus,Lup_luteus
-Medicago,Med_truncatula
-Ormosia,Orm_hosiei
-Pisum,Pisum_sativum
-Senegalia,Sene_laeta
-Senna,Senna_tora
-Sophora,Sop_alopecuroides
-Stylosanthes,Styl_hamata
-Trifolium,Trif_subterraneum
-Vachellia,Vach_flava
-Vicia,Vicia_sativa
-Vigna,Vig_radiata
-Wisteria,Wis_floribunda
+Acacia,Acac_ligulata,Indi_tinctoria
+Ammopiptanthus,Ammopi_mongolicus,Indi_tinctoria
+Astragalus,Astra_mongholicus_nakaianus,Indi_tinctoria
+Bauhinia,Bau_acuminata,Indi_tinctoria
+Caragana,Carag_microphylla,Indi_tinctoria
+Dalbergia,Dal_hainanensis,Indi_tinctoria
+Glycine,Glyci_max,Indi_tinctoria
+Glycyrrhiza,Glycy_glabra,Indi_tinctoria
+Lathyrus,Lathy_sativus,Lens_culinaris
+Lespedeza,Lesp_floribunda,Indi_tinctoria
+Lupinus,Lup_luteus,Indi_tinctoria
+Medicago,Med_truncatula,Lens_culinaris
+Ormosia,Orm_hosiei,Indi_tinctoria
+Pisum,Pisum_sativum,Lens_culinaris
+Senegalia,Sene_laeta,Indi_tinctoria
+Senna,Senna_tora,Indi_tinctoria
+Sophora,Sop_alopecuroides,Indi_tinctoria
+Stylosanthes,Styl_hamata,Indi_tinctoria
+Trifolium,Trif_subterraneum,Lens_culinaris
+Vachellia,Vach_flava,Indi_tinctoria
+Vicia,Vicia_sativa,Lens_culinaris
+Vigna,Vig_radiata,Indi_tinctoria
+Wisteria,Wis_floribunda,Indi_tinctoria
 ## Betulaceae 桦木科
 Alnus,Alnus_cordata,Ostrya_rehderiana
 Betula,Bet_nana,Alnus_cordata
@@ -306,13 +306,13 @@ Gentiana,Gent_straminea,Halen_corniculata
 Swertia,Swe_mussotii,Halen_corniculata
 ## Rubiaceae 茜草科
 Coffea,Cof_arabica,Mitr_speciosa
-Galium,Galium_aparine,Mitr_speciosa
-Gynochthodes,Gynoc_officinalis,Mitr_speciosa
+Galium,Galium_aparine
+Gynochthodes,Gynoc_officinalis
 ## Geraniaceae 牻牛儿苗科
-Erodium,Ero_texanum
-Geranium,Gera_palmatum
-Monsonia,Mons_speciosa
-Pelargonium,Pelar_x_hortorum
+Erodium,Ero_texanum,Hypseo_bilobata
+Geranium,Gera_palmatum,Hypseo_bilobata
+Monsonia,Mons_speciosa,Hypseo_bilobata
+Pelargonium,Pelar_x_hortorum,Hypseo_bilobata
 ## Acanthaceae 爵床科
 Echinacanthus,Echinaca_lofouensis,Androg_paniculata
 Justicia,Jus_leptostachya,Androg_paniculata
@@ -354,12 +354,12 @@ Picconia,Picc_azorica,Jas_nudiflorum
 Schrebera,Schreb_arborea,Jas_nudiflorum
 Syringa,Syr_vulgaris,Jas_nudiflorum
 ## Orobanchaceae 列当科
-Aphyllon,Aphyllon_californicum
-Cistanche,Cistanc_deserticola
-Orobanche,Orob_gracilis
-Pedicularis,Pedic_ishidoyana
+Aphyllon,Aphyllon_californicum,Linden_philippensis
+Cistanche,Cistanc_deserticola,Linden_philippensis
+Orobanche,Orob_gracilis,Linden_philippensis
+Pedicularis,Pedic_ishidoyana,Linden_philippensis
 Phelipanche,Pheli_purpurea
-Rehmannia,Rehm_chingii
+Rehmannia,Rehm_chingii,Linden_philippensis
 ## Paulowniaceae 泡桐科
 Paulownia,Paulo_coreana,Tore_concolor
 ## Phrymaceae 透骨草科
@@ -451,8 +451,8 @@ Nymphaea,Nympha_alba,Barc_longifolia
 Croomia,Croo_japonica,Stem_japonica
 Stemona,Stem_japonica,Croo_japonica
 ## Aristolochiaceae 马兜铃科
-Aristolochia,Aristo_contorta
-Asarum,Asa_sieboldii
+Aristolochia,Aristo_contorta,Saru_henryi
+Asarum,Asa_sieboldii,Saru_henryi
 ## Piperaceae 胡椒科
 Piper,Piper_cenocladum
 ## Bromeliaceae
@@ -466,17 +466,17 @@ Aegilops,Aegil_tauschii
 Agrostis,Agrostis_stolonifera
 Alloeochaete,Alloe_namuliensis
 Alloteropsis,Allote_semialata
-Ampelocalamus,Ampeloc_calcareus
+Ampelocalamus,Ampeloc_calcareus,Litha_pauciflora
 Amphipogon,Amphip_caricinus
 Andropogon,Androp_fastigiatus
 Aristida,Aristi_purpurea
 Arthraxon,Arth_prionodes
-Arundinaria,Arundina_gigantea
+Arundinaria,Arundina_gigantea,Litha_pauciflora
 Arundo,Arundo_plinii
 Astrebla,Astre_pectinata
 Avena,Av_sativa
 Axonopus,Ax_fissifolius
-Bambusa,Bam_oldhamii
+Bambusa,Bam_oldhamii,Litha_pauciflora
 Bothriochloa,Bot_alta
 Bouteloua,Bout_curtipendula
 Brachiaria,Brachi_humidicola
@@ -487,11 +487,11 @@ Chasechloa,Chase_egregia
 Chikusichloa,Chik_aquatica
 Chloris,Chloris_barbata
 Chrysopogon,Chrysop_serrulatus
-Chusquea,Chus_spectabilis
+Chusquea,Chus_spectabilis,Litha_pauciflora
 Crinipes,Crin_abyssinicus
 Cymbopogon,Cymbo_flexuosus
 Dactyloctenium,Dactyloc_aegyptium
-Dendrocalamus,Dendroc_latiflorus
+Dendrocalamus,Dendroc_latiflorus,Litha_pauciflora
 Deschampsia,Desc_antarctica
 Dichanthium,Dichanthi_sericeum
 Distichlis,Dist_bajaensis
@@ -502,17 +502,17 @@ Eragrostis,Erag_minor
 Eremochloa,Eremoc_eriopoda
 Eriachne,Eria_stipacea
 Eriochrysis,Eriochr_cf_cayennensis_365_2
-Fargesia,Far_nitida
+Fargesia,Far_nitida,Litha_pauciflora
 Festuca,Fes_arundinacea
 Garnotia,Gar_thailandica
-Guadua,Gua_weberbaueri
+Guadua,Gua_weberbaueri,Litha_pauciflora
 Heteropogon,Heteropo_triticeus
 Hilaria,Hila_cenchroides
-Himalayacalamus,Him_collaris
+Himalayacalamus,Him_collaris,Litha_pauciflora
 Homolepis,Homo_aturensis
 Hordeum,Hor_vulgare_vulgare
 Hyparrhenia,Hypa_subplumosa
-Indocalamus,Indoc_longiauritus
+Indocalamus,Indoc_longiauritus,Litha_pauciflora
 Indosasa,Indos_sinica
 Isachne,Isac_distichophylla
 Leersia,Lee_tisserantii
@@ -522,18 +522,18 @@ Littledalea,Litt_racemosa
 Lolium,Lol_perenne
 Melica,Melica_mutica
 Miscanthus,Mis_sacchariflorus
-Oldeania,Old_alpina
+Oldeania,Old_alpina,Litha_pauciflora
 Oryza,Oryza_sativa_Japonica
-Otatea,Otat_acuminata
+Otatea,Otat_acuminata,Litha_pauciflora
 Panicum,Pani_virgatum
-Pariana,Paria_radiciflora
+Pariana,Paria_radiciflora,Litha_pauciflora
 Paspalum,Paspalum_fimbriatum
 Pharus,Phar_latifolius
-Phyllostachys,Phyllosta_edulis
-Pleioblastus,Pleiob_maculatus
+Phyllostachys,Phyllosta_edulis,Litha_pauciflora
+Pleioblastus,Pleiob_maculatus,Litha_pauciflora
 Poa,Poa_palustris
 Psathyrostachys,Psat_juncea
-Pseudosasa,Pseudosa_japonica
+Pseudosasa,Pseudosa_japonica,Litha_pauciflora
 Rytidosperma,Ry_semiannulare
 Saccharum,Saccharum_hybrid_cultivar_SP80_3280
 Sartidia,Sart_perrieri
@@ -548,7 +548,7 @@ Triodia,Triod_stipoides
 Tristachya,Trist_humbertii
 Triticum,Triti_aestivum
 Urochloa,Urochl_decumbens
-Yushania,Yus_levigata
+Yushania,Yus_levigata,Litha_pauciflora
 Zea,Zea_mays
 Zizania,Ziza_aquatica
 Zoysia,Zo_macrantha
@@ -650,7 +650,7 @@ Mitella,Mite_diphylla,Chrysos_aureobracteatum
 Tiarella,Tia_cordifolia,Chrysos_aureobracteatum
 ## Convolvulaceae 旋花科
 Cuscuta,Cus_gronovii
-Ipomoea,Ip_purpurea
+Ipomoea,Ip_purpurea,Cres_cretica
 ## Solanaceae 茄科
 Capsicum,Capsi_annuum,Dat_stramonium
 Dunalia,Duna_obovata,Dat_stramonium
@@ -756,15 +756,15 @@ Araucaria,Arau_heterophylla,Woll_nobilis
 ## Podocarpaceae 罗汉松科
 Podocarpus,Podoca_totara,Dacryc_imbricatus
 ## Cupressaceae 柏科
-Callitropsis,Callitro_nootkatensis
-Calocedrus,Caloc_formosana
-Chamaecyparis,Chamaec_formosensis
-Cupressus,Cup_sempervirens
-Hesperocyparis,Hesperocy_glabra
-Juniperus,Jun_bermudiana
-Taiwania,Taiw_cryptomerioides
-Taxodium,Taxo_distichum
-Thuja,Thuja_plicata
+Callitropsis,Callitro_nootkatensis,Caloc_formosana
+Calocedrus,Caloc_formosana,Thuja_plicata
+Chamaecyparis,Chamaec_formosensis,Caloc_formosana
+Cupressus,Cup_sempervirens,Caloc_formosana
+Hesperocyparis,Hesperocy_glabra,Caloc_formosana
+Juniperus,Jun_bermudiana,Caloc_formosana
+Taiwania,Taiw_cryptomerioides,Seq_sempervirens
+Taxodium,Taxo_distichum,Seq_sempervirens
+Thuja,Thuja_plicata,Caloc_formosana
 ## Taxaceae 红豆杉科
 Amentotaxus,Amen_formosana,Torreya_fargesii
 Cephalotaxus,Cephalo_wilsoniana,Torreya_fargesii
@@ -777,11 +777,11 @@ Ephedra,Eph_equisetina
 ## Gnetaceae 买麻藤科
 Gnetum,Gn_parvifolium
 ## Pinaceae 松科
-Abies,Abi_koreana
-Larix,Lar_decidua
-Picea,Picea_sitchensis
-Pinus,Pinus_thunbergii
-Tsuga,Ts_chinensis
+Abies,Abi_koreana,Cedrus_deodara
+Larix,Lar_decidua,Cedrus_deodara
+Picea,Picea_sitchensis,Cedrus_deodara
+Pinus,Pinus_thunbergii,Cedrus_deodara
+Tsuga,Ts_chinensis,Cedrus_deodara
 
 # Haptista 定鞭藻门
 ## Phaeocystaceae 棕囊藻科
@@ -811,7 +811,7 @@ Huperzia,Hup_lucidula
 ## Marattiaceae 合囊蕨科
 Angiopteris,Angi_evecta
 ## Aspleniaceae 虎尾蕨科
-Asplenium,Aspl_pekinense,Hym_unilaterale
+Asplenium,Aspl_pekinense
 ## Athyriaceae 蹄盖蕨科
 Athyrium,Ath_anisopterum,Diplazium_bellum
 Deparia,Dep_lancea,Ath_anisopterum
