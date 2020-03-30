@@ -7,7 +7,6 @@
 - [Update taxdmp](#update-taxdmp)
 - [Scrap id and acc from NCBI](#scrap-id-and-acc-from-ncbi)
 - [Add lineage information](#add-lineage-information)
-  - [Can't get clear taxon information](#cant-get-clear-taxon-information)
 - [Filtering based on valid families and genera](#filtering-based-on-valid-families-and-genera)
 - [Find a way to name these](#find-a-way-to-name-these)
 - [Download sequences and regenerate lineage information](#download-sequences-and-regenerate-lineage-information)
@@ -154,200 +153,6 @@ Manually correct lineages.
 Taxonomy information from [AlgaeBase](http://www.algaebase.org),
 [Wikipedia](https://www.wikipedia.org/) and [Encyclopedia of Life](http://eol.org/).
 
-```bash
-cd ~/data/plastid/summary
-
-# darwin (bsd) need "" for -i
-sed -i".bak" "s/\'//g" CHECKME.csv
-
-# Koliella corcontica (a green algae) was grouped to Streptophyta.
-# Koliella longiseta
-perl -pi -e 's/Koliella,\w+,\w+,\w+,\w+/Koliella,Klebsormidiaceae,Klebsormidiales,Klebsormidiophyceae,Chlorophyta/g' CHECKME.csv
-sed -i".bak" "s/Klebsormidiophyceae,Streptophyta/Klebsormidiophyceae,Chlorophyta/" CHECKME.csv
-
-# Chrysanthemum x morifolium and Pelargonium x hortorum are also weird, but they can be googled.
-
-# missing families
-# queried from http://www.algaebase.org/
-sed -i".bak" "s/Aureococcus,NA/Aureococcus,Pelagomonadaceae/" CHECKME.csv
-sed -i".bak" "s/Aureoumbra,NA/Aureoumbra,Sarcinochrysidaceae/" CHECKME.csv
-sed -i".bak" "s/Bigelowiella,NA/Bigelowiella,Chlorarachniaceae/" CHECKME.csv
-sed -i".bak" "s/Choricystis,NA/Choricystis,Coccomyxaceae/" CHECKME.csv
-sed -i".bak" "s/Carteria,NA,NA/Carteria,Chlamydomonadaceae,Chlamydomonadales/" CHECKME.csv
-sed -i".bak" "s/Cryptoglena,NA,NA/Cryptoglena,Euglenaceae,Euglenales/" CHECKME.csv
-sed -i".bak" "s/Cymbomonas,NA/Cymbomonas,Pyramimonadaceae/" CHECKME.csv
-sed -i".bak" "s/Dicloster,NA,NA/Dicloster,Chlorellaceae,Chlorellales/" CHECKME.csv
-sed -i".bak" "s/Dictyochloropsis,NA/Dictyochloropsis,Trebouxiaceae/" CHECKME.csv
-sed -i".bak" "s/Euglenaformis,NA/Euglenaformis,Euglenaceae/" CHECKME.csv
-sed -i".bak" "s/Euglenaria,NA/Euglenaria,Euglenaceae/" CHECKME.csv
-sed -i".bak" "s/Eutreptiella,NA/Eutreptiella,Eutreptiaceae/" CHECKME.csv
-sed -i".bak" "s/Fusochloris,NA/Fusochloris,Microthamniaceae/" CHECKME.csv
-sed -i".bak" "s/Geminella,NA,NA/Geminella,Chlorellaceae,Chlorellales/" CHECKME.csv
-sed -i".bak" "s/Gloeotilopsis,NA/Gloeotilopsis,Ulotrichaceae/" CHECKME.csv
-sed -i".bak" "s/Helicosporidium,NA/Helicosporidium,Chlorellaceae/" CHECKME.csv
-sed -i".bak" "s/Microthamnion,NA/Microthamnion,Microthamniaceae/" CHECKME.csv
-sed -i".bak" "s/Monomorphina,NA/Monomorphina,Euglenaceae/" CHECKME.csv
-sed -i".bak" "s/Myrmecia,NA/Myrmecia,Trebouxiaceae/" CHECKME.csv
-sed -i".bak" "s/Neocystis,NA/Neocystis,Radiococcaceae/" CHECKME.csv
-sed -i".bak" "s/Nephroselmis,NA,NA/Nephroselmis,Nephroselmidaceae,Nephroselmidales/" CHECKME.csv
-sed -i".bak" "s/Oedogonium,NA/Oedogonium,Oedogoniaceae/" CHECKME.csv
-sed -i".bak" "s/Oedocladium,NA/Oedocladium,Oedogoniaceae/" CHECKME.csv
-sed -i".bak" "s/Oltmannsiellopsis,NA/Oltmannsiellopsis,Oltmannsiellopsidaceae/" CHECKME.csv
-sed -i".bak" "s/Pabia,NA/Pabia,Trebouxiaceae/" CHECKME.csv
-sed -i".bak" "s/Parachlorella,NA/Parachlorella,Chlorellaceae/" CHECKME.csv
-sed -i".bak" "s/Paradoxia,NA/Paradoxia,Coccomyxaceae/" CHECKME.csv
-sed -i".bak" "s/Planctonema,NA/Planctonema,Oocystaceae/" CHECKME.csv
-sed -i".bak" "s/Prasinoderma,NA/Prasinoderma,Prasinococcaceae/" CHECKME.csv
-sed -i".bak" "s/Pseudendoclonium,NA/Pseudendoclonium,Kornmanniaceae/" CHECKME.csv
-sed -i".bak" "s/Pseudochloris,NA,NA/Pseudochloris,Chlorellaceae,Chlorellales/" CHECKME.csv
-sed -i".bak" "s/Pyramimonas,NA/Pyramimonas,Pyramimonadaceae/" CHECKME.csv
-sed -i".bak" "s/Stichococcus,NA/Stichococcus,Prasiolaceae/" CHECKME.csv
-sed -i".bak" "s/Stigeoclonium,NA/Stigeoclonium,Chaetophoraceae/" CHECKME.csv
-sed -i".bak" "s/Trachydiscus,NA/Trachydiscus,Pleurochloridaceae/" CHECKME.csv
-sed -i".bak" "s/Verdigellas,NA/Verdigellas,Palmophyllaceae/" CHECKME.csv
-sed -i".bak" "s/Watanabea,NA/Watanabea,Trebouxiaceae/" CHECKME.csv
-
-sed -i".bak" "s/Chlorellales,NA/Chlorellales,Trebouxiophyceae/" CHECKME.csv
-sed -i".bak" "s/Ettlia,NA/Ettlia,Chlorococcaceae/" CHECKME.csv
-
-# Chlorophyceae, incertae sedis
-#sed -i".bak" "s/Jenufa,NA,NA/Jenufa,NA,NA/" CHECKME.csv
-# Chlorophyta incertae sedis
-#sed -i".bak" "s/Picocystis,NA,NA/Picocystis,NA,NA/" CHECKME.csv
-sed -i".bak" "s/Pleurastrum,NA,NA/Pleurastrum,NA,Chlamydomonadales/" CHECKME.csv
-
-# missing orders
-sed -i".bak" "s/Leptocylindraceae,NA/Leptocylindraceae,Chaetocerotales/" CHECKME.csv
-sed -i".bak" "s/Rhizosoleniaceae,NA/Rhizosoleniaceae,Rhizosoleniales/" CHECKME.csv
-sed -i".bak" "s/Babesiidae,NA/Babesiidae,Piroplasmida/" CHECKME.csv
-sed -i".bak" "s/Theileriidae,NA/Theileriidae,Piroplasmida/" CHECKME.csv
-sed -i".bak" "s/Treubariaceae,NA/Treubariaceae,Chlorococcales/" CHECKME.csv
-sed -i".bak" "s/Oltmannsiellopsidaceae,NA/Oltmannsiellopsidaceae,Oltmannsiellopsidales/" CHECKME.csv
-sed -i".bak" "s/Pycnococcaceae,NA/Pycnococcaceae,Pseudoscourfieldiales/" CHECKME.csv
-sed -i".bak" "s/Coccomyxaceae,NA/Coccomyxaceae,Chlorococcales/" CHECKME.csv
-
-# missing classes and phylums
-sed -i".bak" "s/Glaucocystophyceae,NA/Glaucocystophyceae,Glaucophyta/" CHECKME.csv
-sed -i".bak" "s/Dinophyceae,NA/Dinophyceae,Dinoflagellata/" CHECKME.csv
-
-sed -i".bak" "s/Apiales,NA/Apiales,Magnoliopsida/" CHECKME.csv
-sed -i".bak" "s/Aquifoliales,NA/Aquifoliales,Magnoliopsida/" CHECKME.csv
-sed -i".bak" "s/Asterales,NA/Asterales,Magnoliopsida/" CHECKME.csv
-sed -i".bak" "s/Austrobaileyales,NA/Austrobaileyales,Magnoliopsida/" CHECKME.csv
-sed -i".bak" "s/Brassicales,NA/Brassicales,Magnoliopsida/" CHECKME.csv
-sed -i".bak" "s/Buxales,NA/Buxales,Magnoliopsida/" CHECKME.csv
-sed -i".bak" "s/Canellales,NA/Canellales,Magnoliopsida/" CHECKME.csv
-sed -i".bak" "s/Caryophyllales,NA/Caryophyllales,Magnoliopsida/" CHECKME.csv
-sed -i".bak" "s/Celastrales,NA/Celastrales,Magnoliopsida/" CHECKME.csv
-sed -i".bak" "s/Cornales,NA/Cornales,Magnoliopsida/" CHECKME.csv
-sed -i".bak" "s/Cucurbitales,NA/Cucurbitales,Magnoliopsida/" CHECKME.csv
-sed -i".bak" "s/Dipsacales,NA/Dipsacales,Magnoliopsida/" CHECKME.csv
-sed -i".bak" "s/Ericales,NA/Ericales,Magnoliopsida/" CHECKME.csv
-sed -i".bak" "s/Fabales,NA/Fabales,Magnoliopsida/" CHECKME.csv
-sed -i".bak" "s/Gentianales,NA/Gentianales,Magnoliopsida/" CHECKME.csv
-sed -i".bak" "s/Geraniales,NA/Geraniales,Magnoliopsida/" CHECKME.csv
-sed -i".bak" "s/Ginkgoales,NA/Ginkgoales,Ginkgoopsida/" CHECKME.csv
-sed -i".bak" "s/Gnetales,NA/Gnetales,Gnetopsida/" CHECKME.csv
-sed -i".bak" "s/Gleicheniales,NA/Gleicheniales,Gleicheniales/" CHECKME.csv
-sed -i".bak" "s/Isoetales,NA/Isoetales,Isoetopsida/" CHECKME.csv
-sed -i".bak" "s/Lamiales,NA/Lamiales,Magnoliopsida/" CHECKME.csv
-sed -i".bak" "s/Lycopodiales,NA/Lycopodiales,Lycopodiopsida/" CHECKME.csv
-sed -i".bak" "s/Magnoliales,NA/Magnoliales,Magnoliopsida/" CHECKME.csv
-sed -i".bak" "s/Malpighiales,NA/Malpighiales,Magnoliopsida/" CHECKME.csv
-sed -i".bak" "s/Malvales,NA/Malvales,Magnoliopsida/" CHECKME.csv
-sed -i".bak" "s/Marattiales,NA/Marattiales,Marattiopsida/" CHECKME.csv
-sed -i".bak" "s/Myrtales,NA/Myrtales,Magnoliopsida/" CHECKME.csv
-sed -i".bak" "s/Ophioglossales,NA/Ophioglossales,Ophioglossales/" CHECKME.csv
-sed -i".bak" "s/Osmundales,NA/Osmundales,Polypodiopsida/" CHECKME.csv
-sed -i".bak" "s/Pinales,NA/Pinales,Pinopsida/" CHECKME.csv
-sed -i".bak" "s/Polypodiales,NA/Polypodiales,Polypodiopsida/" CHECKME.csv
-sed -i".bak" "s/Proteales,NA/Proteales,Magnoliopsida/" CHECKME.csv
-sed -i".bak" "s/Ranunculales,NA/Ranunculales,Magnoliopsida/" CHECKME.csv
-sed -i".bak" "s/Rosales,NA/Rosales,Magnoliopsida/" CHECKME.csv
-sed -i".bak" "s/Salviniales,NA/Salviniales,Polypodiopsida/" CHECKME.csv
-sed -i".bak" "s/Saxifragales,NA/Saxifragales,Magnoliopsida/" CHECKME.csv
-sed -i".bak" "s/Schizaeales,NA/Schizaeales,Polypodiopsida/" CHECKME.csv
-sed -i".bak" "s/Selaginellales,NA/Selaginellales,Isoetopsida/" CHECKME.csv
-sed -i".bak" "s/Solanales,NA/Solanales,Magnoliopsida/" CHECKME.csv
-sed -i".bak" "s/Trochodendrales,NA/Trochodendrales,Magnoliopsida/" CHECKME.csv
-sed -i".bak" "s/Vitales,NA/Vitales,Magnoliopsida/" CHECKME.csv
-sed -i".bak" "s/Welwitschiales,NA/Welwitschiales,Gnetopsida/" CHECKME.csv
-sed -i".bak" "s/Zygophyllales,NA/Zygophyllales,Magnoliopsida/" CHECKME.csv
-sed -i".bak" "s/Araucariales,NA/Araucariales,Pinidae/g" CHECKME.csv
-sed -i".bak" "s/Cupressales,NA/Cupressales,Pinidae/g" CHECKME.csv
-sed -i".bak" "s/Cycadales,NA/Cycadales,Cycadopsida/g" CHECKME.csv
-sed -i".bak" "s/Ephedrales,NA/Ephedrales,Gnetidae/g" CHECKME.csv
-sed -i".bak" "s/Ceratophyllales,NA/Ceratophyllales,Magnoliopsida/g" CHECKME.csv
-sed -i".bak" "s/Chloranthales.NA/Chloranthales,Magnoliopsida/g" CHECKME.csv
-sed -i".bak" "s/Fagales,NA/Fagales,Eudicotyledoneae/g" CHECKME.csv
-sed -i".bak" "s/Garryales,NA/Garryales,Magnoliopsida/g" CHECKME.csv
-sed -i".bak" "s/Huerteales,NA/Huerteales,Magnoliopsida/g" CHECKME.csv
-sed -i".bak" "s/Icacinales,NA/Icacinales,eudicots/g" CHECKME.csv
-sed -i".bak" "s/Laurales,NA/Laurales,Magnoliopsida/g" CHECKME.csv
-sed -i".bak" "s/Nymphaeales,NA/Nymphaeales,Magnoliopsida/g" CHECKME.csv
-sed -i".bak" "s/Oxalidales,NA/Oxalidales,eudicots/g" CHECKME.csv
-sed -i".bak" "s/Piperales,NA/Piperales,Magnoliopsida/g" CHECKME.csv
-sed -i".bak" "s/Santalales,NA/Santalales,eudicots/g" CHECKME.csv
-sed -i".bak" "s/Sapindales,NA/Sapindales,eudicots/g" CHECKME.csv
-sed -i".bak" "s/Amborellales,NA/Amborellales,Magnoliopsida/g" CHECKME.csv
-
-# Entry Merged. Taxid 1605147 was merged into taxid 142389 on October 16, 2015.
-sed -i".bak" "/1605147,/d" CHECKME.csv
-
-# comma in names
-sed -i".bak" "/167339,/d" CHECKME.csv
-
-# missing all
-sed -i".bak" "/2003521,/d" CHECKME.csv
-
-# Cercozoa 丝足虫门
-sed -i".bak" "s/Chlorarachniophyceae,NA/Chlorarachniophyceae,Cercozoa/" CHECKME.csv
-
-sed -i".bak" "s/Euglyphida,NA,NA/Euglyphida,Filosa,Cercozoa/" CHECKME.csv
-sed -i".bak" "s/Gymnochlora,NA,NA,NA,NA/Gymnochlora,Chlorarachniaceae,Chlorarachniales,Chlorarachniophyceae,Cercozoa/" CHECKME.csv
-sed -i".bak" "s/Lotharella,NA,NA,NA,NA/Lotharella,Chlorarachniaceae,Chlorarachniales,Chlorarachniophyceae,Cercozoa/" CHECKME.csv
-sed -i".bak" "s/Partenskyella,NA,NA,NA,NA/Partenskyella,Chlorarachniaceae,Chlorarachniales,Chlorarachniophyceae,Cercozoa/" CHECKME.csv
-sed -i".bak" "s/Bigelowiella,Chlorarachniaceae,NA,NA,NA/Bigelowiella,Chlorarachniaceae,Chlorarachniales,Chlorarachniophyceae,Cercozoa/" CHECKME.csv
-
-# Haptophyta 定鞭藻门
-sed -i".bak" "s/Haptophyceae,NA/Haptophyceae,Haptophyta/" CHECKME.csv
-sed -i".bak" "s/Isochrysidales,NA,NA/Isochrysidales,Coccolithophyceae,Haptophyta/" CHECKME.csv
-sed -i".bak" "s/Pavlovales,NA,NA/Pavlovales,Pavlovophyceae,Haptophyta/" CHECKME.csv
-sed -i".bak" "s/Phaeocystales,NA,NA/Phaeocystales,Coccolithophyceae,Haptophyta/" CHECKME.csv
-
-# Ochrophyta 褐藻门
-parallel -j 1 '
-    sed -i".bak" "s/{},NA/{},Ochrophyta/" CHECKME.csv
-    ' ::: \
-        Bolidophyceae Dictyochophyceae Eustigmatophyceae \
-        Pelagophyceae Phaeophyceae Raphidophyceae \
-        Synurophyceae Xanthophyceae
-
-# Rhodophyta 红藻门
-parallel -j 1 '
-    sed -i".bak" "s/{},NA/{},Rhodophyta/" CHECKME.csv
-    ' ::: \
-        Bangiophyceae Compsopogonophyceae Florideophyceae \
-        Rhodellophyceae Stylonematophyceae
-
-# Cryptophyta 隐藻门
-parallel -j 1 '
-    sed -i".bak" "s/{},NA/{},Cryptophyta/" CHECKME.csv
-    ' ::: \
-        Cryptophyta Cryptophyceae
-sed -i".bak" "s/Cryptomonadales,NA,NA/Cryptomonadales,Cryptophyceae,Cryptophyta/" CHECKME.csv
-sed -i".bak" "s/Pyrenomonadales,NA,NA/Pyrenomonadales,Cryptophyceae,Cryptophyta/" CHECKME.csv
-
-# Charophyta 轮藻门
-sed -i".bak" "s/Charophyceae,Streptophyta/Charophyceae,Charophyta/" CHECKME.csv
-sed -i".bak" "s/Chlorokybophyceae,Streptophyta/Chlorokybophyceae,Charophyta/" CHECKME.csv
-sed -i".bak" "s/Coleochaetophyceae,Streptophyta/Coleochaetophyceae,Charophyta/" CHECKME.csv
-sed -i".bak" "s/Zygnemophyceae,Streptophyta/Zygnemophyceae,Charophyta/" CHECKME.csv
-
-# Chlorophyta 绿藻门
-sed -i".bak" "s/Mesostigmatophyceae,Streptophyta/Mesostigmatophyceae,Chlorophyta/" CHECKME.csv
-
-```
 
 Split Streptophyta according to classical plant classification.
 
@@ -367,6 +172,18 @@ Split Streptophyta according to classical plant classification.
 
 ```bash
 cd ~/data/plastid/summary
+
+# darwin (bsd) need "" for -i
+sed -i".bak" CHECKME.csv
+
+# Entry Merged. Taxid 1605147 was merged into taxid 142389 on October 16, 2015.
+sed -i".bak" "/1605147,/d" CHECKME.csv
+
+# comma or parenthesis in names
+sed -i".bak" "/167339,/d" CHECKME.csv
+
+# missing all
+sed -i".bak" "/2003521,/d" CHECKME.csv
 
 # Angiosperms
 perl ~/Scripts/withncbi/taxon/id_members.pl 3398 --rank family |
@@ -421,25 +238,49 @@ perl ~/Scripts/withncbi/taxon/id_members.pl 3195 --rank family |
         '\'' CHECKME.csv
     '
 
+# Charophyta 轮藻
+parallel -j 1 '
+    sed -i".bak" "s/{},Streptophyta/{},Charophyta/" CHECKME.csv
+    ' ::: \
+        Charophyceae Chlorokybophyceae Coleochaetophyceae \
+        Zygnemophyceae
+
+# Chlorophyta 绿藻
+parallel -j 1 '
+    sed -i".bak" "s/{},Streptophyta/{},Chlorophyta/" CHECKME.csv
+    ' ::: \
+        Mesostigmatophyceae Klebsormidiophyceae
+
+# Ochrophyta 褐藻
+parallel -j 1 '
+    sed -i".bak" "s/{},NA/{},Ochrophyta/" CHECKME.csv
+    ' ::: \
+        Bolidophyceae Dictyochophyceae Eustigmatophyceae \
+        Pelagophyceae Phaeophyceae Raphidophyceae \
+        Synurophyceae Xanthophyceae
+
+# Rhodophyta 红藻
+parallel -j 1 '
+    sed -i".bak" "s/{},NA/{},Rhodophyta/" CHECKME.csv
+    ' ::: \
+        Bangiophyceae Compsopogonophyceae Florideophyceae \
+        Rhodellophyceae Stylonematophyceae
+
+# Cryptophyta 隐藻
+parallel -j 1 '
+    sed -i".bak" "s/{},NA/{},Cryptophyta/" CHECKME.csv
+    ' ::: \
+        Cryptophyta Cryptophyceae
+
+# missing phylums
+sed -i".bak" "s/Glaucocystophyceae,NA/Glaucocystophyceae,Glaucophyta/" CHECKME.csv
+sed -i".bak" "s/Dinophyceae,NA/Dinophyceae,Dinoflagellata/" CHECKME.csv
+
+# Chrysanthemum x morifolium and Pelargonium x hortorum are also weird, but they can be googled.
+
 rm *.tmp *.bak
 
 ```
-
-## Can't get clear taxon information
-
-* Genus
-  + Chromera
-  + Elliptochloris
-  + Ettlia
-  + Picocystis
-  + Xylochloris
-  + Jenufa
-  + Pleurastrum
-
-* Species
-  + Chromerida sp. RM11
-  + Trebouxiophyceae sp. MX-AZ01
-  + Trebouxiophyceae sp. TP-2016a
 
 # Filtering based on valid families and genera
 
