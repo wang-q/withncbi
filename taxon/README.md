@@ -287,7 +287,7 @@ rm *.tmp *.bak
 Species and genus should not be "NA" and genus has 2 or more members.
 
 ```text
-4754 ---------> 4725 ---------> 3338 ---------> 4292
+4754 ---------> 4725 ---------> 3338 ---------> 4290
         NA             genus          family
 ```
 
@@ -343,7 +343,7 @@ cat valid.genus.tmp |
 grep -F -f family.tmp valid.tmp > valid.family.tmp
 
 wc -l valid.family.tmp
-# 4292
+# 4290
 
 #----------------------------#
 # results produced in this step

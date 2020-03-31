@@ -170,32 +170,6 @@ cat ../GENOMES/plant_id_seq.csv |
 
 Manually correct lineages.
 
-```bash
-cd ~/data/mito/summary
-
-# darwin (bsd) need "" for -i
-sed -i".bak" "s/\'//g" CHECKME.csv
-
-# Anomodon attenuatus and Anomodon rugelii (Bryophytes) was grouped to Streptophyta.
-sed -i".bak" "s/Bryopsida,Streptophyta/Bryopsida,Bryophytes/" CHECKME.csv
-
-sed -i".bak" "s/Pycnococcaceae,NA/Pycnococcaceae,Pseudoscourfieldiales/" CHECKME.csv
-
-# Charophyta 轮藻门
-sed -i".bak" "s/Charophyceae,Streptophyta/Charophyceae,Charophyta/" CHECKME.csv
-sed -i".bak" "s/Chlorokybophyceae,Streptophyta/Chlorokybophyceae,Charophyta/" CHECKME.csv
-sed -i".bak" "s/Coleochaetophyceae,Streptophyta/Coleochaetophyceae,Charophyta/" CHECKME.csv
-sed -i".bak" "s/Zygnemophyceae,Streptophyta/Zygnemophyceae,Charophyta/" CHECKME.csv
-
-# Chlorophyta 绿藻门
-sed -i".bak" "s/Mesostigmatophyceae,Streptophyta/Mesostigmatophyceae,Chlorophyta/" CHECKME.csv
-
-# Bryophytes
-sed -i".bak" "s/Marchantiopsida,Streptophyta/Marchantiopsida,Bryophytes/" CHECKME.csv
-sed -i".bak" "s/Leiosporocerotopsida,Streptophyta/Leiosporocerotopsida,Bryophytes/" CHECKME.csv
-
-```
-
 Split Streptophyta according to classical plant classification.
 
 * Streptophyta
@@ -220,6 +194,9 @@ cd ~/data/mito/summary
 #    ->find(q{li > a > i[class=family]})
 #    ->each( sub { print shift->text . "\n" } );
 #    ' > Angiosperms.tmp
+
+# darwin (bsd) need "" for -i
+sed -i".bak" CHECKME.csv
 
 # Angiosperms
 perl ~/Scripts/withncbi/taxon/id_members.pl 3398 --rank family |
@@ -274,15 +251,47 @@ perl ~/Scripts/withncbi/taxon/id_members.pl 3195 --rank family |
         '\'' CHECKME.csv
     '
 
+# Charophyta 轮藻
+parallel -j 1 '
+    sed -i".bak" "s/{},Streptophyta/{},Charophyta/" CHECKME.csv
+    ' ::: \
+        Charophyceae Chlorokybophyceae Coleochaetophyceae \
+        Zygnemophyceae
+
+# Chlorophyta 绿藻
+parallel -j 1 '
+    sed -i".bak" "s/{},Streptophyta/{},Chlorophyta/" CHECKME.csv
+    ' ::: \
+        Mesostigmatophyceae Klebsormidiophyceae
+
+# Ochrophyta 褐藻
+parallel -j 1 '
+    sed -i".bak" "s/{},NA/{},Ochrophyta/" CHECKME.csv
+    ' ::: \
+        Bolidophyceae Dictyochophyceae Eustigmatophyceae \
+        Pelagophyceae Phaeophyceae Raphidophyceae \
+        Synurophyceae Xanthophyceae
+
+# Rhodophyta 红藻
+parallel -j 1 '
+    sed -i".bak" "s/{},NA/{},Rhodophyta/" CHECKME.csv
+    ' ::: \
+        Bangiophyceae Compsopogonophyceae Florideophyceae \
+        Rhodellophyceae Stylonematophyceae
+
+# Cryptophyta 隐藻
+parallel -j 1 '
+    sed -i".bak" "s/{},NA/{},Cryptophyta/" CHECKME.csv
+    ' ::: \
+        Cryptophyta Cryptophyceae
+
+# missing phylums
+sed -i".bak" "s/Glaucocystophyceae,NA/Glaucocystophyceae,Glaucophyta/" CHECKME.csv
+sed -i".bak" "s/Dinophyceae,NA/Dinophyceae,Dinoflagellata/" CHECKME.csv
+
 rm *.tmp *.bak
 
 ```
-
-## Can't get clear taxonomy
-
-* Species
-  + Trebouxiophyceae sp. MX-AZ01
-
 
 # Filtering based on valid families and genera
 
@@ -540,6 +549,11 @@ for name in $(cat ../summary/ABBR.csv | sed -e '1d' | cut -d"," -f 10 | sort); d
         mash sketch -k 21 -s 100000 -p 4 - -I "${name}" -o ${name}
 done
 
+```
+
+* h=0.1 as we need outgroup ~ 0.05
+
+```bash
 cd ~/data/mito/summary
 mash triangle -E -p 8 -l <(
         cat ABBR.csv |
@@ -577,7 +591,7 @@ cat dist_full.tsv |
         tree <- as.phylo(clusters)
         write.tree(phy=tree, file="tree.nwk")
 
-        group <- cutree(clusters, h=0.3) # k=3
+        group <- cutree(clusters, h=0.1)
         groups <- as.data.frame(group)
         groups$ids <- rownames(groups)
         rownames(groups) <- NULL
@@ -587,6 +601,69 @@ cat dist_full.tsv |
 
 nw_display -s -b 'visibility:hidden' -w 600 -v 30 tree.nwk |
     rsvg-convert -o plant_mito.png
+
+```
+
+* Abnormal strains
+
+```bash
+cd ~/data/mito/summary
+
+# genus
+cut -d',' -f 5 GENUS.csv | sed -e '1d' | uniq |
+    parallel -j 1 -k '
+        group=$(
+            tsv-join groups.tsv -d 2 \
+                -f <(cat GENUS.csv | grep -w {} | cut -d, -f 10) \
+                -k 1 |
+                cut -f 1 |
+                sort |
+                uniq
+        )
+        number=$(echo "${group}" | wc -l)
+        echo -e "{},${number}"
+    ' |
+    tsv-join --delimiter ","  -d 1 -f GENUS.csv -k 5 -a 9 |
+    tr "," "\t" |
+    tsv-filter --ne 2:1
+#Caulerpa        2       Chlorophyta
+#Chlamydomonas   3       Chlorophyta
+#Polytomella     4       Chlorophyta
+#Dunaliella      2       Chlorophyta
+#Chlorella       3       Chlorophyta
+#Prototheca      2       Chlorophyta
+#Chloroparvula   2       Chlorophyta
+#Chloropicon     5       Chlorophyta
+#Bracteacoccus   2       Chlorophyta
+#Ulva    4       Chlorophyta
+
+# family
+cut -d',' -f 6 GENUS.csv | sed -e '1d' | uniq |
+    parallel -j 1 -k '
+        group=$(
+            tsv-join groups.tsv -d 2 \
+                -f <(cat GENUS.csv | grep -w {} | cut -d, -f 10) \
+                -k 1 |
+                cut -f 1 |
+                sort |
+                uniq
+        )
+        number=$(echo "${group}" | wc -l)
+        echo -e "{},${number}"
+    ' |
+    tsv-join --delimiter ","  -d 1 -f GENUS.csv -k 6 -a 9 |
+    tr "," "\t" |
+    tsv-filter --ne 2:1
+#Fabaceae        2       Angiosperms
+#Malvaceae       2       Angiosperms
+#Poaceae 3       Angiosperms
+#Caulerpaceae    2       Chlorophyta
+#Chlamydomonadaceae      7       Chlorophyta
+#Dunaliellaceae  2       Chlorophyta
+#Chlorellaceae   5       Chlorophyta
+#Chloropicaceae  7       Chlorophyta
+#Bracteacoccaceae        2       Chlorophyta
+#Ulvaceae        4       Chlorophyta
 
 ```
 
@@ -601,7 +678,7 @@ find . -maxdepth 1 -mindepth 1 -type d |
         echo >&2 "==> {}"
 
         if [ -e {}/chr.fasta ]; then
-            echo >&2 "    {} has been processed"
+            echo >&2 "    {} has been processed";
             exit;
         fi
 
@@ -634,7 +711,7 @@ cat GENUS.csv |
     grep -v "^#" |
     perl -na -F"," -e '
         BEGIN{
-            ($phylum, $family, $genus, ) = (q{}, q{}, q{});
+            our ($phylum, $family, $genus) = (q{}, q{}, q{});
         }
 
         chomp for @F;
@@ -819,15 +896,11 @@ cat taxon/group_target.tsv |
     parallel --colsep '\t' --no-run-if-empty --linebuffer -k -j 1 '
         echo -e "==> Group: [{2}]\tTarget: [{4}]\n"
 
-        if bjobs -w | grep -w {2}; then
-            exit;
-        fi
-
         egaz template \
             GENOMES/{4} \
             $(cat taxon/{2} | grep -v -x "{4}" | xargs -I[] echo "GENOMES/[]") \
             --multi -o groups/genus/{2} \
-            --taxon ~/data/organelle/plastid/GENOMES/taxon_ncbi.csv \
+            --taxon ~/data/mito/GENOMES/taxon_ncbi.csv \
             --rawphylo --aligndb --parallel 4 -v
 
         bash groups/genus/{2}/1_pair.sh
@@ -857,7 +930,7 @@ cat taxon/group_target.tsv |
 
 # mash
 cat taxon/group_target.tsv |
-    tsv-filter -H --ge 1:2001 |
+    tsv-filter -H --ge 1:2001 --le 1:3000 |
     sed -e '1d' | #grep -w "^2001" |
     parallel --colsep '\t' --no-run-if-empty --linebuffer -k -j 1 '
         echo -e "==> Group: [{2}]\tTarget: [{4}]\n"
@@ -877,22 +950,64 @@ cat taxon/group_target.tsv |
 find groups -mindepth 1 -maxdepth 3 -type d -name "*_raw" | parallel -r rm -fr
 find groups -mindepth 1 -maxdepth 3 -type d -name "*_fasta" | parallel -r rm -fr
 
-# check status
-echo \
-    $(find groups/genus -mindepth 1 -maxdepth 1 -type d | wc -l) \
-    $(find groups/genus -mindepth 1 -maxdepth 3 -type f -name "*.nwk.pdf" | grep -w raw -v | wc -l)
+```
 
-find groups/genus -mindepth 1 -maxdepth 1 -type d |
-    parallel -j 4 '
-        lines=$(find {} -type f -name "*.nwk.pdf" | grep -w raw -v | wc -l)
-        if [ $lines -eq 0 ]; then
-            lines=$(find {} -type d -name "mafSynNet" | wc -l)
-            if [ $lines -gt 2 ]; then
-                echo {}
-            fi
+* Abnormal groups
+
+```bash
+cd ~/data/mito/
+
+find groups/ -name "pairwise.coverage.csv" | sort |
+    parallel -j 4 -k '
+        cover=$(cat {} | grep -w "intersect" | cut -d, -f 4)
+
+        if [[ "$cover" == "" ]]; then
+            cover=$(cat {} | cut -d, -f 4 | tsv-summarize -H --mean 1 | sed -e "1d")
         fi
-    ' |
-    sort
+
+        taxon=$(
+            echo {//} |
+                sed -e "s/^groups\///g" -e "s/\/Results//g" |
+                sed -e "s/^family\///g" -e "s/^genus\///g" -e "s/^mash\///g"
+            )
+        phylum=$(
+            cat summary/ABBR.csv |
+                grep -w ${taxon} |
+                cut -d, -f 9 |
+                head -n 1
+            )
+        group=$(
+            echo {//} |
+                sed -e "s/^groups\///g" -e "s/\/Results//g" |
+                sed -E "s/\/.+//g"
+            )
+
+        if [ $(bc <<< "${cover} < 0.5") -eq 1 ]; then
+            echo -e "${taxon}\t${cover}\t${phylum}\t${group}"
+        fi
+    '
+#Asteraceae      0.2208  Angiosperms     family
+#Brassicaceae    0.1223  Angiosperms     family
+#Chenopodiaceae  0.1791  Angiosperms     family
+#Chlorellaceae   0.09496 Chlorophyta     family
+#Chloropicaceae  0.0317  Chlorophyta     family
+#Cucurbitaceae   0.0159  Angiosperms     family
+#Fabaceae        0.0000  Angiosperms     family
+#Malvaceae       0.0103  Angiosperms     family
+#Poaceae 0.0154  Angiosperms     family
+#Solanaceae      0.0546  Angiosperms     family
+#Ulvaceae        0.1209  Chlorophyta     family
+#Bracteacoccus   0.2154  Chlorophyta     genus
+#Caulerpa        0.0139  Chlorophyta     genus
+#Chlorella       0.1734  Chlorophyta     genus
+#Chloroparvula   0.1954  Chlorophyta     genus
+#Chloropicon     0.0940  Chlorophyta     genus
+#Corchorus       0.0548  Angiosperms     genus
+#Prototheca      0.0866  Chlorophyta     genus
+#Senna   0.3345  Angiosperms     genus
+#Ulva    0.1086  Chlorophyta     genus
+#group_18        0.3832          mash
+#group_8 0.2587          mash
 
 ```
 
@@ -935,7 +1050,7 @@ cat taxon/group_target.tsv |
             GENOMES/${outgroup} \
             --multi -o groups/genus_og/{2}_og \
             --outgroup ${outgroup} \
-            --taxon ~/data/organelle/plastid/GENOMES/taxon_ncbi.csv \
+            --taxon ~/data/mito/GENOMES/taxon_ncbi.csv \
             --rawphylo --aligndb --parallel 4 -v
 
         bash groups/genus_og/{2}_og/1_pair.sh
