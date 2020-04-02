@@ -7,7 +7,6 @@
 - [Scrap id and acc from NCBI](#scrap-id-and-acc-from-ncbi)
   - [Restrict taxonomy ids to green plants with `taxon/id_restrict.pl`.](#restrict-taxonomy-ids-to-green-plants-with-taxonid_restrictpl)
 - [Add lineage information](#add-lineage-information)
-  - [Can't get clear taxonomy](#cant-get-clear-taxonomy)
 - [Filtering based on valid families and genera](#filtering-based-on-valid-families-and-genera)
 - [Find a way to name these](#find-a-way-to-name-these)
 - [Download sequences and regenerate lineage information](#download-sequences-and-regenerate-lineage-information)
@@ -1409,134 +1408,73 @@ find ../../groups/genus_og -type f -path "*Results*" -name "*.nwk" |
 
 ## d1, d2
 
-`collect_xlsx.pl`
-
 ```bash
 cd ~/data/mito/summary/xlsx
 
-cat <<'EOF' > cmd_collect_d1_d2.tt
-perl ~/Scripts/fig_table/collect_xlsx.pl \
-[% FOREACH item IN data -%]
-    -f [% item.name %].common.xlsx \
-    -s d1_pi_gc_cv \
-    -n [% item.name %] \
-[% END -%]
-    -o cmd_d1.xlsx
-
-perl ~/Scripts/fig_table/collect_xlsx.pl \
-[% FOREACH item IN data -%]
-    -f [% item.name %].common.xlsx \
-    -s d2_pi_gc_cv \
-    -n [% item.name %] \
-[% END -%]
-    -o cmd_d2.xlsx
-
-perl ~/Scripts/fig_table/collect_xlsx.pl \
-[% FOREACH item IN data -%]
-    -f [% item.name %].common.xlsx \
-    -s d1_comb_pi_gc_cv \
-    -n [% item.name %] \
-[% END -%]
-    -o cmd_d1_comb.xlsx
-
-perl ~/Scripts/fig_table/collect_xlsx.pl \
-[% FOREACH item IN data -%]
-    -f [% item.name %].common.xlsx \
-    -s d2_comb_pi_gc_cv \
-    -n [% item.name %] \
-[% END -%]
-    -o cmd_d2_comb.xlsx
-
-EOF
-
+# d1
 cat ../table/genus.lst |
     grep -v "^#" |
-    TT_FILE=cmd_collect_d1_d2.tt perl -MTemplate -nl -e '
-        push @data, { name => $_, };
-        END {
-            $tt = Template->new;
-            $tt->process($ENV{TT_FILE}, { data => \@data, })
-                or die Template->error;
-        }
-    ' \
-    > cmd_collect_d1_d2.sh
+    parallel -j 1 -k '
+        >&2 echo "==> {}"
+        plotr xlsx {}.common.xlsx -s d1_pi_gc_cv -o stdout |
+            sed "1d" |
+            tsv-select -f 1,2 |
+            tsv-filter --le 1:5 --ge 1:0 |
+            perl -nla -e '\''
+                $F[1] = sprintf q{%.6f}, $F[1];
+                print join qq{\t}, @F, {};
+            '\''
+    ' |
+    (echo -e "X\tY\tgroup" && cat) \
+    > d1.tsv
 
-bash cmd_collect_d1_d2.sh
+cat d1.tsv |
+    tsv-summarize -H --group-by 1 --mean 2:Y |
+    perl -pe 's/$/\tgroup/' \
+    > d1.mean.tsv
 
-```
+plotr lines d1.tsv \
+    --ymm 0,0.02 \
+    --xl "Distance to indels ({italic(d)[1]})" \
+    --yl "Nucleotide divergence ({italic(D)})"
 
-`sep_chart.pl`
+plotr lines d1.mean.tsv --style blue \
+    --ymm 0,0.02 \
+    --xl "Distance to indels ({italic(d)[1]})" \
+    --yl "Nucleotide divergence ({italic(D)})"
 
-```bash
-mkdir -p ~/data/mito/summary/fig
-
-cd ~/data/mito/summary/xlsx
-
-cat <<'EOF' > cmd_chart_d1_d2.tt
-perl ~/Scripts/fig_table/sep_chart.pl \
-    -i cmd_d1.xlsx \
-    -xl "Distance to indels ({italic(d)[1]})" \
-    -yl "Nucleotide divergence ({italic(D)})" \
-    -xr "A2:A8" -yr "B2:B8" \
-    --y_min 0.0 --y_max [% y_max %] \
-    -x_min 0 -x_max 5 \
-    -rb "^([% FOREACH item IN data %][% item.name %]|[% END %]NON_EXIST)$" \
-    -rs "NON_EXIST" \
-    --postfix [% postfix %] --style_dot -ms
-
-perl ~/Scripts/fig_table/sep_chart.pl \
-    -i cmd_d1_comb.xlsx \
-    -xl "Distance to indels ({italic(d)[1]})" \
-    -yl "Nucleotide divergence ({italic(D)})" \
-    -xr "A2:A8" -yr "B2:B8" \
-    --y_min 0.0 --y_max [% y_max %] \
-    -x_min 0 -x_max 5 \
-    -rb "^([% FOREACH item IN data %][% item.name %]|[% END %]NON_EXIST)$" \
-    -rs "NON_EXIST" \
-    --postfix [% postfix %] --style_dot
-
-perl ~/Scripts/fig_table/sep_chart.pl \
-    -i cmd_d2.xlsx \
-    -xl "Reciprocal of indel density ({italic(d)[2]})" \
-    -yl "Nucleotide divergence ({italic(D)})" \
-    -xr "A2:A23" -yr "B2:B23" \
-    --y_min 0.0 --y_max [% y_max2 %] \
-    -x_min 0 -x_max 20 \
-    -rb "^([% FOREACH item IN data %][% item.name %]|[% END %]NON_EXIST)$" \
-    -rs "NON_EXIST" \
-    --postfix [% postfix %] --style_dot -ms
-
-perl ~/Scripts/fig_table/sep_chart.pl \
-    -i cmd_d2_comb.xlsx \
-    -xl "Reciprocal of indel density ({italic(d)[2]})" \
-    -yl "Nucleotide divergence ({italic(D)})" \
-    -xr "A2:A23" -yr "B2:B23" \
-    --y_min 0.0 --y_max [% y_max2 %] \
-    -x_min 0 -x_max 20 \
-    -rb "^([% FOREACH item IN data %][% item.name %]|[% END %]NON_EXIST)$" \
-    -rs "NON_EXIST" \
-    --postfix [% postfix %] --style_dot
-
-EOF
-
+# d2
 cat ../table/genus.lst |
-    TT_FILE=cmd_chart_d1_d2.tt perl -MTemplate -nl -e '
-        push @data, { name => $_, };
-        END {
-            $tt = Template->new;
-            $tt->process($ENV{TT_FILE},
-                { data => \@data,
-                y_max => 0.03,
-                y_max2 => 0.03,
-                postfix => q{group_1}, })
-                or die Template->error;
-        }
-    ' \
-    > cmd_chart_genus.sh
+    grep -v "^#" |
+    parallel -j 1 -k '
+        >&2 echo "==> {}"
+        plotr xlsx {}.common.xlsx -s d2_pi_gc_cv -o stdout |
+            sed "1d" |
+            tsv-select -f 1,2 |
+            tsv-filter --le 1:20 --ge 1:0 |
+            perl -nla -e '\''
+                $F[1] = sprintf q{%.6f}, $F[1];
+                print join qq{\t}, @F, {};
+            '\''
+    ' |
+    (echo -e "X\tY\tgroup" && cat) \
+    > d2.tsv
 
-bash cmd_chart_genus.sh
+cat d2.tsv |
+    tsv-summarize -H --group-by 1 --mean 2:Y |
+    perl -pe 's/$/\tgroup/' \
+    > d2.mean.tsv
 
-rm ../xlsx/*.csv
+plotr lines d2.tsv \
+    --ymm 0,0.03 \
+    --xl "Reciprocal of indel density ({italic(d)[2]})" \
+    --yl "Nucleotide divergence ({italic(D)})"
+
+plotr lines d2.mean.tsv --style blue \
+    --ymm 0,0.03 \
+    --xl "Reciprocal of indel density ({italic(d)[2]})" \
+    --yl "Nucleotide divergence ({italic(D)})"
+
 mv ../xlsx/*.pdf ../fig
 
 ```
