@@ -2,9 +2,9 @@
 
 Turn NCBI genome reports and assembly reports into query-able MySQL databases.
 
-Also, taxonomy information are added to all items.
+Also, taxonomy information is added to all items.
 
-Downloading date: 2020-03-17
+Downloading date: 2020-09-17
 
 [TOC levels=1-3]: # ""
 
@@ -25,11 +25,11 @@ Paths in the NCBI ftp site:
 
 Local paths listed in `config.ini`.
 
-NCBI also provides other download methods including rsync and aspera.
+NCBI also provides other download methods, including `rsync` and `aspera`.
 
-I use the following command lines on a linux box. For mac, aspera's path is different.
+I use the following command lines on a Linux box. For mac, aspera's path is different.
 
-```bash
+```shell script
 # gr
 rsync -avP ftp.ncbi.nlm.nih.gov::genomes/GENOME_REPORTS/ \
     ~/data/NCBI/genomes/GENOME_REPORTS/
@@ -49,9 +49,9 @@ rsync -avP ftp.ncbi.nlm.nih.gov::genomes/ASSEMBLY_REPORTS/ \
 
 ```
 
-NCBI bioproject and taxonomy is also needed.
+NCBI bioproject and taxonomy are also needed.
 
-```bash
+```shell script
 # bioproject
 rsync -avP ftp.ncbi.nlm.nih.gov::bioproject/ \
     --exclude="*.xml" \
@@ -67,7 +67,7 @@ rsync -avP ftp.ncbi.nlm.nih.gov::pub/taxonomy/ \
     --exclude="accession2taxid" \
     --exclude="gi_taxid_*" \
     ~/data/NCBI/taxonomy/
-    
+
 rm -fr ~/data/NCBI/taxdmp
 mkdir -p ~/data/NCBI/taxdmp
 tar xvfz ~/data/NCBI/taxonomy/taxdump.tar.gz -C ~/data/NCBI/taxdmp
@@ -83,11 +83,11 @@ We will create 4 MySQL databases:
 * ar_refseq: assembly reports for RefSeq;
 * ar_genbank: assembly reports for GenBank.
 
-Also generate some useful excel workbooks.
+Also, generate some useful excel workbooks.
 
 ## Genome reports
 
-```bash
+```shell script
 cd ~/Scripts/withncbi/db
 
 # raw genome reports to .csv files
@@ -106,21 +106,21 @@ perl gr_overview.pl --db gr_euk
 
 ## Assembly reports
 
-```bash
+```shell script
 cat ~/data/NCBI/genomes/ASSEMBLY_REPORTS/assembly_summary_refseq.txt \
     ~/data/NCBI/genomes/ASSEMBLY_REPORTS/assembly_summary_genbank.txt |
     grep -v "^#" |
     cut -d$'\t' -f 12 | # assembly_level
     sort |
     uniq -c
-#   9699 Chromosome
-#  77232 Complete Genome
-# 550383 Contig
-# 193791 Scaffold
+#12773 Chromosome
+#87407 Complete Genome
+#723964 Contig
+#205964 Scaffold
 
 ```
 
-```bash
+```shell script
 cd ~/Scripts/withncbi/db
 
 perl ar_strains.pl -o ar_strains.csv
@@ -140,10 +140,10 @@ perl ar_overview.pl --db ar_genbank
 
 # Old Bacteria genomes
 
-On 02 December 2015 these directories were moved to
+On 02 December 2015, these directories were moved to
 `ftp://ftp.ncbi.nlm.nih.gov/genomes/archive/old_refseq/`.
 
-```bash
+```shell script
 rsync -av -P ftp.ncbi.nlm.nih.gov::genomes/archive/old_refseq/Bacteria/ \
     --exclude="all.*" \
     --exclude=".tmp" \
