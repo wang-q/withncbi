@@ -35,7 +35,7 @@ gr_overview.pl - Overviews for NCBI GENOME_REPORTS
 =cut
 
 GetOptions(
-    'help|?' => sub { Getopt::Long::HelpMessage(0) },
+    'help|?'       => sub { Getopt::Long::HelpMessage(0) },
     'server|s=s'   => \( my $server   = $Config->{database}{server} ),
     'port|P=i'     => \( my $port     = $Config->{database}{port} ),
     'db|d=s'       => \( my $db_name  = $Config->{database}{db} ),
@@ -81,7 +81,7 @@ my $strains = sub {
     }
 
     {    # write contents
-            # species' member, chr_number and genus_member
+         # species' member, chr_number and genus_member
         $to_xlsx->write_sql( $sheet, { sql_query => $sql_query, } );
     }
 
@@ -106,7 +106,7 @@ my $species = sub {
     }
 
     {    # write contents
-            # species' member, chr_number and genus_member
+         # species' member, chr_number and genus_member
         my $sql_query = q{
             SELECT  genus_id,
                     genus,

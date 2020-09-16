@@ -35,18 +35,18 @@ gr_db.pl
 
     # linux, mac
     perl gr_db.pl --db gr --file prok_strains.csv
-    
+
     perl gr_db.pl --db gr --append --file euk_strains.csv
-    
+
     # windows
     perl gr_db.pl --db gr --file prok_strains.csv --gr d:/data/NCBI/genomes/GENOME_REPORTS
-    
+
     perl gr_db.pl --db gr --append --file euk_strains.csv --gr d:/data/NCBI/genomes/GENOME_REPORTS
 
 =cut
 
 GetOptions(
-    'help|?' => sub { Getopt::Long::HelpMessage(0) },
+    'help|?'       => sub { Getopt::Long::HelpMessage(0) },
     'server|s=s'   => \( my $server      = $Config->{database}{server} ),
     'port|P=i'     => \( my $port        = $Config->{database}{port} ),
     'db|d=s'       => \( my $db_name     = $Config->{database}{db} ),
@@ -54,8 +54,8 @@ GetOptions(
     'password|p=s' => \( my $password    = $Config->{database}{password} ),
     'init_sql=s'   => \( my $init_sql    = "$FindBin::RealBin/../init.sql" ),
     'file=s'       => \( my $strain_file = "prok_strains.csv" ),
-    'gr=s' => \( my $gr_dir = path( $Config->{path}{gr} )->stringify ),
-    'append' => \my $append,    # append euk
+    'gr=s'         => \( my $gr_dir      = path( $Config->{path}{gr} )->stringify ),
+    'append'       => \my $append,    # append euk
 ) or Getopt::Long::HelpMessage(1);
 
 #----------------------------------------------------------#
@@ -63,14 +63,7 @@ GetOptions(
 #----------------------------------------------------------#
 $stopwatch->start_message("Init genome report DB...");
 
-my $dsn
-    = "dbi:mysql:"
-    . "database="
-    . $db_name
-    . ";host="
-    . $server
-    . ";port="
-    . $port;
+my $dsn = "dbi:mysql:" . "database=" . $db_name . ";host=" . $server . ";port=" . $port;
 
 #----------------------------#
 # call mysql
@@ -124,10 +117,7 @@ if ( !$append ) {
     $dbh->do(q{ ALTER TABLE gr ADD COLUMN code text });
 
     my @references;
-    for my $file (
-        "$gr_dir/prok_reference_genomes.txt",
-        "$gr_dir/prok_representative_genomes.txt"
-        )
+    for my $file ( "$gr_dir/prok_reference_genomes.txt", "$gr_dir/prok_representative_genomes.txt" )
     {
         my @lines = path($file)->lines( { chomp => 1, } );
         push @references, @lines;
