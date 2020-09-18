@@ -26,14 +26,14 @@
 
 # Init genome report database.
 
-* Create database by following steps in
+* Create databases by following steps in
   [`db/README.md`](https://github.com/wang-q/withncbi/blob/master/db/README.md#genome-reports)
 
 * Find valid species.
 
-  * Got **229** species.
-  * 69 species have `species_code`
-  * Some species have huge numbers of strains, we will exclude `NZ_*` sequences
+  * We got **230** species.
+  * 68 species have `species_code`
+  * Some species have vast numbers of strains, we will exclude `NZ_*` sequences
 
     * Salmonella enterica
     * Escherichia coli
@@ -44,7 +44,7 @@
     * Mycobacterium tuberculosis
 
 
-```bash
+```shell script
 mkdir -p ~/data/bacteria/summary
 cd ~/data/bacteria/summary
 
@@ -64,7 +64,7 @@ perl ~/Scripts/alignDB/util/query_sql.pl --db gr_prok -q '
         AND species_member > 2
         AND genus IS NOT NULL
         GROUP BY species_id
-        HAVING count > 2 # AND species_code > 0       # having enough and representative member
+        HAVING count > 2 # AND species_code > 0     # having enough and representative members
         ORDER BY subgroup, species_id
     ' -o stdout |
     cut -d ',' -f 1 |
@@ -76,9 +76,9 @@ cat SPECIES_ID.lst | wc -l
 
 * Expand species to strains. (Nested single quotes in bash should be '\'')
 
-  Got **2632** strains.
+  Got **2665** strains.
 
-```bash
+```shell script
 cd ~/data/bacteria/summary
 
 cat SPECIES_ID.lst |
@@ -129,25 +129,58 @@ cat STRAIN.csv | wc -l
 
 * Create abbreviations.
 
-```bash
+* Exclude all strains of "NZ_*" in Salmonella enterica, Escherichia coli, Listeria monocytogenes,
+  Helicobacter pylori, Chlamydia trachomatis, Staphylococcus aureus, and Mycobacterium tuberculosis
+
+```shell script
 cd ~/data/bacteria/summary
 
-echo '#strain_taxonomy_id,strain,species,genus,subgroup,code,accession,abbr' > ABBR.csv
+echo '#strain_taxonomy_id,strain,species,genus,subgroup,code,accession,abbr' > ABBR.csv.tmp
 cat STRAIN.csv |
     grep -v '^#' |
     perl ~/Scripts/withncbi/taxon/abbr_name.pl -c "2,3,4" -s "," -m 0 --shortsub |
     sort -t',' -k5,5 -k4,4 -k3,3 -k6,6 \
-    >> ABBR.csv
+    >> ABBR.csv.tmp
+
+cat ABBR.csv.tmp |
+    cut -d, -f 3 |
+    uniq -c |
+    sort -nr |
+    head -n 10
+
+cat ABBR.csv.tmp |
+    perl -nla -F"," -e '
+        if (
+            $F[2] eq q{Salmonella enterica}
+            or $F[2] eq q{Escherichia coli}
+            or $F[2] eq q{Listeria monocytogenes}
+            or $F[2] eq q{Helicobacter pylori}
+            or $F[2] eq q{Chlamydia trachomatis}
+            or $F[2] eq q{Staphylococcus aureus}
+            or $F[2] eq q{Mycobacterium tuberculosis}
+        ) {
+            $F[6] =~ /^NZ_/ and next;
+        }
+
+        print;
+    ' \
+    > ABBR.csv
+
+cat ABBR.csv |
+    cut -d, -f 3 |
+    uniq -c |
+    sort -nr |
+    head -n 10
 
 ```
 
 # Download sequences and regenerate lineage information.
 
-We don't rename sequences here, so the file has three columns. **2786** accessions.
+We don't rename sequences here, so the file has three columns. **2203** accessions.
 
 And create `bac_ncbi.csv` with abbr names as taxon file.
 
-```bash
+```shell script
 mkdir -p ~/data/bacteria/GENOMES
 cd ~/data/bacteria/GENOMES
 
@@ -172,23 +205,53 @@ cat ../summary/ABBR.csv |
     >> bac_name_acc_id.csv
 cat bac_name_acc_id.csv | wc -l
 
-perl ~/Scripts/withncbi/taxon/batch_get_seq.pl \
-    -f bac_name_acc_id.csv \
-    -l ~/data/NCBI/genomes/Bacteria \
-    2>&1 |
+# Some warnings about trans-splicing genes from BioPerl, just ignore them
+# eutils restricts 3 connections
+cat bac_name_acc_id.csv |
+    grep -v '^#' |
+    2>&1 parallel --colsep ',' --no-run-if-empty --linebuffer -k -j 3 "
+        echo -e '==> id: [{1}]\tseq: [{2}]\n'
+        mkdir -p {1}
+        if [[ -e '{1}/{2}.gff' && -e '{1}/{2}.fa' ]] ; then
+            echo -e '    Sequence [{1}/{2}] exists, next\n'
+            exit
+        fi
+
+        # gb
+        echo -e '    [{1}/{2}].gb'
+        curl -Ls \
+            'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=nucleotide&id={2}&rettype=gb&retmode=text' \
+            > {1}/{2}.gb
+
+        # fasta
+        echo -e '    [{1}/{2}].fa'
+        curl -Ls \
+            'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=nucleotide&id={2}&rettype=fasta&retmode=text' \
+            > {1}/{2}.fa
+
+        # gff
+        echo -e '    [{1}/{2}].gff'
+        perl ~/Scripts/withncbi/taxon/bp_genbank2gff3.pl {1}/{2}.gb -o stdout > {1}/{2}.gff
+        perl -i -nlp -e '/^\#\#FASTA/ and last' {1}/{2}.gff
+
+        echo
+    " |
     tee bac_seq.log
 
 # count downloaded sequences
 find . -maxdepth 2 -name "*.fa" | wc -l
 find . -maxdepth 1 -type d | wc -l
 
+# failed files
+find . -maxdepth 2 -type f -size -1k | grep ".fa$"
+
 ```
 
 ## Numbers for higher ranks
 
-18 subgroups, 111 genera and 229 species.
+18 subgroups, 113 genera and 230 species.
 
-```bash
+```shell script
 cd ~/data/bacteria/summary/
 
 # count every ranks
@@ -203,7 +266,7 @@ rm *.tmp
 
 ## Raw phylogenetic tree by MinHash
 
-```bash
+```shell script
 mkdir -p ~/data/bacteria/mash
 cd ~/data/bacteria/mash
 
@@ -281,14 +344,15 @@ done
 
 * Abnormal strains in Species
 
-```bash
+```shell script
 cd ~/data/bacteria/summary
 find ~/data/bacteria/summary/subgroup -name "*.groups.tsv" |
     sort |
     parallel -j 1 -k '
         cat {} | sed -e "1d" | xargs -I[] echo "{/.}_[]"
     ' |
-    sed -e 's/.groups_/_/' \
+    sed -e 's/.groups_/_/' |
+    sed -e $'s/ /\t/' \
     > all.groups.tsv
 
 cat species.list |
@@ -309,7 +373,7 @@ cat species.list |
 
 ## Exclude diverged strains
 
-Check raw trees generated by previous step.
+Check raw trees generated by the previous step.
 
 * 391904, Bifidobacterium longum subsp. infantis ATCC 15697 = JCM 1222 = DSM 20088, 2008-11-20,
   Complete Genome,
@@ -332,9 +396,6 @@ Check raw trees generated by previous step.
 * 1385755,synthetic Escherichia coli C321.deltaA,Escherichia
   coli,Escherichia,Gammaproteobacteria,,CP006698.1,Es_coli_synthetic_Escherichia_coli_C321_deltaA
 
-* Exclude all strains of "NZ_*" in Salmonella enterica, Escherichia coli, Listeria monocytogenes,
-  Helicobacter pylori, Chlamydia trachomatis, Staphylococcus aureus, and Mycobacterium tuberculosis
-
 ```text
 SELECT taxonomy_id, organism_name, released_date, status, code
 FROM gr_prok.gr
@@ -344,14 +405,8 @@ ORDER BY released_date, status, code
 
 ```
 
-```bash
+```shell script
 cd ~/data/bacteria/summary
-
-cat ABBR.csv |
-    cut -d, -f 3 |
-    uniq -c |
-    sort -nr |
-    head -n 10
 
 cat ABBR.csv |
     grep -v "391904," |
@@ -369,22 +424,7 @@ cat ABBR.csv |
     grep -v "261317," |
     grep -v "372461," |
     grep -v "1243591," |
-    grep -v "1385755," |
-    perl -nla -F"," -e '
-        if (
-            $F[2] eq q{Salmonella enterica}
-            or $F[2] eq q{Escherichia coli}
-            or $F[2] eq q{Listeria monocytogenes}
-            or $F[2] eq q{Helicobacter pylori}
-            or $F[2] eq q{Chlamydia trachomatis}
-            or $F[2] eq q{Staphylococcus aureus}
-            or $F[2] eq q{Mycobacterium tuberculosis}
-        ) {
-            $F[6] =~ /^NZ_/ and next;
-        }
-
-        print;
-    ' \
+    grep -v "1385755," \
     > WORKING.csv
 
 cat WORKING.csv |
@@ -397,7 +437,7 @@ cat WORKING.csv |
 
 # Prepare sequences for lastz
 
-```bash
+```shell script
 cd ~/data/bacteria/GENOMES
 
 find . -maxdepth 1 -mindepth 1 -type d |
@@ -412,7 +452,7 @@ find . -maxdepth 1 -mindepth 1 -type d |
 
         egaz prepseq \
             {} \
-            --gi -v --repeatmasker " --gff --parallel 8"
+            --gi -v --repeatmasker " --gff --parallel 4"
     '
 
 # restore to original states
@@ -428,11 +468,11 @@ find . -maxdepth 1 -mindepth 1 -type d |
 
 Manually edit it then move to `~/Scripts/withncbi/doc/bac_target_OG.md`.
 
-* Listed targets were well curated.
+* Listed targets were well-curated.
 
-* Outgroups can be changes with less intentions.
+* Outgroups can be changes with fewer intentions.
 
-```bash
+```shell script
 cd ~/data/bacteria/summary
 
 cat WORKING.csv |
@@ -480,7 +520,7 @@ WORKING.csv
 
 **205** species and **21** genera.
 
-```bash
+```shell script
 mkdir -p ~/data/bacteria/taxon
 cd ~/data/bacteria/taxon
 
@@ -571,7 +611,7 @@ cat ../summary/WORKING.csv |
 
 ## Plans for align-able targets
 
-```bash
+```shell script
 cd ~/data/bacteria/taxon
 
 cat ~/Scripts/withncbi/doc/bac_target_OG.md |
@@ -615,7 +655,7 @@ rm *.tmp
 
 * Rsync to hpcc
 
-```bash
+```shell script
 rsync -avP \
     ~/data/bacteria/ \
     wangq@202.119.37.251:data/bacteria
@@ -628,7 +668,7 @@ rsync -avP \
 
 ```
 
-```bash
+```shell script
 cd ~/data/bacteria/
 
 # species
@@ -739,7 +779,7 @@ find groups/species -mindepth 1 -maxdepth 1 -type d |
 
 * Add outgroups to `bac_target_OG.md` manually.
 
-```bash
+```shell script
 cd ~/data/bacteria/
 
 # species_og
@@ -783,7 +823,7 @@ cat taxon/group_target.tsv |
 
 ## Self alignments
 
-```bash
+```shell script
 cd ~/data/bacteria/
 
 cat taxon/group_target.tsv |
@@ -811,7 +851,7 @@ cat taxon/group_target.tsv |
 
 ## Copy xlsx files
 
-```bash
+```shell script
 mkdir -p ~/data/bacteria/summary/xlsx
 cd ~/data/bacteria/summary/xlsx
 
@@ -829,7 +869,7 @@ find  ~/data/bacteria/bac.working -type f -name "*.gc.xlsx" |
 
 Create `list.csv` from `WORKING.csv` with sequence lengths.
 
-```bash
+```shell script
 mkdir -p ~/data/bacteria/summary/table
 cd ~/data/bacteria/summary/table
 
@@ -939,7 +979,7 @@ Criteria:
 * Total number of indels >= 100
 * D of multiple alignments < 0.2
 
-```bash
+```shell script
 mkdir -p ~/data/bacteria/summary/table
 
 cd ~/data/bacteria/summary/xlsx
@@ -1066,7 +1106,7 @@ cp -f Table_alignment.xlsx ~/data/bacteria/summary/table
 
 Table_S_bac for GC
 
-```bash
+```shell script
 cd ~/data/bacteria/summary/xlsx
 
 cat <<'EOF' > Table_S_bac.tt
@@ -1232,7 +1272,7 @@ perl ~/Scripts/fig_table/xlsx_table.pl -i Table_S_bac.yml
 
 NCBI Taxonomy tree
 
-```bash
+```shell script
 mkdir -p ~/data/bacteria/summary/group
 cd ~/data/bacteria/summary/group
 
@@ -1258,7 +1298,7 @@ bash species_tree.sh > species.tree
 
 `collect_xlsx.pl`
 
-```bash
+```shell script
 cd ~/data/bacteria/summary/xlsx
 
 cat <<'EOF' > cmd_collect_d1_d2.tt
@@ -1317,7 +1357,7 @@ bash cmd_collect_d1_d2.sh
 
 `sep_chart.pl`
 
-```bash
+```shell script
 mkdir -p ~/data/bacteria/summary/fig
 
 cd ~/data/bacteria/summary/xlsx
@@ -1394,7 +1434,7 @@ cp ~/data/bacteria/summary/xlsx/*.pdf ~/data/bacteria/summary/fig
 
 ## CorelDRAW GC charts
 
-```bash
+```shell script
 cd ~/data/bacteria/summary/xlsx
 
 # Fig_S_bac_d1_gc_cv
