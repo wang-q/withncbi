@@ -11,6 +11,7 @@
 - [Prepare sequences for lastz](#prepare-sequences-for-lastz)
 - [Alignments](#alignments)
   - [Create `bac_target_OG.md` for picking targets and outgroups.](#create-bac_target_ogmd-for-picking-targets-and-outgroups)
+  - [Retrieve targets' assemblies](#retrieve-targets-assemblies)
   - [Create alignments plans without outgroups](#create-alignments-plans-without-outgroups)
   - [Plans for align-able targets](#plans-for-align-able-targets)
   - [Aligning w/o outgroups](#aligning-wo-outgroups)
@@ -501,13 +502,77 @@ cat WORKING.csv |
     ' \
     > bac_target_OG.md
 
-# 229
+# 230
 cat bac_target_OG.md |
     grep -v '^#' |
     grep -E '\S+' |
     wc -l
 
 # mv bac_target_OG.md ~/Scripts/withncbi/doc/bac_target_OG.md
+
+```
+
+## Retrieve targets' assemblies
+
+**192** targets.
+
+```shell script
+cd ~/data/bacteria/summary
+
+cat WORKING.csv |
+    grep -v "^#" |
+    perl -na -F"," -MPath::Tiny -e '
+        BEGIN{
+            %h = ();
+            @ls = grep {/\S/}
+                  grep {!/^#/}
+                  path(q{~/Scripts/withncbi/doc/bac_target_OG.md})->lines({chomp => 1});
+            for (@ls) {
+                @fs = split(/,/);
+                $h{$fs[1]} = 1;
+            }
+            undef @ls;
+        }
+
+        chomp for @F;
+        if (exists $h{$F[7]}) {
+            printf qq{%s\t%s\t%s\n}, $F[2], $F[7], $F[0];
+        }
+    ' |
+    parallel --colsep '\t' --keep-order -r -j 8 '
+        perl ~/Scripts/alignDB/util/query_sql.pl --db ar_refseq --type tsv -q '\''
+            SELECT  "{2}" `#name`,
+                    ftp_path `ftp_path`,
+                    species `organism`,
+                    assembly_level `assembly_level`
+            FROM ar
+            WHERE 1 = 1
+            AND taxonomy_id = {3}
+            '\'' -o stdout |
+        grep -v "^#"
+    ' |
+    (echo -e '#name\tftp_path\torganism\tassembly_level' && cat ) |
+    keep-header -- sort -k3,3 -k1,1 \
+    > target.assembly.tsv
+
+wc -l target.assembly.tsv
+
+```
+
+```shell script
+cd ~/data/bacteria/
+
+perl ~/Scripts/withncbi/taxon/assembly_prep.pl \
+    -f summary/target.assembly.tsv \
+    -o ASSEMBLY
+
+bash ASSEMBLY/target.assembly.rsync.sh
+
+bash ASSEMBLY/target.assembly.collect.sh
+
+tar cvfz target.rna.tar.gz \
+    ASSEMBLY/target.assembly.collect.csv \
+    $(find ASSEMBLY -name "*_rna_from_genomic.fna.gz")
 
 ```
 
@@ -518,7 +583,7 @@ WORKING.csv
 #strain_taxonomy_id,strain,species,genus,subgroup,code,accession,abbr
 ```
 
-**205** species and **21** genera.
+**200** species and **21** genera.
 
 ```shell script
 mkdir -p ~/data/bacteria/taxon
