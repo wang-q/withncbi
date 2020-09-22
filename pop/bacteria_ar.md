@@ -31,16 +31,16 @@
 
 # bacteria_ar: assembly
 
-```bash
+```shell script
 export RANK_NAME=bacteria_ar
 
 mkdir -p ~/data/alignment/${RANK_NAME}        # Working directory
 cd ~/data/alignment/${RANK_NAME}
 
 mysql -ualignDB -palignDB ar_refseq -e "
-    SELECT 
+    SELECT
         organism_name, species, genus, ftp_path, assembly_level
-    FROM ar 
+    FROM ar
     WHERE 1=1
         AND taxonomy_id != species_id               # no strain ID
         AND species_id in (40215, 546, 548, 571, 582, 584, 615, 29388, 1283, 1290)
@@ -48,9 +48,9 @@ mysql -ualignDB -palignDB ar_refseq -e "
     > raw.tsv
 
 mysql -ualignDB -palignDB ar_genbank -e "
-    SELECT 
+    SELECT
         organism_name, species, genus, ftp_path, assembly_level
-    FROM ar 
+    FROM ar
     WHERE 1=1
         AND taxonomy_id != species_id               # no strain ID
         AND species_id in (40215, 546, 548, 571, 582, 584, 615, 29388, 1283, 1290)
@@ -62,7 +62,7 @@ cat raw.tsv |
     perl ~/Scripts/withncbi/taxon/abbr_name.pl -c "1,2,3" -s '\t' -m 3 --shortsub |
     (echo -e '#name\tftp_path\torganism\tassembly_level' && cat ) |
     perl -nl -a -F"," -e '
-        BEGIN{my %seen}; 
+        BEGIN{my %seen};
         /^#/ and print and next;
         /^organism_name/i and next;
         $seen{$F[5]}++;
@@ -119,7 +119,7 @@ parallel --no-run-if-empty --linebuffer -k -j 4 '
         sort |
         uniq |
         wc -l)
-    
+
     n_strains=$(cat ASSEMBLY/bacteria_ar.assembly.collect.csv |
         cut -d"," -f 2 |
         grep -v "Candidatus" |
@@ -127,11 +127,11 @@ parallel --no-run-if-empty --linebuffer -k -j 4 '
         cut -d" " -f 1,2 |
         sort |
         wc -l)
-    
+
     printf "%s\t%d\t%d\n" {} ${n_species} ${n_strains}
     ' ::: "Acinetobacter junii" "Citrobacter freundii" "Klebsiella aerogenes" "Klebsiella oxytoca" \
           "Morganella morganii" "Proteus mirabilis" "Serratia marcescens" \
-          "Staphylococcus capitis" "Staphylococcus haemolyticus" "Staphylococcus hominis" 
+          "Staphylococcus capitis" "Staphylococcus haemolyticus" "Staphylococcus hominis"
 
 #Acinetobacter junii     1       6
 #Citrobacter freundii    1       9
@@ -154,7 +154,7 @@ parallel --no-run-if-empty --linebuffer -k -j 4 '
         > taxon/{= $_ =~ s/ /_/g =} # replace spaces with underscore
     ' ::: "Acinetobacter junii" "Citrobacter freundii" "Klebsiella aerogenes" "Klebsiella oxytoca" \
           "Morganella morganii" "Proteus mirabilis" "Serratia marcescens" \
-          "Staphylococcus capitis" "Staphylococcus haemolyticus" "Staphylococcus hominis" 
+          "Staphylococcus capitis" "Staphylococcus haemolyticus" "Staphylococcus hominis"
 
 wc -l taxon/*
 
@@ -197,7 +197,7 @@ for n in A_jun_SH205 C_fre_CFNIH1 K_aer_KCTC_2190 K_oxy_KONIH1 \
          St_cap_capitis St_hae_JCSC1435 St_hom_hominis_C80; do
     FILE_GFF=$(find ASSEMBLY -type f -name "*_genomic.gff.gz" | grep "${n}")
     echo >&2 "==> Processing ${n}/${FILE_GFF}"
-    
+
     gzip -dcf ${FILE_GFF} > GENOMES/${n}/chr.gff
 done
 
@@ -225,7 +225,7 @@ for item in "${ARRAY[@]}" ; do
     TARGET_NAME="${item##*::}"
 
     echo "==> ${SPECIES_NAME}"
-    
+
     egaz template \
         GENOMES/${TARGET_NAME} \
         $(cat taxon/${SPECIES_NAME} | grep -v "${TARGET_NAME}" | parallel -r echo "GENOMES/{}") \
