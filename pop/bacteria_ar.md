@@ -1,7 +1,8 @@
 # Aligning various genera missing from `bacteria_gr.md`
 
 
-[TOC levels=1-3]: # " "
+[TOC levels=1-3]: # ""
+
 - [Aligning various genera missing from `bacteria_gr.md`](#aligning-various-genera-missing-from-bacteria_grmd)
 - [Strain info](#strain-info)
 - [bacteria_ar: assembly](#bacteria_ar-assembly)
@@ -92,7 +93,7 @@ unset RANK_NAME
 
 ```
 
-```bash
+```shell script
 cd ~/data/alignment/bacteria_ar
 
 perl ~/Scripts/withncbi/taxon/assembly_prep.pl \
@@ -107,7 +108,7 @@ bash ASSEMBLY/bacteria_ar.assembly.collect.sh
 
 # Count strains
 
-```bash
+```shell script
 cd ~/data/alignment/bacteria_ar
 
 parallel --no-run-if-empty --linebuffer -k -j 4 '
@@ -169,7 +170,7 @@ find taxon -maxdepth 1 -type f -not -name "*.replace.tsv" |
 
 * `--perseq` for RefSeq_category Reference Genome assemblies.
 
-```bash
+```shell script
 cd ~/data/alignment/bacteria_ar
 
 # prep
@@ -205,7 +206,7 @@ done
 
 # bacteria_ar: run
 
-```bash
+```shell script
 # species and targets
 ARRAY=(
     'Acinetobacter_junii::A_jun_SH205'
