@@ -49,26 +49,26 @@
 mkdir -p ~/data/bacteria/summary
 cd ~/data/bacteria/summary
 
-perl ~/Scripts/alignDB/util/query_sql.pl --db gr_prok -q '
-        SELECT  species_id `#species_id`,
-                COUNT(*) count,
-                MAX(CHAR_LENGTH(code)) species_code
-        FROM gr
-        WHERE   1 = 1
-        AND (status LIKE "%Complete%"               # complete genomes
-            OR status LIKE "%Chromosome%")
-        AND species NOT LIKE "%Candidatus%"         # uncertainty classification
-        AND taxonomy_id != species_id               # no strain ID
-        AND organism_name NOT LIKE "%,%"            # avoid commas in names
-        AND (chr IS NOT NULL OR LENGTH(CHR) > 0)    # has chromosome accession
-        AND (LENGTH(wgs) = 0 OR wgs IS NULL)        # avoid bad assembly
-        AND species_member > 2
-        AND genus IS NOT NULL
-        GROUP BY species_id
-        HAVING count > 2 # AND species_code > 0     # having enough and representative members
-        ORDER BY subgroup, species_id
-    ' -o stdout |
-    cut -d ',' -f 1 |
+mysql -ualignDB -palignDB gr_prok -e '
+    SELECT  species_id `#species_id`,
+            COUNT(*) count,
+            MAX(CHAR_LENGTH(code)) species_code
+    FROM gr
+    WHERE   1 = 1
+    AND (status LIKE "%Complete%"               # complete genomes
+        OR status LIKE "%Chromosome%")
+    AND species NOT LIKE "%Candidatus%"         # uncertainty classification
+    AND taxonomy_id != species_id               # no strain ID
+    AND organism_name NOT LIKE "%,%"            # avoid commas in names
+    AND (chr IS NOT NULL OR LENGTH(CHR) > 0)    # has chromosome accession
+    AND (LENGTH(wgs) = 0 OR wgs IS NULL)        # avoid bad assembly
+    AND species_member > 2
+    AND genus IS NOT NULL
+    GROUP BY species_id
+    HAVING count > 2 # AND species_code > 0     # having enough and representative members
+    ORDER BY subgroup, species_id
+    ' |
+    cut -f 1 |
     grep -v "^#" \
     > SPECIES_ID.lst
 cat SPECIES_ID.lst | wc -l
@@ -84,7 +84,7 @@ cd ~/data/bacteria/summary
 
 cat SPECIES_ID.lst |
     parallel --keep-order -r -j 8 '
-        perl ~/Scripts/alignDB/util/query_sql.pl --db gr_prok -q '\''
+        mysql -ualignDB -palignDB gr_prok -e '\''
             SELECT  taxonomy_id `#strain_taxonomy_id`,
                     organism_name `strain`,
                     species,
@@ -104,7 +104,7 @@ cat SPECIES_ID.lst |
             AND species_id = {}
             AND LENGTH(chr) > 6
             ORDER BY released_date                      # oldest first
-        '\'' -o stdout |
+        '\'' |
             grep -v "^#" |
             perl -nla -F"," -e '\''
                 $F[4] =~ s/\W+/_/g;
@@ -540,7 +540,7 @@ cat WORKING.csv |
         }
     ' |
     parallel --colsep '\t' --keep-order -r -j 8 '
-        perl ~/Scripts/alignDB/util/query_sql.pl --db ar_refseq --type tsv -q '\''
+        mysql -ualignDB -palignDB ar_refseq -e '\''
             SELECT  "{2}" `#name`,
                     ftp_path `ftp_path`,
                     species `organism`,
@@ -548,7 +548,7 @@ cat WORKING.csv |
             FROM ar
             WHERE 1 = 1
             AND taxonomy_id = {3}
-            '\'' -o stdout |
+            '\'' |
         grep -v "^#"
     ' |
     (echo -e '#name\tftp_path\torganism\tassembly_level' && cat ) |
