@@ -36,18 +36,23 @@ abbr_name.pl - Abbreviate strain scientific names.
 
 =head1 EXAMPLE
 
-    $ echo -e 'Homo sapiens,Homo\nHomo erectus,Homo\n' \
-        | perl abbr_name.pl -s ',' -c "1,1,2"
+    $ echo -e 'Homo sapiens,Homo\nHomo erectus,Homo\n' |
+        perl abbr_name.pl -s ',' -c "1,1,2"
     H_sap
     H_ere
 
-    $ echo -e 'Homo sapiens,Homo\nHomo erectus,Homo\n' \
-        | perl abbr_name.pl -s ',' -c "1,1,2" --tight
+    $ echo -e 'Homo sapiens,Homo\nHomo erectus,Homo\n' |
+        perl abbr_name.pl -s ',' -c "1,1,2" --tight
     Hsap
     Here
 
-    $ echo -e 'Homo sapiens sapiens,Homo sapiens,Homo\nHomo erectus,Homo erectus,Homo\n' \
-        | perl abbr_name.pl -s ',' -c "1,2,3" --tight
+    $ echo -e 'Homo sapiens sapiens,Homo sapiens,Homo\nHomo erectus,Homo erectus,Homo\n' |
+        perl abbr_name.pl -s ',' -c "1,2,3" --tight
+    Hsap_sapiens
+    Here
+
+    $ echo -e 'Legionella pneumophila subsp. pneumophila str. Philadelphia 1\nLeptospira interrogans serovar Copenhageni str. Fiocruz L1-130\n' |
+        perl abbr_name.pl -s ',' -m 0 -c "1,1,1" --shortsub
     Hsap_sapiens
     Here
 
@@ -84,8 +89,8 @@ while ( my $line = <> ) {
         my @O = split /\s+/, $strain;    # Organism
         if ( scalar @O >= 2 ) {
             $genus  = shift @O;
-            $strain = shift @O;
-            $strain = join "_", @O;
+            $species = shift @O;
+            $strain = join "-", @O;
         }
         else {
             warn "Parsing strain [$strain] error.\n";
