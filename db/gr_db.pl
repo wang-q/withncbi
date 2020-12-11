@@ -9,7 +9,7 @@ use FindBin;
 use YAML::Syck;
 
 use DBI;
-use Path::Tiny;
+use Path::Tiny qw();
 use Text::CSV_XS;
 use List::MoreUtils::PP;
 
@@ -54,7 +54,7 @@ GetOptions(
     'password|p=s' => \( my $password    = $Config->{database}{password} ),
     'init_sql=s'   => \( my $init_sql    = "$FindBin::RealBin/../init.sql" ),
     'file=s'       => \( my $strain_file = "prok_strains.csv" ),
-    'gr=s'         => \( my $gr_dir      = path( $Config->{path}{gr} )->stringify ),
+    'gr=s'         => \( my $gr_dir      = Path::Tiny::path( $Config->{path}{gr} )->stringify ),
     'append'       => \my $append,    # append euk
 ) or Getopt::Long::HelpMessage(1);
 
@@ -79,7 +79,7 @@ if ( !$append ) {
     #$drh->func( 'reload',   $db_name, $server, $username, $password, 'admin' );
 
     my DBI $dbh = DBI->connect( $dsn, $username, $password );
-    my $content = path($init_sql)->slurp;
+    my $content = Path::Tiny::path($init_sql)->slurp;
     my @statements = grep {/\w/} split /;/, $content;
     for (@statements) {
         $dbh->do($_) or die $dbh->errstr;
@@ -116,34 +116,24 @@ if ( !$append ) {
     # so I add column code here
     $dbh->do(q{ ALTER TABLE gr ADD COLUMN code text });
 
-    my @references;
+    my %code_of;
     for my $file ( "$gr_dir/prok_reference_genomes.txt", "$gr_dir/prok_representative_genomes.txt" )
     {
-        my @lines = path($file)->lines( { chomp => 1, } );
-        push @references, @lines;
-    }
-
-    # MOD = Model organism
-    # COM = Community selected reference
-    my %code_of;
-    for my $line ( List::MoreUtils::PP::uniq(@references) ) {
-        my ( $name, $code ) = ( split /\t/, $line )[ 2, 8 ];
-
-        my @codes = split /\//, $code;
-        if ( exists $code_of{$name} ) {
-            push @codes, split( /\//, $code_of{$name} );
-        }
-        @codes = grep { !/^(CLI|PHY)$/ } List::MoreUtils::PP::uniq(@codes);
-        if ( grep { $_ eq 'MOD' } @codes ) {
-            $code_of{$name} = 'MOD';
-        }
-        elsif ( grep { $_ eq 'COM' } @codes ) {
-            $code_of{$name} = 'COM';
-        }
-        elsif ( grep { $_ eq 'FGS' } @codes ) {
-            $code_of{$name} = 'FGS';
-        }
-        else {
+        my @lines = Path::Tiny::path($file)->lines( { chomp => 1, } );
+        for my $line (@lines) {
+            my ( $name, $code ) = ( split /\t/, $line )[ 2, 8 ];
+            if ( !defined $code ) {
+                if ( $file eq "$gr_dir/prok_reference_genomes.txt" ) {
+                    $code = "REF";
+                }
+                else {
+                    $code = "REP";
+                }
+            }
+            my @codes = split /\//, $code;
+            if ( exists $code_of{$name} ) {
+                push @codes, split( /\//, $code_of{$name} );
+            }
             $code_of{$name} = join "/", @codes;
         }
     }
