@@ -171,6 +171,12 @@ else {
                 $item = undef if ( $item eq '-' );
             }
 
+            # skip strains
+            next if $row[1] =~ /bacterium/i;
+            next if $row[1] =~ /uncultured/i;
+            next if $row[1] =~ /Candidatus/i;
+            next if $row[1] =~ /\bsp\./i;
+
             # only keep chromosomes
             if ( defined $row[7] ) {
                 my @accs;
@@ -179,7 +185,6 @@ else {
                     my @parts = split /:/, $s;
                     $parts[1] =~ s/\/.+//;
                     push @accs, $parts[1];
-
                 }
                 $row[7] = join "|", @accs;
             }
