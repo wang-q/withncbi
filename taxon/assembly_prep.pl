@@ -85,6 +85,24 @@ Path::Tiny::path($outdir)->mkpath();
 {
     $stopwatch->block_message("Generate .rsync.sh");
 
+    my $file_url = Path::Tiny::path( $outdir, "rsync.tsv" );
+    $file_url->remove if $file_url->is_file;
+
+    for my $key (@orig_orders) {
+        my $ftp = $ftp_of->{$key};
+
+        # ftp   - ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/167/675/GCA_000167675.2_v2.0
+        # rsync - ftp.ncbi.nlm.nih.gov::genomes/all/GCA/000/167/675/GCA_000167675.2_v2.0
+
+        my $rsync = $ftp;
+        $rsync =~ s/ftp:\/\/ftp.ncbi.nlm.nih.gov\//ftp.ncbi.nlm.nih.gov::/;
+        if ( $rsync eq $ftp ) {
+            die "Check the ftp url: [$key] $ftp\n";
+        }
+
+        $file_url->append( sprintf( "%s\t%s\n", $key, $rsync ) );
+    }
+
     my $file_rsync = Path::Tiny::path( $outdir, "$basename.rsync.sh" );
     $file_rsync->remove if $file_rsync->is_file;
 
@@ -101,31 +119,17 @@ signaled () {
 }
 trap signaled TERM QUIT INT
 
+cat rsync.tsv |
+    parallel --colsep '\t' --no-run-if-empty --linebuffer -k -j 4 '
+        echo >&2
+        echo >&2 "==> {1}"
+        mkdir -p {1}
+        rsync -avP {2}/ {1}/
+    '
+
 EOF
     );
 
-    for my $key (@orig_orders) {
-        my $ftp = $ftp_of->{$key};
-
-        # ftp   - ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/167/675/GCA_000167675.2_v2.0
-        # rsync - ftp.ncbi.nlm.nih.gov::genomes/all/GCA/000/167/675/GCA_000167675.2_v2.0
-
-        my $rsync = $ftp;
-        $rsync =~ s/ftp:\/\/ftp.ncbi.nlm.nih.gov\//ftp.ncbi.nlm.nih.gov::/;
-        if ( $rsync eq $ftp ) {
-            die "Check the ftp url: [$key] $ftp\n";
-        }
-
-        $file_rsync->append(
-            <<"EOF"
-echo >&2
-echo >&2 "==> $key"
-mkdir -p $key
-rsync -avP $rsync/ $key/
-
-EOF
-        );
-    }
 }
 
 #----------------------------#
@@ -213,8 +217,8 @@ EOF
         \$template,
         {   basename => $basename,
             names    => \@orig_orders,
-            header   => join( ",", map {s/\s+/_/g; $_} @columns ),
-            columns  => join( " ", map {s/\s+/_/g; $_} @columns ),
+            header   => join( ",", map { s/\s+/_/g; $_ } @columns ),
+            columns  => join( " ", map { s/\s+/_/g; $_ } @columns ),
         },
         $file_collect
     ) or die Template->error;
