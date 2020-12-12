@@ -36,15 +36,6 @@
   * 68 species have `species_code`
   * Some species have vast numbers of strains, we will exclude `NZ_*` sequences
 
-    * Salmonella enterica
-    * Escherichia coli
-    * Listeria monocytogenes
-    * Helicobacter pylori
-    * Chlamydia trachomatis
-    * Staphylococcus aureus
-    * Mycobacterium tuberculosis
-
-
 ```shell script
 mkdir -p ~/data/bacteria/summary
 cd ~/data/bacteria/summary
@@ -130,8 +121,14 @@ cat STRAIN.csv | wc -l
 
 * Create abbreviations.
 
-* Exclude all strains of "NZ_*" in Salmonella enterica, Escherichia coli, Listeria monocytogenes,
-  Helicobacter pylori, Chlamydia trachomatis, Staphylococcus aureus, and Mycobacterium tuberculosis
+* Exclude all strains of "NZ_*" in
+  * Salmonella enterica
+  * Escherichia coli
+  * Listeria monocytogenes
+  * Helicobacter pylori
+  * Chlamydia trachomatis
+  * Staphylococcus aureus
+  * Mycobacterium tuberculosis
 
 ```shell script
 cd ~/data/bacteria/summary

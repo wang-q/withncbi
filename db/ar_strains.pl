@@ -50,8 +50,8 @@ my $ar_dir = path( $Config->{path}{ar} )->stringify;    # assembly report
 my $td_dir = path( $Config->{path}{td} )->stringify;    # taxdmp
 
 GetOptions(
-    'help|?'  => sub { HelpMessage(0) },
-    'genbank' => \my $genbank, # genbank instead of refseq
+    'help|?'     => sub { HelpMessage(0) },
+    'genbank'    => \my $genbank,                              # genbank instead of refseq
     'output|o=s' => \( my $strain_file = "ar_strains.csv" ),
 ) or HelpMessage(1);
 
@@ -72,7 +72,7 @@ my $taxon_db = Bio::DB::Taxonomy->new(
 # load tab sep. txt files
 #----------------------------#
 $stopwatch->block_message("Load ncbi genome report and bioproject summary.");
-my $dbh = DBI->connect("DBI:CSV:");
+my DBI $dbh = DBI->connect("DBI:CSV:");
 
 # Chromosomes_RefSeq ==> Chromosomes
 $dbh->{csv_tables}->{t0} = {
@@ -99,7 +99,7 @@ $dbh->{csv_tables}->{t0} = {
     $stopwatch->block_message("Write summary");
 
     my $query = qq{
-        SELECT 
+        SELECT
             t0.TaxID,
             t0.organism_name,
             t0.bioproject,
@@ -117,7 +117,7 @@ $dbh->{csv_tables}->{t0} = {
         AND t0.genome_rep = 'Full'
     };
 
-    my $header_sth = $dbh->prepare($query);
+    my DBI $header_sth = $dbh->prepare($query);
     $header_sth->execute;
     $header_sth->finish;
 
@@ -152,6 +152,17 @@ $dbh->{csv_tables}->{t0} = {
                 $item = undef if ( $item eq '-' );
                 $item = undef if ( $item eq 'na' );
             }
+
+            # skip strains
+            next if $row[1] =~ /bacterium/i;
+            next if $row[1] =~ /uncultured/i;
+            next if $row[1] =~ /Candidatus/i;
+            next if $row[1] =~ /unidentified/i;
+            next if $row[1] =~ /metagenome/i;
+            next if $row[1] =~ /archaeon/i;
+            next if $row[1] =~ /virus\b/i;
+            next if $row[1] =~ /phage\b/i;
+            next if $row[1] =~ /\bsp\./i;
 
             # find each strains' species and genus
             my $taxon_id = $row[0];

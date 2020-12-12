@@ -122,18 +122,18 @@ if ( !$append ) {
         my @lines = Path::Tiny::path($file)->lines( { chomp => 1, } );
         for my $line (@lines) {
             my ( $name, $code ) = ( split /\t/, $line )[ 2, 8 ];
-            if ( !defined $code ) {
-                if ( $file eq "$gr_dir/prok_reference_genomes.txt" ) {
-                    $code = "REF";
-                }
-                else {
-                    $code = "REP";
-                }
-            }
+            $code //= "";
             my @codes = split /\//, $code;
+            if ( $file eq "$gr_dir/prok_reference_genomes.txt" ) {
+                push @codes, "REF";
+            }
+            else {
+                push @codes, "REP";
+            }
             if ( exists $code_of{$name} ) {
                 push @codes, split( /\//, $code_of{$name} );
             }
+            @codes = List::MoreUtils::PP::uniq(@codes);
             $code_of{$name} = join "/", @codes;
         }
     }

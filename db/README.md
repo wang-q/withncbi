@@ -4,7 +4,7 @@ Turn NCBI genome reports and assembly reports into query-able MySQL databases.
 
 Also, taxonomy information is added to all items.
 
-Downloading date: 2020-09-17
+Downloading date: 2020-12-11
 
 [TOC levels=1-3]: # ""
 
@@ -110,13 +110,13 @@ perl gr_overview.pl --db gr_euk
 cat ~/data/NCBI/genomes/ASSEMBLY_REPORTS/assembly_summary_refseq.txt \
     ~/data/NCBI/genomes/ASSEMBLY_REPORTS/assembly_summary_genbank.txt |
     grep -v "^#" |
-    cut -d$'\t' -f 12 | # assembly_level
+    tsv-select -f 12 | # assembly_level
     sort |
     uniq -c
-#12958 Chromosome
-#89451 Complete Genome
-#759323 Contig
-#211267 Scaffold
+#13066 Chromosome
+#90279 Complete Genome
+#785524 Contig
+#215038 Scaffold
 
 ```
 
@@ -125,6 +125,12 @@ cd ~/Scripts/withncbi/db
 
 perl ar_strains.pl -o ar_strains.csv
 perl ar_strains.pl --genbank -o ar_strains_genbank.csv
+
+wc -l *strains*.csv
+#   33762 ar_strains.csv
+#   42188 ar_strains_genbank.csv
+#    6761 euk_strains.csv
+#   33646 prok_strains.csv
 
 perl ar_db.pl --db ar_refseq --file ar_strains.csv
 perl ar_db.pl --db ar_genbank --file ar_strains_genbank.csv
