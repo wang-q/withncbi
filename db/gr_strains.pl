@@ -172,9 +172,9 @@ else {
             }
 
             # skip strains
-            next if $row[1] =~ /bacterium/i;
-            next if $row[1] =~ /uncultured/i;
-            next if $row[1] =~ /Candidatus/i;
+            next if $row[1] =~ /\bbacterium\b/i;
+            next if $row[1] =~ /\buncultured\b/i;
+            next if $row[1] =~ /\bCandidatus\b/i;
             next if $row[1] =~ /\bsp\./i;
 
             # only keep chromosomes

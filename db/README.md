@@ -127,10 +127,10 @@ perl ar_strains.pl -o ar_strains.csv
 perl ar_strains.pl --genbank -o ar_strains_genbank.csv
 
 wc -l *strains*.csv
-#   33762 ar_strains.csv
-#   42188 ar_strains_genbank.csv
+#   37480 ar_strains.csv
+#   46042 ar_strains_genbank.csv
 #    6761 euk_strains.csv
-#   33646 prok_strains.csv
+#   37471 prok_strains.csv
 
 perl ar_db.pl --db ar_refseq --file ar_strains.csv
 perl ar_db.pl --db ar_genbank --file ar_strains_genbank.csv

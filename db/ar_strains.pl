@@ -154,12 +154,12 @@ $dbh->{csv_tables}->{t0} = {
             }
 
             # skip strains
-            next if $row[1] =~ /bacterium/i;
-            next if $row[1] =~ /uncultured/i;
-            next if $row[1] =~ /Candidatus/i;
-            next if $row[1] =~ /unidentified/i;
-            next if $row[1] =~ /metagenome/i;
-            next if $row[1] =~ /archaeon/i;
+            next if $row[1] =~ /\bbacterium\b/i;
+            next if $row[1] =~ /\buncultured\b/i;
+            next if $row[1] =~ /\bCandidatus\b/i;
+            next if $row[1] =~ /\bunidentified\b/i;
+            next if $row[1] =~ /\bmetagenome\b/i;
+            next if $row[1] =~ /\barchaeon\b/i;
             next if $row[1] =~ /virus\b/i;
             next if $row[1] =~ /phage\b/i;
             next if $row[1] =~ /\bsp\./i;
