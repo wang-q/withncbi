@@ -75,13 +75,13 @@ M. tuberculosis var. microti is distinct from other M. tuberculosis strains
 
 ## MTBC: assembly
 
-```bash
+```shell script
 export RANK_NAME=MTBC
 
 mkdir -p ~/data/alignment/${RANK_NAME}        # Working directory
 cd ~/data/alignment/${RANK_NAME}
 
-mysql -ualignDB -palignDB ar_refseq -e "
+mysql -uroot ar_refseq -e "
     SELECT
         organism_name, species, genus, ftp_path, assembly_level
     FROM ar
@@ -93,7 +93,7 @@ mysql -ualignDB -palignDB ar_refseq -e "
     " \
     > raw.tsv
 
-mysql -ualignDB -palignDB ar_genbank -e "
+mysql -uroot ar_genbank -e "
     SELECT
         organism_name, species, genus, ftp_path, assembly_level
     FROM ar
@@ -110,7 +110,7 @@ cat raw.tsv |
     perl ~/Scripts/withncbi/taxon/abbr_name.pl -c "1,2,3" -s '\t' -m 3 --shortsub |
     (echo -e '#name\tftp_path\torganism\tassembly_level' && cat ) |
     perl -nl -a -F"," -e '
-        BEGIN{my %seen}; 
+        BEGIN{my %seen};
         /^#/ and print and next;
         /^organism_name/i and next;
         $seen{$F[5]}++;
@@ -169,7 +169,7 @@ unset RANK_NAME
 
 ```
 
-```bash
+```shell script
 cd ~/data/alignment/MTBC
 
 perl ~/Scripts/withncbi/taxon/assembly_prep.pl \
@@ -184,13 +184,13 @@ bash ASSEMBLY/MTBC.assembly.collect.sh
 
 ## Count strains
 
-```bash
+```shell script
 cd ~/data/alignment/MTBC
 
 for dir in $(find ASSEMBLY -maxdepth 1 -mindepth 1 -type d | sort); do
     1>&2 echo "==> ${dir}"
     name=$(basename ${dir})
-    
+
     find ${dir} -type f -name "*_genomic.fna.gz" |
         grep -v "_from_" | # exclude CDS and rna
         xargs cat |
@@ -209,10 +209,10 @@ cat ASSEMBLY/n50.tsv |
     tsv-filter -H --ge 3:1000000 |
     tr "\t" "," \
     > ASSEMBLY/n50.pass.csv
-        
+
 wc -l ASSEMBLY/n50*
-#  265 ASSEMBLY/n50.pass.csv
-#  287 ASSEMBLY/n50.tsv
+#     264 ASSEMBLY/n50.pass.csv
+#     286 ASSEMBLY/n50.tsv
 
 tsv-join \
     ASSEMBLY/MTBC.assembly.collect.csv \
@@ -221,12 +221,12 @@ tsv-join \
     > ASSEMBLY/MTBC.assembly.pass.csv
 
 wc -l ASSEMBLY/MTBC.assembly*csv
-#   286 ASSEMBLY/MTBC.assembly.collect.csv
-#   264 ASSEMBLY/MTBC.assembly.pass.csv
+#     286 ASSEMBLY/MTBC.assembly.collect.csv
+#     264 ASSEMBLY/MTBC.assembly.pass.csv
 
 ```
 
-```bash
+```shell script
 cd ~/data/alignment/MTBC
 
 cat ASSEMBLY/MTBC.assembly.pass.csv |
@@ -245,7 +245,7 @@ cat ASSEMBLY/MTBC.assembly.pass.csv |
             sort |
             uniq |
             wc -l)
-        
+
         n_strains=$(cat ASSEMBLY/MTBC.assembly.pass.csv |
             cut -d"," -f 2 |
             grep -v "Candidatus" |
@@ -253,14 +253,14 @@ cat ASSEMBLY/MTBC.assembly.pass.csv |
             cut -d" " -f 1,2 |
             sort |
             wc -l)
-        
+
         printf "%s\t%d\t%d\n" {} ${n_species} ${n_strains}
     '
 
-#Amycolatopsis   1       3
-#Corynebacterium 1       24
-#Mycobacterium   19      232
-#Streptomyces    1       4
+#Amycolatopsis	1	3
+#Corynebacterium	1	24
+#Mycobacterium	18	232
+#Streptomyces	1	4
 
 cat ASSEMBLY/MTBC.assembly.pass.csv |
     sed -e '1d' |
@@ -278,7 +278,7 @@ cat ASSEMBLY/MTBC.assembly.pass.csv |
             sort |
             uniq |
             wc -l)
-        
+
         n_strains=$(cat ASSEMBLY/MTBC.assembly.pass.csv |
             cut -d"," -f 2 |
             grep -v "Candidatus" |
@@ -286,7 +286,7 @@ cat ASSEMBLY/MTBC.assembly.pass.csv |
             cut -d" " -f 1,2 |
             sort |
             wc -l)
-        
+
         printf "%s\t%d\t%d\n" {} ${n_species} ${n_strains}
     '
 #Amycolatopsis mediterranei      1       3
@@ -328,7 +328,7 @@ cat ASSEMBLY/MTBC.assembly.pass.csv |
             sort |
             uniq |
             wc -l)
-        
+
         n_strains=$(cat ASSEMBLY/MTBC.assembly.pass.csv |
             cut -d"," -f 2 |
             grep -v "Candidatus" |
@@ -336,7 +336,7 @@ cat ASSEMBLY/MTBC.assembly.pass.csv |
             cut -d" " -f 1,2 |
             sort |
             wc -l)
-        
+
         printf "%s\t%d\t%d\n" {} ${n_species} ${n_strains}
     '
 
@@ -350,17 +350,17 @@ cat ASSEMBLY/MTBC.assembly.pass.csv |
 
 ## Raw phylogenetic tree by MinHash
 
-```bash
+```shell script
 mkdir -p ~/data/alignment/MTBC/mash
 cd ~/data/alignment/MTBC/mash
 
 for name in $(cat ../ASSEMBLY/MTBC.assembly.pass.csv | sed -e '1d' | cut -d"," -f 1 ); do
     2>&1 echo "==> ${name}"
-    
+
     if [[ -e ${name}.msh ]]; then
         continue
     fi
-    
+
     find ../ASSEMBLY/${name} -name "*.fsa_nt.gz" -or -name "*_genomic.fna.gz" |
         grep -v "_from_" |
         xargs cat |
@@ -388,18 +388,18 @@ cat dist_full.tsv |
         library(readr);
         library(tidyr);
         library(ape);
-        pair_dist <- read_tsv(file("stdin"), col_names=F); 
+        pair_dist <- read_tsv(file("stdin"), col_names=F);
         tmp <- pair_dist %>%
             pivot_wider( names_from = X2, values_from = X3, values_fill = list(X3 = 1.0) )
         tmp <- as.matrix(tmp)
         mat <- tmp[,-1]
         rownames(mat) <- tmp[,1]
-        
+
         dist_mat <- as.dist(mat)
         clusters <- hclust(dist_mat, method = "ward.D2")
-        tree <- as.phylo(clusters) 
+        tree <- as.phylo(clusters)
         write.tree(phy=tree, file="tree.nwk")
-        
+
         group <- cutree(clusters, h=0.4) # k=5
         groups <- as.data.frame(group)
         groups$ids <- rownames(groups)
@@ -415,7 +415,7 @@ nw_display -s -b 'visibility:hidden' -w 600 -v 30 tree.nwk |
 
 ## NCBI taxonomy
 
-```bash
+```shell script
 cd ~/data/alignment/MTBC/taxon
 
 bp_taxonomy2tree.pl -e \
@@ -488,7 +488,7 @@ Review `ASSEMBLY/MTBC.assembly.pass.csv` and `mash/groups.tsv`
 | 109     | Mycobacterium_tuberculosis_variant_africanum |    26 | M_tub_variant_africanum_GM041182 |
 | 110     | Mycobacterium_tuberculosis_variant_bovis     |    14 | M_tub_variant_bovis_AF2122_97    |
 
-```bash
+```shell script
 mkdir -p ~/data/alignment/MTBC/taxon
 cd ~/data/alignment/MTBC/taxon
 
@@ -521,7 +521,7 @@ echo -e "#Serial\tGroup\tCount\tTarget" > group_target.tsv
 for item in "${ARRAY[@]}" ; do
     GROUP_NAME="${item%%::*}"
     TARGET_NAME="${item##*::}"
-    
+
     SERIAL=$(
         cat ../mash/groups.tsv |
             tsv-filter --str-eq 2:${TARGET_NAME} |
@@ -560,7 +560,7 @@ for item in "${ARRAY[@]}" ; do
 
     SERIAL=$((SERIAL + 1))
     GROUP_NAME2=$(echo $GROUP_NAME | tr "_" " ")
-    
+
     if [ "$GROUP_NAME" = "Mycobacterium" ]; then
         cat ../ASSEMBLY/MTBC.assembly.pass.csv |
             tsv-filter -H -d"," --not-blank 18 |
@@ -617,7 +617,7 @@ EOF
 
 * Rsync to hpcc
 
-```bash
+```shell script
 rsync -avP \
     ~/data/alignment/MTBC/ \
     wangq@202.119.37.251:data/alignment/MTBC
@@ -628,7 +628,7 @@ rsync -avP \
 
 * `--perseq` for Chromosome-level assemblies and targets
 
-```bash
+```shell script
 cd ~/data/alignment/MTBC/
 
 # prep
@@ -650,7 +650,7 @@ for n in $(cat taxon/group_target.tsv | sed -e '1d' | cut -f 4 ) \
     ; do
     FILE_GFF=$(find ASSEMBLY -type f -name "*_genomic.gff.gz" | grep "${n}")
     echo >&2 "==> Processing ${n}/${FILE_GFF}"
-    
+
     gzip -d -c ${FILE_GFF} > GENOMES/${n}/chr.gff
 done
 
@@ -658,14 +658,14 @@ done
 
 ## MTBC: run
 
-```bash
+```shell script
 cd ~/data/alignment/MTBC/
 
 cat taxon/group_target.tsv |
     sed -e '1d' |
     parallel --colsep '\t' --no-run-if-empty --linebuffer -k -j 1 '
         echo -e "==> Group: [{2}]\tTarget: [{4}]\n"
-        
+
         egaz template \
             GENOMES/{4} \
             $(cat taxon/{2} | grep -v -x "{4}" | xargs -I[] echo "GENOMES/[]") \
@@ -687,7 +687,7 @@ find . -mindepth 1 -maxdepth 3 -type f -name "output.*" | parallel -r rm
 
 * C_dip_NCTC_13129 as outgroup
 
-```bash
+```shell script
 cd ~/data/alignment/MTBC/
 
 egaz template \

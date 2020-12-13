@@ -6,15 +6,6 @@ C_dip_241	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/241/895/GCF_000241895.1
 C_dip_31A	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/241/875/GCF_000241875.1_ASM24187v1	Corynebacterium diphtheriae	Complete Genome
 C_dip_Aberdeen	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/455/805/GCF_000455805.1_ASM45580v1	Corynebacterium diphtheriae	Contig
 C_dip_BH8	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/241/935/GCF_000241935.1_ASM24193v1	Corynebacterium diphtheriae	Complete Genome
-C_dip_bv_gravis	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/002/202/355/GCF_002202355.1_S29	Corynebacterium diphtheriae	Scaffold
-C_dip_bv_gravis_ISS_4060	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/026/805/GCF_001026805.1_ASM102680v1	Corynebacterium diphtheriae	Contig
-C_dip_bv_gravis_ISS_4746	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/026/845/GCF_001026845.1_ASM102684v1	Corynebacterium diphtheriae	Contig
-C_dip_bv_gravis_ISS_4749	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/188/005/GCF_001188005.1_ASM118800v1	Corynebacterium diphtheriae	Contig
-C_dip_bv_intermedius	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/002/200/985/GCF_002200985.1_ASM220098v1	Corynebacterium diphtheriae	Contig
-C_dip_bv_intermedius_NCTC_5011	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/263/415/GCF_000263415.1_ASM26341v1	Corynebacterium diphtheriae	Contig
-C_dip_bv_mitis	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/002/202/745/GCF_002202745.1_S73	Corynebacterium diphtheriae	Scaffold
-C_dip_bv_mitis_ISS_3319	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/002/843/135/GCF_002843135.1_ASM284313v1	Corynebacterium diphtheriae	Complete Genome
-C_dip_bv_mitis_NC03529	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/257/885/GCF_000257885.1_ASM25788v1	Corynebacterium diphtheriae	Contig
 C_dip_C7_beta	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/255/175/GCF_000255175.1_ASM25517v1	Corynebacterium diphtheriae	Complete Genome
 C_dip_CDCE_8392	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/255/215/GCF_000255215.1_ASM25521v1	Corynebacterium diphtheriae	Complete Genome
 C_dip_DSM_43988	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/455/785/GCF_000455785.1_ASM45578v1	Corynebacterium diphtheriae	Contig
@@ -23,10 +14,19 @@ C_dip_HC02	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/255/155/GCF_000255155.
 C_dip_HC03	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/242/775/GCF_000242775.1_ASM24277v1	Corynebacterium diphtheriae	Complete Genome
 C_dip_HC04	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/255/195/GCF_000255195.1_ASM25519v1	Corynebacterium diphtheriae	Complete Genome
 C_dip_INCA_402	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/241/915/GCF_000241915.1_ASM24191v1	Corynebacterium diphtheriae	Complete Genome
-C_dip_lausannense	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/900/312/965/GCA_900312965.1__CHUV2995_chromosome	Corynebacterium diphtheriae	Complete Genome
 C_dip_NCTC_13129	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/195/815/GCF_000195815.1_ASM19581v1	Corynebacterium diphtheriae	Complete Genome
 C_dip_PW8	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/255/275/GCF_000255275.1_ASM25527v1	Corynebacterium diphtheriae	Complete Genome
 C_dip_VA01	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/255/255/GCF_000255255.1_ASM25525v1	Corynebacterium diphtheriae	Complete Genome
+C_dip_bv_gravis	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/002/202/355/GCF_002202355.1_S29	Corynebacterium diphtheriae	Scaffold
+C_dip_bv_gravis_ISS_4060	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/026/805/GCF_001026805.1_ASM102680v1	Corynebacterium diphtheriae	Contig
+C_dip_bv_gravis_ISS_4746	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/026/845/GCF_001026845.1_ASM102684v1	Corynebacterium diphtheriae	Contig
+C_dip_bv_gravis_ISS_4749	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/188/005/GCF_001188005.1_ASM118800v1	Corynebacterium diphtheriae	Contig
+C_dip_bv_intermedius	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/002/200/985/GCF_002200985.1_ASM220098v1	Corynebacterium diphtheriae	Contig
+C_dip_bv_intermedius_NCTC_5011	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/263/415/GCF_000263415.1_ASM26341v1	Corynebacterium diphtheriae	Contig
+C_dip_bv_mitis	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/014/826/095/GCF_014826095.1_ASM1482609v1	Corynebacterium diphtheriae	Complete Genome
+C_dip_bv_mitis_ISS_3319	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/002/843/135/GCF_002843135.1_ASM284313v1	Corynebacterium diphtheriae	Complete Genome
+C_dip_bv_mitis_NC03529	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/257/885/GCF_000257885.1_ASM25788v1	Corynebacterium diphtheriae	Contig
+C_dip_lausannense	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/900/312/965/GCA_900312965.1__CHUV2995_chromosome	Corynebacterium diphtheriae	Complete Genome
 M_aro_ATCC_BAA_1401_DSM_45069	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/002/086/125/GCF_002086125.1_ASM208612v1	Mycobacterium arosiense	Contig
 M_asi_DSM_44297	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/613/245/GCF_000613245.1_PRJEB5743_assembly_1	Mycobacterium asiaticum	Scaffold
 M_avi_104	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/014/985/GCF_000014985.1_ASM1498v1	Mycobacterium avium	Complete Genome
@@ -53,27 +53,27 @@ M_gen_ATCC_51234	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/526/915/GCF_0005
 M_hae_DSM_44634	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/340/435/GCF_000340435.2_ASM34043v3	Mycobacterium haemophilum	Complete Genome
 M_int_1956	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/523/815/GCF_000523815.1_ASM52381v1	Mycobacterium intracellulare	Contig
 M_int_ATCC_13950	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/277/125/GCF_000277125.1_ASM27712v1	Mycobacterium intracellulare	Complete Genome
-M_int_intracellulare_MTCC_9506	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/298/095/GCF_000298095.1_ASM29809v1	Mycobacterium intracellulare	Complete Genome
-M_int_M_i_198	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/309/055/GCF_000309055.1_Mintra_1.0	Mycobacterium intracellulare	Contig
 M_int_MIN_052511_1280	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/524/015/GCF_000524015.1_ASM52401v1	Mycobacterium intracellulare	Contig
 M_int_MIN_061107_1834	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/523/795/GCF_000523795.1_ASM52379v1	Mycobacterium intracellulare	Contig
 M_int_MOTT_02	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/277/145/GCF_000277145.1_ASM27714v1	Mycobacterium intracellulare	Complete Genome
-M_int_yongonense_05_1390	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/418/535/GCF_000418535.1_ASM41853v2	Mycobacterium intracellulare	Complete Genome
+M_int_M_i_198	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/309/055/GCF_000309055.1_Mintra_1.0	Mycobacterium intracellulare	Contig
+M_int_intracellulare_MTCC_9506	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/298/095/GCF_000298095.1_ASM29809v1	Mycobacterium intracellulare	Complete Genome
 M_int_yongonense	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/002/148/195/GCF_002148195.1_ASM214819v1	Mycobacterium intracellulare	Complete Genome
+M_int_yongonense_05_1390	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/418/535/GCF_000418535.1_ASM41853v2	Mycobacterium intracellulare	Complete Genome
 M_kan_662	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/523/615/GCF_000523615.1_ASM52361v1	Mycobacterium kansasii	Contig
 M_kan_732	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/524/055/GCA_000524055.1_ASM52405v1	Mycobacterium kansasii	Contig
 M_kan_824	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/524/095/GCF_000524095.1_ASM52409v1	Mycobacterium kansasii	Contig
 M_kan_ATCC_12478	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/157/895/GCF_000157895.3_ASM15789v2	Mycobacterium kansasii	Complete Genome
 M_lep_3125609	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/653/495/GCF_001653495.1_ASM165349v1	Mycobacterium leprae	Scaffold
 M_lep_7935681	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/648/835/GCF_001648835.1_ASM164883v1	Mycobacterium leprae	Scaffold
-M_lep_Br4923	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/026/685/GCF_000026685.1_ASM2668v1	Mycobacterium leprae	Complete Genome
+M_lep_Br4923	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/026/685/GCA_000026685.1_ASM2668v1	Mycobacterium leprae	Complete Genome
 M_lep_Kyoto_2	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/003/584/725/GCF_003584725.1_ASM358472v1	Mycobacterium leprae	Complete Genome
 M_lep_TN	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/195/855/GCF_000195855.1_ASM19585v1	Mycobacterium leprae	Complete Genome
 M_lif_128FXT	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/026/445/GCF_000026445.2_ASM2644v2	Mycobacterium liflandii	Complete Genome
 M_mar_E11	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/723/425/GCF_000723425.2_E11	Mycobacterium marinum	Complete Genome
 M_mar_Europe	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/419/315/GCF_000419315.1_Europe	Mycobacterium marinum	Contig
-M_mar_MB2	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/419/335/GCF_000419335.1_MB2	Mycobacterium marinum	Contig
 M_mar_M	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/018/345/GCF_000018345.1_ASM1834v1	Mycobacterium marinum	Complete Genome
+M_mar_MB2	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/419/335/GCF_000419335.1_MB2	Mycobacterium marinum	Contig
 M_ory_112400015	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/353/205/GCF_000353205.1_Morygis1.0	Mycobacterium orygis	Contig
 M_par_ATCC_BAA_614	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/164/135/GCF_000164135.1_ASM16413v1	Mycobacterium parascrofulaceum	Scaffold
 M_pse_JCM_15466	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/003/584/745/GCF_003584745.1_ASM358474v1	Mycobacterium pseudoshottsii	Complete Genome
@@ -90,38 +90,38 @@ M_tub_1821ADB45	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/997/665/GCF_00199
 M_tub_18b	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/835/125/GCF_000835125.1_ASM83512v1	Mycobacterium tuberculosis	Chromosome
 M_tub_49_02	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/786/505/GCF_000786505.1_MT49-02	Mycobacterium tuberculosis	Complete Genome
 M_tub_7199_99	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/331/445/GCF_000331445.1_ASM33144v1	Mycobacterium tuberculosis	Complete Genome
-M_tub_Beijing_NITR203	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/364/825/GCA_000364825.1_ASM36482v1	Mycobacterium tuberculosis	Complete Genome
 M_tub_BT1	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/572/175/GCF_000572175.1_ASM57217v1	Mycobacterium tuberculosis	Complete Genome
 M_tub_BT2	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/572/155/GCF_000572155.1_ASM57215v1	Mycobacterium tuberculosis	Complete Genome
 M_tub_BTB05_552	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/220/435/GCF_000220435.1_ASM22043v1	Mycobacterium tuberculosis	Chromosome
 M_tub_BTB05_559	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/220/455/GCF_000220455.1_ASM22045v1	Mycobacterium tuberculosis	Chromosome
+M_tub_Beijing_NITR203	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/364/825/GCA_000364825.1_ASM36482v1	Mycobacterium tuberculosis	Complete Genome
 M_tub_CAS_NITR204	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/389/925/GCA_000389925.1_ASM38992v1	Mycobacterium tuberculosis	Complete Genome
 M_tub_CCDC5079	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/400/615/GCF_000400615.1_ASM40061v1	Mycobacterium tuberculosis	Complete Genome
 M_tub_CCDC5180	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/270/365/GCF_000270365.1_ASM27036v1	Mycobacterium tuberculosis	Complete Genome
 M_tub_CDC1551	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/008/585/GCF_000008585.1_ASM858v1	Mycobacterium tuberculosis	Complete Genome
 M_tub_CTRI_2	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/224/435/GCF_000224435.1_ASM22443v1	Mycobacterium tuberculosis	Complete Genome
 M_tub_EAI5	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/422/125/GCF_000422125.1_ASM42212v1	Mycobacterium tuberculosis	Complete Genome
-M_tub_EAI5_NITR206	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/389/945/GCF_000389945.1_ASM38994v1	Mycobacterium tuberculosis	Complete Genome
+M_tub_EAI5_NITR206	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/389/945/GCA_000389945.1_ASM38994v1	Mycobacterium tuberculosis	Complete Genome
 M_tub_Erdman_ATCC_35801	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/350/205/GCF_000350205.1_ASM35020v1	Mycobacterium tuberculosis	Complete Genome
 M_tub_F11	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/016/925/GCF_000016925.1_ASM1692v1	Mycobacterium tuberculosis	Complete Genome
 M_tub_H37Ra	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/016/145/GCF_000016145.1_ASM1614v1	Mycobacterium tuberculosis	Complete Genome
+M_tub_H37Rv	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/195/955/GCF_000195955.2_ASM19595v2	Mycobacterium tuberculosis	Complete Genome
 M_tub_H37RvAE	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/746/805/GCF_000746805.1_H37RvAE4	Mycobacterium tuberculosis	Chromosome
 M_tub_H37RvCO	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/263/135/GCF_000263135.1_H37RvCO4	Mycobacterium tuberculosis	Chromosome
-M_tub_H37Rv	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/195/955/GCF_000195955.2_ASM19595v2	Mycobacterium tuberculosis	Complete Genome
 M_tub_H37RvLP	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/751/475/GCF_000751475.1_H37RvLPb	Mycobacterium tuberculosis	Chromosome
 M_tub_H37RvMA	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/751/615/GCF_000751615.1_H37RvMA2	Mycobacterium tuberculosis	Chromosome
 M_tub_H37RvSiena	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/827/085/GCF_000827085.1_ASM82708v1	Mycobacterium tuberculosis	Complete Genome
-M_tub_Haarlem	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/153/685/GCF_000153685.2_ASM15368v2	Mycobacterium tuberculosis	Complete Genome
-M_tub_Haarlem_NITR202	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/389/905/GCA_000389905.1_ASM38990v1	Mycobacterium tuberculosis	Complete Genome
 M_tub_HKBS1	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/572/125/GCF_000572125.1_ASM57212v1	Mycobacterium tuberculosis	Complete Genome
 M_tub_HN878	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/184/005/GCF_000184005.1_ASM18400v1	Mycobacterium tuberculosis	Chromosome
+M_tub_Haarlem	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/153/685/GCF_000153685.2_ASM15368v2	Mycobacterium tuberculosis	Complete Genome
+M_tub_Haarlem_NITR202	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/389/905/GCA_000389905.1_ASM38990v1	Mycobacterium tuberculosis	Complete Genome
 M_tub_K	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/698/475/GCF_000698475.1_ASM69847v1	Mycobacterium tuberculosis	Complete Genome
-M_tub_Kurono	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/828/995/GCF_000828995.1_ASM82899v1	Mycobacterium tuberculosis	Complete Genome
 M_tub_KZN_1435	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/023/625/GCF_000023625.1_ASM2362v1	Mycobacterium tuberculosis	Complete Genome
 M_tub_KZN_4207	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/154/585/GCF_000154585.2_ASM15458v2	Mycobacterium tuberculosis	Complete Genome
 M_tub_KZN_605	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/154/605/GCF_000154605.2_ASM15460v2	Mycobacterium tuberculosis	Complete Genome
 M_tub_KZN_R506	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/163/015/GCF_000163015.1_ASM16301v1	Mycobacterium tuberculosis	Chromosome
 M_tub_KZN_V2475	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/162/995/GCF_000162995.1_ASM16299v1	Mycobacterium tuberculosis	Chromosome
+M_tub_Kurono	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/828/995/GCF_000828995.1_ASM82899v1	Mycobacterium tuberculosis	Complete Genome
 M_tub_PanR0201	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/442/945/GCF_000442945.1_fedora0201c_IS	Mycobacterium tuberculosis	Chromosome
 M_tub_PanR0202	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/417/925/GCF_000417925.1_fedora0202c	Mycobacterium tuberculosis	Chromosome
 M_tub_PanR0203	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/443/305/GCF_000443305.1_fedora0203c_IS	Mycobacterium tuberculosis	Chromosome
@@ -191,6 +191,7 @@ M_tub_R1207	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/184/045/GCF_000184045
 M_tub_RGTB327	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/277/085/GCA_000277085.1_ASM27708v1	Mycobacterium tuberculosis	Complete Genome
 M_tub_RGTB423	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/277/105/GCA_000277105.1_ASM27710v1	Mycobacterium tuberculosis	Complete Genome
 M_tub_S96_129	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/220/415/GCF_000220415.1_ASM22041v1	Mycobacterium tuberculosis	Chromosome
+M_tub_TRS1	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/997/695/GCF_001997695.1_ASM199769v1	Mycobacterium tuberculosis	Chromosome
 M_tub_TRS10	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/002/000/925/GCF_002000925.1_ASM200092v1	Mycobacterium tuberculosis	Chromosome
 M_tub_TRS11	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/998/585/GCF_001998585.1_ASM199858v1	Mycobacterium tuberculosis	Chromosome
 M_tub_TRS12	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/998/175/GCF_001998175.1_ASM199817v1	Mycobacterium tuberculosis	Chromosome
@@ -201,7 +202,7 @@ M_tub_TRS16	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/997/725/GCF_001997725
 M_tub_TRS17	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/997/775/GCF_001997775.1_ASM199777v1	Mycobacterium tuberculosis	Chromosome
 M_tub_TRS18	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/998/265/GCF_001998265.1_ASM199826v1	Mycobacterium tuberculosis	Chromosome
 M_tub_TRS19	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/997/975/GCF_001997975.1_ASM199797v1	Mycobacterium tuberculosis	Chromosome
-M_tub_TRS1	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/997/695/GCF_001997695.1_ASM199769v1	Mycobacterium tuberculosis	Chromosome
+M_tub_TRS2	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/998/365/GCF_001998365.1_ASM199836v1	Mycobacterium tuberculosis	Chromosome
 M_tub_TRS20	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/997/805/GCF_001997805.1_ASM199780v1	Mycobacterium tuberculosis	Chromosome
 M_tub_TRS21	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/997/935/GCF_001997935.1_ASM199793v1	Mycobacterium tuberculosis	Chromosome
 M_tub_TRS22	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/002/000/965/GCF_002000965.1_ASM200096v1	Mycobacterium tuberculosis	Chromosome
@@ -212,7 +213,6 @@ M_tub_TRS26	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/998/735/GCF_001998735
 M_tub_TRS27	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/998/645/GCF_001998645.1_ASM199864v1	Mycobacterium tuberculosis	Chromosome
 M_tub_TRS28	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/998/485/GCF_001998485.1_ASM199848v1	Mycobacterium tuberculosis	Chromosome
 M_tub_TRS29	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/002/000/945/GCF_002000945.1_ASM200094v1	Mycobacterium tuberculosis	Chromosome
-M_tub_TRS2	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/998/365/GCF_001998365.1_ASM199836v1	Mycobacterium tuberculosis	Chromosome
 M_tub_TRS4	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/998/455/GCF_001998455.1_ASM199845v1	Mycobacterium tuberculosis	Chromosome
 M_tub_TRS5	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/998/075/GCF_001998075.1_ASM199807v1	Mycobacterium tuberculosis	Chromosome
 M_tub_TRS6	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/998/425/GCF_001998425.1_ASM199842v1	Mycobacterium tuberculosis	Chromosome
@@ -220,6 +220,8 @@ M_tub_TRS7	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/998/025/GCF_001998025.
 M_tub_TRS8	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/998/545/GCF_001998545.1_ASM199854v1	Mycobacterium tuberculosis	Chromosome
 M_tub_TRS9	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/997/425/GCF_001997425.1_ASM199742v1	Mycobacterium tuberculosis	Chromosome
 M_tub_UT205	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/304/555/GCF_000304555.1_Mt_UT205	Mycobacterium tuberculosis	Chromosome
+M_tub_W_148	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/193/185/GCF_000193185.2_ASM19318v2	Mycobacterium tuberculosis	Complete Genome
+M_tub_X122	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/184/025/GCF_000184025.1_ASM18402v1	Mycobacterium tuberculosis	Chromosome
 M_tub_variant_africanum	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/593/225/GCF_001593225.1_ASM159322v1	Mycobacterium tuberculosis	Chromosome
 M_tub_variant_africanum_GM041182	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/253/355/GCF_000253355.1_ASM25335v1	Mycobacterium tuberculosis	Complete Genome
 M_tub_variant_africanum_K85	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/159/775/GCF_000159775.1_ASM15977v1	Mycobacterium tuberculosis	Scaffold
@@ -246,16 +248,17 @@ M_tub_variant_africanum_MAL020173	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000
 M_tub_variant_africanum_MAL020176	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/667/365/GCF_000667365.1_Myco_afri_MAL020176_V1	Mycobacterium tuberculosis	Scaffold
 M_tub_variant_africanum_MAL020185	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/667/445/GCF_000667445.1_Myco_afri_MAL020185_V1	Mycobacterium tuberculosis	Scaffold
 M_tub_variant_africanum_MAL020193	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/667/525/GCF_000667525.1_Myco_tube_MAL020193_V1	Mycobacterium tuberculosis	Scaffold
+M_tub_variant_bovis	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/078/615/GCF_001078615.1_ASM107861v1	Mycobacterium tuberculosis	Complete Genome
 M_tub_variant_bovis_04_303	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/488/915/GCF_000488915.1_MB04303v1	Mycobacterium tuberculosis	Contig
-M_tub_variant_bovis_AF2122_97	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/195/835/GCF_000195835.2_ASM19583v2	Mycobacterium tuberculosis	Complete Genome
+M_tub_variant_bovis_AF2122_97	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/195/835/GCA_000195835.3_ASM19583v2	Mycobacterium tuberculosis	Complete Genome
 M_tub_variant_bovis_AN5	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/488/935/GCF_000488935.1_MBAN5v1	Mycobacterium tuberculosis	Contig
 M_tub_variant_bovis_B2_7505	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/649/675/GCF_000649675.1_Myco_bovi_B2_7505_V1	Mycobacterium tuberculosis	Scaffold
+M_tub_variant_bovis_BCG	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/043/255/GCF_001043255.1_ASM104325v1	Mycobacterium tuberculosis	Complete Genome
 M_tub_variant_bovis_BCG_ATCC_35733	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/194/035/GCF_000194035.1_ASM19403v2	Mycobacterium tuberculosis	Contig
 M_tub_variant_bovis_BCG_ATCC_35740	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/194/055/GCF_000194055.1_ASM19405v2	Mycobacterium tuberculosis	Contig
-M_tub_variant_bovis_BCG_ATCC_35743	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/194/075/GCF_000194075.2_ASM19407v3	Mycobacterium tuberculosis	Complete Genome
+M_tub_variant_bovis_BCG_ATCC_35743	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/194/075/GCA_000194075.3_ASM19407v3	Mycobacterium tuberculosis	Complete Genome
 M_tub_variant_bovis_BCG_China	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/194/015/GCF_000194015.1_ASM19401v2	Mycobacterium tuberculosis	Contig
 M_tub_variant_bovis_BCG_Frappier	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/463/175/GCF_000463175.1_BCG_Frappier	Mycobacterium tuberculosis	Contig
-M_tub_variant_bovis_BCG	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/043/255/GCF_001043255.1_ASM104325v1	Mycobacterium tuberculosis	Complete Genome
 M_tub_variant_bovis_BCG_Glaxo	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/463/195/GCF_000463195.1_BCG_Glaxo	Mycobacterium tuberculosis	Contig
 M_tub_variant_bovis_BCG_Korea_1168P	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/338/715/GCF_000338715.2_ASM33871v2	Mycobacterium tuberculosis	Complete Genome
 M_tub_variant_bovis_BCG_Mexico	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/234/725/GCF_000234725.1_ASM23472v1	Mycobacterium tuberculosis	Complete Genome
@@ -267,14 +270,11 @@ M_tub_variant_bovis_BCG_Prague	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/46
 M_tub_variant_bovis_BCG_Sweden	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/463/275/GCF_000463275.1_BCG_Sweden	Mycobacterium tuberculosis	Contig
 M_tub_variant_bovis_BCG_Tokyo_172	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/010/685/GCF_000010685.1_ASM1068v1	Mycobacterium tuberculosis	Complete Genome
 M_tub_variant_bovis_Bz_31150	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/649/655/GCF_000649655.1_Myco_bovi_Bz_31150_V1	Mycobacterium tuberculosis	Scaffold
-M_tub_variant_bovis	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/078/615/GCF_001078615.1_ASM107861v1	Mycobacterium tuberculosis	Complete Genome
 M_tub_variant_bovis_MAL010093	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/666/385/GCF_000666385.1_Myco_bovi_MAL010093_V1	Mycobacterium tuberculosis	Scaffold
 M_tub_variant_caprae	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/941/665/GCF_001941665.1_ASM194166v1	Mycobacterium tuberculosis	Chromosome
 M_tub_variant_microti	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/002/982/215/GCF_002982215.1_ASM298221v1	Mycobacterium tuberculosis	Scaffold
 M_tub_variant_microti_OV254	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/865/895/GCA_002865895.1_ASM286589v1	Mycobacterium tuberculosis	Contig
 M_tub_variant_pinnipedii	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/002/982/275/GCF_002982275.1_ASM298227v1	Mycobacterium tuberculosis	Scaffold
-M_tub_W_148	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/193/185/GCF_000193185.2_ASM19318v2	Mycobacterium tuberculosis	Complete Genome
-M_tub_X122	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/184/025/GCF_000184025.1_ASM18402v1	Mycobacterium tuberculosis	Chromosome
 M_ulc_Agy99	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/013/925/GCF_000013925.1_ASM1392v2	Mycobacterium ulcerans	Complete Genome
 M_ulc_Harvey	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/524/035/GCA_000524035.1_ASM52403v1	Mycobacterium ulcerans	Contig
 M_ulc_shinshuense	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/002/355/775/GCF_002355775.1_ASM235577v1	Mycobacterium ulcerans	Complete Genome
