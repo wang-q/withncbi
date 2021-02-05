@@ -1542,7 +1542,7 @@ find DOMAINS/ -name "*.replace.tsv" |
     sort -u \
     > DOMAINS/domains.tsv
 wc -l DOMAINS/domains.tsv
-#8722 DOMAINS/domains.tsv
+#8964 DOMAINS/domains.tsv
 
 # Status of domains
 for domain in $(cat domain.list); do
@@ -1564,7 +1564,7 @@ for domain in $(cat domain.list); do
 done
 
 datamash check < DOMAINS/domains.tsv
-#8722 lines, 42 fields
+#8964 lines, 42 fields
 
 # Add header line
 for domain in $(cat domain.list); do
@@ -1574,28 +1574,31 @@ done |
     paste -s -d $'\t' - \
     > DOMAINS/header.tsv
 
+cat DOMAINS/header.tsv DOMAINS/domains.tsv \
+    > temp && mv temp DOMAINS/domains.tsv
+
 # Filter out DEAD or Helicase_C only sequences
 cat DOMAINS/domains.tsv |
-    tsv-filter --str-eq 18:O --str-eq 19:O \
+    tsv-filter -H --str-eq DEAD:O --str-eq Helicase_C:O \
     > DOMAINS/RhlB.tsv
 
 # Filter out DHH or DHHA1 only sequences
 cat DOMAINS/domains.tsv |
-    tsv-filter --str-eq 41:O --str-eq 42:O \
+    tsv-filter -H --str-eq DHH:O --str-eq DHHA1:O \
     > DOMAINS/NrnA.tsv
 
 rm -fr temp
 cat DOMAINS/domains.tsv |
-    tsv-filter --str-ne 18:O --str-ne 19:O |
-    tsv-filter --str-ne 41:O --str-ne 42:O |
-    (cat DOMAINS/header.tsv && cat) |
+    tsv-filter -H --str-ne DEAD:O --str-ne Helicase_C:O |
+    tsv-filter -H --str-ne DHH:O --str-ne DHHA1:O |
     (cat && cat DOMAINS/RhlB.tsv) |
     (cat && cat DOMAINS/NrnA.tsv) |
+    tsv-uniq |
     keep-header -- sort -k1,1 \
     > temp && mv temp DOMAINS/domains.tsv
 
 tsv-join \
-    PROTEINS/all.size_anno.tsv \
+    PROTEINS/all.info.tsv \
     --data-fields 1 \
     -f DOMAINS/domains.tsv \
     --key-fields 1 \
@@ -1604,7 +1607,7 @@ tsv-join \
     > temp && mv temp DOMAINS/domains.tsv
 
 datamash check < DOMAINS/domains.tsv
-#7130 lines, 44 fields
+#7272 lines, 45 fields
 
 rm DOMAINS/header.tsv DOMAINS/RhlB.tsv DOMAINS/NrnA.tsv
 
