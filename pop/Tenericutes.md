@@ -1260,41 +1260,41 @@ https://www.uniprot.org/uniprot/?query=Ribonuclease+AND+organism%3A%22Bacillus+s
 |:------------------------------------------------------------------:|
 |                       Me_florum_L1_YP_053450                       |
 
-| ![Mycop_cap_capricolum_ATCC_27343_WP_011386996.png](../image/Mycop_cap_capricolum_ATCC_27343_WP_011386996.png) |
+| ![My_cap_capricolum_ATCC_27343_WP_011386996.png](../image/My_cap_capricolum_ATCC_27343_WP_011386996.png) |
 |:--------------------------------------------------------------------------------------------------------------:|
-|                                  Mycop_cap_capricolum_ATCC_27343_WP_011386996                                  |
+|                                  My_cap_capricolum_ATCC_27343_WP_011386996                                  |
 
-| ![Mycop_put_KS1_WP_014034866.png](../image/Mycop_put_KS1_WP_014034866.png) |
+| ![My_put_KS1_WP_014034866.png](../image/My_put_KS1_WP_014034866.png) |
 |:--------------------------------------------------------------------------:|
-|                         Mycop_put_KS1_WP_014034866                         |
+|                         My_put_KS1_WP_014034866                         |
 
-| ![Mycop_hyor_WP_014335631.png](../image/Mycop_hyor_WP_014335631.png) |
+| ![My_hyor_WP_014335631.png](../image/My_hyor_WP_014335631.png) |
 |:--------------------------------------------------------------------:|
-|                       Mycop_hyor_WP_014335631                        |
+|                       My_hyor_WP_014335631                        |
 
-| ![Mycop_bovis_CQ_W70_WP_013456627.png](../image/Mycop_bovis_CQ_W70_WP_013456627.png) |
+| ![My_bovis_CQ_W70_WP_013456627.png](../image/My_bovis_CQ_W70_WP_013456627.png) |
 |:------------------------------------------------------------------------------------:|
-|                           Mycop_bovis_CQ_W70_WP_013456627                            |
+|                           My_bovis_CQ_W70_WP_013456627                            |
 
-| ![Mycop_canis_PG_14_WP_004794628.png](../image/Mycop_canis_PG_14_WP_004794628.png) |
+| ![My_canis_PG_14_WP_004794628.png](../image/My_canis_PG_14_WP_004794628.png) |
 |:----------------------------------------------------------------------------------:|
-|                           Mycop_canis_PG_14_WP_004794628                           |
+|                           My_canis_PG_14_WP_004794628                           |
 
 | ![U_ure_10_ATCC_33699_WP_012560232.png](../image/U_ure_10_ATCC_33699_WP_012560232.png) |
 |:--------------------------------------------------------------------------------------:|
 |                            U_ure_10_ATCC_33699_WP_012560232                            |
 
-| ![Mycop_gallis_WP_011113707.png](../image/Mycop_gallis_WP_011113707.png) |
+| ![My_gallis_WP_011113707.png](../image/My_gallis_WP_011113707.png) |
 |:------------------------------------------------------------------------:|
-|                        Mycop_gallis_WP_011113707                         |
+|                        My_gallis_WP_011113707                         |
 
-| ![Mycop_pne_WP_014325416.png](../image/Mycop_pne_WP_014325416.png) |
+| ![My_pne_WP_014325416.png](../image/My_pne_WP_014325416.png) |
 |:------------------------------------------------------------------:|
-|                       Mycop_pne_WP_014325416                       |
+|                       My_pne_WP_014325416                       |
 
-| ![Mycop_gen_G37_WP_009885662.png](../image/Mycop_gen_G37_WP_009885662.png) |
+| ![My_gen_G37_WP_009885662.png](../image/My_gen_G37_WP_009885662.png) |
 |:--------------------------------------------------------------------------:|
-|                         Mycop_gen_G37_WP_009885662                         |
+|                         My_gen_G37_WP_009885662                         |
 
 ## Domains of RNases and Cooperators
 
