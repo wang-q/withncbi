@@ -2088,8 +2088,6 @@ done |
 ```shell script
 cd ~/data/alignment/Tenericutes
 
-cat RNaseR/RNaseR.pro.fa
-
 for GENUS in $(cat genus.list); do
     echo 1>&2 "==> GENUS [${GENUS}]"
 
