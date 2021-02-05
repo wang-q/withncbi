@@ -1353,7 +1353,7 @@ https://www.uniprot.org/uniprot/?query=Ribonuclease+AND+organism%3A%22Bacillus+s
   * Enolase_C (PF00113)
 
 * RNase Y
-  * DUF3552 (PF12072)
+  * RNase_Y_N (PF12072)
   * ~~HD (PF01966)~~
 
 * RNase J1/J2
@@ -1439,7 +1439,7 @@ for domain in \
     DEAD Helicase_C \
     PolyA_pol PolyA_pol_RNAbd PolyA_pol_arg_C \
     Enolase_N Enolase_C \
-    DUF3552 \
+    RNase_Y_N \
     Lactamase_B RMMBL RNase_J_C \
     PFK \
     Ribonuclease_T2 \
@@ -1490,47 +1490,47 @@ done |
 
 | Domain                              | Count |
 |:------------------------------------|------:|
-| DOMAINS/OB_RNB.replace.tsv          |   382 |
-| DOMAINS/CSD2.replace.tsv            |   279 |
-| DOMAINS/RNB.replace.tsv             |   312 |
-| DOMAINS/S1.replace.tsv              |   832 |
-| DOMAINS/HTH_12.replace.tsv          |   120 |
+| DOMAINS/OB_RNB.replace.tsv          |   389 |
+| DOMAINS/CSD2.replace.tsv            |   288 |
+| DOMAINS/RNB.replace.tsv             |   328 |
+| DOMAINS/S1.replace.tsv              |   845 |
+| DOMAINS/HTH_12.replace.tsv          |   109 |
 | DOMAINS/RNase_II_C_S1.replace.tsv   |    96 |
 | DOMAINS/Importin_rep.replace.tsv    |     6 |
-| DOMAINS/PIN_4.replace.tsv           |    13 |
+| DOMAINS/PIN_4.replace.tsv           |    10 |
 | DOMAINS/Rrp44_CSD1.replace.tsv      |     5 |
-| DOMAINS/OB_Dis3.replace.tsv         |     8 |
+| DOMAINS/OB_Dis3.replace.tsv         |     4 |
 | DOMAINS/Rrp44_S1.replace.tsv        |     0 |
-| DOMAINS/RNase_E_G.replace.tsv       |    22 |
-| DOMAINS/RNase_PH.replace.tsv        |    88 |
-| DOMAINS/RNase_PH_C.replace.tsv      |    97 |
-| DOMAINS/PNPase.replace.tsv          |    80 |
-| DOMAINS/KH_1.replace.tsv            |   470 |
-| DOMAINS/DEAD.replace.tsv            |  2276 |
-| DOMAINS/Helicase_C.replace.tsv      |  1454 |
-| DOMAINS/PolyA_pol.replace.tsv       |    66 |
-| DOMAINS/PolyA_pol_RNAbd.replace.tsv |    86 |
+| DOMAINS/RNase_E_G.replace.tsv       |    20 |
+| DOMAINS/RNase_PH.replace.tsv        |    80 |
+| DOMAINS/RNase_PH_C.replace.tsv      |    88 |
+| DOMAINS/PNPase.replace.tsv          |    72 |
+| DOMAINS/KH_1.replace.tsv            |   469 |
+| DOMAINS/DEAD.replace.tsv            |  2355 |
+| DOMAINS/Helicase_C.replace.tsv      |  1468 |
+| DOMAINS/PolyA_pol.replace.tsv       |    60 |
+| DOMAINS/PolyA_pol_RNAbd.replace.tsv |    80 |
 | DOMAINS/PolyA_pol_arg_C.replace.tsv |     6 |
-| DOMAINS/Enolase_N.replace.tsv       |   335 |
-| DOMAINS/Enolase_C.replace.tsv       |   337 |
-| DOMAINS/DUF3552.replace.tsv         |   269 |
-| DOMAINS/Lactamase_B.replace.tsv     |   789 |
-| DOMAINS/RMMBL.replace.tsv           |   439 |
-| DOMAINS/RNase_J_C.replace.tsv       |   569 |
-| DOMAINS/PFK.replace.tsv             |   321 |
+| DOMAINS/Enolase_N.replace.tsv       |   346 |
+| DOMAINS/Enolase_C.replace.tsv       |   350 |
+| DOMAINS/RNase_Y_N.replace.tsv       |   250 |
+| DOMAINS/Lactamase_B.replace.tsv     |   745 |
+| DOMAINS/RMMBL.replace.tsv           |   482 |
+| DOMAINS/RNase_J_C.replace.tsv       |   680 |
+| DOMAINS/PFK.replace.tsv             |   319 |
 | DOMAINS/Ribonuclease_T2.replace.tsv |     3 |
-| DOMAINS/Ribonucleas_3_3.replace.tsv |   343 |
-| DOMAINS/dsrm.replace.tsv            |   307 |
-| DOMAINS/Ribonuclease_P.replace.tsv  |   335 |
-| DOMAINS/RNase_H.replace.tsv         |    89 |
-| DOMAINS/RNase_HII.replace.tsv       |   449 |
-| DOMAINS/DUF3378.replace.tsv         |    77 |
-| DOMAINS/Lactamase_B_2.replace.tsv   |   731 |
-| DOMAINS/DNA_pol_A_exo1.replace.tsv  |   139 |
-| DOMAINS/HRDC.replace.tsv            |    55 |
-| DOMAINS/RNase_T.replace.tsv         |   441 |
-| DOMAINS/DHH.replace.tsv             |   775 |
-| DOMAINS/DHHA1.replace.tsv           |  1034 |
+| DOMAINS/Ribonucleas_3_3.replace.tsv |   357 |
+| DOMAINS/dsrm.replace.tsv            |   323 |
+| DOMAINS/Ribonuclease_P.replace.tsv  |   351 |
+| DOMAINS/RNase_H.replace.tsv         |    88 |
+| DOMAINS/RNase_HII.replace.tsv       |   483 |
+| DOMAINS/DUF3378.replace.tsv         |    75 |
+| DOMAINS/Lactamase_B_2.replace.tsv   |   692 |
+| DOMAINS/DNA_pol_A_exo1.replace.tsv  |   125 |
+| DOMAINS/HRDC.replace.tsv            |    46 |
+| DOMAINS/RNase_T.replace.tsv         |   445 |
+| DOMAINS/DHH.replace.tsv             |   822 |
+| DOMAINS/DHHA1.replace.tsv           |  1092 |
 
 ```shell script
 cd ~/data/alignment/Tenericutes
