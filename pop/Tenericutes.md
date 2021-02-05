@@ -1,46 +1,48 @@
 # Aligning various genera from Tenericutes
 
 
-[TOC levels=1-3]: # " "
+[TOC levels=1-3]: # ""
+
 - [Aligning various genera from Tenericutes](#aligning-various-genera-from-tenericutes)
 - [Phylum Tenericutes and outgroups](#phylum-tenericutes-and-outgroups)
-    - [Download from NCBI assembly](#download-from-ncbi-assembly)
-    - [NCBI taxonomy](#ncbi-taxonomy)
-    - [Count strains](#count-strains)
+  - [Download from NCBI assembly](#download-from-ncbi-assembly)
+  - [Some packages needed](#some-packages-needed)
+  - [NCBI taxonomy](#ncbi-taxonomy)
+  - [Count strains](#count-strains)
 - [Collect proteins](#collect-proteins)
-    - [`all.pro.fa`](#allprofa)
-    - [`all.replace.fa`](#allreplacefa)
-    - [`all.info.tsv`](#allinfotsv)
+  - [`all.pro.fa`](#allprofa)
+  - [`all.replace.fa`](#allreplacefa)
+  - [`all.info.tsv`](#allinfotsv)
 - [Phylogenetics with 40 single-copy genes, *RpoB*, *EF-tu* and RNase_R](#phylogenetics-with-40-single-copy-genes-rpob-ef-tu-and-rnase_r)
-    - [Find corresponding proteins by `hmmsearch`](#find-corresponding-proteins-by-hmmsearch)
-    - [Create valid marker gene list](#create-valid-marker-gene-list)
-    - [Align and concat marker genes to create species tree](#align-and-concat-marker-genes-to-create-species-tree)
-    - [Tweak the concat tree](#tweak-the-concat-tree)
-    - [TIGR](#tigr)
+  - [Find corresponding proteins by `hmmsearch`](#find-corresponding-proteins-by-hmmsearch)
+  - [Create valid marker gene list](#create-valid-marker-gene-list)
+  - [Align and concat marker genes to create species tree](#align-and-concat-marker-genes-to-create-species-tree)
+  - [Tweak the concat tree](#tweak-the-concat-tree)
+  - [TIGR](#tigr)
 - [Essential genes](#essential-genes)
 - [Bacteria degradosome](#bacteria-degradosome)
-    - [Components of the RNA degradosome in E. coli](#components-of-the-rna-degradosome-in-e-coli)
-    - [The Gram-Positive Bacterial RNA Degradosome](#the-gram-positive-bacterial-rna-degradosome)
-    - [Proteins containing S1 domain in E. coli](#proteins-containing-s1-domain-in-e-coli)
-    - [Other RNases](#other-rnases)
+  - [Components of the RNA degradosome in E. coli](#components-of-the-rna-degradosome-in-e-coli)
+  - [The Gram-Positive Bacterial RNA Degradosome](#the-gram-positive-bacterial-rna-degradosome)
+  - [Proteins containing S1 domain in E. coli](#proteins-containing-s1-domain-in-e-coli)
+  - [Other RNases](#other-rnases)
 - [Intriguing domains](#intriguing-domains)
-    - [Domain organisation of RNase R](#domain-organisation-of-rnase-r)
-        - [E. coli RNase R](#e-coli-rnase-r)
-        - [E. coli RNase II](#e-coli-rnase-ii)
-        - [Human RRP44](#human-rrp44)
-        - [Fly Dis3](#fly-dis3)
-        - [Yeast RRP44](#yeast-rrp44)
-        - [Arabidopsis thaliana RP44A](#arabidopsis-thaliana-rp44a)
-    - [hmmer.org HMMSCAN Results](#hmmerorg-hmmscan-results)
-    - [Domains of RNases and Cooperators](#domains-of-rnases-and-cooperators)
-    - [Scan every domains](#scan-every-domains)
-    - [InterProScan](#interproscan)
+  - [Domain organisation of RNase R](#domain-organisation-of-rnase-r)
+    - [E. coli RNase R](#e-coli-rnase-r)
+    - [E. coli RNase II](#e-coli-rnase-ii)
+    - [Human RRP44](#human-rrp44)
+    - [Fly Dis3](#fly-dis3)
+    - [Yeast RRP44](#yeast-rrp44)
+    - [Arabidopsis thaliana RP44A](#arabidopsis-thaliana-rp44a)
+  - [hmmer.org HMMSCAN Results](#hmmerorg-hmmscan-results)
+  - [Domains of RNases and Cooperators](#domains-of-rnases-and-cooperators)
+  - [Scan every domains](#scan-every-domains)
+  - [InterProScan](#interproscan)
 - [RNase R](#rnase-r)
-    - [Stats of annotations and HMM models](#stats-of-annotations-and-hmm-models)
-    - [Find all RNase R](#find-all-rnase-r)
-    - [Tweak the tree of RNaseR](#tweak-the-tree-of-rnaser)
-    - [RNB domain](#rnb-domain)
-    - [Importin_rep domain](#importin_rep-domain)
+  - [Stats of annotations and HMM models](#stats-of-annotations-and-hmm-models)
+  - [Find all RNase R](#find-all-rnase-r)
+  - [Tweak the tree of RNaseR](#tweak-the-tree-of-rnaser)
+  - [RNB domain](#rnb-domain)
+  - [Importin_rep domain](#importin_rep-domain)
 - [Tenericutes: run](#tenericutes-run)
 
 
@@ -60,59 +62,57 @@ Ref.:
 Key genera:
 
 * Acholeplasmatales
-    * *Acholeplasma*: 2147
-    * *Candidatus Phytoplasma*: 33926
+  * *Acholeplasma*: 2147
+  * *Candidatus Phytoplasma*: 33926
 
 * Anaeroplasmatales
-    * *Anaeroplasma*: 2086
-    * *Asteroleplasma*: 2152
+  * *Anaeroplasma*: 2086
+  * *Asteroleplasma*: 2152
 
 * Entomoplasmatales
-    * *Entomoplasma*: 46238
-    * *Mesoplasma*: 46239
-    * *Spiroplasma*: 2132
+  * *Entomoplasma*: 46238
+  * *Mesoplasma*: 46239
+  * *Spiroplasma*: 2132
 
 * Mycoplasmatales
-    * *Mycoplasma*: 2093
-    * *Ureaplasma*: 2129
-    * *Candidatus Hepatoplasma*: 295595
+  * *Mycoplasma*: 2093
+  * *Ureaplasma*: 2129
+  * *Candidatus Hepatoplasma*: 295595
 
 * *Candidatus Izimaplasma*: 1912503
 
 * Haloplasmatales
-    * *Haloplasma*: 471824
-    * *Inordinaticella*: 1979191
+  * *Haloplasma*: 471824
+  * *Inordinaticella*: 1979191
 
 Outgroup:
 
 * Firmicutes
-    * Bacillus subtilis subsp. subtilis str. 168: 224308
-    * Staphylococcus aureus subsp. aureus NCTC 8325: 93061
-    * Eubacterium limosum KIST612: 903814
-    * Erysipelothrix rhusiopathiae str. Fujisawa: 650150
-    * Clostridium acetobutylicum ATCC 824: 272562
-    * Clostridium tetani E88: 212717
+  * Bacillus subtilis subsp. subtilis str. 168: 224308
+  * Staphylococcus aureus subsp. aureus NCTC 8325: 93061
+  * Erysipelothrix rhusiopathiae str. Fujisawa: 650150
+  * Clostridium acetobutylicum ATCC 824: 272562
+  * Clostridium tetani E88: 212717
 
 * Actinobacteria
-    * Amycolatopsis mediterranei U32: 749927
-    * Bifidobacterium adolescentis ATCC 15703: 367928
-    * Corynebacterium glutamicum ATCC 13032: 196627
-    * Mycobacterium tuberculosis H37Rv: 83332
+  * Amycolatopsis mediterranei U32: 749927
+  * Bifidobacterium adolescentis ATCC 15703: 367928
+  * Corynebacterium glutamicum ATCC 13032: 196627
 
 * Alphaproteobacteria
-    * Brucella melitensis bv. 1 str. 16M: 224914
+  * Brucella melitensis bv. 1 str. 16M: 224914
 
 * Betaproteobacteria
-    * Neisseria gonorrhoeae FA 1090: 242231
+  * Neisseria gonorrhoeae FA 1090: 242231
 
 * Gammaproteobacteria
-    * Escherichia coli str. K-12 substr. MG1655: 511145
-    * Salmonella enterica subsp. enterica serovar Typhimurium str. LT2: 99287
-    * Pseudomonas aeruginosa PAO1: 208964
-    * Pseudomonas putida KT2440: 160488
+  * Escherichia coli str. K-12 substr. MG1655: 511145
+  * Salmonella enterica subsp. enterica serovar Typhimurium str. LT2: 99287
+  * Pseudomonas aeruginosa PAO1: 208964
+  * Pseudomonas putida KT2440: 160488
 
 * delta/epsilon subdivisions
-    * Helicobacter pylori 26695: 85962
+  * Helicobacter pylori 26695: 85962
 
 Check NCBI pages:
 
@@ -121,43 +121,43 @@ Check NCBI pages:
 
 ## Download from NCBI assembly
 
-```bash
+```shell script
 export RANK_NAME=Tenericutes
 
 mkdir -p ~/data/alignment/${RANK_NAME}        # Working directory
 cd ~/data/alignment/${RANK_NAME}
 
 mysql -ualignDB -palignDB ar_refseq -e "
-    SELECT 
+    SELECT
         organism_name, species, genus, ftp_path, assembly_level
-    FROM ar 
+    FROM ar
     WHERE 1=1
         AND genus_id in (2147, 33926, 2086, 2152, 46238, 46239, 2132, 2093, 2129, 295595, 1912503, 471824, 1979191)
     " \
     > raw.tsv
 
 mysql -ualignDB -palignDB ar_refseq -e "
-    SELECT 
+    SELECT
         organism_name, species, genus, ftp_path, assembly_level
-    FROM ar 
+    FROM ar
     WHERE 1=1
-        AND taxonomy_id in (224308, 93061, 903814, 650150, 272562, 212717, 749927, 367928, 196627, 83332)
+        AND taxonomy_id in (224308, 93061, 650150, 272562, 212717, 749927, 367928, 196627)
     " \
     >> raw.tsv
 
 mysql -ualignDB -palignDB ar_refseq -e "
-    SELECT 
+    SELECT
         organism_name, species, genus, ftp_path, assembly_level
-    FROM ar 
+    FROM ar
     WHERE 1=1
         AND taxonomy_id in (224914, 242231, 511145, 99287, 208964, 160488, 85962)
     " \
     >> raw.tsv
 
 mysql -ualignDB -palignDB ar_genbank -e "
-    SELECT 
+    SELECT
         organism_name, species, genus, ftp_path, assembly_level
-    FROM ar 
+    FROM ar
     WHERE 1=1
         AND genus_id in (2147, 33926, 2086, 2152, 46238, 46239, 2132, 2093, 2129, 295595, 1912503, 471824, 1979191)
     " \
@@ -168,7 +168,7 @@ cat raw.tsv |
     perl ~/Scripts/withncbi/taxon/abbr_name.pl -c "1,2,3" -s '\t' -m 3 --shortsub |
     (echo -e '#name\tftp_path\torganism\tassembly_level' && cat ) |
     perl -nl -a -F"," -e '
-        BEGIN{my %seen}; 
+        BEGIN{my %seen};
         /^#/ and print and next;
         /^organism_name/i and next;
         $seen{$F[5]}++;
@@ -188,6 +188,10 @@ cat ${RANK_NAME}.assembly.tsv |
     sort -nr
 
 # Edit .tsv, remove unnecessary strains, check strain names and comment out poor assemblies.
+
+# Remove uncertain species like Acholeplasma sp.
+# Move outgroups to the bottom.
+
 # vim ${RANK_NAME}.assembly.tsv
 # cp ${RANK_NAME}.assembly.tsv ~/Scripts/withncbi/pop
 
@@ -198,7 +202,7 @@ unset RANK_NAME
 
 ```
 
-```bash
+```shell script
 cd ~/data/alignment/Tenericutes
 
 perl ~/Scripts/withncbi/taxon/assembly_prep.pl \
@@ -211,9 +215,24 @@ bash ASSEMBLY/Tenericutes.assembly.collect.sh
 
 ```
 
+## Some packages needed
+
+```shell script
+brew install hmmer
+brew install librsvg
+
+brew install brewsci/bio/muscle
+brew install brewsci/bio/fasttree
+brew install brewsci/bio/easel
+brew install brewsci/bio/newick-utils
+
+brew install wang-q/tap/tsv-utils
+
+```
+
 ## NCBI taxonomy
 
-```bash
+```shell script
 cd ~/data/alignment/Tenericutes
 
 bp_taxonomy2tree.pl -e \
@@ -258,7 +277,7 @@ nw_display -w 600 -s Tenericutes.newick |
 
 ## Count strains
 
-```bash
+```shell script
 cd ~/data/alignment/Tenericutes
 
 parallel --no-run-if-empty --linebuffer -k -j 4 '
@@ -270,7 +289,7 @@ parallel --no-run-if-empty --linebuffer -k -j 4 '
         sort |
         uniq |
         wc -l)
-    
+
     n_strains=$(cat ASSEMBLY/Tenericutes.assembly.collect.csv |
         cut -d"," -f 2 |
         grep -v "Candidatus" |
@@ -278,56 +297,53 @@ parallel --no-run-if-empty --linebuffer -k -j 4 '
         cut -d" " -f 1,2 |
         sort |
         wc -l)
-    
+
     printf "%s\t%d\t%d\n" {} ${n_species} ${n_strains}
     ' ::: Acholeplasma Entomoplasma Mesoplasma Spiroplasma Mycoplasma Ureaplasma
 
-#Acholeplasma    11      12
-#Entomoplasma    6       10
-#Mesoplasma      11      15
-#Spiroplasma     25      30
-#Mycoplasma      86      197
-#Ureaplasma      4       25
+#Acholeplasma	10	13
+#Entomoplasma	6	10
+#Mesoplasma	11	15
+#Spiroplasma	28	31
+#Mycoplasma	95	217
+#Ureaplasma	4	25
 
 mkdir -p taxon
 
 echo "An_bac" > taxon/Anaeroplasma
 echo "Ha_cont_SSD_17B" > taxon/Haloplasma
 echo "I_for" > taxon/Inordinaticella
-echo "CH_crin_Av" > taxon/Hepatoplasma
+#echo "CH_crin_Av" > taxon/Hepatoplasma
 
-cat <<EOF > taxon/Izimaplasma
-CI_sp_HR1
-CI_sp_HR2
-CI_sp_Z
-EOF
+#cat <<EOF > taxon/Izimaplasma
+#CI_sp_HR1
+#CI_sp_HR2
+#CI_sp_Z
+#EOF
 
 cat <<EOF > taxon/Phytoplasma
 CP_Ast_AYWB
 CP_Bra
-CP_aura
 CP_aus
-CP_aus_Strawberry_NZSb11
-CP_mali
-CP_ory
-CP_phoenici
-CP_pru
-CP_sol
-CP_ziz
+CP_Cat
 CP_Chrysanthemum_c
 CP_Chrysanthemum_y
+CP_Cyn
 CP_Ech
 CP_Ita_MA1
 CP_Mai
 CP_Mil_MW1
-CP_Vac_VAC
-CP_Whe
 CP_New
 CP_Oni_OY_M
+CP_Par
 CP_Pea_NTU2011
-CP_Phy
+CP_Per
 CP_Poi_JR1
+CP_Rap
 CP_Ric
+CP_Sac
+CP_Vac_VAC
+CP_Whe
 EOF
 
 parallel --no-run-if-empty --linebuffer -k -j 4 '
@@ -338,69 +354,58 @@ parallel --no-run-if-empty --linebuffer -k -j 4 '
         > taxon/{}
     ' ::: Acholeplasma Entomoplasma Mesoplasma Spiroplasma Mycoplasma Ureaplasma
 
-# Misplaced in taxonomy tree
-#echo "Ac_sp_CAG_878" >> taxon/Acholeplasma
-
-#cat <<EOF >> taxon/Mycoplasma
-#Mycop_sp_CAG_472
-#Mycop_sp_CAG_611
-#Mycop_sp_CAG_611_25_7
-#Mycop_sp_CAG_776
-#Mycop_sp_CAG_877
-#Mycop_sp_CAG_956
-#EOF
-
 cat <<EOF > taxon/Firmicutes
 Ba_subt_subtilis_168
-St_aure_aureus_NCTC_8325
 Cl_ace_ATCC_824
 Cl_tet_E88
 Er_rhu_Fujisawa
-Eu_lim_KIST612
+St_aure_aureus_NCTC_8325
 EOF
 
 cat <<EOF > taxon/Actinobacteria
 Am_med_U32
 Bi_ado_ATCC_15703
 Co_glu_ATCC_13032
-Mycob_tub_H37Rv
 EOF
 
 cat <<EOF > taxon/Proteobacteria
+Br_meli_bv_1_16M
 Es_coli_K_12_MG1655
-Sa_ente_Typhimurium_LT2
+He_pyl_26695
+N_gon_FA_1090
 P_aer_PAO1
 P_puti_KT2440
-Br_meli_bv_1_16M
-N_gon_FA_1090
-He_pyl_26695
+Sa_ente_enterica_Typhimurium_LT2
 EOF
 
 wc -l taxon/*
 
 find taxon -maxdepth 1 -type f -not -name "*.replace.tsv" |
-    xargs -i basename {} \
+    xargs -I{} basename {} |
+    sort \
     > genus.list
 
 # Omit strains without protein annotations
-#Sp_Chol
-#CP_Phy
-#Mycop_moa_ATCC_27625
-#Mycop_sp_Bg1
-#Mycop_sp_Bg2
-#Mycop_sp_U
+#My_arg_ATCC_23838
+#My_moa_ATCC_27625
+#My_myc_capri_G1201
 for GENUS in $(cat genus.list); do
     for STRAIN in $(cat taxon/${GENUS}); do
         if ! compgen -G "ASSEMBLY/${STRAIN}/*_protein.faa.gz" > /dev/null; then
             echo ${STRAIN}
         fi
-    done 
-done \
+        if ! compgen -G "ASSEMBLY/${STRAIN}/*_cds_from_genomic.fna.gz" > /dev/null; then
+            echo ${STRAIN}
+        fi
+    done
+done |
+    uniq \
     > omit.list
 
+# Remove lines in taxon/${GENUS}
 for GENUS in $(cat genus.list); do
     perl -nl -i -MPath::Tiny -e '
-        BEGIN { 
+        BEGIN {
             our %omit = map { $_ => 1 }
                         grep {/\S/}
                         path(q{omit.list})->lines({ chomp => 1});
@@ -414,21 +419,21 @@ done
 | Order             | Genus           | Comments           | Species | Strains |
 |:------------------|:----------------|:-------------------|--------:|--------:|
 | Acholeplasmatales |                 |                    |         |         |
-|                   | Acholeplasma    | 无胆甾原体           |      11 |      13 |
-|                   | Phytoplasma     | 植原体              |         |      25 |
+|                   | Acholeplasma    | 无胆甾原体           |      10 |      13 |
+|                   | Phytoplasma     | 植原体              |         |      22 |
 | Anaeroplasmatales |                 |                    |         |         |
 |                   | Anaeroplasma    |                    |       1 |       1 |
 |                   | Asteroleplasma  |                    |         |         |
 | Entomoplasmatales |                 | 虫原体              |         |         |
 |                   | Entomoplasma    |                    |       6 |      10 |
 |                   | Mesoplasma      |                    |      11 |      15 |
-|                   | Spiroplasma     | 螺原体, 感染昆虫与植物 |      25 |      31 |
+|                   | Spiroplasma     | 螺原体, 感染昆虫与植物 |      28 |      31 |
 | Mycoplasmatales   |                 |                    |         |         |
-|                   | Mycoplasma      | 支原体              |      86 |     207 |
+|                   | Mycoplasma      | 支原体              |      95 |     217 |
 |                   | Ureaplasma      | 脲原体              |       4 |      25 |
-|                   | Hepatoplasma    |                    |       1 |       1 |
+|                   | Hepatoplasma    |                    |         |         |
 | Unclassified      |                 |                    |         |         |
-|                   | Izimaplasma     | 独立生活             |         |       3 |
+|                   | Izimaplasma     | 独立生活             |         |         |
 | Haloplasmatales   |                 |                    |         |         |
 |                   | Haloplasma      |                    |       1 |       1 |
 |                   | Inordinaticella |                    |       1 |       1 |
@@ -437,18 +442,18 @@ done
 
 ## `all.pro.fa`
 
-```bash
+```shell script
 cd ~/data/alignment/Tenericutes
 
 mkdir -p PROTEINS
 
-# 350
+# 351
 find ASSEMBLY -maxdepth 1 -type d |
     sort |
     grep 'ASSEMBLY/' |
     wc -l
 
-# 344
+# 348
 find ASSEMBLY -type f -name "*_protein.faa.gz" |
     wc -l
 
@@ -486,7 +491,7 @@ cat PROTEINS/all.pro.fa |
 
 ## `all.replace.fa`
 
-```bash
+```shell script
 cd ~/data/alignment/Tenericutes
 
 rm PROTEINS/all.strain.tsv
@@ -505,11 +510,11 @@ for GENUS in $(cat genus.list); do
                 printf qq{%s\t%s_%s\t%s\n}, $n, $ENV{STRAIN}, $s, $ENV{STRAIN};
             ' \
         > PROTEINS/${STRAIN}.replace.tsv
-        
+
         cut -f 2,3 PROTEINS/${STRAIN}.replace.tsv >> PROTEINS/all.strain.tsv
 
         faops replace -s ASSEMBLY/${STRAIN}/*_protein.faa.gz <(cut -f 1,2 PROTEINS/${STRAIN}.replace.tsv) stdout
-        
+
         rm PROTEINS/${STRAIN}.replace.tsv
     done
 done \
@@ -519,12 +524,12 @@ done \
 cat PROTEINS/all.pro.fa |
     grep "^>" |
     wc -l
-#310265
+#315324
 
 cat PROTEINS/all.replace.fa |
     grep "^>" |
     wc -l
-#310265
+#315324
 
 rm -fr temp
 (echo -e "#name\tstrain" && cat PROTEINS/all.strain.tsv)  \
@@ -540,7 +545,7 @@ rm PROTEINS/all.replace.sizes
 
 ## `all.info.tsv`
 
-```bash
+```shell script
 cd ~/data/alignment/Tenericutes
 
 for GENUS in $(cat genus.list); do
@@ -564,7 +569,7 @@ done \
 
 cat PROTEINS/all.annotation.tsv |
     wc -l
-#310265
+#315324
 
 rm -fr temp
 (echo -e "#name\tannotation" && cat PROTEINS/all.annotation.tsv) \
@@ -592,13 +597,13 @@ tsv-join \
 
 cat PROTEINS/all.info.tsv |
     wc -l
-#310266
+#315325
 
 ```
 
 # Phylogenetics with 40 single-copy genes, *RpoB*, *EF-tu* and RNase_R
 
-##  Find corresponding proteins by `hmmsearch`
+## Find corresponding proteins by `hmmsearch`
 
 * Download need hmm models in [`hmm/README.md`](../hmm/README.md)
 
@@ -608,23 +613,23 @@ cat PROTEINS/all.info.tsv |
 * RpoB: TIGR02013
 * EF-tu: TIGR00485
 
-```bash
+```shell script
 E_VALUE=1e-20
 
 cd ~/data/alignment/Tenericutes
 
-# example
-#gzip -dcf ASSEMBLY/Aaxa_ATCC_25176/*_protein.faa.gz |
-#    hmmsearch -E 1e-20 --domE 1e-20 --noali --notextw ~/data/HMM/40sg/bacteria_and_archaea_dir/BA00001.hmm - |
+## example
+#gzip -dcf ASSEMBLY/Ac_axa_ATCC_25176/*_protein.faa.gz |
+#    hmmsearch -E 1e-20 --domE 1e-20 --noali --notextw ~/data/HMM/40scg/bacteria_and_archaea_dir/BA00001.hmm - |
 #    grep '>>' |
 #    perl -nl -e '/>>\s+(\S+)/ and print $1'
 
 # Find all genes
 for marker in BA000{01..40}; do
     echo "==> marker [${marker}]"
-    
+
     mkdir -p PROTEINS/${marker}
-    
+
     for GENUS in $(cat genus.list); do
         echo "==> GENUS [${GENUS}]"
 
@@ -638,15 +643,15 @@ for marker in BA000{01..40}; do
         done \
             > PROTEINS/${marker}/${GENUS}.replace.tsv
     done
-    
+
     echo
 done
 
 for marker in TIGR02013 TIGR00485; do
     echo "==> marker [${marker}]"
-    
+
     mkdir -p PROTEINS/${marker}
-    
+
     for GENUS in $(cat genus.list); do
         echo "==> GENUS [${GENUS}]"
 
@@ -664,7 +669,7 @@ for marker in TIGR02013 TIGR00485; do
         done \
             > PROTEINS/${marker}/${GENUS}.replace.tsv
     done
-    
+
     echo
 done
 
@@ -674,27 +679,30 @@ done
 
 * `hmmsearch` may identify more than one copy for some marker genes.
 
-    * BA00005: translation initiation factor IF-2
-    * BA00008: signal recognition particle protein
-    * BA00013: phenylalanine--tRNA ligase subunit beta
+  * BA00005: translation initiation factor IF-2
+  * BA00008: signal recognition particle protein
+  * BA00013: phenylalanine--tRNA ligase subunit beta
+
+  * TIGR02013: the beta subunit of Bacterial RNA polymerase
+  * TIGR00485: translation elongation factor EF-Tu
 
 * Misidentified marker genes
 
-    * BA00004: translation initiation factor EF-2
+  * BA00004: translation initiation factor EF-2
 
 * Missing from many strains
 
-    * BA00022: ribosomal protein L25/L23
-    * BA00027: ribosomal protein L29
-    * BA00032: tRNA pseudouridine synthase B
-    * BA00035: Porphobilinogen deaminase
-    * BA00038: phosphoribosylformylglycinamidine cyclo-ligase
-    * BA00039: ribonuclease HII
-    * BA00040: ribosomal protein L24
+  * BA00022: ribosomal protein L25/L23
+  * BA00027: ribosomal protein L29
+  * BA00032: tRNA pseudouridine synthase B
+  * BA00035: Porphobilinogen deaminase
+  * BA00038: phosphoribosylformylglycinamidine cyclo-ligase
+  * BA00039: ribonuclease HII
+  * BA00040: ribosomal protein L24
 
 Compare proteins and strains.
 
-```bash
+```shell script
 cd ~/data/alignment/Tenericutes
 
 for marker in BA000{01..03} BA000{06..07} BA000{09..12} BA000{14..21} BA000{23..26} BA000{28..31} BA000{33..34} BA000{36..37}; do
@@ -709,7 +717,7 @@ for marker in $(cat marker.list); do
             cut -f 2 |
             diff - taxon/${GENUS}
     done
-    
+
     echo
 done
 
@@ -717,10 +725,10 @@ done
 
 ## Align and concat marker genes to create species tree
 
-```bash
+```shell script
 cd ~/data/alignment/Tenericutes
 
-# extract sequences 
+# extract sequences
 for marker in $(cat marker.list) TIGR02013 TIGR00485; do
     echo "==> marker [${marker}]"
 
@@ -732,23 +740,23 @@ for marker in $(cat marker.list) TIGR02013 TIGR00485; do
         # avoid duplicated fasta headers
         faops some PROTEINS/all.pro.fa PROTEINS/${marker}/${GENUS}.replace.tsv stdout |
             faops filter -u stdin ${mytmpdir}/${GENUS}.fa
-        
+
         # avoid duplicated original names
         cat PROTEINS/${marker}/${GENUS}.replace.tsv |
             parallel --no-run-if-empty --linebuffer -k -j 1 "
                 faops replace -s ${mytmpdir}/${GENUS}.fa <(echo {}) stdout
             " \
             > PROTEINS/${marker}/${GENUS}.pro.fa
-            
+
         rm -fr ${mytmpdir}
     done
-    
+
     echo
 done
 
 for marker in $(cat marker.list) TIGR02013 TIGR00485; do
     echo "==> marker [${marker}]"
-    
+
     for GENUS in $(cat genus.list); do
         cat PROTEINS/${marker}/${GENUS}.pro.fa
     done \
@@ -759,7 +767,7 @@ done
 cat marker.list |
     parallel --no-run-if-empty --linebuffer -k -j 4 "
         echo '==> {}'
-        
+
         muscle -quiet -in PROTEINS/{}/{}.pro.fa -out PROTEINS/{}/{}.aln.fa
     "
 
@@ -767,14 +775,12 @@ cat marker.list |
 for marker in $(cat marker.list); do
     # sequences in one line
     faops filter -l 0 PROTEINS/${marker}/${marker}.aln.fa stdout
-    
+
     # empty line for .fas
     echo
 done \
     > PROTEINS/markers.aln.fas
 
-# faspos names need full headers
-#fasops names Phylo/markers.aln.fas -o stdout
 cat PROTEINS/markers.aln.fas |
     grep "^>" |
     sed "s/^>//" |
@@ -783,13 +789,14 @@ cat PROTEINS/markers.aln.fas |
     > strains.list
 fasops concat PROTEINS/markers.aln.fas strains.list -o PROTEINS/concat.aln.fa
 
+# FastTree produces NJ trees to simulate ML ones
 FastTree -quiet PROTEINS/concat.aln.fa > PROTEINS/concat.aln.newick
 
 ```
 
 ## Tweak the concat tree
 
-```bash
+```shell script
 cd ~/data/alignment/Tenericutes
 
 # reroot
@@ -803,7 +810,7 @@ for GENUS in $(cat genus.list); do
             nw_stats -f l - |
             cut -f 3
     )
-    
+
     if [[ "$NODE" ]]; then
         echo "${GENUS}" >> genus.monophyly.list
         cat taxon/${GENUS} |
@@ -812,7 +819,7 @@ for GENUS in $(cat genus.list); do
     else
         echo "${GENUS}" >> genus.paraphyly.list
     fi
-    
+
 done
 
 # Merge strains in genus to higher-rank
@@ -841,18 +848,18 @@ rm species.monophyly.list species.paraphyly.list species.monophyly.map
 cat species.count.tsv |
     perl -nl -MPath::Tiny -e '
         BEGIN {
-            our @strains = 
+            our @strains =
                 grep {/\S/}
                 path(q{strains.paraphyly.list})->lines({ chomp => 1});
         }
-        
+
         my @ns = split /\t/;
         my @sts = grep {/^$ns[0]/} @strains;
-        
+
         my $cmd = q{nw_clade -m PROTEINS/concat.reroot.newick };
         $cmd .= " $_ " for @sts;
         $cmd .= " | nw_stats -f l - | cut -f 3";
-        
+
         my $result = `$cmd`;
         if ($result) {
             print qq{$_ $ns[1]} for @sts;
@@ -873,14 +880,14 @@ nw_rename PROTEINS/concat.map.newick species.monophyly.map |
 
 ## TIGR
 
-```bash
+```shell script
 cd ~/data/alignment/Tenericutes
 
 parallel --no-run-if-empty --linebuffer -k -j 4 "
     echo '==> {}'
-    
+
     muscle -quiet -in PROTEINS/{}/{}.pro.fa -out PROTEINS/{}/{}.aln.fa
-    
+
     FastTree -quiet PROTEINS/{}/{}.aln.fa > PROTEINS/{}/{}.aln.newick
     " ::: TIGR02013 TIGR00485
 
@@ -888,35 +895,34 @@ parallel --no-run-if-empty --linebuffer -k -j 4 "
 
 # Essential genes
 
-
-```bash
+```shell script
 cd ~/data/alignment/Tenericutes
 
 mkdir -p ESS
 
-# Mycop_gen_G37
+# My_gen_G37
 for index in $(seq 1 7); do
     curl -s "http://tubic.org/deg_bak/show.php?selfield=ac&term=DEG1006&page=${index}&sort=ac&db=p" |
         pup 'table.geneList tr td table.geneList tr td text{}' |
         grep '\S' |
-        paste -d $'\t' - - - - - 
+        paste -d $'\t' - - - - -
 done |
     tsv-uniq \
-    > ESS/Mycop_gen_G37.tsv
+    > ESS/My_gen_G37.tsv
 
 for index in $(seq -f "%03g" 1 381); do
     curl -s "http://tubic.org/deg_bak/information.php?ac=DEG10060${index}" |
         pup 'table tr:last-child td pre text{}' |
         (echo ">DEG10060${index}" && cat)
 done \
-    > ESS/Mycop_gen_G37.pro.fa
+    > ESS/My_gen_G37.pro.fa
 
 # Ba_subt_subtilis_168
 for index in $(seq 1 5); do
     curl -s "http://tubic.org/deg_bak/show.php?selfield=ac&term=DEG1001&page=${index}&sort=ac&db=p" |
         pup 'table.geneList tr td table.geneList tr td text{}' |
         grep '\S' |
-        paste -d $'\t' - - - - - 
+        paste -d $'\t' - - - - -
 done |
     tsv-uniq \
     > ESS/Ba_subt_subtilis_168.tsv
@@ -933,7 +939,7 @@ for index in $(seq 1 11); do
     curl -s "http://tubic.org/deg_bak/show.php?selfield=ac&term=DEG1018&page=${index}&sort=ac&db=p" |
         pup 'table.geneList tr td table.geneList tr td text{}' |
         grep '\S' |
-        paste -d $'\t' - - - - - 
+        paste -d $'\t' - - - - -
 done |
     tsv-uniq \
     > ESS/Es_coli_K_12_MG1655.tsv
@@ -945,29 +951,12 @@ for index in $(seq -f "%03g" 1 609); do
 done \
     > ESS/Es_coli_K_12_MG1655.pro.fa
 
-# Mycob_tub_H37Rv
-for index in $(seq 1 11); do
-    curl -s "http://tubic.org/deg_bak/show.php?selfield=ac&term=DEG1025&page=${index}&sort=ac&db=p" |
-        pup 'table.geneList tr td table.geneList tr td text{}' |
-        grep '\S' |
-        paste -d $'\t' - - - - - 
-done |
-    tsv-uniq \
-    > ESS/Mycob_tub_H37Rv.tsv
-
-for index in $(seq -f "%03g" 1 771); do
-    curl -s "http://tubic.org/deg_bak/information.php?ac=DEG10250${index}" |
-        pup 'table tr:last-child td pre text{}' |
-        (echo ">DEG10250${index}" && cat)
-done \
-    > ESS/Mycob_tub_H37Rv.pro.fa
-
 # St_aure_aureus_NCTC_8325
 for index in $(seq 1 6); do
     curl -s "http://tubic.org/deg_bak/show.php?selfield=ac&term=DEG1017&page=${index}&sort=ac&db=p" |
         pup 'table.geneList tr td table.geneList tr td text{}' |
         grep '\S' |
-        paste -d $'\t' - - - - - 
+        paste -d $'\t' - - - - -
 done |
     tsv-uniq \
     > ESS/St_aure_aureus_NCTC_8325.tsv
@@ -983,6 +972,33 @@ done \
 # Visit https://www.uniprot.org/uniprot/?query=organism%3A%22243273%22&sort=score
 # Download Tab
 
+# Find RNase in ESS
+cat ESS/*.tsv |
+    grep -i 'nuclease'
+
+#120 	DEG10010120	rnc 	ribonuclease III 	Bacillus subtilis 168
+#270 	DEG10010270	rnpA 	protein component of ribonuclease P (RNase P) 	Bacillus subtilis 168
+#50 	DEG10180050	rnhB 	Ribonuclease HII (EC 3.1.26.4) 	Escherichia coli MG1655 I
+#56 	DEG10180056	rnhA 	Ribonuclease HI (EC 3.1.26.4) 	Escherichia coli MG1655 I
+#103 	DEG10180103	rusA 	Crossover junction endodeoxyribonuclease rusA (EC 3.1.22.-) 	Escherichia coli MG1655 I
+#176 	DEG10180176	rne 	Ribonuclease E (EC 3.1.4.-) 	Escherichia coli MG1655 I
+#275 	DEG10180275	rnt 	Ribonuclease T (EC 3.1.13.-) 	Escherichia coli MG1655 I
+#312 	DEG10180312	ruvC 	Crossover junction endodeoxyribonuclease ruvC (EC 3.1.22.4) 	Escherichia coli MG1655 I
+#397 	DEG10180397	rnc 	Ribonuclease III (EC 3.1.26.3) 	Escherichia coli MG1655 I
+#608 	DEG10180608	yjjV 	Putative deoxyribonuclease yjjV (EC 3.1.21.-) 	Escherichia coli MG1655 I
+#55 	DEG10060055	uvrB 	excinuclease ABC, B subunit 	Mycoplasma genitalium G37
+#85 	DEG10060085	vacB 	ribonuclease R 	Mycoplasma genitalium G37
+#155 	DEG10060155	MG_186 	Staphylococcal nuclease homologue, putative 	Mycoplasma genitalium G37
+#167 	DEG10060167	rnhC 	ribonuclease HIII 	Mycoplasma genitalium G37
+#174 	DEG10060174	uvrC 	excinuclease ABC, C subunit 	Mycoplasma genitalium G37
+#200 	DEG10060200	MG_235 	apurinic endonuclease (APN1) 	Mycoplasma genitalium G37
+#219 	DEG10060219	MG_262 	5&#39;-3&#39; exonuclease, putative 	Mycoplasma genitalium G37
+#341 	DEG10060341	uvrA 	excinuclease ABC, A subunit 	Mycoplasma genitalium G37
+#375 	DEG10060375	rnpA 	ribonuclease P protein component 	Mycoplasma genitalium G37
+#82 	DEG10170082	SAOUHSC_00803 	ribonuclease R 	Staphylococcus aureus NCTC 8325
+#187 	DEG10170187	recU 	Holliday junction-specific endonuclease 	Staphylococcus aureus NCTC 8325
+#287 	DEG10170287	SAOUHSC_02277 	putative DNA-binding/iron metalloprotein/AP endonuclease 	Staphylococcus aureus NCTC 8325
+#350 	DEG10170350	rnpA 	ribonuclease P 	Staphylococcus aureus NCTC 8325
 
 ```
 
@@ -1006,48 +1022,48 @@ https://www.uniprot.org/uniprot/?query=ribonuclease+AND+organism%3A%22Escherichi
   or in the intercistronic regions of polycistronic messages. As the elongating ribosomes finish
   translating the functionally inactivated mRNA, RNase E further cleaves the ribosome-free mRNA.
 * Fragments of mRNA produced by RNase E are digested to nucleotides by the exonucleases.
-    * RNase II
-    * RNase R
-    * PNPase
+  * RNase II
+  * RNase R
+  * PNPase
 * RNA helicase B (RhlB) and poly(A) polymerase (PAP) are accessory factors that facilitate
   exoribonucleolytic activity.
-    * RhlB
-    * PAP
+  * RhlB
+  * PAP
 
 * rne
-    * Ribonuclease E
-    * https://www.uniprot.org/uniprot/RNE_ECOLI
-    * S1, RNase_E_G
+  * Ribonuclease E
+  * https://www.uniprot.org/uniprot/RNE_ECOLI
+  * S1, RNase_E_G
 
 * rnb
-    * Exoribonuclease 2
-    * https://www.uniprot.org/uniprot/RNB_ECOLI
-    * OB_RNB, CSD2, RNB, S1
+  * Exoribonuclease 2
+  * https://www.uniprot.org/uniprot/RNB_ECOLI
+  * OB_RNB, CSD2, RNB, S1
 
 * rnr
-    * Ribonuclease R
-    * https://www.uniprot.org/uniprot/RNR_ECOLI
-    * HTH_12, OB_RNB, CSD2, RNB, S1
+  * Ribonuclease R
+  * https://www.uniprot.org/uniprot/RNR_ECOLI
+  * HTH_12, OB_RNB, CSD2, RNB, S1
 
 * pnp
-    * Polyribonucleotide nucleotidyltransferase
-    * https://www.uniprot.org/uniprot/PNP_ECOLI
-    * RNase_PH, RNase_PH_C, PNPase, RNase_PH, RNase_PH_C, KH_1, S1
+  * Polyribonucleotide nucleotidyltransferase
+  * https://www.uniprot.org/uniprot/PNP_ECOLI
+  * RNase_PH, RNase_PH_C, PNPase, RNase_PH, RNase_PH_C, KH_1, S1
 
 * rhlB
-    * ATP-dependent RNA helicase RhlB
-    * https://www.uniprot.org/uniprot/RHLB_ECOLI
-    * DEAD, Helicase_C
+  * ATP-dependent RNA helicase RhlB
+  * https://www.uniprot.org/uniprot/RHLB_ECOLI
+  * DEAD, Helicase_C
 
 * eno
-    * Enolase
-    * https://www.uniprot.org/uniprot/ENO_ECOLI
-    * Enolase_N, Enolase_C
+  * Enolase
+  * https://www.uniprot.org/uniprot/ENO_ECOLI
+  * Enolase_N, Enolase_C
 
 * pcnB
-    * Poly(A) polymerase I
-    * https://www.uniprot.org/uniprot/PCNB_ECOLI
-    * PolyA_pol, PolyA_pol_RNAbd, PolyA_pol_arg_C
+  * Poly(A) polymerase I
+  * https://www.uniprot.org/uniprot/PCNB_ECOLI
+  * PolyA_pol, PolyA_pol_RNAbd, PolyA_pol_arg_C
 
 RNE_ECOLI has binary interactions with 5 proteins:
 
@@ -1058,14 +1074,14 @@ RNE_ECOLI has binary interactions with 5 proteins:
 * ENO_ECOLI
 
 * srmB
-    * ATP-dependent RNA helicase SrmB
-    * https://www.uniprot.org/uniprot/SRMB_ECOLI
-    * DEAD, Helicase_C
+  * ATP-dependent RNA helicase SrmB
+  * https://www.uniprot.org/uniprot/SRMB_ECOLI
+  * DEAD, Helicase_C
 
 * dnaK
-    * Chaperone protein DnaK
-    * https://www.uniprot.org/uniprot/DNAK_ECOLI
-    * HSP70 (PF00012)
+  * Chaperone protein DnaK
+  * https://www.uniprot.org/uniprot/DNAK_ECOLI
+  * HSP70 (PF00012)
 
 ## The Gram-Positive Bacterial RNA Degradosome
 
@@ -1079,108 +1095,108 @@ https://www.uniprot.org/uniprot/?query=Ribonuclease+AND+organism%3A%22Bacillus+s
 * Enolase ==> Enolase and PFK
 
 * rny
-    * Ribonuclease Y
-    * https://www.uniprot.org/uniprot/RNY_BACSU
-    * DUF3552, KH_1, HD
+  * Ribonuclease Y
+  * https://www.uniprot.org/uniprot/RNY_BACSU
+  * DUF3552, KH_1, HD
 
 * rnjA
-    * Ribonuclease J1
-    * https://www.uniprot.org/uniprot/RNJ1_BACSU
-    * Lactamase_B, RMMBL, RNase_J_C
+  * Ribonuclease J1
+  * https://www.uniprot.org/uniprot/RNJ1_BACSU
+  * Lactamase_B, RMMBL, RNase_J_C
 
 * rnjB
-    * Ribonuclease J2
-    * https://www.uniprot.org/uniprot/RNJ2_BACSU
-    * Lactamase_B, RMMBL, RNase_J_C
+  * Ribonuclease J2
+  * https://www.uniprot.org/uniprot/RNJ2_BACSU
+  * Lactamase_B, RMMBL, RNase_J_C
 
 * cshA
-    * DEAD-box ATP-dependent RNA helicase CshA
-    * https://www.uniprot.org/uniprot/CSHA_BACSU
-    * DEAD, Helicase_C
+  * DEAD-box ATP-dependent RNA helicase CshA
+  * https://www.uniprot.org/uniprot/CSHA_BACSU
+  * DEAD, Helicase_C
 
 * pfkA
-    * ATP-dependent 6-phosphofructokinase
-    * https://www.uniprot.org/uniprot/PFKA_BACSU
-    * PFK (PF00365)
+  * ATP-dependent 6-phosphofructokinase
+  * https://www.uniprot.org/uniprot/PFKA_BACSU
+  * PFK (PF00365)
 
 * pnp
-    * Polyribonucleotide nucleotidyltransferase
-    * https://www.uniprot.org/uniprot/PNP_BACSU
-    * RNase_PH, RNase_PH_C, PNPase, RNase_PH, RNase_PH_C, KH_1, S1
+  * Polyribonucleotide nucleotidyltransferase
+  * https://www.uniprot.org/uniprot/PNP_BACSU
+  * RNase_PH, RNase_PH_C, PNPase, RNase_PH, RNase_PH_C, KH_1, S1
 
 ## Proteins containing S1 domain in E. coli
 
 * rpsA
-    * 30S ribosomal protein S1
-    * https://www.uniprot.org/uniprot/RS1_ECOLI
-    * 6 X S1
+  * 30S ribosomal protein S1
+  * https://www.uniprot.org/uniprot/RS1_ECOLI
+  * 6 X S1
 
 * rng
-    * Ribonuclease G
-    * https://www.uniprot.org/uniprot/RNG_ECOLI
-    * S1, RNase_E_G
+  * Ribonuclease G
+  * https://www.uniprot.org/uniprot/RNG_ECOLI
+  * S1, RNase_E_G
 
 * nusA
-    * Transcription termination/antitermination protein NusA
-    * https://www.uniprot.org/uniprot/NUSA_ECOLI
-    * NusA_N, S1, KH_5, HHH_5
+  * Transcription termination/antitermination protein NusA
+  * https://www.uniprot.org/uniprot/NUSA_ECOLI
+  * NusA_N, S1, KH_5, HHH_5
 
 * yhgF
-    * Protein YhgF
-    * https://www.uniprot.org/uniprot/YHGF_ECOLI
-    * Tex_N, Tex_YqgF, HHH_3, HHH_9, S1
+  * Protein YhgF
+  * https://www.uniprot.org/uniprot/YHGF_ECOLI
+  * Tex_N, Tex_YqgF, HHH_3, HHH_9, S1
 
 ## Other RNases
 
 * endo
 
-    * rna
-        * Ribonuclease I
-        * https://www.uniprot.org/uniprot/RNI_ECOLI
-        * Ribonuclease_T2
-    * rnc
-        * Ribonuclease 3
-        * https://www.uniprot.org/uniprot/RNC_ECOLI
-        * Ribonucleas_3_3, dsrm
-    * rnpA
-        * Ribonuclease P protein component
-        * https://www.uniprot.org/uniprot/RNPA_ECOLI
-        * Ribonuclease_P
-    * rnhA
-        * Ribonuclease HI
-        * https://www.uniprot.org/uniprot/RNH_ECOLI
-        * RNase_H
-    * rnhB
-        * Ribonuclease HII
-        * https://www.uniprot.org/uniprot/RNH2_ECOLI
-        * RNase_HII
-    * rnhC
-        * Ribonuclease HIII
-        * https://www.uniprot.org/uniprot/RNH3_BACSU
-        * RDUF3378, Nase_HII
-    * rbn
-        * Ribonuclease BN
-        * https://www.uniprot.org/uniprot/RBN_ECOLI
-        * Lactamase_B_2
+  * rna
+    * Ribonuclease I
+    * https://www.uniprot.org/uniprot/RNI_ECOLI
+    * Ribonuclease_T2
+  * rnc
+    * Ribonuclease 3
+    * https://www.uniprot.org/uniprot/RNC_ECOLI
+    * Ribonucleas_3_3, dsrm
+  * rnpA
+    * Ribonuclease P protein component
+    * https://www.uniprot.org/uniprot/RNPA_ECOLI
+    * Ribonuclease_P
+  * rnhA
+    * Ribonuclease HI
+    * https://www.uniprot.org/uniprot/RNH_ECOLI
+    * RNase_H
+  * rnhB
+    * Ribonuclease HII
+    * https://www.uniprot.org/uniprot/RNH2_ECOLI
+    * RNase_HII
+  * rnhC
+    * Ribonuclease HIII
+    * https://www.uniprot.org/uniprot/RNH3_BACSU
+    * RDUF3378, Nase_HII
+  * rbn
+    * Ribonuclease BN
+    * https://www.uniprot.org/uniprot/RBN_ECOLI
+    * Lactamase_B_2
 
 * exo
 
-    * rnd
-        * Ribonuclease D
-        * https://www.uniprot.org/uniprot/RND_ECOLI
-        * DNA_pol_A_exo1, HRDC
-    * rnt
-        * Ribonuclease T
-        * https://www.uniprot.org/uniprot/RNT_ECOLI
-        * RNase_T
-    * rph
-        * Ribonuclease PH
-        * https://www.uniprot.org/uniprot/RNPH_BACSU
-        * RNase_PH, RNase_PH_C
-    * nrnA
-        * Bifunctional oligoribonuclease and PAP phosphatase NrnA
-        * https://www.uniprot.org/uniprot/NRNA_BACSU
-        * DHH, DHHA1
+  * rnd
+    * Ribonuclease D
+    * https://www.uniprot.org/uniprot/RND_ECOLI
+    * DNA_pol_A_exo1, HRDC
+  * rnt
+    * Ribonuclease T
+    * https://www.uniprot.org/uniprot/RNT_ECOLI
+    * RNase_T
+  * rph
+    * Ribonuclease PH
+    * https://www.uniprot.org/uniprot/RNPH_BACSU
+    * RNase_PH, RNase_PH_C
+  * nrnA
+    * Bifunctional oligoribonuclease and PAP phosphatase NrnA
+    * https://www.uniprot.org/uniprot/NRNA_BACSU
+    * DHH, DHHA1
 
 # Intriguing domains
 
@@ -1261,123 +1277,123 @@ https://www.uniprot.org/uniprot/?query=Ribonuclease+AND+organism%3A%22Bacillus+s
 |                       Me_florum_L1_YP_053450                       |
 
 | ![My_cap_capricolum_ATCC_27343_WP_011386996.png](../image/My_cap_capricolum_ATCC_27343_WP_011386996.png) |
-|:--------------------------------------------------------------------------------------------------------------:|
-|                                  My_cap_capricolum_ATCC_27343_WP_011386996                                  |
+|:--------------------------------------------------------------------------------------------------------:|
+|                                My_cap_capricolum_ATCC_27343_WP_011386996                                 |
 
 | ![My_put_KS1_WP_014034866.png](../image/My_put_KS1_WP_014034866.png) |
-|:--------------------------------------------------------------------------:|
-|                         My_put_KS1_WP_014034866                         |
+|:--------------------------------------------------------------------:|
+|                       My_put_KS1_WP_014034866                        |
 
 | ![My_hyor_WP_014335631.png](../image/My_hyor_WP_014335631.png) |
-|:--------------------------------------------------------------------:|
-|                       My_hyor_WP_014335631                        |
+|:--------------------------------------------------------------:|
+|                      My_hyor_WP_014335631                      |
 
 | ![My_bovis_CQ_W70_WP_013456627.png](../image/My_bovis_CQ_W70_WP_013456627.png) |
-|:------------------------------------------------------------------------------------:|
-|                           My_bovis_CQ_W70_WP_013456627                            |
+|:------------------------------------------------------------------------------:|
+|                          My_bovis_CQ_W70_WP_013456627                          |
 
 | ![My_canis_PG_14_WP_004794628.png](../image/My_canis_PG_14_WP_004794628.png) |
-|:----------------------------------------------------------------------------------:|
-|                           My_canis_PG_14_WP_004794628                           |
+|:----------------------------------------------------------------------------:|
+|                         My_canis_PG_14_WP_004794628                          |
 
 | ![U_ure_10_ATCC_33699_WP_012560232.png](../image/U_ure_10_ATCC_33699_WP_012560232.png) |
 |:--------------------------------------------------------------------------------------:|
 |                            U_ure_10_ATCC_33699_WP_012560232                            |
 
 | ![My_gallis_WP_011113707.png](../image/My_gallis_WP_011113707.png) |
-|:------------------------------------------------------------------------:|
-|                        My_gallis_WP_011113707                         |
+|:------------------------------------------------------------------:|
+|                       My_gallis_WP_011113707                       |
 
 | ![My_pne_WP_014325416.png](../image/My_pne_WP_014325416.png) |
-|:------------------------------------------------------------------:|
-|                       My_pne_WP_014325416                       |
+|:------------------------------------------------------------:|
+|                     My_pne_WP_014325416                      |
 
 | ![My_gen_G37_WP_009885662.png](../image/My_gen_G37_WP_009885662.png) |
-|:--------------------------------------------------------------------------:|
-|                         My_gen_G37_WP_009885662                         |
+|:--------------------------------------------------------------------:|
+|                       My_gen_G37_WP_009885662                        |
 
 ## Domains of RNases and Cooperators
 
 * RNase II/R
-    * OB_RNB (PF08206)
-    * CSD2 (PF17876)
-    * RNB (PF00773)
-    * S1 (PF00575)
+  * OB_RNB (PF08206)
+  * CSD2 (PF17876)
+  * RNB (PF00773)
+  * S1 (PF00575)
 
-    * HTH_12 (PF08461)
-    * RNase_II_C_S1 (PF18614)
-    * Importin_rep (PF18773)
+  * HTH_12 (PF08461)
+  * RNase_II_C_S1 (PF18614)
+  * Importin_rep (PF18773)
 
 * Dis3
-    * PIN_4 (PF13638)
-    * Rrp44_CSD1 (PF17216)
-    * OB_Dis3 (PF17849)
-    * Rrp44_S1 (PF17215)
+  * PIN_4 (PF13638)
+  * Rrp44_CSD1 (PF17216)
+  * OB_Dis3 (PF17849)
+  * Rrp44_S1 (PF17215)
 
 * RNase E
-    * RNase_E_G (PF10150)
+  * RNase_E_G (PF10150)
 
 * PNPase
-    * RNase_PH (PF01138)
-    * RNase_PH_C (PF03725)
-    * PNPase (PF03726)
-    * KH_1 (PF00013)
+  * RNase_PH (PF01138)
+  * RNase_PH_C (PF03725)
+  * PNPase (PF03726)
+  * KH_1 (PF00013)
 
 * RhlB
-    * DEAD (PF00270)
-    * Helicase_C (PF00271)
+  * DEAD (PF00270)
+  * Helicase_C (PF00271)
 
 * Poly(A) polymerase I
-    * PolyA_pol (PF01743)
-    * PolyA_pol_RNAbd (PF12627)
-    * PolyA_pol_arg_C (PF12626)
+  * PolyA_pol (PF01743)
+  * PolyA_pol_RNAbd (PF12627)
+  * PolyA_pol_arg_C (PF12626)
 
 * Enolase
-    * Enolase_N (PF03952)
-    * Enolase_C (PF00113)
+  * Enolase_N (PF03952)
+  * Enolase_C (PF00113)
 
 * RNase Y
-    * DUF3552 (PF12072)
-    * ~~HD (PF01966)~~
+  * DUF3552 (PF12072)
+  * ~~HD (PF01966)~~
 
 * RNase J1/J2
-    * Lactamase_B (PF00753)
-    * RMMBL (PF07521)
-    * RNase_J_C (PF17770)
+  * Lactamase_B (PF00753)
+  * RMMBL (PF07521)
+  * RNase_J_C (PF17770)
 
 * ATP-dependent 6-phosphofructokinase
-    * PFK (PF00365)
+  * PFK (PF00365)
 
 * Ribonuclease I
-    * Ribonuclease_T2 (PF00445)
+  * Ribonuclease_T2 (PF00445)
 
 * Ribonuclease 3
-    * Ribonucleas_3_3 (PF14622)
-    * dsrm (PF00035)
+  * Ribonucleas_3_3 (PF14622)
+  * dsrm (PF00035)
 
 * Ribonuclease P protein component
-    * Ribonuclease_P (PF00825)
+  * Ribonuclease_P (PF00825)
 
 * Ribonuclease H
-    * RNase_H (PF00075)
-    * RNase_HII (PF01351)
-    * DUF3378 (PF11858)
+  * RNase_H (PF00075)
+  * RNase_HII (PF01351)
+  * DUF3378 (PF11858)
 
 * Ribonuclease BN
-    * Lactamase_B_2 (PF12706)
+  * Lactamase_B_2 (PF12706)
 
 * Ribonuclease D
-    * DNA_pol_A_exo1 (PF01612)
-    * HRDC (PF00570)
+  * DNA_pol_A_exo1 (PF01612)
+  * HRDC (PF00570)
 
 * Ribonuclease T
-    * RNase_T (PF00929)
+  * RNase_T (PF00929)
 
 * Bifunctional oligoribonuclease and PAP phosphatase NrnA
-    * DHH (PF01368)
-    * DHHA1 (PF02272)
+  * DHH (PF01368)
+  * DHHA1 (PF02272)
 
-```bash
+```shell script
 cd ~/data/alignment/Tenericutes
 
 mkdir -p DOMAINS/HMM
@@ -1410,7 +1426,7 @@ done
 
 ## Scan every domains
 
-```bash
+```shell script
 E_VALUE=1e-3
 
 cd ~/data/alignment/Tenericutes
@@ -1441,7 +1457,7 @@ done \
 
 for domain in $(cat domain.list); do
     echo 1>&2 "==> domain [${domain}]"
-        
+
     for GENUS in $(cat genus.list); do
         echo 1>&2 "==> GENUS [${GENUS}]"
 
@@ -1456,10 +1472,10 @@ for domain in $(cat domain.list); do
                     $s =~ s/\.\d+//;
                     printf qq{%s\t%s_%s\n}, $n, $ENV{STRAIN}, $s;
                 '
-        done 
+        done
     done \
         > DOMAINS/${domain}.replace.tsv
-    
+
     echo 1>&2
 done
 
@@ -1516,7 +1532,7 @@ done |
 | DOMAINS/DHH.replace.tsv             |   775 |
 | DOMAINS/DHHA1.replace.tsv           |  1034 |
 
-```bash
+```shell script
 cd ~/data/alignment/Tenericutes
 
 # All proteins appeared
@@ -1537,13 +1553,13 @@ for domain in $(cat domain.list); do
         --data-fields 1 \
         -f <(
             cat DOMAINS/${domain}.replace.tsv |
-                perl -nla -e 'print qq{$F[1]\tO}' 
+                perl -nla -e 'print qq{$F[1]\tO}'
         ) \
         --key-fields 1 \
         --append-fields 2 \
         --write-all "" \
         > DOMAINS/tmp.tsv
-        
+
     mv DOMAINS/tmp.tsv DOMAINS/domains.tsv
 done
 
@@ -1598,7 +1614,7 @@ rm DOMAINS/header.tsv DOMAINS/RhlB.tsv DOMAINS/NrnA.tsv
 
 InterProScan 启动很慢, 因此一次提交整个菌株里的数十个蛋白.
 
-```bash
+```shell script
 cd ~/data/alignment/Tenericutes
 
 mkdir -p IPS
@@ -1615,7 +1631,7 @@ for GENUS in $(cat genus.list); do
             cut -f 1 |
             grep -Fx -f <(cut -f 1 DOMAINS/domains.tsv) \
             > IPS/${STRAIN}/wanted.list
-        
+
         faops some PROTEINS/all.replace.fa IPS/${STRAIN}/wanted.list IPS/${STRAIN}/${STRAIN}.fa
     done
 done
@@ -1629,12 +1645,12 @@ for GENUS in $(cat genus.list); do
             if [[ -e IPS/{}/{}.tsv ]]; then
                 exit;
             fi
-            
+
             interproscan.sh -dp -f tsv,json,svg -i IPS/{}/{}.fa --output-file-base IPS/{}/{}
             tar -xz -f IPS/{}/{}.svg.tar.gz -C IPS/{}
             rm IPS/{}/{}.svg.tar.gz
         "
-    
+
     echo 1>&2
 done
 
@@ -1653,7 +1669,7 @@ for GENUS in $(cat genus.list); do
                 select(.type == "FAMILY") |
                 [$name[0].name, .description] |
                 @tsv
-            ' | 
+            ' |
             tsv-uniq -f 1
     done
 done |
@@ -1704,7 +1720,7 @@ cut -f 4 IPS/predicts.tsv |
 | RNB                |   224 |
 | S1                 |   206 |
 
-```bash
+```shell script
 cd ~/data/alignment/Tenericutes
 
 mkdir -p RNaseR
@@ -1784,7 +1800,7 @@ cat PROTEINS/all.pro.fa |
 
 ## Find all RNase R
 
-```bash
+```shell script
 cd ~/data/alignment/Tenericutes
 
 # Find all genes
@@ -1798,11 +1814,11 @@ for GENUS in $(cat genus.list); do
             sed "s/^>//" |
             STRAIN=${STRAIN} perl -nl -MPath::Tiny -e '
                 BEGIN {
-                    our %seen = map {(split /\t/)[0] => 1} 
+                    our %seen = map {(split /\t/)[0] => 1}
                         grep {/\S/}
                         path(q{DOMAINS/RNB.replace.tsv})->lines({ chomp => 1});
                 }
-                
+
                 $n = $_;
                 $s = $n;
                 $s =~ s/\.\d+//;
@@ -1823,20 +1839,20 @@ cat RNaseR/*.replace.tsv | wc -l
 # extract sequences for each genus
 for GENUS in $(cat genus.list); do
     echo "==> ${GENUS}"
-    
+
     mytmpdir=`mktemp -d 2>/dev/null || mktemp -d -t 'mytmpdir'`
 
     # avoid duplicated fasta headers
     faops some PROTEINS/all.pro.fa RNaseR/${GENUS}.replace.tsv stdout |
         faops filter -u stdin ${mytmpdir}/${GENUS}.fa
-    
+
     # avoid duplicated original names
     cat RNaseR/${GENUS}.replace.tsv |
         parallel --no-run-if-empty --linebuffer -k -j 1 "
             faops replace -s ${mytmpdir}/${GENUS}.fa <(echo {}) stdout
         " \
         > RNaseR/${GENUS}.pro.fa
-        
+
     rm -fr ${mytmpdir}
 done
 
@@ -1844,7 +1860,7 @@ done
 cat genus.list |
     parallel --no-run-if-empty --linebuffer -k -j 4 '
         echo "==> {}"
-        
+
         muscle -quiet -in RNaseR/{}.pro.fa -out RNaseR/{}.aln.fa
     '
 
@@ -1852,7 +1868,7 @@ cat genus.list |
 cat genus.list |
     parallel --no-run-if-empty --linebuffer -k -j 4 '
         echo "==> {}"
-        
+
         FastTree -quiet RNaseR/{}.aln.fa > RNaseR/{}.aln.newick
     '
 
@@ -1868,7 +1884,7 @@ FastTree -quiet RNaseR/RNaseR.aln.fa > RNaseR/RNaseR.aln.newick
 
 ## Tweak the tree of RNaseR
 
-```bash
+```shell script
 cd ~/data/alignment/Tenericutes
 
 # reroot
@@ -1890,18 +1906,18 @@ rm species.monophyly.list species.paraphyly.list species.monophyly.map
 cat species.count.tsv |
     perl -nl -MPath::Tiny -e '
         BEGIN {
-            our @lists = 
+            our @lists =
                 grep {/\S/}
                 path(q{RNaseR.list})->lines({ chomp => 1});
         }
-        
+
         my @ns = split /\t/;
         my @sts = grep {/^$ns[0]/} @lists;
-        
+
         my $cmd = q{nw_clade -m RNaseR/RNaseR.reroot.newick };
         $cmd .= " $_ " for @sts;
         $cmd .= " | nw_stats -f l - | cut -f 3";
-        
+
         my $result = `$cmd`;
         if ($result) {
             print qq{$_ $ns[1]} for @sts;
@@ -1922,7 +1938,7 @@ nw_rename RNaseR/RNaseR.reroot.newick species.monophyly.map |
 
 ## RNB domain
 
-```bash
+```shell script
 E_VALUE=1e-3
 
 cd ~/data/alignment/Tenericutes
@@ -1955,18 +1971,18 @@ rm species.monophyly.list species.paraphyly.list species.monophyly.map
 cat species.count.tsv |
     perl -nl -MPath::Tiny -e '
         BEGIN {
-            our @lists = 
+            our @lists =
                 grep {/\S/}
                 path(q{RNB.list})->lines({ chomp => 1});
         }
-        
+
         my @ns = split /\t/;
         my @sts = grep {/^$ns[0]/} @lists;
-        
+
         my $cmd = q{nw_clade -m RNaseR/RNB.reroot.newick };
         $cmd .= " $_ " for @sts;
         $cmd .= " | nw_stats -f l - | cut -f 3";
-        
+
         my $result = `$cmd`;
         if ($result) {
             print qq{$_ $ns[1]} for @sts;
@@ -1988,7 +2004,7 @@ nw_rename RNaseR/RNB.reroot.newick species.monophyly.map |
 
 ## Importin_rep domain
 
-```bash
+```shell script
 E_VALUE=1e-3
 
 cd ~/data/alignment/Tenericutes
@@ -2006,14 +2022,14 @@ FastTree -quiet RNaseR/Importin_rep.aln.fa > RNaseR/Importin_rep.aln.newick
 
 # Tenericutes: run
 
-```bash
+```shell script
 $(brew --prefix)/Cellar/$(brew list --versions repeatmasker | sed 's/ /\//')/libexec/util/queryRepeatDatabase.pl \
     -stat -species Bacteria
 ```
 
 * Rsync to hpcc
 
-```bash
+```shell script
 rsync -avP \
     ~/data/alignment/Tenericutes/ \
     wangq@202.119.37.251:data/alignment/Tenericutes
@@ -2024,7 +2040,7 @@ rsync -avP \
 
 `--perseq` for RefSeq_category Reference Genome assemblies.
 
-```bash
+```shell script
 cd ~/data/alignment/Tenericutes
 
 # prep
@@ -2045,7 +2061,7 @@ ls -t output.* | head -n 1 | xargs tail -f | grep "==>"
 for n in Mpne_M129 Mflo_L1 Mmyc_subsp_mycoides_SC_str_PG1; do
     FILE_GFF=$(find ASSEMBLY -type f -name "*_genomic.gff.gz" | grep "${n}")
     echo >&2 "==> Processing ${n}/${FILE_GFF}"
-    
+
     gzip -dcf ${FILE_GFF} > GENOMES/${n}/chr.gff
 done
 

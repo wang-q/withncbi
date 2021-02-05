@@ -1,6 +1,7 @@
 # HMM related resources
 
 [TOC levels=1-3]: # " "
+
 - [HMM related resources](#hmm-related-resources)
 - [PFAM-A](#pfam-a)
 - [TIGRFAM](#tigrfam)
@@ -9,7 +10,7 @@
 
 # PFAM-A
 
-```bash
+```shell script
 mkdir -p ~/data/HMM/PFAM
 
 cd ~/data/HMM/PFAM
@@ -29,15 +30,16 @@ done
 
 # TIGRFAM
 
-```bash
+```shell script
 mkdir -p ~/data/HMM/TIGRFAM
 
 cd ~/data/HMM/TIGRFAM
 
-wget -N --content-disposition ftp://ftp.jcvi.org/pub/data/TIGRFAMs/14.0_Release/TIGRFAMs_14.0_HMM.tar.gz
+proxychains4 wget -N --content-disposition ftp://ftp.jcvi.org/pub/data/TIGRFAMs/14.0_Release/TIGRFAMs_14.0_HMM.tar.gz
 
 mkdir -p HMM
-tar xvfz TIGRFAMs_14.0_HMM.tar.gz --directory HMM
+tar --directory HMM -xzvf TIGRFAMs_14.0_HMM.tar.gz TIGR02013.HMM
+tar --directory HMM -xzvf TIGRFAMs_14.0_HMM.tar.gz TIGR00485.HMM
 
 ```
 
@@ -56,7 +58,7 @@ Ref.:
 
 4. `bacteria_and_archaea.tgz`: https://ndownloader.figshare.com/files/3093482
 
-```bash
+```shell script
 mkdir -p ~/data/HMM/40scg
 cd ~/data/HMM/40scg
 
