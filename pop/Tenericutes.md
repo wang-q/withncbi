@@ -6,9 +6,9 @@
 - [Aligning various genera from Tenericutes](#aligning-various-genera-from-tenericutes)
 - [Phylum Tenericutes and outgroups](#phylum-tenericutes-and-outgroups)
   - [Download from NCBI assembly](#download-from-ncbi-assembly)
-  - [Some packages needed](#some-packages-needed)
   - [NCBI taxonomy](#ncbi-taxonomy)
   - [Count strains](#count-strains)
+- [Some packages needed](#some-packages-needed)
 - [Collect proteins](#collect-proteins)
   - [`all.pro.fa`](#allprofa)
   - [`all.replace.fa`](#allreplacefa)
@@ -43,6 +43,9 @@
   - [Tweak the tree of RNaseR](#tweak-the-tree-of-rnaser)
   - [RNB domain](#rnb-domain)
   - [Importin_rep domain](#importin_rep-domain)
+- [Collect CDS](#collect-cds)
+  - [`all.cds.fa`](#allcdsfa)
+  - [`RNaseR.cds.fa`](#rnasercdsfa)
 - [Tenericutes: run](#tenericutes-run)
 
 
@@ -212,21 +215,6 @@ perl ~/Scripts/withncbi/taxon/assembly_prep.pl \
 bash ASSEMBLY/Tenericutes.assembly.rsync.sh
 
 bash ASSEMBLY/Tenericutes.assembly.collect.sh
-
-```
-
-## Some packages needed
-
-```shell script
-brew install hmmer
-brew install librsvg
-
-brew install brewsci/bio/muscle
-brew install brewsci/bio/fasttree
-brew install brewsci/bio/easel
-brew install brewsci/bio/newick-utils
-
-brew install wang-q/tap/tsv-utils
 
 ```
 
@@ -437,6 +425,26 @@ done
 | Haloplasmatales   |                 |                    |         |         |
 |                   | Haloplasma      |                    |       1 |       1 |
 |                   | Inordinaticella |                    |       1 |       1 |
+
+# Some packages needed
+
+```shell script
+brew install hmmer
+brew install librsvg
+
+brew install brewsci/bio/muscle
+brew install brewsci/bio/fasttree
+brew install brewsci/bio/easel
+brew install brewsci/bio/newick-utils
+
+brew install datamash
+brew install miller
+brew install wang-q/tap/tsv-utils
+
+brew install jq
+brew install pup
+
+```
 
 # Collect proteins
 
@@ -1640,6 +1648,7 @@ for GENUS in $(cat genus.list); do
 done
 
 # scan proteins of each strain with InterProScan
+# By default InterProScan uses 8 cpu cores
 for GENUS in $(cat genus.list); do
     echo 1>&2 "==> GENUS [${GENUS}]"
 
@@ -1649,8 +1658,9 @@ for GENUS in $(cat genus.list); do
                 exit;
             fi
 
-            interproscan.sh -dp -f tsv,json,svg -i IPS/{}/{}.fa --output-file-base IPS/{}/{}
-            tar -xz -f IPS/{}/{}.svg.tar.gz -C IPS/{}
+            interproscan.sh --cpu 4 -dp -f tsv,json,svg -i IPS/{}/{}.fa --output-file-base IPS/{}/{}
+            mkdir -p IPS/{}/svg
+            tar -xz -f IPS/{}/{}.svg.tar.gz -C IPS/{}/svg
             rm IPS/{}/{}.svg.tar.gz
         "
 
@@ -1712,23 +1722,23 @@ cut -f 4 IPS/predicts.tsv |
 
 | Item               | Count |
 |:-------------------|------:|
-| "ribonuclease R "  |   295 |
-| "ribonuclease II " |     2 |
-| " RNB "            |     6 |
-| " RNase R "        |     2 |
-| " RNase II "       |     1 |
+| "ribonuclease R "  |   305 |
+| "ribonuclease II " |     4 |
+| " RNB "            |     8 |
+| "RNase R "         |     2 |
+| "RNase II "        |     8 |
 | deduped            |   229 |
-| OB_RNB             |   192 |
-| CSD2               |   196 |
-| RNB                |   224 |
-| S1                 |   206 |
+| OB_RNB             |   203 |
+| CSD2               |   203 |
+| RNB                |   235 |
+| S1                 |   217 |
 
 ```shell script
 cd ~/data/alignment/Tenericutes
 
 mkdir -p RNaseR
 
-# Annotations containing RNB domain
+# Annotations containing the RNB domain
 cat PROTEINS/all.pro.fa |
     grep "^>" |
     grep -f <(cut -f 1 DOMAINS/RNB.replace.tsv) |
@@ -1749,15 +1759,15 @@ cat PROTEINS/all.pro.fa |
     grep " RNB " |
     wc -l
 cat PROTEINS/all.pro.fa |
-    grep " RNase R " |
+    grep "RNase R " |
     wc -l
 cat PROTEINS/all.pro.fa |
-    grep " RNase II " |
+    grep "RNase II " |
     wc -l
 
 faops some PROTEINS/all.pro.fa \
     <(cat PROTEINS/all.pro.fa |
-        grep -e "ribonuclease R " -e "ribonuclease II " -e " RNB " -e " RNase R " -e " RNase II " |
+        grep -e "ribonuclease R " -e "ribonuclease II " -e " RNB " -e "RNase R " -e "RNase II " |
         cut -d" " -f 1 |
         sed "s/^>//" |
         sort | uniq) \
@@ -1782,7 +1792,7 @@ find ASSEMBLY -maxdepth 1 -type d |
     grep 'ASSEMBLY/' |
     parallel --no-run-if-empty --linebuffer -k -j 4 '
         gzip -dcf {}/*_protein.faa.gz |
-            grep -e "ribonuclease R " -e "ribonuclease II " -e " RNB " -e " RNase R " -e " RNase II " |
+            grep -e "ribonuclease R " -e "ribonuclease II " -e " RNB " -e "RNase R " -e "RNase II " |
             (echo {} && cat)
         echo
     ' \
@@ -1791,10 +1801,9 @@ find ASSEMBLY -maxdepth 1 -type d |
 # Annotated as RNase R but lacking RNB domains:
 cat PROTEINS/all.pro.fa |
     grep "^>" |
-    grep -e "ribonuclease R " -e "ribonuclease II " -e " RNB " -e " RNase R " -e " RNase II " |
+    grep -e "ribonuclease R " -e "ribonuclease II " -e " RNB " -e "RNase R " -e "RNase II " |
     grep -v -f <(cut -f 1 DOMAINS/RNB.replace.tsv)
-#>OAL10424.1 ribonuclease R [Candidatus Mycoplasma haemobos]
-#>AFO52271.1 ribonuclease R [Candidatus Mycoplasma haemolamae str. Purdue]
+#>VEU63217.1 exoribonuclease II [Mycoplasma fermentans]
 #>AEG72387.1 ribonuclease R [Mycoplasma haemofelis Ohio2]
 #>WP_112665413.1 ribonuclease R [Mycoplasma wenyonii]
 #>NP_462407.3 putative RNase R [Salmonella enterica subsp. enterica serovar Typhimurium str. LT2]
@@ -1812,7 +1821,7 @@ for GENUS in $(cat genus.list); do
 
     for STRAIN in $(cat taxon/${GENUS}); do
         gzip -dcf ASSEMBLY/${STRAIN}/*_protein.faa.gz |
-            grep -e "ribonuclease R " -e "ribonuclease II " -e " RNB " -e " RNase R " -e " RNase II " |
+            grep -e "ribonuclease R " -e "ribonuclease II " -e " RNB " -e "RNase R " -e "RNase II " |
             cut -d" " -f 1 |
             sed "s/^>//" |
             STRAIN=${STRAIN} perl -nl -MPath::Tiny -e '
@@ -1836,7 +1845,7 @@ for GENUS in $(cat genus.list); do
         > RNaseR/${GENUS}.replace.tsv
 done
 
-# 301
+# 323
 cat RNaseR/*.replace.tsv | wc -l
 
 # extract sequences for each genus
@@ -1891,7 +1900,7 @@ FastTree -quiet RNaseR/RNaseR.aln.fa > RNaseR/RNaseR.aln.newick
 cd ~/data/alignment/Tenericutes
 
 # reroot
-nw_reroot RNaseR/RNaseR.aln.newick Am_med_U32_YP_003763410 > RNaseR/RNaseR.reroot.newick
+nw_reroot RNaseR/RNaseR.aln.newick Am_med_U32_WP_013223097 > RNaseR/RNaseR.reroot.newick
 
 nw_labels -I RNaseR/RNaseR.aln.newick > RNaseR.list
 
@@ -1956,7 +1965,7 @@ muscle -quiet -in RNaseR/RNB.pro.fa -out RNaseR/RNB.aln.fa
 FastTree -quiet RNaseR/RNB.aln.fa > RNaseR/RNB.aln.newick
 
 # reroot
-nw_reroot RNaseR/RNB.aln.newick Am_med_U32_YP_003763410/46-352 > RNaseR/RNB.reroot.newick
+nw_reroot RNaseR/RNB.aln.newick Am_med_U32_WP_013223097/46-352 > RNaseR/RNB.reroot.newick
 
 nw_labels -I RNaseR/RNB.aln.newick > RNB.list
 
@@ -2020,6 +2029,80 @@ esl-reformat fasta RNaseR/Importin_rep.sto > RNaseR/Importin_rep.pro.fa
 
 muscle -quiet -in RNaseR/Importin_rep.pro.fa -out RNaseR/Importin_rep.aln.fa
 FastTree -quiet RNaseR/Importin_rep.aln.fa > RNaseR/Importin_rep.aln.newick
+
+```
+
+# Collect CDS
+
+## `all.cds.fa`
+
+```shell script
+cd ~/data/alignment/Tenericutes
+
+mkdir -p CDS
+
+# 348
+find ASSEMBLY -type f -name "*_cds_from_genomic.fna.gz" |
+    wc -l
+
+# sed script converting from Contigs to Strain
+for GENUS in $(cat genus.list); do
+    echo 1>&2 "==> GENUS [${GENUS}]"
+
+    for STRAIN in $(cat taxon/${GENUS}); do
+        find ASSEMBLY/${STRAIN} -type f -name "*_genomic.fna.gz" |
+            grep -v "_from_" |
+            xargs gzip -dcf |
+            grep '^>' |
+            cut -d' ' -f 1 |
+            sed 's/>//' |
+            xargs -I{} echo -e "{}\t${STRAIN}"
+    done
+done \
+    > CDS/contigs_to_strain.tsv
+
+cat CDS/contigs_to_strain.tsv |
+    perl -nla -e '
+        print q{s/^>} . quotemeta($F[0]) . q{/>} . quotemeta($F[1]) . q{/g;};
+    ' \
+    > CDS/sed.script
+
+wc -l CDS/sed.script
+# 5726
+
+for GENUS in $(cat genus.list); do
+    echo 1>&2 "==> GENUS [${GENUS}]"
+
+    for STRAIN in $(cat taxon/${GENUS}); do
+        gzip -dcf ASSEMBLY/${STRAIN}/*_cds_from_genomic.fna.gz
+    done
+done |
+    perl -nl -e 's/^>lcl\|/>/g; print' |
+    perl -nl -e 's/\s+\[.+?\]//g; print' \
+    > CDS/all.cds.fa
+
+```
+
+## `RNaseR.cds.fa`
+
+```shell script
+cd ~/data/alignment/Tenericutes
+
+cat RNaseR/RNaseR.pro.fa
+
+for GENUS in $(cat genus.list); do
+    echo 1>&2 "==> GENUS [${GENUS}]"
+
+    cat CDS/all.cds.fa |
+        grep '>' |
+        grep -F -f <( cat RNaseR/${GENUS}.replace.tsv | cut -f 1 ) |
+        sed 's/^>//'
+done \
+    > CDS/RNaseR.list
+
+faops order CDS/all.cds.fa CDS/RNaseR.list stdout |
+    sed -f CDS/sed.script \
+    > CDS/RNaseR.cds.fa
 
 ```
 
