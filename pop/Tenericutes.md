@@ -20,7 +20,7 @@
   - [Tweak the concat tree](#tweak-the-concat-tree)
   - [TIGR](#tigr)
 - [Essential genes](#essential-genes)
-- [Bacteria degradosome](#bacteria-degradosome)
+- [Bacteria degradosomes](#bacteria-degradosomes)
   - [Components of the RNA degradosome in E. coli](#components-of-the-rna-degradosome-in-e-coli)
   - [The Gram-Positive Bacterial RNA Degradosome](#the-gram-positive-bacterial-rna-degradosome)
   - [Proteins containing S1 domain in E. coli](#proteins-containing-s1-domain-in-e-coli)
@@ -1010,7 +1010,7 @@ cat ESS/*.tsv |
 
 ```
 
-# Bacteria degradosome
+# Bacteria degradosomes
 
 Ref.:
 
@@ -1166,22 +1166,29 @@ https://www.uniprot.org/uniprot/?query=Ribonuclease+AND+organism%3A%22Bacillus+s
     * Ribonuclease 3
     * https://www.uniprot.org/uniprot/RNC_ECOLI
     * Ribonucleas_3_3, dsrm
+    * Digests double-stranded RNA formed within single-strand substrates, but not RNA-DNA hybrids.
+      Involved in the processing of rRNA precursors, viral transcripts, some mRNAs and at least 1
+      tRNA.
   * rnpA
     * Ribonuclease P protein component
     * https://www.uniprot.org/uniprot/RNPA_ECOLI
     * Ribonuclease_P
+    * Endonucleolytic cleavage of RNA, removing 5'-extranucleotides from tRNA precursor.
   * rnhA
     * Ribonuclease HI
     * https://www.uniprot.org/uniprot/RNH_ECOLI
     * RNase_H
+    * Endonuclease that specifically degrades the RNA of RNA-DNA hybrids.
   * rnhB
     * Ribonuclease HII
     * https://www.uniprot.org/uniprot/RNH2_ECOLI
     * RNase_HII
+    * Endonuclease that specifically degrades the RNA of RNA-DNA hybrids.
   * rnhC
     * Ribonuclease HIII
     * https://www.uniprot.org/uniprot/RNH3_BACSU
     * RDUF3378, Nase_HII
+    * Endonuclease that specifically degrades the RNA of RNA-DNA hybrids.
   * rbn
     * Ribonuclease BN
     * https://www.uniprot.org/uniprot/RBN_ECOLI
