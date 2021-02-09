@@ -1,9 +1,9 @@
-# Aligning various genera from Tenericutes
+# RNases from Tenericutes
 
 
 [TOC levels=1-3]: # ""
 
-- [Aligning various genera from Tenericutes](#aligning-various-genera-from-tenericutes)
+- [RNases from Tenericutes](#rnases-from-tenericutes)
 - [Phylum Tenericutes and outgroups](#phylum-tenericutes-and-outgroups)
   - [Download from NCBI assembly](#download-from-ncbi-assembly)
   - [NCBI taxonomy](#ncbi-taxonomy)
@@ -37,8 +37,10 @@
   - [Domains of RNases and Cooperators](#domains-of-rnases-and-cooperators)
   - [Scan every domains](#scan-every-domains)
   - [InterProScan](#interproscan)
-- [RNase R](#rnase-r)
-  - [Stats of annotations and HMM models](#stats-of-annotations-and-hmm-models)
+- [*Mycoplasma* degradosomes and RNases](#mycoplasma-degradosomes-and-rnases)
+- [We can't trust annotations](#we-cant-trust-annotations)
+  - [Stats of annotations and HMM models of RNase R](#stats-of-annotations-and-hmm-models-of-rnase-r)
+- [Find RNases and Cooperators](#find-rnases-and-cooperators)
   - [Find all RNase R](#find-all-rnase-r)
   - [Tweak the tree of RNaseR](#tweak-the-tree-of-rnaser)
   - [RNB domain](#rnb-domain)
@@ -466,7 +468,7 @@ find ASSEMBLY -type f -name "*_protein.faa.gz" |
     wc -l
 
 for GENUS in $(cat genus.list); do
-    echo "==> GENUS [${GENUS}]"
+    echo 1>&2 "==> GENUS [${GENUS}]"
 
     for STRAIN in $(cat taxon/${GENUS}); do
         gzip -dcf ASSEMBLY/${STRAIN}/*_protein.faa.gz
@@ -1200,10 +1202,13 @@ https://www.uniprot.org/uniprot/?query=Ribonuclease+AND+organism%3A%22Bacillus+s
     * Ribonuclease D
     * https://www.uniprot.org/uniprot/RND_ECOLI
     * DNA_pol_A_exo1, HRDC
+    * Exonuclease involved in the 3' processing of various precursor tRNAs.
   * rnt
     * Ribonuclease T
     * https://www.uniprot.org/uniprot/RNT_ECOLI
     * RNase_T
+    * Trims short 3' overhangs of a variety of RNA species, leaving a one or two nucleotide 3'
+      overhang.
   * rph
     * Ribonuclease PH
     * https://www.uniprot.org/uniprot/RNPH_BACSU
@@ -1687,45 +1692,128 @@ for GENUS in $(cat genus.list); do
                 .matches[] |
                 .signature.entry |
                 select(.type == "FAMILY") |
-                [$name[0].name, .description] |
+                [$name[0].name, .accession, .description] |
                 @tsv
             ' |
             tsv-uniq -f 1
     done
 done |
-    (echo -e "#name\tfamily" && cat) \
+    (echo -e "#name\tfamily\tdescription" && cat) \
     > IPS/family.tsv
 
 tsv-join \
-    <(cut -f 1-3 DOMAINS/domains.tsv) \
+    <(cut -f 1-4 DOMAINS/domains.tsv) \
     --data-fields 1 \
     -f IPS/family.tsv \
     --key-fields 1 \
-    --append-fields 2 \
+    --append-fields 2-3 \
     --write-all "" |
     tsv-join \
         --data-fields 1 \
         -f DOMAINS/domains.tsv \
         --key-fields 1 \
-        --append-fields 4-44 |
+        --append-fields 5-45 |
      keep-header -- sort -k1,1 \
     > IPS/predicts.tsv
 
-cut -f 3 IPS/predicts.tsv |
+cut -f 4 IPS/predicts.tsv |
+    sort |
+    uniq -c |
+    sort -nr
+
+cut -f 6 IPS/predicts.tsv |
     sort |
     uniq -dc |
     sort -nr
 
-cut -f 4 IPS/predicts.tsv |
+cat IPS/predicts.tsv |
+    tsv-filter -H -v --str-in-fld 4:"DUF" --empty 6 |
+    tsv-filter -H -v --str-in-fld 4:"DUF" --str-in-fld 6:"DUF" |
+    tsv-filter -H -v --istr-in-fld 4:"hypothetical" --empty 6 |
+    tsv-filter -H -v --istr-in-fld 4:"putative" --empty 6 |
+    tsv-filter -H -v --istr-in-fld 4:"DNA polymerase" --istr-in-fld 6:"DNA polymerase" |
+    tsv-filter -H -v --or --istr-in-fld 4:"Ribosomal protein" --istr-in-fld 6:"Ribosomal protein" |
+    tsv-filter -H -v --or --istr-in-fld 4:"Restriction" --istr-in-fld 6:"Restriction" |
+    tsv-filter -H -v --or --istr-in-fld 4:"primosomal protein" --istr-in-fld 6:"primosomal protein" |
+    tsv-filter -H -v --or --str-in-fld 4:"Uvr" --str-in-fld 6:"Uvr" |
+    tsv-filter -H -v --or --str-in-fld 4:"NusA" --str-in-fld 6:"NusA" |
+    tsv-filter -H -v --or --str-in-fld 4:"SecA" --str-in-fld 6:"SecA" |
+    tsv-filter -H -v --or --str-in-fld 4:"HrcA" --str-in-fld 6:"HrcA" |
+    tsv-filter -H -v --or --str-in-fld 4:"RecJ" --str-in-fld 6:"RecJ" |
+    tsv-filter -H -v --or --str-in-fld 4:"RecG" --str-in-fld 6:"RecG" |
+    tsv-filter -H -v --or --str-in-fld 4:"RecQ" --str-in-fld 6:"RecQ" |
+    tsv-filter -H -v --istr-in-fld 4:"MBL fold" --empty 6 |
+    tsv-filter -H -v --istr-in-fld 4:"DEAD/DEAH box helicase" --empty 6 |
+    tsv-filter -H -v --istr-in-fld 4:"DHH family" --empty 6 |
+    tsv-filter -H -v --istr-in-fld 4:"DHH family" --istr-in-fld 6:"Cyclic-di-AMP phosphodiesterase" |
+    tsv-filter -H -v --str-in-fld 4:"tRNA" --empty 6 |
+    tsv-filter -H -v --str-in-fld 4:"tRNA" --str-in-fld 6:"tRNA" |
+    tsv-filter -H -v --istr-in-fld 4:"transposase" --empty 6 |
+    tsv-filter -H -v --istr-in-fld 4:"transcriptional accessory" --empty 6 |
+    tsv-filter -H -v --istr-in-fld 6:"Cold shock, CspA" |
+    tsv-filter -H -v --istr-in-fld 4:"DNA helicase" --empty 6 \
+    > IPS/predicts.filter.tsv
+
+cut -f 6 IPS/predicts.filter.tsv |
     sort |
-    uniq -dc |
+    uniq -c |
     sort -nr
+
+cat IPS/predicts.filter.tsv |
+    tsv-filter -H --empty 6 |
+    cut -f 4 |
+    sort |
+    uniq -c |
+    sort -nr
+
+plotr tsv IPS/predicts.filter.tsv \
+    --header \
+    --contain 4:ribonuclease \
+    --contain 4:rnase \
+    --contain 4:enolase \
+    --contain 6:ribonuclease \
+    --contain 6:enolase
 
 ```
 
-# RNase R
+# *Mycoplasma* degradosomes and RNases
 
-## Stats of annotations and HMM models
+| Item                                      | Present? |
+|:------------------------------------------|---------:|
+| **Shared**                                |          |
+| Ribonuclease II/R                         |      all |
+| Enolase                                   |      all |
+| PNPase                                    |          |
+| **Gram-negative**                         |          |
+| Ribonuclease E                            |          |
+| RNA helicase B (RhlB)                     |          |
+| Poly(A) polymerase (PAP)                  |          |
+| **Gram-positive**                         |          |
+| Ribonuclease Y                            |     half |
+| Ribonuclease J                            |      all |
+| RNA helicase CshA                         |          |
+| ATP-dependent 6-phosphofructokinase (PFK) |      all |
+
+
+| Item                  | Present? |
+|:----------------------|---------:|
+| **endo**              |          |
+| Ribonuclease I/T      |          |
+| Ribonuclease III      |      all |
+| Ribonuclease P        |      all |
+| Ribonuclease H/HI     |     part |
+| Ribonuclease HII/HIII |      all |
+| NrnA                  |      all |
+| **exo**               |          |
+| Ribonuclease D        |          |
+| Ribonuclease T        |          |
+| Ribonuclease PH       |          |
+| NrnA                  |      all |
+
+
+# We can't trust annotations
+
+## Stats of annotations and HMM models of RNase R
 
 | Item               | Count |
 |:-------------------|------:|
@@ -1734,7 +1822,6 @@ cut -f 4 IPS/predicts.tsv |
 | " RNB "            |     8 |
 | "RNase R "         |     2 |
 | "RNase II "        |     8 |
-| deduped            |   229 |
 | OB_RNB             |   203 |
 | CSD2               |   203 |
 | RNB                |   235 |
@@ -1745,7 +1832,7 @@ cd ~/data/alignment/Tenericutes
 
 mkdir -p RNaseR
 
-# Annotations containing the RNB domain
+# Annotations of proteins containing the RNB domain
 cat PROTEINS/all.pro.fa |
     grep "^>" |
     grep -f <(cut -f 1 DOMAINS/RNB.replace.tsv) |
@@ -1814,6 +1901,71 @@ cat PROTEINS/all.pro.fa |
 #>AEG72387.1 ribonuclease R [Mycoplasma haemofelis Ohio2]
 #>WP_112665413.1 ribonuclease R [Mycoplasma wenyonii]
 #>NP_462407.3 putative RNase R [Salmonella enterica subsp. enterica serovar Typhimurium str. LT2]
+
+```
+
+# Find RNases and Cooperators
+
+| family    | description                               | count |
+|:----------|:------------------------------------------|:------|
+| IPR008226 | Mini-ribonuclease 3 family                | 6     |
+| IPR022894 | Oligoribonuclease                         | 8     |
+| IPR000100 | Ribonuclease P                            | 350   |
+| IPR001352 | Ribonuclease HII/HIII                     | 264   |
+| IPR001568 | Ribonuclease T2-like                      | 2     |
+| IPR002381 | Ribonuclease PH, bacterial-type           | 12    |
+| IPR004476 | Ribonuclease II/ribonuclease R            | 115   |
+| IPR004613 | Ribonuclease J                            | 300   |
+| IPR004641 | Ribonuclease HIII                         | 79    |
+| IPR004659 | Ribonuclease E/G                          | 7     |
+| IPR005987 | Ribonuclease T                            | 4     |
+| IPR006292 | Ribonuclease D                            | 5     |
+| IPR011804 | Ribonuclease II                           | 2     |
+| IPR011805 | Ribonuclease R                            | 195   |
+| IPR011907 | Ribonuclease III                          | 340   |
+| IPR013469 | Ribonuclease BN                           | 1     |
+| IPR013471 | Ribonuclease Z/BN                         | 8     |
+| IPR017290 | Ribonuclease H, Bacteroides-type          | 30    |
+| IPR017705 | Ribonuclease Y                            | 176   |
+| IPR022892 | Ribonuclease HI                           | 13    |
+| IPR022898 | Ribonuclease HII                          | 126   |
+| IPR028878 | Ribonuclease E                            | 2     |
+| IPR030854 | Ribonuclease J, bacteria                  | 170   |
+| IPR039378 | Ribonuclease T2, prokaryotic              | 1     |
+| IPR019307 | RNA-binding protein AU-1/Ribonuclease E/G | 7     |
+
+```shell script
+cd ~/data/alignment/Tenericutes
+
+cat IPS/predicts.filter.tsv |
+    tsv-filter -H --istr-in-fld description:"Ribonuclease" |
+    cut -f 5,6 |
+    tsv-summarize -H --group-by 1,2 --count |
+    grep -v "deoxy" |
+    keep-header -- sort -k2,2 |
+    mlr --itsv --omd cat
+
+mkdir -p RNases
+
+cat IPS/predicts.filter.tsv |
+    tsv-filter -H --or \
+        --istr-eq description:"Ribonuclease II" \
+        --istr-eq description:"Ribonuclease R" \
+        --istr-eq description:"Ribonuclease II/ribonuclease R" \
+    > RNases/RNaseR.tmp
+
+cat IPS/predicts.filter.tsv |
+    tsv-filter -H --str-eq RNB:"O" |
+    grep -e "ribonuclease R" -e "ribonuclease II" -e "RNB" -e "RNase R" -e "RNase II" \
+    >> RNases/RNaseR.tmp
+
+cat RNases/RNaseR.tmp |
+    tsv-uniq \
+    > RNases/RNaseR.tsv
+
+plotr tsv RNases/RNaseR.tsv --header
+
+rm RNases/*.tmp
 
 ```
 
