@@ -571,6 +571,10 @@ tar cvfz target.rna.tar.gz \
     ASSEMBLY/target.assembly.collect.csv \
     $(find ASSEMBLY -name "*_rna_from_genomic.fna.gz")
 
+tar cvfz target.genomic.tar.gz \
+    ASSEMBLY/target.assembly.collect.csv \
+    $(find ASSEMBLY -name "*_genomic.fna.gz" | grep -v "_from_" | sort)
+
 ```
 
 ## Create alignments plans without outgroups
