@@ -24,7 +24,7 @@ create table gr
     genus_strain_member  int,
     primary key (taxonomy_id)
 )
-ENGINE = MyISAM;
+ENGINE = MyISAM CHARSET=latin1;
 
 create index gr_organism_name_K on gr
 (
@@ -56,7 +56,7 @@ create table ar
     genus_strain_member  int,
     primary key (taxonomy_id)
 )
-ENGINE = MyISAM;
+ENGINE = MyISAM CHARSET=latin1;
 
 create index ar_organism_name_K on ar
 (
