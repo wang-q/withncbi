@@ -1,6 +1,5 @@
 # Aligning various genera missing from `bacteria_gr.md`
 
-
 [TOC levels=1-3]: # ""
 
 - [Aligning various genera missing from `bacteria_gr.md`](#aligning-various-genera-missing-from-bacteria_grmd)
@@ -9,7 +8,6 @@
 - [Count strains](#count-strains)
 - [bacteria_ar: prepare](#bacteria_ar-prepare)
 - [bacteria_ar: run](#bacteria_ar-run)
-
 
 # Strain info
 
