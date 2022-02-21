@@ -19,7 +19,7 @@ my $Config = Config::Tiny->read("$FindBin::RealBin/../config.ini");
 
 =head1 NAME
 
-id_project_to.pl - Project taxonomy ids to names, sepcies, genus or higher ranks.
+id_project_to.pl - Project taxonomy ids to names, species, genus or higher ranks.
 
 =head1 SYNOPSIS
 
@@ -33,10 +33,10 @@ id_project_to.pl - Project taxonomy ids to names, sepcies, genus or higher ranks
 
 =head1 EXAMPLE
 
-    $ echo 9606 | perl taxon/id_project_to.pl 
+    $ echo 9606 | perl taxon/id_project_to.pl
     9606,Homo sapiens
 
-    $ echo 9606 | perl taxon/id_project_to.pl --rank class 
+    $ echo 9606 | perl taxon/id_project_to.pl --rank class
     9606,Mammalia
 
     $ echo 9606 Human | perl taxon/id_project_to.pl --rank class --rankid
