@@ -29,51 +29,26 @@
   - [d1, d2](#d1-d2)
 
 
-# Update taxdmp
+# Update taxonomy database
 
-*Update `~/data/NCBI/taxdmp` before running `id_restrict.pl` or `id_project_to.pl`*.
+```shell
+brew install miller
+brew install wang-q/tap/nwr wang-q/tap/tsv-utils
+
+rm -fr ~/.nwr
+
+nwr download
+
+nwr txdb
+
+```
 
 # Scrap id and acc from NCBI
 
-Open browser and visit
-[NCBI mitochondrion page](http://www.ncbi.nlm.nih.gov/genomes/GenomesGroup.cgi?taxid=33090&opt=organelle).
-Save page to a local file, html only. In this case, it's
-`doc/green_plants_mitochondrion_200326.html`.
+Use `taxon/gb_taxon_locus.pl` to extract information from RefSeq files.
 
-All [Eukaryota](https://www.ncbi.nlm.nih.gov/genomes/GenomesGroup.cgi?taxid=2759&opt=organelle),
-`doc/eukaryota_mitochondrion_200326.html`.
-
-```text
-Eukaryota (2759)                10151
-    Viridiplantae (33090)       278
-        Chlorophyta (3041)      70
-        Streptophyta (35493)    208
-```
-
-Use `taxon/id_seq_dom_select.pl` to extract Taxonomy ids and genbank accessions from all history
-pages.
-
-Got **10320** accessions.
-
-```bash
+```shell
 mkdir -p ~/data/mito/GENOMES
-cd ~/data/mito/GENOMES
-
-rm webpage_id_seq.csv
-
-perl ~/Scripts/withncbi/taxon/id_seq_dom_select.pl \
-    ~/Scripts/withncbi/doc/eukaryota_mitochondrion_200326.html \
-    >> webpage_id_seq.csv
-
-perl ~/Scripts/withncbi/taxon/id_seq_dom_select.pl \
-    ~/Scripts/withncbi/doc/green_plants_mitochondrion_200326.html \
-    >> webpage_id_seq.csv
-
-```
-
-Use `taxon/gb_taxon_locus.pl` to extract information from refseq genbank files.
-
-```bash
 cd ~/data/mito/GENOMES
 
 wget -N ftp://ftp.ncbi.nlm.nih.gov/genomes/refseq/mitochondrion/mitochondrion.1.genomic.gbff.gz
@@ -87,57 +62,63 @@ rm genomic.gbff
 #rm *.genomic.gbff.gz
 
 cat refseq_id_seq.csv | grep -v "^#" | wc -l
-# 10277
+# 12290
 
 # combine
-cat webpage_id_seq.csv refseq_id_seq.csv |
+cat refseq_id_seq.csv |
     sort -u | # duplicated id-seq pair
-    sort -t, -k1,1 \
-    > id_seq.csv
+    sort -t, -k1,1 |
+    mlr --icsv --otsv cat \
+    > id_seq.tsv
 
-cat id_seq.csv | grep -v "^#" | wc -l
-# 10320
+cat id_seq.tsv | grep -v "^#" | wc -l
+# 12290
 
 ```
 
-## Restrict taxonomy ids to green plants with `taxon/id_restrict.pl`.
+## Restrict taxonomy ids to green plants
 
-```bash
+```text
+Eukaryota (2759)
+    Viridiplantae (33090)
+        Chlorophyta (3041)
+        Streptophyta (35493)
+```
+
+```shell
 cd ~/data/mito/GENOMES
 
 # Viridiplantae 33090
-echo '#strain_taxon_id,accession' > plant_id_seq.csv
-cat id_seq.csv |
-    grep -v "^#" |
-    perl ~/Scripts/withncbi/taxon/id_restrict.pl -s "," -a 33090 \
-    >> plant_id_seq.csv
+echo -e '#tax_id\taccession' > plant_id_seq.tsv
+cat id_seq.tsv |
+    nwr restrict 33090 -f stdin -c 1 \
+    >> plant_id_seq.tsv
 
-cat plant_id_seq.csv | grep -v "^#" | wc -l
-# 295
+cat plant_id_seq.tsv | grep -v "^#" | wc -l
+# 380
 
-cat plant_id_seq.csv |
-    cut -d',' -f 1 |
+cat plant_id_seq.tsv |
+    cut -f 1 |
     sort -n |
-    uniq -c |
-    grep -v -E '\s+1\s+'
-#      3 3659 Cucumis sativus has 3 chromosomes
-#      2 3708 Brassica napus linear plasmid NC_004946
-#      2 39946 Oryza sativa indica plasmid B2 NC_001776
-#      2 39947 Oryza sativa japonica plasmid B1 NC_001751
-#      2 51329 Polytomella parva has 2 chromosomes
-#      2 351366 Polytomella sp. SAG 63-10 has 2 chromosomes
+    tsv-uniq --number --repeated |
+    nwr append stdin
+#3659    2       Cucumis sativus
+#3659    3       Cucumis sativus
+#3708    2       Brassica napus
+#51329   2       Polytomella parva
+#351366  2       Polytomella piriformis
 
-#      2 3702 Arabidopsis thaliana NC_001284.2 was removed by RefSeq staff
+```
 
-sed -i".bak" "/,NC_001284$/d" plant_id_seq.csv # Arabidopsis thaliana
+Look inside `plant_id_seq.tsv` and remove redundancies
+
+```shell
+# Cucumis sativus has 3 chromosomes
+# Brassica napus linear plasmid NC_004946
+# Polytomella parva has 2 chromosomes
+# Polytomella sp. SAG 63-10 has 2 chromosomes
+
 sed -i".bak" "/,NC_004946$/d" plant_id_seq.csv # Brassica napus
-sed -i".bak" "/,NC_001751$/d" plant_id_seq.csv # Oryza sativa japonica
-sed -i".bak" "/,NC_001776$/d" plant_id_seq.csv # Oryza sativa indica
-
-# Vicia faba mitochondrial plasmid MtVFPL3 NC_011084
-# Zea mays mitochondrial plasmid pBMSmt1.9 NC_001400
-sed -i".bak" "/,NC_011084$/d" plant_id_seq.csv
-sed -i".bak" "/,NC_001400$/d" plant_id_seq.csv
 
 ```
 
@@ -145,25 +126,18 @@ sed -i".bak" "/,NC_001400$/d" plant_id_seq.csv
 
 Give ids better shapes for manually checking and automatic filtering.
 
-If you sure, you can add or delete lines and contents in `CHECKME.csv`.
+If you sure, you can add or delete lines and contents in `CHECKME.tsv`.
 
-```bash
+```shell
 mkdir -p ~/data/mito/summary
 cd ~/data/mito/summary
 
-# generate a .csv file for manually checking
-echo '#strain_taxon_id,accession,strain,species,genus,family,order,class,phylum' > CHECKME.csv
-cat ../GENOMES/plant_id_seq.csv |
-    grep -v "^#" |
-    perl ~/Scripts/withncbi/taxon/id_project_to.pl -s "," |
-    perl ~/Scripts/withncbi/taxon/id_project_to.pl -s "," --rank species |
-    perl ~/Scripts/withncbi/taxon/id_project_to.pl -s "," --rank genus |
-    perl ~/Scripts/withncbi/taxon/id_project_to.pl -s "," --rank family |
-    perl ~/Scripts/withncbi/taxon/id_project_to.pl -s "," --rank order |
-    perl ~/Scripts/withncbi/taxon/id_project_to.pl -s "," --rank class |
-    perl ~/Scripts/withncbi/taxon/id_project_to.pl -s "," --rank phylum |
-    sort -t',' -k9,9 -k8,8 -k7,7 -k6,6 -k5,5 \
-    >> CHECKME.csv
+# generate a TSV file for manually checking
+cat ../GENOMES/plant_id_seq.tsv |
+    nwr append stdin |
+    nwr append stdin -r species -r genus -r family -r order -r class -r phylum |
+    keep-header -- sort -k9,9 -k8,8 -k7,7 -k6,6 -k5,5 \
+    > CHECKME.tsv
 
 ```
 
@@ -177,15 +151,15 @@ Split Streptophyta according to classical plant classification.
       * Tracheophyta
         * Euphyllophyta
           * Spermatophyta
-            * Magnoliopsida (flowering plants) 3398 - Angiosperm
-            * Acrogymnospermae 1437180 - Gymnosperm
-          * Polypodiopsida 241806 - ferns
-        * Lycopodiopsida 1521260 - clubmosses
-      * Anthocerotophyta 13809 - hornworts
-      * Bryophyta 3208 - mosses
-      * Marchantiophyta 3195 - liverworts
+            * Magnoliopsida     3398 - Angiosperm
+            * Acrogymnospermae  1437180 - Gymnosperm
+          * Polypodiopsida      241806 - ferns
+        * Lycopodiopsida        1521260 - clubmosses
+      * Anthocerotophyta        13809 - hornworts
+      * Bryophyta               3208 - mosses
+      * Marchantiophyta         3195 - liverworts
 
-```bash
+```shell
 cd ~/data/mito/summary
 
 #perl -Mojo -e '
@@ -198,74 +172,80 @@ cd ~/data/mito/summary
 sed -i".bak" CHECKME.csv
 
 # Angiosperms
-perl ~/Scripts/withncbi/taxon/id_members.pl 3398 --rank family |
+nwr member 3398 -r family |
+    cut -f 2 |
     parallel -r -j 1 '
         perl -pi -e '\''
-            s/({},\w+,\w+),Streptophyta/\1,Angiosperms/g
-        '\'' CHECKME.csv
+            s/({}\t\w+\t\w+)\tStreptophyta/\1\tAngiosperms/g
+        '\'' CHECKME.tsv
     '
 
 # Gymnosperms
-perl ~/Scripts/withncbi/taxon/id_members.pl 1437180 --rank family |
+nwr member 3398 -r family |
+    cut -f 2 |
     parallel -r -j 1 '
         perl -pi -e '\''
-            s/({},\w+,\w+),Streptophyta/\1,Gymnosperms/g
-        '\'' CHECKME.csv
+            s/({}\t\w+\t\w+)\tStreptophyta/\1\tGymnosperms/g
+        '\'' CHECKME.tsv
     '
 
 # Pteridophytes
-perl ~/Scripts/withncbi/taxon/id_members.pl 241806 --rank family |
+nwr member 241806 -r family |
+    cut -f 2 |
     parallel -r -j 1 '
         perl -pi -e '\''
-            s/({},\w+,\w+),Streptophyta/\1,Pteridophytes/g
-        '\'' CHECKME.csv
+            s/({}\t\w+\t\w+)\tStreptophyta/\1\tPteridophytes/g
+        '\'' CHECKME.tsv
     '
-
-perl ~/Scripts/withncbi/taxon/id_members.pl 1521260 --rank family |
+nwr member 1521260 -r family |
+    cut -f 2 |
     parallel -r -j 1 '
         perl -pi -e '\''
-            s/({},\w+,\w+),Streptophyta/\1,Pteridophytes/g
-        '\'' CHECKME.csv
+            s/({}\t\w+\t\w+)\tStreptophyta/\1\tPteridophytes/g
+        '\'' CHECKME.tsv
     '
 
 # Bryophytes
-perl ~/Scripts/withncbi/taxon/id_members.pl 13809 --rank family |
+nwr member 13809 -r family |
+    cut -f 2 |
     parallel -r -j 1 '
         perl -pi -e '\''
-            s/({},\w+,\w+),Streptophyta/\1,Bryophytes/g
-        '\'' CHECKME.csv
+            s/({}\t\w+\t\w+)\tStreptophyta/\1\tBryophytes/g
+        '\'' CHECKME.tsv
     '
 
-perl ~/Scripts/withncbi/taxon/id_members.pl 3208 --rank family |
+nwr member 3208 -r family |
+    cut -f 2 |
     parallel -r -j 1 '
         perl -pi -e '\''
-            s/({},\w+,\w+),Streptophyta/\1,Bryophytes/g
-        '\'' CHECKME.csv
+            s/({}\t\w+\t\w+)\tStreptophyta/\1\tBryophytes/g
+        '\'' CHECKME.tsv
     '
 
-perl ~/Scripts/withncbi/taxon/id_members.pl 3195 --rank family |
+nwr member 3195 -r family |
+    cut -f 2 |
     parallel -r -j 1 '
         perl -pi -e '\''
-            s/({},\w+,\w+),Streptophyta/\1,Bryophytes/g
-        '\'' CHECKME.csv
+            s/({}\t\w+\t\w+)\tStreptophyta/\1\tBryophytes/g
+        '\'' CHECKME.tsv
     '
 
 # Charophyta 轮藻
 parallel -j 1 '
-    sed -i".bak" "s/{},Streptophyta/{},Charophyta/" CHECKME.csv
+    sed -i".bak" "s/{}\tStreptophyta/{}\tCharophyta/" CHECKME.tsv
     ' ::: \
         Charophyceae Chlorokybophyceae Coleochaetophyceae \
         Zygnemophyceae
 
 # Chlorophyta 绿藻
 parallel -j 1 '
-    sed -i".bak" "s/{},Streptophyta/{},Chlorophyta/" CHECKME.csv
+    sed -i".bak" "s/{}\tStreptophyta/{}\tChlorophyta/" CHECKME.tsv
     ' ::: \
         Mesostigmatophyceae Klebsormidiophyceae
 
 # Ochrophyta 褐藻
 parallel -j 1 '
-    sed -i".bak" "s/{},NA/{},Ochrophyta/" CHECKME.csv
+    sed -i".bak" "s/{}\tNA/{}\tOchrophyta/" CHECKME.tsv
     ' ::: \
         Bolidophyceae Dictyochophyceae Eustigmatophyceae \
         Pelagophyceae Phaeophyceae Raphidophyceae \
@@ -273,20 +253,20 @@ parallel -j 1 '
 
 # Rhodophyta 红藻
 parallel -j 1 '
-    sed -i".bak" "s/{},NA/{},Rhodophyta/" CHECKME.csv
+    sed -i".bak" "s/{}\tNA/{}\tRhodophyta/" CHECKME.tsv
     ' ::: \
         Bangiophyceae Compsopogonophyceae Florideophyceae \
         Rhodellophyceae Stylonematophyceae
 
 # Cryptophyta 隐藻
 parallel -j 1 '
-    sed -i".bak" "s/{},NA/{},Cryptophyta/" CHECKME.csv
+    sed -i".bak" "s/{}\tNA/{}\tCryptophyta/" CHECKME.tsv
     ' ::: \
         Cryptophyta Cryptophyceae
 
 # missing phylums
-sed -i".bak" "s/Glaucocystophyceae,NA/Glaucocystophyceae,Glaucophyta/" CHECKME.csv
-sed -i".bak" "s/Dinophyceae,NA/Dinophyceae,Dinoflagellata/" CHECKME.csv
+sed -i".bak" "s/Glaucocystophyceae\tNA/Glaucocystophyceae\tGlaucophyta/" CHECKME.tsv
+sed -i".bak" "s/Dinophyceae\tNA/Dinophyceae\tDinoflagellata/" CHECKME.tsv
 
 rm *.tmp *.bak
 
@@ -297,21 +277,21 @@ rm *.tmp *.bak
 Species and genus should not be "NA" and genus has 2 or more members.
 
 ```text
-291 ---------> 287 ---------> 113 ---------> 158
+380 ---------> 372 ---------> 160 ---------> 210
         NA           genus         family
 ```
 
 
-```bash
+```shell
 mkdir -p ~/data/mito/summary
 cd ~/data/mito/summary
 
-cat CHECKME.csv | grep -v "^#" | wc -l
-# 291
+cat CHECKME.tsv | grep -v "^#" | wc -l
+# 380
 
 # filter out accessions without linage information (strain, species, genus and family)
-cat CHECKME.csv |
-    perl -nla -F"," -e '
+cat CHECKME.tsv |
+    perl -nla -F"\t" -e '
         /^#/ and next;
         ($F[2] eq q{NA} or $F[3] eq q{NA} or $F[4] eq q{NA} or $F[5] eq q{NA} ) and next;
         print
@@ -319,18 +299,18 @@ cat CHECKME.csv |
     > valid.tmp
 
 wc -l valid.tmp
-# 287
+# 372
 
 #----------------------------#
 # Genus
 #----------------------------#
 # valid genera
 cat valid.tmp |
-    perl -nla -F"," -e '
+    perl -nla -F"\t" -e '
         $seen{$F[4]}++;
         END {
             for $k (sort keys %seen) {
-                printf qq{,%s,\n}, $k if $seen{$k} > 1
+                printf qq{\t%s\t\n}, $k if $seen{$k} > 1
             }
         }
     ' \
@@ -340,27 +320,29 @@ cat valid.tmp |
 grep -F -f genus.tmp valid.tmp > valid.genus.tmp
 
 wc -l valid.genus.tmp
-# 113
+# 160
 
 #----------------------------#
 # Family
 #----------------------------#
 # get some genera back as candidates for outgroup
 cat valid.genus.tmp |
-    perl -nla -F"," -e 'printf qq{,$F[5],\n}' \
+    perl -nla -F"\t" -e 'printf qq{\t$F[5]\t\n}' \
     > family.tmp
 
 # intersect between two files
 grep -F -f family.tmp valid.tmp > valid.family.tmp
 
 wc -l valid.family.tmp
-# 158
+# 210
 
 #----------------------------#
 # results produced in this step
 #----------------------------#
-head -n 1 CHECKME.csv > DOWNLOAD.csv
-cat valid.family.tmp >> DOWNLOAD.csv
+head -n 1 CHECKME.tsv > DOWNLOAD.tsv
+cat valid.family.tmp |
+    sort -t$'\t' -k9,9 -k8,8 -k7,7 -k6,6 -k5,5 \
+    >> DOWNLOAD.tsv
 
 # clean
 rm *.tmp *.bak
@@ -371,36 +353,39 @@ rm *.tmp *.bak
 
 Seems it's OK to use species as names.
 
-```bash
+```shell
 cd ~/data/mito/summary
 
 # sub-species
-cat DOWNLOAD.csv |
-    perl -nl -a -F"," -e '
+cat DOWNLOAD.tsv |
+    perl -nl -a -F"\t" -e '
         /^#/i and next;
         $seen{$F[3]}++;
         END {
-            for $k (keys %seen){printf qq{%s,%d\n}, $k, $seen{$k} if $seen{$k} > 1}
+            for $k (keys %seen){printf qq{%s\t%d\n}, $k, $seen{$k} if $seen{$k} > 1}
         };
     ' |
     sort
-#Beta vulgaris,2
-#Cucumis sativus,3
-#Oryza sativa,2
-#Polytomella parva,2
-#Polytomella piriformis,2
-#Zea mays,2
+#Beta vulgaris   2
+#Brassica napus  2
+#Brassica rapa   2
+#Cucumis sativus 3
+#Oryza sativa    2
+#Polytomella parva       2
+#Polytomella piriformis  2
+#Zea mays        2
 
 # strain name not equal to species
-cat DOWNLOAD.csv |
+cat DOWNLOAD.tsv |
     grep -v '^#' |
-    tsv-filter -d"," --ff-str-ne 3:4 |
-    tsv-select -d"," -f 3 |
+    tsv-filter --ff-str-ne 3:4 |
+    tsv-select -f 3 |
     sort
 #Aegilops speltoides var. ligustica
 #Beta vulgaris subsp. maritima
 #Beta vulgaris subsp. vulgaris
 #Brassica rapa subsp. oleifera
+#Calypogeia fissa subsp. neogaea
 #Marchantia polymorpha subsp. ruderalis
 #Oryza sativa Indica Group
 #Oryza sativa Japonica Group
@@ -411,21 +396,21 @@ cat DOWNLOAD.csv |
 
 Create abbreviations.
 
-```bash
+```shell
 cd ~/data/mito/summary
 
 echo '#strain_taxon_id,accession,strain,species,genus,family,order,class,phylum,abbr' > ABBR.csv
 cat DOWNLOAD.csv |
     grep -v '^#' |
     perl ~/Scripts/withncbi/taxon/abbr_name.pl -c "3,4,5" -s "," -m 0 --shortsub |
-    sort -t',' -k9,9 -k7,7 -k6,6 -k10,10 \
+    sort -t$'\t' -k9,9 -k7,7 -k6,6 -k10,10 \
     >> ABBR.csv
 
 ```
 
 # Download sequences and regenerate lineage information
 
-```bash
+```shell
 cd ~/data/mito/GENOMES
 
 echo "#strain_name,accession,strain_taxon_id" > name_acc_id.csv
@@ -484,7 +469,7 @@ find . -name "*.fa" | wc -l
 
 21 orders, 22 families, 36 genera and 106 species.
 
-```bash
+```shell
 cd ~/data/mito/summary
 
 # valid genera
@@ -532,7 +517,7 @@ rm *.tmp *.bak
 
 ## Raw phylogenetic tree by MinHash
 
-```bash
+```shell
 mkdir -p ~/data/mito/mash
 cd ~/data/mito/mash
 
@@ -552,7 +537,7 @@ done
 
 * h=0.1 as we need outgroup ~ 0.05
 
-```bash
+```shell
 cd ~/data/mito/summary
 mash triangle -E -p 8 -l <(
         cat ABBR.csv |
@@ -605,7 +590,7 @@ nw_display -s -b 'visibility:hidden' -w 600 -v 30 tree.nwk |
 
 * Abnormal strains
 
-```bash
+```shell
 cd ~/data/mito/summary
 
 # genus
@@ -668,7 +653,7 @@ cut -d',' -f 6 GENUS.csv | sed -e '1d' | uniq |
 
 # Prepare sequences for lastz
 
-```bash
+```shell
 cd ~/data/mito/GENOMES
 
 find . -maxdepth 1 -mindepth 1 -type d |
@@ -703,7 +688,7 @@ Manually edit it then move to `~/Scripts/withncbi/doc/mito_t_o.md`.
 
 * Outgroups can be changes with less intentions.
 
-```bash
+```shell
 cd ~/data/mito/summary
 
 cat GENUS.csv |
@@ -750,7 +735,7 @@ GENUS.csv
 
 **36** genera and **15** families.
 
-```bash
+```shell
 mkdir -p ~/data/mito/taxon
 cd ~/data/mito/taxon
 
@@ -842,7 +827,7 @@ cat ../summary/ABBR.csv |
 
 ## Plans for align-able targets
 
-```bash
+```shell
 cd ~/data/mito/taxon
 
 cat ~/Scripts/withncbi/doc/mito_t_o.md |
@@ -885,7 +870,7 @@ rm *.tmp
 
 ## Aligning w/o outgroups
 
-```bash
+```shell
 cd ~/data/mito/
 
 # genus
@@ -953,7 +938,7 @@ find groups -mindepth 1 -maxdepth 3 -type d -name "*_fasta" | parallel -r rm -fr
 
 * Abnormal groups
 
-```bash
+```shell
 cd ~/data/mito/
 
 find groups/ -name "pairwise.coverage.csv" | sort |
@@ -1018,7 +1003,7 @@ find groups/ -name "pairwise.coverage.csv" | sort |
 
 * *D* between target and outgroup should be around **0.05**.
 
-```bash
+```shell
 cd ~/data/mito/
 
 # genus_og
@@ -1063,7 +1048,7 @@ cat taxon/group_target.tsv |
 
 ## Self alignments
 
-```bash
+```shell
 cd ~/data/mito/
 
 cat taxon/group_target.tsv |
@@ -1089,7 +1074,7 @@ cat taxon/group_target.tsv |
 
 ## Copy xlsx files
 
-```bash
+```shell
 mkdir -p ~/data/mito/summary/xlsx
 cd ~/data/mito/summary/xlsx
 
@@ -1107,7 +1092,7 @@ find ../../groups/genus_og -type f -name "*.common.xlsx" |
 
 Create `list.csv` from `GENUS.csv` with sequence lengths.
 
-```bash
+```shell
 mkdir -p ~/data/mito/summary/table
 cd ~/data/mito/summary/table
 
@@ -1211,7 +1196,7 @@ Criteria:
 * Total number of indels >= 100
 * D of multiple alignments < 0.05
 
-```bash
+```shell
 cd ~/data/mito/summary/xlsx
 
 cat <<'EOF' > Table_alignment.tt
@@ -1276,7 +1261,7 @@ cp -f Table_alignment_all.csv ~/data/mito/summary/table
 
 ```
 
-```bash
+```shell
 cd ~/data/mito/summary/table
 
 echo "Genus,avg_size" > group_avg_size.csv
@@ -1363,7 +1348,7 @@ cp -f ~/data/mito/summary/xlsx/Table_alignment.csv ~/data/mito/summary/table
 
 NCBI Taxonomy tree
 
-```bash
+```shell
 mkdir -p ~/data/mito/summary/group
 cd ~/data/mito/summary/group
 
@@ -1390,7 +1375,7 @@ nw_display -s -b 'visibility:hidden' -w 600 -v 30 genera.newick |
 
 ## Phylogenic trees of each genus with outgroup
 
-```bash
+```shell
 mkdir -p ~/data/mito/summary/trees
 cd ~/data/mito/summary/trees
 
@@ -1408,7 +1393,7 @@ find ../../groups/genus_og -type f -path "*Results*" -name "*.nwk" |
 
 ## d1, d2
 
-```bash
+```shell
 cd ~/data/mito/summary/xlsx
 
 # d1
