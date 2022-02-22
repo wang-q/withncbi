@@ -39,6 +39,8 @@ brew install wang-q/tap/nwr wang-q/tap/tsv-utils
 
 ```
 
+Install [egaz](https://github.com/wang-q/App-Egaz#installation)
+
 ## Update taxonomy database
 
 ```shell
@@ -468,10 +470,10 @@ done
 #order   count
 #24
 
-# sort by multiply columns: phylum, family, genus, accession
+# sort by multiply columns: phylum, order, family, genus, accession
 # Older accessions have better sequencing qualities
 cat GENUS.tsv |
-    keep-header -- sort -t$'\t' -k9,9 -k6,6 -k5,5 -k2,2 \
+    keep-header -- sort -t$'\t' -k9,9 -k7,7 -k6,6 -k5,5 -k2,2 \
     >> GENUS.tmp
 mv GENUS.tmp GENUS.tsv
 
@@ -737,7 +739,7 @@ cat GENUS.tsv |
     ' \
     > mito_t_o.md
 
-# 36
+# 45
 cat mito_t_o.md |
     grep -v '^#' |
     grep -E '\S+' |
@@ -754,7 +756,7 @@ GENUS.tsv
 #strain_taxon_id accession strain species genus family order class phylum abbr
 ```
 
-**36** genera and **15** families.
+**34** genera and **19** families.
 
 ```shell
 mkdir -p ~/data/mito/taxon
@@ -763,9 +765,9 @@ cd ~/data/mito/taxon
 echo -e "#Serial\tGroup\tCount\tTarget" > group_target.tsv
 
 # genus
-cat ../summary/GENUS.csv |
+cat ../summary/GENUS.tsv |
     grep -v "^#" |
-    SERIAL=1 perl -na -F"," -MPath::Tiny -e '
+    SERIAL=1 perl -na -F"\t" -MPath::Tiny -e '
         BEGIN{
             $name = q{};
             %id_of = ();
@@ -806,9 +808,9 @@ cat ../summary/GENUS.csv |
     >> group_target.tsv
 
 # family
-cat ../summary/ABBR.csv |
+cat ../summary/ABBR.tsv |
     grep -v "^#" |
-    SERIAL=1001 perl -na -F"," -MPath::Tiny -e '
+    SERIAL=1001 perl -na -F"\t" -MPath::Tiny -e '
         BEGIN{
             our $name = q{};
             our %id_of = ();
@@ -890,6 +892,8 @@ rm *.tmp
 ```
 
 ## Aligning w/o outgroups
+
+Start a MySQL server, which aligndb needs. `mysqld_safe`
 
 ```shell
 cd ~/data/mito/
@@ -976,9 +980,9 @@ find groups/ -name "pairwise.coverage.csv" | sort |
                 sed -e "s/^family\///g" -e "s/^genus\///g" -e "s/^mash\///g"
             )
         phylum=$(
-            cat summary/ABBR.csv |
+            cat summary/ABBR.tsv |
                 grep -w ${taxon} |
-                cut -d, -f 9 |
+                tsv-select -f 9 |
                 head -n 1
             )
         group=$(
@@ -991,17 +995,21 @@ find groups/ -name "pairwise.coverage.csv" | sort |
             echo -e "${taxon}\t${cover}\t${phylum}\t${group}"
         fi
     '
-#Asteraceae      0.2208  Angiosperms     family
-#Brassicaceae    0.1223  Angiosperms     family
+
+#Asteraceae      0.1488  Angiosperms     family
+#Brassicaceae    0.1181  Angiosperms     family
 #Chenopodiaceae  0.1791  Angiosperms     family
 #Chlorellaceae   0.09496 Chlorophyta     family
 #Chloropicaceae  0.0317  Chlorophyta     family
-#Cucurbitaceae   0.0159  Angiosperms     family
+#Cucurbitaceae   0.0140  Angiosperms     family
 #Fabaceae        0.0000  Angiosperms     family
 #Malvaceae       0.0103  Angiosperms     family
-#Poaceae 0.0154  Angiosperms     family
-#Solanaceae      0.0546  Angiosperms     family
-#Ulvaceae        0.1209  Chlorophyta     family
+#Nyctaginaceae   0.3327  Angiosperms     family
+#Poaceae 0.0000  Angiosperms     family
+#Rutaceae        0.0124  Angiosperms     family
+#Salicaceae      0.4175  Angiosperms     family
+#Solanaceae      0.0000  Angiosperms     family
+#Ulvaceae        0.0744  Chlorophyta     family
 #Bracteacoccus   0.2154  Chlorophyta     genus
 #Caulerpa        0.0139  Chlorophyta     genus
 #Chlorella       0.1734  Chlorophyta     genus
@@ -1010,15 +1018,15 @@ find groups/ -name "pairwise.coverage.csv" | sort |
 #Corchorus       0.0548  Angiosperms     genus
 #Prototheca      0.0866  Chlorophyta     genus
 #Senna   0.3345  Angiosperms     genus
-#Ulva    0.1086  Chlorophyta     genus
-#group_18        0.3832          mash
-#group_8 0.2587          mash
+#Solanum 0.0371  Angiosperms     genus
+#Ulva    0.0811  Chlorophyta     genus
+#group_23        0.3832          mash
 
 ```
 
 ## Aligning with outgroups
 
-* Review alignments and phylogenetic trees generated in `groups/family/` and `groups/group/`
+* Review alignments and phylogenetic trees generated in `groups/family/` and `groups/mash/`
 
 * Add outgroups to `mito_t_o.md` manually.
 
@@ -1111,7 +1119,7 @@ find ../../groups/genus_og -type f -name "*.common.xlsx" |
 
 ## Genome list
 
-Create `list.csv` from `GENUS.csv` with sequence lengths.
+Create `list.csv` from `GENUS.tsv` with sequence lengths.
 
 ```shell
 mkdir -p ~/data/mito/summary/table
@@ -1161,17 +1169,17 @@ find ../../groups/genus -type f -name "chr_length.csv" |
     ' \
     > length.tmp
 cat length.tmp | datamash check
-#108 lines, 3 fields
+#123 lines, 3 fields
 
 # phylum family genus abbr taxon_id
-cat ~/data/mito/summary/GENUS.csv |
+cat ~/data/mito/summary/GENUS.tsv |
     grep -v "^#" |
-    perl -nla -F"," -e 'print join qq{\t}, ($F[8], $F[5], $F[4], $F[9], $F[0], )' |
+    perl -nla -F"\t" -e 'print join qq{\t}, ($F[8], $F[5], $F[4], $F[9], $F[0], )' |
     sort |
     uniq \
     > abbr.tmp
 cat abbr.tmp | datamash check
-#91 lines, 5 fields
+#155 lines, 5 fields
 
 tsv-join \
     abbr.tmp \
@@ -1181,7 +1189,7 @@ tsv-join \
     --append-fields 2,3 \
     > list.tmp
 cat list.tmp | datamash check
-#108 lines, 7 fields
+#123 lines, 7 fields
 
 # sort as orders in mito_t_o.md
 echo -e "#phylum,family,genus,abbr,taxon_id,accession,length" > list.csv
@@ -1201,7 +1209,7 @@ cat list.tmp |
     tr $'\t' ',' \
     >> list.csv
 cat list.csv | datamash check -t,
-#109 lines, 7 fields
+#124 lines, 7 fields
 
 rm *.tmp
 
@@ -1415,6 +1423,7 @@ find ../../groups/genus_og -type f -path "*Results*" -name "*.nwk" |
 ## d1, d2
 
 ```shell
+mkdir -p ~/data/mito/summary/fig
 cd ~/data/mito/summary/xlsx
 
 # d1
@@ -1481,7 +1490,7 @@ plotr lines d2.mean.tsv --style blue \
     --xl "Reciprocal of indel density ({italic(d)[2]})" \
     --yl "Nucleotide divergence ({italic(D)})"
 
-mv ../xlsx/*.pdf ../fig
+mv *.pdf ../fig
 
 ```
 
