@@ -142,7 +142,7 @@ for my $i ( 0 .. $count - 1 ) {
         $sp_of->{ $sp[$i] };
     my $organism = join "_", grep { defined $_ and length $_ } $ge_sp, $st[$i];
 
-    print join( ",", @{ $rows[$i] }, $organism ), "\n";
+    print join( $separator, @{ $rows[$i] }, $organism ), "\n";
 }
 
 exit;
