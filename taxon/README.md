@@ -46,7 +46,7 @@ id ---> lineage ---> filtering ---> naming ---> strain_info.pl ---> mash ---> eg
 
 # Update taxdmp
 
-*Update `~/data/NCBI/taxdmp` before running `id_restrict.pl` or `id_project_to.pl`*.
+*Update `~/data/NCBI/taxdmp` before running `strain_info.pl`*.
 
 # Scrap id and acc from NCBI
 
@@ -126,25 +126,18 @@ cat id_seq.csv | grep -v "^#" | wc -l
 
 Give ids better shapes for manually checking and automatic filtering.
 
-If you sure, you can add or delete lines and contents in `CHECKME.csv`.
+If you sure, you can add or delete lines and contents in `CHECKME.tsv`.
 
-```bash
-mkdir -p ~/data/plastid/summary
-cd ~/data/plastid/summary
+```shell
+mkdir -p ~/data/mito/summary
+cd ~/data/mito/summary
 
-# generate a .csv file for manually checking
-echo '#strain_taxon_id,accession,strain,species,genus,family,order,class,phylum' > CHECKME.csv
-cat ../GENOMES/id_seq.csv |
-    grep -v "^#" |
-    perl ~/Scripts/withncbi/taxon/id_project_to.pl -s "," |
-    perl ~/Scripts/withncbi/taxon/id_project_to.pl -s "," --rank species |
-    perl ~/Scripts/withncbi/taxon/id_project_to.pl -s "," --rank genus |
-    perl ~/Scripts/withncbi/taxon/id_project_to.pl -s "," --rank family |
-    perl ~/Scripts/withncbi/taxon/id_project_to.pl -s "," --rank order |
-    perl ~/Scripts/withncbi/taxon/id_project_to.pl -s "," --rank class |
-    perl ~/Scripts/withncbi/taxon/id_project_to.pl -s "," --rank phylum |
-    sort -t',' -k9,9 -k8,8 -k7,7 -k6,6 -k5,5 \
-    >> CHECKME.csv
+# generate a TSV file for manually checking
+cat ../GENOMES/plant_id_seq.tsv |
+    nwr append stdin |
+    nwr append stdin -r species -r genus -r family -r order -r class -r phylum |
+    keep-header -- sort -k9,9 -k8,8 -k7,7 -k6,6 -k5,5 \
+    > CHECKME.tsv
 
 ```
 
