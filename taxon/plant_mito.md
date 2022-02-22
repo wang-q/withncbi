@@ -184,7 +184,7 @@ sed -i".bak" CHECKME.csv
 
 # Angiosperms
 nwr member 3398 -r family |
-    cut -f 2 |
+    tsv-select -f 2 |
     parallel -r -j 1 '
         perl -pi -e '\''
             s/({}\t\w+\t\w+)\tStreptophyta/\1\tAngiosperms/g
@@ -192,8 +192,8 @@ nwr member 3398 -r family |
     '
 
 # Gymnosperms
-nwr member 3398 -r family |
-    cut -f 2 |
+nwr member 1437180 -r family |
+    tsv-select -f 2 |
     parallel -r -j 1 '
         perl -pi -e '\''
             s/({}\t\w+\t\w+)\tStreptophyta/\1\tGymnosperms/g
@@ -202,14 +202,14 @@ nwr member 3398 -r family |
 
 # Pteridophytes
 nwr member 241806 -r family |
-    cut -f 2 |
+    tsv-select -f 2 |
     parallel -r -j 1 '
         perl -pi -e '\''
             s/({}\t\w+\t\w+)\tStreptophyta/\1\tPteridophytes/g
         '\'' CHECKME.tsv
     '
 nwr member 1521260 -r family |
-    cut -f 2 |
+    tsv-select -f 2 |
     parallel -r -j 1 '
         perl -pi -e '\''
             s/({}\t\w+\t\w+)\tStreptophyta/\1\tPteridophytes/g
@@ -218,7 +218,7 @@ nwr member 1521260 -r family |
 
 # Bryophytes
 nwr member 13809 -r family |
-    cut -f 2 |
+    tsv-select -f 2 |
     parallel -r -j 1 '
         perl -pi -e '\''
             s/({}\t\w+\t\w+)\tStreptophyta/\1\tBryophytes/g
@@ -226,7 +226,7 @@ nwr member 13809 -r family |
     '
 
 nwr member 3208 -r family |
-    cut -f 2 |
+    tsv-select -f 2 |
     parallel -r -j 1 '
         perl -pi -e '\''
             s/({}\t\w+\t\w+)\tStreptophyta/\1\tBryophytes/g
@@ -234,7 +234,7 @@ nwr member 3208 -r family |
     '
 
 nwr member 3195 -r family |
-    cut -f 2 |
+    tsv-select -f 2 |
     parallel -r -j 1 '
         perl -pi -e '\''
             s/({}\t\w+\t\w+)\tStreptophyta/\1\tBryophytes/g

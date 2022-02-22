@@ -186,74 +186,80 @@ sed -i".bak" "/167339,/d" CHECKME.csv
 sed -i".bak" "/2003521,/d" CHECKME.csv
 
 # Angiosperms
-perl ~/Scripts/withncbi/taxon/id_members.pl 3398 --rank family |
+nwr member 3398 -r family |
+    tsv-select -f 2 |
     parallel -r -j 1 '
         perl -pi -e '\''
-            s/({},\w+,\w+),Streptophyta/\1,Angiosperms/g
-        '\'' CHECKME.csv
+            s/({}\t\w+\t\w+)\tStreptophyta/\1\tAngiosperms/g
+        '\'' CHECKME.tsv
     '
 
 # Gymnosperms
-perl ~/Scripts/withncbi/taxon/id_members.pl 1437180 --rank family |
+nwr member 1437180 -r family |
+    tsv-select -f 2 |
     parallel -r -j 1 '
         perl -pi -e '\''
-            s/({},\w+,\w+),Streptophyta/\1,Gymnosperms/g
-        '\'' CHECKME.csv
+            s/({}\t\w+\t\w+)\tStreptophyta/\1\tGymnosperms/g
+        '\'' CHECKME.tsv
     '
 
 # Pteridophytes
-perl ~/Scripts/withncbi/taxon/id_members.pl 241806 --rank family |
+nwr member 241806 -r family |
+    tsv-select -f 2 |
     parallel -r -j 1 '
         perl -pi -e '\''
-            s/({},\w+,\w+),Streptophyta/\1,Pteridophytes/g
-        '\'' CHECKME.csv
+            s/({}\t\w+\t\w+)\tStreptophyta/\1\tPteridophytes/g
+        '\'' CHECKME.tsv
     '
-
-perl ~/Scripts/withncbi/taxon/id_members.pl 1521260 --rank family |
+nwr member 1521260 -r family |
+    tsv-select -f 2 |
     parallel -r -j 1 '
         perl -pi -e '\''
-            s/({},\w+,\w+),Streptophyta/\1,Pteridophytes/g
-        '\'' CHECKME.csv
+            s/({}\t\w+\t\w+)\tStreptophyta/\1\tPteridophytes/g
+        '\'' CHECKME.tsv
     '
 
 # Bryophytes
-perl ~/Scripts/withncbi/taxon/id_members.pl 13809 --rank family |
+nwr member 13809 -r family |
+    tsv-select -f 2 |
     parallel -r -j 1 '
         perl -pi -e '\''
-            s/({},\w+,\w+),Streptophyta/\1,Bryophytes/g
-        '\'' CHECKME.csv
+            s/({}\t\w+\t\w+)\tStreptophyta/\1\tBryophytes/g
+        '\'' CHECKME.tsv
     '
 
-perl ~/Scripts/withncbi/taxon/id_members.pl 3208 --rank family |
+nwr member 3208 -r family |
+    tsv-select -f 2 |
     parallel -r -j 1 '
         perl -pi -e '\''
-            s/({},\w+,\w+),Streptophyta/\1,Bryophytes/g
-        '\'' CHECKME.csv
+            s/({}\t\w+\t\w+)\tStreptophyta/\1\tBryophytes/g
+        '\'' CHECKME.tsv
     '
 
-perl ~/Scripts/withncbi/taxon/id_members.pl 3195 --rank family |
+nwr member 3195 -r family |
+    tsv-select -f 2 |
     parallel -r -j 1 '
         perl -pi -e '\''
-            s/({},\w+,\w+),Streptophyta/\1,Bryophytes/g
-        '\'' CHECKME.csv
+            s/({}\t\w+\t\w+)\tStreptophyta/\1\tBryophytes/g
+        '\'' CHECKME.tsv
     '
 
 # Charophyta 轮藻
 parallel -j 1 '
-    sed -i".bak" "s/{},Streptophyta/{},Charophyta/" CHECKME.csv
+    sed -i".bak" "s/{}\tStreptophyta/{}\tCharophyta/" CHECKME.tsv
     ' ::: \
         Charophyceae Chlorokybophyceae Coleochaetophyceae \
         Zygnemophyceae
 
 # Chlorophyta 绿藻
 parallel -j 1 '
-    sed -i".bak" "s/{},Streptophyta/{},Chlorophyta/" CHECKME.csv
+    sed -i".bak" "s/{}\tStreptophyta/{}\tChlorophyta/" CHECKME.tsv
     ' ::: \
         Mesostigmatophyceae Klebsormidiophyceae
 
 # Ochrophyta 褐藻
 parallel -j 1 '
-    sed -i".bak" "s/{},NA/{},Ochrophyta/" CHECKME.csv
+    sed -i".bak" "s/{}\tNA/{}\tOchrophyta/" CHECKME.tsv
     ' ::: \
         Bolidophyceae Dictyochophyceae Eustigmatophyceae \
         Pelagophyceae Phaeophyceae Raphidophyceae \
@@ -261,20 +267,20 @@ parallel -j 1 '
 
 # Rhodophyta 红藻
 parallel -j 1 '
-    sed -i".bak" "s/{},NA/{},Rhodophyta/" CHECKME.csv
+    sed -i".bak" "s/{}\tNA/{}\tRhodophyta/" CHECKME.tsv
     ' ::: \
         Bangiophyceae Compsopogonophyceae Florideophyceae \
         Rhodellophyceae Stylonematophyceae
 
 # Cryptophyta 隐藻
 parallel -j 1 '
-    sed -i".bak" "s/{},NA/{},Cryptophyta/" CHECKME.csv
+    sed -i".bak" "s/{}\tNA/{}\tCryptophyta/" CHECKME.tsv
     ' ::: \
         Cryptophyta Cryptophyceae
 
 # missing phylums
-sed -i".bak" "s/Glaucocystophyceae,NA/Glaucocystophyceae,Glaucophyta/" CHECKME.csv
-sed -i".bak" "s/Dinophyceae,NA/Dinophyceae,Dinoflagellata/" CHECKME.csv
+sed -i".bak" "s/Glaucocystophyceae\tNA/Glaucocystophyceae\tGlaucophyta/" CHECKME.tsv
+sed -i".bak" "s/Dinophyceae\tNA/Dinophyceae\tDinoflagellata/" CHECKME.tsv
 
 # Chrysanthemum x morifolium and Pelargonium x hortorum are also weird, but they can be googled.
 
