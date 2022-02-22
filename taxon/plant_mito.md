@@ -1,4 +1,4 @@
-# Process plant mitochondrion genomes
+# Plant mitochondrion genomes
 
 [TOC levels=1-3]: # ""
 
@@ -28,13 +28,20 @@
   - [Phylogenic trees of each genus with outgroup](#phylogenic-trees-of-each-genus-with-outgroup)
   - [d1, d2](#d1-d2)
 
+# Preparation
 
-# Update taxonomy database
+## Download software
 
 ```shell
-brew install miller
+brew install miller librsvg
+brew install mash newick_utils
 brew install wang-q/tap/nwr wang-q/tap/tsv-utils
 
+```
+
+## Update taxonomy database
+
+```shell
 rm -fr ~/.nwr
 
 nwr download
@@ -42,6 +49,8 @@ nwr download
 nwr txdb
 
 ```
+
+*[Update](../db/README.md#get-data-from-ncbi) `~/data/NCBI/taxdmp` before running `strain_info.pl`.*
 
 # Scrap id and acc from NCBI
 
@@ -151,13 +160,13 @@ Split Streptophyta according to classical plant classification.
       * Tracheophyta
         * Euphyllophyta
           * Spermatophyta
-            * Magnoliopsida     3398 - Angiosperm
-            * Acrogymnospermae  1437180 - Gymnosperm
-          * Polypodiopsida      241806 - ferns
-        * Lycopodiopsida        1521260 - clubmosses
-      * Anthocerotophyta        13809 - hornworts
-      * Bryophyta               3208 - mosses
-      * Marchantiophyta         3195 - liverworts
+            * Magnoliopsida 3398 - Angiosperm
+            * Acrogymnospermae 1437180 - Gymnosperm
+          * Polypodiopsida 241806 - ferns
+        * Lycopodiopsida 1521260 - clubmosses
+      * Anthocerotophyta 13809 - hornworts
+      * Bryophyta 3208 - mosses
+      * Marchantiophyta 3195 - liverworts
 
 ```shell
 cd ~/data/mito/summary
@@ -281,7 +290,6 @@ Species and genus should not be "NA" and genus has 2 or more members.
         NA           genus         family
 ```
 
-
 ```shell
 mkdir -p ~/data/mito/summary
 cd ~/data/mito/summary
@@ -399,12 +407,76 @@ Create abbreviations.
 ```shell
 cd ~/data/mito/summary
 
-echo '#strain_taxon_id,accession,strain,species,genus,family,order,class,phylum,abbr' > ABBR.csv
-cat DOWNLOAD.csv |
+head -n 1 DOWNLOAD.tsv |
+    sed 's/$/\tabbr/' \
+     > ABBR.tsv
+
+cat DOWNLOAD.tsv |
     grep -v '^#' |
-    perl ~/Scripts/withncbi/taxon/abbr_name.pl -c "3,4,5" -s "," -m 0 --shortsub |
+    perl ~/Scripts/withncbi/taxon/abbr_name.pl -c "3,4,5" -s '\t' -m 0 --shortsub |
+    mlr --icsv --otsv cat |
     sort -t$'\t' -k9,9 -k7,7 -k6,6 -k10,10 \
-    >> ABBR.csv
+    >> ABBR.tsv
+
+```
+
+## Numbers for higher ranks
+
+21 orders, 22 families, 36 genera and 106 species.
+
+```shell
+cd ~/data/mito/summary
+
+## valid genera
+#cat ABBR.tsv |
+#    grep -v "^#" |
+#    perl -nl -a -F"\t" -e '
+#        $seen{$F[4]}++;
+#        END {
+#            for $k (sort keys %seen) {
+#                printf qq{\t%s\t\n}, $k if $seen{$k} > 1
+#            }
+#        }
+#    ' \
+#    > genus.valid.tmp
+
+cat ABBR.tsv |
+    tsv-uniq -H -f genus --at-least 2 |
+    tsv-select -H -f genus |
+    sed 's/^/\t/' |
+    sed 's/$/\t/' \
+    > genus.valid.tmp
+
+# intersect between two files
+grep -F -f genus.valid.tmp ABBR.tsv > GENUS.tsv
+
+wc -l GENUS.tsv
+# 161
+
+# count every ranks
+for rank in species genus family order; do
+    cat GENUS.tsv |
+        tsv-summarize -H --group-by ${rank} --count |
+        keep-header -- wc -l
+done
+#species count
+#151
+#genus   count
+#45
+#family  count
+#28
+#order   count
+#24
+
+# sort by multiply columns: phylum, family, genus, accession
+# Older accessions have better sequencing qualities
+cat GENUS.tsv |
+    keep-header -- sort -t$'\t' -k9,9 -k6,6 -k5,5 -k2,2 \
+    >> GENUS.tmp
+mv GENUS.tmp GENUS.tsv
+
+# clean
+rm *.tmp *.bak
 
 ```
 
@@ -414,21 +486,21 @@ cat DOWNLOAD.csv |
 cd ~/data/mito/GENOMES
 
 echo "#strain_name,accession,strain_taxon_id" > name_acc_id.csv
-cat ../summary/ABBR.csv |
+cat ../summary/ABBR.tsv |
     grep -v '^#' |
-    perl -nl -a -F"," -e 'print qq{$F[9],$F[1],$F[0]}' |
+    perl -nl -a -F"\t" -e 'print qq{$F[9],$F[1],$F[0]}' |
     sort \
     >> name_acc_id.csv
 
 # Local, Runtime 4 seconds.
-cat ../summary/ABBR.csv |
+cat ../summary/ABBR.tsv |
     grep -v '^#' |
-    perl -nla -F"," -e 'print qq{$F[0],$F[9]}' |
+    perl -nla -F"\t" -e 'print qq{$F[0],$F[9]}' |
     uniq |
     perl ~/Scripts/withncbi/taxon/strain_info.pl --stdin --withname --file taxon_ncbi.csv
 
 # Some warnings about trans-splicing genes from BioPerl, just ignore them
-# eutils restricts 3 connections
+# eutils restricts 3 requests per second
 cat name_acc_id.csv |
     grep -v '^#' |
     2>&1 parallel --colsep ',' --no-run-if-empty --linebuffer -k -j 3 "
@@ -465,63 +537,13 @@ find . -name "*.fa" | wc -l
 
 ```
 
-## Numbers for higher ranks
-
-21 orders, 22 families, 36 genera and 106 species.
-
-```shell
-cd ~/data/mito/summary
-
-# valid genera
-cat ABBR.csv |
-    grep -v "^#" |
-    perl -nl -a -F"," -e '
-        $seen{$F[4]}++;
-        END {
-            for $k (sort keys %seen) {
-                printf qq{,%s,\n}, $k if $seen{$k} > 1
-            }
-        }
-    ' \
-    > genus.valid.tmp
-
-# intersect between two files
-grep -F -f genus.valid.tmp ABBR.csv > GENUS.csv
-
-wc -l GENUS.csv
-# 113
-
-# count every ranks
-cut -d',' -f 4 GENUS.csv | sort | uniq > species.list.tmp
-cut -d',' -f 5 GENUS.csv | sort | uniq > genus.list.tmp
-cut -d',' -f 6 GENUS.csv | sort | uniq > family.list.tmp
-cut -d',' -f 7 GENUS.csv | sort | uniq > order.list.tmp
-wc -l order.list.tmp family.list.tmp genus.list.tmp species.list.tmp
-#  21 order.list.tmp
-#  22 family.list.tmp
-#  36 genus.list.tmp
-# 106 species.list.tmp
-
-# sort by multiply columns, phylum, order, family, genus, accession
-head -n 1 ABBR.csv > GENUS.tmp
-cat GENUS.csv |
-    sort -t',' -k9,9 -k7,7 -k6,6 -k5,5 -k2,2 \
-    >> GENUS.tmp
-
-mv GENUS.tmp GENUS.csv
-
-# clean
-rm *.tmp *.bak
-
-```
-
 ## Raw phylogenetic tree by MinHash
 
 ```shell
 mkdir -p ~/data/mito/mash
 cd ~/data/mito/mash
 
-for name in $(cat ../summary/ABBR.csv | sed -e '1d' | cut -d"," -f 10 | sort); do
+for name in $(tsv-select ../summary/ABBR.tsv -H -f abbr | sed -e '1d'); do
     2>&1 echo "==> ${name}"
 
     if [[ -e ${name}.msh ]]; then
@@ -540,9 +562,8 @@ done
 ```shell
 cd ~/data/mito/summary
 mash triangle -E -p 8 -l <(
-        cat ABBR.csv |
+        tsv-select ABBR.tsv -H -f abbr |
             sed '1d' |
-            cut -d"," -f 10 |
             parallel echo "../mash/{}.msh"
     ) \
     > dist.tsv
@@ -594,60 +615,60 @@ nw_display -s -b 'visibility:hidden' -w 600 -v 30 tree.nwk |
 cd ~/data/mito/summary
 
 # genus
-cut -d',' -f 5 GENUS.csv | sed -e '1d' | uniq |
+tsv-select GENUS.tsv -H -f genus | sed -e '1d' | uniq |
     parallel -j 1 -k '
         group=$(
             tsv-join groups.tsv -d 2 \
-                -f <(cat GENUS.csv | grep -w {} | cut -d, -f 10) \
+                -f <(cat GENUS.tsv | grep -w {} | tsv-select -f 10) \
                 -k 1 |
                 cut -f 1 |
                 sort |
                 uniq
         )
         number=$(echo "${group}" | wc -l)
-        echo -e "{},${number}"
+        echo -e "{}\t${number}"
     ' |
-    tsv-join --delimiter ","  -d 1 -f GENUS.csv -k 5 -a 9 |
-    tr "," "\t" |
+    tsv-join -d 1 -f GENUS.tsv -k 5 -a 9 |
     tsv-filter --ne 2:1
+#Solanum 2       Angiosperms
+#Bracteacoccus   2       Chlorophyta
 #Caulerpa        2       Chlorophyta
 #Chlamydomonas   3       Chlorophyta
 #Polytomella     4       Chlorophyta
-#Dunaliella      2       Chlorophyta
 #Chlorella       3       Chlorophyta
 #Prototheca      2       Chlorophyta
 #Chloroparvula   2       Chlorophyta
 #Chloropicon     5       Chlorophyta
-#Bracteacoccus   2       Chlorophyta
-#Ulva    4       Chlorophyta
+#Dunaliella      2       Chlorophyta
+#Ulva    7       Chlorophyta
 
 # family
-cut -d',' -f 6 GENUS.csv | sed -e '1d' | uniq |
+tsv-select GENUS.tsv -H -f family | sed -e '1d' | uniq |
     parallel -j 1 -k '
         group=$(
             tsv-join groups.tsv -d 2 \
-                -f <(cat GENUS.csv | grep -w {} | cut -d, -f 10) \
+                -f <(cat GENUS.tsv | grep -w {} | tsv-select -f 10) \
                 -k 1 |
                 cut -f 1 |
                 sort |
                 uniq
         )
         number=$(echo "${group}" | wc -l)
-        echo -e "{},${number}"
+        echo -e "{}\t${number}"
     ' |
-    tsv-join --delimiter ","  -d 1 -f GENUS.csv -k 6 -a 9 |
-    tr "," "\t" |
+    tsv-join -d 1 -f GENUS.tsv -k 6 -a 9 |
     tsv-filter --ne 2:1
-#Fabaceae        2       Angiosperms
+#Fabaceae        4       Angiosperms
 #Malvaceae       2       Angiosperms
 #Poaceae 3       Angiosperms
+#Solanaceae      2       Angiosperms
+#Bracteacoccaceae        2       Chlorophyta
 #Caulerpaceae    2       Chlorophyta
 #Chlamydomonadaceae      7       Chlorophyta
-#Dunaliellaceae  2       Chlorophyta
 #Chlorellaceae   5       Chlorophyta
 #Chloropicaceae  7       Chlorophyta
-#Bracteacoccaceae        2       Chlorophyta
-#Ulvaceae        4       Chlorophyta
+#Dunaliellaceae  2       Chlorophyta
+#Ulvaceae        7       Chlorophyta
 
 ```
 
@@ -691,9 +712,9 @@ Manually edit it then move to `~/Scripts/withncbi/doc/mito_t_o.md`.
 ```shell
 cd ~/data/mito/summary
 
-cat GENUS.csv |
+cat GENUS.tsv |
     grep -v "^#" |
-    perl -na -F"," -e '
+    perl -na -F"\t" -e '
         BEGIN{
             our ($phylum, $family, $genus) = (q{}, q{}, q{});
         }
@@ -729,8 +750,8 @@ cat mito_t_o.md |
 ## Create alignments plans without outgroups
 
 ```text
-GENUS.csv
-#strain_taxon_id,accession,strain,species,genus,family,order,class,phylum,abbr
+GENUS.tsv
+#strain_taxon_id accession strain species genus family order class phylum abbr
 ```
 
 **36** genera and **15** families.
