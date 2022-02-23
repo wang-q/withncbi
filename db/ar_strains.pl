@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use autodie;
 
-use Getopt::Long qw(HelpMessage);
+use Getopt::Long;
 use Config::Tiny;
 use FindBin;
 use YAML qw(Dump Load DumpFile LoadFile);
@@ -50,10 +50,10 @@ my $ar_dir = path( $Config->{path}{ar} )->stringify;    # assembly report
 my $td_dir = path( $Config->{path}{td} )->stringify;    # taxdmp
 
 GetOptions(
-    'help|?'     => sub { HelpMessage(0) },
-    'genbank'    => \my $genbank,                              # genbank instead of refseq
+    'help|?'     => sub { Getopt::Long::HelpMessage(0) },
+    'genbank'    => \my $genbank,    # genbank instead of refseq
     'output|o=s' => \( my $strain_file = "ar_strains.csv" ),
-) or HelpMessage(1);
+) or Getopt::Long::HelpMessage(1);
 
 #----------------------------------------------------------#
 # init
@@ -85,10 +85,10 @@ $dbh->{csv_tables}->{t0} = {
     quote_char     => '',
     col_names      => [
         qw{ assembly_accession bioproject biosample wgs_master
-            refseq_category taxid species_taxid organism_name
-            infraspecific_name isolate version_status assembly_level
-            release_type genome_rep seq_rel_date asm_name submitter
-            gbrs_paired_asm paired_asm_comp ftp_path }
+          refseq_category taxid species_taxid organism_name
+          infraspecific_name isolate version_status assembly_level
+          release_type genome_rep seq_rel_date asm_name submitter
+          gbrs_paired_asm paired_asm_comp ftp_path }
     ],
 };
 
@@ -127,9 +127,10 @@ $dbh->{csv_tables}->{t0} = {
     my @cols_name = map { s/^t[01]\.//; $_ } @{ $header_sth->{'NAME'} };
     $csv->print(
         $csv_fh,
-        [   @cols_name,
+        [
+            @cols_name,
             qw{ superkingdom group subgroup species species_id genus genus_id species_member
-                genus_species_member genus_strain_member }
+              genus_species_member genus_strain_member }
         ]
     );
 
@@ -145,6 +146,8 @@ $dbh->{csv_tables}->{t0} = {
     );
     my @taxon_ids;
     for my $str (@strs) {
+
+        #@type DBI
         my $join_sth = $dbh->prepare( $query . $str );
         $join_sth->execute;
         while ( my @row = $join_sth->fetchrow_array ) {
@@ -178,9 +181,9 @@ $dbh->{csv_tables}->{t0} = {
             }
 
             # superkingdom, group, subgroup
-            push @row, ( find_group($node) );
+            push @row, ( MyUtil::find_group($node) );
 
-            my $species = find_ancestor( $node, 'species' );
+            my $species = MyUtil::find_ancestor( $node, 'species' );
             if ($species) {
                 push @row, ( $species->scientific_name, $species->id );
             }
@@ -189,7 +192,7 @@ $dbh->{csv_tables}->{t0} = {
                 next;
             }
 
-            my $genus = find_ancestor( $node, 'genus' );
+            my $genus = MyUtil::find_ancestor( $node, 'genus' );
             if ($genus) {
                 push @row, ( $genus->scientific_name, $genus->id );
             }
@@ -212,9 +215,9 @@ $dbh->{csv_tables}->{t0} = {
 if ( $^O ne "Win32" ) {
     print "\n";
     system "wc -l $_"
-        for "$ar_dir/assembly_summary_refseq.txt",
-        "$ar_dir/assembly_summary_genbank.txt",
-        $strain_file;
+      for "$ar_dir/assembly_summary_refseq.txt",
+      "$ar_dir/assembly_summary_genbank.txt",
+      $strain_file;
 }
 
 #----------------------------#

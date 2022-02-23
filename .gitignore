@@ -23,6 +23,7 @@ doc/pop/
 *.xls
 *.xlsx
 *.csv
+*.tsv
 *.pdf
 *.fa
 *.fas

@@ -34,13 +34,13 @@ ar_db.pl
 
     # linux, mac
     perl ar_db.pl --db ar_refseq --file ar_strains.csv
-    
+
     perl ar_db.pl --db ar_genbank --file ar_strains_genbank.csv
 
 =cut
 
 GetOptions(
-    'help|?' => sub { HelpMessage(0) },
+    'help|?'       => sub { HelpMessage(0) },
     'server|s=s'   => \( my $server      = $Config->{database}{server} ),
     'port|P=i'     => \( my $port        = $Config->{database}{port} ),
     'db|d=s'       => \( my $db_name     = $Config->{database}{db} ),
@@ -48,7 +48,7 @@ GetOptions(
     'password|p=s' => \( my $password    = $Config->{database}{password} ),
     'init_sql=s'   => \( my $init_sql    = "$FindBin::RealBin/../init.sql" ),
     'file=s'       => \( my $strain_file = "ar_strains.csv" ),
-    'ar=s'         => \( my $ar_dir      = path( $Config->{path}{ar} )->stringify ),
+    'ar=s'         => \( my $ar_dir = path( $Config->{path}{ar} )->stringify ),
 ) or HelpMessage(1);
 
 #----------------------------------------------------------#
@@ -69,14 +69,16 @@ $stopwatch->start_message("Init genome report DB...");
     # don't need this and crash under win32
     #$drh->func( 'reload',   $db_name, $server, $username, $password, 'admin' );
 
-    my $dbh        = DBI->connect( "dbi:mysql:$db_name:$server", $username, $password );
+    my $dbh =
+      DBI->connect( "dbi:mysql:$db_name:$server", $username, $password );
     my $content    = path($init_sql)->slurp;
-    my @statements = grep {/\w/} split /;/, $content;
+    my @statements = grep { /\w/ } split /;/, $content;
     for (@statements) {
         $dbh->do($_) or die $dbh->errstr;
     }
 }
 
+#@type DBI
 my $dbh = DBI->connect( "dbi:mysql:$db_name:$server", $username, $password );
 
 #----------------------------#
@@ -85,6 +87,7 @@ my $dbh = DBI->connect( "dbi:mysql:$db_name:$server", $username, $password );
 {
     $stopwatch->block_message("Loading $strain_file");
 
+    #@type DBI
     my $load_sth = $dbh->prepare(
         qq{
         LOAD DATA LOCAL INFILE '$strain_file'
@@ -105,6 +108,8 @@ my $dbh = DBI->connect( "dbi:mysql:$db_name:$server", $username, $password );
 
     # find species contains multiply strains
     my %species_member_of;
+
+    #@type DBI
     my $species_sth = $dbh->prepare(
         qq{
         SELECT species, count(taxonomy_id)

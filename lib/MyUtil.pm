@@ -18,7 +18,7 @@ use Bio::Taxon;
 use Bio::TreeIO;
 
 use base 'Exporter';
-use vars qw(@ISA @EXPORT_OK %EXPORT_TAGS);
+our (@ISA, @EXPORT_OK, %EXPORT_TAGS);
 @ISA = qw(Exporter);
 
 %EXPORT_TAGS = (
