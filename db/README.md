@@ -113,10 +113,10 @@ cat ~/data/NCBI/genomes/ASSEMBLY_REPORTS/assembly_summary_refseq.txt \
     tsv-select -f 12 | # assembly_level
     sort |
     uniq -c
-#13066 Chromosome
-#90279 Complete Genome
-#785524 Contig
-#215038 Scaffold
+#  16147 Chromosome
+# 112143 Complete Genome
+#1094897 Contig
+# 251747 Scaffold
 
 ```
 
@@ -127,10 +127,10 @@ perl ar_strains.pl -o ar_strains.csv
 perl ar_strains.pl --genbank -o ar_strains_genbank.csv
 
 wc -l *strains*.csv
-#   37480 ar_strains.csv
-#   46042 ar_strains_genbank.csv
-#    6761 euk_strains.csv
-#   37471 prok_strains.csv
+#   40055 ar_strains.csv
+#   51461 ar_strains_genbank.csv
+#    8528 euk_strains.csv
+#   40778 prok_strains.csv
 
 perl ar_db.pl --db ar_refseq --file ar_strains.csv
 perl ar_db.pl --db ar_genbank --file ar_strains_genbank.csv

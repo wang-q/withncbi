@@ -96,7 +96,7 @@ Path::Tiny::path($outdir)->mkpath();
         # rsync - ftp.ncbi.nlm.nih.gov::genomes/all/GCA/000/167/675/GCA_000167675.2_v2.0
 
         my $rsync = $ftp;
-        $rsync =~ s/ftp:\/\/ftp.ncbi.nlm.nih.gov\//ftp.ncbi.nlm.nih.gov::/;
+        $rsync =~ s/(ftp|https?):\/\/ftp.ncbi.nlm.nih.gov\//ftp.ncbi.nlm.nih.gov::/;
         if ( $rsync eq $ftp ) {
             die "Check the ftp url: [$key] $ftp\n";
         }
