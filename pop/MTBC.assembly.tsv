@@ -162,6 +162,13 @@ M_fre_GCF_012223425_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/012/223/425/G
 M_gas_GCF_002102175_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/002/102/175/GCF_002102175.1_ASM210217v1	Mycobacterium gastri	Contig
 #M_GCF_001665295_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/665/295/GCF_001665295.1_ASM166529v1	Mycobacterium sp. 1554424.7	Contig
 M_gen_ATCC_51234_GCF_000526915_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/526/915/GCF_000526915.1_ASM52691v1	Mycobacterium genavense	Contig
+M_goo_GCA_001187505_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/001/187/505/GCA_001187505.1_ASM118750v1	Mycobacterium goodii	Complete Genome
+M_goo_GCA_002798385_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/798/385/GCA_002798385.1_ASM279838v1	Mycobacterium goodii	Contig
+M_goo_GCA_018524265_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/018/524/265/GCA_018524265.1_ASM1852426v1	Mycobacterium goodii	Contig
+M_goo_GCA_018524285_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/018/524/285/GCA_018524285.1_ASM1852428v1	Mycobacterium goodii	Contig
+M_goo_GCA_018524295_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/018/524/295/GCA_018524295.1_ASM1852429v1	Mycobacterium goodii	Contig
+M_goo_GCA_018524325_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/018/524/325/GCA_018524325.1_ASM1852432v1	Mycobacterium goodii	Contig
+M_goo_GCA_018524375_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/018/524/375/GCA_018524375.1_ASM1852437v1	Mycobacterium goodii	Scaffold
 M_gor_GCF_001417955_2	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/417/955/GCF_001417955.2_ASM141795v2	Mycobacterium gordonae	Contig
 M_gor_GCF_001673255_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/673/255/GCF_001673255.1_ASM167325v1	Mycobacterium gordonae	Contig
 M_gor_GCF_001673475_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/673/475/GCF_001673475.1_ASM167347v1	Mycobacterium gordonae	Contig
@@ -443,6 +450,12 @@ M_per_GCF_900566005_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/900/566/005/G
 M_per_GCF_900566015_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/900/566/015/GCF_900566015.1_LAUMK42	Mycobacterium persicum	Contig
 M_per_GCF_900566035_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/900/566/035/GCF_900566035.1_LAUMK4	Mycobacterium persicum	Contig
 M_per_GCF_902825395_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/902/825/395/GCF_902825395.1_Q1465	Mycobacterium persicum	Contig
+M_por_GCA_001686675_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/001/686/675/GCA_001686675.1_ASM168667v1	Mycobacterium porcinum	Contig
+M_por_GCA_001722425_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/001/722/425/GCA_001722425.1_ASM172242v1	Mycobacterium porcinum	Contig
+M_por_GCA_001942045_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/001/942/045/GCA_001942045.1_ASM194204v1	Mycobacterium porcinum	Scaffold
+M_por_GCA_002086835_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/086/835/GCA_002086835.1_ASM208683v1	Mycobacterium porcinum	Contig
+M_por_GCA_007786435_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/007/786/435/GCA_007786435.1_ASM778643v1	Mycobacterium porcinum	Contig
+M_por_GCA_900289185_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/900/289/185/GCA_900289185.1_PRJEB24917	Mycobacterium porcinum	Contig
 M_pseudok_GCF_900566025_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/900/566/025/GCF_900566025.1_LAUMK35	Mycobacterium pseudokansasii	Contig
 M_pseudok_GCF_900566045_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/900/566/045/GCF_900566045.1_LAUMK21	Mycobacterium pseudokansasii	Contig
 M_pseudok_GCF_900566075_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/900/566/075/GCF_900566075.1_MK142	Mycobacterium pseudokansasii	Contig
@@ -460,6 +473,9 @@ M_riy_GCF_905219515_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/905/219/515/G
 M_riy_GCF_905219525_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/905/219/525/GCF_905219525.1_MR244	Mycobacterium riyadhense	Contig
 M_riy_GCF_905219535_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/905/219/535/GCF_905219535.1_MR226	Mycobacterium riyadhense	Contig
 M_riy_GCF_905219555_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/905/219/555/GCF_905219555.1_MR246	Mycobacterium riyadhense	Contig
+M_ruf_GCA_000762985_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/762/985/GCA_000762985.1_ASM76298v1	Mycobacterium rufum	Contig
+M_ruf_GCA_016219585_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/016/219/585/GCA_016219585.1_ASM1621958v1	Mycobacterium rufum	Scaffold
+M_ruf_JCM_16372_GCA_001313925_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/001/313/925/GCA_001313925.1_ASM131392v1	Mycobacterium rufum	Contig
 M_sas_GCF_002101875_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/002/101/875/GCF_002101875.1_ASM210187v1	Mycobacterium saskatchewanense	Contig
 M_sas_GCF_010729105_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/010/729/105/GCF_010729105.1_ASM1072910v1	Mycobacterium saskatchewanense	Complete Genome
 M_scr_GCF_001667885_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/667/885/GCF_001667885.1_ASM166788v1	Mycobacterium scrofulaceum	Contig
