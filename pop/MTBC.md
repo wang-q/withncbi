@@ -330,7 +330,8 @@ echo "
 ```shell
 cd ~/data/alignment/MTBC
 
-# Not M. tuberculosis and M. avium
+# Not M. tuberculosis, M. avium and M. intracellulare
+# Good M. sp.
 echo "
     SELECT
         organism_name || ' ' || assembly_accession AS name,
@@ -338,20 +339,26 @@ echo "
     FROM ar
     WHERE 1=1
         AND genus IN ('Mycobacterium')
+        AND (
+            (species LIKE '% sp.%' AND assembly_level IN ('Complete Genome', 'Chromosome') )
+            OR
+            (species NOT LIKE '% sp.%')
+        )
         AND species != 'Mycobacterium tuberculosis'
         AND species != 'Mycobacterium avium'
+        AND species != 'Mycobacterium intracellulare'
     " |
     sqlite3 -tabs ~/.nwr/ar_refseq.sqlite \
     > raw.tsv
 
-# M. avium
+# M. avium and M. intracellulare
 echo "
     SELECT
         organism_name || ' ' || assembly_accession AS name,
         species, genus, ftp_path, assembly_level
     FROM ar
     WHERE 1=1
-        AND species = 'Mycobacterium avium'
+        AND species IN ('Mycobacterium avium', 'Mycobacterium intracellulare')
         AND assembly_level IN ('Complete Genome', 'Chromosome')
     " |
     sqlite3 -tabs ~/.nwr/ar_refseq.sqlite \
@@ -373,15 +380,36 @@ echo "
     WHERE 1=1
         AND species = 'Mycobacterium tuberculosis'
         AND tax_id != 1773
-        AND ( (
-            organism_name LIKE '% variant %'
-            ) OR (
-            organism_name LIKE '% subsp %'
-            ) OR (
-            organism_name NOT LIKE '% variant %' AND assembly_level IN ('Complete Genome', 'Chromosome')
-            ) )
+        AND (
+            (organism_name LIKE '% subsp %')
+            OR
+            (organism_name NOT LIKE '% variant %' AND assembly_level IN ('Complete Genome', 'Chromosome') )
+            OR
+            (organism_name LIKE '% variant %'
+                AND (
+                    (organism_name NOT LIKE '% variant bovis %')
+                    OR
+                    (assembly_level IN ('Complete Genome', 'Chromosome') )
+                )
+            )
+        )
     " |
     sqlite3 -tabs ~/.nwr/ar_refseq.sqlite \
+    >> raw.tsv
+
+# Missing in refseq
+#134601 | M. goodii
+#39693 | M. porcinum
+#318424 | M. rufum
+echo "
+    SELECT
+        organism_name || ' ' || assembly_accession AS name,
+        species, genus, ftp_path, assembly_level
+    FROM ar
+    WHERE 1=1
+        AND species_id IN (134601, 39693, 318424)
+    " |
+    sqlite3 -tabs ~/.nwr/ar_genbank.sqlite \
     >> raw.tsv
 
 # Good outgroups
@@ -421,6 +449,9 @@ cat MTBC.assembly.tsv |
 # vim MTBC.assembly.tsv
 # cp MTBC.assembly.tsv ~/Scripts/withncbi/pop
 
+# Comment out
+# M_col_Mycobacterium_tuberculosis_TKK_01_0051_GCF_000661085_1
+
 # Cleaning
 rm raw*.*sv
 
@@ -436,6 +467,12 @@ perl ~/Scripts/withncbi/taxon/assembly_prep.pl \
 bash ASSEMBLY/MTBC.assembly.rsync.sh
 
 bash ASSEMBLY/MTBC.assembly.collect.sh
+
+#find ASSEMBLY -maxdepth 1 -mindepth 1 -type d | head |
+#    tr "/" "\t" |
+#    cut -f 2 |
+#    tsv-join --exclude -k 1 -f ASSEMBLY/rsync.tsv -d 1 |
+#    xargs -I[] rm -fr ASSEMBLY/[]
 
 ```
 
