@@ -125,7 +125,7 @@ cat rsync.tsv |
         echo >&2
         echo >&2 "==> {1}"
         mkdir -p {1}
-        rsync -avP {2}/ {1}/
+        rsync -avP {2}/ {1}/ --exclude="assembly_status.txt"
     '
 
 EOF
