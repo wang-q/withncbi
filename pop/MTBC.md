@@ -17,41 +17,114 @@
 * [Mycobacterium](https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=1763)
 * [Mycobacterium tuberculosis complex](https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=77643)
 
-| Group                   | Species               |  Tax ID | Comments |
-|:------------------------|:----------------------|--------:|:---------|
-| M. tuberculosis complex |                       |         |          |
-|                         | M. canetti            |   78331 | 卡氏分枝杆菌   |
-|                         | M. decipiens          | 1430326 |          |
-|                         | M. mungi              | 1844474 |          |
-|                         | M. orygis             | 1305738 |          |
-|                         | M. tuberculosis       |    1773 | 结核分枝杆菌   |
-| M. avium complex        |                       |         |          |
-|                         | M. avium              |    1764 | 鸟分枝杆菌    |
-|                         | M. chimaera           |  222805 |          |
-|                         | M. colombiense        |  339268 |          |
-|                         | M. intracellulare     |    1767 | 胞内分枝杆菌   |
-|                         | M. mantenii           |  560555 |          |
-|                         | M. marseillense       |  701042 |          |
-|                         | M. paraintracellulare | 1138383 | 副胞内分枝杆菌  |
-| M. simiae complex       |                       |         |          |
-|                         | M. genavense          |   36812 |          |
-|                         | M. parascrofulaceum   |  240125 |          |
-|                         | M. simiae             |    1784 | 猿分支杆菌    |
-| Close to MSC            |                       |         |          |
-|                         | M. asiaticum          |    1790 | 亚洲分枝杆菌   |
-|                         | M. bohemicum          |    1998 | 波希米亚分枝杆菌 |
-| Others                  |                       |         |          |
-|                         | M. gordonae           |    1778 | 戈登分枝杆菌   |
-|                         | M. haemophilum        |   29311 |          |
-|                         | M. kansasii           |    1955 | 堪萨斯分枝杆菌  |
-|                         | M. leprae             |    1769 | 麻风分枝杆菌   |
-|                         | M. liflandii          |  261524 |          |
-|                         | M. malmoense          |    1780 | 莫尔门分枝杆菌  |
-|                         | M. marinum            |    1781 | 海洋分枝杆菌   |
-|                         | M. persicum           | 1487726 |          |
-|                         | M. pseudoshottsii     |  265949 |          |
-|                         | M. ulcerans           |    1809 |          |
-|                         | M. xenopi             |    1789 | 蟾分枝杆菌    |
+| #tax_id | species                     | RS  | comments                |
+|---------|-----------------------------|-----|-------------------------|
+|         |                             |     | M. tuberculosis complex |
+| 78331   | M. canettii                 | 29  | 卡氏分枝杆菌                  |
+| 1773    | M. tuberculosis             | 286 | 结核分枝杆菌                  |
+|         |                             |     | M. avium complex        |
+| 1764    | M. avium                    | 39  | 鸟分枝杆菌                   |
+| 339268  | M. colombiense              | 9   |                         |
+| 1767    | M. intracellulare           | 62  | 胞内分枝杆菌                  |
+| 560555  | M. mantenii                 | 3   |                         |
+| 701042  | M. marseillense             | 5   |                         |
+| 1138383 | M. paraintracellulare       | 12  | 副胞内分枝杆菌                 |
+| 701043  | M. timonense                | 1   |                         |
+|         |                             |     | M. simiae complex       |
+| 1964395 | M. ahvazicum                | 1   |                         |
+| 761804  | M. europaeum                | 2   |                         |
+| 292462  | M. florentinum              | 2   |                         |
+| 36812   | M. genavense                | 1   |                         |
+| 53376   | M. heidelbergense           | 2   |                         |
+| 33895   | M. interjectum              | 1   |                         |
+| 120959  | M. kubicae                  | 6   |                         |
+| 141349  | M. lentiflavum              | 1   |                         |
+| 154654  | M. montefiorense            | 1   |                         |
+| 767916  | M. paraense                 | 4   |                         |
+| 240125  | M. parascrofulaceum         | 1   |                         |
+| 185642  | M. parmense                 | 2   |                         |
+| 220927  | M. saskatchewanense         | 2   |                         |
+| 243061  | M. sherrisii                | 1   |                         |
+| 722731  | M. shigaense                | 3   |                         |
+| 1784    | M. simiae                   | 3   | 猿分支杆菌                   |
+| 470076  | M. stomatepiae              | 1   |                         |
+| 47839   | M. triplex                  | 2   |                         |
+|         |                             |     | Others                  |
+| 1927124 | M. aquaticum                | 1   |                         |
+| 1790    | M. asiaticum                | 4   | 亚洲分枝杆菌                  |
+| 2094119 | M. basiliense               | 1   |                         |
+| 56425   | M. bohemicum                | 2   | 波希米亚分枝杆菌                |
+| 84962   | M. botniense                | 1   |                         |
+| 1273442 | M. bourgelatii              | 1   |                         |
+| 43348   | M. branderi                 | 2   |                         |
+| 28045   | M. celatum                  | 2   |                         |
+| 44010   | M. conspicuum               | 2   |                         |
+| 1775    | M. cookii                   | 1   |                         |
+| 1430326 | M. decipiens                | 1   |                         |
+| 1801    | M. diernhoferi              | 3   |                         |
+| 482462  | M. dioxanotrophicus         | 1   |                         |
+| 1260918 | M. fragae                   | 2   |                         |
+| 117567  | M. frederiksbergense        | 1   |                         |
+| 1778    | M. gordonae                 | 1   | 戈登分枝杆菌                  |
+| 1552759 | M. grossiae                 | 1   |                         |
+| 29311   | M. haemophilum              | 5   |                         |
+| 110505  | M. heckeshornense           | 3   |                         |
+| 512402  | M. heraklionense            | 1   |                         |
+| 49897   | M. hodleri                  | 2   |                         |
+| 152142  | M. holsaticum               | 1   |                         |
+| 1768    | M. kansasii                 | 17  | 堪萨斯分枝杆菌                 |
+| 1069220 | M. koreense                 | 2   |                         |
+| 2212479 | M. kyogaense                | 1   |                         |
+| 169765  | M. lacus                    | 1   |                         |
+| 2048550 | M. lehmannii                | 2   |                         |
+| 1769    | M. leprae                   | 3   | 麻风分枝杆菌                  |
+| 480418  | M. lepromatosis             | 1   |                         |
+| 261524  | M. liflandii                | 1   |                         |
+| 1780    | M. malmoense                | 2   | 莫尔门分枝杆菌                 |
+| 1781    | M. marinum                  | 19  | 海洋分枝杆菌                  |
+| 244292  | M. nebraskense              | 1   |                         |
+| 242737  | M. neglectum                | 1   |                         |
+| 2048551 | M. neumannii                | 1   |                         |
+| 459858  | M. noviomagense             | 1   |                         |
+| 2492438 | M. novum                    | 1   |                         |
+| 1841861 | M. numidiamassiliense       | 1   |                         |
+| 2738409 | M. ostraviense              | 2   |                         |
+| 370524  | M. pallens                  | 1   |                         |
+| 53378   | M. paraffinicum             | 1   |                         |
+| 1389713 | M. paragordonae             | 6   |                         |
+| 590652  | M. paraseoulense            | 2   |                         |
+| 1487726 | M. persicum                 | 4   |                         |
+| 2341080 | M. pseudokansasii           | 1   |                         |
+| 265949  | M. pseudoshottsii           | 1   |                         |
+| 1841860 | M. rhizamassiliense         | 1   |                         |
+| 486698  | M. riyadhense               | 9   |                         |
+| 1796    | M. senegalense              | 4   |                         |
+| 386911  | M. seoulense                | 1   |                         |
+| 29313   | M. shimoidei                | 2   |                         |
+| 398694  | M. shinjukuense             | 1   |                         |
+| 133549  | M. shottsii                 | 2   |                         |
+| 627089  | M. simulans                 | 2   |                         |
+| 1785    | M. sp.                      | 58  |                         |
+| 886343  | M. spongiae                 | 1   |                         |
+| 1908205 | M. syngnathidarum           | 2   |                         |
+| 1841859 | M. terramassiliense         | 1   |                         |
+| 2162698 | M. uberis                   | 1   |                         |
+| 1809    | M. ulcerans                 | 3   |                         |
+| 1719132 | M. vicinigordonae           | 1   |                         |
+| 547163  | M. vulneris                 | 1   |                         |
+| 1789    | M. xenopi                   | 3   | 蟾分枝杆菌                   |
+|         |                             |     | Actinobacteria          |
+| 33910   | Amycolatopsis mediterranei  | 4   | 地中海拟无枝酸菌                |
+| 1717    | Corynebacterium diphtheriae | 16  | 白喉棒状杆菌                  |
+| 1912    | Streptomyces hygroscopicus  | 3   | 吸水链霉菌                   |
+
+| #tax_id | biotype                            | RS  |            |
+|---------|------------------------------------|-----|:-----------|
+| 33894   | M. tuberculosis variant africanum  | 33  | 非洲分枝杆菌     |
+| 1765    | M. tuberculosis variant bovis      | 102 | 牛分枝杆菌, 卡介苗 |
+| 115862  | M. tuberculosis variant caprae     | 3   | 山羊分枝杆菌     |
+| 1806    | M. tuberculosis variant microti    | 5   | 仓鼠分枝杆菌     |
+| 194542  | M. tuberculosis variant pinnipedii | 1   | 鳍足分枝杆菌     |
 
 ### List all ranks
 
@@ -151,7 +224,12 @@ done |
     > species.count.tsv
 
 cat species.count.tsv |
-    tsv-filter -H --ge RS:5 --or --ge GB:5 |
+    tsv-filter -H --ge RS:3 --or --ge GB:3 |
+    sed 's/Mycobacterium /M. /g' |
+    mlr --itsv --omd cat
+
+cat species.count.tsv |
+    tsv-filter -H --lt RS:1 --ge GB:2 |
     sed 's/Mycobacterium /M. /g' |
     mlr --itsv --omd cat
 
@@ -184,6 +262,12 @@ cat species.count.tsv |
 | 547163  | M. vulneris           | 1    | 5    |
 | 134601  | M. goodii             | 0    | 7    |
 | 39693   | M. porcinum           | 0    | 6    |
+
+| #tax_id | species     | RS  | GB  |
+|---------|-------------|-----|-----|
+| 134601  | M. goodii   | 0   | 7   |
+| 39693   | M. porcinum | 0   | 6   |
+| 318424  | M. rufum    | 0   | 3   |
 
 ### MTBC assemblies
 
@@ -225,20 +309,20 @@ done |
 
 ```
 
-| #tax_id | group                               | RS   | comments   |
-|---------|-------------------------------------|------|:-----------|
-| 1844474 | M. mungi                            | 1    |            |
-| 1305738 | M. orygis                           | 2    |            |
-| 78331   | M. canettii                         | 34   | 卡氏分枝杆菌     |
-| 1773    | M. tuberculosis                     | 6830 |            |
-| 194542  | M. tuberculosis variant pinnipedii  | 3    | 鳍足分枝杆菌     |
-| 182785  | M. tuberculosis subsp. tuberculosis | 1    |            |
-| 115862  | M. tuberculosis variant caprae      | 4    | 山羊分枝杆菌     |
-| 33894   | M. tuberculosis variant africanum   | 34   | 非洲分枝杆菌     |
-| 1806    | M. tuberculosis variant microti     | 6    | 仓鼠分枝杆菌     |
-| 1765    | M. tuberculosis variant bovis       | 143  | 牛分枝杆菌, 卡介苗 |
+| #tax_id | group                               | RS   |
+|---------|-------------------------------------|------|
+| 1844474 | M. mungi                            | 1    |
+| 1305738 | M. orygis                           | 2    |
+| 78331   | M. canettii                         | 34   |
+| 1773    | M. tuberculosis                     | 6830 |
+| 194542  | M. tuberculosis variant pinnipedii  | 3    |
+| 182785  | M. tuberculosis subsp. tuberculosis | 1    |
+| 115862  | M. tuberculosis variant caprae      | 4    |
+| 33894   | M. tuberculosis variant africanum   | 34   |
+| 1806    | M. tuberculosis variant microti     | 6    |
+| 1765    | M. tuberculosis variant bovis       | 143  |
 
-M. tuberculosis var. microti is distinct from other M. tuberculosis strains
+M. tuberculosis var. microti is distinct from other M. tuberculosis biotypes
 
 ### MTB biotypes
 
@@ -291,7 +375,7 @@ echo "
         tax_id
     FROM ar
     WHERE 1=1
-        AND genus IN ('Amycolatopsis', 'Corynebacterium', 'Streptomyces') -- species_id IN (33910, 1717, 1912)
+        AND genus IN ('Amycolatopsis', 'Corynebacterium', 'Streptomyces')
         AND assembly_level IN ('Complete Genome', 'Chromosome')
         AND tax_id != species_id
     " |
@@ -310,20 +394,20 @@ echo "
 
 ```
 
-| #tax_id | species                            | RS  | comments |
-|---------|------------------------------------|-----|:---------|
-| 33910   | Amycolatopsis mediterranei         | 4   | 地中海拟无枝酸菌 |
-| 1717    | Corynebacterium diphtheriae        | 14  | 白喉棒状杆菌   |
-| 1718    | Corynebacterium glutamicum         | 9   |          |
-| 1719    | Corynebacterium pseudotuberculosis | 14  |          |
-| 65058   | Corynebacterium ulcerans           | 5   |          |
-| 43771   | Corynebacterium urealyticum        | 2   |          |
-| 29303   | Streptomyces cattleya              | 2   |          |
-| 1969    | Streptomyces chartreusis           | 2   |          |
-| 1912    | Streptomyces hygroscopicus         | 2   | 吸水链霉菌    |
-| 1916    | Streptomyces lividans              | 2   |          |
-| 1927    | Streptomyces rimosus               | 2   |          |
-| 54571   | Streptomyces venezuelae            | 2   |          |
+| #tax_id | species                            | RS  |
+|---------|------------------------------------|-----|
+| 33910   | Amycolatopsis mediterranei         | 4   |
+| 1717    | Corynebacterium diphtheriae        | 14  |
+| 1718    | Corynebacterium glutamicum         | 9   |
+| 1719    | Corynebacterium pseudotuberculosis | 14  |
+| 65058   | Corynebacterium ulcerans           | 5   |
+| 43771   | Corynebacterium urealyticum        | 2   |
+| 29303   | Streptomyces cattleya              | 2   |
+| 1969    | Streptomyces chartreusis           | 2   |
+| 1912    | Streptomyces hygroscopicus         | 2   |
+| 1916    | Streptomyces lividans              | 2   |
+| 1927    | Streptomyces rimosus               | 2   |
+| 54571   | Streptomyces venezuelae            | 2   |
 
 ## MTBC: assembly
 
@@ -505,8 +589,8 @@ cat ASSEMBLY/n50.tsv |
     > ASSEMBLY/n50.pass.csv
 
 wc -l ASSEMBLY/n50*
-#     264 ASSEMBLY/n50.pass.csv
-#     286 ASSEMBLY/n50.tsv
+#  710 ASSEMBLY/n50.pass.csv
+#  965 ASSEMBLY/n50.tsv
 
 tsv-join \
     ASSEMBLY/MTBC.assembly.collect.csv \
@@ -515,130 +599,90 @@ tsv-join \
     > ASSEMBLY/MTBC.assembly.pass.csv
 
 wc -l ASSEMBLY/MTBC.assembly*csv
-#     286 ASSEMBLY/MTBC.assembly.collect.csv
-#     264 ASSEMBLY/MTBC.assembly.pass.csv
+#   965 ASSEMBLY/MTBC.assembly.collect.csv
+#   710 ASSEMBLY/MTBC.assembly.pass.csv
 
 ```
 
 ```shell
 cd ~/data/alignment/MTBC
 
+# Group by genus
 cat ASSEMBLY/MTBC.assembly.pass.csv |
     sed -e '1d' |
-    cut -d"," -f 2 |
-    grep -v "Candidatus" |
-    cut -d" " -f 1 |
-    sort |
-    uniq |
+    tsv-select -d, -f 2 |
+    tsv-select -d" " -f 1 |
+    tsv-uniq |
     parallel --no-run-if-empty --linebuffer -k -j 4 '
         n_species=$(cat ASSEMBLY/MTBC.assembly.pass.csv |
-            cut -d"," -f 2 |
-            grep -v "Candidatus" |
-            grep "{}" |
-            cut -d" " -f 1,2 |
-            sort |
-            uniq |
+            tsv-select -d, -f 2 |
+            grep {} |
+            tsv-select -d" " -f 1,2 |
+            tsv-uniq |
             wc -l)
 
         n_strains=$(cat ASSEMBLY/MTBC.assembly.pass.csv |
-            cut -d"," -f 2 |
-            grep -v "Candidatus" |
-            grep "{}" |
-            cut -d" " -f 1,2 |
+            tsv-select -d, -f 2 |
+            grep {} |
+            tsv-select -d" " -f 1,2 |
             sort |
             wc -l)
 
         printf "%s\t%d\t%d\n" {} ${n_species} ${n_strains}
     '
+#Amycolatopsis   1       4
+#Corynebacterium 1       16
+#Mycobacterium   90      686
+#Streptomyces    1       3
 
-#Amycolatopsis	1	3
-#Corynebacterium	1	24
-#Mycobacterium	18	232
-#Streptomyces	1	4
-
+# Group by species
 cat ASSEMBLY/MTBC.assembly.pass.csv |
     sed -e '1d' |
-    cut -d"," -f 2 |
-    grep -v "Candidatus" |
-    cut -d" " -f 1,2 |
-    sort |
-    uniq |
+    tsv-select -d, -f 2 |
+    tsv-select -d" " -f 1,2 |
+    tsv-uniq |
     parallel --no-run-if-empty --linebuffer -k -j 4 '
-        n_species=$(cat ASSEMBLY/MTBC.assembly.pass.csv |
-            cut -d"," -f 2 |
-            grep -v "Candidatus" |
-            grep {} |
-            cut -d" " -f 1,2 |
-            sort |
-            uniq |
-            wc -l)
-
         n_strains=$(cat ASSEMBLY/MTBC.assembly.pass.csv |
-            cut -d"," -f 2 |
-            grep -v "Candidatus" |
+            tsv-select -d, -f 2 |
             grep {} |
-            cut -d" " -f 1,2 |
+            tsv-select -d" " -f 1,2 |
             sort |
             wc -l)
 
-        printf "%s\t%d\t%d\n" {} ${n_species} ${n_strains}
-    '
-#Amycolatopsis mediterranei      1       3
-#Corynebacterium diphtheriae     1       24
-#Mycobacterium asiaticum 1       1
-#Mycobacterium avium     1       7
-#Mycobacterium bohemicum 1       1
-#Mycobacterium canettii  1       5
-#Mycobacterium colombiense       1       1
-#Mycobacterium genavense 1       1
-#Mycobacterium haemophilum       1       1
-#Mycobacterium intracellulare    1       8
-#Mycobacterium kansasii  1       4
-#Mycobacterium leprae    1       3
-#Mycobacterium liflandii 1       1
-#Mycobacterium marinum   1       4
-#Mycobacterium parascrofulaceum  1       1
-#Mycobacterium pseudoshottsii    1       1
-#Mycobacterium simiae    1       1
-#Mycobacterium tuberculosis      1       187
-#Mycobacterium ulcerans  1       2
-#Mycobacterium xenopi    1       3
-#Streptomyces hygroscopicus      1       4
+        printf "%s\t%d\n" {} ${n_strains}
+    ' |
+    nwr append stdin --id |
+    tsv-select -f 4,1,2 |
+    nwr append stdin -r "species group" |
+    sed 's/NA//g' |
+    tsv-sort -k4,4 -k2,2 |
+    sed 's/Mycobacterium /M. /g' |
+    (echo -e '#tax_id\tspecies\tRS\t' && cat) |
+    mlr --itsv --omd cat
+# Paste this table to the top of this document
 
 cat ASSEMBLY/MTBC.assembly.pass.csv |
     sed -e '1d' |
-    cut -d"," -f 2 |
-    grep -v "Candidatus" |
+    tsv-select -d, -f 2 |
     grep "Mycobacterium tuberculosis variant" |
     cut -d" " -f 1-4 |
-    sort |
-    uniq |
+    tsv-uniq |
     parallel --no-run-if-empty --linebuffer -k -j 4 '
-        n_species=$(cat ASSEMBLY/MTBC.assembly.pass.csv |
-            cut -d"," -f 2 |
-            grep -v "Candidatus" |
-            grep {} |
-            cut -d" " -f 1,2 |
-            sort |
-            uniq |
-            wc -l)
-
         n_strains=$(cat ASSEMBLY/MTBC.assembly.pass.csv |
-            cut -d"," -f 2 |
-            grep -v "Candidatus" |
+            tsv-select -d, -f 2 |
             grep {} |
-            cut -d" " -f 1,2 |
+            tsv-select -d" " -f 1,2 |
             sort |
             wc -l)
 
-        printf "%s\t%d\t%d\n" {} ${n_species} ${n_strains}
-    '
-
-#Mycobacterium tuberculosis variant africanum    1       26
-#Mycobacterium tuberculosis variant bovis        1       14
-#Mycobacterium tuberculosis variant caprae       1       1
-#Mycobacterium tuberculosis variant microti      1       1
-#Mycobacterium tuberculosis variant pinnipedii   1       1
+        printf "%s\t%d\n" {} ${n_strains}
+    ' |
+    nwr append stdin --id |
+    tsv-select -f 4,1,2 |
+    sed 's/Mycobacterium /M. /g' |
+    (echo -e '#tax_id\tbiotype\tRS' && cat) |
+    mlr --itsv --omd cat
+# Paste this table to the top of this document
 
 ```
 
