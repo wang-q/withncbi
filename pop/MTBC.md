@@ -1,6 +1,5 @@
 # *Mycobacterium tuberculosis* complex
 
-
 [TOC levels=1-3]: # ""
 
 - [*Mycobacterium tuberculosis* complex](#mycobacterium-tuberculosis-complex)
@@ -13,96 +12,390 @@
   - [MTBC: prepare](#mtbc-prepare)
   - [MTBC: run](#mtbc-run)
 
-
 ## Strain info
 
 * [Mycobacterium](https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=1763)
 * [Mycobacterium tuberculosis complex](https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=77643)
 
-| Group                   | Species               | Species ID | Comments      | Strains |
-|:------------------------|:----------------------|-----------:|:--------------|--------:|
-| M. tuberculosis complex |                       |            |               |         |
-|                         | M. canetti            |      78331 | 卡氏分枝杆菌    |       5 |
-|                         | M. decipiens          |    1430326 |               |         |
-|                         | M. mungi              |    1844474 |               |         |
-|                         | M. orygis             |    1305738 |               |       0 |
-|                         | M. tuberculosis       |       1773 | 结核分枝杆菌    |     187 |
-| M. avium complex        |                       |            |               |         |
-|                         | M. avium              |       1764 | 鸟分枝杆菌      |       7 |
-|                         | M. chimaera           |     222805 |               |         |
-|                         | M. colombiense        |     339268 |               |       1 |
-|                         | M. intracellulare     |       1767 | 胞内分枝杆菌    |       8 |
-|                         | M. mantenii           |     560555 |               |         |
-|                         | M. marseillense       |     701042 |               |         |
-|                         | M. paraintracellulare |    1138383 | 副胞内分枝杆菌   |         |
-| M. simiae complex       |                       |            |               |         |
-|                         | M. genavense          |      36812 |               |       1 |
-|                         | M. parascrofulaceum   |     240125 |               |       1 |
-|                         | M. simiae             |       1784 | 猿分支杆菌      |       1 |
-| Close to MSC            |                       |            |               |         |
-|                         | M. asiaticum          |       1790 | 亚洲分枝杆菌    |       1 |
-|                         | M. bohemicum          |       1998 | 波希米亚分枝杆菌 |       1 |
-| Others                  |                       |            |               |         |
-|                         | M. gordonae           |       1778 | 戈登分枝杆菌    |         |
-|                         | M. haemophilum        |      29311 |               |       1 |
-|                         | M. kansasii           |       1955 | 堪萨斯分枝杆菌   |       4 |
-|                         | M. leprae             |       1769 | 麻风分枝杆菌    |       3 |
-|                         | M. liflandii          |     261524 |               |       1 |
-|                         | M. malmoense          |       1780 | 莫尔门分枝杆菌   |         |
-|                         | M. marinum            |       1781 | 海洋分枝杆菌    |       4 |
-|                         | M. persicum           |    1487726 |               |         |
-|                         | M. pseudoshottsii     |     265949 |               |       1 |
-|                         | M. ulcerans           |       1809 |               |       2 |
-|                         | M. xenopi             |       1789 | 蟾分枝杆菌      |       3 |
+| Group                   | Species               |  Tax ID | Comments |
+|:------------------------|:----------------------|--------:|:---------|
+| M. tuberculosis complex |                       |         |          |
+|                         | M. canetti            |   78331 | 卡氏分枝杆菌   |
+|                         | M. decipiens          | 1430326 |          |
+|                         | M. mungi              | 1844474 |          |
+|                         | M. orygis             | 1305738 |          |
+|                         | M. tuberculosis       |    1773 | 结核分枝杆菌   |
+| M. avium complex        |                       |         |          |
+|                         | M. avium              |    1764 | 鸟分枝杆菌    |
+|                         | M. chimaera           |  222805 |          |
+|                         | M. colombiense        |  339268 |          |
+|                         | M. intracellulare     |    1767 | 胞内分枝杆菌   |
+|                         | M. mantenii           |  560555 |          |
+|                         | M. marseillense       |  701042 |          |
+|                         | M. paraintracellulare | 1138383 | 副胞内分枝杆菌  |
+| M. simiae complex       |                       |         |          |
+|                         | M. genavense          |   36812 |          |
+|                         | M. parascrofulaceum   |  240125 |          |
+|                         | M. simiae             |    1784 | 猿分支杆菌    |
+| Close to MSC            |                       |         |          |
+|                         | M. asiaticum          |    1790 | 亚洲分枝杆菌   |
+|                         | M. bohemicum          |    1998 | 波希米亚分枝杆菌 |
+| Others                  |                       |         |          |
+|                         | M. gordonae           |    1778 | 戈登分枝杆菌   |
+|                         | M. haemophilum        |   29311 |          |
+|                         | M. kansasii           |    1955 | 堪萨斯分枝杆菌  |
+|                         | M. leprae             |    1769 | 麻风分枝杆菌   |
+|                         | M. liflandii          |  261524 |          |
+|                         | M. malmoense          |    1780 | 莫尔门分枝杆菌  |
+|                         | M. marinum            |    1781 | 海洋分枝杆菌   |
+|                         | M. persicum           | 1487726 |          |
+|                         | M. pseudoshottsii     |  265949 |          |
+|                         | M. ulcerans           |    1809 |          |
+|                         | M. xenopi             |    1789 | 蟾分枝杆菌    |
 
-| Subspecies                      |     ID | Comments        | Strains |
-|:--------------------------------|-------:|:----------------|--------:|
-| M. tuberculosis var. africanum  |  33894 | 非洲分枝杆菌      |      26 |
-| M. tuberculosis var. bovis      |   1765 | 牛分枝杆菌, 卡介苗 |      14 |
-| M. tuberculosis var. caprae     | 115862 |                 |       1 |
-| M. tuberculosis var. microti    |   1806 | 仓鼠分枝杆菌      |       1 |
-| M. tuberculosis var. pinnipedii | 194542 |                 |       1 |
+### List all ranks
+
+```shell
+mkdir -p ~/data/alignment/MTBC
+cd ~/data/alignment/MTBC
+
+nwr member Mycobacterium |
+    grep -v " sp." |
+    tsv-summarize -H -g 3 --count |
+    mlr --itsv --omd cat
+
+nwr member Mycobacterium -r "species group" -r subspecies -r biotype |
+    tsv-select -f 1-3 |
+    keep-header -- tsv-sort -k3,3r |
+    sed 's/Mycobacterium /M. /g' |
+    mlr --itsv --omd cat
+
+```
+
+| rank          | count |
+|---------------|-------|
+| genus         | 1     |
+| species       | 149   |
+| no rank       | 39    |
+| species group | 3     |
+| strain        | 3002  |
+| subspecies    | 9     |
+| biotype       | 5     |
+
+| #tax_id | sci_name                                | rank          |
+|---------|-----------------------------------------|---------------|
+| 1124626 | M. ulcerans subsp. shinshuense          | subspecies    |
+| 1203599 | M. intracellulare subsp. yongonense     | subspecies    |
+| 1770    | M. avium subsp. paratuberculosis        | subspecies    |
+| 182785  | M. tuberculosis subsp. tuberculosis     | subspecies    |
+| 222805  | M. intracellulare subsp. chimaera       | subspecies    |
+| 35617   | M. intracellulare subsp. intracellulare | subspecies    |
+| 439334  | M. avium subsp. hominissuis             | subspecies    |
+| 44282   | M. avium subsp. silvaticum              | subspecies    |
+| 44454   | M. avium subsp. avium                   | subspecies    |
+| 120793  | M. avium complex (MAC)                  | species group |
+| 2249310 | M. simiae complex                       | species group |
+| 77643   | M. tuberculosis complex                 | species group |
+| 115862  | M. tuberculosis variant caprae          | biotype       |
+| 1765    | M. tuberculosis variant bovis           | biotype       |
+| 1806    | M. tuberculosis variant microti         | biotype       |
+| 194542  | M. tuberculosis variant pinnipedii      | biotype       |
+| 33894   | M. tuberculosis variant africanum       | biotype       |
+
+### Species with assemblies
+
+```shell
+cd ~/data/alignment/MTBC
+
+SPECIES=$(
+    nwr member Mycobacterium -r species |
+        grep -v -i "Candidatus " |
+        grep -v -i "candidate " |
+        grep -v " sp." |
+        sed '1d' |
+        cut -f 1 |
+        sort
+)
+
+for S in $SPECIES; do
+    RS=$(
+        echo "
+            SELECT
+                COUNT(*)
+            FROM ar
+            WHERE 1=1
+                AND species_id = $S
+            " |
+            sqlite3 -tabs ~/.nwr/ar_refseq.sqlite
+    )
+
+    GB=$(
+        echo "
+            SELECT
+                COUNT(*)
+            FROM ar
+            WHERE 1=1
+                AND species_id = $S
+            " |
+            sqlite3 -tabs ~/.nwr/ar_genbank.sqlite
+    )
+
+    if [[ ${RS} -gt 0 ]] || [[ ${GB} -gt 0 ]]; then
+        echo -e "$S\t$RS\t$GB"
+    fi
+done |
+    nwr append stdin |
+    tsv-select -f 1,4,2-3 |
+    tsv-sort -k3,3nr -k4,4nr |
+    (echo -e '#tax_id\tspecies\tRS\tGB' && cat) \
+    > species.count.tsv
+
+cat species.count.tsv |
+    tsv-filter -H --ge RS:5 --or --ge GB:5 |
+    sed 's/Mycobacterium /M. /g' |
+    mlr --itsv --omd cat
+
+```
+
+| #tax_id | species               | RS   | GB   |
+|---------|-----------------------|------|------|
+| 1773    | M. tuberculosis       | 6830 | 7074 |
+| 1764    | M. avium              | 247  | 417  |
+| 1767    | M. intracellulare     | 83   | 86   |
+| 1768    | M. kansasii           | 34   | 47   |
+| 78331   | M. canettii           | 34   | 35   |
+| 1781    | M. marinum            | 26   | 26   |
+| 339268  | M. colombiense        | 20   | 20   |
+| 1138383 | M. paraintracellulare | 14   | 15   |
+| 1487726 | M. persicum           | 10   | 12   |
+| 1790    | M. asiaticum          | 10   | 10   |
+| 486698  | M. riyadhense         | 10   | 10   |
+| 1780    | M. malmoense          | 8    | 8    |
+| 1809    | M. ulcerans           | 7    | 11   |
+| 1778    | M. gordonae           | 7    | 9    |
+| 120959  | M. kubicae            | 7    | 7    |
+| 1389713 | M. paragordonae       | 6    | 6    |
+| 560555  | M. mantenii           | 6    | 6    |
+| 701042  | M. marseillense       | 6    | 6    |
+| 1769    | M. leprae             | 5    | 6    |
+| 29311   | M. haemophilum        | 5    | 5    |
+| 1789    | M. xenopi             | 4    | 6    |
+| 512402  | M. heraklionense      | 1    | 7    |
+| 547163  | M. vulneris           | 1    | 5    |
+| 134601  | M. goodii             | 0    | 7    |
+| 39693   | M. porcinum           | 0    | 6    |
+
+### MTBC assemblies
+
+```shell
+cd ~/data/alignment/MTBC
+
+GROUP=$(
+    nwr member "Mycobacterium tuberculosis complex" -r species -r subspecies -r biotype |
+        grep -v -i "Candidatus " |
+        grep -v -i "candidate " |
+        grep -v " sp." |
+        sed '1d' |
+        cut -f 1
+)
+
+for G in $GROUP; do
+    printf "$G\t"
+    echo "
+        SELECT
+            tax_id
+        FROM ar
+        WHERE 1=1
+            AND genus_id = 1763
+        " |
+        sqlite3 -tabs ~/.nwr/ar_refseq.sqlite |
+        parallel -j 4 "
+            IS_ANCESTOR=\$(nwr lineage {} | tsv-filter --str-eq 3:$G)
+            if [[ \${#IS_ANCESTOR} -gt 1 ]]; then
+                echo {} | nwr append stdin
+            fi
+            " |
+        wc -l
+done |
+    nwr append stdin |
+    tsv-select -f 1,3,2 |
+    sed 's/Mycobacterium /M. /g' |
+    (echo -e '#tax_id\tgroup\tRS' && cat) |
+    mlr --itsv --omd cat
+
+```
+
+| #tax_id | group                               | RS   | comments   |
+|---------|-------------------------------------|------|:-----------|
+| 1844474 | M. mungi                            | 1    |            |
+| 1305738 | M. orygis                           | 2    |            |
+| 78331   | M. canettii                         | 34   | 卡氏分枝杆菌     |
+| 1773    | M. tuberculosis                     | 6830 |            |
+| 194542  | M. tuberculosis variant pinnipedii  | 3    | 鳍足分枝杆菌     |
+| 182785  | M. tuberculosis subsp. tuberculosis | 1    |            |
+| 115862  | M. tuberculosis variant caprae      | 4    | 山羊分枝杆菌     |
+| 33894   | M. tuberculosis variant africanum   | 34   | 非洲分枝杆菌     |
+| 1806    | M. tuberculosis variant microti     | 6    | 仓鼠分枝杆菌     |
+| 1765    | M. tuberculosis variant bovis       | 143  | 牛分枝杆菌, 卡介苗 |
 
 M. tuberculosis var. microti is distinct from other M. tuberculosis strains
 
-* Other species of Actinobacteria
+### MTB biotypes
 
-| Species                     | Species ID | Comments       | Strains |
-|:----------------------------|-----------:|:---------------|--------:|
-| Amycolatopsis mediterranei  |      33910 | 地中海拟无枝酸菌属 |       3 |
-| Corynebacterium diphtheriae |       1717 | 白喉棒状杆菌      |      24 |
-| Streptomyces hygroscopicus  |       1912 | 吸水链霉菌       |       4 |
+56 strains and 190 assemblies have biotype information.
+
+```shell
+cd ~/data/alignment/MTBC
+
+nwr member "Mycobacterium tuberculosis"
+
+nwr member "Mycobacterium tuberculosis" -r strain |
+    sed '1d' | # head -n 1000 |
+    cut -f 1 |
+    parallel -j 4 '
+        IS_ANCESTOR=$(nwr lineage {} | tsv-filter --str-eq 1:biotype)
+        if [[ ${#IS_ANCESTOR} -gt 1 ]]; then
+            echo {} | nwr append stdin
+        fi
+        ' |
+    wc -l
+# 56
+
+echo "
+    SELECT
+        tax_id
+    FROM ar
+    WHERE 1=1
+        AND species_id = 1773
+        AND tax_id != 1773
+    " |
+    sqlite3 -tabs ~/.nwr/ar_refseq.sqlite |
+    parallel -j 4 '
+        IS_ANCESTOR=$(nwr lineage {} | tsv-filter --str-eq 1:biotype)
+        if [[ ${#IS_ANCESTOR} -gt 1 ]]; then
+            echo {} | nwr append stdin
+        fi
+        ' |
+    wc -l
+# 190
+
+```
+
+### Other species of Actinobacteria
+
+```shell
+cd ~/data/alignment/MTBC
+
+echo "
+    SELECT
+        tax_id
+    FROM ar
+    WHERE 1=1
+        AND genus IN ('Amycolatopsis', 'Corynebacterium', 'Streptomyces') -- species_id IN (33910, 1717, 1912)
+        AND assembly_level IN ('Complete Genome', 'Chromosome')
+        AND tax_id != species_id
+    " |
+    sqlite3 -tabs ~/.nwr/ar_refseq.sqlite |
+    parallel -j 4 '
+        IS_STRAIN=$(nwr info --tsv {} | tsv-filter --str-eq 3:strain)
+        if [[ ${#IS_STRAIN} -gt 1 ]]; then
+            echo {} | nwr append stdin -r species --id
+        fi
+        ' |
+    tsv-summarize -g 3,2 --count |
+    tsv-filter --gt 3:1 |
+    tsv-sort -k2,2 |
+    (echo -e '#tax_id\tspecies\tRS' && cat) |
+    mlr --itsv --omd cat
+
+```
+
+| #tax_id | species                            | RS  | comments |
+|---------|------------------------------------|-----|:---------|
+| 33910   | Amycolatopsis mediterranei         | 4   | 地中海拟无枝酸菌 |
+| 1717    | Corynebacterium diphtheriae        | 14  | 白喉棒状杆菌   |
+| 1718    | Corynebacterium glutamicum         | 9   |          |
+| 1719    | Corynebacterium pseudotuberculosis | 14  |          |
+| 65058   | Corynebacterium ulcerans           | 5   |          |
+| 43771   | Corynebacterium urealyticum        | 2   |          |
+| 29303   | Streptomyces cattleya              | 2   |          |
+| 1969    | Streptomyces chartreusis           | 2   |          |
+| 1912    | Streptomyces hygroscopicus         | 2   | 吸水链霉菌    |
+| 1916    | Streptomyces lividans              | 2   |          |
+| 1927    | Streptomyces rimosus               | 2   |          |
+| 54571   | Streptomyces venezuelae            | 2   |          |
 
 ## MTBC: assembly
 
-```shell script
-export RANK_NAME=MTBC
+```shell
+cd ~/data/alignment/MTBC
 
-mkdir -p ~/data/alignment/${RANK_NAME}        # Working directory
-cd ~/data/alignment/${RANK_NAME}
-
-mysql -uroot ar_refseq -e "
+# Not M. tuberculosis and M. avium
+echo "
     SELECT
-        organism_name, species, genus, ftp_path, assembly_level
+        organism_name || ' ' || assembly_accession AS name,
+        species, genus, ftp_path, assembly_level
     FROM ar
     WHERE 1=1
-        AND taxonomy_id != species_id               # no strain ID
-        AND ( genus_id in (1763)
-            OR species_id in (78331, 1844474, 1305738, 1773, \
-                33910, 1717, 1912) )
-    " \
+        AND genus IN ('Mycobacterium')
+        AND species != 'Mycobacterium tuberculosis'
+        AND species != 'Mycobacterium avium'
+    " |
+    sqlite3 -tabs ~/.nwr/ar_refseq.sqlite \
     > raw.tsv
 
-mysql -uroot ar_genbank -e "
+# M. avium
+echo "
     SELECT
-        organism_name, species, genus, ftp_path, assembly_level
+        organism_name || ' ' || assembly_accession AS name,
+        species, genus, ftp_path, assembly_level
     FROM ar
     WHERE 1=1
-        AND taxonomy_id != species_id               # no strain ID
-        AND ( genus_id in (1763)
-            OR species_id in (78331, 1844474, 1305738, 1773, \
-                33910, 1717, 1912) )
-    " \
+        AND species = 'Mycobacterium avium'
+        AND assembly_level IN ('Complete Genome', 'Chromosome')
+    " |
+    sqlite3 -tabs ~/.nwr/ar_refseq.sqlite \
+    >> raw.tsv
+
+# M. tuberculosis biotypes
+#1773    | M. tuberculosis
+#194542  | M. tuberculosis variant pinnipedii
+#182785  | M. tuberculosis subsp. tuberculosis
+#115862  | M. tuberculosis variant caprae
+#33894   | M. tuberculosis variant africanum
+#1806    | M. tuberculosis variant microti
+#1765    | M. tuberculosis variant bovis
+echo "
+    SELECT
+        organism_name || ' ' || assembly_accession AS name,
+        species, genus, ftp_path, assembly_level
+    FROM ar
+    WHERE 1=1
+        AND species = 'Mycobacterium tuberculosis'
+        AND tax_id != 1773
+        AND ( (
+            organism_name LIKE '% variant %'
+            ) OR (
+            organism_name LIKE '% subsp %'
+            ) OR (
+            organism_name NOT LIKE '% variant %' AND assembly_level IN ('Complete Genome', 'Chromosome')
+            ) )
+    " |
+    sqlite3 -tabs ~/.nwr/ar_refseq.sqlite \
+    >> raw.tsv
+
+# Good outgroups
+echo "
+    SELECT
+        organism_name || ' ' || assembly_accession AS name,
+        species, genus, ftp_path, assembly_level
+    FROM ar
+    WHERE 1=1
+        AND species_id IN (33910, 1717, 1912)
+        AND assembly_level IN ('Complete Genome', 'Chromosome')
+        AND tax_id != species_id
+    " |
+    sqlite3 -tabs ~/.nwr/ar_refseq.sqlite \
     >> raw.tsv
 
 cat raw.tsv |
@@ -118,58 +411,22 @@ cat raw.tsv |
         printf qq{%s\t%s\t%s\t%s\n}, $F[5], $F[3], $F[1], $F[4];
         ' |
     keep-header -- sort -k3,3 -k1,1 \
-    > raw.0.assembly.tsv
+    > MTBC.assembly.tsv
 
 # find potential duplicated strains or assemblies
-cat raw.0.assembly.tsv |
-    cut -f 1 |
-    sort |
-    uniq -c |
-    sort -nr
-
-cat raw.0.assembly.tsv |
-    tsv-filter -H --str-ne 3:"Mycobacterium tuberculosis" |
-    tsv-filter -H --str-ne 3:"Mycobacterium avium" \
-    > raw.1.assembly.tsv
-
-cat raw.0.assembly.tsv |
-    tsv-filter -H --str-eq 3:"Mycobacterium tuberculosis" |
-    tsv-filter -H --str-in-fld 1:"_variant_" \
-    > raw.2.assembly.tsv
-
-# Too many strains
-cat raw.0.assembly.tsv |
-    tsv-filter -H --str-eq 3:"Mycobacterium tuberculosis" |
-    tsv-filter -H --istr-ne 4:"Contig" |
-    tsv-filter -H --istr-ne 4:"Scaffold" \
-    > raw.3.assembly.tsv
-
-# Poor assembled GA II and IonTorrent reads
-cat raw.0.assembly.tsv |
-    tsv-filter -H --str-eq 3:"Mycobacterium avium" |
-    tsv-filter -H --istr-ne 4:"Contig" |
-    tsv-filter -H --istr-ne 4:"Scaffold" \
-    > raw.4.assembly.tsv
-
-tsv-append -H raw.{1,2,3,4}.assembly.tsv |
-    tsv-uniq -H |
-    keep-header -- sort \
-    > ${RANK_NAME}.assembly.tsv
-
-# comment out unneeded assembly levels
+cat MTBC.assembly.tsv |
+    tsv-uniq -f 1 --repeated
 
 # Edit .tsv, remove unnecessary strains, check strain names and comment out poor assemblies.
-# vim ${RANK_NAME}.assembly.tsv
-# cp ${RANK_NAME}.assembly.tsv ~/Scripts/withncbi/pop
+# vim MTBC.assembly.tsv
+# cp MTBC.assembly.tsv ~/Scripts/withncbi/pop
 
 # Cleaning
 rm raw*.*sv
 
-unset RANK_NAME
-
 ```
 
-```shell script
+```shell
 cd ~/data/alignment/MTBC
 
 perl ~/Scripts/withncbi/taxon/assembly_prep.pl \
@@ -184,7 +441,7 @@ bash ASSEMBLY/MTBC.assembly.collect.sh
 
 ## Count strains
 
-```shell script
+```shell
 cd ~/data/alignment/MTBC
 
 for dir in $(find ASSEMBLY -maxdepth 1 -mindepth 1 -type d | sort); do
@@ -226,7 +483,7 @@ wc -l ASSEMBLY/MTBC.assembly*csv
 
 ```
 
-```shell script
+```shell
 cd ~/data/alignment/MTBC
 
 cat ASSEMBLY/MTBC.assembly.pass.csv |
@@ -350,7 +607,7 @@ cat ASSEMBLY/MTBC.assembly.pass.csv |
 
 ## Raw phylogenetic tree by MinHash
 
-```shell script
+```shell
 mkdir -p ~/data/alignment/MTBC/mash
 cd ~/data/alignment/MTBC/mash
 
@@ -415,7 +672,7 @@ nw_display -s -b 'visibility:hidden' -w 600 -v 30 tree.nwk |
 
 ## NCBI taxonomy
 
-```shell script
+```shell
 cd ~/data/alignment/MTBC/taxon
 
 bp_taxonomy2tree.pl -e \
@@ -488,7 +745,7 @@ Review `ASSEMBLY/MTBC.assembly.pass.csv` and `mash/groups.tsv`
 | 109     | Mycobacterium_tuberculosis_variant_africanum |    26 | M_tub_variant_africanum_GM041182 |
 | 110     | Mycobacterium_tuberculosis_variant_bovis     |    14 | M_tub_variant_bovis_AF2122_97    |
 
-```shell script
+```shell
 mkdir -p ~/data/alignment/MTBC/taxon
 cd ~/data/alignment/MTBC/taxon
 
@@ -617,7 +874,7 @@ EOF
 
 * Rsync to hpcc
 
-```shell script
+```shell
 rsync -avP \
     ~/data/alignment/MTBC/ \
     wangq@202.119.37.251:data/alignment/MTBC
@@ -628,7 +885,7 @@ rsync -avP \
 
 * `--perseq` for Chromosome-level assemblies and targets
 
-```shell script
+```shell
 cd ~/data/alignment/MTBC/
 
 # prep
@@ -658,7 +915,7 @@ done
 
 ## MTBC: run
 
-```shell script
+```shell
 cd ~/data/alignment/MTBC/
 
 cat taxon/group_target.tsv |
@@ -687,7 +944,7 @@ find . -mindepth 1 -maxdepth 3 -type f -name "output.*" | parallel -r rm
 
 * C_dip_NCTC_13129 as outgroup
 
-```shell script
+```shell
 cd ~/data/alignment/MTBC/
 
 egaz template \
