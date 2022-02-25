@@ -142,7 +142,7 @@ M_col_GCF_001954115_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/954/115/G
 M_col_GCF_003284935_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/003/284/935/GCF_003284935.1_ASM328493v1	Mycobacterium colombiense	Contig
 M_col_GCF_003284975_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/003/284/975/GCF_003284975.1_ASM328497v1	Mycobacterium colombiense	Contig
 M_col_GCF_900161855_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/900/161/855/GCF_900161855.1_PRJEB19244	Mycobacterium colombiense	Scaffold
-M_col_Mycobacterium_tuberculosis_TKK_01_0051_GCF_000661085_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/661/085/GCF_000661085.1_Myco_sp_TKK-01-0051_V1	Mycobacterium colombiense	Scaffold
+#M_col_Mycobacterium_tuberculosis_TKK_01_0051_GCF_000661085_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/661/085/GCF_000661085.1_Myco_sp_TKK-01-0051_V1	Mycobacterium colombiense	Scaffold
 M_con_GCF_002102095_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/002/102/095/GCF_002102095.1_ASM210209v1	Mycobacterium conspicuum	Contig
 M_con_GCF_010730195_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/010/730/195/GCF_010730195.1_ASM1073019v1	Mycobacterium conspicuum	Complete Genome
 M_coo_GCF_010727945_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/010/727/945/GCF_010727945.1_ASM1072794v1	Mycobacterium cookii	Complete Genome
@@ -160,7 +160,7 @@ M_fra_GCF_002102185_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/002/102/185/G
 M_fra_GCF_020622285_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/020/622/285/GCF_020622285.1_ASM2062228v1	Mycobacterium fragae	Contig
 M_fre_GCF_012223425_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/012/223/425/GCF_012223425.1_ASM1222342v1	Mycobacterium frederiksbergense	Chromosome
 M_gas_GCF_002102175_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/002/102/175/GCF_002102175.1_ASM210217v1	Mycobacterium gastri	Contig
-M_GCF_001665295_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/665/295/GCF_001665295.1_ASM166529v1	Mycobacterium sp. 1554424.7	Contig
+#M_GCF_001665295_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/665/295/GCF_001665295.1_ASM166529v1	Mycobacterium sp. 1554424.7	Contig
 M_gen_ATCC_51234_GCF_000526915_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/526/915/GCF_000526915.1_ASM52691v1	Mycobacterium genavense	Contig
 M_gor_GCF_001417955_2	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/417/955/GCF_001417955.2_ASM141795v2	Mycobacterium gordonae	Contig
 M_gor_GCF_001673255_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/673/255/GCF_001673255.1_ASM167325v1	Mycobacterium gordonae	Contig
