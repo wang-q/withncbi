@@ -6,6 +6,8 @@
   - [NCBI RefSeq](#ncbi-refseq)
   - [MinHash to get non-redundant plasmids](#minhash-to-get-non-redundant-plasmids)
   - [Grouping by MinHash](#grouping-by-minhash)
+  - [Plasmid: prepare](#plasmid-prepare)
+  - [Plasmid: run](#plasmid-run)
 
 
 ## NCBI RefSeq
@@ -38,7 +40,7 @@ gzip -dcf RefSeq/*.genomic.fna.gz > RefSeq/plasmid.fa
 
 ```
 
-## MinHash to get non-redundant plasmids 
+## MinHash to get non-redundant plasmids
 
 ```bash
 mkdir ~/data/plasmid/nr
@@ -88,7 +90,7 @@ head -n 5 redundant.tsv
 #NZ_LR745043.1   NC_005249.1     0.000656154     0       973/1000
 #NZ_CP033694.1   NC_006323.1     0.00766986      0       741/1000
 
-cat redundant.tsv | wc -l 
+cat redundant.tsv | wc -l
 # 129384
 
 cat redundant.tsv |
@@ -96,13 +98,13 @@ cat redundant.tsv |
         BEGIN {
             our $g = Graph::Undirected->new;
         }
-        
+
         $g->add_edge($F[0], $F[1]);
-    
+
         END {
             for my $cc ( $g->connected_components ) {
                 print join qq{\t}, sort @{$cc};
-            }        
+            }
         }
     ' \
     > connected_components.tsv
@@ -177,9 +179,9 @@ cat connected.tsv |
         BEGIN {
             our $g = Graph::Undirected->new;
         }
-        
+
         $g->add_edge($F[0], $F[1]);
-    
+
         END {
             my @rare;
             my $serial = 1;
@@ -191,14 +193,14 @@ cat connected.tsv |
                 my $count = scalar @{$cc};
                 if ($count < 50) {
                     push @rare, @{$cc};
-                } 
+                }
                 else {
                     path(qq{group/$serial.lst})->spew(map {qq{$_\n}} @{$cc});
                     $serial++;
                 }
             }
             path(qq{group/00.lst})->spew(map {qq{$_\n}} @rare);
-            
+
             path(qq{grouped.lst})->spew(map {qq{$_\n}} $g->vertices);
         }
     '
@@ -226,35 +228,35 @@ wc -l group/*
 find group -maxdepth 1 -type f -name "[0-9]*.lst" | sort |
     parallel -j 4 --line-buffer '
         echo >&2 "==> {}"
-        
+
         faops some ../nr/refseq.nr.fa {} stdout |
             mash sketch -k 21 -s 1000 -i -p 6 - -o {}.msh
-            
+
         mash dist -p 6 {}.msh {}.msh > {}.tsv
     '
 
 find group -maxdepth 1 -type f -name "[0-9]*.lst.tsv" | sort |
     parallel -j 4 --line-buffer '
         echo >&2 "==> {}"
-        
+
         cat {} |
             tsv-select -f 1-3 |
             Rscript -e '\''
                 library(readr);
                 library(tidyr);
                 library(ape);
-                pair_dist <- read_tsv(file("stdin"), col_names=F); 
+                pair_dist <- read_tsv(file("stdin"), col_names=F);
                 tmp <- pair_dist %>%
                     pivot_wider( names_from = X2, values_from = X3, values_fill = list(X3 = 1.0) )
                 tmp <- as.matrix(tmp)
                 mat <- tmp[,-1]
                 rownames(mat) <- tmp[,1]
-                
+
                 dist_mat <- as.dist(mat)
                 clusters <- hclust(dist_mat, method = "ward.D2")
-                tree <- as.phylo(clusters) 
+                tree <- as.phylo(clusters)
                 write.tree(phy=tree, file="{.}.tree.nwk")
-                
+
                 group <- cutree(clusters, h=0.2) # k=3
                 groups <- as.data.frame(group)
                 groups$ids <- rownames(groups)
@@ -281,7 +283,7 @@ find group -name "*.groups.tsv" | sort |
 find subgroup -name "*.lst" | sort |
     parallel -j 1 -k '
         lines=$(cat {} | wc -l)
-        
+
         if (( lines < 5 )); then
             echo -e "{}\t$lines"
             cat {} >> subgroup/lonely.lst
@@ -346,12 +348,12 @@ cat next.tsv |
 
         GROUP_NAME={/.}
         TARGET_NAME=$(head -n 1 {} | perl -pe "s/\.\d+//g")
-        
+
         SERIAL={#}
         COUNT=$(cat {} | wc -l)
-        
+
         echo -e "${SERIAL}\t${GROUP_NAME}\t${COUNT}\t${TARGET_NAME}" >> ../taxon/group_target.tsv
-    
+
         faops order ../nr/refseq.fa {} stdout |
             faops filter -s stdin stdout \
             > ../GENOMES/${GROUP_NAME}.fa
@@ -392,7 +394,7 @@ cat taxon/group_target.tsv |
     sed -e '1d' |
     parallel --colsep '\t' --no-run-if-empty --linebuffer -k -j 4 '
         echo -e "==> Group: [{2}]\tTarget: [{4}]\n"
-        
+
         for name in $(cat taxon/{2}.sizes | cut -f 1); do
             egaz prepseq GENOMES/{2}/${name}
         done
@@ -415,14 +417,14 @@ cat taxon/group_target.tsv |
     sed -e '1d' |
     parallel --colsep '\t' --no-run-if-empty --linebuffer -k -j 4 '
         echo -e "==> Group: [{2}]\tTarget: [{4}]"
-        
+
         median=$(cat taxon/{2}.sizes | datamash median 2)
         mad=$(cat taxon/{2}.sizes | datamash mad 2)
         lower_limit=$( bc <<< " (${median} - 2 * ${mad}) / 2" )
-        
+
 #        echo $median $mad $lower_limit
         lines=$(tsv-filter taxon/{2}.sizes --le "2:${lower_limit}" | wc -l)
-        
+
         if (( lines > 0 )); then
             echo >&2 "    $lines lines to be filtered"
             tsv-join taxon/{2}.sizes -e -f <(
@@ -461,7 +463,7 @@ cat taxon/group_target.tsv |
     sed -e '1d' | grep "^53" |
     parallel --colsep '\t' --no-run-if-empty --linebuffer -k -j 1 '
         echo -e "==> Group: [{2}]\tTarget: [{4}]\n"
-        
+
         egaz template \
             GENOMES/{2}/{4} \
             $(cat taxon/{2}.sizes | cut -f 1 | grep -v -x "{4}" | xargs -I[] echo "GENOMES/{2}/[]") \
