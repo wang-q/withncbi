@@ -21,11 +21,11 @@
 |---------|-----------------------------|-----|-------------------------|
 |         |                             |     | M. tuberculosis complex |
 | 78331   | M. canettii                 | 29  | 卡氏分枝杆菌                  |
-| 1773    | M. tuberculosis             | 286 | 结核分枝杆菌                  |
+| 1773    | M. tuberculosis             | 266 | 结核分枝杆菌                  |
 |         |                             |     | M. avium complex        |
 | 1764    | M. avium                    | 39  | 鸟分枝杆菌                   |
 | 339268  | M. colombiense              | 9   |                         |
-| 1767    | M. intracellulare           | 62  | 胞内分枝杆菌                  |
+| 1767    | M. intracellulare           | 36  | 胞内分枝杆菌                  |
 | 560555  | M. mantenii                 | 3   |                         |
 | 701042  | M. marseillense             | 5   |                         |
 | 1138383 | M. paraintracellulare       | 12  | 副胞内分枝杆菌                 |
@@ -104,7 +104,7 @@
 | 398694  | M. shinjukuense             | 1   |                         |
 | 133549  | M. shottsii                 | 2   |                         |
 | 627089  | M. simulans                 | 2   |                         |
-| 1785    | M. sp.                      | 58  |                         |
+| 1785    | M. sp.                      | 14  |                         |
 | 886343  | M. spongiae                 | 1   |                         |
 | 1908205 | M. syngnathidarum           | 2   |                         |
 | 1841859 | M. terramassiliense         | 1   |                         |
@@ -121,7 +121,7 @@
 | #tax_id | biotype                            | RS  |            |
 |---------|------------------------------------|-----|:-----------|
 | 33894   | M. tuberculosis variant africanum  | 33  | 非洲分枝杆菌     |
-| 1765    | M. tuberculosis variant bovis      | 102 | 牛分枝杆菌, 卡介苗 |
+| 1765    | M. tuberculosis variant bovis      | 82  | 牛分枝杆菌, 卡介苗 |
 | 115862  | M. tuberculosis variant caprae     | 3   | 山羊分枝杆菌     |
 | 1806    | M. tuberculosis variant microti    | 5   | 仓鼠分枝杆菌     |
 | 194542  | M. tuberculosis variant pinnipedii | 1   | 鳍足分枝杆菌     |
@@ -548,15 +548,18 @@ perl ~/Scripts/withncbi/taxon/assembly_prep.pl \
     -f ~/Scripts/withncbi/pop/MTBC.assembly.tsv \
     -o ASSEMBLY
 
+# Remove dirs not in the list
+find ASSEMBLY -maxdepth 1 -mindepth 1 -type d |
+    tr "/" "\t" |
+    cut -f 2 |
+    tsv-join --exclude -k 1 -f ASSEMBLY/rsync.tsv -d 1 |
+    xargs -I[] rm -fr ASSEMBLY/[]
+
+# Run
 bash ASSEMBLY/MTBC.assembly.rsync.sh
 
 bash ASSEMBLY/MTBC.assembly.collect.sh
 
-#find ASSEMBLY -maxdepth 1 -mindepth 1 -type d | head |
-#    tr "/" "\t" |
-#    cut -f 2 |
-#    tsv-join --exclude -k 1 -f ASSEMBLY/rsync.tsv -d 1 |
-#    xargs -I[] rm -fr ASSEMBLY/[]
 
 ```
 
@@ -589,8 +592,8 @@ cat ASSEMBLY/n50.tsv |
     > ASSEMBLY/n50.pass.csv
 
 wc -l ASSEMBLY/n50*
-#  710 ASSEMBLY/n50.pass.csv
-#  965 ASSEMBLY/n50.tsv
+#  633 ASSEMBLY/n50.pass.csv
+#  798 ASSEMBLY/n50.tsv
 
 tsv-join \
     ASSEMBLY/MTBC.assembly.collect.csv \
@@ -599,8 +602,8 @@ tsv-join \
     > ASSEMBLY/MTBC.assembly.pass.csv
 
 wc -l ASSEMBLY/MTBC.assembly*csv
-#   965 ASSEMBLY/MTBC.assembly.collect.csv
-#   710 ASSEMBLY/MTBC.assembly.pass.csv
+#   798 ASSEMBLY/MTBC.assembly.collect.csv
+#   633 ASSEMBLY/MTBC.assembly.pass.csv
 
 ```
 
@@ -632,7 +635,7 @@ cat ASSEMBLY/MTBC.assembly.pass.csv |
     '
 #Amycolatopsis   1       4
 #Corynebacterium 1       16
-#Mycobacterium   90      686
+#Mycobacterium   93      609
 #Streptomyces    1       3
 
 # Group by species
@@ -747,14 +750,14 @@ cat dist_full.tsv |
     '
 
 nw_display -s -b 'visibility:hidden' -w 600 -v 30 tree.nwk |
-    rsvg-convert -o ~/Scripts/withncbi/image/MTBC.png
+    rsvg-convert -o ../MTBC.png
 
 ```
 
 ## NCBI taxonomy
 
 ```shell
-cd ~/data/alignment/MTBC/taxon
+cd ~/data/alignment/MTBC/
 
 bp_taxonomy2tree.pl -e \
     $(
@@ -762,6 +765,7 @@ bp_taxonomy2tree.pl -e \
             sed -e '1d' |
             cut -d"," -f 2 |
             grep -v "Candidatus" |
+            grep -v " sp." |
             cut -d" " -f 1,2 |
             tr " " "_" |
             sort |
@@ -793,7 +797,7 @@ bp_taxonomy2tree.pl -e \
     > ncbi.nwk
 
 nw_display -s -b 'visibility:hidden' -w 600 -v 30 ncbi.nwk |
-    rsvg-convert -o ~/Scripts/withncbi/image/Mycobacterium.ncbi.png
+    rsvg-convert -o Mycobacterium.ncbi.png
 
 ```
 
@@ -805,26 +809,49 @@ nw_display -s -b 'visibility:hidden' -w 600 -v 30 ncbi.nwk |
 
 Review `ASSEMBLY/MTBC.assembly.pass.csv` and `mash/groups.tsv`
 
-| #Serial | Group                                        | Count | Target                           |
-|:--------|:---------------------------------------------|------:|:---------------------------------|
-| 1       | A_med                                        |     3 | A_med_U32                        |
-| 2       | C_dip                                        |    24 | C_dip_NCTC_13129                 |
-| 3       | M_avi_int                                    |    22 | M_avi_paratuberculosis_K_10      |
-| 4       | M_can_tub                                    |   191 | M_tub_H37Rv                      |
-| 5       | M_hae_lep                                    |     4 | M_lep_TN                         |
-| 6       | M_kan_xen                                    |     7 | M_kan_ATCC_12478                 |
-| 7       | M_lif_mar_pse_ulc                            |     8 | M_mar_M                          |
-| 8       | S_hyg                                        |     4 | S_hyg_jinggangensis_5008         |
-| 101     | Mycobacterium                                |    20 | M_tub_H37Rv                      |
-| 102     | Mycobacterium_avium                          |     7 | M_avi_paratuberculosis_K_10      |
-| 103     | Mycobacterium_canettii                       |     5 | M_can_CIPT_140010059             |
-| 104     | Mycobacterium_intracellulare                 |     8 | M_int_ATCC_13950                 |
-| 105     | Mycobacterium_kansasii                       |     4 | M_kan_ATCC_12478                 |
-| 106     | Mycobacterium_leprae                         |     3 | M_lep_TN                         |
-| 107     | Mycobacterium_marinum                        |     4 | M_mar_E11                        |
-| 108     | Mycobacterium_tuberculosis                   |   156 | M_tub_H37Rv                      |
-| 109     | Mycobacterium_tuberculosis_variant_africanum |    26 | M_tub_variant_africanum_GM041182 |
-| 110     | Mycobacterium_tuberculosis_variant_bovis     |    14 | M_tub_variant_bovis_AF2122_97    |
+| #Serial | Group                                        | Count | Target                                      |
+|:--------|:---------------------------------------------|------:|:--------------------------------------------|
+| 1       | A_med                                        |     3 | A_med_RB_GCF_000454025_1                    |
+| 2       | C_dip                                        |    16 | C_dip_NCTC_13129_GCF_000195815_1            |
+| 6       | M_avi                                        |    39 | M_avi_paratuberculosis_K_10_GCF_000007865_1 |
+| 9       | M_can_tub                                    |   295 | M_tub_H37Rv_GCF_000195955_2                 |
+| 13      | M_hae_leprae                                 |    10 | M_leprae_TN_GCF_000195855_1                 |
+| 15      | M_intr_mars_parai                            |    55 | M_intr_ATCC_13950_GCF_000277125_1           |
+| 16      | M_kan_per                                    |    24 | M_kan_ATCC_12478_GCF_000157895_3            |
+| 18      | M_mari_ulc                                   |    26 | M_mari_M_GCF_000018345_1                    |
+| 20      | S_hyg                                        |     3 | S_hyg_jinggangensis_5008_GCF_000245355_1    |
+| 101     | Mycobacterium                                |    20 | M_tub_H37Rv                                 |
+| 102     | Mycobacterium_avium                          |     7 | M_avi_paratuberculosis_K_10                 |
+| 103     | Mycobacterium_canettii                       |     5 | M_can_CIPT_140010059                        |
+| 104     | Mycobacterium_intracellulare                 |     8 | M_int_ATCC_13950                            |
+| 105     | Mycobacterium_kansasii                       |     4 | M_kan_ATCC_12478                            |
+| 106     | Mycobacterium_leprae                         |     3 | M_lep_TN                                    |
+| 107     | Mycobacterium_marinum                        |     4 | M_mar_E11                                   |
+| 108     | Mycobacterium_tuberculosis                   |   156 | M_tub_H37Rv                                 |
+| 109     | Mycobacterium_tuberculosis_variant_africanum |    26 | M_tub_variant_africanum_GM041182            |
+| 110     | Mycobacterium_tuberculosis_variant_bovis     |    14 | M_tub_variant_bovis_AF2122_97               |
+
+| #Serial | Group                                        | Count | Target                                         |
+|---------|----------------------------------------------|-------|------------------------------------------------|
+| 1       | A_med                                        | 4     | A_med_RB_GCF_000454025_1                       |
+| 2       | C_dip                                        | 16    | C_dip_NCTC_13129_GCF_000195815_1               |
+| 6       | M_avi                                        | 39    | M_avi_paratuberculosis_K_10_GCF_000007865_1    |
+| 9       | M_can_tub                                    | 295   | M_tub_H37Rv_GCF_000195955_2                    |
+| 13      | M_hae_leprae                                 | 10    | M_leprae_TN_GCF_000195855_1                    |
+| 15      | M_intr_mars_parai                            | 55    | M_intr_ATCC_13950_GCF_000277125_1              |
+| 16      | M_kan_per                                    | 24    | M_kan_ATCC_12478_GCF_000157895_3               |
+| 18      | M_mari_ulc                                   | 26    | M_mari_M_GCF_000018345_1                       |
+| 20      | S_hyg                                        | 3     | S_hyg_jinggangensis_5008_GCF_000245355_1       |
+| 101     | Mycobacterium                                | 88    | M_tub_H37Rv_GCF_000195955_2                    |
+| 102     | Mycobacterium_avium                          | 39    | M_avi_paratuberculosis_K_10_GCF_000007865_1    |
+| 103     | Mycobacterium_canettii                       | 29    | M_can_CIPT_140010059_GCF_000253375_1           |
+| 104     | Mycobacterium_intracellulare                 | 36    | M_intr_ATCC_13950_GCF_000277125_1              |
+| 105     | Mycobacterium_kansasii                       | 17    | M_kan_ATCC_12478_GCF_000157895_3               |
+| 106     | Mycobacterium_leprae                         | 3     | M_leprae_TN_GCF_000195855_1                    |
+| 107     | Mycobacterium_marinum                        | 19    | M_mari_M_GCF_000018345_1                       |
+| 108     | Mycobacterium_tuberculosis                   | 174   | M_tub_H37Rv_GCF_000195955_2                    |
+| 109     | Mycobacterium_tuberculosis_variant_africanum | 33    | M_tub_africanum_GM041182_GCF_000253355_1       |
+| 110     | Mycobacterium_tuberculosis_variant_bovis     | 82    | M_tub_bovis_BCG_Pasteur_1173P2_GCF_000009445_1 |
 
 ```shell
 mkdir -p ~/data/alignment/MTBC/taxon
@@ -833,25 +860,16 @@ cd ~/data/alignment/MTBC/taxon
 cp ../mash/tree.nwk .
 cp ../mash/groups.tsv .
 
-## manually removes some assemblies
-#cat ../mash/groups.tsv |
-#    grep -v "Ba_mic" |
-#    grep -v "Cry_bai" |
-#    grep -v "En_inv_IP1" |
-#    grep -v "L_sp_A" \
-#    > groups.tsv
-#echo -e "2\tBa_mic" >> groups.tsv
-#echo -e "2\tBa_mic_RI" >> groups.tsv
-
 ARRAY=(
-    'A_med::A_med_U32'
-    'C_dip::C_dip_NCTC_13129'
-    'M_avi_int::M_avi_paratuberculosis_K_10'
-    'M_can_tub::M_tub_H37Rv'
-    'M_hae_lep::M_lep_TN'
-    'M_kan_xen::M_kan_ATCC_12478'
-    'M_lif_mar_pse_ulc::M_mar_M'
-    'S_hyg::S_hyg_jinggangensis_5008'
+    'A_med::A_med_RB_GCF_000454025_1'
+    'C_dip::C_dip_NCTC_13129_GCF_000195815_1'
+    'M_avi::M_avi_paratuberculosis_K_10_GCF_000007865_1'
+    'M_can_tub::M_tub_H37Rv_GCF_000195955_2'
+    'M_hae_leprae::M_leprae_TN_GCF_000195855_1'
+    'M_intr_mars_parai::M_intr_ATCC_13950_GCF_000277125_1'
+    'M_kan_per::M_kan_ATCC_12478_GCF_000157895_3'
+    'M_mari_ulc::M_mari_M_GCF_000018345_1'
+    'S_hyg::S_hyg_jinggangensis_5008_GCF_000245355_1'
 )
 
 echo -e "#Serial\tGroup\tCount\tTarget" > group_target.tsv
@@ -879,16 +897,16 @@ done
 
 # Custom groups
 ARRAY=(
-    'Mycobacterium::M_tub_H37Rv'
-    'Mycobacterium_avium::M_avi_paratuberculosis_K_10'
-    'Mycobacterium_canettii::M_can_CIPT_140010059'
-    'Mycobacterium_intracellulare::M_int_ATCC_13950'
-    'Mycobacterium_kansasii::M_kan_ATCC_12478'
-    'Mycobacterium_leprae::M_lep_TN'
-    'Mycobacterium_marinum::M_mar_E11'
-    'Mycobacterium_tuberculosis::M_tub_H37Rv'
-    'Mycobacterium_tuberculosis_variant_africanum::M_tub_variant_africanum_GM041182'
-    'Mycobacterium_tuberculosis_variant_bovis::M_tub_variant_bovis_AF2122_97'
+    'Mycobacterium::M_tub_H37Rv_GCF_000195955_2'
+    'Mycobacterium_avium::M_avi_paratuberculosis_K_10_GCF_000007865_1'
+    'Mycobacterium_canettii::M_can_CIPT_140010059_GCF_000253375_1'
+    'Mycobacterium_intracellulare::M_intr_ATCC_13950_GCF_000277125_1'
+    'Mycobacterium_kansasii::M_kan_ATCC_12478_GCF_000157895_3'
+    'Mycobacterium_leprae::M_leprae_TN_GCF_000195855_1'
+    'Mycobacterium_marinum::M_mari_M_GCF_000018345_1'
+    'Mycobacterium_tuberculosis::M_tub_H37Rv_GCF_000195955_2'
+    'Mycobacterium_tuberculosis_variant_africanum::M_tub_africanum_GM041182_GCF_000253355_1'
+    'Mycobacterium_tuberculosis_variant_bovis::M_tub_bovis_BCG_Pasteur_1173P2_GCF_000009445_1'
 )
 
 SERIAL=100
@@ -934,20 +952,10 @@ done
 
 mlr --itsv --omd cat group_target.tsv
 
-cat <<'EOF' > chr-level.list
-M_avi_paratuberculosis_K_10
-M_can_CIPT_140010059
-M_col_CECT_3035
-M_hae_DSM_44634
-M_int_ATCC_13950
-M_int_intracellulare_MTCC_9506
-M_int_yongonense_05_1390
-M_kan_ATCC_12478
-M_mar_E11
-M_tub_H37Rv
-M_tub_variant_africanum_GM041182
-M_tub_variant_bovis_AF2122_97
-EOF
+cat ../ASSEMBLY/MTBC.assembly.pass.csv |
+    tsv-filter -H -d, --str-eq Assembly_level:"Complete Genome" |
+    tsv-select -H -d, -f name \
+    > complete-genome.lst
 
 ```
 
@@ -974,7 +982,7 @@ egaz template \
     ASSEMBLY \
     --prep -o GENOMES \
     $( cat taxon/group_target.tsv | sed -e '1d' | cut -f 4 | parallel -j 1 echo " --perseq {} " ) \
-    $( cat taxon/chr-level.list | parallel -j 1 echo " --perseq {} " ) \
+    $( cat taxon/complete-genome.lst | parallel -j 1 echo " --perseq {} " ) \
     --min 5000 --about 5000000 \
     -v --repeatmasker "--parallel 24"
 
@@ -984,7 +992,7 @@ ls -t output.* | head -n 1 | xargs tail -f | grep "==>"
 
 # gff
 for n in $(cat taxon/group_target.tsv | sed -e '1d' | cut -f 4 ) \
-    $( cat taxon/chr-level.list ) \
+    $( cat taxon/complete-genome.lst ) \
     ; do
     FILE_GFF=$(find ASSEMBLY -type f -name "*_genomic.gff.gz" | grep "${n}")
     echo >&2 "==> Processing ${n}/${FILE_GFF}"
