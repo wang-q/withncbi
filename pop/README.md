@@ -1,8 +1,6 @@
-# Build alignments on an whole Eukaryotes genus
+# Build alignments across a eukaryotic taxonomy rank
 
-Or order, family, species.
-
-Genus *Trichoderma* as example.
+Genus *Trichoderma* as an example.
 
 [TOC levels=1-3]: # ""
 
@@ -21,302 +19,210 @@ Genus *Trichoderma* as example.
   - [FAQ](#faq)
 
 
-## Section 1: select strains and download sequences.
+## Preparations
 
+* Install `nwr` and create a local taxonomy database.
 
-Create `pop/trichoderma.wgs.tsv` manually. Names should only contain alphanumeric characters and
-underscores. Be careful with tabs and spaces, because .tsv stands for Tab-separated values, white
-spaces matters.
+```shell
+brew install wang-q/tap/nwr
 
-Check NCBI pages
-
-* https://www.ncbi.nlm.nih.gov/Traces/wgs/?view=wgs&search=Trichoderma
-* http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?mode=Info&id=5543
-* http://www.ncbi.nlm.nih.gov/genome/?term=txid5543[Organism:exp]
-* http://www.ncbi.nlm.nih.gov/assembly?term=txid5543[Organism:exp]
-
-And query a local `ar_genbank` DB. This is just a convenient but not accurate approach, especially
-for sub-species parts.
-
-```mysql
-SELECT
-    CONCAT(LEFT(genus, 1),
-            LEFT(TRIM(REPLACE(species, genus, '')),
-                3),
-            REPLACE((REPLACE(organism_name, species, '')),
-                ' ',
-                '_')),
-    SUBSTRING(wgs_master, 1, 4),
-    organism_name,
-    assembly_level
-FROM
-    ar_genbank.ar
-WHERE
-    genus = 'Trichoderma'
-        AND wgs_master LIKE '%000%'
-ORDER BY assembly_level, organism_name
+nwr download
+nwr txdb
 
 ```
 
-For genus contains many species, you should be careful that "Gspe" (*G*enus *spe*cies) style
-abbreviation may mix up two or more species.
+* Create the [assembly database](https://github.com/wang-q/nwr/blob/master/doc/assembly.md).
 
-```mysql
-SELECT DISTINCT
-    species
-FROM
-    ar_genbank.ar
-WHERE
-    genus = 'Trichoderma'
+## Strain info
 
-```
+* [Trichoderma](https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=5543)
+* [Entrez records](http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?mode=Info&id=5543)
 
-### `pop/trichoderma.*.tsv`
+### List all ranks
 
-When the two approaches get very different number of strains, you run the following steps. Check
-intermediate results on necessary.
+There are no noteworthy classification ranks other than species.
 
-Working directory should be `~/data/alignment/trichoderma` in this section.
+```shell
+mkdir -p ~/data/alignment/Trichoderma
+cd ~/data/alignment/Trichoderma
 
-```bash
-export RANK_LEVEL=genus
-export RANK_ID=5543
-export RANK_NAME=trichoderma
+nwr member Trichoderma |
+    grep -v " sp." |
+    tsv-summarize -H -g 3 --count |
+    mlr --itsv --omd cat
 
-mkdir -p ~/data/alignment/${RANK_NAME}            # Working directory
-cd ~/data/alignment/${RANK_NAME}
+nwr lineage Trichoderma |
+    tsv-filter --str-ne 1:clade |
+    sed -n '/kingdom\tFungi/,$p' |
+    (echo -e '#rank\tsci_name\ttax_id' && cat) |
+    mlr --itsv --omd cat
 
 ```
 
-#### `.wgs.tsv`
+| rank     | count |
+|----------|------:|
+| genus    |     1 |
+| species  |   420 |
+| no rank  |     1 |
+| varietas |     2 |
+| strain   |    14 |
+| forma    |     2 |
 
-You can copy & paste the following block of codes.
+| #rank      | sci_name          | tax_id |
+|------------|-------------------|--------|
+| kingdom    | Fungi             | 4751   |
+| subkingdom | Dikarya           | 451864 |
+| phylum     | Ascomycota        | 4890   |
+| subphylum  | Pezizomycotina    | 147538 |
+| class      | Sordariomycetes   | 147550 |
+| subclass   | Hypocreomycetidae | 222543 |
+| order      | Hypocreales       | 5125   |
+| family     | Hypocreaceae      | 5129   |
+| genus      | Trichoderma       | 5543   |
 
-```bash
-# stage1
-# Results from sql query.
-mysql -ualignDB -palignDB gr_euk -e "
-    SELECT 
-        SUBSTRING(wgs,1,6) as prefix0,
-        SUBSTRING(wgs,1,4) as prefix,
-        organism_name,
-        status 
-    FROM gr 
-    WHERE wgs != '' AND ${RANK_LEVEL}_id = ${RANK_ID}
-    " \
-    > raw.tsv
+### Species with assemblies
 
-mysql -ualignDB -palignDB ar_refseq -e "
-    SELECT 
-        CONCAT(SUBSTRING(wgs_master,1,5), RIGHT(wgs_master,1)) as prefix0,
-        SUBSTRING(wgs_master,1,4) as prefix,
-        organism_name,
-        assembly_level 
-    FROM ar 
-    WHERE wgs_master != '' AND ${RANK_LEVEL}_id = ${RANK_ID}
-    " \
-    >> raw.tsv
+Check also the outgroups of the family Hypocreaceae.
 
-mysql -ualignDB -palignDB ar_genbank -e "
+```shell
+cd ~/data/alignment/Trichoderma
+
+SPECIES=$(
+    nwr member Hypocreaceae -r species |
+        grep -v -i "Candidatus " |
+        grep -v -i "candidate " |
+        grep -v " sp." |
+        sed '1d' |
+        cut -f 1 |
+        sort
+)
+
+for S in $SPECIES; do
+    GB=$(
+        echo "
+            SELECT
+                COUNT(*)
+            FROM ar
+            WHERE 1=1
+                AND species_id = $S
+            " |
+            sqlite3 -tabs ~/.nwr/ar_genbank.sqlite
+    )
+
+    CHR=$(
+        echo "
+            SELECT
+                COUNT(*)
+            FROM ar
+            WHERE 1=1
+                AND species_id = $S
+                AND assembly_level IN ('Complete Genome', 'Chromosome')
+            " |
+            sqlite3 -tabs ~/.nwr/ar_genbank.sqlite
+    )
+
+    if [[ ${GB} -gt 0 ]]; then
+        echo -e "$S\t$GB\t$CHR"
+    fi
+done |
+    nwr append stdin |
+    tsv-select -f 1,4,2-3 |
+    tsv-sort -k3,3nr -k4,4nr -k2,2 |
+    (echo -e '#tax_id\tspecies\tGB\tCHR' && cat) \
+    > species.count.tsv
+
+cat species.count.tsv |
+    tsv-filter -H --ge GB:1 |
+    sed 's/Trichoderma /T. /g' |
+    mlr --itsv --omd cat
+
+```
+
+| #tax_id | species                | GB  | CHR |
+|---------|------------------------|-----|-----|
+| 51453   | T. reesei              | 11  | 7   |
+| 101201  | T. asperellum          | 11  | 2   |
+| 5544    | T. harzianum           | 9   | 1   |
+| 63577   | T. atroviride          | 7   | 1   |
+| 29875   | T. virens              | 6   | 2   |
+| 150374  | Escovopsis weberi      | 2   | 0   |
+| 1567482 | T. afroharzianum       | 2   | 0   |
+| 398673  | T. gamsii              | 2   | 0   |
+| 49224   | T. hamatum             | 2   | 0   |
+| 5548    | T. longibrachiatum     | 2   | 0   |
+| 654480  | T. cornu-damae         | 1   | 1   |
+| 1491008 | T. semiorbis           | 1   | 1   |
+| 1491479 | T. simmonsii           | 1   | 1   |
+| 767780  | Cladobotryum protrusum | 1   | 0   |
+| 2060699 | Hypomyces perniciosus  | 1   | 0   |
+| 5132    | Hypomyces rosellus     | 1   | 0   |
+| 490622  | T. arundinaceum        | 1   | 0   |
+| 702382  | T. asperelloides       | 1   | 0   |
+| 1491457 | T. atrobrunneum        | 1   | 0   |
+| 247546  | T. brevicompactum      | 1   | 0   |
+| 2034171 | T. brevicrassum        | 1   | 0   |
+| 58853   | T. citrinoviride       | 1   | 0   |
+| 202914  | T. erinaceum           | 1   | 0   |
+| 1195189 | T. gracile             | 1   | 0   |
+| 1491466 | T. guizhouense         | 1   | 0   |
+| 97093   | T. koningii            | 1   | 0   |
+| 337941  | T. koningiopsis        | 1   | 0   |
+| 1567552 | T. lentiforme          | 1   | 0   |
+| 1491472 | T. lixii               | 1   | 0   |
+| 1497375 | T. oligosporum         | 1   | 0   |
+| 858221  | T. parareesei          | 1   | 0   |
+| 500994  | T. pleuroti            | 1   | 0   |
+| 5547    | T. viride              | 1   | 0   |
+
+
+## Trichoderma: assembly
+
+```shell
+cd ~/data/alignment/Trichoderma
+
+echo "
     SELECT
-        CONCAT(SUBSTRING(wgs_master,1,5), RIGHT(wgs_master,1)) as prefix0,
-        SUBSTRING(wgs_master,1,4) as prefix,
-        organism_name,
-        assembly_level 
-    FROM ar 
-    WHERE wgs_master != '' AND ${RANK_LEVEL}_id = ${RANK_ID}
-    " \
-    >> raw.tsv
-
-# stage2
-# NCBI changed its WGS page, make curl defunct
-# Click on the 'Taxonomic Groups' on the left panel
-# Click the 'Download' button in the middle of NCBI WGS page.
-rm -f ~/Downloads/wgs_selector*.csv
-chrome "https://www.ncbi.nlm.nih.gov/Traces/wgs/?view=wgs&search=${RANK_NAME}"
-
-# Quit chrome Cmd-Q
-
-# There're no chromosome level assemblies in WGS
-cat ~/Downloads/wgs_selector.csv |
-    perl -nl -a -F"," -e '
-        my $p = substr($F[0],0,4);
-        my $status = $F[13] > 0 ? q{Scaffold} : q{Contig};
-        print qq{$F[0]\t$p\t$F[4]\t$status}
-    ' \
-    >> raw.tsv
-
-cat raw.tsv |
-    perl -nl -a -F"\t" -e '
-        BEGIN{my %seen}; 
-        /^prefix/i and next;
-        scalar @F == 4 or next;
-        $seen{$F[1]}++;
-        $seen{$F[1]} > 1 and next;
-        print join(qq{\t}, $F[0], $F[0], $F[2], $F[3]);
-    ' \
-    > raw2.tsv
-
-# stage3
-# Run `wgs_prep.pl` to get a crude `raw2.csv`
-perl ~/Scripts/withncbi/taxon/wgs_prep.pl -f raw2.tsv --csvonly
-
-echo -e '#name\tprefix\torganism\tcontigs' > raw3.tsv
-cat raw2.csv |
-    perl -nl -a -F"," -e '
-        /^prefix/i and next;
-        s/"//g for @F;
-        @O = split(/ /, $F[3]);
-        $name = substr($O[0],0,1) . substr($O[1],0,3);
-        $name .= q{_} . $F[4] if $F[4];
-        $name =~ s/\s+$//g;
-        $name =~ s/\W+/_/g;
-        print qq{$name\t$F[0]\t$F[3]\t$F[9]}
-    ' |
-    sort -t$'\t' -k4 -n |
-    uniq \
-    >> raw3.tsv
-
-mv raw3.tsv ${RANK_NAME}.wgs.tsv
-
-# find potential duplicated strains or assemblies
-cat ${RANK_NAME}.wgs.tsv |
-    perl -nl -a -F"\t" -e 'print $F[0]' |
-    sort |
-    uniq -c |
-    sort -nr
-
-# Edit .tsv, remove duplicated strains, check strain names and comment out poor assemblies.
-# vim ${GENUS}.wgs.tsv
-
-# Cleaning
-rm raw*.*sv
-
-```
-
-#### `.assembly.tsv`
-
-```bash
-
-mysql -ualignDB -palignDB ar_refseq -e "
-    SELECT 
-        organism_name, species, ftp_path, assembly_level
-    FROM ar 
+        organism_name || ' ' || assembly_accession AS name,
+        species, genus, ftp_path, assembly_level
+    FROM ar
     WHERE 1=1
-#        AND wgs_master = ''
-#        AND assembly_level = 'Chromosome'
-        AND organism_name != species
-        AND ${RANK_LEVEL}_id = ${RANK_ID}
-    " \
+        AND (
+            (genus IN ('Trichoderma'))
+            OR
+            (species IN ('Escovopsis weberi', 'Cladobotryum protrusum', 'Hypomyces perniciosus', 'Hypomyces rosellus'))
+        )
+        AND species NOT LIKE '% sp.%'
+    " |
+    sqlite3 -tabs ~/.nwr/ar_genbank.sqlite \
     > raw.tsv
 
-mysql -ualignDB -palignDB ar_genbank -e "
-    SELECT 
-        organism_name, species, ftp_path, assembly_level
-    FROM ar 
-    WHERE 1=1
-#        AND wgs_master = ''
-#        AND assembly_level = 'Chromosome'
-        AND organism_name != species
-        AND ${RANK_LEVEL}_id = ${RANK_ID}
-    " \
-    >> raw.tsv
-
-echo -e '#name\tftp_path\torganism\tassembly_level' > ${RANK_NAME}.assembly.tsv
-
 cat raw.tsv |
-    perl -nl -a -F"\t" -e '
-        BEGIN{my %seen}; 
+    grep -v '^#' |
+    perl ~/Scripts/withncbi/taxon/abbr_name.pl -c "1,2,3" -s '\t' -m 3 --shortsub |
+    (echo -e '#name\tftp_path\torganism\tassembly_level' && cat ) |
+    perl -nl -a -F"," -e '
+        BEGIN{my %seen};
+        /^#/ and print and next;
         /^organism_name/i and next;
-        $n = $F[0];
-        $rx = quotemeta $F[1];
-        $n =~ s/$rx\s*//;
-        $n =~ s/\s+$//;
-        $n =~ s/\W+/_/g;
-        @O = split(/ /, $F[1]);
-        $name = substr($O[0],0,1) . substr($O[1],0,3);
-        $name .= q{_} . $n if $n;
-        $seen{$name}++;
-        $seen{$name} > 1 and next;
-        printf qq{%s\t%s\t%s\t%s\n}, $name, $F[2], $F[1], $F[3];
-        ' \
-    >> ${RANK_NAME}.assembly.tsv
-
-
-# comment out unneeded conditions
+        $seen{$F[5]}++;
+        $seen{$F[5]} > 1 and next;
+        printf qq{%s\t%s\t%s\t%s\n}, $F[5], $F[3], $F[1], $F[4];
+        ' |
+    keep-header -- sort -k3,3 -k1,1 \
+    > Trichoderma.assembly.tsv
 
 # find potential duplicated strains or assemblies
-cat ${RANK_NAME}.assembly.tsv |
-    cut -f 1 |
-    sort |
-    uniq -c |
-    sort -nr
+cat Trichoderma.assembly.tsv |
+    tsv-uniq -f 1 --repeated
 
 # Edit .tsv, remove unnecessary strains, check strain names and comment out poor assemblies.
-# vim ${GENUS}.assembly.tsv
+# vim Trichoderma.assembly.tsv
+# cp Trichoderma.assembly.tsv ~/Scripts/withncbi/pop
+
+# Comment out unneeded strains
 
 # Cleaning
 rm raw*.*sv
-
-```
-
-```bash
-unset RANK_LEVEL
-unset RANK_ID
-unset RANK_NAME
-
-```
-
-### `wgs_prep.pl`
-
-Put the .tsv file to `~/Scripts/withncbi/pop/` and run `wgs_prep.pl` again. When everything is fine,
-commit the .tsv file.
-
-For detailed WGS info, click Prefix column lead to WGS project, where we could download gzipped
-fasta and project description manually.
-
-`wgs_prep.pl` will create a directory named `WGS` and some files containing meta information:
-
-```bash
-cd ~/data/alignment/trichoderma
-
-perl ~/Scripts/withncbi/taxon/wgs_prep.pl \
-    -f ~/Scripts/withncbi/pop/trichoderma.wgs.tsv \
-    --fix \
-    -o WGS
-
-```
-
-1. `trichoderma.wgs.csv`
-
-   Various information for WGS projects extracted from NCBI WGS record pages.
-
-2. `trichoderma.wgs.rsync.sh` and `trichoderma.wgs.aria2.sh`
-
-   Download WGS files.
-
-3. `trichoderma.wgs.data.yml` and `trichoderma.wgs.master.yml`
-
-   ```yaml
-   ---
-   data:
-     - taxon: 452589
-       name: 'Tart_IMI_2206040'
-       sciname: 'Trichoderma atroviride IMI 206040'
-       prefix: 'ABDG02'
-       coverage: '8.26x Sanger'
-   ```
-
-Download WGS files.
-
-```bash
-cd ~/data/alignment/trichoderma
-
-bash WGS/trichoderma.wgs.rsync.sh
-bash WGS/trichoderma.wgs.aria2.sh
-
-# check downloaded .gz files
-find WGS -name "*.gz" | parallel -j 4 gzip -t
 
 ```
 
@@ -330,7 +236,7 @@ Information of assemblies are collected from *_assembly_report.txt *after* downl
 cd ~/data/alignment/trichoderma
 
 perl ~/Scripts/withncbi/taxon/assembly_prep.pl \
-    -f ~/Scripts/withncbi/pop/trichoderma.assembly.tsv \
+    -f ~/Scripts/withncbi/pop/Trichoderma.assembly.tsv \
     -o ASSEMBLY
 
 bash ASSEMBLY/trichoderma.assembly.rsync.sh
@@ -349,13 +255,13 @@ cd ~/data/alignment/trichoderma/mash
 
 for dir in $(find ../ASSEMBLY ../WGS -maxdepth 1 -mindepth 1 -type d ); do
     2>&1 echo "==> ${dir}"
-    
+
     name=$(basename ${dir})
-    
+
     if [[ -e ${name}.msh ]]; then
         continue
     fi
-    
+
     find ${dir} -name "*.fsa_nt.gz" -or -name "*_genomic.fna.gz" |
         xargs cat |
         mash sketch -k 21 -s 100000 -p 4 - -I "${name}" -o ${name}
@@ -378,18 +284,18 @@ cat dist_full.tsv |
         library(readr);
         library(tidyr);
         library(ape);
-        pair_dist <- read_tsv(file("stdin"), col_names=F); 
+        pair_dist <- read_tsv(file("stdin"), col_names=F);
         tmp <- pair_dist %>%
             pivot_wider( names_from = X2, values_from = X3, values_fill = list(X3 = 1.0) )
         tmp <- as.matrix(tmp)
         mat <- tmp[,-1]
         rownames(mat) <- tmp[,1]
-        
+
         dist_mat <- as.dist(mat)
         clusters <- hclust(dist_mat, method = "ward.D2")
-        tree <- as.phylo(clusters) 
+        tree <- as.phylo(clusters)
         write.tree(phy=tree, file="tree.nwk")
-        
+
         group <- cutree(clusters, k=3) # h=0.5
         groups <- as.data.frame(group)
         groups$ids <- rownames(groups)
@@ -419,16 +325,16 @@ mkdir -p GENOMES
 
 # Sanger
 for perseq in Tree_QM6a Tvir_Gv29_8 Tatr_IMI_206040; do
-    echo ASSEMBLY/${perseq}; 
+    echo ASSEMBLY/${perseq};
 done |
     parallel --no-run-if-empty --linebuffer -k -j 2 '
         echo >&2 "==> {/}"
-        
+
         if [ -d GENOMES/{/} ]; then
             echo >&2 "    GENOMES/{/} presents"
             exit;
         fi
-        
+
         FILE_FA=$(ls {} | grep "_genomic.fna.gz" | grep -v "_from_")
         echo >&2 "==> Processing {}/${FILE_FA}"
 
@@ -436,10 +342,10 @@ done |
             {}/${FILE_FA} \
             -o GENOMES/{/} \
             --min 50000 --gi -v --repeatmasker "--species Fungi --parallel 8"
-            
+
         FILE_GFF=$(ls {} | grep "_genomic.gff.gz")
         echo >&2 "==> Processing {}/${FILE_GFF}"
-        
+
         gzip -d -c {}/${FILE_GFF} > GENOMES/{/}/chr.gff
     '
 
@@ -447,23 +353,23 @@ done |
 find ASSEMBLY -maxdepth 1 -type d -path "*/????*" |
     parallel --no-run-if-empty --linebuffer -k -j 2 '
         echo >&2 "==> {/}"
-        
+
         if [ -d GENOMES/{/} ]; then
             echo >&2 "    GENOMES/{/} presents"
             exit;
         fi
 
         FILE_FA=$(ls {} | grep "_genomic.fna.gz" | grep -v "_from_")
-    
+
         egaz prepseq \
             {}/${FILE_FA} \
             -o GENOMES/{/} \
             --about 5000000 \
-            --min 5000 --gi -v --repeatmasker "--species Fungi --parallel 8" 
-            
+            --min 5000 --gi -v --repeatmasker "--species Fungi --parallel 8"
+
         FILE_GFF=$(ls {} | grep "_genomic.gff.gz")
         echo >&2 "==> Processing {}/${FILE_GFF}"
-        
+
         gzip -d -c {}/${FILE_GFF} > GENOMES/{/}/chr.gff
     '
 
@@ -471,19 +377,19 @@ find ASSEMBLY -maxdepth 1 -type d -path "*/????*" |
 find WGS -maxdepth 1 -type d -path "*/????*" |
     parallel --no-run-if-empty --linebuffer -k -j 2 '
         echo >&2 "==> {/}"
-        
+
         if [ -d GENOMES/{/} ]; then
             echo >&2 "    GENOMES/{/} presents"
             exit;
         fi
 
         FILE_FA=$(ls {} | grep ".fsa_nt.gz")
-    
+
         egaz prepseq \
             {}/${FILE_FA} \
             -o GENOMES/{/} \
             --about 5000000 \
-            --min 5000 --gi -v --repeatmasker "--species Fungi --parallel 8" 
+            --min 5000 --gi -v --repeatmasker "--species Fungi --parallel 8"
     '
 
 
