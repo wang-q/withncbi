@@ -7,58 +7,57 @@ Less detailed than *Trichoderma* in
 [TOC levels=1-3]: # ""
 
 - [Aligning various genera from Fungi](#aligning-various-genera-from-fungi)
-  - [Strain info](#strain-info)
-  - [NCBI Assembly](#ncbi-assembly)
-  - [Count strains](#count-strains)
-  - [Raw phylogenetic tree by MinHash](#raw-phylogenetic-tree-by-minhash)
-  - [Groups and targets](#groups-and-targets)
-  - [Fungi: prepare](#fungi-prepare)
-  - [candida: run](#candida-run)
-  - [Fungi: run](#fungi-run)
+    - [Strain info](#strain-info)
+    - [NCBI Assembly](#ncbi-assembly)
+    - [Count strains](#count-strains)
+    - [Raw phylogenetic tree by MinHash](#raw-phylogenetic-tree-by-minhash)
+    - [Groups and targets](#groups-and-targets)
+    - [Fungi: prepare](#fungi-prepare)
+    - [candida: run](#candida-run)
+    - [Fungi: run](#fungi-run)
 
 ## Strain info
 
-| Group          | Genus            | Genus ID | Comments          | Species | Strains |
-|:---------------|:-----------------|---------:|:------------------|--------:|--------:|
-| Ascomycetes    |                  |          |                   |         |         |
-|                | Saccharomyces    |     4930 | 酵母菌属           |       8 |      50 |
-|                | Aspergillus      |     5052 | 曲霉菌属           |      47 |      62 |
-|                | Blastomyces      |   229219 | 芽生菌属 (lung)    |       2 |       4 |
-|                | Candida          |  1535326 | 念珠菌属           |       4 |      37 |
-|                | Coccidioides     |     5500 | 球孢子菌属 (lung)   |       2 |      14 |
-|                | Colletotrichum   |     5455 | 炭疽菌属           |       6 |       6 |
-|                | Epichloe         |     5112 |                   |       2 |       3 |
-|                | Fusarium         |     5506 | 镰刀菌             |       6 |      40 |
+| Group          | Genus            | Genus ID | Comments      | Species | Strains |
+|:---------------|:-----------------|---------:|:--------------|--------:|--------:|
+| Ascomycetes    |                  |          |               |         |         |
+|                | Saccharomyces    |     4930 | 酵母菌属          |       8 |      50 |
+|                | Aspergillus      |     5052 | 曲霉菌属          |      47 |      62 |
+|                | Blastomyces      |   229219 | 芽生菌属 (lung)   |       2 |       4 |
+|                | Candida          |  1535326 | 念珠菌属          |       4 |      37 |
+|                | Coccidioides     |     5500 | 球孢子菌属 (lung)  |       2 |      14 |
+|                | Colletotrichum   |     5455 | 炭疽菌属          |       6 |       6 |
+|                | Epichloe         |     5112 |               |       2 |       3 |
+|                | Fusarium         |     5506 | 镰刀菌           |       6 |      40 |
 |                | Hanseniaspora    |    29832 | 有孢汉逊酵母        |       3 |       4 |
 |                | Histoplasma      |     5036 | 组织胞浆菌属 (lung) |       1 |       5 |
-|                | Kazachstania     |    71245 |                   |       2 |       2 |
-|                | Metschnikowia    |    27320 | 梅奇酵母属          |       3 |       3 |
-|                | Ogataea          |   461281 |                   |       1 |       1 |
+|                | Kazachstania     |    71245 |               |       2 |       2 |
+|                | Metschnikowia    |    27320 | 梅奇酵母属         |       3 |       3 |
+|                | Ogataea          |   461281 |               |       1 |       1 |
 |                | Paracoccidioides |    38946 | 副球孢子菌属 (lung) |       2 |       3 |
-|                | Penicillium      |     5073 | 青霉菌属           |      12 |      18 |
-|                | Pichia           |     4919 | 毕赤酵母属          |       2 |       2 |
-|                | Pneumocystis     |     4753 | 肺孢子菌属 (lung)   |       3 |       3 |
-|                | Pyricularia      |    48558 | 梨孢属             |       2 |       7 |
-|                | Sporothrix       |    29907 | 孢子丝菌属 (skin)   |       3 |       4 |
-|                | Talaromyces      |     5094 | 踝节菌属 (lung)    |       2 |       3 |
-|                | Trichoderma      |     5543 | 木霉属             |       7 |      10 |
-|                | Trichophyton     |     5550 | 毛癣菌属           |       7 |      16 |
-|                | Verticillium     |  1036719 | 轮枝菌属           |       3 |       6 |
-|                | Yarrowia         |     4951 | 耶氏酵母           |       1 |       3 |
-|                | Zymoseptoria     |  1047167 |                   |       4 |      16 |
-| Basidiomycetes |                  |          |                   |         |         |
-|                | Cryptococcus     |     5206 | 隐球菌属, 脑膜炎    |       5 |      53 |
-|                | Malassezia       |    55193 | 马拉色菌属          |       3 |       3 |
-|                | Puccinia         |     5296 | 柄锈菌属           |       4 |       6 |
-|                | Rhodotorula      |     5533 | 红酵母属           |       2 |       4 |
-|                | Ustilago         |     5269 | 黑粉菌属           |       1 |       1 |
-| Other          |                  |          |                   |         |         |
-|                | Mucor            |     4830 | 毛霉菌属           |       2 |       4 |
+|                | Penicillium      |     5073 | 青霉菌属          |      12 |      18 |
+|                | Pichia           |     4919 | 毕赤酵母属         |       2 |       2 |
+|                | Pneumocystis     |     4753 | 肺孢子菌属 (lung)  |       3 |       3 |
+|                | Pyricularia      |    48558 | 梨孢属           |       2 |       7 |
+|                | Sporothrix       |    29907 | 孢子丝菌属 (skin)  |       3 |       4 |
+|                | Talaromyces      |     5094 | 踝节菌属 (lung)   |       2 |       3 |
+|                | Trichoderma      |     5543 | 木霉属           |       7 |      10 |
+|                | Trichophyton     |     5550 | 毛癣菌属          |       7 |      16 |
+|                | Verticillium     |  1036719 | 轮枝菌属          |       3 |       6 |
+|                | Yarrowia         |     4951 | 耶氏酵母          |       1 |       3 |
+|                | Zymoseptoria     |  1047167 |               |       4 |      16 |
+| Basidiomycetes |                  |          |               |         |         |
+|                | Cryptococcus     |     5206 | 隐球菌属, 脑膜炎     |       5 |      53 |
+|                | Malassezia       |    55193 | 马拉色菌属         |       3 |       3 |
+|                | Puccinia         |     5296 | 柄锈菌属          |       4 |       6 |
+|                | Rhodotorula      |     5533 | 红酵母属          |       2 |       4 |
+|                | Ustilago         |     5269 | 黑粉菌属          |       1 |       1 |
+| Other          |                  |          |               |         |         |
+|                | Mucor            |     4830 | 毛霉菌属          |       2 |       4 |
 
 * https://patient.info/doctor/fungal-lung-infections
 
 * https://www.cdc.gov/fungal/diseases/index.html
-
 
 ## NCBI Assembly
 
@@ -69,9 +68,9 @@ mkdir -p ~/data/alignment/${RANK_NAME}        # Working directory
 cd ~/data/alignment/${RANK_NAME}
 
 mysql -ualignDB -palignDB ar_refseq -e "
-    SELECT 
+    SELECT
         organism_name, species, genus, ftp_path, assembly_level
-    FROM ar 
+    FROM ar
     WHERE 1=1
         AND taxonomy_id != species_id               # no strain ID
         AND genus_id in (
@@ -87,9 +86,9 @@ mysql -ualignDB -palignDB ar_refseq -e "
     > raw.tsv
 
 mysql -ualignDB -palignDB ar_genbank -e "
-    SELECT 
+    SELECT
         organism_name, species, genus, ftp_path, assembly_level
-    FROM ar 
+    FROM ar
     WHERE 1=1
         AND taxonomy_id != species_id               # no strain ID
         AND genus_id in (
@@ -110,7 +109,7 @@ cat raw.tsv |
     perl ~/Scripts/withncbi/taxon/abbr_name.pl -c "1,2,3" -s '\t' -m 3 --shortsub |
     (echo -e '#name\tftp_path\torganism\tassembly_level' && cat ) |
     perl -nl -a -F"," -e '
-        BEGIN{my %seen}; 
+        BEGIN{my %seen};
         /^#/ and print and next;
         /^organism_name/i and next;
         $seen{$F[5]}++;
@@ -161,7 +160,7 @@ cd ~/data/alignment/Fungi
 for dir in $(find ASSEMBLY -maxdepth 1 -mindepth 1 -type d | sort); do
     1>&2 echo "==> ${dir}"
     name=$(basename ${dir})
-    
+
     find ${dir} -type f -name "*_genomic.fna.gz" |
         grep -v "_from_" |
         xargs cat |
@@ -179,7 +178,7 @@ cat ASSEMBLY/n50.tsv |
         --ge 2:100000 |
     tr "\t" "," \
     > ASSEMBLY/n50.pass.csv
-        
+
 wc -l ASSEMBLY/n50*
 #  401 ASSEMBLY/n50.pass.csv
 #  453 ASSEMBLY/n50.tsv
@@ -208,7 +207,7 @@ parallel --no-run-if-empty --linebuffer -k -j 4 '
         sort |
         uniq |
         wc -l)
-    
+
     n_strains=$(cat ASSEMBLY/Fungi.assembly.pass.csv |
         cut -d"," -f 2 |
         grep -v "Candidatus" |
@@ -216,7 +215,7 @@ parallel --no-run-if-empty --linebuffer -k -j 4 '
         cut -d" " -f 1,2 |
         sort |
         wc -l)
-    
+
     printf "%s\t%d\t%d\n" {} ${n_species} ${n_strains}
     ' ::: $(
         cat ASSEMBLY/Fungi.assembly.pass.csv |
@@ -271,11 +270,11 @@ cd ~/data/alignment/Fungi/mash
 
 for name in $(cat ../ASSEMBLY/Fungi.assembly.pass.csv | sed -e '1d' | cut -d"," -f 1 ); do
     2>&1 echo "==> ${name}"
-    
+
     if [[ -e ${name}.msh ]]; then
         continue
     fi
-    
+
     find ../ASSEMBLY/${name} -name "*.fsa_nt.gz" -or -name "*_genomic.fna.gz" |
         grep -v "_from_" |
         xargs cat |
@@ -303,18 +302,18 @@ cat dist_full.tsv |
         library(readr);
         library(tidyr);
         library(ape);
-        pair_dist <- read_tsv(file("stdin"), col_names=F); 
+        pair_dist <- read_tsv(file("stdin"), col_names=F);
         tmp <- pair_dist %>%
             pivot_wider( names_from = X2, values_from = X3, values_fill = list(X3 = 1.0) )
         tmp <- as.matrix(tmp)
         mat <- tmp[,-1]
         rownames(mat) <- tmp[,1]
-        
+
         dist_mat <- as.dist(mat)
         clusters <- hclust(dist_mat, method = "ward.D2")
-        tree <- as.phylo(clusters) 
+        tree <- as.phylo(clusters)
         write.tree(phy=tree, file="tree.nwk")
-        
+
         group <- cutree(clusters, h=0.5) # k=3
         groups <- as.data.frame(group)
         groups$ids <- rownames(groups)
@@ -428,7 +427,7 @@ echo -e "#Serial\tGroup\tCount\tTarget\tSequencing" > group_target.tsv
 for item in "${ARRAY[@]}" ; do
     GROUP_NAME="${item%%::*}"
     TARGET_NAME="${item##*::}"
-    
+
     SERIAL=$(
         cat ../mash/groups.tsv |
             tsv-filter --str-eq 2:${TARGET_NAME} |
@@ -500,7 +499,7 @@ for n in $(cat taxon/group_target.tsv | sed -e '1d' | cut -f 4 ) \
     ; do
     FILE_GFF=$(find ASSEMBLY -type f -name "*_genomic.gff.gz" | grep "${n}")
     echo >&2 "==> Processing ${n}/${FILE_GFF}"
-    
+
     gzip -d -c ${FILE_GFF} > GENOMES/${n}/chr.gff
 done
 
@@ -551,7 +550,7 @@ cat taxon/group_target.tsv |
     sed -e '1d' |
     parallel --colsep '\t' --no-run-if-empty --linebuffer -k -j 1 '
         echo -e "==> Group: [{2}]\tTarget: [{4}]\n"
-        
+
         egaz template \
             GENOMES/{4} \
             $(cat taxon/{2} | grep -v -x "{4}" | xargs -I[] echo "GENOMES/[]") \

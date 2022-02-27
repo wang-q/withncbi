@@ -1,16 +1,19 @@
 # *Mycobacterium tuberculosis* complex
 
-[TOC levels=1-3]: # ""
-
 - [*Mycobacterium tuberculosis* complex](#mycobacterium-tuberculosis-complex)
-  - [Strain info](#strain-info)
-  - [MTBC: assembly](#mtbc-assembly)
-  - [Count strains](#count-strains)
-  - [Raw phylogenetic tree by MinHash](#raw-phylogenetic-tree-by-minhash)
-  - [NCBI taxonomy](#ncbi-taxonomy)
-  - [Groups and targets](#groups-and-targets)
-  - [MTBC: prepare](#mtbc-prepare)
-  - [MTBC: run](#mtbc-run)
+    * [Strain info](#strain-info)
+        + [List all ranks](#list-all-ranks)
+        + [Species with assemblies](#species-with-assemblies)
+        + [MTBC assemblies](#mtbc-assemblies)
+        + [MTB biotypes](#mtb-biotypes)
+        + [Other species of Actinobacteria](#other-species-of-actinobacteria)
+    * [MTBC: assembly](#mtbc-assembly)
+    * [Count strains](#count-strains)
+    * [Raw phylogenetic tree by MinHash](#raw-phylogenetic-tree-by-minhash)
+    * [NCBI taxonomy](#ncbi-taxonomy)
+    * [Groups and targets](#groups-and-targets)
+    * [MTBC: prepare](#mtbc-prepare)
+    * [MTBC: run](#mtbc-run)
 
 ## Strain info
 
@@ -702,7 +705,7 @@ for name in $(cat ../ASSEMBLY/MTBC.assembly.pass.csv | sed -e '1d' | cut -d"," -
         continue
     fi
 
-    find ../ASSEMBLY/${name} -name "*.fsa_nt.gz" -or -name "*_genomic.fna.gz" |
+    find ../ASSEMBLY/${name} -name "*_genomic.fna.gz" |
         grep -v "_from_" |
         xargs cat |
         mash sketch -k 21 -s 100000 -p 8 - -I "${name}" -o ${name}
@@ -915,11 +918,11 @@ for item in "${ARRAY[@]}" ; do
     TARGET_NAME="${item##*::}"
 
     SERIAL=$((SERIAL + 1))
-    GROUP_NAME2=$(echo $GROUP_NAME | tr "_" " ")
+    GROUP_NAME_2=$(echo $GROUP_NAME | tr "_" " ")
 
     if [ "$GROUP_NAME" = "Mycobacterium" ]; then
         cat ../ASSEMBLY/MTBC.assembly.pass.csv |
-            tsv-filter -H -d"," --not-blank 18 |
+            tsv-filter -H -d"," --not-blank RefSeq_category |
             sed '1d' |
             cut -d"," -f 1 \
             > ${GROUP_NAME}
@@ -932,14 +935,14 @@ for item in "${ARRAY[@]}" ; do
             tsv-filter -H -d"," --istr-ne 12:"Contig" |
             tsv-filter -H -d"," --istr-ne 12:"Scaffold" |
             cut -d"," -f 1,2 |
-            grep "${GROUP_NAME2}" |
+            grep "${GROUP_NAME_2}" |
             grep -v "M_tub_variant_microti" |
             cut -d"," -f 1 \
             > ${GROUP_NAME}
     else
         cat ../ASSEMBLY/MTBC.assembly.pass.csv |
             cut -d"," -f 1,2 |
-            grep "${GROUP_NAME2}" |
+            grep "${GROUP_NAME_2}" |
             cut -d"," -f 1 \
             > ${GROUP_NAME}
     fi
