@@ -18,7 +18,6 @@ Genus *Trichoderma* as an example.
   - [Section 5: cleaning](#section-5-cleaning)
   - [FAQ](#faq)
 
-
 ## Preparations
 
 * Install `nwr` and create a local taxonomy database.
@@ -82,7 +81,7 @@ nwr lineage Trichoderma |
 
 ### Species with assemblies
 
-Check also the outgroups of the family Hypocreaceae.
+Check also the family Hypocreaceae for outgroups.
 
 ```shell
 cd ~/data/alignment/Trichoderma
@@ -174,8 +173,10 @@ cat species.count.tsv |
 | 500994  | T. pleuroti            | 1   | 0   |
 | 5547    | T. viride              | 1   | 0   |
 
-
 ## Trichoderma: assembly
+
+[WGS](https://www.ncbi.nlm.nih.gov/Traces/wgs/?view=wgs&search=Trichoderma) is now useless and can
+be ignored.
 
 ```shell
 cd ~/data/alignment/Trichoderma
@@ -226,49 +227,110 @@ rm raw*.*sv
 
 ```
 
-### `assembly_prep.pl`
-
 Information of assemblies are collected from *_assembly_report.txt *after* downloading.
 
-**Caution**: line endings of *_assembly_report.txt files are `CRLF`.
+**Note**: `*_assembly_report.txt` have `CRLF` at the end of the line.
 
-```bash
-cd ~/data/alignment/trichoderma
+```shell
+cd ~/data/alignment/Trichoderma
 
 perl ~/Scripts/withncbi/taxon/assembly_prep.pl \
     -f ~/Scripts/withncbi/pop/Trichoderma.assembly.tsv \
     -o ASSEMBLY
 
-bash ASSEMBLY/trichoderma.assembly.rsync.sh
+# Run
+bash ASSEMBLY/Trichoderma.assembly.rsync.sh
 
-bash ASSEMBLY/trichoderma.assembly.collect.sh
+bash ASSEMBLY/Trichoderma.assembly.collect.sh
+
+# Remove dirs not in the list
+find ASSEMBLY -maxdepth 1 -mindepth 1 -type d |
+    tr "/" "\t" |
+    cut -f 2 |
+    tsv-join --exclude -k 1 -f ASSEMBLY/rsync.tsv -d 1 |
+    xargs -I[] rm -fr ASSEMBLY/[]
+
+# md5
+cat ASSEMBLY/rsync.tsv |
+    tsv-select -f 1 |
+    parallel -j 4 --keep-order '
+        echo "==> {}"
+        cd ASSEMBLY/{}
+        md5sum --check md5checksums.txt
+    ' |
+    grep -v ": OK"
 
 ```
 
-## Section 2: create a raw phylogenetic tree by MinHash
+## Filter strains by N50
 
-### `mash`
+```shell
+cd ~/data/alignment/Trichoderma
 
-```bash
-mkdir -p ~/data/alignment/trichoderma/mash
-cd ~/data/alignment/trichoderma/mash
-
-for dir in $(find ../ASSEMBLY ../WGS -maxdepth 1 -mindepth 1 -type d ); do
-    2>&1 echo "==> ${dir}"
-
+for dir in $(find ASSEMBLY -maxdepth 1 -mindepth 1 -type d | sort); do
+    1>&2 echo "==> ${dir}"
     name=$(basename ${dir})
+
+    find ${dir} -type f -name "*_genomic.fna.gz" |
+        grep -v "_from_" | # exclude CDS and rna
+        xargs cat |
+        faops n50 -C -S stdin |
+        (echo -e "name\t${name}" && cat) |
+        datamash transpose
+done |
+    tsv-uniq |
+    tee ASSEMBLY/n50.tsv
+
+cat ASSEMBLY/n50.tsv |
+    tsv-filter \
+        -H --or \
+        --le 4:100 \
+        --ge 2:100000 |
+    tsv-filter -H --ge 3:1000000 |
+    tr "\t" "," \
+    > ASSEMBLY/n50.pass.csv
+
+wc -l ASSEMBLY/n50*
+#  66 ASSEMBLY/n50.pass.csv
+#  78 ASSEMBLY/n50.tsv
+
+tsv-join \
+    ASSEMBLY/Trichoderma.assembly.collect.csv \
+    --delimiter "," -H --key-fields 1 \
+    --filter-file ASSEMBLY/n50.pass.csv \
+    > ASSEMBLY/Trichoderma.assembly.pass.csv
+
+wc -l ASSEMBLY/Trichoderma.assembly*csv
+#   78 ASSEMBLY/Trichoderma.assembly.collect.csv
+#   66 ASSEMBLY/Trichoderma.assembly.pass.csv
+
+```
+
+## Raw phylogenetic tree by MinHash
+
+```shell
+mkdir -p ~/data/alignment/Trichoderma/mash
+cd ~/data/alignment/Trichoderma/mash
+
+for name in $(cat ../ASSEMBLY/Trichoderma.assembly.pass.csv | sed -e '1d' | cut -d"," -f 1 ); do
+    2>&1 echo "==> ${name}"
 
     if [[ -e ${name}.msh ]]; then
         continue
     fi
 
-    find ${dir} -name "*.fsa_nt.gz" -or -name "*_genomic.fna.gz" |
+    find ../ASSEMBLY/${name} -name "*_genomic.fna.gz" |
+        grep -v "_from_" |
         xargs cat |
-        mash sketch -k 21 -s 100000 -p 4 - -I "${name}" -o ${name}
+        mash sketch -k 21 -s 100000 -p 8 - -I "${name}" -o ${name}
 done
 
-mash triangle -E -l <( find . -maxdepth 1 -type f -name "*.msh" | sort ) > dist.tsv
+mash triangle -E -p 8 -l <(
+    cat ../ASSEMBLY/Trichoderma.assembly.pass.csv | sed -e '1d' | cut -d"," -f 1 | parallel echo "{}.msh"
+    ) \
+    > dist.tsv
 
+# fill matrix with lower triangle
 tsv-select -f 1-3 dist.tsv |
     (tsv-select -f 2,1,3 dist.tsv && cat) |
     (
@@ -296,125 +358,198 @@ cat dist_full.tsv |
         tree <- as.phylo(clusters)
         write.tree(phy=tree, file="tree.nwk")
 
-        group <- cutree(clusters, k=3) # h=0.5
+        group <- cutree(clusters, h=0.4) # k=5
         groups <- as.data.frame(group)
         groups$ids <- rownames(groups)
         rownames(groups) <- NULL
         groups <- groups[order(groups$group), ]
-        cat(format_tsv(groups))
+        write_tsv(groups, "groups.tsv")
     '
 
-nw_display -w 600 -b 'visibility:hidden' -s tree.nwk |
-    rsvg-convert -o ~/Scripts/withncbi/image/Trichoderma.png
+nw_display -s -b 'visibility:hidden' -w 600 -v 30 tree.nwk |
+    rsvg-convert -o ../Trichoderma.png
+
+# cp ../Trichoderma.png ~/Scripts/withncbi/image/
 
 ```
 
 ![Trichoderma.png](../image/Trichoderma.png)
 
-## Section 3: prepare sequences for `egaz`
+## Groups and targets
 
-### Manually
+Review `ASSEMBLY/Trichoderma.assembly.pass.csv` and `mash/groups.tsv`.
 
-* `perseq` mean split fasta by names, target or good assembles should set it
-* `--species Fungi` specify the species or clade of this group for RepeatMasker
+Create `ARRAY` manually with a format `group::target`.
 
-```bash
-cd ~/data/alignment/trichoderma
+Target criteria:
+* Prefer Sander sequenced assemblies
+* RefSeq_category with `Representative Genome`
+* Assembly_level with `Complete Genome` or `Chromosome`
 
-mkdir -p GENOMES
+```shell
+mkdir -p ~/data/alignment/Trichoderma/taxon
+cd ~/data/alignment/Trichoderma/taxon
 
-# Sanger
-for perseq in Tree_QM6a Tvir_Gv29_8 Tatr_IMI_206040; do
-    echo ASSEMBLY/${perseq};
-done |
-    parallel --no-run-if-empty --linebuffer -k -j 2 '
-        echo >&2 "==> {/}"
+cp ../mash/tree.nwk .
+cp ../mash/groups.tsv .
 
-        if [ -d GENOMES/{/} ]; then
-            echo >&2 "    GENOMES/{/} presents"
-            exit;
-        fi
+echo -e "#Serial\tGroup\tCount\tTarget" > group_target.tsv
 
-        FILE_FA=$(ls {} | grep "_genomic.fna.gz" | grep -v "_from_")
-        echo >&2 "==> Processing {}/${FILE_FA}"
+# groups accroding `groups.tsv`
+ARRAY=(
+    'C_E_H::H_ros_GCA_011799845_1'
+    'T_har_vire::T_vire_Gv29_8_GCA_000170995_2'
+    'T_asperellum_atrov::T_atrov_IMI_206040_GCA_000171015_2'
+    'T_lon_ree::T_ree_QM6a_GCA_000167675_2'
+)
 
-        egaz prepseq \
-            {}/${FILE_FA} \
-            -o GENOMES/{/} \
-            --min 50000 --gi -v --repeatmasker "--species Fungi --parallel 8"
+for item in "${ARRAY[@]}" ; do
+    GROUP_NAME="${item%%::*}"
+    TARGET_NAME="${item##*::}"
 
-        FILE_GFF=$(ls {} | grep "_genomic.gff.gz")
-        echo >&2 "==> Processing {}/${FILE_GFF}"
+    SERIAL=$(
+        cat ../mash/groups.tsv |
+            tsv-filter --str-eq 2:${TARGET_NAME} |
+            tsv-select -f 1
+    )
 
-        gzip -d -c {}/${FILE_GFF} > GENOMES/{/}/chr.gff
-    '
+    cat groups.tsv |
+        tsv-filter --str-eq 1:${SERIAL} |
+        tsv-select -f 2 \
+        > ${GROUP_NAME}
 
-# Other assemblies
-find ASSEMBLY -maxdepth 1 -type d -path "*/????*" |
-    parallel --no-run-if-empty --linebuffer -k -j 2 '
-        echo >&2 "==> {/}"
+    COUNT=$(cat ${GROUP_NAME} | wc -l )
 
-        if [ -d GENOMES/{/} ]; then
-            echo >&2 "    GENOMES/{/} presents"
-            exit;
-        fi
+    echo -e "${SERIAL}\t${GROUP_NAME}\t${COUNT}\t${TARGET_NAME}" >> group_target.tsv
 
-        FILE_FA=$(ls {} | grep "_genomic.fna.gz" | grep -v "_from_")
+done
 
-        egaz prepseq \
-            {}/${FILE_FA} \
-            -o GENOMES/{/} \
-            --about 5000000 \
-            --min 5000 --gi -v --repeatmasker "--species Fungi --parallel 8"
+# Custom groups
+ARRAY=(
+    'Trichoderma::T_ree_QM6a_GCA_000167675_2'
+    'Trichoderma_reesei::T_ree_QM6a_GCA_000167675_2'
+    'Trichoderma_asperellum::T_asperellum_CBS_433_97_GCA_003025105_1'
+    'Trichoderma_harzianum::T_har_CBS_226_95_GCA_003025095_1'
+    'Trichoderma_atroviride::T_atrov_IMI_206040_GCA_000171015_2'
+    'Trichoderma_virens::T_vire_Gv29_8_GCA_000170995_2'
+)
 
-        FILE_GFF=$(ls {} | grep "_genomic.gff.gz")
-        echo >&2 "==> Processing {}/${FILE_GFF}"
+SERIAL=100
+for item in "${ARRAY[@]}" ; do
+    GROUP_NAME="${item%%::*}"
+    TARGET_NAME="${item##*::}"
 
-        gzip -d -c {}/${FILE_GFF} > GENOMES/{/}/chr.gff
-    '
+    SERIAL=$((SERIAL + 1))
+    GROUP_NAME_2=$(echo $GROUP_NAME | tr "_" " ")
 
-# WGS
-find WGS -maxdepth 1 -type d -path "*/????*" |
-    parallel --no-run-if-empty --linebuffer -k -j 2 '
-        echo >&2 "==> {/}"
+    if [ "$GROUP_NAME" = "Trichoderma" ]; then
+        cat ../ASSEMBLY/Trichoderma.assembly.pass.csv |
+            tsv-filter -H -d"," --not-blank RefSeq_category |
+            sed '1d' |
+            cut -d"," -f 1 \
+            > ${GROUP_NAME}
+        echo "C_pro_GCA_004303015_1" >> ${GROUP_NAME}
+        echo "E_web_GCA_003055145_1" >> ${GROUP_NAME}
+        echo "H_per_GCA_008477525_1" >> ${GROUP_NAME}
+        echo "H_ros_GCA_011799845_1" >> ${GROUP_NAME}
+    else
+        cat ../ASSEMBLY/Trichoderma.assembly.pass.csv |
+            cut -d"," -f 1,2 |
+            grep "${GROUP_NAME_2}" |
+            cut -d"," -f 1 \
+            > ${GROUP_NAME}
+    fi
 
-        if [ -d GENOMES/{/} ]; then
-            echo >&2 "    GENOMES/{/} presents"
-            exit;
-        fi
+    COUNT=$(cat ${GROUP_NAME} | wc -l )
 
-        FILE_FA=$(ls {} | grep ".fsa_nt.gz")
+    echo -e "${SERIAL}\t${GROUP_NAME}\t${COUNT}\t${TARGET_NAME}" >> group_target.tsv
 
-        egaz prepseq \
-            {}/${FILE_FA} \
-            -o GENOMES/{/} \
-            --about 5000000 \
-            --min 5000 --gi -v --repeatmasker "--species Fungi --parallel 8"
-    '
+done
+
+mlr --itsv --omd cat group_target.tsv
+
+cat ../ASSEMBLY/Trichoderma.assembly.pass.csv |
+    tsv-filter -H -d, --str-eq Assembly_level:"Complete Genome" |
+    tsv-select -H -d, -f name \
+    > complete-genome.lst
 
 
 ```
 
-### `egaz template --prep`
+| #Serial | Group                  | Count | Target                                  |
+|---------|------------------------|-------|-----------------------------------------|
+| 1       | C_E_H                  | 6     | H_ros_GCA_011799845_1                   |
+| 2       | T_har_vire             | 20    | T_vire_Gv29_8_GCA_000170995_2           |
+| 3       | T_asperellum_atrov     | 23    | T_atrov_IMI_206040_GCA_000171015_2      |
+| 4       | T_lon_ree              | 16    | T_ree_QM6a_GCA_000167675_2              |
+| 101     | Trichoderma            | 31    | T_ree_QM6a_GCA_000167675_2              |
+| 102     | Trichoderma_reesei     | 10    | T_ree_QM6a_GCA_000167675_2              |
+| 103     | Trichoderma_asperellum | 10    | T_asperellum_CBS_433_97_GCA_003025105_1 |
+| 104     | Trichoderma_harzianum  | 7     | T_har_CBS_226_95_GCA_003025095_1        |
+| 105     | Trichoderma_atroviride | 7     | T_atrov_IMI_206040_GCA_000171015_2      |
+| 106     | Trichoderma_virens     | 6     | T_vire_Gv29_8_GCA_000170995_2           |
 
-Or use `egaz template --prep`. In this approach, GFF files should be manually placed in the GENOMES/
-directory.
+## Prepare sequences for `egaz`
 
-```bash
-cd ~/data/alignment/trichoderma
+* `--perseq` for Chromosome-level assemblies and targets
+  * means split fasta by names, target or good assembles should set it
+* `--species Fungi` specify the species or clade of this group for RepeatMasker
 
+
+```shell
+cd ~/data/alignment/Trichoderma/
+
+# prep
 egaz template \
-    ASSEMBLY WGS \
+    ASSEMBLY \
     --prep -o GENOMES \
-    --perseq Tree_QM6a --perseq Tvir_Gv29_8 --perseq Tatr_IMI_206040 \
+    $( cat taxon/group_target.tsv | sed -e '1d' | cut -f 4 | parallel -j 1 echo " --perseq {} " ) \
+    $( cat taxon/complete-genome.lst | parallel -j 1 echo " --perseq {} " ) \
     --min 5000 --about 5000000 \
-    -v --repeatmasker "--species Fungi --parallel 8"
+    -v --repeatmasker "--species Fungi --parallel 24"
 
 bash GENOMES/0_prep.sh
 
+# gff
+for n in $(cat taxon/group_target.tsv | sed -e '1d' | cut -f 4 ) \
+    $( cat taxon/complete-genome.lst ) \
+    ; do
+    FILE_GFF=$(find ASSEMBLY -type f -name "*_genomic.gff.gz" | grep "${n}")
+    echo >&2 "==> Processing ${n}/${FILE_GFF}"
+
+    gzip -dc ${FILE_GFF} > GENOMES/${n}/chr.gff
+done
+
 ```
 
-## Section 4: generate alignments
+## Generate alignments
+
+
+```shell
+cd ~/data/alignment/Trichoderma/
+
+cat taxon/group_target.tsv |
+    sed -e '1d' |
+    parallel --colsep '\t' --no-run-if-empty --linebuffer -k -j 1 '
+        echo -e "==> Group: [{2}]\tTarget: [{4}]\n"
+
+        egaz template \
+            GENOMES/{4} \
+            $(cat taxon/{2} | grep -v -x "{4}" | xargs -I[] echo "GENOMES/[]") \
+            --multi -o groups/{2}/ \
+            --tree taxon/tree.nwk \
+            --parallel 8 -v
+
+        bash groups/{2}/1_pair.sh
+        bash groups/{2}/3_multi.sh
+    '
+
+# clean
+find groups -mindepth 1 -maxdepth 3 -type d -name "*_raw" | parallel -r rm -fr
+find groups -mindepth 1 -maxdepth 3 -type d -name "*_fasta" | parallel -r rm -fr
+find . -mindepth 1 -maxdepth 3 -type f -name "output.*" | parallel -r rm
+
+```
 
 Use Tatr_IMI_206040 as target
 
@@ -447,49 +582,3 @@ bash multi/1_pair.sh
 bash multi/3_multi.sh
 
 ```
-
-## Section 5: cleaning
-
-This is the ultimate final step. No more. Actually you may choose not to do this. It's depended on
-your disk capacity.
-
-```bash
-cd ~/data/alignment/Fungi/trichoderma
-
-# clean raw fasta
-find . -maxdepth 1 -type d -name "*_raw" | xargs rm -fr
-
-# clean maf-fasta
-find . -maxdepth 1 -type d -name "*_fasta" | xargs rm -fr
-
-# clean raxml phy
-find . -maxdepth 2 -type f -name "*.phy" -or -name "*.phy.reduced" | xargs rm
-
-# compress files
-find . -type f -name "*.maf" | parallel gzip
-find . -type f -name "*.fas" | parallel gzip
-
-```
-
-## FAQ
-
-* Why .tsv? All of your other programs use .csv.
-
-  There are strains of which sub-species parts contain commas, can you believe it?
-
-* I've 500 genomes of *E. coli*, the manually editing step 1 kills me.
-
-  The whole `pop/` and much of `util/` scripts are for Eukaryotes. For small genomes of bacteria,
-  archaea and organelles, check `taxon/bacteria_gr.md`.
-
-* Your command lines executed and the results are wired.
-
-  Be sure you aren't in Windows. Be sure you are familiar to bash command lines.
-
-  Or send what you want to me and let me do the job.
-
-* I have a very good assembly on chromosome level, but I can't find it in WGS.
-
-  Best genomes on the world went to NCBI RefSeq. Use tools in `util/` to download them. Examples can
-  be found in `pop/OPs-download.md`.
-
