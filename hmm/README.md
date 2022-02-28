@@ -1,14 +1,11 @@
 # HMM related resources
 
-[TOC levels=1-3]: # " "
-
 - [HMM related resources](#hmm-related-resources)
-- [PFAM-A](#pfam-a)
-- [TIGRFAM](#tigrfam)
-- [40 single-copy genes](#40-single-copy-genes)
+    * [PFAM-A](#pfam-a)
+    * [TIGRFAM](#tigrfam)
+    * [40 single-copy genes](#40-single-copy-genes)
 
-
-# PFAM-A
+## PFAM-A
 
 ```shell script
 mkdir -p ~/data/HMM/PFAM
@@ -16,7 +13,7 @@ mkdir -p ~/data/HMM/PFAM
 cd ~/data/HMM/PFAM
 
 for basename in Pfam-A.hmm Pfam-A.hmm.dat active_site.dat; do
-    wget -N --content-disposition ftp://ftp.ebi.ac.uk/pub/databases/Pfam/releases/Pfam32.0/${basename}.gz
+    proxychains4 wget -N --content-disposition ftp://ftp.ebi.ac.uk/pub/databases/Pfam/releases/Pfam32.0/${basename}.gz
     wget -N --content-disposition ftp://ftp.ebi.ac.uk/pub/databases/Pfam/releases/Pfam32.0/${basename}.gz
     wget -N --content-disposition ftp://ftp.ebi.ac.uk/pub/databases/Pfam/releases/Pfam32.0/${basename}.gz
 done
@@ -28,7 +25,7 @@ done
 
 ```
 
-# TIGRFAM
+## TIGRFAM
 
 ```shell script
 mkdir -p ~/data/HMM/TIGRFAM
@@ -43,7 +40,7 @@ tar --directory HMM -xzvf TIGRFAMs_14.0_HMM.tar.gz TIGR00485.HMM
 
 ```
 
-# 40 single-copy genes
+## 40 single-copy genes
 
 Ref.:
 
@@ -62,9 +59,9 @@ Ref.:
 mkdir -p ~/data/HMM/40scg
 cd ~/data/HMM/40scg
 
-wget -N --content-disposition https://ndownloader.figshare.com/files/3093482
+curl -LO https://ndownloader.figshare.com/files/3093482
 
-tar xvfz bacteria_and_archaea.tgz
+tar xvfz 3093482
 
 ```
 
