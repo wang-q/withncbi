@@ -1,28 +1,39 @@
 #name	ftp_path	organism	assembly_level
-A_chr_GCF_002220155_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/002/220/155/GCF_002220155.1_ASM222015v1	Azotobacter chroococcum	Complete Genome
-A_chr_GCF_016406165_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/016/406/165/GCF_016406165.1_ASM1640616v1	Azotobacter chroococcum	Complete Genome
-A_chr_NCIMB_8003_GCF_000817975_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/817/975/GCF_000817975.1_ASM81797v1	Azotobacter chroococcum	Complete Genome
-A_saline_GCF_009363155_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/009/363/155/GCF_009363155.1_ASM936315v1	Azotobacter salinestris	Complete Genome
-A_vin_CA6_GCF_000380365_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/380/365/GCF_000380365.1_ASM38036v1	Azotobacter vinelandii	Complete Genome
-A_vin_CA_GCF_000380335_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/380/335/GCF_000380335.1_ASM38033v1	Azotobacter vinelandii	Complete Genome
-A_vin_DJ_GCF_000021045_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/021/045/GCF_000021045.1_ASM2104v1	Azotobacter vinelandii	Complete Genome
-E_moran_GCF_003991975_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/003/991/975/GCF_003991975.1_ASM399197v1	Entomomonas moraniae	Complete Genome
+Ac_pit_PHEA_2	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/191/145/GCF_000191145.1_ASM19114v1	Acinetobacter pittii	Complete Genome
+Az_chr_GCF_002220155_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/002/220/155/GCF_002220155.1_ASM222015v1	Azotobacter chroococcum	Complete Genome
+Az_chr_GCF_016406165_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/016/406/165/GCF_016406165.1_ASM1640616v1	Azotobacter chroococcum	Complete Genome
+Az_chr_NCIMB_8003_GCF_000817975_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/817/975/GCF_000817975.1_ASM81797v1	Azotobacter chroococcum	Complete Genome
+Az_saline_GCF_009363155_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/009/363/155/GCF_009363155.1_ASM936315v1	Azotobacter salinestris	Complete Genome
+Az_vin_CA6_GCF_000380365_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/380/365/GCF_000380365.1_ASM38036v1	Azotobacter vinelandii	Complete Genome
+Az_vin_CA_GCF_000380335_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/380/335/GCF_000380335.1_ASM38033v1	Azotobacter vinelandii	Complete Genome
+Az_vin_DJ_GCF_000021045_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/021/045/GCF_000021045.1_ASM2104v1	Azotobacter vinelandii	Complete Genome
+B_sub_subtilis_168	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/009/045/GCF_000009045.1_ASM904v1	Bacillus subtilis	Complete Genome
+Cam_jej_jejuni_NCTC_11168_ATCC_700819	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/009/085/GCF_000009085.1_ASM908v1	Campylobacter jejuni	Complete Genome
+Cau_vib_NA1000	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/022/005/GCF_000022005.1_ASM2200v1	Caulobacter vibrioides	Complete Genome
+Ch_tra_D_UW_3_CX	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/008/725/GCF_000008725.1_ASM872v1	Chlamydia trachomatis	Complete Genome
+Co_bur_RSA_493	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/007/765/GCF_000007765.2_ASM776v2	Coxiella burnetii	Complete Genome
+En_moran_GCF_003991975_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/003/991/975/GCF_003991975.1_ASM399197v1	Entomomonas moraniae	Complete Genome
+Es_coli_K_12_MG1655	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/005/845/GCF_000005845.2_ASM584v2	Escherichia coli	Complete Genome
+Es_coli_O157_H7_Sakai	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/008/865/GCF_000008865.2_ASM886v2	Escherichia coli	Complete Genome
 H_aes_GCF_021184005_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/021/184/005/GCF_021184005.1_ASM2118400v1	Halopseudomonas aestusnigri	Complete Genome
 H_lit_GCF_900105005_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/900/105/005/GCF_900105005.1_IMG-taxon_2667527220_annotated_assembly	Halopseudomonas litoralis	Chromosome
 H_sab_GCF_900105255_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/900/105/255/GCF_900105255.1_IMG-taxon_2675902958_annotated_assembly	Halopseudomonas sabulinigri	Chromosome
 H_sale_GCF_900105655_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/900/105/655/GCF_900105655.1_IMG-taxon_2667527386_annotated_assembly	Halopseudomonas salegens	Chromosome
 H_xin_GCF_900104945_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/900/104/945/GCF_900104945.1_IMG-taxon_2667527388_annotated_assembly	Halopseudomonas xinjiangensis	Chromosome
-M_adh_GCF_018972165_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/018/972/165/GCF_018972165.1_ASM1897216v1	Marinobacter adhaerens	Complete Genome
-M_adh_HP15_GCF_000166295_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/166/295/GCF_000166295.1_ASM16629v1	Marinobacter adhaerens	Complete Genome
-M_fon_GCF_008122265_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/008/122/265/GCF_008122265.1_ASM812226v1	Marinobacter fonticola	Complete Genome
-M_nau_ATCC_49840_GCF_000284615_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/284/615/GCF_000284615.1_ASM28461v1	Marinobacter nauticus	Complete Genome
-M_nau_VT8_GCF_000015365_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/015/365/GCF_000015365.1_ASM1536v1	Marinobacter nauticus	Complete Genome
-M_psychrophilus_GCF_001043175_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/043/175/GCF_001043175.1_ASM104317v1	Marinobacter psychrophilus	Complete Genome
-M_sala_GCF_002116735_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/002/116/735/GCF_002116735.1_ASM211673v1	Marinobacter salarius	Complete Genome
-M_sala_GCF_003986605_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/003/986/605/GCF_003986605.1_ASM398660v1	Marinobacter salarius	Complete Genome
-M_salinus_GCF_001854125_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/854/125/GCF_001854125.1_ASM185412v1	Marinobacter salinus	Complete Genome
-M_sals_GCF_017798185_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/017/798/185/GCF_017798185.1_ASM1779818v1	Marinobacter salsuginis	Chromosome
-M_simil_GCF_000830985_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/830/985/GCF_000830985.1_ASM83098v1	Marinobacter similis	Complete Genome
+K_pne_pneumoniae_HS11286	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/240/185/GCF_000240185.1_ASM24018v2	Klebsiella pneumoniae	Complete Genome
+L_mono_EGD_e	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/196/035/GCF_000196035.1_ASM19603v1	Listeria monocytogenes	Complete Genome
+Ma_adh_GCF_018972165_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/018/972/165/GCF_018972165.1_ASM1897216v1	Marinobacter adhaerens	Complete Genome
+Ma_adh_HP15_GCF_000166295_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/166/295/GCF_000166295.1_ASM16629v1	Marinobacter adhaerens	Complete Genome
+Ma_fon_GCF_008122265_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/008/122/265/GCF_008122265.1_ASM812226v1	Marinobacter fonticola	Complete Genome
+Ma_nau_ATCC_49840_GCF_000284615_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/284/615/GCF_000284615.1_ASM28461v1	Marinobacter nauticus	Complete Genome
+Ma_nau_VT8_GCF_000015365_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/015/365/GCF_000015365.1_ASM1536v1	Marinobacter nauticus	Complete Genome
+Ma_psychrophilus_GCF_001043175_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/043/175/GCF_001043175.1_ASM104317v1	Marinobacter psychrophilus	Complete Genome
+Ma_sala_GCF_002116735_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/002/116/735/GCF_002116735.1_ASM211673v1	Marinobacter salarius	Complete Genome
+Ma_sala_GCF_003986605_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/003/986/605/GCF_003986605.1_ASM398660v1	Marinobacter salarius	Complete Genome
+Ma_salinus_GCF_001854125_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/854/125/GCF_001854125.1_ASM185412v1	Marinobacter salinus	Complete Genome
+Ma_sals_GCF_017798185_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/017/798/185/GCF_017798185.1_ASM1779818v1	Marinobacter salsuginis	Chromosome
+Ma_simil_GCF_000830985_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/830/985/GCF_000830985.1_ASM83098v1	Marinobacter similis	Complete Genome
+My_tub_H37Rv	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/195/955/GCF_000195955.2_ASM19595v2	Mycobacterium tuberculosis	Complete Genome
 Pe_agg_GCF_009756665_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/009/756/665/GCF_009756665.1_ASM975666v1	Permianibacter aggregans	Complete Genome
 Ps_aer_B136_33_GCF_000359505_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/359/505/GCF_000359505.1_ASM35950v1	Pseudomonas aeruginosa	Complete Genome
 Ps_aer_C_NN2_GCF_900185255_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/900/185/255/GCF_900185255.1_NN2	Pseudomonas aeruginosa	Complete Genome
@@ -404,6 +415,7 @@ Ps_aer_PA1R_GCF_000496645_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/496
 Ps_aer_PA7_GCF_000017205_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/017/205/GCF_000017205.1_ASM1720v1	Pseudomonas aeruginosa	Complete Genome
 Ps_aer_PAK_GCF_000568855_2	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/568/855/GCF_000568855.2_ASM56885v2	Pseudomonas aeruginosa	Complete Genome
 Ps_aer_PAK_GCF_902172305_2	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/902/172/305/GCF_902172305.2_Pseudomonas_aeruginosa_PAKAF	Pseudomonas aeruginosa	Complete Genome
+Ps_aer_PAO1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/006/765/GCF_000006765.1_ASM676v1	Pseudomonas aeruginosa	Complete Genome
 Ps_aer_PAO1_GCF_000006765_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/006/765/GCF_000006765.1_ASM676v1	Pseudomonas aeruginosa	Complete Genome
 Ps_aer_PAO1_GCF_013001005_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/013/001/005/GCF_013001005.1_ASM1300100v1	Pseudomonas aeruginosa	Complete Genome
 Ps_aer_RP73_GCF_000414035_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/414/035/GCF_000414035.1_ASM41403v1	Pseudomonas aeruginosa	Complete Genome
@@ -545,9 +557,9 @@ Ps_corr_GCF_017604325_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/017/604/325
 Ps_corr_GCF_900106085_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/900/106/085/GCF_900106085.1_IMG-taxon_2639763195_annotated_assembly	Pseudomonas corrugata	Chromosome
 Ps_cre_GCF_000759535_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/759/535/GCF_000759535.1_ASM75953v1	Pseudomonas cremoricolorata	Complete Genome
 Ps_don_GCF_000696345_2	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/696/345/GCF_000696345.2_ASM69634v2	Pseudomonas donghuensis	Complete Genome
-Ps_ent_GCF_003940785_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/003/940/785/GCF_003940785.1_ASM394078v1	Pseudomonas entomophila	Complete Genome
-Ps_ent_GCF_018417595_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/018/417/595/GCF_018417595.1_ASM1841759v1	Pseudomonas entomophila	Complete Genome
-Ps_ent_L48_GCF_000026105_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/026/105/GCF_000026105.1_ASM2610v1	Pseudomonas entomophila	Complete Genome
+Ps_ento_GCF_003940785_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/003/940/785/GCF_003940785.1_ASM394078v1	Pseudomonas entomophila	Complete Genome
+Ps_ento_GCF_018417595_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/018/417/595/GCF_018417595.1_ASM1841759v1	Pseudomonas entomophila	Complete Genome
+Ps_ento_L48_GCF_000026105_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/026/105/GCF_000026105.1_ASM2610v1	Pseudomonas entomophila	Complete Genome
 Ps_euc_GCF_013374995_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/013/374/995/GCF_013374995.1_ASM1337499v1	Pseudomonas eucalypticola	Complete Genome
 Ps_extrema_GCF_900102035_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/900/102/035/GCF_900102035.1_IMG-taxon_2667527225_annotated_assembly	Pseudomonas extremaustralis	Chromosome
 Ps_extremo_GCF_900104365_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/900/104/365/GCF_900104365.1_IMG-taxon_2639762715_annotated_assembly	Pseudomonas extremorientalis	Chromosome
@@ -945,6 +957,9 @@ Ps_yam_GCF_900105735_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/900/105/735/
 Ps_zar_GCF_014268695_2	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/014/268/695/GCF_014268695.2_ASM1426869v2	Pseudomonas zarinae	Complete Genome
 Ps_zeae_GCF_014268485_2	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/014/268/485/GCF_014268485.2_ASM1426848v2	Pseudomonas zeae	Complete Genome
 Ps_zha_GCF_018972185_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/018/972/185/GCF_018972185.1_ASM1897218v1	Pseudomonas zhaodongensis	Complete Genome
+Sa_ente_enterica_Typhimurium_LT2	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/006/945/GCF_000006945.2_ASM694v2	Salmonella enterica	Complete Genome
+Sh_fle_2a_301	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/006/925/GCF_000006925.2_ASM692v2	Shigella flexneri	Complete Genome
+St_aur_aureus_NCTC_8325	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/013/425/GCF_000013425.1_ASM1342v1	Staphylococcus aureus	Complete Genome
 T_alka_GCF_001267175_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/267/175/GCF_001267175.1_ASM126717v1	Thiopseudomonas alkaliphila	Complete Genome
 T_alka_GCF_001267195_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/267/195/GCF_001267195.1_ASM126719v1	Thiopseudomonas alkaliphila	Complete Genome
 T_alka_GCF_001267215_1	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/267/215/GCF_001267215.1_ASM126721v1	Thiopseudomonas alkaliphila	Complete Genome
