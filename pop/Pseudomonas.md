@@ -991,6 +991,8 @@ bash ~/Scripts/withncbi/taxon/condense_tree.sh concat.species_group.newick ../st
 mv concat.species_group.condense.newick concat.species.newick
 cat concat.species_group.condense.map >> concat.condensed.map
 
+rm *.condense.map
+
 # png
 nw_display -s -b 'visibility:hidden' -w 600 -v 30 concat.species.newick |
     rsvg-convert -o Pseudomonas.concat.png
