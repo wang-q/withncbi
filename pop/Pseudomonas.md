@@ -30,17 +30,19 @@ investigated.
 
 ## Software
 
-* Install `nwr` and create a local taxonomy database.
+* Install `nwr` and create a local taxonomy and assembly database.
 
 ```shell
-brew install wang-q/tap/nwr
+brew install wang-q/tap/nwr # 0.5.4 or above
+brew install sqlite         # 3.34 or above
 
 nwr download
 nwr txdb
 
-```
+nwr ardb
+nwr ardb --genbank
 
-* Create the [assembly database](https://github.com/wang-q/nwr/blob/master/doc/assembly.md).
+```
 
 * Other packages
 

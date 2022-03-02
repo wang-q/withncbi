@@ -4,19 +4,17 @@ Genus *Trichoderma* as an example.
 
 [TOC levels=1-3]: # ""
 
-- [Build alignments on an whole Eukaryotes genus](#build-alignments-on-an-whole-eukaryotes-genus)
-  - [Section 1: select strains and download sequences.](#section-1-select-strains-and-download-sequences)
-    - [`pop/trichoderma.*.tsv`](#poptrichodermatsv)
-    - [`wgs_prep.pl`](#wgs_preppl)
-    - [`assembly_prep.pl`](#assembly_preppl)
-  - [Section 2: create a raw phylogenetic tree by MinHash](#section-2-create-a-raw-phylogenetic-tree-by-minhash)
-    - [`mash`](#mash)
-  - [Section 3: prepare sequences for `egaz`](#section-3-prepare-sequences-for-egaz)
-    - [Manually](#manually)
-    - [`egaz template --prep`](#egaz-template---prep)
-  - [Section 4: generate alignments](#section-4-generate-alignments)
-  - [Section 5: cleaning](#section-5-cleaning)
-  - [FAQ](#faq)
+- [Build alignments across a eukaryotic taxonomy rank](#build-alignments-across-a-eukaryotic-taxonomy-rank)
+    * [Preparations](#preparations)
+    * [Strain info](#strain-info)
+        + [List all ranks](#list-all-ranks)
+        + [Species with assemblies](#species-with-assemblies)
+    * [Trichoderma: assembly](#trichoderma-assembly)
+    * [Filter strains by N50](#filter-strains-by-n50)
+    * [Raw phylogenetic tree by MinHash](#raw-phylogenetic-tree-by-minhash)
+    * [Groups and targets](#groups-and-targets)
+    * [Prepare sequences for `egaz`](#prepare-sequences-for-egaz)
+    * [Generate alignments](#generate-alignments)
 
 ## Preparations
 
@@ -382,6 +380,7 @@ Review `ASSEMBLY/Trichoderma.assembly.pass.csv` and `mash/groups.tsv`.
 Create `ARRAY` manually with a format `group::target`.
 
 Target criteria:
+
 * Prefer Sander sequenced assemblies
 * RefSeq_category with `Representative Genome`
 * Assembly_level with `Complete Genome` or `Chromosome`
@@ -492,9 +491,8 @@ cat ../ASSEMBLY/Trichoderma.assembly.pass.csv |
 ## Prepare sequences for `egaz`
 
 * `--perseq` for Chromosome-level assemblies and targets
-  * means split fasta by names, target or good assembles should set it
+    * means split fasta by names, target or good assembles should set it
 * `--species Fungi` specify the species or clade of this group for RepeatMasker
-
 
 ```shell
 cd ~/data/alignment/Trichoderma/
@@ -523,7 +521,6 @@ done
 ```
 
 ## Generate alignments
-
 
 ```shell
 cd ~/data/alignment/Trichoderma/
