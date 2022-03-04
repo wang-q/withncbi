@@ -1,6 +1,6 @@
-# *Pseudomonas* degradosomes
+# *Pseudomonas* HGT
 
-- [*Pseudomonas* degradosomes](#pseudomonas-degradosomes)
+- [*Pseudomonas* HGT](#pseudomonas-hgt)
     * [Software](#software)
     * [Strain info](#strain-info)
         + [List all ranks](#list-all-ranks)
@@ -21,12 +21,23 @@
         + [Align and concat marker genes to create species tree](#align-and-concat-marker-genes-to-create-species-tree)
         + [Tweak the concat tree](#tweak-the-concat-tree)
 
-Microorganisms of the genus Pseudomonas are extremely rich in metabolic diversity, and it is thought
-that this diversity also allows them to survive in a very wide range of ecological niches.
+The genus Pseudomonas includes the conditionally pathogenic bacteria Pseudomonas aeruginosa, plant
+pathogens, plant beneficial bacteria, and soil bacteria. Microorganisms of Pseudomonas are extremely
+rich in metabolic diversity, and it is thought that this diversity also allows them to survive in a
+very wide range of ecological niches.
+
+The metabolism of carbohydrates is a fundamental biochemical process that ensures a continuous
+supply of energy to living cells.
 
 The biodegradation of RNA is also an important part of metabolism, which is accomplished by the
 degradosomes. However, the diversity of degradosomes in different environments has not been fully
 investigated.
+
+According to a recent [paper](https://doi.org/10.1128/mSystems.00543-20), there are some order-level
+changes in Gammaproteobacteria. We include both old and new orders.
+
+* Old ones: Cellvibrionales, Oceanospirillales, Pseudomonadales, and Alteromonadales
+* New ones: Moraxellales, Kangiellales, and Pseudomonadales
 
 ## Software
 
@@ -71,32 +82,32 @@ brew install pup
 ### List all ranks
 
 ```shell
-mkdir -p ~/data/alignment/Pseudomonas
-cd ~/data/alignment/Pseudomonas
+mkdir -p ~/data/Pseudomonas
+cd ~/data/Pseudomonas
 
 nwr member Pseudomonas |
     grep -v " sp." |
     tsv-summarize -H -g 3 --count |
     mlr --itsv --omd cat
 
-nwr member Pseudomonas -r "species group" -r "species subgroup" |
+nwr member Acinetobacter |
+    grep -v " sp." |
+    tsv-summarize -H -g 3 --count |
+    mlr --itsv --omd cat
+
+nwr member Pseudomonas Acinetobacter -r "species group" -r "species subgroup" |
     tsv-select -f 1-3 |
     keep-header -- tsv-sort -k3,3 -k2,2 |
     sed 's/Pseudomonas /P. /g' |
+    sed 's/Acinetobacter /A. /g' |
     mlr --itsv --omd cat
-
-#nwr member "Pseudomonadales" |
-#    tsv-filter -H --str-ne rank:"no rank" |
-#    tsv-filter -H --str-ne rank:species |
-#    tsv-filter -H --str-ne rank:subspecies |
-#    tsv-filter -H --str-ne rank:strain
 
 ```
 
 | rank             | count |
 |------------------|-------|
 | genus            | 1     |
-| species          | 404   |
+| species          | 405   |
 | strain           | 747   |
 | subspecies       | 12    |
 | no rank          | 120   |
@@ -104,14 +115,30 @@ nwr member Pseudomonas -r "species group" -r "species subgroup" |
 | species subgroup | 5     |
 | isolate          | 1     |
 
+| rank             | count |
+|------------------|-------|
+| genus            | 1     |
+| species group    | 2     |
+| species subgroup | 3     |
+| species          | 113   |
+| strain           | 1110  |
+| no rank          | 2     |
+| subspecies       | 1     |
+| isolate          | 2     |
+
 | #tax_id | sci_name                                 | rank             |
 |---------|------------------------------------------|------------------|
+| 909768  | A. calcoaceticus/baumannii complex       | species group    |
+| 2839056 | A. Taxon 24                              | species group    |
 | 136841  | P. aeruginosa group                      | species group    |
 | 136842  | P. chlororaphis group                    | species group    |
 | 136843  | P. fluorescens group                     | species group    |
 | 136845  | P. putida group                          | species group    |
 | 136846  | P. stutzeri group                        | species group    |
 | 136849  | P. syringae group                        | species group    |
+| 2839060 | A. Taxon 24C                             | species subgroup |
+| 2839057 | A. Taxon 24D                             | species subgroup |
+| 2839061 | A. Taxon 24E                             | species subgroup |
 | 627141  | P. nitroreducens/multiresinivorans group | species subgroup |
 | 1232139 | P. oleovorans/pseudoalcaligenes group    | species subgroup |
 | 578833  | P. stutzeri subgroup                     | species subgroup |
@@ -122,17 +149,25 @@ nwr member Pseudomonas -r "species group" -r "species subgroup" |
 
 Check also the order Pseudomonadales.
 
+* Old ones: Cellvibrionales, Oceanospirillales, Pseudomonadales, and Alteromonadales
+* New ones: Moraxellales, Kangiellales, and Pseudomonadales
+
 ```shell
-cd ~/data/alignment/Pseudomonas
+cd ~/data/Pseudomonas
 
 SPECIES=$(
-    nwr member Pseudomonadales -r species |
+    nwr member -r species \
+        Cellvibrionales Oceanospirillales Alteromonadales \
+        Moraxellales Kangiellales Pseudomonadales |
         grep -v -i "Candidatus " |
         grep -v -i "candidate " |
         grep -v " sp." |
+        grep -v -E "\bbacterium\b" |
+        grep -v -E "\bsymbiont\b" |
         sed '1d' |
         cut -f 1 |
-        sort
+        sort |
+        uniq
 )
 
 for S in $SPECIES; do
@@ -170,59 +205,56 @@ done |
     > species.count.tsv
 
 cat species.count.tsv |
-    tsv-filter -H --ge CHR:1 |
+    tsv-filter -H --ge CHR:5 |
     tsv-filter -H --invert --str-in-fld species:Pseudomonas --lt RS:30 |
+    tsv-filter -H --invert --str-in-fld species:Acinetobacter --lt RS:30 |
     sed 's/Pseudomonas /P. /g' |
+    sed 's/Acinetobacter /A. /g' |
     mlr --itsv --omd cat
 
 ```
 
-| #tax_id | species                       | RS   | CHR |
-|---------|-------------------------------|------|-----|
-| 287     | P. aeruginosa                 | 6271 | 475 |
-| 33069   | P. viridiflava                | 1536 | 7   |
-| 317     | P. syringae                   | 540  | 41  |
-| 294     | P. fluorescens                | 257  | 39  |
-| 303     | P. putida                     | 189  | 49  |
-| 316     | P. stutzeri                   | 131  | 30  |
-| 29438   | P. savastanoi                 | 116  | 5   |
-| 251701  | P. syringae group genomosp. 3 | 108  | 8   |
-| 587753  | P. chlororaphis               | 99   | 60  |
-| 47877   | P. amygdali                   | 86   | 8   |
-| 53409   | P. coronafaciens              | 75   | 3   |
-| 47880   | P. fulva                      | 74   | 4   |
-| 380021  | P. protegens                  | 73   | 23  |
-| 36746   | P. cichorii                   | 51   | 3   |
-| 76759   | P. monteilii                  | 46   | 9   |
-| 86185   | P. lundensis                  | 39   | 4   |
-| 296     | P. fragi                      | 38   | 6   |
-| 1615674 | P. lactis                     | 31   | 1   |
-| 2743    | Marinobacter nauticus         | 26   | 2   |
-| 353     | Azotobacter chroococcum       | 10   | 3   |
-| 1697053 | Thiopseudomonas alkaliphila   | 7    | 7   |
-| 1033846 | Marinobacter adhaerens        | 7    | 2   |
-| 1420917 | Marinobacter salarius         | 7    | 2   |
-| 354     | Azotobacter vinelandii        | 5    | 3   |
-| 857252  | Halopseudomonas aestusnigri   | 4    | 1   |
-| 418719  | Marinobacter salsuginis       | 4    | 1   |
-| 1510150 | Permianibacter aggregans      | 2    | 1   |
-| 69964   | Azotobacter salinestris       | 1    | 1   |
-| 2213226 | Entomomonas moraniae          | 1    | 1   |
-| 797277  | Halopseudomonas litoralis     | 1    | 1   |
-| 472181  | Halopseudomonas sabulinigri   | 1    | 1   |
-| 1434072 | Halopseudomonas salegens      | 1    | 1   |
-| 487184  | Halopseudomonas xinjiangensis | 1    | 1   |
-| 2603215 | Marinobacter fonticola        | 1    | 1   |
-| 330734  | Marinobacter psychrophilus    | 1    | 1   |
-| 1874317 | Marinobacter salinus          | 1    | 1   |
-| 1420916 | Marinobacter similis          | 1    | 1   |
+| #tax_id | species                         | RS   | CHR |
+|---------|---------------------------------|------|-----|
+| 287     | P. aeruginosa                   | 6310 | 475 |
+| 470     | A. baumannii                    | 5933 | 332 |
+| 33069   | P. viridiflava                  | 1536 | 7   |
+| 317     | P. syringae                     | 540  | 41  |
+| 48296   | A. pittii                       | 315  | 32  |
+| 294     | P. fluorescens                  | 257  | 39  |
+| 480     | Moraxella catarrhalis           | 210  | 16  |
+| 303     | P. putida                       | 189  | 49  |
+| 106654  | A. nosocomialis                 | 159  | 11  |
+| 316     | P. stutzeri                     | 133  | 30  |
+| 29438   | P. savastanoi                   | 116  | 5   |
+| 38313   | Shewanella algae                | 108  | 22  |
+| 587753  | P. chlororaphis                 | 99   | 60  |
+| 756892  | A. indicus                      | 91   | 19  |
+| 47877   | P. amygdali                     | 86   | 8   |
+| 380021  | P. protegens                    | 73   | 23  |
+| 40215   | A. junii                        | 65   | 9   |
+| 1530123 | A. seifertii                    | 58   | 25  |
+| 29430   | A. haemolyticus                 | 55   | 14  |
+| 76759   | P. monteilii                    | 46   | 9   |
+| 40214   | A. johnsonii                    | 43   | 19  |
+| 296     | P. fragi                        | 38   | 6   |
+| 28090   | A. lwoffii                      | 31   | 11  |
+| 43657   | Pseudoalteromonas luteoviolacea | 25   | 5   |
+| 28108   | Alteromonas macleodii           | 24   | 9   |
+| 34062   | Moraxella osloensis             | 21   | 10  |
+| 43662   | Pseudoalteromonas piscicida     | 18   | 6   |
+| 314275  | Alteromonas mediterranea        | 16   | 16  |
+| 24      | Shewanella putrefaciens         | 15   | 9   |
+| 62322   | Shewanella baltica              | 14   | 11  |
+| 386891  | Moraxella bovoculi              | 9    | 7   |
+| 1697053 | Thiopseudomonas alkaliphila     | 7    | 7   |
 
 ### Outgroups
 
 Use these model organisms as outgroups.
 
 ```shell
-cd ~/data/alignment/Pseudomonas
+cd ~/data/Pseudomonas
 
 GENUS=$(
     nwr member Bacteria -r genus |
@@ -231,8 +263,7 @@ GENUS=$(
         sed '1d' |
         cut -f 1 |
         tr "\n" "," |
-        sed 's/,$/\)/' |
-        sed 's/^/\(/'
+        sed 's/,$//'
 )
 
 echo "
@@ -242,7 +273,7 @@ echo "
         *
     FROM ar
     WHERE 1=1
-        AND genus_id IN $GENUS
+        AND genus_id IN ($GENUS)
         AND refseq_category IN ('reference genome')
     " |
     sqlite3 -tabs ~/.nwr/ar_refseq.sqlite \
@@ -283,8 +314,19 @@ cat reference.tsv |
 
 ## Download all assemblies
 
+Species with 2 or more genomes were retained.
+
 ```shell
-cd ~/data/alignment/Pseudomonas
+cd ~/data/Pseudomonas
+
+SPECIES=$(
+    cat species.count.tsv |
+        tsv-filter -H --ge CHR:2 |
+        sed '1d' |
+        cut -f 1 |
+        tr "\n" "," |
+        sed 's/,$//'
+)
 
 echo "
     SELECT
@@ -292,17 +334,14 @@ echo "
         species, genus, ftp_path, assembly_level
     FROM ar
     WHERE 1=1
-        AND genus IN (
-            'Pseudomonas',
-            'Azotobacter', 'Entomomonas', 'Halopseudomonas', 'Marinobacter',
-            'Permianibacter', 'Thiopseudomonas'
-        )
+        AND species_id IN ($SPECIES)
         AND species NOT LIKE '% sp.%'
         AND organism_name NOT LIKE '% sp.%'
         AND assembly_level IN ('Complete Genome', 'Chromosome')
     " |
     sqlite3 -tabs ~/.nwr/ar_refseq.sqlite |
-    tsv-filter --invert --str-eq 2:"Pseudomonas aeruginosa" --str-eq 5:"Chromosome" \
+    tsv-filter --invert --str-eq 2:"Pseudomonas aeruginosa" --str-eq 5:"Chromosome" |
+    tsv-filter --invert --str-eq 2:"Acinetobacter baumannii" --str-eq 5:"Chromosome" \
     > raw.tsv
 
 cat reference.tsv |
@@ -334,9 +373,6 @@ cat Pseudomonas.assembly.tsv |
 # cp Pseudomonas.assembly.tsv ~/Scripts/withncbi/pop
 
 # Comment out unneeded strains
-#Ps_GCF_900235905_1
-#Ps_ole_Pseudomonas_pseudoalcaligenes_CECT_5344_GCF_000297075_2
-#Ps_Pseudomonas_syringae_pv_maculicola_ES4326_GCF_000145845_2
 
 # Cleaning
 rm raw*.*sv
@@ -344,7 +380,7 @@ rm raw*.*sv
 ```
 
 ```shell
-cd ~/data/alignment/Pseudomonas
+cd ~/data/Pseudomonas
 
 perl ~/Scripts/withncbi/taxon/assembly_prep.pl \
     -f ~/Scripts/withncbi/pop/Pseudomonas.assembly.tsv \
@@ -381,14 +417,8 @@ cat ASSEMBLY/rsync.tsv |
 
 * Check N50 of assemblies
 
-* `Azotobacter` bacteria were very far away from the others in the phylogenetic tree constructed
-  from 40 single-copy genes. Probably because of:
-    * the assembly pipeline
-    * annotations
-    * HGT
-
 ```shell
-cd ~/data/alignment/Pseudomonas
+cd ~/data/Pseudomonas
 
 for dir in $(find ASSEMBLY -maxdepth 1 -mindepth 1 -type d | sort); do
     1>&2 echo "==> ${dir}"
@@ -414,26 +444,25 @@ cat ASSEMBLY/n50.tsv |
     > ASSEMBLY/n50.pass.csv
 
 wc -l ASSEMBLY/n50*
-#  960 ASSEMBLY/n50.pass.csv
-#  960 ASSEMBLY/n50.tsv
+#  1522 ASSEMBLY/n50.pass.csv
+#  1522 ASSEMBLY/n50.tsv
 
 tsv-join \
     ASSEMBLY/Pseudomonas.assembly.collect.csv \
     --delimiter "," -H --key-fields 1 \
-    --filter-file ASSEMBLY/n50.pass.csv |
-    tsv-filter -H -d, --invert --str-in-fld 2:"Azotobacter" \
+    --filter-file ASSEMBLY/n50.pass.csv \
     > ASSEMBLY/Pseudomonas.assembly.pass.csv
 
 wc -l ASSEMBLY/Pseudomonas.assembly*csv
-#   960 ASSEMBLY/Pseudomonas.assembly.collect.csv
-#   953 ASSEMBLY/Pseudomonas.assembly.pass.csv
+#  1522 ASSEMBLY/Pseudomonas.assembly.collect.csv
+#  1522 ASSEMBLY/Pseudomonas.assembly.pass.csv
 
 ```
 
 * Genus
 
 ```shell
-cd ~/data/alignment/Pseudomonas
+cd ~/data/Pseudomonas
 
 # Group by genus
 cat ASSEMBLY/Pseudomonas.assembly.pass.csv |
@@ -473,32 +502,40 @@ cat genus.lst |
 
 ```
 
-| #tax_id | genus           | #species | #strains |
-|---------|-----------------|----------|----------|
-| 469     | Acinetobacter   | 1        | 1        |
-| 1386    | Bacillus        | 1        | 1        |
-| 194     | Campylobacter   | 1        | 1        |
-| 75      | Caulobacter     | 1        | 1        |
-| 810     | Chlamydia       | 1        | 1        |
-| 776     | Coxiella        | 1        | 1        |
-| 2758906 | Entomomonas     | 1        | 1        |
-| 561     | Escherichia     | 2        | 2        |
-| 2901189 | Halopseudomonas | 5        | 5        |
-| 570     | Klebsiella      | 1        | 1        |
-| 1637    | Listeria        | 1        | 1        |
-| 2742    | Marinobacter    | 10       | 11       |
-| 1763    | Mycobacterium   | 1        | 1        |
-| 1649479 | Permianibacter  | 1        | 1        |
-| 286     | Pseudomonas     | 255      | 913      |
-| 590     | Salmonella      | 1        | 1        |
-| 620     | Shigella        | 1        | 1        |
-| 1279    | Staphylococcus  | 1        | 1        |
-| 1654787 | Thiopseudomonas | 1        | 7        |
+| #tax_id | genus             | #species | #strains |
+|---------|-------------------|----------|----------|
+| 469     | Acinetobacter     | 43       | 484      |
+| 226     | Alteromonas       | 16       | 31       |
+| 352     | Azotobacter       | 5        | 6        |
+| 1386    | Bacillus          | 1        | 1        |
+| 194     | Campylobacter     | 1        | 1        |
+| 75      | Caulobacter       | 1        | 1        |
+| 10      | Cellvibrio        | 2        | 4        |
+| 810     | Chlamydia         | 1        | 1        |
+| 776     | Coxiella          | 1        | 1        |
+| 561     | Escherichia       | 2        | 2        |
+| 2745    | Halomonas         | 5        | 13       |
+| 135575  | Idiomarina        | 2        | 2        |
+| 570     | Klebsiella        | 1        | 1        |
+| 1637    | Listeria          | 1        | 1        |
+| 2742    | Marinobacter      | 5        | 6        |
+| 28253   | Marinomonas       | 1        | 2        |
+| 475     | Moraxella         | 5        | 35       |
+| 1763    | Mycobacterium     | 1        | 1        |
+| 53246   | Pseudoalteromonas | 18       | 33       |
+| 286     | Pseudomonas       | 172      | 830      |
+| 497     | Psychrobacter     | 2        | 2        |
+| 590     | Salmonella        | 1        | 1        |
+| 22      | Shewanella        | 15       | 50       |
+| 620     | Shigella          | 1        | 1        |
+| 1279    | Staphylococcus    | 1        | 1        |
+| 187492  | Thalassolituus    | 3        | 3        |
+| 1654787 | Thiopseudomonas   | 1        | 7        |
 
 * strains
 
 ```shell
-cd ~/data/alignment/Pseudomonas
+cd ~/data/Pseudomonas
 
 # list strains
 mkdir -p taxon
@@ -555,7 +592,8 @@ rm *.tmp
 Done by `bp_taxonomy2tree.pl` from BioPerl.
 
 ```shell
-cd ~/data/alignment/Pseudomonas/tree
+mkdir -p ~/data/Pseudomonas/tree
+cd ~/data/Pseudomonas/tree
 
 bp_taxonomy2tree.pl -e \
     $(
@@ -574,8 +612,8 @@ nw_display -s -b 'visibility:hidden' -w 600 -v 30 ncbi.nwk |
 ## Raw phylogenetic tree by MinHash
 
 ```shell
-mkdir -p ~/data/alignment/Pseudomonas/mash
-cd ~/data/alignment/Pseudomonas/mash
+mkdir -p ~/data/Pseudomonas/mash
+cd ~/data/Pseudomonas/mash
 
 for strain in $(cat ../strains.lst ); do
     2>&1 echo "==> ${strain}"
@@ -636,8 +674,8 @@ cat dist_full.tsv |
 ### Tweak the mash tree
 
 ```shell
-mkdir -p ~/data/alignment/Pseudomonas/tree
-cd ~/data/alignment/Pseudomonas/tree
+mkdir -p ~/data/Pseudomonas/tree
+cd ~/data/Pseudomonas/tree
 
 nw_reroot ../mash/tree.nwk B_sub_subtilis_168 St_aur_aureus_NCTC_8325 \
     > mash.reroot.newick
@@ -673,21 +711,21 @@ nw_display -s -b 'visibility:hidden' -w 600 -v 30 mash.species.newick |
 ### `all.pro.fa`
 
 ```shell script
-cd ~/data/alignment/Pseudomonas
+cd ~/data/Pseudomonas
 
 mkdir -p PROTEINS
 
-# 959
+# 1521
 find ASSEMBLY -maxdepth 1 -mindepth 1 -type d |
     sort |
     grep 'ASSEMBLY/' |
     wc -l
 
-# 959
+# 1521
 find ASSEMBLY -type f -name "*_protein.faa.gz" |
     wc -l
 
-# 952
+# 1521
 cat strains.lst |
     wc -l
 
@@ -722,7 +760,7 @@ cat PROTEINS/all.pro.fa |
 ### `all.replace.fa`
 
 ```shell
-cd ~/data/alignment/Pseudomonas
+cd ~/data/Pseudomonas
 
 rm PROTEINS/all.strain.tsv
 for STRAIN in $(cat strains.lst); do
@@ -750,12 +788,12 @@ done \
 cat PROTEINS/all.pro.fa |
     grep "^>" |
     wc -l
-#5290421
+#7188968
 
 cat PROTEINS/all.replace.fa |
     grep "^>" |
     wc -l
-#5290421
+#7188968
 
 (echo -e "#name\tstrain" && cat PROTEINS/all.strain.tsv)  \
     > temp &&
@@ -772,7 +810,7 @@ rm PROTEINS/all.replace.sizes
 ### `all.info.tsv`
 
 ```shell
-cd ~/data/alignment/Pseudomonas
+cd ~/data/Pseudomonas
 
 for STRAIN in $(cat strains.lst); do
     gzip -dcf ASSEMBLY/${STRAIN}/*_protein.faa.gz |
@@ -791,7 +829,7 @@ done \
 
 cat PROTEINS/all.annotation.tsv |
     wc -l
-#5290421
+#7188968
 
 (echo -e "#name\tannotation" && cat PROTEINS/all.annotation.tsv) \
     > temp &&
@@ -819,11 +857,11 @@ tsv-join \
 
 cat PROTEINS/all.info.tsv |
     wc -l
-#5290422
+#7188969
 
 ```
 
-## Phylogenetics with 40 single-copy genes and RNase_R
+## Phylogenetics with 40 single-copy genes
 
 ### Find corresponding proteins by `hmmsearch`
 
@@ -835,7 +873,7 @@ cat PROTEINS/all.info.tsv |
 ```shell
 E_VALUE=1e-20
 
-cd ~/data/alignment/Pseudomonas
+cd ~/data/Pseudomonas
 
 ## example
 #gzip -dcf ASSEMBLY/Ac_axa_ATCC_25176/*_protein.faa.gz |
@@ -877,12 +915,15 @@ done
     * BA00005: translation initiation factor IF-2
     * BA00008: signal recognition particle protein
 
+* Acinetobacter
+    * BA00028
+
 Compare proteins and strains.
 
 ```shell script
-cd ~/data/alignment/Pseudomonas
+cd ~/data/Pseudomonas
 
-for marker in BA000{01..03} BA000{06..07} BA000{09..40}; do
+for marker in BA000{01..03} BA000{06..07} BA000{09..27} BA000{29..40}; do
     echo ${marker}
 done > marker.lst
 
@@ -903,7 +944,7 @@ done
 ### Align and concat marker genes to create species tree
 
 ```shell script
-cd ~/data/alignment/Pseudomonas
+cd ~/data/Pseudomonas
 
 # extract sequences
 for marker in $(cat marker.lst); do
@@ -968,7 +1009,7 @@ FastTree -quiet PROTEINS/concat.aln.fa > PROTEINS/concat.aln.newick
 ### Tweak the concat tree
 
 ```shell script
-cd ~/data/alignment/Pseudomonas/tree
+cd ~/data/Pseudomonas/tree
 
 nw_reroot ../PROTEINS/concat.aln.newick B_sub_subtilis_168 St_aur_aureus_NCTC_8325 \
     > concat.reroot.newick
