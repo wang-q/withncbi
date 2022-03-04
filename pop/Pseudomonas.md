@@ -44,7 +44,7 @@ changes in Gammaproteobacteria. We include both old and new orders.
 * Install `nwr` and create a local taxonomy and assembly database.
 
 ```shell
-brew install wang-q/tap/nwr # 0.5.4 or above
+brew install wang-q/tap/nwr # 0.5.5 or above
 brew install sqlite         # 3.34 or above
 
 nwr download
@@ -59,12 +59,14 @@ nwr ardb --genbank
 
 ```shell
 brew install hmmer
+brew install samtools
 brew install librsvg
 
 brew install brewsci/bio/muscle
 brew install brewsci/bio/fasttree
 brew install brewsci/bio/easel
 brew install brewsci/bio/newick-utils
+brew install brewsci/bio/trimal
 
 brew install datamash
 brew install miller
@@ -78,6 +80,7 @@ brew install pup
 ## Strain info
 
 * [Pseudomonas](https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=286)
+* [Acinetobacter](https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=469)
 
 ### List all ranks
 
@@ -417,6 +420,8 @@ cat ASSEMBLY/rsync.tsv |
 
 * Check N50 of assemblies
 
+* Pseudom_flu_GCF_900636635_1 is a strain of P. aeruginosa
+
 ```shell
 cd ~/data/Pseudomonas
 
@@ -450,7 +455,8 @@ wc -l ASSEMBLY/n50*
 tsv-join \
     ASSEMBLY/Pseudomonas.assembly.collect.csv \
     --delimiter "," -H --key-fields 1 \
-    --filter-file ASSEMBLY/n50.pass.csv \
+    --filter-file ASSEMBLY/n50.pass.csv |
+    tsv-filter --delimiter "," -H --str-not-in-fld 1:GCF_900636635 \
     > ASSEMBLY/Pseudomonas.assembly.pass.csv
 
 wc -l ASSEMBLY/Pseudomonas.assembly*csv
@@ -734,20 +740,41 @@ for STRAIN in $(cat strains.lst); do
 done \
     > PROTEINS/all.pro.fa
 
+cat PROTEINS/all.pro.fa |
+    perl -nl -e '
+        BEGIN { our %seen; our $h; }
+
+        if (/^>/) {
+            $h = (split(" ", $_))[0];
+            $seen{$h}++;
+            $_ = $h;
+        }
+        print if $seen{$h} == 1;
+    ' \
+    > PROTEINS/all.uniq.fa
+
+# counting proteins
+cat PROTEINS/all.pro.fa |
+    grep "^>" |
+    wc -l
+#7188968
+
+cat PROTEINS/all.pro.fa |
+    grep "^>" |
+    tsv-uniq |
+    wc -l
+#2488019
+
+# annotations may be different
+cat PROTEINS/all.uniq.fa |
+    grep "^>" |
+    wc -l
+#2439297
+
 # ribonuclease
 cat PROTEINS/all.pro.fa |
     grep "ribonuclease" |
     grep -v "deoxyribonuclease" |
-    perl -nl -e 's/^>\w+\.\d+\s+//g; print' |
-    perl -nl -e 's/\s+\[.+?\]$//g; print' |
-    perl -nl -e 's/MULTISPECIES: //g; print' |
-    sort |
-    uniq -c |
-    sort -nr
-
-# methyltransferase
-cat PROTEINS/all.pro.fa |
-    grep "methyltransferase" |
     perl -nl -e 's/^>\w+\.\d+\s+//g; print' |
     perl -nl -e 's/\s+\[.+?\]$//g; print' |
     perl -nl -e 's/MULTISPECIES: //g; print' |
@@ -783,12 +810,6 @@ for STRAIN in $(cat strains.lst); do
     rm PROTEINS/${STRAIN}.replace.tsv
 done \
     > PROTEINS/all.replace.fa
-
-# counting proteins
-cat PROTEINS/all.pro.fa |
-    grep "^>" |
-    wc -l
-#7188968
 
 cat PROTEINS/all.replace.fa |
     grep "^>" |
@@ -865,7 +886,7 @@ cat PROTEINS/all.info.tsv |
 
 ### Find corresponding proteins by `hmmsearch`
 
-* Download hmm models in [`hmm/README.md`](../hmm/README.md)
+* Download HMM models as described in [`hmm/README.md`](../hmm/README.md)
 
 * The `E_VALUE` was manually adjusted to 1e-20 to reach a balance between sensitivity and
   speciality.
@@ -877,7 +898,7 @@ cd ~/data/Pseudomonas
 
 ## example
 #gzip -dcf ASSEMBLY/Ac_axa_ATCC_25176/*_protein.faa.gz |
-#    hmmsearch -E 1e-20 --domE 1e-20 --noali --notextw ~/data/HMM/40scg/bacteria_and_archaea_dir/BA00001.hmm - |
+#    hmmsearch -E 1e-20 --domE 1e-20 --noali --notextw ~/data/HMM/scg40/bacteria_and_archaea_dir/BA00001.hmm - |
 #    grep '>>' |
 #    perl -nl -e '/>>\s+(\S+)/ and print $1'
 
@@ -892,7 +913,7 @@ for marker in BA000{01..40}; do
 
         for STRAIN in $(cat taxon/${GENUS}); do
             gzip -dcf ASSEMBLY/${STRAIN}/*_protein.faa.gz |
-                hmmsearch -E ${E_VALUE} --domE ${E_VALUE} --noali --notextw ~/data/HMM/40scg/bacteria_and_archaea_dir/${marker}.hmm - |
+                hmmsearch -E ${E_VALUE} --domE ${E_VALUE} --noali --notextw ~/data/HMM/scg40/bacteria_and_archaea_dir/${marker}.hmm - |
                 grep '>>' |
                 STRAIN=${STRAIN} perl -nl -e '
                     />>\s+(\S+)/ and printf qq{%s\t%s\n}, $1, $ENV{STRAIN};
@@ -943,66 +964,72 @@ done
 
 ### Align and concat marker genes to create species tree
 
+* Strains within a species share a large proportion of identical protein sequences.
+
+* Use `trimal -automated1` to remove gaps.
+
 ```shell script
 cd ~/data/Pseudomonas
 
 # extract sequences
-for marker in $(cat marker.lst); do
-    echo "==> marker [${marker}]"
+cat marker.lst |
+    parallel --no-run-if-empty --linebuffer -k -j 4 '
+        >&2 echo "==> marker [{}]"
 
-    for GENUS in $(cat genus.lst); do
-        echo "==> GENUS [${GENUS}]"
+        for GENUS in $(cat genus.lst); do
+            >&2 echo "==> GENUS [${GENUS}]"
 
-        mytmpdir=`mktemp -d 2>/dev/null || mktemp -d -t 'mytmpdir'`
+            cat PROTEINS/{}/${GENUS}.replace.tsv |
+                cut -f 1 |
+                tsv-uniq |
+                samtools faidx PROTEINS/all.uniq.fa -r -
+        done \
+            > PROTEINS/{}/{}.pro.fa
 
-        # avoid duplicated fasta headers
-        faops some PROTEINS/all.pro.fa PROTEINS/${marker}/${GENUS}.replace.tsv stdout |
-            faops filter -u stdin ${mytmpdir}/${GENUS}.fa
+        for GENUS in $(cat genus.lst); do
+            cat PROTEINS/{}/${GENUS}.replace.tsv
+        done \
+            > PROTEINS/{}/{}.replace.tsv
 
-        # avoid duplicated original names
-        cat PROTEINS/${marker}/${GENUS}.replace.tsv |
-            parallel --no-run-if-empty --linebuffer -k -j 1 "
-                faops replace -s ${mytmpdir}/${GENUS}.fa <(echo {}) stdout
-            " \
-            > PROTEINS/${marker}/${GENUS}.pro.fa
-
-        rm -fr ${mytmpdir}
-    done
-
-    echo
-done
-
-for marker in $(cat marker.lst); do
-    echo "==> marker [${marker}]"
-
-    for GENUS in $(cat genus.lst); do
-        cat PROTEINS/${marker}/${GENUS}.pro.fa
-    done \
-        > PROTEINS/${marker}/${marker}.pro.fa
-done
+        >&2 echo
+    '
 
 # aligning each markers with muscle
 cat marker.lst |
-    parallel --no-run-if-empty --linebuffer -k -j 4 "
-        echo '==> {}'
+    parallel --no-run-if-empty --linebuffer -k -j 4 '
+        >&2 echo "==> {}"
 
         muscle -quiet -in PROTEINS/{}/{}.pro.fa -out PROTEINS/{}/{}.aln.fa
-    "
+    '
+
+for marker in $(cat marker.lst); do
+    >&2 echo "==> marker [${marker}]"
+
+    # 1 name to many names
+    cat PROTEINS/${marker}/${marker}.replace.tsv |
+        parallel --no-run-if-empty --linebuffer -k -j 4 "
+            faops replace -s PROTEINS/${marker}/${marker}.aln.fa <(echo {}) stdout
+        " \
+        > PROTEINS/${marker}/${marker}.replace.fa
+done
 
 # concat marker genes
 for marker in $(cat marker.lst); do
     # sequences in one line
-    faops filter -l 0 PROTEINS/${marker}/${marker}.aln.fa stdout
+    faops filter -l 0 PROTEINS/${marker}/${marker}.replace.fa stdout
 
     # empty line for .fas
     echo
 done \
-    > PROTEINS/markers.aln.fas
+    > PROTEINS/scg40.aln.fas
 
-fasops concat PROTEINS/markers.aln.fas strains.lst -o PROTEINS/concat.aln.fa
+fasops concat PROTEINS/scg40.aln.fas strains.lst -o PROTEINS/scg40.aln.fa
+
+# trim with TrimAl
+trimal -in PROTEINS/scg40.aln.fa -out PROTEINS/scg40.trim.fa -automated1
 
 # FastTree produces NJ trees to simulate ML ones
-FastTree -quiet PROTEINS/concat.aln.fa > PROTEINS/concat.aln.newick
+FastTree PROTEINS/scg40.trim.fa > PROTEINS/scg40.trim.newick
 
 ```
 
@@ -1011,33 +1038,175 @@ FastTree -quiet PROTEINS/concat.aln.fa > PROTEINS/concat.aln.newick
 ```shell script
 cd ~/data/Pseudomonas/tree
 
-nw_reroot ../PROTEINS/concat.aln.newick B_sub_subtilis_168 St_aur_aureus_NCTC_8325 \
-    > concat.reroot.newick
+nw_reroot ../PROTEINS/scg40.trim.newick B_sub_subtilis_168 St_aur_aureus_NCTC_8325 \
+    > scg40.reroot.newick
 
-rm concat.condensed.map
+rm scg40.condensed.map
 
 # genus
-bash ~/Scripts/withncbi/taxon/condense_tree.sh concat.reroot.newick ../strains.taxon.tsv 1 4
+bash ~/Scripts/withncbi/taxon/condense_tree.sh scg40.reroot.newick ../strains.taxon.tsv 1 4
 
-mv concat.condense.newick concat.genus.newick
-cat concat.condense.map >> concat.condensed.map
+mv scg40.condense.newick scg40.genus.newick
+cat scg40.condense.map >> scg40.condensed.map
 
 # species_group
-bash ~/Scripts/withncbi/taxon/condense_tree.sh concat.genus.newick ../strains.taxon.tsv 1 5
+bash ~/Scripts/withncbi/taxon/condense_tree.sh scg40.genus.newick ../strains.taxon.tsv 1 5
 
-mv concat.genus.condense.newick concat.species_group.newick
-cat concat.genus.condense.map >> concat.condensed.map
+mv scg40.genus.condense.newick scg40.species_group.newick
+cat scg40.genus.condense.map >> scg40.condensed.map
 
 # species
-bash ~/Scripts/withncbi/taxon/condense_tree.sh concat.species_group.newick ../strains.taxon.tsv 1 6
+bash ~/Scripts/withncbi/taxon/condense_tree.sh scg40.species_group.newick ../strains.taxon.tsv 1 6
 
-mv concat.species_group.condense.newick concat.species.newick
-cat concat.species_group.condense.map >> concat.condensed.map
+mv scg40.species_group.condense.newick scg40.species.newick
+cat scg40.species_group.condense.map >> scg40.condensed.map
 
 rm *.condense.map
 
 # png
-nw_display -s -b 'visibility:hidden' -w 600 -v 30 concat.species.newick |
-    rsvg-convert -o Pseudomonas.concat.png
+nw_display -s -b 'visibility:hidden' -w 600 -v 30 scg40.species.newick |
+    rsvg-convert -o Pseudomonas.scg40.png
+
+```
+
+## Phylogenetics with bac120
+
+### Find corresponding proteins by `hmmsearch`
+
+```shell
+E_VALUE=1e-20
+
+cd ~/data/Pseudomonas
+
+# Find all genes
+for marker in $(cat ~/data/HMM/bac120/bac120.tsv | sed '1d' | cut -f 1); do
+    echo "==> marker [${marker}]"
+
+    mkdir -p PROTEINS/${marker}
+
+    for GENUS in $(cat genus.lst); do
+        echo "==> GENUS [${GENUS}]"
+
+        for STRAIN in $(cat taxon/${GENUS}); do
+            gzip -dcf ASSEMBLY/${STRAIN}/*_protein.faa.gz |
+                hmmsearch -E ${E_VALUE} --domE ${E_VALUE} --noali --notextw ~/data/HMM/bac120/HMM/${marker}.HMM - |
+                grep '>>' |
+                STRAIN=${STRAIN} perl -nl -e '
+                    />>\s+(\S+)/ and printf qq{%s\t%s\n}, $1, $ENV{STRAIN};
+                '
+        done \
+            > PROTEINS/${marker}/${GENUS}.replace.tsv
+    done
+
+    echo
+done
+
+
+```
+
+### Align and concat marker genes to create species tree
+
+```shell script
+cd ~/data/Pseudomonas
+
+# extract sequences
+cat ~/data/HMM/bac120/bac120.tsv |
+    sed '1d' |
+    cut -f 1 |
+    parallel --no-run-if-empty --linebuffer -k -j 4 '
+        >&2 echo "==> marker [{}]"
+
+        for GENUS in $(cat genus.lst); do
+            >&2 echo "==> GENUS [${GENUS}]"
+
+            cat PROTEINS/{}/${GENUS}.replace.tsv |
+                cut -f 1 |
+                tsv-uniq |
+                samtools faidx PROTEINS/all.uniq.fa -r -
+        done \
+            > PROTEINS/{}/{}.pro.fa
+
+        for GENUS in $(cat genus.lst); do
+            cat PROTEINS/{}/${GENUS}.replace.tsv
+        done \
+            > PROTEINS/{}/{}.replace.tsv
+
+        >&2 echo
+    '
+
+# aligning each markers with muscle
+cat ~/data/HMM/bac120/bac120.tsv |
+    sed '1d' |
+    cut -f 1 |
+    parallel --no-run-if-empty --linebuffer -k -j 4 '
+        >&2 echo "==> {}"
+
+        muscle -quiet -in PROTEINS/{}/{}.pro.fa -out PROTEINS/{}/{}.aln.fa
+    '
+
+for marker in $(cat ~/data/HMM/bac120/bac120.tsv | sed '1d' | cut -f 1); do
+    >&2 echo "==> marker [${marker}]"
+
+    # 1 name to many names
+    cat PROTEINS/${marker}/${marker}.replace.tsv |
+        parallel --no-run-if-empty --linebuffer -k -j 4 "
+            faops replace -s PROTEINS/${marker}/${marker}.aln.fa <(echo {}) stdout
+        " \
+        > PROTEINS/${marker}/${marker}.replace.fa
+done
+
+# concat marker genes
+for marker in $(cat ~/data/HMM/bac120/bac120.tsv | sed '1d' | cut -f 1); do
+    # sequences in one line
+    faops filter -l 0 PROTEINS/${marker}/${marker}.replace.fa stdout
+
+    # empty line for .fas
+    echo
+done \
+    > PROTEINS/bac120.aln.fas
+
+fasops concat PROTEINS/bac120.aln.fas strains.lst -o PROTEINS/bac120.aln.fa
+
+# trim with TrimAl
+trimal -in PROTEINS/bac120.aln.fa -out PROTEINS/bac120.trim.fa -automated1
+
+# To make it faster
+FastTree -fastest -noml PROTEINS/bac120.trim.fa > PROTEINS/bac120.trim.newick
+
+```
+
+### Tweak the concat tree
+
+```shell script
+cd ~/data/Pseudomonas/tree
+
+nw_reroot ../PROTEINS/bac120.trim.newick B_sub_subtilis_168 St_aur_aureus_NCTC_8325 \
+    > bac120.reroot.newick
+
+rm bac120.condensed.map
+
+# genus
+bash ~/Scripts/withncbi/taxon/condense_tree.sh bac120.reroot.newick ../strains.taxon.tsv 1 4
+
+mv bac120.condense.newick bac120.genus.newick
+cat bac120.condense.map >> bac120.condensed.map
+
+# species_group
+bash ~/Scripts/withncbi/taxon/condense_tree.sh bac120.genus.newick ../strains.taxon.tsv 1 5
+
+mv bac120.genus.condense.newick bac120.species_group.newick
+cat bac120.genus.condense.map >> bac120.condensed.map
+
+# species
+bash ~/Scripts/withncbi/taxon/condense_tree.sh bac120.species_group.newick ../strains.taxon.tsv 1 6
+
+mv bac120.species_group.condense.newick bac120.species.newick
+cat bac120.species_group.condense.map >> bac120.condensed.map
+
+rm *.condense.map
+
+# png
+nw_display -s -b 'visibility:hidden' -w 600 -v 30 bac120.species.newick |
+    rsvg-convert -o Pseudomonas.bac120.png
 
 ```
