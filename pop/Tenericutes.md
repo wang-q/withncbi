@@ -630,7 +630,7 @@ cd ~/data/alignment/Tenericutes
 
 ## example
 #gzip -dcf ASSEMBLY/Ac_axa_ATCC_25176/*_protein.faa.gz |
-#    hmmsearch -E 1e-20 --domE 1e-20 --noali --notextw ~/data/HMM/40scg/bacteria_and_archaea_dir/BA00001.hmm - |
+#    hmmsearch -E 1e-20 --domE 1e-20 --noali --notextw ~/data/HMM/scg40/bacteria_and_archaea_dir/BA00001.hmm - |
 #    grep '>>' |
 #    perl -nl -e '/>>\s+(\S+)/ and print $1'
 
@@ -645,7 +645,7 @@ for marker in BA000{01..40}; do
 
         for STRAIN in $(cat taxon/${GENUS}); do
             gzip -dcf ASSEMBLY/${STRAIN}/*_protein.faa.gz |
-                hmmsearch -E ${E_VALUE} --domE ${E_VALUE} --noali --notextw ~/data/HMM/40scg/bacteria_and_archaea_dir/${marker}.hmm - |
+                hmmsearch -E ${E_VALUE} --domE ${E_VALUE} --noali --notextw ~/data/HMM/scg40/bacteria_and_archaea_dir/${marker}.hmm - |
                 grep '>>' |
                 STRAIN=${STRAIN} perl -nl -e '
                     />>\s+(\S+)/ and printf qq{%s\t%s\n}, $1, $ENV{STRAIN};

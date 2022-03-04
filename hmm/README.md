@@ -56,8 +56,8 @@ Ref.:
 4. `bacteria_and_archaea.tgz`: https://ndownloader.figshare.com/files/3093482
 
 ```shell
-mkdir -p ~/data/HMM/40scg
-cd ~/data/HMM/40scg
+mkdir -p ~/data/HMM/scg40
+cd ~/data/HMM/scg40
 
 curl -LO https://ndownloader.figshare.com/files/3093482
 
