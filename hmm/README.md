@@ -7,7 +7,7 @@
 
 ## PFAM-A
 
-```shell script
+```shell
 mkdir -p ~/data/HMM/PFAM
 
 cd ~/data/HMM/PFAM
@@ -27,12 +27,12 @@ done
 
 ## TIGRFAM
 
-```shell script
+```shell
 mkdir -p ~/data/HMM/TIGRFAM
 
 cd ~/data/HMM/TIGRFAM
 
-proxychains4 wget -N --content-disposition ftp://ftp.jcvi.org/pub/data/TIGRFAMs/14.0_Release/TIGRFAMs_14.0_HMM.tar.gz
+proxychains4 wget -N --content-disposition ftp://ftp.jcvi.org/data/TIGRFAMs/14.0_Release/TIGRFAMs_14.0_HMM.tar.gz
 
 mkdir -p HMM
 tar --directory HMM -xzvf TIGRFAMs_14.0_HMM.tar.gz TIGR02013.HMM
@@ -55,13 +55,47 @@ Ref.:
 
 4. `bacteria_and_archaea.tgz`: https://ndownloader.figshare.com/files/3093482
 
-```shell script
+```shell
 mkdir -p ~/data/HMM/40scg
 cd ~/data/HMM/40scg
 
 curl -LO https://ndownloader.figshare.com/files/3093482
 
 tar xvfz 3093482
+
+```
+
+## 120 bacterial proteins `bac120`
+
+Ref.:
+
+1. Nature Microbiology volume 2, pages 1533–1542 (2017)
+   * Save Supplementary Table 6 to `hmm/bac120.tsv`
+2. Nature Biotechnology volume 36, pages 996–1004 (2018)
+
+```shell
+mkdir -p ~/data/HMM/bac120
+cd ~/data/HMM/bac120
+
+cp ~/Scripts/withncbi/hmm/bac120.tsv ~/data/HMM/bac120/
+
+mkdir -p HMM
+
+cat ~/Scripts/withncbi/hmm/bac120.tsv |
+    sed '1d' |
+    tsv-select -f 1 |
+    grep '^TIGR' |
+    parallel --no-run-if-empty --linebuffer -k -j 4 '
+        tar --directory HMM -xzvf ../TIGRFAM/TIGRFAMs_14.0_HMM.tar.gz {}.HMM
+    '
+
+cat ~/Scripts/withncbi/hmm/bac120.tsv |
+    sed '1d' |
+    tsv-select -f 1 |
+    grep -v '^TIGR' |
+    parallel --no-run-if-empty --linebuffer -k -j 4 '
+        curl -L http://pfam.xfam.org/family/{}/hmm > HMM/{}.HMM
+    '
 
 ```
 
