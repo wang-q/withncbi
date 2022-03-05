@@ -63,8 +63,6 @@ nwr ardb --genbank
 
 ```shell
 brew install hmmer
-brew install librsvg
-
 brew install brewsci/bio/muscle
 brew install brewsci/bio/fasttree
 brew install brewsci/bio/easel
@@ -75,6 +73,7 @@ brew install datamash
 brew install miller
 brew install wang-q/tap/tsv-utils
 
+brew install librsvg
 brew install jq
 brew install pup
 
@@ -686,7 +685,8 @@ cat dist_full.tsv |
 mkdir -p ~/data/Pseudomonas/tree
 cd ~/data/Pseudomonas/tree
 
-nw_reroot ../mash/tree.nwk B_sub_subtilis_168 St_aur_aureus_NCTC_8325 \
+nw_reroot ../mash/tree.nwk B_sub_subtilis_168 St_aur_aureus_NCTC_8325 |
+    nw_order -c n - \
     > mash.reroot.newick
 
 rm mash.condensed.map
@@ -992,10 +992,10 @@ cat marker.lst |
             > PROTEINS/{}/{}.pro.fa
     '
 
-# aligning each markers with muscle
+# Align each markers with `muscle`
 cat marker.lst |
     parallel --no-run-if-empty --linebuffer -k -j 4 '
-        >&2 echo "==> {}"
+        >&2 echo "==> marker [{}]"
 
         muscle -quiet -in PROTEINS/{}/{}.pro.fa -out PROTEINS/{}/{}.aln.fa
     '
@@ -1011,7 +1011,7 @@ for marker in $(cat marker.lst); do
         > PROTEINS/${marker}/${marker}.replace.fa
 done
 
-# concat marker genes
+# Concat marker genes
 for marker in $(cat marker.lst); do
     # sequences in one line
     faops filter -l 0 PROTEINS/${marker}/${marker}.replace.fa stdout
@@ -1023,7 +1023,7 @@ done \
 
 fasops concat PROTEINS/scg40.aln.fas strains.lst -o PROTEINS/scg40.aln.fa
 
-# trim with TrimAl
+# Trim poorly aligned regions with `TrimAl`
 trimal -in PROTEINS/scg40.aln.fa -out PROTEINS/scg40.trim.fa -automated1
 
 # FastTree produces NJ trees to simulate ML ones
@@ -1036,7 +1036,8 @@ FastTree PROTEINS/scg40.trim.fa > PROTEINS/scg40.trim.newick
 ```shell script
 cd ~/data/Pseudomonas/tree
 
-nw_reroot ../PROTEINS/scg40.trim.newick B_sub_subtilis_168 St_aur_aureus_NCTC_8325 \
+nw_reroot ../PROTEINS/scg40.trim.newick B_sub_subtilis_168 St_aur_aureus_NCTC_8325 |
+    nw_order -c n - \
     > scg40.reroot.newick
 
 rm scg40.condensed.map
@@ -1107,37 +1108,28 @@ done
 ```shell script
 cd ~/data/Pseudomonas
 
-# extract sequences
-cat ~/data/HMM/bac120/bac120.tsv |
-    sed '1d' |
-    cut -f 1 |
+# Extract sequences
+cat ~/data/HMM/bac120/bac120.tsv | sed '1d' | cut -f 1 |
     parallel --no-run-if-empty --linebuffer -k -j 4 '
         >&2 echo "==> marker [{}]"
-
-        for GENUS in $(cat genus.lst); do
-            >&2 echo "==> GENUS [${GENUS}]"
-
-            cat PROTEINS/{}/${GENUS}.replace.tsv |
-                cut -f 1 |
-                tsv-uniq |
-                samtools faidx PROTEINS/all.uniq.fa -r -
-        done \
-            > PROTEINS/{}/{}.pro.fa
 
         for GENUS in $(cat genus.lst); do
             cat PROTEINS/{}/${GENUS}.replace.tsv
         done \
             > PROTEINS/{}/{}.replace.tsv
 
-        >&2 echo
+        faops some PROTEINS/all.uniq.fa <(
+            cat PROTEINS/{}/{}.replace.tsv |
+                cut -f 1 |
+                tsv-uniq
+            ) stdout \
+            > PROTEINS/{}/{}.pro.fa
     '
 
-# aligning each markers with muscle
-cat ~/data/HMM/bac120/bac120.tsv |
-    sed '1d' |
-    cut -f 1 |
+# Align each markers with muscle
+cat ~/data/HMM/bac120/bac120.tsv | sed '1d' | cut -f 1 |
     parallel --no-run-if-empty --linebuffer -k -j 4 '
-        >&2 echo "==> {}"
+        >&2 echo "==> marker [{}]"
 
         muscle -quiet -in PROTEINS/{}/{}.pro.fa -out PROTEINS/{}/{}.aln.fa
     '
@@ -1153,7 +1145,7 @@ for marker in $(cat ~/data/HMM/bac120/bac120.tsv | sed '1d' | cut -f 1); do
         > PROTEINS/${marker}/${marker}.replace.fa
 done
 
-# concat marker genes
+# Concat marker genes
 for marker in $(cat ~/data/HMM/bac120/bac120.tsv | sed '1d' | cut -f 1); do
     # sequences in one line
     faops filter -l 0 PROTEINS/${marker}/${marker}.replace.fa stdout
@@ -1165,7 +1157,7 @@ done \
 
 fasops concat PROTEINS/bac120.aln.fas strains.lst -o PROTEINS/bac120.aln.fa
 
-# trim with TrimAl
+# Trim poorly aligned regions with `TrimAl`
 trimal -in PROTEINS/bac120.aln.fa -out PROTEINS/bac120.trim.fa -automated1
 
 # To make it faster
@@ -1178,7 +1170,8 @@ FastTree -fastest -noml PROTEINS/bac120.trim.fa > PROTEINS/bac120.trim.newick
 ```shell script
 cd ~/data/Pseudomonas/tree
 
-nw_reroot ../PROTEINS/bac120.trim.newick B_sub_subtilis_168 St_aur_aureus_NCTC_8325 \
+nw_reroot ../PROTEINS/bac120.trim.newick B_sub_subtilis_168 St_aur_aureus_NCTC_8325 |
+    nw_order -c n - \
     > bac120.reroot.newick
 
 rm bac120.condensed.map
