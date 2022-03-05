@@ -15,11 +15,15 @@
         + [`all.pro.fa`](#allprofa)
         + [`all.replace.fa`](#allreplacefa)
         + [`all.info.tsv`](#allinfotsv)
-    * [Phylogenetics with 40 single-copy genes and RNase_R](#phylogenetics-with-40-single-copy-genes-and-rnase_r)
+    * [Phylogenetics with 40 single-copy genes](#phylogenetics-with-40-single-copy-genes)
         + [Find corresponding proteins by `hmmsearch`](#find-corresponding-proteins-by-hmmsearch)
         + [Create a valid marker gene list](#create-a-valid-marker-gene-list)
         + [Align and concat marker genes to create species tree](#align-and-concat-marker-genes-to-create-species-tree)
         + [Tweak the concat tree](#tweak-the-concat-tree)
+    * [Phylogenetics with bac120](#phylogenetics-with-bac120)
+        + [Find corresponding proteins by `hmmsearch`](#find-corresponding-proteins-by-hmmsearch-1)
+        + [Align and concat marker genes to create species tree](#align-and-concat-marker-genes-to-create-species-tree-1)
+        + [Tweak the concat tree](#tweak-the-concat-tree-1)
 
 The genus Pseudomonas includes the conditionally pathogenic bacteria Pseudomonas aeruginosa, plant
 pathogens, plant beneficial bacteria, and soil bacteria. Microorganisms of Pseudomonas are extremely
