@@ -63,7 +63,6 @@ nwr ardb --genbank
 
 ```shell
 brew install hmmer
-brew install samtools
 brew install librsvg
 
 brew install brewsci/bio/muscle
@@ -975,27 +974,22 @@ done
 ```shell script
 cd ~/data/Pseudomonas
 
-# extract sequences
+# Extract sequences
 cat marker.lst |
     parallel --no-run-if-empty --linebuffer -k -j 4 '
         >&2 echo "==> marker [{}]"
-
-        for GENUS in $(cat genus.lst); do
-            >&2 echo "==> GENUS [${GENUS}]"
-
-            cat PROTEINS/{}/${GENUS}.replace.tsv |
-                cut -f 1 |
-                tsv-uniq |
-                samtools faidx PROTEINS/all.uniq.fa -r -
-        done \
-            > PROTEINS/{}/{}.pro.fa
 
         for GENUS in $(cat genus.lst); do
             cat PROTEINS/{}/${GENUS}.replace.tsv
         done \
             > PROTEINS/{}/{}.replace.tsv
 
-        >&2 echo
+        faops some PROTEINS/all.uniq.fa <(
+            cat PROTEINS/{}/{}.replace.tsv |
+                cut -f 1 |
+                tsv-uniq
+            ) stdout \
+            > PROTEINS/{}/{}.pro.fa
     '
 
 # aligning each markers with muscle
