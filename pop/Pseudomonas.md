@@ -461,7 +461,7 @@ tsv-join \
 
 wc -l ASSEMBLY/Pseudomonas.assembly*csv
 #  1522 ASSEMBLY/Pseudomonas.assembly.collect.csv
-#  1522 ASSEMBLY/Pseudomonas.assembly.pass.csv
+#  1521 ASSEMBLY/Pseudomonas.assembly.pass.csv
 
 ```
 
@@ -529,7 +529,7 @@ cat genus.lst |
 | 475     | Moraxella         | 5        | 35       |
 | 1763    | Mycobacterium     | 1        | 1        |
 | 53246   | Pseudoalteromonas | 18       | 33       |
-| 286     | Pseudomonas       | 172      | 830      |
+| 286     | Pseudomonas       | 172      | 829      |
 | 497     | Psychrobacter     | 2        | 2        |
 | 590     | Salmonella        | 1        | 1        |
 | 22      | Shewanella        | 15       | 50       |
@@ -731,7 +731,7 @@ find ASSEMBLY -maxdepth 1 -mindepth 1 -type d |
 find ASSEMBLY -type f -name "*_protein.faa.gz" |
     wc -l
 
-# 1521
+# 1520
 cat strains.lst |
     wc -l
 
@@ -757,19 +757,19 @@ cat PROTEINS/all.pro.fa |
 cat PROTEINS/all.pro.fa |
     grep "^>" |
     wc -l
-#7188968
+#7182872
 
 cat PROTEINS/all.pro.fa |
     grep "^>" |
     tsv-uniq |
     wc -l
-#2488019
+#2487274
 
 # annotations may be different
 cat PROTEINS/all.uniq.fa |
     grep "^>" |
     wc -l
-#2439297
+#2438570
 
 # ribonuclease
 cat PROTEINS/all.pro.fa |
@@ -814,7 +814,7 @@ done \
 cat PROTEINS/all.replace.fa |
     grep "^>" |
     wc -l
-#7188968
+#7182872
 
 (echo -e "#name\tstrain" && cat PROTEINS/all.strain.tsv)  \
     > temp &&
@@ -850,7 +850,7 @@ done \
 
 cat PROTEINS/all.annotation.tsv |
     wc -l
-#7188968
+#7182872
 
 (echo -e "#name\tannotation" && cat PROTEINS/all.annotation.tsv) \
     > temp &&
@@ -878,7 +878,7 @@ tsv-join \
 
 cat PROTEINS/all.info.tsv |
     wc -l
-#7188969
+#7182873
 
 ```
 
