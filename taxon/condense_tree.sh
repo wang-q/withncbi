@@ -29,13 +29,6 @@ NODE_COL=${3:-1}
 GROUP_COL=${4:-2}
 
 # Run
-BASENAME=$NWK_FILE
-for suffix in .newick .nwk .nh .tree .reroot; do
-     BASENAME=$(basename $BASENAME $suffix)
-done
-
-mytmpdir=`mktemp -d 2>/dev/null || mktemp -d -t 'mytmpdir'`
-
 >&2 cat <<EOF
 ==> Parameters
 NWK_FILE=${NWK_FILE}
@@ -43,11 +36,11 @@ MAP_FILE=${MAP_FILE}
 NODE_COL=${NODE_COL}
 GROUP_COL=${GROUP_COL}
 
-BASENAME=${BASENAME}
-
-Writing ${BASENAME}.condense.newick
+Writing condense.newick and condense.map
 
 EOF
+
+mytmpdir=`mktemp -d 2>/dev/null || mktemp -d -t 'mytmpdir'`
 
 nw_labels ${NWK_FILE} > ${mytmpdir}/labels.lst
 
@@ -92,7 +85,7 @@ nw_rename ${NWK_FILE} ${mytmpdir}/group.monophyly.map |
     > ${mytmpdir}/group.monophyly.newick
 
 # Outputs
-mv ${mytmpdir}/group.monophyly.newick ${BASENAME}.condense.newick
-mv ${mytmpdir}/group.monophyly.map ${BASENAME}.condense.map
+mv ${mytmpdir}/group.monophyly.newick condense.newick
+mv ${mytmpdir}/group.monophyly.map condense.map
 
-#rm -fr ${mytmpdir}
+rm -fr ${mytmpdir}
