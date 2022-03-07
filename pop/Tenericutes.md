@@ -1444,7 +1444,7 @@ done
 
 ```
 
-## Scan every domains
+## Scan every domain
 
 ```shell script
 E_VALUE=1e-3
