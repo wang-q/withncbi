@@ -717,7 +717,8 @@ for item in "${ARRAY[@]}" ; do
     mv condense.newick mash.${GROUP_NAME}.newick
     cat condense.map >> mash.condensed.map
 
-cat mash.species_group.condense.map >> mash.condensed.map
+    CUR_TREE=mash.${GROUP_NAME}.newick
+done
 
 # png
 nw_display -s -b 'visibility:hidden' -w 600 -v 30 mash.species.newick |
@@ -1215,3 +1216,129 @@ nw_display -s -b 'visibility:hidden' -w 600 -v 30 bac120.species.newick |
     rsvg-convert -o Pseudomonas.bac120.png
 
 ```
+
+## Domains
+
+### Scrap PFAM domains
+
+* Perform keyword search in `pfam` and save the result page as `html only`.
+    * [GO:0005975](https://pfam.xfam.org/search/keyword?query=GO%3A0005975)
+    * [Glyco_hyd](http://pfam.xfam.org/search/keyword?query=Glyco_hyd)
+    * [carbohydrate metabolic](http://pfam.xfam.org/search/keyword?query=carbohydrate+metabolic)
+    * [Glycosyl_hydrolase](https://pfam.xfam.org/search/keyword?query=Glycosyl+hydrolase)
+
+* [`GO:0005975` carbohydrate metabolic process](https://www.ebi.ac.uk/QuickGO/GTerm?id=GO:0005975)
+
+* `GO:0005975` in the reference
+  strain [P. aeruginosa PAO1](https://www.pseudomonas.com/goterms/list?accession=GO%3A0005975&strain_id=107)
+  . Search every protein sequence in [interpro](http://www.ebi.ac.uk/interpro/), and append missing
+  ones.
+
+```shell
+cd ~/data/Pseudomonas/
+
+cat GO_0005975.htm |
+    pup 'table.resultTable tr td text{}' |
+    grep '\S' |
+    paste -d $'\t' - - - - - |
+    tsv-select -f 2-4 \
+    > raw.tsv
+
+cat Glyco_hyd.htm |
+    pup 'table.resultTable tr td text{}' |
+    grep '\S' |
+    paste -d $'\t' - - - - - |
+    tsv-select -f 2-4 \
+    >> raw.tsv
+
+cat carbohydrate_metabolic.htm |
+    pup 'table.resultTable tr td text{}' |
+    grep '\S' |
+    paste -d $'\t' - - - - - - - - |
+    tsv-select -f 2-4 \
+    >> raw.tsv
+
+cat Glycosyl_hydrolase.htm |
+    pup 'table.resultTable tr td text{}' |
+    grep '\S' |
+    paste -d $'\t' - - - - - - - - - |
+    tsv-filter --ne 5:10000000 | # Text fields of Pfam entries are not empty
+    tsv-select -f 2-4 \
+    >> raw.tsv
+
+# Missing
+#echo -e "PF13242\tHydrolase_like\t" >> raw.tsv
+
+wc -l < raw.tsv
+#494
+
+cat raw.tsv |
+    tsv-filter --str-not-in-fld 2:"DUF" |
+    tsv-uniq -f 1 |
+    tsv-sort -k2,2 \
+    > pfam_domain.tsv
+
+wc -l < pfam_domain.tsv
+#280
+
+mkdir -p ~/data/Pseudomonas/DOMAINS/HMM
+
+cat pfam_domain.tsv |
+    parallel --col-sep "\t" --no-run-if-empty --linebuffer -k -j 4 '
+        >&2 echo {2}
+        curl -L http://pfam.xfam.org/family/{1}/hmm > DOMAINS/HMM/{2}.hmm
+    '
+
+find DOMAINS/HMM -type f -name "*.hmm" |
+    wc -l
+#280
+
+```
+
+### Scan every domain
+
+* The `E_VALUE` was adjusted to 1e-3 to capture all possible sequences.
+
+```shell script
+E_VALUE=1e-3
+
+cd ~/data/Pseudomonas/
+
+for domain in $(cat pfam_domain.tsv | cut -f 2 | sort); do
+    >&2 echo "==> domain [${domain}]"
+
+    if [ -e DOMAINS/${domain}.replace.tsv ]; then
+        continue;
+    fi
+
+    for GENUS in $(cat genus.lst); do
+        >&2 echo "==> GENUS [${GENUS}]"
+
+        for STRAIN in $(cat taxon/${GENUS}); do
+            gzip -dcf ASSEMBLY/${STRAIN}/*_protein.faa.gz |
+                hmmsearch -E ${E_VALUE} --domE ${E_VALUE} --noali --notextw DOMAINS/HMM/${domain}.hmm - |
+                grep '>>' |
+                STRAIN=${STRAIN} perl -nl -e '
+                    />>\s+(\S+)/ or next;
+                    $n = $1;
+                    $s = $n;
+                    $s =~ s/\.\d+//;
+                    printf qq{%s\t%s_%s\n}, $n, $ENV{STRAIN}, $s;
+                '
+        done
+    done \
+        > DOMAINS/${domain}.replace.tsv
+
+    >&2 echo
+done
+
+for domain in $(cat pfam_domain.tsv | cut -f 2 | sort); do
+    wc -l DOMAINS/${domain}.replace.tsv
+done |
+    datamash reverse -W |
+    tsv-filter --ge 2:10 |
+    (echo -e "Domain\tCount" && cat) |
+    mlr --itsv --omd cat
+
+```
+
