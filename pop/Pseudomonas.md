@@ -564,29 +564,26 @@ cat ASSEMBLY/Pseudomonas.assembly.pass.csv |
     sed -e '1d' |
     tr "," "\t" |
     tsv-select -f 1,2,3 |
-    nwr append stdin -c 3 -r genus -r "species group" -r species |
+    nwr append stdin -c 3 -r species -r genus -r family -r order |
     parallel --col-sep "\t" --no-run-if-empty --linebuffer -k -j 1 '
         if [[ "{#}" -eq "1" ]]; then
             rm strains.lst
             rm genus.tmp
-            rm species_group.tmp
             rm species.tmp
         fi
 
         echo {1} >> strains.lst
 
-        echo {4} >> genus.tmp
-        echo {1} >> taxon/{4}
+        echo {5} >> genus.tmp
+        echo {1} >> taxon/{5}
 
-        echo {5} >> species_group.tmp
-        echo {6} >> species.tmp
+        echo {4} >> species.tmp
 
-        printf "%s\t%s\t%d\t%s\t%s\t%s\n" {1} {2} {3} {4} {5} {6}
+        printf "%s\t%s\t%d\t%s\t%s\t%s\t%s\n" {1} {2} {3} {4} {5} {6} {7}
     ' \
     > strains.taxon.tsv
 
 cat genus.tmp | tsv-uniq > genus.lst
-cat species_group.tmp | tsv-uniq > species_group.lst
 cat species.tmp | tsv-uniq > species.lst
 
 # Omit strains without protein annotations
@@ -700,24 +697,26 @@ nw_reroot ../mash/tree.nwk B_sub_subtilis_168 St_aur_aureus_NCTC_8325 |
     nw_order -c n - \
     > mash.reroot.newick
 
+# rank::col
+ARRAY=(
+#    'order::7'
+    'family::6'
+    'genus::5'
+    'species::4'
+)
+
 rm mash.condensed.map
+CUR_TREE=mash.reroot.newick
 
-# genus
-bash ~/Scripts/withncbi/taxon/condense_tree.sh mash.reroot.newick ../strains.taxon.tsv 1 4
+for item in "${ARRAY[@]}" ; do
+    GROUP_NAME="${item%%::*}"
+    GROUP_COL="${item##*::}"
 
-mv mash.condense.newick mash.genus.newick
-cat mash.condense.map >> mash.condensed.map
+    bash ~/Scripts/withncbi/taxon/condense_tree.sh ${CUR_TREE} ../strains.taxon.tsv 1 ${GROUP_COL}
 
-# species_group
-bash ~/Scripts/withncbi/taxon/condense_tree.sh mash.genus.newick ../strains.taxon.tsv 1 5
+    mv condense.newick mash.${GROUP_NAME}.newick
+    cat condense.map >> mash.condensed.map
 
-mv mash.genus.condense.newick mash.species_group.newick
-cat mash.genus.condense.map >> mash.condensed.map
-
-# species
-bash ~/Scripts/withncbi/taxon/condense_tree.sh mash.species_group.newick ../strains.taxon.tsv 1 6
-
-mv mash.species_group.condense.newick mash.species.newick
 cat mash.species_group.condense.map >> mash.condensed.map
 
 # png
@@ -735,19 +734,19 @@ cd ~/data/Pseudomonas
 
 mkdir -p PROTEINS
 
-# 1521
 find ASSEMBLY -maxdepth 1 -mindepth 1 -type d |
     sort |
     grep 'ASSEMBLY/' |
     wc -l
+# 1519
 
-# 1521
 find ASSEMBLY -type f -name "*_protein.faa.gz" |
     wc -l
+# 1519
 
-# 1520
 cat strains.lst |
     wc -l
+# 1514
 
 for STRAIN in $(cat strains.lst); do
     gzip -dcf ASSEMBLY/${STRAIN}/*_protein.faa.gz
@@ -771,19 +770,19 @@ cat PROTEINS/all.pro.fa |
 cat PROTEINS/all.pro.fa |
     grep "^>" |
     wc -l
-#7182872
+#7151013
 
 cat PROTEINS/all.pro.fa |
     grep "^>" |
     tsv-uniq |
     wc -l
-#2487274
+#2468817
 
 # annotations may be different
 cat PROTEINS/all.uniq.fa |
     grep "^>" |
     wc -l
-#2438570
+#2420143
 
 # ribonuclease
 cat PROTEINS/all.pro.fa |
@@ -828,7 +827,7 @@ done \
 cat PROTEINS/all.replace.fa |
     grep "^>" |
     wc -l
-#7182872
+#7151013
 
 (echo -e "#name\tstrain" && cat PROTEINS/all.strain.tsv)  \
     > temp &&
@@ -864,7 +863,7 @@ done \
 
 cat PROTEINS/all.annotation.tsv |
     wc -l
-#7182872
+#7151013
 
 (echo -e "#name\tannotation" && cat PROTEINS/all.annotation.tsv) \
     > temp &&
@@ -892,7 +891,7 @@ tsv-join \
 
 cat PROTEINS/all.info.tsv |
     wc -l
-#7182873
+#7151014
 
 ```
 
@@ -1051,27 +1050,28 @@ nw_reroot ../PROTEINS/scg40.trim.newick B_sub_subtilis_168 St_aur_aureus_NCTC_83
     nw_order -c n - \
     > scg40.reroot.newick
 
+# rank::col
+ARRAY=(
+#    'order::7'
+#    'family::6'
+    'genus::5'
+    'species::4'
+)
+
 rm scg40.condensed.map
+CUR_TREE=scg40.reroot.newick
 
-# genus
-bash ~/Scripts/withncbi/taxon/condense_tree.sh scg40.reroot.newick ../strains.taxon.tsv 1 4
+for item in "${ARRAY[@]}" ; do
+    GROUP_NAME="${item%%::*}"
+    GROUP_COL="${item##*::}"
 
-mv scg40.condense.newick scg40.genus.newick
-cat scg40.condense.map >> scg40.condensed.map
+    bash ~/Scripts/withncbi/taxon/condense_tree.sh ${CUR_TREE} ../strains.taxon.tsv 1 ${GROUP_COL}
 
-# species_group
-bash ~/Scripts/withncbi/taxon/condense_tree.sh scg40.genus.newick ../strains.taxon.tsv 1 5
+    mv condense.newick scg40.${GROUP_NAME}.newick
+    cat condense.map >> scg40.condensed.map
 
-mv scg40.genus.condense.newick scg40.species_group.newick
-cat scg40.genus.condense.map >> scg40.condensed.map
-
-# species
-bash ~/Scripts/withncbi/taxon/condense_tree.sh scg40.species_group.newick ../strains.taxon.tsv 1 6
-
-mv scg40.species_group.condense.newick scg40.species.newick
-cat scg40.species_group.condense.map >> scg40.condensed.map
-
-rm *.condense.map
+    CUR_TREE=scg40.${GROUP_NAME}.newick
+done
 
 # png
 nw_display -s -b 'visibility:hidden' -w 600 -v 30 scg40.species.newick |
@@ -1187,25 +1187,28 @@ nw_reroot ../PROTEINS/bac120.trim.newick B_sub_subtilis_168 St_aur_aureus_NCTC_8
 
 rm bac120.condensed.map
 
-# genus
-bash ~/Scripts/withncbi/taxon/condense_tree.sh bac120.reroot.newick ../strains.taxon.tsv 1 4
+# rank::col
+ARRAY=(
+#    'order::7'
+#    'family::6'
+    'genus::5'
+    'species::4'
+)
 
-mv bac120.condense.newick bac120.genus.newick
-cat bac120.condense.map >> bac120.condensed.map
+rm bac120.condensed.map
+CUR_TREE=bac120.reroot.newick
 
-# species_group
-bash ~/Scripts/withncbi/taxon/condense_tree.sh bac120.genus.newick ../strains.taxon.tsv 1 5
+for item in "${ARRAY[@]}" ; do
+    GROUP_NAME="${item%%::*}"
+    GROUP_COL="${item##*::}"
 
-mv bac120.genus.condense.newick bac120.species_group.newick
-cat bac120.genus.condense.map >> bac120.condensed.map
+    bash ~/Scripts/withncbi/taxon/condense_tree.sh ${CUR_TREE} ../strains.taxon.tsv 1 ${GROUP_COL}
 
-# species
-bash ~/Scripts/withncbi/taxon/condense_tree.sh bac120.species_group.newick ../strains.taxon.tsv 1 6
+    mv condense.newick bac120.${GROUP_NAME}.newick
+    cat condense.map >> bac120.condensed.map
 
-mv bac120.species_group.condense.newick bac120.species.newick
-cat bac120.species_group.condense.map >> bac120.condensed.map
-
-rm *.condense.map
+    CUR_TREE=bac120.${GROUP_NAME}.newick
+done
 
 # png
 nw_display -s -b 'visibility:hidden' -w 600 -v 30 bac120.species.newick |
