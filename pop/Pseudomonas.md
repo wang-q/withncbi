@@ -1219,6 +1219,60 @@ nw_display -s -b 'visibility:hidden' -w 600 -v 30 bac120.species.newick |
 
 ## Domains
 
+### Proteins in P. aeruginosa PAO1
+
+* [`GO:0005975` carbohydrate metabolic process](https://www.ebi.ac.uk/QuickGO/GTerm?id=GO:0005975)
+
+* `GO:0005975` in the reference
+  strain [P. aeruginosa PAO1](https://www.pseudomonas.com/goterms/list?accession=GO%3A0005975&strain_id=107)
+  .
+
+```shell
+E_VALUE=1e-5
+
+cd ~/data/Pseudomonas/
+mkdir -p ~/data/Pseudomonas/DOMAINS/Paer_PAO1
+
+curl -L 'https://www.pseudomonas.com/goterms/list?accession=GO:0005975&strain_id=107&format=TAB' |
+    sed '1d' |
+    tsv-select -f 1 \
+    > DOMAINS/Paer_PAO1/locus.lst
+
+gzip -dcf ASSEMBLY/Pseudom_aer_PAO1/*_genomic.gff.gz |
+    grep -v "^#" |
+    tsv-filter --str-eq 3:CDS |
+    grep -F -f DOMAINS/Paer_PAO1/locus.lst |
+    perl -nl -e 'print $1 if /;Name=(.+?);/' \
+    > DOMAINS/Paer_PAO1/pro.lst
+
+faops some ASSEMBLY/Pseudom_aer_PAO1/*_protein.faa.gz DOMAINS/Paer_PAO1/pro.lst stdout \
+    > DOMAINS/Paer_PAO1/pro.fa
+
+# prepare an HMM database for faster hmmscan searches
+#hmmpress ~/data/HMM/PFAM/Pfam-A.hmm
+
+hmmscan -E ${E_VALUE} --domE ${E_VALUE} --noali --notextw \
+    ~/data/HMM/PFAM/Pfam-A.hmm DOMAINS/Paer_PAO1/pro.fa |
+    grep '>>' |
+    perl -nl -e '/>>\s+(\S+)/ and print $1' |
+    sort |
+    uniq \
+    > DOMAINS/Paer_PAO1/domain.lst
+
+wc -l < DOMAINS/Paer_PAO1/domain.lst
+# 64
+
+# query ID against .hmm.dat to find AC
+cat ~/data/HMM/PFAM/Pfam-A.hmm.dat |
+    grep -F -w -f DOMAINS/Paer_PAO1/domain.lst -A 2 |
+    grep -E ' (ID|AC) ' |
+    perl -nl -e 'print substr($_, 10) ' |
+    paste -d $'\t' - - |
+    tsv-select -f 2,1 \
+    > DOMAINS/Paer_PAO1/pfam_domain.tsv
+
+```
+
 ### Scrap PFAM domains
 
 * Perform keyword search in `pfam` and save the result page as `html only`.
