@@ -333,6 +333,11 @@ SPECIES=$(
         sed 's/,$//'
 )
 
+# Pseudomonas aeruginosa PAO1 is in the reference list
+cat reference.tsv |
+    tsv-select -H -f organism_name,species,genus,ftp_path,assembly_level \
+    > raw.tsv
+
 echo "
     SELECT
         organism_name || ' ' || assembly_accession AS name,
@@ -347,10 +352,6 @@ echo "
     sqlite3 -tabs ~/.nwr/ar_refseq.sqlite |
     tsv-filter --invert --str-eq 2:"Pseudomonas aeruginosa" --str-eq 5:"Chromosome" |
     tsv-filter --invert --str-eq 2:"Acinetobacter baumannii" --str-eq 5:"Chromosome" \
-    > raw.tsv
-
-cat reference.tsv |
-    tsv-select -H -f organism_name,species,genus,ftp_path,assembly_level \
     >> raw.tsv
 
 cat raw.tsv |
@@ -362,7 +363,9 @@ cat raw.tsv |
         BEGIN{my %seen};
         /^#/ and print and next;
         /^organism_name/i and next;
-        $seen{$F[5]}++;
+        $seen{$F[3]}++; # ftp_path
+        $seen{$F[3]} > 1 and next;
+        $seen{$F[5]}++; # abbr_name
         $seen{$F[5]} > 1 and next;
         printf qq{%s\t%s\t%s\t%s\n}, $F[5], $F[3], $F[1], $F[4];
         ' |
@@ -422,7 +425,11 @@ cat ASSEMBLY/rsync.tsv |
 
 * Check N50 of assemblies
 
-* Pseudom_flu_GCF_900636635_1 is a strain of P. aeruginosa
+* Some strains were anomalously labeled and identified by the `mash` tree.
+    * Pseudom_flu_GCF_900636635_1
+    * Pseudom_chl_GCF_001023535_1
+    * Pseudom_syr_GCF_004006335_1
+    * Pseudom_puti_GCF_003228315_1 and Pseudom_puti_GCF_020172705_1
 
 ```shell
 cd ~/data/Pseudomonas
@@ -451,19 +458,23 @@ cat ASSEMBLY/n50.tsv |
     > ASSEMBLY/n50.pass.csv
 
 wc -l ASSEMBLY/n50*
-#  1522 ASSEMBLY/n50.pass.csv
-#  1522 ASSEMBLY/n50.tsv
+#  1520 ASSEMBLY/n50.pass.csv
+#  1520 ASSEMBLY/n50.tsv
 
 tsv-join \
     ASSEMBLY/Pseudomonas.assembly.collect.csv \
     --delimiter "," -H --key-fields 1 \
     --filter-file ASSEMBLY/n50.pass.csv |
-    tsv-filter --delimiter "," -H --str-not-in-fld 1:GCF_900636635 \
+    tsv-filter --delimiter "," -H --str-not-in-fld 1:GCF_900636635 |
+    tsv-filter --delimiter "," -H --str-not-in-fld 1:GCF_001023535 |
+    tsv-filter --delimiter "," -H --str-not-in-fld 1:GCF_004006335 |
+    tsv-filter --delimiter "," -H --str-not-in-fld 1:GCF_003228315 |
+    tsv-filter --delimiter "," -H --str-not-in-fld 1:GCF_020172705 \
     > ASSEMBLY/Pseudomonas.assembly.pass.csv
 
 wc -l ASSEMBLY/Pseudomonas.assembly*csv
-#  1522 ASSEMBLY/Pseudomonas.assembly.collect.csv
-#  1521 ASSEMBLY/Pseudomonas.assembly.pass.csv
+#  1520 ASSEMBLY/Pseudomonas.assembly.collect.csv
+#  1515 ASSEMBLY/Pseudomonas.assembly.pass.csv
 
 ```
 
@@ -512,7 +523,7 @@ cat genus.lst |
 
 | #tax_id | genus             | #species | #strains |
 |---------|-------------------|----------|----------|
-| 469     | Acinetobacter     | 43       | 484      |
+| 469     | Acinetobacter     | 43       | 483      |
 | 226     | Alteromonas       | 16       | 31       |
 | 352     | Azotobacter       | 5        | 6        |
 | 1386    | Bacillus          | 1        | 1        |
@@ -531,7 +542,7 @@ cat genus.lst |
 | 475     | Moraxella         | 5        | 35       |
 | 1763    | Mycobacterium     | 1        | 1        |
 | 53246   | Pseudoalteromonas | 18       | 33       |
-| 286     | Pseudomonas       | 172      | 829      |
+| 286     | Pseudomonas       | 172      | 824      |
 | 497     | Psychrobacter     | 2        | 2        |
 | 590     | Salmonella        | 1        | 1        |
 | 22      | Shewanella        | 15       | 50       |
