@@ -24,6 +24,11 @@
         + [Find corresponding proteins by `hmmsearch`](#find-corresponding-proteins-by-hmmsearch-1)
         + [Align and concat marker genes to create species tree](#align-and-concat-marker-genes-to-create-species-tree-1)
         + [Tweak the concat tree](#tweak-the-concat-tree-1)
+    * [Protein domains and families](#protein-domains-and-families)
+        + [Proteins in Pseudomonas strains](#proteins-in-pseudomonas-strains)
+        + [Scrap PFAM domains](#scrap-pfam-domains)
+        + [Scan every domain](#scan-every-domain)
+        + [InterProScan](#interproscan)
 
 The genus Pseudomonas includes the conditionally pathogenic bacteria Pseudomonas aeruginosa, plant
 pathogens, plant beneficial bacteria, and soil bacteria. Microorganisms of Pseudomonas are extremely
@@ -1217,7 +1222,7 @@ nw_display -s -b 'visibility:hidden' -w 600 -v 30 bac120.species.newick |
 
 ```
 
-## Domains
+## Protein domains and families
 
 ### Proteins in Pseudomonas strains
 
@@ -1389,7 +1394,7 @@ find DOMAINS/HMM -type f -name "*.hmm" |
 
 ### Scan every domain
 
-The `E_VALUE` was adjusted to 1e-3 to capture all possible sequences.
+* The `E_VALUE` was adjusted to 1e-3 to capture all possible sequences.
 
 ```shell script
 E_VALUE=1e-3
@@ -1494,6 +1499,181 @@ related to carbohydrate metabolism.
     * SKI 莽草酸
     * QRPTase_C 喹啉酸
 * Oxidoreductases
+    * Epimerase
     * ApbA
     * 3Beta_HSD
     * NAD_Gly3P_dh_N
+
+* We can't interproscan all `2420143` proteins
+
+```shell script
+cd ~/data/Pseudomonas
+
+# All proteins appeared
+cat pfam_domain.tsv | cut -f 2 | sort |
+    tsv-filter --not-regex 1:'^AAA' |
+    tsv-filter --not-regex 1:'^GDP' |
+    tsv-filter --not-regex 1:'^CBS' |
+    tsv-filter --not-regex 1:'^CTP' |
+    tsv-filter --not-regex 1:'^HAD' |
+    tsv-filter --not-regex 1:'^F420' |
+    tsv-filter --not-regex 1:'^SKI' |
+    tsv-filter --not-regex 1:'^QRPTase' |
+    tsv-filter --not-regex 1:'^Epimerase' |
+    tsv-filter --not-regex 1:'^ApbA' |
+    tsv-filter --not-regex 1:'^3Beta_HSD' |
+    tsv-filter --not-regex 1:'^NAD_Gly3P' \
+    > domain.lst
+
+wc -l < domain.lst
+#202
+
+cat domain.lst |
+    parallel --no-run-if-empty --linebuffer -k -j 1 '
+        tsv-select -f 2 DOMAINS/{}.replace.tsv
+    ' |
+    sort -u \
+    > DOMAINS/domains.tsv
+
+wc -l < DOMAINS/domains.tsv
+#168791
+
+faops size PROTEINS/all.uniq.fa | wc -l
+#2420143
+
+for domain in $(cat domain.lst); do
+    echo 1>&2 "==> domain [${domain}]"
+
+    tsv-join \
+        DOMAINS/domains.tsv \
+        --data-fields 1 \
+        -f <(
+            cat DOMAINS/${domain}.replace.tsv |
+                perl -nla -e 'print qq{$F[1]\tO}'
+        ) \
+        --key-fields 1 \
+        --append-fields 2 \
+        --write-all "" \
+        > DOMAINS/tmp.tsv
+
+    mv DOMAINS/tmp.tsv DOMAINS/domains.tsv
+done
+
+datamash check < DOMAINS/domains.tsv
+#168791 lines, 203 fields
+
+# Add header line
+for domain in $(cat domain.lst); do
+    echo "${domain}"
+done |
+    (echo -e "#name" && cat) |
+    paste -s -d $'\t' - \
+    > DOMAINS/header.tsv
+
+cat DOMAINS/header.tsv DOMAINS/domains.tsv \
+    > tmp.tsv && mv tmp.tsv DOMAINS/domains.tsv
+
+tsv-join \
+    PROTEINS/all.info.tsv \
+    --data-fields 1 \
+    -f DOMAINS/domains.tsv \
+    --key-fields 1 \
+    --append-fields 2-203 |
+     keep-header -- sort -k1,1 \
+    > tmp.tsv && mv tmp.tsv DOMAINS/domains.tsv
+
+datamash check < DOMAINS/domains.tsv
+#168792 lines, 206 fields
+
+rm DOMAINS/header.tsv
+
+```
+
+### InterProScan
+
+InterProScan 启动很慢, 因此一次提交整个菌株里的数十个蛋白.
+
+```shell script
+cd ~/data/Pseudomonas
+
+mkdir -p IPS
+
+# extract wanted sequences
+for GENUS in $(cat genus.lst); do
+    >&2 echo "==> GENUS [${GENUS}]"
+
+    cat taxon/${GENUS} |
+        parallel --no-run-if-empty --linebuffer -k -j 8 '
+            mkdir -p IPS/{}
+
+            cat PROTEINS/all.info.tsv |
+                tsv-filter --str-eq 2:{} |
+                cut -f 1 |
+                grep -Fx -f <(cut -f 1 DOMAINS/domains.tsv | grep "^{}") \
+                > IPS/{}/wanted.lst
+
+            faops some PROTEINS/all.replace.fa IPS/{}/wanted.lst IPS/{}/{}.fa
+        '
+done
+
+# scan proteins of each strain with InterProScan
+# By default InterProScan uses 8 cpu cores
+mkdir -p split
+split -a 4 -l 30 -d strains.lst split/
+
+for f in $(find split -maxdepth 1 -type f -name "[0-9]*" | sort); do
+    >&2 echo "==> IPS [${f}]"
+    bsub -q mpi -n 24 -J "IPS-${f}" "
+        cat ${f} |
+            parallel --no-run-if-empty --linebuffer -k -j 6 '
+                if [[ -e IPS/{}/{}.tsv ]]; then
+                    >&2 echo {};
+                    exit;
+                fi
+
+                interproscan.sh --cpu 4 -dp -f tsv,json,svg -i IPS/{}/{}.fa --output-file-base IPS/{}/{}
+            '
+        "
+done
+
+rm -fr split output.*
+
+# IPS family
+for GENUS in $(cat genus.lst); do
+    echo 1>&2 "==> GENUS [${GENUS}]"
+
+    for STRAIN in $(cat taxon/${GENUS}); do
+        cat IPS/${STRAIN}/${STRAIN}.json |
+            jq .results |
+            jq -r -c '
+                .[] |
+                .xref as $name |
+                .matches[] |
+                .signature.entry |
+                select(.type == "FAMILY") |
+                [$name[0].name, .accession, .description] |
+                @tsv
+            ' |
+            tsv-uniq -f 1
+    done
+done |
+    (echo -e "#name\tfamily\tdescription" && cat) \
+    > IPS/family.tsv
+
+tsv-join \
+    <(cut -f 1-4 DOMAINS/domains.tsv) \
+    --data-fields 1 \
+    -f IPS/family.tsv \
+    --key-fields 1 \
+    --append-fields 2-3 \
+    --write-all "" |
+    tsv-join \
+        --data-fields 1 \
+        -f DOMAINS/domains.tsv \
+        --key-fields 1 \
+        --append-fields 5-206 |
+     keep-header -- sort -k1,1 \
+    > IPS/predicts.tsv
+
+```
+
