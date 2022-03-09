@@ -2690,3 +2690,71 @@ nw_reroot YggL/YggL.aln.newick $(nw_labels YggL/YggL.aln.newick | grep -E "B_sub
     > YggL/YggL.reoot.newick
 
 ```
+
+## Collect CDS
+
+### `all.cds.fa`
+
+```shell script
+cd ~/data/Pseudomonas
+
+mkdir -p CDS
+
+find ASSEMBLY -type f -name "*_cds_from_genomic.fna.gz" |
+    wc -l
+# 1519
+
+# sed script converting from Contigs to Strain
+for GENUS in $(cat genus.lst); do
+    echo 1>&2 "==> GENUS [${GENUS}]"
+
+    for STRAIN in $(cat taxon/${GENUS}); do
+        find ASSEMBLY/${STRAIN} -type f -name "*_genomic.fna.gz" |
+            grep -v "_from_" |
+            xargs gzip -dcf |
+            grep '^>' |
+            cut -d' ' -f 1 |
+            sed 's/>//' |
+            xargs -I{} echo -e "{}\t${STRAIN}"
+    done
+done \
+    > CDS/contigs_to_strain.tsv
+
+cat CDS/contigs_to_strain.tsv |
+    perl -nla -e '
+        print q{s/^>} . quotemeta($F[0]) . q{/>} . quotemeta($F[1]) . q{/g;};
+    ' \
+    > CDS/sed.script
+
+wc -l < CDS/sed.script
+# 3114
+
+for GENUS in $(cat genus.lst); do
+    echo 1>&2 "==> GENUS [${GENUS}]"
+
+    for STRAIN in $(cat taxon/${GENUS}); do
+        gzip -dcf ASSEMBLY/${STRAIN}/*_cds_from_genomic.fna.gz
+    done
+done |
+    perl -nl -e 's/^>lcl\|/>/g; print' |
+    perl -nl -e 's/\s+\[.+?\]//g; print' \
+    > CDS/all.cds.fa
+
+```
+
+### `YggL.cds.fa`
+
+```shell script
+cd ~/data/Pseudomonas
+
+cat CDS/all.cds.fa |
+    grep '>' |
+    grep -F -f <( cat YggL/YggL.replace.tsv | cut -f 1 ) |
+    sed 's/^>//' \
+    > CDS/YggL.lst
+
+faops order CDS/all.cds.fa CDS/YggL.lst stdout |
+    sed -f CDS/sed.script \
+    > CDS/YggL.cds.fa
+
+```
