@@ -1233,6 +1233,10 @@ nw_display -s -b 'visibility:hidden' -w 600 -v 30 bac120.species.newick |
 ### Proteins in Pseudomonas strains
 
 * [`GO:0005975` carbohydrate metabolic process](https://www.ebi.ac.uk/QuickGO/GTerm?id=GO:0005975)
+    * http://www.cazy.org/Glycoside-Hydrolases.html
+
+* [`GO:0016837` carbon-oxygen lyase activity, acting on polysaccharides](https://www.ebi.ac.uk/QuickGO/GTerm?id=GO:0016837)
+    * http://www.cazy.org/Polysaccharide-Lyases.html
 
 * Search `https://www.pseudomonas.com/goterms` for `GO:0005975`
     * 107 - Pseudomonas aeruginosa PAO1
@@ -1852,8 +1856,21 @@ for f in $(cat variety.tsv | tsv-select -f 1 | sed '1d' | sort); do
         > tmp.tsv
 
     COUNT=$(cat tmp.tsv | wc -l)
-    HAS_T=$(cat tmp.tsv | grep -E "aeruginosa|chlororaphis|fluorescens|protegens|putida|syringae" | wc -l)
-    if [[ ${COUNT} -ge "1" && ${COUNT} -le "5" && ${HAS_T} -ge "1" ]]; then
+    HAS_T=$(cat tmp.tsv | grep -E "aeruginosa|fluorescens|putida|syringae" | wc -l)
+    HAS_ENOUGH=$(
+        cat IPS/predicts.tsv |
+            tsv-select -f 1-3,5,6 |
+            tsv-filter -H --str-eq family:"${f}" |
+            tsv-join -d 2 \
+                -f strains.taxon.tsv -k 1 \
+                --append-fields 4 |
+            tsv-summarize -g 6,2 --count |
+            tsv-filter --ge 3:2 |
+            tsv-summarize -g 1 --count |
+            tsv-filter --ge 2:5 |
+            wc -l
+    )
+    if [[ ${COUNT} -ge "1" && ${COUNT} -le "10" && ${HAS_T} -ge "1" && ${HAS_ENOUGH} -ge "1" ]]; then
         cat tmp.tsv |
             sed "1 s/^/${f}\\t/" |
             sed "2,$ s/^/\\t/"
@@ -1865,74 +1882,149 @@ done |
 
 ```
 
-| #family   | species                          | count   |
-|-----------|----------------------------------|---------|
-| IPR000146 | Alteromonas macleodii            | 1/2     |
-|           | Pseudoalteromonas aliena         | 1/2     |
-|           | Pseudoalteromonas carrageenovora | 1/2     |
-|           | Pseudoalteromonas translucida    | 1/3     |
-|           | Pseudomonas aeruginosa           | 1/2     |
-| IPR000631 | Pseudomonas protegens            | 1/2     |
-| IPR000743 | Alteromonas australica           | 2/1     |
-|           | Pseudomonas amygdali             | 1/2     |
-|           | Pseudomonas savastanoi           | 1/2     |
-|           | Pseudomonas syringae             | 1/2/3   |
-| IPR000811 | Pseudomonas balearica            | 1/2     |
-|           | Pseudomonas fluorescens          | 1/2     |
-|           | Pseudomonas mandelii             | 1/2     |
-|           | Pseudomonas stutzeri             | 1/2     |
-|           | Pseudomonas veronii              | 1/2     |
-| IPR002037 | Pseudomonas fluorescens          | 1/2     |
-|           | Pseudomonas knackmussii          | 1/2     |
-|           | Pseudomonas putida               | 1/2     |
-| IPR002053 | Pseudomonas syringae             | 1/2     |
-| IPR003469 | Pseudomonas amygdali             | 1/2     |
-|           | Pseudomonas coronafaciens        | 2/3/4   |
-|           | Pseudomonas orientalis           | 1/2     |
-|           | Pseudomonas savastanoi           | 1/2/3   |
-|           | Pseudomonas syringae             | 1/2/3/4 |
-| IPR004625 | Pseudomonas aeruginosa           | 1/2     |
-|           | Pseudomonas putida               | 1/2     |
-| IPR005593 | Pseudomonas aeruginosa           | 1/2     |
-|           | Pseudomonas veronii              | 1/2     |
-| IPR005999 | Alteromonas australica           | 1/2     |
-|           | Marinobacter adhaerens           | 1/2     |
-|           | Pseudomonas aeruginosa           | 1/2     |
-| IPR006323 | Pseudomonas fluorescens          | 1/2     |
-|           | Pseudomonas otitidis             | 1/2     |
-|           | Pseudomonas putida               | 1/2     |
-|           | Pseudomonas umsongensis          | 1/2     |
-| IPR006346 | Pseudomonas aeruginosa           | 1/2     |
-|           | Pseudomonas fluorescens          | 1/2     |
-|           | Pseudomonas monteilii            | 1/2     |
-|           | Pseudomonas putida               | 1/2     |
-|           | Pseudomonas stutzeri             | 1/2     |
-| IPR006391 | Pseudomonas fluorescens          | 1/2     |
-|           | Pseudomonas protegens            | 1/2     |
-|           | Pseudomonas veronii              | 1/2     |
-| IPR010023 | Pseudomonas fragi                | 1/2     |
-|           | Pseudomonas putida               | 1/2     |
-| IPR010099 | Pseudomonas brassicacearum       | 1/2     |
-|           | Pseudomonas fluorescens          | 1/2     |
-| IPR010130 | Pseudomonas chlororaphis         | 1/2     |
-| IPR017643 | Pseudomonas putida               | 1/2     |
-| IPR022857 | Pseudomonas fluorescens          | 1/2     |
-|           | Pseudomonas psychrotolerans      | 1/2     |
-| IPR022956 | Pseudomonas monteilii            | 1/2     |
-|           | Pseudomonas plecoglossicida      | 1/2     |
-|           | Pseudomonas putida               | 1/2     |
-| IPR023725 | Pseudomonas putida               | 1/2     |
-| IPR028614 | Escherichia coli                 | 1/2     |
-|           | Pseudomonas fluorescens          | 1/2     |
-|           | Pseudomonas protegens            | 1/2     |
-|           | Pseudomonas veronii              | 1/2     |
-| IPR029767 | Pseudomonas entomophila          | 1/2     |
-|           | Pseudomonas fluorescens          | 1/2     |
-|           | Pseudomonas mendocina            | 1/2     |
-|           | Pseudomonas protegens            | 1/2     |
-| IPR037950 | Pseudomonas brassicacearum       | 1/3     |
-|           | Pseudomonas chlororaphis         | 1/2/3   |
-|           | Pseudomonas fluorescens          | 1/2/3   |
+| #family   | species                           | count   |
+|-----------|-----------------------------------|---------|
+| IPR000146 | Alteromonas macleodii             | 1/2     |
+|           | Pseudoalteromonas aliena          | 1/2     |
+|           | Pseudoalteromonas carrageenovora  | 1/2     |
+|           | Pseudoalteromonas translucida     | 1/3     |
+|           | Pseudomonas aeruginosa            | 1/2     |
+| IPR000743 | Alteromonas australica            | 2/1     |
+|           | Pseudomonas amygdali              | 1/2     |
+|           | Pseudomonas savastanoi            | 1/2     |
+|           | Pseudomonas syringae              | 1/2/3   |
+| IPR000811 | Pseudomonas balearica             | 1/2     |
+|           | Pseudomonas fluorescens           | 1/2     |
+|           | Pseudomonas mandelii              | 1/2     |
+|           | Pseudomonas stutzeri              | 1/2     |
+|           | Pseudomonas veronii               | 1/2     |
+| IPR001585 | Escherichia coli                  | 2/3     |
+|           | Halomonas titanicae               | 1/2     |
+|           | Pseudoalteromonas shioyasakiensis | 1/2     |
+|           | Pseudomonas azotoformans          | 1/2     |
+|           | Pseudomonas fluorescens           | 1/2     |
+|           | Pseudomonas lurida                | 2/3     |
+|           | Pseudomonas tolaasii              | 1/2     |
+| IPR002037 | Pseudomonas fluorescens           | 1/2     |
+|           | Pseudomonas knackmussii           | 1/2     |
+|           | Pseudomonas putida                | 1/2     |
+| IPR002053 | Pseudomonas syringae              | 1/2     |
+| IPR002139 | Pseudomonas azotoformans          | 1/2     |
+|           | Pseudomonas chlororaphis          | 1/2     |
+|           | Pseudomonas fluorescens           | 1/2     |
+|           | Pseudomonas frederiksbergensis    | 1/2     |
+|           | Pseudomonas psychrotolerans       | 2/3     |
+|           | Shewanella baltica                | 1/2     |
+| IPR003469 | Pseudomonas amygdali              | 1/2     |
+|           | Pseudomonas coronafaciens         | 2/3/4   |
+|           | Pseudomonas orientalis            | 1/2     |
+|           | Pseudomonas savastanoi            | 1/2/3   |
+|           | Pseudomonas syringae              | 1/2/3/4 |
+| IPR004625 | Pseudomonas aeruginosa            | 1/2     |
+|           | Pseudomonas putida                | 1/2     |
+| IPR004730 | Alteromonas macleodii             | 1/2     |
+|           | Alteromonas mediterranea          | 1/2     |
+|           | Halomonas meridiana               | 1/2     |
+|           | Halomonas titanicae               | 1/2/3   |
+|           | Pseudomonas fluorescens           | 1/2     |
+|           | Pseudomonas synxantha             | 1/2     |
+| IPR004800 | Alteromonas macleodii             | 1/2     |
+|           | Halomonas piezotolerans           | 1/2     |
+|           | Pseudomonas atacamensis           | 1/2     |
+|           | Pseudomonas citronellolis         | 1/2     |
+|           | Pseudomonas fluorescens           | 1/2     |
+|           | Pseudomonas fragi                 | 1/2     |
+|           | Pseudomonas putida                | 1/2     |
+|           | Thalassolituus oleivorans         | 1/2     |
+| IPR005593 | Pseudomonas aeruginosa            | 1/2     |
+|           | Pseudomonas veronii               | 1/2     |
+| IPR005999 | Alteromonas australica            | 1/2     |
+|           | Marinobacter adhaerens            | 1/2     |
+|           | Pseudomonas aeruginosa            | 1/2     |
+| IPR006000 | Marinomonas primoryensis          | 1/2     |
+|           | Pseudomonas azotoformans          | 1/2     |
+|           | Pseudomonas fluorescens           | 1/2     |
+|           | Pseudomonas orientalis            | 1/2     |
+|           | Pseudomonas rhodesiae             | 1/2     |
+|           | Pseudomonas simiae                | 1/2     |
+|           | Pseudomonas tolaasii              | 2/3     |
+|           | Pseudomonas trivialis             | 1/2     |
+|           | Pseudomonas yamanorum             | 1/2     |
+| IPR006323 | Pseudomonas fluorescens           | 1/2     |
+|           | Pseudomonas otitidis              | 1/2     |
+|           | Pseudomonas putida                | 1/2     |
+|           | Pseudomonas umsongensis           | 1/2     |
+| IPR006328 | Alteromonas mediterranea          | 1/2     |
+|           | Alteromonas stellipolaris         | 1/2     |
+|           | Halomonas hydrothermalis          | 1/2     |
+|           | Pseudoalteromonas agarivorans     | 1/2     |
+|           | Pseudoalteromonas aliena          | 1/2     |
+|           | Pseudomonas aeruginosa            | 1/2     |
+|           | Pseudomonas viridiflava           | 1/2     |
+| IPR006346 | Pseudomonas aeruginosa            | 1/2     |
+|           | Pseudomonas fluorescens           | 1/2     |
+|           | Pseudomonas monteilii             | 1/2     |
+|           | Pseudomonas putida                | 1/2     |
+|           | Pseudomonas stutzeri              | 1/2     |
+| IPR006368 | Escherichia coli                  | 1/2     |
+|           | Pseudomonas amygdali              | 1/2     |
+|           | Pseudomonas chlororaphis          | 1/2     |
+|           | Pseudomonas congelans             | 1/2     |
+|           | Pseudomonas fluorescens           | 1/2     |
+|           | Pseudomonas moraviensis           | 1/2     |
+|           | Pseudomonas stutzeri              | 1/2     |
+|           | Pseudomonas syringae              | 1/2     |
+|           | Pseudomonas veronii               | 1/2     |
+| IPR006391 | Pseudomonas fluorescens           | 1/2     |
+|           | Pseudomonas protegens             | 1/2     |
+|           | Pseudomonas veronii               | 1/2     |
+| IPR010023 | Pseudomonas fragi                 | 1/2     |
+|           | Pseudomonas putida                | 1/2     |
+| IPR010099 | Pseudomonas brassicacearum        | 1/2     |
+|           | Pseudomonas fluorescens           | 1/2     |
+| IPR011877 | Pseudomonas amygdali              | 1/2     |
+|           | Pseudomonas congelans             | 1/2     |
+|           | Pseudomonas coronafaciens         | 1/2     |
+|           | Pseudomonas libanensis            | 1/2     |
+|           | Pseudomonas poae                  | 1/2     |
+|           | Pseudomonas savastanoi            | 1/2     |
+|           | Pseudomonas synxantha             | 1/2     |
+|           | Pseudomonas syringae              | 1/2     |
+|           | Pseudomonas yamanorum             | 1/2     |
+| IPR017583 | Acinetobacter johnsonii           | 1/2     |
+|           | Pseudomonas antarctica            | 1/2     |
+|           | Pseudomonas azotoformans          | 1/2     |
+|           | Pseudomonas balearica             | 1/2     |
+|           | Pseudomonas fluorescens           | 1/2     |
+|           | Pseudomonas lurida                | 1/2     |
+|           | Pseudomonas orientalis            | 1/2     |
+|           | Pseudomonas stutzeri              | 1/2     |
+|           | Pseudomonas synxantha             | 1/2     |
+| IPR017643 | Pseudomonas putida                | 1/2     |
+| IPR022857 | Pseudomonas fluorescens           | 1/2     |
+|           | Pseudomonas psychrotolerans       | 1/2     |
+| IPR022956 | Pseudomonas monteilii             | 1/2     |
+|           | Pseudomonas plecoglossicida       | 1/2     |
+|           | Pseudomonas putida                | 1/2     |
+| IPR023725 | Pseudomonas putida                | 1/2     |
+| IPR028614 | Escherichia coli                  | 1/2     |
+|           | Pseudomonas fluorescens           | 1/2     |
+|           | Pseudomonas protegens             | 1/2     |
+|           | Pseudomonas veronii               | 1/2     |
+| IPR029767 | Pseudomonas entomophila           | 1/2     |
+|           | Pseudomonas fluorescens           | 1/2     |
+|           | Pseudomonas mendocina             | 1/2     |
+|           | Pseudomonas protegens             | 1/2     |
+| IPR035461 | Alteromonas mediterranea          | 1/2     |
+|           | Marinobacter nauticus             | 1/2     |
+|           | Pseudoalteromonas luteoviolacea   | 2/3     |
+|           | Pseudoalteromonas piscicida       | 1/2     |
+|           | Pseudomonas aeruginosa            | 1/2     |
+|           | Pseudomonas lalkuanensis          | 1/2     |
+|           | Thalassolituus oleivorans         | 1/2     |
+| IPR037950 | Pseudomonas brassicacearum        | 1/3     |
+|           | Pseudomonas chlororaphis          | 1/2/3   |
+|           | Pseudomonas fluorescens           | 1/2/3   |
 
 ### Among species
 
@@ -1970,7 +2062,7 @@ done
 
 ```
 
-## Glycerol kinase
+## IPR005999 - Glycerol kinase
 
 * IPR000577 - Carbohydrate kinase, FGGY
     * IPR005999 - Glycerol kinase
@@ -2019,6 +2111,18 @@ cat IPS/predicts.tsv |
 #502     204
 #504     15
 #505     288
+
+cat IPS/predicts.tsv |
+    tsv-filter -H --str-eq family:IPR005999 |
+    tsv-select -f 1-6 |
+    tsv-join -d 2 \
+        -f strains.taxon.tsv -k 1 \
+        --append-fields 4 |
+    tsv-filter --or --str-eq 7:"Pseudomonas aeruginosa" |
+    tsv-summarize -g 7,2 --count |
+    tsv-filter --gt 3:1 |
+    tsv-summarize -g 1 --count
+#Pseudomonas aeruginosa  223
 
 ```
 
@@ -2083,9 +2187,337 @@ done
 
 ```
 
-## Xylulose 5-phosphate/Fructose 6-phosphate phosphoketolase
+不同基因家族之间分得很开, 应该不会相互混淆.
 
-IPR005593
+在 PAO1 中, 这两个基因 PA3582 (glpK) 和 PA3579 只间隔一个基因. 不能确定是 HGT.
+
+## IPR004800 - Phosphosugar isomerase, KdsD/KpsF-type
+
+```shell
+cd ~/data/Pseudomonas
+
+cat IPS/predicts.tsv |
+    tsv-filter -H --str-eq family:IPR004800 |
+    tsv-summarize -H -g annotation --count
+#annotation      count
+#KpsF/GutQ family sugar-phosphate isomerase      1149
+#D-arabinose 5-phosphate isomerase       8
+#arabinose-5-phosphate isomerase 2
+#carbohydrate isomerase  1
+#D-arabinose 5-phosphate isomerase GutQ  1
+#D-arabinose 5-phosphate isomerase KdsD  1
+#arabinose-5-phosphate isomerase KdsD    389
+#putative polysialic acid capsule expression protein     1
+#hypothetical protein SF2731     1
+
+cat IPS/predicts.tsv |
+    tsv-filter -H --str-eq family:IPR004800 |
+    tsv-summarize -H -g size --count |
+    keep-header -- tsv-sort -k1,1n |
+    tsv-filter -H --ge count:10
+#size    count
+#310     17
+#315     13
+#323     40
+#324     452
+#325     528
+#326     422
+#328     18
+#339     16
+
+cat IPS/predicts.tsv |
+    tsv-filter -H --str-eq family:IPR004800 |
+    tsv-select -f 1-6 |
+    tsv-join -d 2 \
+        -f strains.taxon.tsv -k 1 \
+        --append-fields 4 |
+    tsv-filter --or --str-eq 7:"Pseudomonas fluorescens" --str-eq 7:"Pseudomonas putida" |
+    tsv-summarize -g 7,2 --count |
+    tsv-filter --gt 3:1 |
+    tsv-summarize -g 1 --count
+#Pseudomonas fluorescens 2
+#Pseudomonas putida      24
+
+```
+
+### domain structure and gene tree
+
+All proteins have the same structure SIS.
+
+```shell
+cd ~/data/Pseudomonas
+
+mkdir -p ~/data/Pseudomonas/KdsD
+
+cat IPS/predicts.tsv |
+    tsv-filter -H --str-eq family:IPR004800 |
+    datamash transpose |
+    perl -nl -e '
+        $row = $_;
+        $row =~ s/\s//g;
+        length($row) > 20 and print;
+    ' |
+    datamash transpose \
+    > KdsD/KdsD.tsv
+
+plotr tsv KdsD/KdsD.tsv --header
+
+cat DOMAINS/domains.tsv |
+    tsv-filter -H --not-empty SIS |
+    tsv-select -H -f 1-4,SIS \
+    > KdsD/SIS.tsv
+
+wc -l KdsD/*.tsv
+#   1554 KdsD/KdsD.tsv
+#   8121 KdsD/SIS.tsv
+
+for f in KdsD ; do
+    >&2 echo "==> ${f}"
+
+    faops some PROTEINS/all.replace.fa <(tsv-select -f 1 KdsD/${f}.tsv) stdout \
+        > KdsD/${f}.fa
+
+    muscle -in KdsD/${f}.fa -out KdsD/${f}.aln.fa
+
+    FastTree KdsD/${f}.aln.fa > KdsD/${f}.aln.newick
+
+    nw_reroot KdsD/${f}.aln.newick $(nw_labels KdsD/${f}.aln.newick | grep -E "B_sub|St_aur") |
+        nw_order -c n - \
+        > KdsD/${f}.reoot.newick
+
+done
+
+```
+
+## IPR000146 - Fructose-1,6-bisphosphatase class 1
+
+FBP 是糖酵解途径中的核心基因
+
+```shell
+cd ~/data/Pseudomonas
+
+cat IPS/predicts.tsv |
+    tsv-filter -H --str-eq family:IPR000146 |
+    tsv-summarize -H -g annotation --count
+#annotation      count
+#class 1 fructose-bisphosphatase 1123
+#fructose-1,6-bisphosphatase     7
+#fructose-1,6-bisphosphatase, FIG superfamily    1
+#fructose-1,6-bisphosphatase 1   1
+
+cat IPS/predicts.tsv |
+    tsv-filter -H --str-eq family:IPR000146 |
+    tsv-select -f 1-6 |
+    tsv-join -d 2 \
+        -f strains.taxon.tsv -k 1 \
+        --append-fields 4 |
+    tsv-filter --str-eq 7:"Pseudomonas aeruginosa" |
+    tsv-summarize -g 2 --count |
+    tsv-filter --gt 2:1
+#Pseudom_aer_VRFPA04_GCF_000473745_2     2
+
+
+```
+
+只有一个菌株含有两个 FBP
+
+## IPR004625 - Pyridoxine kinase
+
+```shell
+cd ~/data/Pseudomonas
+
+cat IPS/predicts.tsv |
+    tsv-filter -H --str-eq family:IPR004625 |
+    tsv-summarize -H -g annotation --count
+#annotation      count
+#pyridoxine kinase       1
+#pyridoxal kinase 2      1
+#pyridoxal kinase I      1
+#pyridoxamine kinase     3
+#pyridoxal-pyridoxamine kinase/hydroxymethylpyrimidine kinase    2
+#pyridoxal kinase        1
+#pyridoxal kinase PdxY   623
+#pyridoxine/pyridoxal/pyridoxamine kinase        5
+#bifunctional hydroxymethylpyrimidine kinase/phosphomethylpyrimidine kinase      1
+#PfkB family carbohydrate kinase 2
+#bifunctional pyridoxal kinase/hydroxymethylpyrimidine kinase    1
+
+cat IPS/predicts.tsv |
+    tsv-filter -H --str-eq family:IPR004625 |
+    tsv-select -f 1-6 |
+    tsv-join -d 2 \
+        -f strains.taxon.tsv -k 1 \
+        --append-fields 4 |
+    tsv-filter --or --str-eq 7:"Pseudomonas aeruginosa" --str-eq 7:"Pseudomonas putida" |
+    tsv-summarize -g 2 --count |
+    tsv-filter --gt 2:1
+#Pseudom_aer_GCF_020990445_1     2
+#Pseudom_puti_GCF_002356095_1    2
+
+
+```
+
+## IPR002053 - Glycoside hydrolase, family 25
+
+```shell
+cd ~/data/Pseudomonas
+
+cat IPS/predicts.tsv |
+    tsv-filter -H --str-eq family:IPR002053 |
+    tsv-summarize -H -g annotation --count
+#annotation      count
+#glycoside hydrolase family 25 protein   280
+#putative lysozyme       1
+#lysozyme        1
+#putative glycosyl hydrolase YegX        1
+#glycosyl hydrolase      1
+#hypothetical protein SF2164     1
+
+cat IPS/predicts.tsv |
+    tsv-filter -H --str-eq family:IPR002053 |
+    tsv-select -f 1-6 |
+    tsv-join -d 2 \
+        -f strains.taxon.tsv -k 1 \
+        --append-fields 4 |
+    tsv-filter --str-eq 7:"Pseudomonas syringae" |
+    tsv-summarize -g 2 --count |
+    tsv-filter --gt 2:1
+#Pseudom_syr_pv_avii_GCF_900235835_1     2
+
+
+```
+
+## IPR006323 - Phosphonoacetaldehyde hydrolase
+
+```shell
+cd ~/data/Pseudomonas
+
+cat IPS/predicts.tsv |
+    tsv-filter -H --str-eq family:IPR006323 |
+    tsv-summarize -H -g annotation --count
+#annotation      count
+#phosphonoacetaldehyde hydrolase 864
+#2-aminoethylphosphonate transport       1
+
+cat IPS/predicts.tsv |
+    tsv-filter -H --str-eq family:IPR006323 |
+    tsv-select -f 1-6 |
+    tsv-join -d 2 \
+        -f strains.taxon.tsv -k 1 \
+        --append-fields 4 |
+    tsv-filter --or --str-eq 7:"Pseudomonas fluorescens" --str-eq 7:"Pseudomonas putida" |
+    tsv-summarize -g 2 --count |
+    tsv-filter --gt 2:1
+#Pseudom_flu_GCF_001878715_1     2
+#Pseudom_puti_GB_1_GCF_000019125_1       2
+#Pseudom_puti_GCF_001630725_2    2
+#Pseudom_puti_GCF_001886975_1    2
+#Pseudom_puti_S13_1_2_GCF_000498395_2    2
+
+```
+
+## IPR006328 - L-2-Haloacid dehalogenase
+
+```shell
+cd ~/data/Pseudomonas
+
+cat IPS/predicts.tsv |
+    tsv-filter -H --str-eq family:IPR006328 |
+    tsv-summarize -H -g annotation --count
+#annotation      count
+#haloacid dehalogenase type II   313
+
+cat IPS/predicts.tsv |
+    tsv-filter -H --str-eq family:IPR006328 |
+    tsv-select -f 1-6 |
+    tsv-join -d 2 \
+        -f strains.taxon.tsv -k 1 \
+        --append-fields 4 |
+    tsv-filter --str-eq 7:"Pseudomonas aeruginosa" |
+    tsv-summarize -g 2 --count |
+    tsv-filter --gt 2:1
+#Pseudom_aer_GCF_002411865_3     2
+
+```
+
+## IPR006346 - 2-phosphoglycolate phosphatase-like, prokaryotic
+
+```shell
+cd ~/data/Pseudomonas
+
+cat IPS/predicts.tsv |
+    tsv-filter -H --str-eq family:IPR006346 |
+    tsv-summarize -H -g annotation --count
+#annotation      count
+#phosphoglycolate phosphatase    210
+#HAD-IA family hydrolase 10
+#N-acetylmuramic acid 6-phosphate phosphatase MupP       329
+
+cat IPS/predicts.tsv |
+    tsv-filter -H --str-eq family:IPR006346 |
+    tsv-select -f 1-6 |
+    tsv-join -d 2 \
+        -f strains.taxon.tsv -k 1 \
+        --append-fields 4 |
+    tsv-filter --or --str-eq 7:"Pseudomonas aeruginosa" --str-eq 7:"Pseudomonas fluorescens" --str-eq 7:"Pseudomonas putida" |
+    tsv-summarize -g 2 --count |
+    tsv-filter --gt 2:1
+#Pseudom_aer_GCF_001874465_1     2
+#Pseudom_aer_GCF_002104595_1     2
+#Pseudom_aer_GCF_002104615_1     2
+#Pseudom_aer_GCF_002192495_1     2
+#Pseudom_aer_GCF_002968655_1     2
+#Pseudom_aer_GCF_003060845_1     2
+#Pseudom_aer_GCF_003332705_2     2
+#Pseudom_aer_GCF_003429205_1     2
+#Pseudom_aer_GCF_014930935_1     2
+#Pseudom_aer_GCF_019915465_1     2
+#Pseudom_aer_GCF_019915485_1     2
+#Pseudom_aer_GCF_021166275_1     2
+#Pseudom_aer_GCF_021497405_1     2
+#Pseudom_flu_GCF_001307275_1     2
+#Pseudom_puti_GCF_001908395_1    2
+#Pseudom_puti_GCF_002736125_1    2
+#Pseudom_puti_GCF_008605605_1    2
+
+```
+
+## IPR010023 - KdsC family
+
+```shell
+cd ~/data/Pseudomonas
+
+cat IPS/predicts.tsv |
+    tsv-filter -H --str-eq family:IPR010023 |
+    tsv-summarize -H -g annotation --count
+#annotation      count
+#HAD-IIIA family hydrolase       500
+#3-deoxy-D-manno-octulosonate 8-phosphate (KDO 8-P) phosphatase  1
+#HAD hydrolase family protein    57
+#3-deoxy-manno-octulosonate-8-phosphatase KdsC   124
+#HAD family hydrolase    804
+#HAD-superfamily hydrolase       1
+#3-deoxy-manno-octulosonate-8-phosphatase        1
+#3-deoxy-D-manno-octulosonate 8-phosphate phosphatase KdsC       2
+#3-deoxy-D-manno-octulosonate 8-phosphate phosphatase    3
+#hypothetical protein PA4458     1
+#3-deoxy-manno-octulosonate cytidylyltransferase 6
+
+cat IPS/predicts.tsv |
+    tsv-filter -H --str-eq family:IPR010023 |
+    tsv-select -f 1-6 |
+    tsv-join -d 2 \
+        -f strains.taxon.tsv -k 1 \
+        --append-fields 4 |
+    tsv-filter --str-eq 7:"Pseudomonas putida" |
+    tsv-summarize -g 2 --count |
+    tsv-filter --gt 2:1
+#Pseudom_puti_GCF_002736125_1    2
+#Pseudom_puti_S13_1_2_GCF_000498395_2    2
+
+```
+
+## IPR005593 - Xylulose 5-phosphate/Fructose 6-phosphate phosphoketolase
 
 ```shell
 cd ~/data/Pseudomonas
