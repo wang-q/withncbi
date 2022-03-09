@@ -32,9 +32,17 @@
     * [Search for gene families with uneven members](#search-for-gene-families-with-uneven-members)
         + [Within species](#within-species)
         + [Among species](#among-species)
-    * [Glycerol kinase](#glycerol-kinase)
+    * [IPR005999 - Glycerol kinase](#ipr005999---glycerol-kinase)
         + [domain structure and gene tree](#domain-structure-and-gene-tree)
-    * [Xylulose 5-phosphate/Fructose 6-phosphate phosphoketolase](#xylulose-5-phosphatefructose-6-phosphate-phosphoketolase)
+    * [IPR004800 - Phosphosugar isomerase, KdsD/KpsF-type](#ipr004800---phosphosugar-isomerase-kdsdkpsf-type)
+        + [domain structure and gene tree](#domain-structure-and-gene-tree-1)
+    * [IPR005593 - Xylulose 5-phosphate/Fructose 6-phosphate phosphoketolase](#ipr005593---xylulose-5-phosphatefructose-6-phosphate-phosphoketolase)
+        + [domain structure and gene tree](#domain-structure-and-gene-tree-2)
+    * [IPR006346 - 2-phosphoglycolate phosphatase-like, prokaryotic](#ipr006346---2-phosphoglycolate-phosphatase-like-prokaryotic)
+        + [domain structure and gene tree](#domain-structure-and-gene-tree-3)
+    * [IPR035461 - GmhA/DiaA](#ipr035461---gmhadiaa)
+    * [InterProScan on all proteins of typical strains](#interproscan-on-all-proteins-of-typical-strains)
+    * [IPR007416 - YggL 50S ribosome-binding protein](#ipr007416---yggl-50s-ribosome-binding-protein)
 
 The genus Pseudomonas includes the conditionally pathogenic bacteria Pseudomonas aeruginosa, plant
 pathogens, plant beneficial bacteria, and soil bacteria. Microorganisms of Pseudomonas are extremely
@@ -2390,7 +2398,6 @@ cat IPS/predicts.tsv |
 
 All proteins have the same structure Hydrolase and Hydrolase_like, some have Hydrolase_3.
 
-
 ```shell
 cd ~/data/Pseudomonas
 
@@ -2459,5 +2466,227 @@ cat IPS/predicts.tsv |
     tsv-summarize -g 2 --count |
     tsv-filter --gt 2:1
 #Pseudom_aer_GCF_001548335_1     2
+
+```
+
+## InterProScan on all proteins of typical strains
+
+```shell
+cd ~/data/Pseudomonas
+
+faops size ASSEMBLY/Pseudom_aer_PAO1/*_protein.faa.gz |
+    wc -l
+#5572
+
+faops size ASSEMBLY/Pseudom_aer_PAO1/*_protein.faa.gz |
+    tsv-summarize --sum 2
+#1858983
+
+mkdir -p STRAINS
+
+for S in \
+    Pseudom_aer_PAO1 \
+    Pseudom_puti_KT2440_GCF_000007565_2 \
+    Pseudom_chl_aureofaciens_30_84_GCF_000281915_1 \
+    Pseudom_flu_SBW25_GCF_000009225_2 \
+    Pseudom_pro_Pf_5_GCF_000012265_1 \
+    Pseudom_stu_A1501_GCF_000013785_1 \
+    Pseudom_syr_pv_syringae_B728a_GCF_000012245_1 \
+    Pseudom_sav_pv_phaseolicola_1448A_GCF_000012205_1 \
+    Pseudom_ento_L48_GCF_000026105_1 \
+    Pseudom_aer_UCBPP_PA14_GCF_000014625_1 \
+    Pseudom_aer_PA7_GCF_000017205_1 \
+    Pseudom_aer_LESB58_GCF_000026645_1 \
+    ; do
+    echo ${S}
+done \
+    > typical.lst
+
+for S in $(cat typical.lst); do
+    mkdir -p STRAINS/${S}
+    faops split-about ASSEMBLY/${S}/*_protein.faa.gz 200000 STRAINS/${S}/
+done
+
+for S in $(cat typical.lst); do
+    for f in $(find STRAINS/${S}/ -maxdepth 1 -type f -name "[0-9]*.fa" | sort); do
+        >&2 echo "==> ${f}"
+        bsub -q mpi -n 24 -J "${f}" "
+                if [[ -e ${f}.tsv ]]; then
+                    >&2 echo ${f};
+                    exit;
+                fi
+
+                interproscan.sh --cpu 24 -dp -f tsv,json -i ${f} --output-file-base ${f}
+            "
+    done
+done
+
+# same protein may have multiple families
+for S in $(cat typical.lst); do
+    for f in $(find STRAINS/${S} -maxdepth 1 -type f -name "[0-9]*.json" | sort); do
+        >&2 echo "==> ${f}"
+        cat ${f} |
+            jq .results |
+            jq -r -c '
+                .[] |
+                .xref as $name |
+                .matches[] |
+                .signature.entry |
+                select(.type == "FAMILY") |
+                [$name[0].name, .accession, .description] |
+                @tsv
+            ' |
+            tsv-uniq
+    done \
+        >  STRAINS/${S}/family.tsv
+done
+
+COUNT=
+for S in $(cat typical.lst); do
+    if [ ! -s STRAINS/${S}/family.tsv ]; then
+        continue
+    fi
+    cat STRAINS/${S}/family.tsv |
+        tsv-summarize -g 2,3 --count \
+        > STRAINS/${S}/family-count.tsv
+
+    COUNT=$((COUNT + 1))
+done
+echo $COUNT
+
+# families in all strains
+for S in $(cat typical.lst); do
+    cat STRAINS/${S}/family-count.tsv
+done |
+    tsv-summarize -g 1,2 --count |
+    tsv-filter -H --istr-not-in-fld 2:"probable" |
+    tsv-filter -H --istr-not-in-fld 2:"putative" |
+    tsv-filter -H --istr-not-in-fld 2:"Uncharacterised" |
+    tsv-filter -H --istr-not-in-fld 2:" DUF" |
+    tsv-filter --ge 3:$COUNT \
+    > STRAINS/universal.tsv
+
+# All other strains should have only 1 family member
+cp STRAINS/universal.tsv STRAINS/family-1.tsv
+for S in $(cat typical.lst | grep -v "_aer_"); do
+    if [ ! -s STRAINS/${S}/family-count.tsv ]; then
+        continue
+    fi
+    cat STRAINS/${S}/family-count.tsv |
+        tsv-join -k 1 -f STRAINS/family-1.tsv |
+        tsv-filter --eq 3:1 \
+        > STRAINS/family-tmp.tsv
+
+    mv STRAINS/family-tmp.tsv STRAINS/family-1.tsv
+done
+
+# All P_aer strains should have multiple family members
+cp STRAINS/family-1.tsv STRAINS/family-n.tsv
+for S in $(cat typical.lst | grep "_aer_"); do
+    if [ ! -s STRAINS/${S}/family-count.tsv ]; then
+        continue
+    fi
+    cat STRAINS/${S}/family-count.tsv |
+        tsv-join -k 1 -f STRAINS/family-n.tsv |
+        tsv-filter --gt 3:1 \
+        > STRAINS/family-tmp.tsv
+
+    wc -l < STRAINS/family-tmp.tsv
+    mv STRAINS/family-tmp.tsv STRAINS/family-n.tsv
+done
+
+wc -l STRAINS/Pseudom_aer_PAO1/family.tsv STRAINS/universal.tsv STRAINS/family-1.tsv STRAINS/family-n.tsv
+#  4084 STRAINS/Pseudom_aer_PAO1/family.tsv
+#  1567 STRAINS/universal.tsv
+#   972 STRAINS/family-1.tsv
+#    14 STRAINS/family-n.tsv
+
+cat STRAINS/family-n.tsv |
+    tsv-select -f 1,2 |
+    (echo -e "#family\tcount" && cat) |
+    mlr --itsv --omd cat
+
+```
+
+| #family   | count                                                         |
+|-----------|---------------------------------------------------------------|
+| IPR014311 | Guanine deaminase                                             |
+| IPR001404 | Heat shock protein Hsp90 family                               |
+| IPR005999 | Glycerol kinase                                               |
+| IPR000813 | 7Fe ferredoxin                                                |
+| IPR011757 | Lytic transglycosylase MltB                                   |
+| IPR007416 | YggL 50S ribosome-binding protein                             |
+| IPR004361 | Glyoxalase I                                                  |
+| IPR024922 | Rubredoxin                                                    |
+| IPR001353 | Proteasome, subunit alpha/beta                                |
+| IPR002307 | Tyrosine-tRNA ligase                                          |
+| IPR024088 | Tyrosine-tRNA ligase, bacterial-type                          |
+| IPR037532 | Peptidoglycan D,D-transpeptidase FtsI                         |
+| IPR003672 | CobN/magnesium chelatase                                      |
+| IPR004685 | Branched-chain amino acid transport system II carrier protein |
+
+## IPR007416 - YggL 50S ribosome-binding protein
+
+* Pfam:     PF04320 - YggL_50S_bp
+* PANTHER:  PTHR38778 - CYTOPLASMIC PROTEIN-RELATED (PTHR38778)
+
+```shell
+cd ~/data/Pseudomonas
+
+cat STRAINS/Pseudom_aer_PAO1/*.tsv |
+    grep "IPR007416"
+
+mkdir -p YggL/HMM
+
+curl -L http://pfam.xfam.org/family/PF04320/hmm > YggL/HMM/YggL_50S_bp.hmm
+curl -L www.pantherdb.org/panther/exportHmm.jsp?acc=PTHR38778 > YggL/HMM/PTHR38778.hmm
+
+E_VALUE=1e-20
+for domain in YggL_50S_bp PTHR38778; do
+    >&2 echo "==> domain [${domain}]"
+
+    if [ -e YggL/${domain}.replace.tsv ]; then
+        continue;
+    fi
+
+    for GENUS in $(cat genus.lst); do
+        >&2 echo "==> GENUS [${GENUS}]"
+
+        for STRAIN in $(cat taxon/${GENUS}); do
+            gzip -dcf ASSEMBLY/${STRAIN}/*_protein.faa.gz |
+                hmmsearch -E ${E_VALUE} --domE ${E_VALUE} --noali --notextw YggL/HMM/${domain}.hmm - |
+                grep '>>' |
+                STRAIN=${STRAIN} perl -nl -e '
+                    />>\s+(\S+)/ or next;
+                    $n = $1;
+                    $s = $n;
+                    $s =~ s/\.\d+//;
+                    printf qq{%s\t%s_%s\n}, $n, $ENV{STRAIN}, $s;
+                '
+        done
+    done \
+        > YggL/${domain}.replace.tsv
+
+    >&2 echo
+done
+
+tsv-join YggL/YggL_50S_bp.replace.tsv \
+    -f YggL/PTHR38778.replace.tsv \
+    > YggL/YggL.replace.tsv
+
+wc -l YggL/*.tsv
+#  1301 YggL/PTHR38778.replace.tsv
+#  1302 YggL/YggL_50S_bp.replace.tsv
+#  1301 YggL/YggL.replace.tsv
+
+faops some PROTEINS/all.replace.fa <(tsv-select -f 2 YggL/YggL.replace.tsv) YggL/YggL.fa
+
+muscle -in YggL/YggL.fa -out YggL/YggL.aln.fa
+
+FastTree YggL/YggL.aln.fa > YggL/YggL.aln.newick
+
+nw_reroot YggL/YggL.aln.newick $(nw_labels YggL/YggL.aln.newick | grep -E "B_sub|St_aur") |
+    nw_order -c n - \
+    > YggL/YggL.reoot.newick
 
 ```
