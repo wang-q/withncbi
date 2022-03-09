@@ -29,6 +29,12 @@
         + [Scrap PFAM domains](#scrap-pfam-domains)
         + [Scan every domain](#scan-every-domain)
         + [InterProScan](#interproscan)
+    * [Search for gene families with uneven members](#search-for-gene-families-with-uneven-members)
+        + [Within species](#within-species)
+        + [Among species](#among-species)
+    * [Glycerol kinase](#glycerol-kinase)
+        + [domain structure and gene tree](#domain-structure-and-gene-tree)
+    * [Xylulose 5-phosphate/Fructose 6-phosphate phosphoketolase](#xylulose-5-phosphatefructose-6-phosphate-phosphoketolase)
 
 The genus Pseudomonas includes the conditionally pathogenic bacteria Pseudomonas aeruginosa, plant
 pathogens, plant beneficial bacteria, and soil bacteria. Microorganisms of Pseudomonas are extremely
@@ -1591,7 +1597,10 @@ rm DOMAINS/header.tsv
 
 ### InterProScan
 
-InterProScan 启动很慢, 因此一次提交整个菌株里的数十个蛋白.
+The previous `hmmsearch` steps were done to narrow down the number of target proteins so that as few
+proteins as possible would be passed to the following IPS steps.
+
+InterProScan starts slowly, so dozens of proteins from one strain are submitted at once.
 
 ```shell script
 cd ~/data/Pseudomonas
@@ -1639,13 +1648,14 @@ done
 rm -fr split output.*
 
 # IPS family
-for GENUS in $(cat genus.lst); do
-    echo 1>&2 "==> GENUS [${GENUS}]"
-
-    for STRAIN in $(cat taxon/${GENUS}); do
-        cat IPS/${STRAIN}/${STRAIN}.json |
+cat strains.lst |
+    parallel --no-run-if-empty --linebuffer -k -j 8 '
+        if [ $(({#} % 10)) -eq "0" ]; then
+            >&2 printf "."
+        fi
+        cat IPS/{}/{}.json |
             jq .results |
-            jq -r -c '
+            jq -r -c '\''
                 .[] |
                 .xref as $name |
                 .matches[] |
@@ -1653,10 +1663,9 @@ for GENUS in $(cat genus.lst); do
                 select(.type == "FAMILY") |
                 [$name[0].name, .accession, .description] |
                 @tsv
-            ' |
+            '\'' |
             tsv-uniq -f 1
-    done
-done |
+    ' |
     (echo -e "#name\tfamily\tdescription" && cat) \
     > IPS/family.tsv
 
@@ -1677,3 +1686,433 @@ tsv-join \
 
 ```
 
+## Search for gene families with uneven members
+
+```shell
+cd ~/data/Pseudomonas
+
+cat IPS/predicts.tsv |
+    tsv-filter -H --not-empty description |
+    tsv-summarize -H -g strain,family,description --count |
+    keep-header -- tsv-sort -k4,4n |
+    tsv-summarize -H -g family,description --unique-values 4 |
+    keep-header -- tsv-sort -k2,2 |
+    tsv-filter -H --str-in-fld 3:'|' --char-len-lt 3:10 |
+    tsv-filter -H --istr-not-in-fld 2:"probable" |
+    tsv-filter -H --istr-not-in-fld 2:"putative" |
+    tsv-filter -H --istr-not-in-fld 2:"Uncharacterised" |
+    sed 's/count_unique_values/count/' |
+    tr '|' '/' \
+    > variety.tsv
+
+cat variety.tsv |
+    mlr --itsv --omd cat
+
+```
+
+| family    | description                                                                  | count     |
+|-----------|------------------------------------------------------------------------------|-----------|
+| IPR006346 | 2-phosphoglycolate phosphatase-like, prokaryotic                             | 1/2       |
+| IPR043700 | 3-dehydroshikimate dehydratase                                               | 1/2/3     |
+| IPR039104 | 6-Phosphogluconolactonase                                                    | 1/2/3     |
+| IPR015443 | Aldose 1-epimerase                                                           | 1/2       |
+| IPR008183 | Aldose 1-/Glucose-6-phosphate 1-epimerase                                    | 1/2/3/4   |
+| IPR006046 | Alpha amylase                                                                | 1/2       |
+| IPR005841 | Alpha-D-phosphohexomutase superfamily                                        | 1/2/3/4   |
+| IPR016828 | Alpha-L-arabinofuranosidase                                                  | 1/2       |
+| IPR001719 | AP endonuclease 2                                                            | 1/2       |
+| IPR000631 | ATP-dependent (S)-NAD(P)H-hydrate dehydratase                                | 1/2       |
+| IPR011835 | Bacterial/plant glycogen synthase                                            | 1/2/3     |
+| IPR008264 | Beta-glucanase                                                               | 1/2       |
+| IPR025705 | Beta-hexosaminidase                                                          | 1/2/3/4/5 |
+| IPR022956 | Beta-hexosaminidase, bacterial                                               | 1/2       |
+| IPR006879 | Carbohydrate deacetylase YdjC-like                                           | 1/2       |
+| IPR000577 | Carbohydrate kinase, FGGY                                                    | 1/2/3/4/5 |
+| IPR013445 | CDP-glucose 4,6-dehydratase                                                  | 1/2       |
+| IPR003919 | Cellulose synthase, subunit A                                                | 1/2       |
+| IPR011843 | Coenzyme PQQ biosynthesis protein E, bacteria                                | 1/2       |
+| IPR000150 | Cof family                                                                   | 1/2/3/4/5 |
+| IPR004446 | D,D-heptose 1,7-bisphosphate phosphatase                                     | 1/2       |
+| IPR012062 | D-tagatose-1,6-bisphosphate aldolase subunit  GatZ/KbaZ-like                 | 1/2       |
+| IPR005913 | dTDP-4-dehydrorhamnose reductase family                                      | 1/2/3/4/5 |
+| IPR005888 | dTDP-glucose 4,6-dehydratase                                                 | 1/2/3     |
+| IPR029865 | Dyslexia-associated protein KIAA0319-like                                    | 1/2       |
+| IPR010099 | Epimerase family protein SDR39U1                                             | 1/2       |
+| IPR024713 | Fructosamine deglycase FrlB                                                  | 1/3       |
+| IPR000146 | Fructose-1,6-bisphosphatase class 1                                          | 1/2/3     |
+| IPR000771 | Fructose-bisphosphate aldolase, class-II                                     | 1/2/3/4/5 |
+| IPR028614 | GDP-L-fucose synthase/GDP-L-colitose synthase                                | 1/2       |
+| IPR006368 | GDP-mannose 4,6-dehydratase                                                  | 1/2       |
+| IPR023725 | Glucan biosynthesis glucosyltransferase H                                    | 1/2       |
+| IPR014438 | Glucan biosynthesis protein MdoG/MdoD                                        | 1/2/3     |
+| IPR006425 | Glucoamylase, bacterial                                                      | 1/2       |
+| IPR004547 | Glucosamine-6-phosphate isomerase                                            | 1/2/3/4   |
+| IPR005855 | Glucosamine-fructose-6-phosphate aminotransferase, isomerising               | 1/2/3     |
+| IPR025532 | Glucose-6-phosphate 1-epimerase                                              | 1/2       |
+| IPR005999 | Glycerol kinase                                                              | 1/2       |
+| IPR011837 | Glycogen debranching enzyme, GlgX type                                       | 1/2       |
+| IPR001137 | Glycoside hydrolase family 11                                                | 1/2       |
+| IPR006101 | Glycoside hydrolase, family 2                                                | 1/2/3     |
+| IPR002053 | Glycoside hydrolase, family 25                                               | 1/2       |
+| IPR000805 | Glycoside hydrolase family 26                                                | 1/2/3     |
+| IPR000743 | Glycoside hydrolase, family 28                                               | 1/2/3     |
+| IPR000933 | Glycoside hydrolase, family 29                                               | 1/2       |
+| IPR023933 | Glycoside hydrolase, family 2, beta-galactosidase                            | 1/2       |
+| IPR001139 | Glycoside hydrolase family 30                                                | 1/2       |
+| IPR000322 | Glycoside hydrolase family 31                                                | 1/2/3/4   |
+| IPR001362 | Glycoside hydrolase, family 32                                               | 1/2/3/4   |
+| IPR001944 | Glycoside hydrolase, family 35                                               | 1/2       |
+| IPR001661 | Glycoside hydrolase, family 37                                               | 1/2       |
+| IPR000514 | Glycoside hydrolase, family 39                                               | 1/2       |
+| IPR001088 | Glycoside hydrolase, family 4                                                | 1/2/3/4/7 |
+| IPR003476 | Glycoside hydrolase, family 42                                               | 1/2       |
+| IPR003469 | Glycoside hydrolase, family 68                                               | 1/2/3/4   |
+| IPR002037 | Glycoside hydrolase, family 8                                                | 1/2       |
+| IPR001701 | Glycoside hydrolase family 9                                                 | 1/3       |
+| IPR031924 | Glycosyl hydrolase family 115                                                | 1/2       |
+| IPR011683 | Glycosyl hydrolase family 53                                                 | 1/2/3     |
+| IPR010905 | Glycosyl hydrolase, family 88                                                | 1/2/4     |
+| IPR000811 | Glycosyl transferase, family 35                                              | 1/2       |
+| IPR005076 | Glycosyl transferase, family 6                                               | 1/2       |
+| IPR035461 | GmhA/DiaA                                                                    | 1/2/3     |
+| IPR006355 | HAD hydrolase, LHPP/HDHD2                                                    | 1/2       |
+| IPR006385 | HAD-superfamily hydrolase, subfamily IB, SerB1-like                          | 1/2       |
+| IPR006357 | HAD-superfamily hydrolase, subfamily IIA                                     | 1/2       |
+| IPR013126 | Heat shock protein 70 family                                                 | 1/2/3/4   |
+| IPR017643 | Hydroxypyruvate isomerase                                                    | 1/2       |
+| IPR026040 | Hydroxypyruvate isomerase-like                                               | 1/2/3/4   |
+| IPR003535 | Intimin/invasin bacterial adhesion mediator protein                          | 1/2/3     |
+| IPR030823 | IolE/MocC family                                                             | 1/2       |
+| IPR010023 | KdsC family                                                                  | 1/2       |
+| IPR006328 | L-2-Haloacid dehalogenase                                                    | 1/2       |
+| IPR005501 | LamB/YcsF/PxpA-like                                                          | 1/2/3/4   |
+| IPR000709 | Leu/Ile/Val-binding protein                                                  | 1/2       |
+| IPR011304 | L-lactate dehydrogenase                                                      | 1/2       |
+| IPR001557 | L-lactate/malate dehydrogenase                                               | 1/2/3     |
+| IPR017045 | Maltose phosphorylase/glycosyl hydrolase/vacuolar acid trehalase             | 1/2       |
+| IPR004628 | Mannonate dehydratase                                                        | 1/2       |
+| IPR014344 | PEP-CTERM locus, polysaccharide deactylase                                   | 1/2       |
+| IPR001314 | Peptidase S1A, chymotrypsin family                                           | 1/2/3     |
+| IPR037950 | Peptidoglycan deacetylase PgdA-like                                          | 1/2/3     |
+| IPR006352 | Phosphoglucosamine mutase, bacterial type                                    | 1/2       |
+| IPR004515 | Phosphoheptose isomerase                                                     | 1/2       |
+| IPR006323 | Phosphonoacetaldehyde hydrolase                                              | 1/2       |
+| IPR004469 | Phosphoserine phosphatase                                                    | 1/2       |
+| IPR011863 | Phosphoserine phosphatase/homoserine phosphotransferase bifunctional protein | 1/2       |
+| IPR004800 | Phosphosugar isomerase, KdsD/KpsF-type                                       | 1/2       |
+| IPR023854 | Poly-beta-1,6-N-acetyl-D-glucosamine N-deacetylase PgaB                      | 1/2/3     |
+| IPR023853 | Poly-beta-1,6 N-acetyl-D-glucosamine synthase PgaC/IcaA                      | 1/2       |
+| IPR006391 | P-type ATPase, B chain, subfamily IA                                         | 1/2       |
+| IPR006415 | P-type ATPase, subfamily IIIB                                                | 1/2/3     |
+| IPR039331 | Purple acid phosphatase-like                                                 | 1/2       |
+| IPR004625 | Pyridoxine kinase                                                            | 1/2       |
+| IPR011877 | Ribokinase                                                                   | 1/2       |
+| IPR002139 | Ribokinase/fructokinase                                                      | 1/2/3/4/5 |
+| IPR004785 | Ribose 5-phosphate isomerase B                                               | 1/2       |
+| IPR026019 | Ribulose-phosphate 3-epimerase                                               | 1/2       |
+| IPR000056 | Ribulose-phosphate 3-epimerase-like                                          | 1/2/3/4   |
+| IPR016377 | Sucrose/Glucosylglycerate phosphorylase-related                              | 1/2       |
+| IPR003500 | Sugar-phosphate isomerase, RpiB/LacA/LacB family                             | 1/2/3     |
+| IPR017583 | Tagatose/fructose phosphokinase                                              | 1/2/3     |
+| IPR001585 | Transaldolase/Fructose-6-phosphate aldolase                                  | 1/2/3     |
+| IPR004730 | Transaldolase type 1                                                         | 1/2/3     |
+| IPR003337 | Trehalose-phosphatase                                                        | 1/2       |
+| IPR012665 | Trehalose synthase                                                           | 1/2       |
+| IPR010130 | Type I secretion outer membrane protein, TolC                                | 1/2       |
+| IPR020023 | UDP-2,4-diacetamido-2,4,6-trideoxy-beta-L-altropyranose hydrolase            | 1/2       |
+| IPR005886 | UDP-glucose 4-epimerase                                                      | 1/2/3     |
+| IPR002213 | UDP-glucuronosyl/UDP-glucosyltransferase                                     | 1/2       |
+| IPR006326 | UDP-glycosyltransferase, MGT                                                 | 1/2/3     |
+| IPR029767 | UDP-N-acetylglucosamine 2-epimerase WecB-like                                | 1/2       |
+| IPR020025 | UDP-N-acetylglucosamine 4,6-dehydratase (inverting)                          | 1/2       |
+| IPR022857 | Undecaprenyl-phosphate 4-deoxy-4-formamido-L-arabinose transferase           | 1/2       |
+| IPR039426 | Vitamin B12 transporter BtuB-like                                            | 1/2       |
+| IPR001998 | Xylose isomerase                                                             | 1/2       |
+| IPR006000 | Xylulokinase                                                                 | 1/2/3     |
+| IPR005593 | Xylulose 5-phosphate/Fructose 6-phosphate phosphoketolase                    | 1/2/3     |
+
+### Within species
+
+```shell
+cd ~/data/Pseudomonas
+
+for f in $(cat variety.tsv | tsv-select -f 1 | sed '1d' | sort); do
+    cat IPS/predicts.tsv |
+        tsv-select -f 1-3,5,6 |
+        tsv-filter -H --str-eq family:"${f}" |
+        tsv-join -d 2 \
+            -f strains.taxon.tsv -k 1 \
+            --append-fields 4 |
+        tsv-summarize -g 6,2 --count |
+        keep-header -- tsv-sort -k3,3n |
+        tsv-summarize -g 1 --unique-values 3 |
+        tsv-filter --str-in-fld 2:'|' |
+        tsv-sort -k1,1 |
+        tr '|' '/' \
+        > tmp.tsv
+
+    COUNT=$(cat tmp.tsv | wc -l)
+    HAS_T=$(cat tmp.tsv | grep -E "aeruginosa|chlororaphis|fluorescens|protegens|putida|syringae" | wc -l)
+    if [[ ${COUNT} -ge "1" && ${COUNT} -le "5" && ${HAS_T} -ge "1" ]]; then
+        cat tmp.tsv |
+            sed "1 s/^/${f}\\t/" |
+            sed "2,$ s/^/\\t/"
+    fi
+
+done |
+    (echo -e "#family\tspecies\tcount" && cat) |
+    mlr --itsv --omd cat
+
+```
+
+| #family   | species                          | count   |
+|-----------|----------------------------------|---------|
+| IPR000146 | Alteromonas macleodii            | 1/2     |
+|           | Pseudoalteromonas aliena         | 1/2     |
+|           | Pseudoalteromonas carrageenovora | 1/2     |
+|           | Pseudoalteromonas translucida    | 1/3     |
+|           | Pseudomonas aeruginosa           | 1/2     |
+| IPR000631 | Pseudomonas protegens            | 1/2     |
+| IPR000743 | Alteromonas australica           | 2/1     |
+|           | Pseudomonas amygdali             | 1/2     |
+|           | Pseudomonas savastanoi           | 1/2     |
+|           | Pseudomonas syringae             | 1/2/3   |
+| IPR000811 | Pseudomonas balearica            | 1/2     |
+|           | Pseudomonas fluorescens          | 1/2     |
+|           | Pseudomonas mandelii             | 1/2     |
+|           | Pseudomonas stutzeri             | 1/2     |
+|           | Pseudomonas veronii              | 1/2     |
+| IPR002037 | Pseudomonas fluorescens          | 1/2     |
+|           | Pseudomonas knackmussii          | 1/2     |
+|           | Pseudomonas putida               | 1/2     |
+| IPR002053 | Pseudomonas syringae             | 1/2     |
+| IPR003469 | Pseudomonas amygdali             | 1/2     |
+|           | Pseudomonas coronafaciens        | 2/3/4   |
+|           | Pseudomonas orientalis           | 1/2     |
+|           | Pseudomonas savastanoi           | 1/2/3   |
+|           | Pseudomonas syringae             | 1/2/3/4 |
+| IPR004625 | Pseudomonas aeruginosa           | 1/2     |
+|           | Pseudomonas putida               | 1/2     |
+| IPR005593 | Pseudomonas aeruginosa           | 1/2     |
+|           | Pseudomonas veronii              | 1/2     |
+| IPR005999 | Alteromonas australica           | 1/2     |
+|           | Marinobacter adhaerens           | 1/2     |
+|           | Pseudomonas aeruginosa           | 1/2     |
+| IPR006323 | Pseudomonas fluorescens          | 1/2     |
+|           | Pseudomonas otitidis             | 1/2     |
+|           | Pseudomonas putida               | 1/2     |
+|           | Pseudomonas umsongensis          | 1/2     |
+| IPR006346 | Pseudomonas aeruginosa           | 1/2     |
+|           | Pseudomonas fluorescens          | 1/2     |
+|           | Pseudomonas monteilii            | 1/2     |
+|           | Pseudomonas putida               | 1/2     |
+|           | Pseudomonas stutzeri             | 1/2     |
+| IPR006391 | Pseudomonas fluorescens          | 1/2     |
+|           | Pseudomonas protegens            | 1/2     |
+|           | Pseudomonas veronii              | 1/2     |
+| IPR010023 | Pseudomonas fragi                | 1/2     |
+|           | Pseudomonas putida               | 1/2     |
+| IPR010099 | Pseudomonas brassicacearum       | 1/2     |
+|           | Pseudomonas fluorescens          | 1/2     |
+| IPR010130 | Pseudomonas chlororaphis         | 1/2     |
+| IPR017643 | Pseudomonas putida               | 1/2     |
+| IPR022857 | Pseudomonas fluorescens          | 1/2     |
+|           | Pseudomonas psychrotolerans      | 1/2     |
+| IPR022956 | Pseudomonas monteilii            | 1/2     |
+|           | Pseudomonas plecoglossicida      | 1/2     |
+|           | Pseudomonas putida               | 1/2     |
+| IPR023725 | Pseudomonas putida               | 1/2     |
+| IPR028614 | Escherichia coli                 | 1/2     |
+|           | Pseudomonas fluorescens          | 1/2     |
+|           | Pseudomonas protegens            | 1/2     |
+|           | Pseudomonas veronii              | 1/2     |
+| IPR029767 | Pseudomonas entomophila          | 1/2     |
+|           | Pseudomonas fluorescens          | 1/2     |
+|           | Pseudomonas mendocina            | 1/2     |
+|           | Pseudomonas protegens            | 1/2     |
+| IPR037950 | Pseudomonas brassicacearum       | 1/3     |
+|           | Pseudomonas chlororaphis         | 1/2/3   |
+|           | Pseudomonas fluorescens          | 1/2/3   |
+
+### Among species
+
+```shell
+cd ~/data/Pseudomonas
+
+for f in $(cat variety.tsv | tsv-select -f 1 | sed '1d' | sort); do
+    cat IPS/predicts.tsv |
+        tsv-select -f 1-3,5,6 |
+        tsv-filter -H --str-eq family:"${f}" |
+        tsv-join -d 2 \
+            -f strains.taxon.tsv -k 1 \
+            --append-fields 4 |
+        tsv-summarize -g 6,2 --count |
+        keep-header -- tsv-sort -k3,3n |
+        tsv-summarize -g 1 --unique-values 3 |
+        tsv-filter --str-not-in-fld 2:'|' |
+        tsv-sort -k1,1 |
+        tr '|' '/' \
+        > tmp.tsv
+
+    IS_1=$(cat tmp.tsv | tsv-filter --eq 2:1 | wc -l)
+    IS_N=$(cat tmp.tsv | tsv-filter --ne 2:1 | wc -l)
+    HAS_T=$(cat tmp.tsv | tsv-filter --ne 2:1 | grep -E "aeruginosa|chlororaphis|fluorescens|protegens|putida|syringae" | wc -l)
+
+    if [[ ${IS_1} -ge "20" && ${IS_N} -ge "1" && ${IS_N} -le "10" && ${HAS_T} -ge "1" ]]; then
+        printf "%s\t%d\t%d\t%d\n" $f $IS_1 $IS_N $HAS_T
+        cat tmp.tsv | tsv-filter --ne 2:1 | grep -E "aeruginosa|chlororaphis|fluorescens|protegens|putida|syringae"
+    fi
+done
+#IPR010099       82      5       1
+#Pseudomonas protegens   2
+#IPR028614       27      1       1
+#Pseudomonas chlororaphis        2
+
+```
+
+## Glycerol kinase
+
+* IPR000577 - Carbohydrate kinase, FGGY
+    * IPR005999 - Glycerol kinase
+    * IPR006000 - Xylulokinase
+
+```shell
+cd ~/data/Pseudomonas
+
+cat IPS/predicts.tsv |
+    tsv-filter -H --str-eq family:IPR005999  |
+    tsv-summarize -H -g annotation --count
+#annotation      count
+#glycerol kinase GlpK    1161
+#glycerol kinase 10
+
+cat IPS/predicts.tsv |
+    tsv-filter -H --str-eq family:IPR000577  |
+    tsv-summarize -H -g annotation --count |
+    tsv-filter -H --gt 2:5
+#annotation      count
+#glycerol kinase GlpK    671
+#xylulokinase    289
+#glycerol kinase 45
+#carbohydrate kinase     9
+#FGGY-family carbohydrate kinase 592
+
+cat IPS/predicts.tsv |
+    tsv-filter -H --str-eq family:IPR006000  |
+    tsv-summarize -H -g annotation --count |
+    tsv-filter -H --gt 2:5
+#annotation      count
+#xylulokinase    478
+
+cat IPS/predicts.tsv |
+    tsv-filter -H --str-eq family:IPR005999 |
+    tsv-summarize -H -g size --count |
+    keep-header -- tsv-sort -k1,1n |
+    tsv-filter -H --ge count:10
+#size    count
+#493     15
+#494     348
+#495     19
+#499     48
+#500     19
+#501     185
+#502     204
+#504     15
+#505     288
+
+```
+
+### domain structure and gene tree
+
+All proteins have the same structure FGGY_C and FGGY_N.
+
+```shell
+cd ~/data/Pseudomonas
+
+mkdir -p ~/data/Pseudomonas/GlpK
+
+cat IPS/predicts.tsv |
+    tsv-filter -H --str-eq family:IPR005999 |
+    datamash transpose |
+    perl -nl -e '
+        $row = $_;
+        $row =~ s/\s//g;
+        length($row) > 20 and print;
+    ' |
+    datamash transpose \
+    > GlpK/GlpK.tsv
+
+plotr tsv GlpK/GlpK.tsv --header
+
+cat IPS/predicts.tsv |
+    tsv-filter -H --or --str-eq family:IPR005999 --str-eq family:IPR000577 --str-eq family:IPR006000 |
+    datamash transpose |
+    perl -nl -e '
+        $row = $_;
+        $row =~ s/\s//g;
+        length($row) > 20 and print;
+    ' |
+    datamash transpose \
+    > GlpK/FGGY.tsv
+
+cat DOMAINS/domains.tsv |
+    tsv-filter -H --not-empty FGGY_C --not-empty FGGY_N |
+    tsv-select -H -f 1-4,FGGY_C,FGGY_N \
+    > GlpK/FGGY_N_C.tsv
+
+wc -l GlpK/*.tsv
+#  3727 GlpK/FGGY_N_C.tsv
+#  3282 GlpK/FGGY.tsv
+#  1098 GlpK/GlpK.tsv
+
+for f in GlpK FGGY FGGY_N_C ; do
+    >&2 echo "==> ${f}"
+
+    faops some PROTEINS/all.replace.fa <(tsv-select -f 1 GlpK/${f}.tsv) stdout \
+        > GlpK/${f}.fa
+
+    muscle -in GlpK/${f}.fa -out GlpK/${f}.aln.fa
+
+    FastTree GlpK/${f}.aln.fa > GlpK/${f}.aln.newick
+
+    nw_reroot GlpK/${f}.aln.newick $(nw_labels GlpK/${f}.aln.newick | grep -E "B_sub|St_aur") |
+        nw_order -c n - \
+        > GlpK/${f}.reoot.newick
+
+done
+
+```
+
+## Xylulose 5-phosphate/Fructose 6-phosphate phosphoketolase
+
+IPR005593
+
+```shell
+cd ~/data/Pseudomonas
+
+cat IPS/predicts.tsv |
+    tsv-filter -H --str-eq family:IPR005593  |
+    tsv-summarize -H -g annotation --count
+#annotation      count
+#D-xylulose 5-phosphate/D-fructose 6-phosphate phosphoketolase   139
+#xylulose 5-phosphate 3-epimerase        82
+#hypothetical protein    87
+#phosphoketolase 195
+#hypothetical protein PA3613     1
+#phosphoketolase family protein  126
+
+cat IPS/predicts.tsv |
+    tsv-filter -H --str-eq family:IPR005593 |
+    tsv-summarize -H -g size --count |
+    keep-header -- tsv-sort -k1,1n |
+    tsv-filter -H --ge count:10
+#size    count
+#788     49
+#789     10
+#790     13
+#791     40
+#801     401
+#805     16
+#809     54
+
+```
