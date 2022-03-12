@@ -33,17 +33,13 @@
     * [Search for gene families with uneven members](#search-for-gene-families-with-uneven-members)
         + [Within species](#within-species)
         + [Among species](#among-species)
-    * [IPR005999 - Glycerol kinase](#ipr005999---glycerol-kinase)
-        + [domain structure and gene tree](#domain-structure-and-gene-tree)
-    * [IPR004800 - Phosphosugar isomerase, KdsD/KpsF-type](#ipr004800---phosphosugar-isomerase-kdsdkpsf-type)
-        + [domain structure and gene tree](#domain-structure-and-gene-tree-1)
-    * [IPR005593 - Xylulose 5-phosphate/Fructose 6-phosphate phosphoketolase](#ipr005593---xylulose-5-phosphatefructose-6-phosphate-phosphoketolase)
-        + [domain structure and gene tree](#domain-structure-and-gene-tree-2)
-    * [IPR006346 - 2-phosphoglycolate phosphatase-like, prokaryotic](#ipr006346---2-phosphoglycolate-phosphatase-like-prokaryotic)
-        + [domain structure and gene tree](#domain-structure-and-gene-tree-3)
-    * [IPR035461 - GmhA/DiaA](#ipr035461---gmhadiaa)
+        + [IPR005999 - Glycerol kinase](#ipr005999---glycerol-kinase)
+        + [IPR004800 - Phosphosugar isomerase, KdsD/KpsF-type](#ipr004800---phosphosugar-isomerase-kdsdkpsf-type)
+        + [IPR005593 - Xylulose 5-phosphate/Fructose 6-phosphate phosphoketolase](#ipr005593---xylulose-5-phosphatefructose-6-phosphate-phosphoketolase)
+        + [IPR006346 - 2-phosphoglycolate phosphatase-like, prokaryotic](#ipr006346---2-phosphoglycolate-phosphatase-like-prokaryotic)
+        + [IPR035461 - GmhA/DiaA](#ipr035461---gmhadiaa)
     * [InterProScan on all proteins of typical strains](#interproscan-on-all-proteins-of-typical-strains)
-    * [IPR007416 - YggL 50S ribosome-binding protein](#ipr007416---yggl-50s-ribosome-binding-protein)
+        + [IPR007416 - YggL 50S ribosome-binding protein](#ipr007416---yggl-50s-ribosome-binding-protein)
     * [Collect CDS](#collect-cds)
         + [`all.cds.fa`](#allcdsfa)
         + [`YggL.cds.fa`](#ygglcdsfa)
@@ -306,7 +302,7 @@ echo "
     " |
     sqlite3 -tabs ~/.nwr/ar_refseq.sqlite \
     > reference.tsv
-https://www.ebi.ac.uk/biosamples/download?format=json&text=SAMN02604151
+
 cat reference.tsv |
     sed '1s/^/#/' |
     nwr append stdin -r phylum -r class |
@@ -2115,7 +2111,7 @@ done
 
 ```
 
-## IPR005999 - Glycerol kinase
+### IPR005999 - Glycerol kinase
 
 * IPR000577 - Carbohydrate kinase, FGGY
     * IPR005999 - Glycerol kinase
@@ -2178,8 +2174,6 @@ cat IPS/predicts.tsv |
 #Pseudomonas aeruginosa  223
 
 ```
-
-### domain structure and gene tree
 
 All proteins have the same structure FGGY_C and FGGY_N.
 
@@ -2244,7 +2238,7 @@ done
 
 在 PAO1 中, 这两个基因 PA3582 (glpK) 和 PA3579 只间隔一个基因. 不能确定是 HGT.
 
-## IPR004800 - Phosphosugar isomerase, KdsD/KpsF-type
+### IPR004800 - Phosphosugar isomerase, KdsD/KpsF-type
 
 ```shell
 cd ~/data/Pseudomonas
@@ -2293,8 +2287,6 @@ cat IPS/predicts.tsv |
 
 ```
 
-### domain structure and gene tree
-
 All proteins have the same structure SIS.
 
 ```shell
@@ -2342,7 +2334,7 @@ done
 
 ```
 
-## IPR005593 - Xylulose 5-phosphate/Fructose 6-phosphate phosphoketolase
+### IPR005593 - Xylulose 5-phosphate/Fructose 6-phosphate phosphoketolase
 
 ```shell
 cd ~/data/Pseudomonas
@@ -2385,8 +2377,6 @@ cat IPS/predicts.tsv |
 #Pseudomonas aeruginosa  50
 
 ```
-
-### domain structure and gene tree
 
 All proteins have the same structure XFP and XFP_N, some have XFP_C.
 
@@ -2435,7 +2425,7 @@ done
 
 ```
 
-## IPR006346 - 2-phosphoglycolate phosphatase-like, prokaryotic
+### IPR006346 - 2-phosphoglycolate phosphatase-like, prokaryotic
 
 ```shell
 cd ~/data/Pseudomonas
@@ -2476,8 +2466,6 @@ cat IPS/predicts.tsv |
 #Pseudom_puti_GCF_008605605_1    2
 
 ```
-
-### domain structure and gene tree
 
 All proteins have the same structure Hydrolase and Hydrolase_like, some have Hydrolase_3.
 
@@ -2526,7 +2514,7 @@ done
 
 ```
 
-## IPR035461 - GmhA/DiaA
+### IPR035461 - GmhA/DiaA
 
 ```shell
 cd ~/data/Pseudomonas
@@ -2708,7 +2696,7 @@ cat STRAINS/family-n.tsv |
 | IPR003672 | CobN/magnesium chelatase                                      |
 | IPR004685 | Branched-chain amino acid transport system II carrier protein |
 
-## IPR007416 - YggL 50S ribosome-binding protein
+### IPR007416 - YggL 50S ribosome-binding protein
 
 * Pfam:     PF04320 - YggL_50S_bp
 * PANTHER:  PTHR38778 - CYTOPLASMIC PROTEIN-RELATED (PTHR38778)
