@@ -7,6 +7,7 @@
         + [Species with assemblies](#species-with-assemblies)
         + [Outgroups](#outgroups)
     * [Download all assemblies](#download-all-assemblies)
+    * [BioSample](#biosample)
     * [Count and group strains](#count-and-group-strains)
     * [NCBI taxonomy](#ncbi-taxonomy)
     * [Raw phylogenetic tree by MinHash](#raw-phylogenetic-tree-by-minhash)
@@ -43,6 +44,9 @@
     * [IPR035461 - GmhA/DiaA](#ipr035461---gmhadiaa)
     * [InterProScan on all proteins of typical strains](#interproscan-on-all-proteins-of-typical-strains)
     * [IPR007416 - YggL 50S ribosome-binding protein](#ipr007416---yggl-50s-ribosome-binding-protein)
+    * [Collect CDS](#collect-cds)
+        + [`all.cds.fa`](#allcdsfa)
+        + [`YggL.cds.fa`](#ygglcdsfa)
 
 The genus Pseudomonas includes the conditionally pathogenic bacteria Pseudomonas aeruginosa, plant
 pathogens, plant beneficial bacteria, and soil bacteria. Microorganisms of Pseudomonas are extremely
@@ -302,7 +306,7 @@ echo "
     " |
     sqlite3 -tabs ~/.nwr/ar_refseq.sqlite \
     > reference.tsv
-
+https://www.ebi.ac.uk/biosamples/download?format=json&text=SAMN02604151
 cat reference.tsv |
     sed '1s/^/#/' |
     nwr append stdin -r phylum -r class |
@@ -437,6 +441,85 @@ cat ASSEMBLY/rsync.tsv |
         md5sum --check md5checksums.txt
     ' |
     grep -v ": OK"
+```
+
+## BioSample
+
+ENA's BioSample missed many strains, so NCBI's was used.
+
+```shell
+cd ~/data/Pseudomonas
+
+mkdir -p biosample
+
+ulimit -n `ulimit -Hn`
+
+cat ASSEMBLY/Pseudomonas.assembly.collect.csv |
+    tsv-select -H -d, -f BioSample |
+    grep "^SAM" |
+    parallel --no-run-if-empty --linebuffer -k -j 4 '
+        if [ ! -s biosample/{}.txt ]; then
+            >&2 echo {}
+            curl -fsSL "https://www.ncbi.nlm.nih.gov/biosample/?term={}&report=full&format=text" -o biosample/{}.txt
+#            curl -fsSL "https://www.ebi.ac.uk/biosamples/samples/{}" -o biosample/{}.json
+        fi
+    '
+
+find biosample -name "SAM*.txt" | wc -l
+# 1518
+
+find biosample -name "SAM*.txt" |
+    parallel --no-run-if-empty --linebuffer -k -j 4 '
+        cat {} |
+            perl -nl -e '\''
+                print $1 if m{\s+\/([\w_ ]+)=};
+            '\''
+    ' |
+    tsv-uniq --at-least 50 | # ignore rare attributes
+    grep -v "^INSDC" |
+    grep -v "^ENA" \
+    > attributes.lst
+
+cat attributes.lst |
+    (echo -e "BioSample" && cat) |
+    tr '\n' '\t' |
+    sed 's/\t$/\n/' \
+    > Pseudomonas.biosample.tsv
+
+find biosample -name "SAM*.txt" |
+    parallel --no-run-if-empty --linebuffer -k -j 1 '
+        >&2 echo {/.}
+        cat {} |
+            perl -nl -MPath::Tiny -e '\''
+                BEGIN {
+                    our @keys = grep {/\S/} path(q{attributes.lst})->lines({chomp => 1});
+                    our %stat = ();
+                }
+
+                m(\s+\/([\w_ ]+)=\"(.+)\") or next;
+                my $k = $1;
+                my $v = $2;
+                if ( $v =~ m(\bNA|missing|Not applicable|not collected|not available|not provided|N\/A|not known|unknown\b)i ) {
+                    $stat{$k} = q();
+                } else {
+                    $stat{$k} = $v;
+                }
+
+                END {
+                    my @c;
+                    for my $key ( @keys ) {
+                        if (exists $stat{$key}) {
+                            push @c, $stat{$key};
+                        }
+                        else {
+                            push @c, q();
+                        }
+                    }
+                    print join(qq{\t}, q{{/.}}, @c);
+                }
+            '\''
+    ' \
+    >> Pseudomonas.biosample.tsv
 
 ```
 
