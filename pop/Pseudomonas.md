@@ -84,7 +84,6 @@ nwr ardb --genbank
 brew install hmmer
 brew install brewsci/bio/muscle
 brew install brewsci/bio/fasttree
-brew install brewsci/bio/easel
 brew install brewsci/bio/newick-utils
 brew install brewsci/bio/trimal
 
