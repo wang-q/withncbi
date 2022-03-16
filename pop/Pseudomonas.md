@@ -95,6 +95,13 @@ brew install librsvg
 brew install jq
 brew install pup
 
+# KaKs
+brew install brewsci/bio/clustal-w
+brew install brewsci/bio/paml
+
+cpanm Bio::Tools::Run::Alignment::Clustalw
+cpanm https://github.com/wang-q/Bio-Tools-Phylo-PAML.git
+
 ```
 
 ## Strain info
