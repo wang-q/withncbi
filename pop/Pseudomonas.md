@@ -2718,8 +2718,12 @@ mkdir -p YggL/HMM
 curl -L http://pfam.xfam.org/family/PF04320/hmm > YggL/HMM/YggL_50S_bp.hmm
 curl -L www.pantherdb.org/panther/exportHmm.jsp?acc=PTHR38778 > YggL/HMM/PTHR38778.hmm
 
+# Ribosomal protein L10 and S8
+curl -L http://pfam.xfam.org/family/PF00466/hmm > YggL/HMM/Ribosomal_L10.hmm
+curl -L http://pfam.xfam.org/family/PF00410/hmm > YggL/HMM/Ribosomal_S8.hmm
+
 E_VALUE=1e-20
-for domain in YggL_50S_bp PTHR38778; do
+for domain in YggL_50S_bp PTHR38778 Ribosomal_L10 Ribosomal_S8 ; do
     >&2 echo "==> domain [${domain}]"
 
     if [ -e YggL/${domain}.replace.tsv ]; then
@@ -2753,6 +2757,8 @@ tsv-join YggL/YggL_50S_bp.replace.tsv \
 
 wc -l YggL/*.tsv
 #  1301 YggL/PTHR38778.replace.tsv
+#  1512 YggL/Ribosomal_L10.replace.tsv
+#  1514 YggL/Ribosomal_S8.replace.tsv
 #  1302 YggL/YggL_50S_bp.replace.tsv
 #  1301 YggL/YggL.replace.tsv
 
@@ -2824,14 +2830,18 @@ done |
 ```shell script
 cd ~/data/Pseudomonas
 
-cat CDS/all.cds.fa |
-    grep '>' |
-    grep -F -f <( cat YggL/YggL.replace.tsv | cut -f 1 ) |
-    sed 's/^>//' \
-    > CDS/YggL.lst
+for domain in YggL Ribosomal_L10 Ribosomal_S8 ; do
+    cat CDS/all.cds.fa |
+        grep '>' |
+        grep -F -f <( cat YggL/${domain}.replace.tsv | cut -f 1 ) |
+        sed 's/^>//' \
+        > CDS/${domain}.lst
+done
 
-faops order CDS/all.cds.fa CDS/YggL.lst stdout |
-    sed -f CDS/sed.script \
-    > CDS/YggL.cds.fa
+for domain in YggL Ribosomal_L10 Ribosomal_S8 ; do
+    faops order CDS/all.cds.fa CDS/${domain}.lst stdout |
+        sed -f CDS/sed.script \
+        > CDS/${domain}.cds.fa
+done
 
 ```
