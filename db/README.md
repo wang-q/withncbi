@@ -106,6 +106,8 @@ rsync --list-only rsync://ftp.ncbi.nlm.nih.gov/blast/db/v5/refseq_protein*.gz |
 cat refseq_protein.lst |
     parallel -j4 'rsync -avP rsync://ftp.ncbi.nih.gov/blast/db/v5/{} .'
 
+md5sum --check refseq_protein.md5
+
 # nr
 curl -O https://ftp.ncbi.nih.gov/blast/db/v5/nr-prot-metadata.json
 
@@ -131,6 +133,8 @@ rsync --list-only rsync://ftp.ncbi.nlm.nih.gov/blast/db/v5/nr*.gz |
 
 cat nr.lst |
     parallel -j4 'rsync -avP rsync://ftp.ncbi.nih.gov/blast/db/v5/{} .'
+
+md5sum --check nr.md5
 
 ```
 
