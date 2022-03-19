@@ -16,7 +16,7 @@ Downloading date: 2020-12-11
 - [Old Bacteria genomes](#old-bacteria-genomes)
 
 
-# Get data from NCBI
+## Get data from NCBI
 
 Paths in the NCBI ftp site:
 
@@ -74,7 +74,67 @@ tar xvfz ~/data/NCBI/taxonomy/taxdump.tar.gz -C ~/data/NCBI/taxdmp
 
 ```
 
-# Databases
+## Blast DB v5
+
+```shell
+mkdir -p ~/data/blast
+cd ~/data/blast
+
+# refseq_protein
+curl -O https://ftp.ncbi.nih.gov/blast/db/v5/refseq_protein-prot-metadata.json
+
+cat refseq_protein-prot-metadata.json |
+    jq -r '.description, ."last-updated", ."number-of-volumes" | tostring'
+#NCBI Protein Reference Sequences
+#2022-03-16T00:00:00
+#28
+
+cat refseq_protein-prot-metadata.json |
+    jq -r '.files[]' |
+    sed 's/^ftp/https/' |
+    sed 's/$/.md5/' |
+    sort |
+    parallel -j4 -k 'curl -fsSL {}' \
+    > refseq_protein.md5
+
+rsync --list-only rsync://ftp.ncbi.nlm.nih.gov/blast/db/v5/refseq_protein*.gz |
+    grep '.tar.gz' |
+    perl -nla -F"\s+" -e 'print $F[-1]' |
+    sort \
+    > refseq_protein.lst
+
+cat refseq_protein.lst |
+    parallel -j4 'rsync -avP rsync://ftp.ncbi.nih.gov/blast/db/v5/{} .'
+
+# nr
+curl -O https://ftp.ncbi.nih.gov/blast/db/v5/nr-prot-metadata.json
+
+cat nr-prot-metadata.json |
+    jq -r '.description, ."last-updated", ."number-of-volumes" | tostring'
+#All non-redundant GenBank CDS translations+PDB+SwissProt+PIR+PRF excluding environmental samples from WGS projects
+#2022-03-14T00:00:00
+#57
+
+cat nr-prot-metadata.json |
+    jq -r '.files[]' |
+    sed 's/^ftp/https/' |
+    sed 's/$/.md5/' |
+    sort |
+    parallel -j4 -k 'curl -fsSL {}' \
+    > nr.md5
+
+rsync --list-only rsync://ftp.ncbi.nlm.nih.gov/blast/db/v5/nr*.gz |
+    grep '.tar.gz' |
+    perl -nla -F"\s+" -e 'print $F[-1]' |
+    sort \
+    > nr.lst
+
+cat nr.lst |
+    parallel -j4 'rsync -avP rsync://ftp.ncbi.nih.gov/blast/db/v5/{} .'
+
+```
+
+## Databases
 
 We will create 4 MySQL databases:
 
@@ -85,7 +145,7 @@ We will create 4 MySQL databases:
 
 Also, generate some useful excel workbooks.
 
-## Genome reports
+### Genome reports
 
 ```shell script
 cd ~/Scripts/withncbi/db
@@ -104,7 +164,7 @@ perl gr_overview.pl --db gr_euk
 
 ```
 
-## Assembly reports
+### Assembly reports
 
 ```shell script
 cat ~/data/NCBI/genomes/ASSEMBLY_REPORTS/assembly_summary_refseq.txt \
@@ -144,7 +204,7 @@ perl ar_overview.pl --db ar_genbank
 ```
 
 
-# Old Bacteria genomes
+## Old Bacteria genomes
 
 On 02 December 2015, these directories were moved to
 `ftp://ftp.ncbi.nlm.nih.gov/genomes/archive/old_refseq/`.
