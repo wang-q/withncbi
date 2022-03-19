@@ -2778,7 +2778,7 @@ nw_reroot YggL/YggL.aln.newick $(nw_labels YggL/YggL.aln.newick | grep -E "B_sub
 
 ### `all.cds.fa`
 
-```shell script
+```shell
 cd ~/data/Pseudomonas
 
 mkdir -p CDS
@@ -2827,7 +2827,7 @@ done |
 
 ### `YggL.cds.fa`
 
-```shell script
+```shell
 cd ~/data/Pseudomonas
 
 for domain in YggL Ribosomal_L10 Ribosomal_S8 ; do
