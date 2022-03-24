@@ -18,17 +18,19 @@ Genus *Trichoderma* as an example.
 
 ## Preparations
 
-* Install `nwr` and create a local taxonomy database.
+* Install `nwr` and create a local taxonomy and assembly database.
 
 ```shell
 brew install wang-q/tap/nwr
+brew install sqlite
 
 nwr download
 nwr txdb
 
-```
+nwr ardb
+nwr ardb --genbank
 
-* Create the [assembly database](https://github.com/wang-q/nwr/blob/master/doc/assembly.md).
+```
 
 ## Strain info
 
@@ -171,7 +173,7 @@ cat species.count.tsv |
 | 500994  | T. pleuroti            | 1   | 0   |
 | 5547    | T. viride              | 1   | 0   |
 
-## Trichoderma: assembly
+## Download all assemblies
 
 [WGS](https://www.ncbi.nlm.nih.gov/Traces/wgs/?view=wgs&search=Trichoderma) is now useless and can
 be ignored.
@@ -197,13 +199,16 @@ echo "
 
 cat raw.tsv |
     grep -v '^#' |
+    tsv-uniq |
     perl ~/Scripts/withncbi/taxon/abbr_name.pl -c "1,2,3" -s '\t' -m 3 --shortsub |
     (echo -e '#name\tftp_path\torganism\tassembly_level' && cat ) |
     perl -nl -a -F"," -e '
         BEGIN{my %seen};
         /^#/ and print and next;
         /^organism_name/i and next;
-        $seen{$F[5]}++;
+        $seen{$F[3]}++; # ftp_path
+        $seen{$F[3]} > 1 and next;
+        $seen{$F[5]}++; # abbr_name
         $seen{$F[5]} > 1 and next;
         printf qq{%s\t%s\t%s\t%s\n}, $F[5], $F[3], $F[1], $F[4];
         ' |
@@ -236,17 +241,20 @@ perl ~/Scripts/withncbi/taxon/assembly_prep.pl \
     -f ~/Scripts/withncbi/pop/Trichoderma.assembly.tsv \
     -o ASSEMBLY
 
-# Run
-bash ASSEMBLY/Trichoderma.assembly.rsync.sh
-
-bash ASSEMBLY/Trichoderma.assembly.collect.sh
-
 # Remove dirs not in the list
 find ASSEMBLY -maxdepth 1 -mindepth 1 -type d |
     tr "/" "\t" |
     cut -f 2 |
     tsv-join --exclude -k 1 -f ASSEMBLY/rsync.tsv -d 1 |
-    xargs -I[] rm -fr ASSEMBLY/[]
+    parallel --no-run-if-empty --linebuffer -k -j 1 '
+        echo Remove {}
+        rm -fr ASSEMBLY/{}
+    '
+
+# Run
+proxychains4 bash ASSEMBLY/Pseudomonas.assembly.rsync.sh
+
+bash ASSEMBLY/Pseudomonas.assembly.collect.sh
 
 # md5
 cat ASSEMBLY/rsync.tsv |
@@ -260,7 +268,7 @@ cat ASSEMBLY/rsync.tsv |
 
 ```
 
-## Filter strains by N50
+## Count and group strains
 
 ```shell
 cd ~/data/alignment/Trichoderma
@@ -304,27 +312,101 @@ wc -l ASSEMBLY/Trichoderma.assembly*csv
 
 ```
 
+
+* strains
+
+```shell
+cd ~/data/alignment/Trichoderma
+
+# list strains
+mkdir -p taxon
+
+rm taxon/*
+cat ASSEMBLY/Trichoderma.assembly.pass.csv |
+    sed -e '1d' |
+    tr "," "\t" |
+    tsv-select -f 1,2,3 |
+    nwr append stdin -c 3 -r species -r genus -r family -r order |
+    parallel --col-sep "\t" --no-run-if-empty --linebuffer -k -j 1 '
+        if [[ "{#}" -eq "1" ]]; then
+            rm strains.lst
+            rm genus.tmp
+            rm species.tmp
+        fi
+
+        echo {1} >> strains.lst
+
+        echo {5} >> genus.tmp
+        echo {1} >> taxon/{5}
+
+        echo {4} >> species.tmp
+
+        printf "%s\t%s\t%d\t%s\t%s\t%s\t%s\n" {1} {2} {3} {4} {5} {6} {7}
+    ' \
+    > strains.taxon.tsv
+
+cat genus.tmp | tsv-uniq > genus.lst
+cat species.tmp | tsv-uniq > species.lst
+
+# Omit strains without protein annotations
+for STRAIN in $(cat strains.lst); do
+    if ! compgen -G "ASSEMBLY/${STRAIN}/*_protein.faa.gz" > /dev/null; then
+        echo ${STRAIN}
+    fi
+    if ! compgen -G "ASSEMBLY/${STRAIN}/*_cds_from_genomic.fna.gz" > /dev/null; then
+        echo ${STRAIN}
+    fi
+done |
+    tsv-uniq \
+    > omit.lst
+
+rm *.tmp
+
+```
+
+## NCBI taxonomy
+
+Done by `bp_taxonomy2tree.pl` from BioPerl.
+
+```shell
+mkdir -p ~/data/alignment/Trichoderma/tree
+cd ~/data/alignment/Trichoderma/tree
+
+bp_taxonomy2tree.pl -e \
+    $(
+        cat ../species.lst |
+            tr " " "_" |
+            parallel echo '-s {}'
+    ) |
+    sed 's/Trichoderma/T/g' \
+    > ncbi.nwk
+
+nw_display -s -b 'visibility:hidden' -w 600 -v 30 ncbi.nwk |
+    rsvg-convert -o Trichoderma.ncbi.png
+
+```
+
 ## Raw phylogenetic tree by MinHash
 
 ```shell
 mkdir -p ~/data/alignment/Trichoderma/mash
 cd ~/data/alignment/Trichoderma/mash
 
-for name in $(cat ../ASSEMBLY/Trichoderma.assembly.pass.csv | sed -e '1d' | cut -d"," -f 1 ); do
-    2>&1 echo "==> ${name}"
+for strain in $(cat ../strains.lst ); do
+    2>&1 echo "==> ${strain}"
 
-    if [[ -e ${name}.msh ]]; then
+    if [[ -e ${strain}.msh ]]; then
         continue
     fi
 
-    find ../ASSEMBLY/${name} -name "*_genomic.fna.gz" |
+    find ../ASSEMBLY/${strain} -name "*_genomic.fna.gz" |
         grep -v "_from_" |
         xargs cat |
-        mash sketch -k 21 -s 100000 -p 8 - -I "${name}" -o ${name}
+        mash sketch -k 21 -s 100000 -p 8 - -I "${strain}" -o ${strain}
 done
 
 mash triangle -E -p 8 -l <(
-    cat ../ASSEMBLY/Trichoderma.assembly.pass.csv | sed -e '1d' | cut -d"," -f 1 | parallel echo "{}.msh"
+    cat ../strains.lst | parallel echo "{}.msh"
     ) \
     > dist.tsv
 
@@ -364,10 +446,46 @@ cat dist_full.tsv |
         write_tsv(groups, "groups.tsv")
     '
 
-nw_display -s -b 'visibility:hidden' -w 600 -v 30 tree.nwk |
-    rsvg-convert -o ../Trichoderma.png
+```
 
-# cp ../Trichoderma.png ~/Scripts/withncbi/image/
+### Tweak the mash tree
+
+```shell
+mkdir -p ~/data/alignment/Trichoderma/tree
+cd ~/data/alignment/Trichoderma/tree
+
+nw_reroot ../mash/tree.nwk C_pro_GCA_004303015_1 H_per_GCA_008477525_1 |
+    nw_order -c n - \
+    > mash.reroot.newick
+
+# rank::col
+ARRAY=(
+#    'order::7'
+#    'family::6'
+    'genus::5'
+    'species::4'
+)
+
+rm mash.condensed.map
+CUR_TREE=mash.reroot.newick
+
+for item in "${ARRAY[@]}" ; do
+    GROUP_NAME="${item%%::*}"
+    GROUP_COL="${item##*::}"
+
+    bash ~/Scripts/withncbi/taxon/condense_tree.sh ${CUR_TREE} ../strains.taxon.tsv 1 ${GROUP_COL}
+
+    mv condense.newick mash.${GROUP_NAME}.newick
+    cat condense.map >> mash.condensed.map
+
+    CUR_TREE=mash.${GROUP_NAME}.newick
+done
+
+# png
+nw_display -s -b 'visibility:hidden' -w 600 -v 30 mash.species.newick |
+    rsvg-convert -o Trichoderma.mash.png
+
+# cp Trichoderma.mash.png ~/Scripts/withncbi/image/Trichoderma.png
 
 ```
 
