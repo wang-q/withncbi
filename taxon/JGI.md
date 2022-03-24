@@ -12,10 +12,10 @@
 
 Login [phytozome portal](https://phytozome.jgi.doe.gov/pz/portal.html).
 
-Select needed species in *PhytozomeV12*
-[download page](http://genome.jgi.doe.gov/pages/dynamicOrganismDownload.jsf?organism=PhytozomeV12),
+Select needed species in *PhytozomeV13*
+[download page](https://genome.jgi.doe.gov/portal/pages/dynamicOrganismDownload.jsf?organism=Phytozome),
 then click the `Download Selected Files` button. A file named `PhytozomeV12_download.zip` would be
-created on the fly. Extract compressed file to `~/data/PhytozomeV12/SpeciesName`.
+created on the fly. Extract compressed file to `~/data/PhytozomeV13/SpeciesName`.
 
 JGI recommends using Globus, but it's blocked by GFW.
 
@@ -57,7 +57,7 @@ for name in \
     Bstacei Bdistachyon \
     ; do
     1>&2 echo "==> ${name}"
-    
+
     find ~/data/PhytozomeV12/${name}/assembly -type f -name "*.fa.gz" -not -name "*masked*" |
         xargs cat |
         faops n50 -C -S stdin |
@@ -104,7 +104,7 @@ for name in \
     Bstacei Bdistachyon \
     ; do
     1>&2 echo "==> ${name}"
-    
+
     find ~/data/PhytozomeV12/${name}/assembly -type f -name "*.fa.gz" -not -name "*masked*" |
         xargs cat |
         mash sketch -k 21 -s 100000 -p 4 - -I "${name}" -o ${name}
@@ -128,18 +128,18 @@ cat dist_full.tsv |
         library(readr);
         library(tidyr);
         library(ape);
-        pair_dist <- read_tsv(file("stdin"), col_names=F); 
+        pair_dist <- read_tsv(file("stdin"), col_names=F);
         tmp <- pair_dist %>%
             pivot_wider( names_from = X2, values_from = X3, values_fill = list(X3 = 1.0) )
         tmp <- as.matrix(tmp)
         mat <- tmp[,-1]
         rownames(mat) <- tmp[,1]
-        
+
         dist_mat <- as.dist(mat)
         clusters <- hclust(dist_mat, method = "ward.D2")
-        tree <- as.phylo(clusters) 
+        tree <- as.phylo(clusters)
         write.tree(phy=tree, file="tree.nwk")
-        
+
         group <- cutree(clusters, k=2) # h=0.2
         groups <- as.data.frame(group)
         groups$ids <- rownames(groups)
@@ -168,16 +168,16 @@ for name in \
     Osativa  OsativaKitaake \
     Bstacei Bdistachyon \
     ; do
-    
+
     if [ ! -d ~/data/alignment/JGI/${name} ]; then
         1>&2 echo "==> ${name}"
-    
+
         mkdir -p ~/data/alignment/JGI/${name}
         pushd ~/data/alignment/JGI/${name} > /dev/null
-        
+
         find ~/data/PhytozomeV12/${name}/assembly -type f -name "*.fa.gz" -not -name "*masked*" |
             xargs gzip -dc > toplevel.fa
-        
+
         faops count toplevel.fa |
             perl -nla -e '
                 next if $F[0] eq 'total';
@@ -208,10 +208,10 @@ for name in \
     Osativa  OsativaKitaake \
     Bstacei Bdistachyon \
     ; do
-    
+
     if [ ! -f ~/data/alignment/JGI/${name}/chr.2bit ]; then
         1>&2 echo "==> ${name}"
-    
+
 #        egaz prepseq \
 #            --repeatmasker '--species Viridiplantae --gff --parallel 8' -v \
 #            ~/data/alignment/JGI/${name}
@@ -244,7 +244,7 @@ for name in \
     find ~/data/PhytozomeV12/${name}/annotation/ -name "*.gff3.gz" |
         grep "gene_exons" |
         xargs gzip -dcf > chr.gff
-    
+
     # create anno.yml
     spanr gff --tag CDS chr.gff -o cds.yml
     spanr gff *.rm.gff -o repeat.yml
