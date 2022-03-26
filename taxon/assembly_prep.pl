@@ -122,6 +122,9 @@ trap signaled TERM QUIT INT
 
 cat rsync.tsv |
     parallel --colsep '\t' --no-run-if-empty --linebuffer -k -j 4 '
+        if [ -s "{1}/md5checksums.txt" ]; then
+            exit
+        fi
         echo >&2
         echo >&2 "==> {1}"
         mkdir -p {1}
