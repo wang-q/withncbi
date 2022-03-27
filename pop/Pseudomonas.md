@@ -1053,21 +1053,20 @@ cd ~/data/Pseudomonas
 
 # Find all genes
 for marker in BA000{01..40}; do
-    echo "==> marker [${marker}]"
+    >&2 echo "==> marker [${marker}]"
 
     mkdir -p PROTEINS/${marker}
 
     for ORDER in $(cat order.lst); do
-        echo "==> ORDER [${ORDER}]"
+        >&2 echo "==> ORDER [${ORDER}]"
 
-        for STRAIN in $(cat taxon/${ORDER}); do
-            gzip -dcf ASSEMBLY/${STRAIN}/*_protein.faa.gz |
-                hmmsearch -E ${E_VALUE} --domE ${E_VALUE} --noali --notextw ~/data/HMM/scg40/bacteria_and_archaea_dir/${marker}.hmm - |
-                grep '>>' |
-                STRAIN=${STRAIN} perl -nl -e '
-                    />>\s+(\S+)/ and printf qq{%s\t%s\n}, $1, $ENV{STRAIN};
-                '
-        done \
+        cat taxon/${ORDER} |
+            parallel --no-run-if-empty --linebuffer -k -j 8 "
+                gzip -dcf ASSEMBLY/{}/*_protein.faa.gz |
+                    hmmsearch -E ${E_VALUE} --domE ${E_VALUE} --noali --notextw ~/data/HMM/scg40/bacteria_and_archaea_dir/${marker}.hmm - |
+                    grep '>>' |
+                    perl -nl -e ' m{>>\s+(\S+)} and printf qq{%s\t%s\n}, \$1, {}; '
+            " \
             > PROTEINS/${marker}/${ORDER}.replace.tsv
     done
 
@@ -1099,10 +1098,10 @@ done > marker.lst
 for marker in $(cat marker.lst); do
     echo "==> marker [${marker}]"
 
-    for GENUS in $(cat genus.lst); do
-        cat PROTEINS/${marker}/${GENUS}.replace.tsv |
+    for ORDER in $(cat order.lst); do
+        cat PROTEINS/${marker}/${ORDER}.replace.tsv |
             cut -f 2 |
-            diff - taxon/${GENUS}
+            diff - taxon/${ORDER}
     done
 
     echo
@@ -1124,8 +1123,8 @@ cat marker.lst |
     parallel --no-run-if-empty --linebuffer -k -j 4 '
         >&2 echo "==> marker [{}]"
 
-        for GENUS in $(cat genus.lst); do
-            cat PROTEINS/{}/${GENUS}.replace.tsv
+        for ORDER in $(cat order.lst); do
+            cat PROTEINS/{}/${ORDER}.replace.tsv
         done \
             > PROTEINS/{}/{}.replace.tsv
 
@@ -1181,7 +1180,7 @@ FastTree PROTEINS/scg40.trim.fa > PROTEINS/scg40.trim.newick
 ```shell script
 cd ~/data/Pseudomonas/tree
 
-nw_reroot ../PROTEINS/scg40.trim.newick B_sub_subtilis_168 St_aur_aureus_NCTC_8325 |
+nw_reroot ../PROTEINS/scg40.trim.newick Bac_subti_subtilis_168 Sta_aure_aureus_NCTC_8325 |
     nw_order -c n - \
     > scg40.reroot.newick
 
@@ -1225,27 +1224,25 @@ cd ~/data/Pseudomonas
 
 # Find all genes
 for marker in $(cat ~/data/HMM/bac120/bac120.tsv | sed '1d' | cut -f 1); do
-    echo "==> marker [${marker}]"
+    >&2 echo "==> marker [${marker}]"
 
     mkdir -p PROTEINS/${marker}
 
-    for GENUS in $(cat genus.lst); do
-        echo "==> GENUS [${GENUS}]"
+    for ORDER in $(cat order.lst); do
+        >&2 echo "==> ORDER [${ORDER}]"
 
-        for STRAIN in $(cat taxon/${GENUS}); do
-            gzip -dcf ASSEMBLY/${STRAIN}/*_protein.faa.gz |
-                hmmsearch -E ${E_VALUE} --domE ${E_VALUE} --noali --notextw ~/data/HMM/bac120/HMM/${marker}.HMM - |
-                grep '>>' |
-                STRAIN=${STRAIN} perl -nl -e '
-                    />>\s+(\S+)/ and printf qq{%s\t%s\n}, $1, $ENV{STRAIN};
-                '
-        done \
-            > PROTEINS/${marker}/${GENUS}.replace.tsv
+        cat taxon/${ORDER} |
+            parallel --no-run-if-empty --linebuffer -k -j 8 "
+                gzip -dcf ASSEMBLY/{}/*_protein.faa.gz |
+                    hmmsearch -E ${E_VALUE} --domE ${E_VALUE} --noali --notextw ~/data/HMM/bac120/HMM/${marker}.HMM - |
+                    grep '>>' |
+                    perl -nl -e ' m{>>\s+(\S+)} and printf qq{%s\t%s\n}, \$1, {}; '
+            " \
+            > PROTEINS/${marker}/${ORDER}.replace.tsv
     done
 
     echo
 done
-
 
 ```
 
@@ -1254,13 +1251,32 @@ done
 ```shell script
 cd ~/data/Pseudomonas
 
-# Extract sequences
 cat ~/data/HMM/bac120/bac120.tsv | sed '1d' | cut -f 1 |
+    parallel --no-run-if-empty --linebuffer -k -j 4 '
+        cat PROTEINS/{}/*.replace.tsv | wc -l
+    ' |
+    tsv-summarize --median 1
+# 1951
+
+cat ~/data/HMM/bac120/bac120.tsv | sed '1d' | cut -f 1 |
+    parallel --no-run-if-empty --linebuffer -k -j 4 '
+        echo {}
+        cat PROTEINS/{}/*.replace.tsv | wc -l
+    ' |
+    paste - - |
+    tsv-filter --invert --ge 2:1500 --le 2:2500 |
+    cut -f 1 \
+    > PROTEINS/bac120.omit.lst
+
+# Extract sequences
+# Multiple copies slow down the alignment process
+cat ~/data/HMM/bac120/bac120.tsv | sed '1d' | cut -f 1 |
+    grep -v -Fx -f PROTEINS/bac120.omit.lst |
     parallel --no-run-if-empty --linebuffer -k -j 4 '
         >&2 echo "==> marker [{}]"
 
-        for GENUS in $(cat genus.lst); do
-            cat PROTEINS/{}/${GENUS}.replace.tsv
+        for ORDER in $(cat order.lst); do
+            cat PROTEINS/{}/${ORDER}.replace.tsv
         done \
             > PROTEINS/{}/{}.replace.tsv
 
@@ -1274,14 +1290,23 @@ cat ~/data/HMM/bac120/bac120.tsv | sed '1d' | cut -f 1 |
 
 # Align each markers with muscle
 cat ~/data/HMM/bac120/bac120.tsv | sed '1d' | cut -f 1 |
-    parallel --no-run-if-empty --linebuffer -k -j 4 '
+    parallel --no-run-if-empty --linebuffer -k -j 8 '
         >&2 echo "==> marker [{}]"
+        if [ ! -s PROTEINS/{}/{}.pro.fa ]; then
+            exit
+        fi
+        if [ -s PROTEINS/{}/{}.aln.fa ]; then
+            exit
+        fi
 
         muscle -quiet -in PROTEINS/{}/{}.pro.fa -out PROTEINS/{}/{}.aln.fa
     '
 
 for marker in $(cat ~/data/HMM/bac120/bac120.tsv | sed '1d' | cut -f 1); do
     >&2 echo "==> marker [${marker}]"
+    if [ ! -s PROTEINS/${marker}/${marker}.pro.fa ]; then
+        continue
+    fi
 
     # 1 name to many names
     cat PROTEINS/${marker}/${marker}.replace.tsv |
@@ -1293,6 +1318,10 @@ done
 
 # Concat marker genes
 for marker in $(cat ~/data/HMM/bac120/bac120.tsv | sed '1d' | cut -f 1); do
+    if [ ! -s PROTEINS/${marker}/${marker}.pro.fa ]; then
+        continue
+    fi
+
     # sequences in one line
     faops filter -l 0 PROTEINS/${marker}/${marker}.replace.fa stdout
 
@@ -1306,6 +1335,12 @@ fasops concat PROTEINS/bac120.aln.fas strains.lst -o PROTEINS/bac120.aln.fa
 # Trim poorly aligned regions with `TrimAl`
 trimal -in PROTEINS/bac120.aln.fa -out PROTEINS/bac120.trim.fa -automated1
 
+faops size PROTEINS/bac120.*.fa |
+    tsv-uniq -f 2 |
+    cut -f 2
+#52756
+#25526
+
 # To make it faster
 FastTree -fastest -noml PROTEINS/bac120.trim.fa > PROTEINS/bac120.trim.newick
 
@@ -1316,7 +1351,7 @@ FastTree -fastest -noml PROTEINS/bac120.trim.fa > PROTEINS/bac120.trim.newick
 ```shell script
 cd ~/data/Pseudomonas/tree
 
-nw_reroot ../PROTEINS/bac120.trim.newick B_sub_subtilis_168 St_aur_aureus_NCTC_8325 |
+nw_reroot ../PROTEINS/bac120.trim.newick Bac_subti_subtilis_168 Sta_aure_aureus_NCTC_8325 |
     nw_order -c n - \
     > bac120.reroot.newick
 
@@ -1386,16 +1421,16 @@ done  |
     > DOMAINS/ref_strain/locus.lst
 
 gzip -dcf \
-    ASSEMBLY/Pseudom_aer_PAO1/*_genomic.gff.gz \
+    ASSEMBLY/Pseudom_aeru_PAO1/*_genomic.gff.gz \
     ASSEMBLY/Pseudom_puti_KT2440_GCF_000007565_2/*_genomic.gff.gz \
     ASSEMBLY/Pseudom_chl_aureofaciens_30_84_GCF_000281915_1/*_genomic.gff.gz \
-    ASSEMBLY/Pseudom_flu_SBW25_GCF_000009225_2/*_genomic.gff.gz \
-    ASSEMBLY/Pseudom_pro_Pf_5_GCF_000012265_1/*_genomic.gff.gz \
+    ASSEMBLY/Pseudom_fluo_SBW25_GCF_000009225_2/*_genomic.gff.gz \
+    ASSEMBLY/Pseudom_prot_Pf_5_GCF_000012265_1/*_genomic.gff.gz \
     ASSEMBLY/Pseudom_stu_A1501_GCF_000013785_1/*_genomic.gff.gz \
     ASSEMBLY/Pseudom_syr_pv_syringae_B728a_GCF_000012245_1/*_genomic.gff.gz \
     ASSEMBLY/Pseudom_sav_pv_phaseolicola_1448A_GCF_000012205_1/*_genomic.gff.gz \
-    ASSEMBLY/Pseudom_ento_L48_GCF_000026105_1/*_genomic.gff.gz \
-    ASSEMBLY/Pseudom_aer_UCBPP_PA14_GCF_000014625_1/*_genomic.gff.gz |
+    ASSEMBLY/Pseudom_entomophi_L48_GCF_000026105_1/*_genomic.gff.gz \
+    ASSEMBLY/Pseudom_aeru_UCBPP_PA14_GCF_000014625_1/*_genomic.gff.gz |
     grep -v "^#" |
     grep -F -w -f DOMAINS/ref_strain/locus.lst |
     tsv-filter --str-eq 3:gene |
@@ -1403,16 +1438,16 @@ gzip -dcf \
     > DOMAINS/ref_strain/gene.lst
 
 gzip -dcf \
-    ASSEMBLY/Pseudom_aer_PAO1/*_genomic.gff.gz \
+    ASSEMBLY/Pseudom_aeru_PAO1/*_genomic.gff.gz \
     ASSEMBLY/Pseudom_puti_KT2440_GCF_000007565_2/*_genomic.gff.gz \
     ASSEMBLY/Pseudom_chl_aureofaciens_30_84_GCF_000281915_1/*_genomic.gff.gz \
-    ASSEMBLY/Pseudom_flu_SBW25_GCF_000009225_2/*_genomic.gff.gz \
-    ASSEMBLY/Pseudom_pro_Pf_5_GCF_000012265_1/*_genomic.gff.gz \
+    ASSEMBLY/Pseudom_fluo_SBW25_GCF_000009225_2/*_genomic.gff.gz \
+    ASSEMBLY/Pseudom_prot_Pf_5_GCF_000012265_1/*_genomic.gff.gz \
     ASSEMBLY/Pseudom_stu_A1501_GCF_000013785_1/*_genomic.gff.gz \
     ASSEMBLY/Pseudom_syr_pv_syringae_B728a_GCF_000012245_1/*_genomic.gff.gz \
     ASSEMBLY/Pseudom_sav_pv_phaseolicola_1448A_GCF_000012205_1/*_genomic.gff.gz \
-    ASSEMBLY/Pseudom_ento_L48_GCF_000026105_1/*_genomic.gff.gz \
-    ASSEMBLY/Pseudom_aer_UCBPP_PA14_GCF_000014625_1/*_genomic.gff.gz |
+    ASSEMBLY/Pseudom_entomophi_L48_GCF_000026105_1/*_genomic.gff.gz \
+    ASSEMBLY/Pseudom_aeru_UCBPP_PA14_GCF_000014625_1/*_genomic.gff.gz |
     grep -v "^#" |
     grep -F -w -f DOMAINS/ref_strain/gene.lst |
     tsv-filter --str-eq 3:CDS |
@@ -1527,10 +1562,10 @@ find DOMAINS/HMM -type f -name "*.hmm" |
 
 ### Scan every domain
 
-* The `E_VALUE` was adjusted to 1e-3 to capture all possible sequences.
+* The `E_VALUE` was adjusted to 1e-5 to capture all possible sequences.
 
 ```shell script
-E_VALUE=1e-3
+E_VALUE=1e-5
 
 cd ~/data/Pseudomonas/
 
@@ -1541,21 +1576,22 @@ for domain in $(cat pfam_domain.tsv | cut -f 2 | sort); do
         continue;
     fi
 
-    for GENUS in $(cat genus.lst); do
-        >&2 echo "==> GENUS [${GENUS}]"
+    for ORDER in $(cat order.lst); do
+        >&2 echo "==> ORDER [${ORDER}]"
 
-        for STRAIN in $(cat taxon/${GENUS}); do
-            gzip -dcf ASSEMBLY/${STRAIN}/*_protein.faa.gz |
-                hmmsearch -E ${E_VALUE} --domE ${E_VALUE} --noali --notextw DOMAINS/HMM/${domain}.hmm - |
-                grep '>>' |
-                STRAIN=${STRAIN} perl -nl -e '
-                    />>\s+(\S+)/ or next;
-                    $n = $1;
-                    $s = $n;
-                    $s =~ s/\.\d+//;
-                    printf qq{%s\t%s_%s\n}, $n, $ENV{STRAIN}, $s;
-                '
-        done
+        cat taxon/${ORDER} |
+            parallel --no-run-if-empty --linebuffer -k -j 8 "
+                gzip -dcf ASSEMBLY/{}/*_protein.faa.gz |
+                    hmmsearch -E ${E_VALUE} --domE ${E_VALUE} --noali --notextw DOMAINS/HMM/${domain}.hmm - |
+                    grep '>>' |
+                    perl -nl -e '
+                        m{>>\s+(\S+)} or next;
+                        \$n = \$1;
+                        \$s = \$n;
+                        \$s =~ s/\.\d+//;
+                        printf qq{%s\t%s_%s\n}, \$n, {}, \$s;
+                    '
+            "
     done \
         > DOMAINS/${domain}.replace.tsv
 
@@ -1575,48 +1611,51 @@ done |
 
 | Domain                              | Count |
 |-------------------------------------|-------|
-| DOMAINS/Epimerase.replace.tsv       | 53528 |
-| DOMAINS/AAA_33.replace.tsv          | 36056 |
-| DOMAINS/Hydrolase.replace.tsv       | 30648 |
-| DOMAINS/HAD.replace.tsv             | 24827 |
-| DOMAINS/F420_oxidored.replace.tsv   | 23957 |
-| DOMAINS/RmlD_sub_bind.replace.tsv   | 22072 |
-| DOMAINS/GDP_Man_Dehyd.replace.tsv   | 20434 |
-| DOMAINS/HAD_2.replace.tsv           | 19649 |
-| DOMAINS/ApbA.replace.tsv            | 17803 |
-| DOMAINS/CBS.replace.tsv             | 17485 |
-| DOMAINS/Hydrolase_3.replace.tsv     | 16587 |
-| DOMAINS/3Beta_HSD.replace.tsv       | 15744 |
-| DOMAINS/Glycos_transf_2.replace.tsv | 14495 |
-| DOMAINS/Glyco_tranf_2_3.replace.tsv | 13715 |
-| DOMAINS/Hydrolase_like.replace.tsv  | 12776 |
-| DOMAINS/Glyco_trans_4_4.replace.tsv | 11103 |
-| DOMAINS/NAD_Gly3P_dh_N.replace.tsv  | 8591  |
-| DOMAINS/PfkB.replace.tsv            | 8207  |
-| DOMAINS/SIS.replace.tsv             | 8120  |
-| DOMAINS/Glyco_trans_2_3.replace.tsv | 7641  |
-| DOMAINS/AP_endonuc_2.replace.tsv    | 6976  |
-| DOMAINS/Alpha-amylase.replace.tsv   | 6546  |
-| DOMAINS/Phos_pyr_kin.replace.tsv    | 6081  |
-| DOMAINS/FGGY_C.replace.tsv          | 5874  |
-| DOMAINS/CTP_transf_like.replace.tsv | 5325  |
-| DOMAINS/Polysacc_deac_1.replace.tsv | 5282  |
-| DOMAINS/Glyco_transf_21.replace.tsv | 4734  |
-| DOMAINS/SKI.replace.tsv             | 4232  |
-| DOMAINS/PGM_PMM_I.replace.tsv       | 4120  |
-| DOMAINS/PGM_PMM_II.replace.tsv      | 4010  |
-| DOMAINS/PGM_PMM_III.replace.tsv     | 4008  |
-| DOMAINS/PGM_PMM_IV.replace.tsv      | 4006  |
-| DOMAINS/FGGY_N.replace.tsv          | 3754  |
-| DOMAINS/QRPTase_C.replace.tsv       | 3668  |
-| DOMAINS/DctQ.replace.tsv            | 3063  |
-| DOMAINS/Aldose_epim.replace.tsv     | 2768  |
-| DOMAINS/CBM_48.replace.tsv          | 2763  |
-| DOMAINS/Glyco_hydro_3.replace.tsv   | 2743  |
-| DOMAINS/LamB_YcsF.replace.tsv       | 2467  |
-| DOMAINS/Glyco_transf_28.replace.tsv | 2147  |
-| DOMAINS/Glyco_hydro_19.replace.tsv  | 2122  |
-| DOMAINS/Chitin_synth_2.replace.tsv  | 2047  |
+| DOMAINS/Epimerase.replace.tsv       | 40284 |
+| DOMAINS/Hydrolase.replace.tsv       | 35532 |
+| DOMAINS/HAD.replace.tsv             | 22725 |
+| DOMAINS/CBS.replace.tsv             | 21493 |
+| DOMAINS/GDP_Man_Dehyd.replace.tsv   | 21275 |
+| DOMAINS/HAD_2.replace.tsv           | 20959 |
+| DOMAINS/RmlD_sub_bind.replace.tsv   | 19014 |
+| DOMAINS/Glycos_transf_2.replace.tsv | 18461 |
+| DOMAINS/F420_oxidored.replace.tsv   | 15900 |
+| DOMAINS/Glyco_tranf_2_3.replace.tsv | 15734 |
+| DOMAINS/3Beta_HSD.replace.tsv       | 15218 |
+| DOMAINS/Hydrolase_3.replace.tsv     | 14970 |
+| DOMAINS/Hydrolase_like.replace.tsv  | 14372 |
+| DOMAINS/PfkB.replace.tsv            | 11621 |
+| DOMAINS/SIS.replace.tsv             | 11589 |
+| DOMAINS/AAA_33.replace.tsv          | 10988 |
+| DOMAINS/Glyco_trans_4_4.replace.tsv | 10216 |
+| DOMAINS/Alpha-amylase.replace.tsv   | 8387  |
+| DOMAINS/AP_endonuc_2.replace.tsv    | 7594  |
+| DOMAINS/ApbA.replace.tsv            | 7173  |
+| DOMAINS/Glyco_trans_2_3.replace.tsv | 7143  |
+| DOMAINS/Phos_pyr_kin.replace.tsv    | 6989  |
+| DOMAINS/CTP_transf_like.replace.tsv | 6561  |
+| DOMAINS/Polysacc_deac_1.replace.tsv | 6150  |
+| DOMAINS/FGGY_C.replace.tsv          | 6079  |
+| DOMAINS/PGM_PMM_I.replace.tsv       | 5353  |
+| DOMAINS/FGGY_N.replace.tsv          | 5288  |
+| DOMAINS/PGM_PMM_II.replace.tsv      | 5240  |
+| DOMAINS/PGM_PMM_III.replace.tsv     | 5234  |
+| DOMAINS/PGM_PMM_IV.replace.tsv      | 4831  |
+| DOMAINS/Glyco_transf_21.replace.tsv | 4791  |
+| DOMAINS/NAD_Gly3P_dh_N.replace.tsv  | 4291  |
+| DOMAINS/SKI.replace.tsv             | 3889  |
+| DOMAINS/QRPTase_C.replace.tsv       | 3824  |
+| DOMAINS/Glyco_hydro_3.replace.tsv   | 3698  |
+| DOMAINS/Aldose_epim.replace.tsv     | 3536  |
+| DOMAINS/CBM_48.replace.tsv          | 3407  |
+| DOMAINS/DctQ.replace.tsv            | 3160  |
+| DOMAINS/LamB_YcsF.replace.tsv       | 2784  |
+| DOMAINS/Glyco_transf_28.replace.tsv | 2446  |
+| DOMAINS/Glyco_tran_28_C.replace.tsv | 2409  |
+| DOMAINS/TAL_FSA.replace.tsv         | 2340  |
+| DOMAINS/F_bP_aldolase.replace.tsv   | 2239  |
+| DOMAINS/Ribul_P_3_epim.replace.tsv  | 2124  |
+| DOMAINS/Chitin_synth_2.replace.tsv  | 2029  |
 
 Check each domain, such as `https://pfam.xfam.org/family/Epimerase`. Some domains are not directly
 related to carbohydrate metabolism.
@@ -1669,10 +1708,10 @@ cat domain.lst |
     > DOMAINS/domains.tsv
 
 wc -l < DOMAINS/domains.tsv
-#168791
+#200612
 
 faops size PROTEINS/all.uniq.fa | wc -l
-#2420143
+#3944568
 
 for domain in $(cat domain.lst); do
     echo 1>&2 "==> domain [${domain}]"
@@ -1693,7 +1732,7 @@ for domain in $(cat domain.lst); do
 done
 
 datamash check < DOMAINS/domains.tsv
-#168791 lines, 203 fields
+#200612 lines, 203 fields
 
 # Add header line
 for domain in $(cat domain.lst); do
@@ -1716,7 +1755,7 @@ tsv-join \
     > tmp.tsv && mv tmp.tsv DOMAINS/domains.tsv
 
 datamash check < DOMAINS/domains.tsv
-#168792 lines, 206 fields
+#200613 lines, 206 fields
 
 rm DOMAINS/header.tsv
 
@@ -1735,22 +1774,29 @@ cd ~/data/Pseudomonas
 mkdir -p IPS
 
 # extract wanted sequences
-for GENUS in $(cat genus.lst); do
-    >&2 echo "==> GENUS [${GENUS}]"
+cat strains.lst |
+    parallel --no-run-if-empty --linebuffer -k -j 8 '
+        if [ $(({#} % 10)) -eq "0" ]; then
+            >&2 printf "."
+        fi
 
-    cat taxon/${GENUS} |
-        parallel --no-run-if-empty --linebuffer -k -j 8 '
-            mkdir -p IPS/{}
+        mkdir -p IPS/{}
 
-            cat PROTEINS/all.info.tsv |
-                tsv-filter --str-eq 2:{} |
-                cut -f 1 |
-                grep -Fx -f <(cut -f 1 DOMAINS/domains.tsv | grep "^{}") \
-                > IPS/{}/wanted.lst
+        cat PROTEINS/all.info.tsv |
+            tsv-filter --str-eq 2:{} |
+            cut -f 1 |
+            grep -Fx -f <(cut -f 1 DOMAINS/domains.tsv | grep "^{}") \
+            > IPS/{}/wanted.lst
 
-            faops some PROTEINS/all.replace.fa IPS/{}/wanted.lst IPS/{}/{}.fa
-        '
-done
+        faops some PROTEINS/all.replace.fa IPS/{}/wanted.lst IPS/{}/{}.fa
+    '
+
+cat strains.lst |
+    parallel --no-run-if-empty --linebuffer -k -j 4 '
+        cat IPS/{}/wanted.lst | wc -l
+    ' |
+    tsv-summarize --quantile 1:0.25,0.5,0.75
+#64      111     128
 
 # scan proteins of each strain with InterProScan
 # By default InterProScan uses 8 cpu cores
@@ -1762,17 +1808,25 @@ for f in $(find split -maxdepth 1 -type f -name "[0-9]*" | sort); do
     bsub -q mpi -n 24 -J "IPS-${f}" "
         cat ${f} |
             parallel --no-run-if-empty --linebuffer -k -j 6 '
-                if [[ -e IPS/{}/{}.tsv ]]; then
+                if [ -e IPS/{}/{}.tsv ]; then
                     >&2 echo {};
                     exit;
                 fi
 
-                interproscan.sh --cpu 4 -dp -f tsv,json,svg -i IPS/{}/{}.fa --output-file-base IPS/{}/{}
+                interproscan.sh --cpu 4 -dp -f tsv,json -i IPS/{}/{}.fa --output-file-base IPS/{}/{}
             '
         "
 done
 
 rm -fr split output.*
+
+find IPS -type f -name "*.json" | sort |
+    parallel --no-run-if-empty --linebuffer -k -j 8 '
+        if [ $(({#} % 10)) -eq "0" ]; then
+            >&2 printf "."
+        fi
+        pigz -p 3 {}
+    '
 
 # IPS family
 cat strains.lst |
@@ -1780,7 +1834,7 @@ cat strains.lst |
         if [ $(({#} % 10)) -eq "0" ]; then
             >&2 printf "."
         fi
-        cat IPS/{}/{}.json |
+        gzip -dcf IPS/{}/{}.json.gz |
             jq .results |
             jq -r -c '\''
                 .[] |
@@ -2581,29 +2635,29 @@ cat IPS/predicts.tsv |
 ```shell
 cd ~/data/Pseudomonas
 
-faops size ASSEMBLY/Pseudom_aer_PAO1/*_protein.faa.gz |
+faops size ASSEMBLY/Pseudom_aeru_PAO1/*_protein.faa.gz |
     wc -l
 #5572
 
-faops size ASSEMBLY/Pseudom_aer_PAO1/*_protein.faa.gz |
+faops size ASSEMBLY/Pseudom_aeru_PAO1/*_protein.faa.gz |
     tsv-summarize --sum 2
 #1858983
 
 mkdir -p STRAINS
 
 for S in \
-    Pseudom_aer_PAO1 \
+    Pseudom_aeru_PAO1 \
     Pseudom_puti_KT2440_GCF_000007565_2 \
     Pseudom_chl_aureofaciens_30_84_GCF_000281915_1 \
-    Pseudom_flu_SBW25_GCF_000009225_2 \
-    Pseudom_pro_Pf_5_GCF_000012265_1 \
+    Pseudom_entomophi_L48_GCF_000026105_1 \
+    Pseudom_fluo_SBW25_GCF_000009225_2 \
+    Pseudom_prot_Pf_5_GCF_000012265_1 \
+    Pseudom_sav_pv_phaseolicola_1448A_GCF_000012205_1 \
     Pseudom_stu_A1501_GCF_000013785_1 \
     Pseudom_syr_pv_syringae_B728a_GCF_000012245_1 \
-    Pseudom_sav_pv_phaseolicola_1448A_GCF_000012205_1 \
-    Pseudom_ento_L48_GCF_000026105_1 \
-    Pseudom_aer_UCBPP_PA14_GCF_000014625_1 \
-    Pseudom_aer_PA7_GCF_000017205_1 \
-    Pseudom_aer_LESB58_GCF_000026645_1 \
+    Pseudom_aeru_UCBPP_PA14_GCF_000014625_1 \
+    Pseudom_aeru_PA7_GCF_000017205_1 \
+    Pseudom_aeru_LESB58_GCF_000026645_1 \
     ; do
     echo ${S}
 done \
@@ -2617,14 +2671,14 @@ done
 for S in $(cat typical.lst); do
     for f in $(find STRAINS/${S}/ -maxdepth 1 -type f -name "[0-9]*.fa" | sort); do
         >&2 echo "==> ${f}"
-        bsub -q mpi -n 24 -J "${f}" "
-                if [[ -e ${f}.tsv ]]; then
-                    >&2 echo ${f};
-                    exit;
-                fi
+        if [ -e ${f}.tsv ]; then
+            >&2 echo ${f}
+            continue
+        fi
 
-                interproscan.sh --cpu 24 -dp -f tsv,json -i ${f} --output-file-base ${f}
-            "
+        bsub -q mpi -n 24 -J "${f}" "
+            interproscan.sh --cpu 24 -dp -f tsv,json -i ${f} --output-file-base ${f}
+        "
     done
 done
 
@@ -2645,7 +2699,7 @@ for S in $(cat typical.lst); do
             ' |
             tsv-uniq
     done \
-        >  STRAINS/${S}/family.tsv
+        > STRAINS/${S}/family.tsv
 done
 
 COUNT=
