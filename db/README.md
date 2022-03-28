@@ -76,6 +76,10 @@ tar xvfz ~/data/NCBI/taxonomy/taxdump.tar.gz -C ~/data/NCBI/taxdmp
 
 ## Blast DB v5
 
+These databases *may* be updated every few days.
+
+After checking the MD5s, don't update them casually.
+
 ```shell
 mkdir -p ~/data/blast
 cd ~/data/blast
@@ -86,8 +90,8 @@ curl -O https://ftp.ncbi.nih.gov/blast/db/v5/refseq_protein-prot-metadata.json
 cat refseq_protein-prot-metadata.json |
     jq -r '.description, ."last-updated", ."number-of-volumes" | tostring'
 #NCBI Protein Reference Sequences
-#2022-03-16T00:00:00
-#28
+#2022-03-25T00:00:00
+#29
 
 cat refseq_protein-prot-metadata.json |
     jq -r '.files[]' |
@@ -104,7 +108,9 @@ rsync --list-only rsync://ftp.ncbi.nlm.nih.gov/blast/db/v5/refseq_protein*.gz |
     > refseq_protein.lst
 
 cat refseq_protein.lst |
-    parallel -j4 'rsync -avP rsync://ftp.ncbi.nih.gov/blast/db/v5/{} .'
+    parallel -j4 '
+        rsync -avP rsync://ftp.ncbi.nih.gov/blast/db/v5/{} .
+    '
 
 md5sum --check refseq_protein.md5
 
@@ -114,7 +120,7 @@ curl -O https://ftp.ncbi.nih.gov/blast/db/v5/nr-prot-metadata.json
 cat nr-prot-metadata.json |
     jq -r '.description, ."last-updated", ."number-of-volumes" | tostring'
 #All non-redundant GenBank CDS translations+PDB+SwissProt+PIR+PRF excluding environmental samples from WGS projects
-#2022-03-14T00:00:00
+#2022-03-25T00:00:00
 #57
 
 cat nr-prot-metadata.json |
@@ -132,7 +138,9 @@ rsync --list-only rsync://ftp.ncbi.nlm.nih.gov/blast/db/v5/nr*.gz |
     > nr.lst
 
 cat nr.lst |
-    parallel -j4 'rsync -avP rsync://ftp.ncbi.nih.gov/blast/db/v5/{} .'
+    parallel -j4 '
+        proxychains4 rsync -avP rsync://ftp.ncbi.nih.gov/blast/db/v5/{} .
+    '
 
 md5sum --check nr.md5
 
