@@ -1,78 +1,12 @@
 # `db/`
 
-Turn NCBI genome reports and assembly reports into query-able MySQL databases.
-
-Also, taxonomy information is added to all items.
-
-Downloading date: 2020-12-11
-
-[TOC levels=1-3]: # ""
-
 - [`db/`](#db)
-- [Get data from NCBI](#get-data-from-ncbi)
-- [Databases](#databases)
-  - [Genome reports](#genome-reports)
-  - [Assembly reports](#assembly-reports)
-- [Old Bacteria genomes](#old-bacteria-genomes)
-
-
-## Get data from NCBI
-
-Paths in the NCBI ftp site:
-
-* <ftp://ftp.ncbi.nlm.nih.gov/genomes/GENOME_REPORTS>
-* <ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS>
-
-Local paths listed in `config.ini`.
-
-NCBI also provides other download methods, including `rsync` and `aspera`.
-
-I use the following command lines on a Linux box. For mac, aspera's path is different.
-
-```shell script
-# gr
-rsync -avP ftp.ncbi.nlm.nih.gov::genomes/GENOME_REPORTS/ \
-    ~/data/NCBI/genomes/GENOME_REPORTS/
-
-#~/.aspera/connect/bin/ascp \
-#    -TQ -k1 -p -v \
-#    -i ~/.aspera/connect/etc/asperaweb_id_dsa.openssh \
-#    anonftp@ftp-private.ncbi.nlm.nih.gov:/genomes/ASSEMBLY_REPORTS \
-#   ~/data/NCBI/genomes/
-
-# ar
-# there're hidden useless directories.
-rsync -avP ftp.ncbi.nlm.nih.gov::genomes/ASSEMBLY_REPORTS/ \
-    --exclude=".tmp" \
-    --exclude=".old" \
-    ~/data/NCBI/genomes/ASSEMBLY_REPORTS/
-
-```
-
-NCBI bioproject and taxonomy are also needed.
-
-```shell script
-# bioproject
-rsync -avP ftp.ncbi.nlm.nih.gov::bioproject/ \
-    --exclude="*.xml" \
-    ~/data/NCBI/bioproject/
-
-# taxonomy
-rsync -avP ftp.ncbi.nlm.nih.gov::pub/taxonomy/ \
-    --exclude=".tmp" \
-    --exclude=".old" \
-    --exclude="*.Z" \
-    --exclude="taxdump_archive" \
-    --exclude="new_taxdump" \
-    --exclude="accession2taxid" \
-    --exclude="gi_taxid_*" \
-    ~/data/NCBI/taxonomy/
-
-rm -fr ~/data/NCBI/taxdmp
-mkdir -p ~/data/NCBI/taxdmp
-tar xvfz ~/data/NCBI/taxonomy/taxdump.tar.gz -C ~/data/NCBI/taxdmp
-
-```
+    * [Blast DB v5](#blast-db-v5)
+    * [Get data from NCBI](#get-data-from-ncbi)
+    * [Databases](#databases)
+        + [Genome reports](#genome-reports)
+        + [Assembly reports](#assembly-reports)
+    * [Old Bacteria genomes](#old-bacteria-genomes)
 
 ## Blast DB v5
 
@@ -146,6 +80,72 @@ md5sum --check nr.md5
 
 ```
 
+## Get data from NCBI
+
+*This section and the following are essentially replaced by [`nwr`](https://github.com/wang-q/nwr).*
+
+Turn NCBI genome reports and assembly reports into query-able MySQL databases.
+
+Also, taxonomy information is added to all items.
+
+Downloading date: 2020-12-11
+
+Paths in the NCBI ftp site:
+
+* <ftp://ftp.ncbi.nlm.nih.gov/genomes/GENOME_REPORTS>
+* <ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS>
+
+Local paths listed in `config.ini`.
+
+NCBI also provides other download methods, including `rsync` and `aspera`.
+
+I use the following command lines on a Linux box. For mac, aspera's path is different.
+
+```shell script
+# gr
+rsync -avP ftp.ncbi.nlm.nih.gov::genomes/GENOME_REPORTS/ \
+    ~/data/NCBI/genomes/GENOME_REPORTS/
+
+#~/.aspera/connect/bin/ascp \
+#    -TQ -k1 -p -v \
+#    -i ~/.aspera/connect/etc/asperaweb_id_dsa.openssh \
+#    anonftp@ftp-private.ncbi.nlm.nih.gov:/genomes/ASSEMBLY_REPORTS \
+#   ~/data/NCBI/genomes/
+
+# ar
+# there're hidden useless directories.
+rsync -avP ftp.ncbi.nlm.nih.gov::genomes/ASSEMBLY_REPORTS/ \
+    --exclude=".tmp" \
+    --exclude=".old" \
+    ~/data/NCBI/genomes/ASSEMBLY_REPORTS/
+
+```
+
+NCBI bioproject and taxonomy are also needed.
+
+```shell script
+# bioproject
+rsync -avP ftp.ncbi.nlm.nih.gov::bioproject/ \
+    --exclude="*.xml" \
+    ~/data/NCBI/bioproject/
+
+# taxonomy
+rsync -avP ftp.ncbi.nlm.nih.gov::pub/taxonomy/ \
+    --exclude=".tmp" \
+    --exclude=".old" \
+    --exclude="*.Z" \
+    --exclude="taxdump_archive" \
+    --exclude="new_taxdump" \
+    --exclude="accession2taxid" \
+    --exclude="gi_taxid_*" \
+    ~/data/NCBI/taxonomy/
+
+rm -fr ~/data/NCBI/taxdmp
+mkdir -p ~/data/NCBI/taxdmp
+tar xvfz ~/data/NCBI/taxonomy/taxdump.tar.gz -C ~/data/NCBI/taxdmp
+
+```
+
 ## Databases
 
 We will create 4 MySQL databases:
@@ -214,7 +214,6 @@ perl ar_overview.pl --db ar_genbank
 #rm *.xlsx *.csv
 
 ```
-
 
 ## Old Bacteria genomes
 
