@@ -12,6 +12,7 @@
     * [NCBI taxonomy](#ncbi-taxonomy)
     * [Raw phylogenetic tree by MinHash](#raw-phylogenetic-tree-by-minhash)
         + [Tweak the mash tree](#tweak-the-mash-tree)
+    * [Pangenome](#pangenome)
     * [Collect proteins](#collect-proteins)
         + [`all.pro.fa`](#allprofa)
         + [`all.replace.fa`](#allreplacefa)
@@ -102,6 +103,11 @@ cpanm Bio::Tools::Run::Alignment::Clustalw
 cpanm https://github.com/wang-q/Bio-Tools-Phylo-PAML.git
 
 ```
+
+* Pangenome
+
+    * `PPanGGOLiN` is used in this project. Installation steps can be
+      found [here](https://github.com/wang-q/dotfiles/blob/master/others.sh).
 
 ## Strain info
 
@@ -856,6 +862,35 @@ done
 # png
 nw_display -s -b 'visibility:hidden' -w 600 -v 30 mash.species.newick |
     rsvg-convert -o Pseudomonas.mash.png
+
+```
+
+## Pangenome
+
+```shell
+cd ~/data/Pseudomonas
+
+mkdir -p pangenome
+
+cat strains.lst |
+    grep "^Pseudom_aeru_" |
+    parallel --no-run-if-empty --linebuffer -k -j 4 '
+        GBFF=$(compgen -G "ASSEMBLY/{}/*_genomic.gbff.gz")
+
+        if [ "${GBFF}" == "" ]; then
+            exit;
+        fi
+
+        echo {}
+        compgen -G "ASSEMBLY/{}/*_genomic.gbff.gz"
+    ' |
+    paste - - \
+    > pangenome/Pseudom_aeru.gbff.list
+
+wc -l < pangenome/Pseudom_aeru.gbff.list
+# 391
+
+ppanggolin workflow --anno pangenome/Pseudom_aeru.gbff.list --cpu 8 -o pangenome/Pseudom_aeru
 
 ```
 
