@@ -1286,15 +1286,21 @@ cd ~/data/Pseudomonas
 
 cat ~/data/HMM/bac120/bac120.tsv | sed '1d' | cut -f 1 |
     parallel --no-run-if-empty --linebuffer -k -j 4 '
-        cat PROTEINS/{}/*.replace.tsv | wc -l
+        for ORDER in $(cat order.lst); do
+            cat PROTEINS/{}/${ORDER}.replace.tsv
+        done |
+            wc -l
     ' |
-    tsv-summarize --median 1
-# 1951
+    tsv-summarize --quantile 1:0.25,0.5,0.75
+# 1948    1951    3066
 
 cat ~/data/HMM/bac120/bac120.tsv | sed '1d' | cut -f 1 |
     parallel --no-run-if-empty --linebuffer -k -j 4 '
         echo {}
-        cat PROTEINS/{}/*.replace.tsv | wc -l
+        for ORDER in $(cat order.lst); do
+            cat PROTEINS/{}/${ORDER}.replace.tsv
+        done |
+            wc -l
     ' |
     paste - - |
     tsv-filter --invert --ge 2:1500 --le 2:2500 |
