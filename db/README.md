@@ -2,6 +2,7 @@
 
 - [`db/`](#db)
     * [Blast DB v5](#blast-db-v5)
+        + [decompress](#decompress)
     * [Get data from NCBI](#get-data-from-ncbi)
     * [Databases](#databases)
         + [Genome reports](#genome-reports)
@@ -18,7 +19,9 @@ After checking the MD5s, don't update them casually.
 mkdir -p ~/data/blast
 cd ~/data/blast
 
+#----------------------------#
 # refseq_protein
+#----------------------------#
 curl -O https://ftp.ncbi.nih.gov/blast/db/v5/refseq_protein-prot-metadata.json
 
 cat refseq_protein-prot-metadata.json |
@@ -48,7 +51,9 @@ cat refseq_protein.lst |
 
 md5sum --check refseq_protein.md5
 
+#----------------------------#
 # nr
+#----------------------------#
 curl -O https://ftp.ncbi.nih.gov/blast/db/v5/nr-prot-metadata.json
 
 cat nr-prot-metadata.json |
@@ -77,6 +82,88 @@ cat nr.lst |
     '
 
 md5sum --check nr.md5
+
+#----------------------------#
+# refseq_select_prot
+#----------------------------#
+curl -O https://ftp.ncbi.nih.gov/blast/db/v5/refseq_select_prot-prot-metadata.json
+
+cat refseq_select_prot-prot-metadata.json |
+    jq -r '.description, ."last-updated", ."number-of-volumes" | tostring'
+#RefSeq Select proteins
+#2022-03-26T00:00:00
+#9
+
+cat refseq_select_prot-prot-metadata.json |
+    jq -r '.files[]' |
+    sed 's/^ftp/https/' |
+    sed 's/$/.md5/' |
+    sort |
+    parallel -j4 -k 'curl -fsSL {}' \
+    > refseq_select_prot.md5
+
+rsync --list-only rsync://ftp.ncbi.nlm.nih.gov/blast/db/v5/refseq_select_prot*.gz |
+    grep '.tar.gz' |
+    perl -nla -F"\s+" -e 'print $F[-1]' |
+    sort \
+    > refseq_select_prot.lst
+
+cat refseq_select_prot.lst |
+    parallel -j4 '
+        rsync -avP rsync://ftp.ncbi.nih.gov/blast/db/v5/{} .
+    '
+
+# rsync
+rsync -avP ~/data/blast/ wangq@202.119.37.251:data/blast
+
+```
+
+### decompress
+
+```shell
+mkdir -p ~/data/blast/db
+
+cd ~/data/blast/db
+
+if grep -q -i blastdb $HOME/.bashrc; then
+    echo "==> .bashrc already contains blastdb"
+else
+    echo "==> Updating .bashrc with blastdb..."
+
+    BLASTDB_PATH='export BLASTDB="$HOME/share/blast/db/"'
+    echo ${BLASTDB_PATH} >> $HOME/.bashrc
+
+    eval ${BLASTDB_PATH}
+fi
+source $HOME/.bashrc
+
+cat <<EOF > $HOME/.ncbirc
+[BLAST]
+BLASTDB=$HOME/share/blast/db/
+
+EOF
+
+# NCBI recommends this, but it is too slow for processing large data sets.
+update_blastdb.pl --blastdb_version 5 --passive --verbose --decompress 16S_ribosomal_RNA
+
+# decompress
+cat ../refseq_protein.lst |
+    parallel --no-run-if-empty --linebuffer -k -j 1 '
+        >&2 echo "==> {}"
+        tar xvfz ../{}
+    '
+
+cat ../nr.lst |
+    parallel --no-run-if-empty --linebuffer -k -j 1 '
+        >&2 echo "==> {}"
+        tar xvfz ../{}
+    '
+
+# test run
+# mouse     10090
+# P38398    BRCA1 susceptibility protein
+cd ~
+echo P38398 | blastp -taxids 10090 -db nr -outfmt '7 std scomname'
 
 ```
 
