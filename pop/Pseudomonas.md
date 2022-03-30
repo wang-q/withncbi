@@ -661,12 +661,12 @@ cat order.lst |
     nwr append stdin --id |
     tsv-select -f 5,4,2,3 |
     tsv-sort -k2,2 |
-    (echo -e '#tax_id\tfamily\t#species\t#strains' && cat) |
+    (echo -e '#tax_id\torder\t#species\t#strains' && cat) |
     mlr --itsv --omd cat
 
 ```
 
-| #tax_id | family                | #species | #strains |
+| #tax_id | order                 | #species | #strains |
 |---------|-----------------------|----------|----------|
 | 1692040 | Acidiferrobacterales  | 3        | 3        |
 | 135624  | Aeromonadales         | 18       | 18       |
@@ -692,6 +692,71 @@ cat order.lst |
 | 72273   | Thiotrichales         | 32       | 32       |
 | 135623  | Vibrionales           | 46       | 46       |
 | 135614  | Xanthomonadales       | 53       | 53       |
+
+* Genus
+
+```shell
+cd ~/data/Pseudomonas
+
+# Group by order
+cat ASSEMBLY/Pseudomonas.assembly.pass.csv |
+    sed -e '1d' |
+    tsv-select -d, -f 3 |
+    tsv-uniq |
+    nwr append stdin -r genus |
+    tsv-select -f 2 |
+    tsv-uniq \
+    > genus.lst
+
+cat genus.lst |
+    parallel --no-run-if-empty --linebuffer -k -j 4 '
+        n_species=$(cat ASSEMBLY/Pseudomonas.assembly.pass.csv |
+            sed "1d" |
+            tsv-select -d, -f 3 |
+            nwr append stdin -r genus -r species |
+            grep {} |
+            tsv-select -f 1,3 |
+            tsv-uniq |
+            wc -l)
+
+        n_strains=$(cat ASSEMBLY/Pseudomonas.assembly.pass.csv |
+            sed "1d" |
+            tsv-select -d, -f 3 |
+            nwr append stdin -r genus |
+            grep {} |
+            wc -l)
+
+        printf "%s\t%d\t%d\n" {} ${n_species} ${n_strains}
+    ' |
+    nwr append stdin --id |
+    tsv-select -f 5,4,2,3 |
+    tsv-sort -k2,2 |
+    tsv-filter --ge 4:10 |
+    (echo -e '#tax_id\tgenus\t#species\t#strains' && cat) |
+    mlr --itsv --omd cat
+
+```
+
+| #tax_id | genus             | #species | #strains |
+|---------|-------------------|----------|----------|
+| 469     | Acinetobacter     | 43       | 486      |
+| 642     | Aeromonas         | 12       | 12       |
+| 226     | Alteromonas       | 16       | 31       |
+| 544     | Citrobacter       | 14       | 14       |
+| 547     | Enterobacter      | 10       | 10       |
+| 262     | Francisella       | 11       | 11       |
+| 2745    | Halomonas         | 5        | 13       |
+| 445     | Legionella        | 14       | 14       |
+| 68      | Lysobacter        | 12       | 12       |
+| 475     | Moraxella         | 5        | 35       |
+| 122277  | Pectobacterium    | 12       | 12       |
+| 53246   | Pseudoalteromonas | 18       | 33       |
+| 286     | Pseudomonas       | 172      | 827      |
+| 613     | Serratia          | 14       | 14       |
+| 22      | Shewanella        | 16       | 52       |
+| 662     | Vibrio            | 38       | 38       |
+| 338     | Xanthomonas       | 18       | 18       |
+| 629     | Yersinia          | 12       | 12       |
 
 * strains
 
