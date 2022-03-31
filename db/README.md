@@ -1,19 +1,23 @@
 # `db/`
 
 - [`db/`](#db)
-    * [Blast DB v5](#blast-db-v5)
+    * [Blast](#blast)
+        + [Blast DB v5](#blast-db-v5)
         + [decompress](#decompress)
+        + [FASTA](#fasta)
     * [Get data from NCBI](#get-data-from-ncbi)
     * [Databases](#databases)
         + [Genome reports](#genome-reports)
         + [Assembly reports](#assembly-reports)
     * [Old Bacteria genomes](#old-bacteria-genomes)
 
-## Blast DB v5
+## Blast
 
 These databases *may* be updated every few days.
 
 After checking the MD5s, don't update them casually.
+
+### Blast DB v5
 
 ```shell
 mkdir -p ~/data/blast
@@ -130,7 +134,7 @@ if grep -q -i blastdb $HOME/.bashrc; then
 else
     echo "==> Updating .bashrc with blastdb..."
 
-    BLASTDB_PATH='export BLASTDB="$HOME/share/blast/db/"'
+    BLASTDB_PATH='export BLASTDB="$HOME/data/blast/db"'
     echo ${BLASTDB_PATH} >> $HOME/.bashrc
 
     eval ${BLASTDB_PATH}
@@ -139,7 +143,7 @@ source $HOME/.bashrc
 
 cat <<EOF > $HOME/.ncbirc
 [BLAST]
-BLASTDB=$HOME/share/blast/db/
+BLASTDB=$HOME/data/blast/db
 
 EOF
 
@@ -160,10 +164,40 @@ cat ../nr.lst |
     '
 
 # test run
+blastdbcmd -db nr -dbtype prot -info
+
 # mouse     10090
 # P38398    BRCA1 susceptibility protein
-cd ~
-echo P38398 | blastp -taxids 10090 -db nr -outfmt '7 std scomname'
+curl -LO https://www.uniprot.org/uniprot/P38398.fasta
+
+cat P38398.fasta |
+    blastp -db refseq_protein -taxids 10090 -num_threads 8 -outfmt '7 std scomname'
+
+```
+
+### FASTA
+
+`diamond` uses its own database format.
+
+```shell
+mkdir -p ~/data/blast/fasta
+cd ~/data/blast/fasta
+
+# swissprot
+rsync -avP rsync://ftp.ncbi.nih.gov/blast/db/FASTA/swissprot.gz .
+
+curl -O https://ftp.ncbi.nih.gov/blast/db/FASTA/swissprot.gz.md5
+md5sum --check swissprot.gz.md5
+
+# nr
+# This file is huge, 123G
+aria2c -j 4 -x 4 -s 4 --file-allocation=none -c https://ftp.ncbi.nih.gov/blast/db/FASTA/nr.gz
+
+curl -O https://ftp.ncbi.nih.gov/blast/db/FASTA/nr.gz.md5
+md5sum --check nr.gz.md5
+
+# diamond
+diamond makedb --in nr.gz -d nr
 
 ```
 
