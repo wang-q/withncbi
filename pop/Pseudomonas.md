@@ -95,7 +95,7 @@ brew install librsvg
 brew install jq
 brew install pup
 
-# KaKs
+# dN/dS
 brew install brewsci/bio/clustal-w
 brew install brewsci/bio/paml
 
