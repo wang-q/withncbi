@@ -84,7 +84,7 @@ Path::Tiny::path($outdir)->mkpath();
 # rsync
 #----------------------------#
 {
-    $stopwatch->block_message("Generate .rsync.sh");
+    $stopwatch->block_message("Generate .rsync.sh .check.sh");
 
     my $file_url = Path::Tiny::path( $outdir, "rsync.tsv" );
     $file_url->remove if $file_url->is_file;
@@ -120,15 +120,55 @@ signaled () {
 }
 trap signaled TERM QUIT INT
 
+touch check.list
+
 cat rsync.tsv |
+    tsv-join -f check.list -k 1 -e |
     parallel --colsep '\t' --no-run-if-empty --linebuffer -k -j 4 '
-        if [ -s "{1}/md5checksums.txt" ]; then
-            exit
-        fi
         echo >&2
         echo >&2 "==> {1}"
         mkdir -p {1}
         rsync -avP --no-links {2}/ {1}/ --exclude="assembly_status.txt"
+    '
+
+EOF
+    );
+
+    my $file_check = Path::Tiny::path( $outdir, "$basename.check.sh" );
+    $file_check->remove if $file_check->is_file;
+
+    $file_check->append(
+        <<'EOF'
+#!/bin/bash
+
+BASE_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+cd ${BASE_DIR}
+
+signaled () {
+    echo Interrupted
+    exit 1
+}
+trap signaled TERM QUIT INT
+
+touch check.list
+
+cat check.list |
+    tsv-uniq \
+    > tmp.list
+mv tmp.list check.list
+
+cat rsync.tsv |
+    tsv-join -f check.list -k 1 -e |
+    parallel --colsep '\t' --no-run-if-empty --linebuffer -k -j 4 '
+        if [[ ! -e {1} ]]; then
+            exit
+        fi
+        echo >&2 "==> {1}"
+        cd {1}
+        md5sum --check md5checksums.txt --quiet
+        if [ "$?" -eq "0" ]; then
+            echo "{1}" >> ../check.list
+        fi
     '
 
 EOF
