@@ -97,8 +97,8 @@ while ( my $line = <> ) {
         }
     }
     else {
-        $strain  =~ s/^$species ?//;
-        $species =~ s/^$genus //;
+        $strain  =~ s/^\Q$species\E ?//;
+        $species =~ s/^\Q$genus\E //;
     }
 
     # Remove `Candidatus`
