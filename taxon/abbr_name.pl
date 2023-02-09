@@ -60,8 +60,8 @@ abbr_name.pl - Abbreviate strain scientific names.
 
 Getopt::Long::GetOptions(
     'help|?'        => sub { Getopt::Long::HelpMessage(0) },
-    'column|c=s'    => \( my $column = '1,2,3' ),
-    'separator|s=s' => \( my $separator = '\s+' ),
+    'column|c=s'    => \( my $column      = '1,2,3' ),
+    'separator|s=s' => \( my $separator   = '\s+' ),
     'min|m=i'       => \( my $min_species = 3 ),
     'tight'         => \my $tight,
     'shortsub'      => \my $shortsub,
@@ -88,17 +88,26 @@ while ( my $line = <> ) {
     if ( $genus eq $species ) {
         my @O = split /\s+/, $strain;    # Organism
         if ( scalar @O >= 2 ) {
-            $genus  = shift @O;
+            $genus   = shift @O;
             $species = shift @O;
-            $strain = join "-", @O;
+            $strain  = join "-", @O;
         }
         else {
             warn "Parsing strain [$strain] error.\n";
         }
     }
     else {
-        $strain  =~ s/^\Q$species\E ?//;
-        $species =~ s/^\Q$genus\E //;
+        # $strain starts with $species
+        if ( rindex( $strain, $species, 0 ) == 0 ) {
+            $strain  =~ s/^\Q$species\E ?//;
+            $species =~ s/^\Q$genus\E //;
+        }
+
+        # irregular species names
+        else {
+            $strain  =~ s/^\Q$genus\E ?//;
+            $species =~ s/^\Q$genus\E //;
+        }
     }
 
     # Remove `Candidatus`
@@ -134,13 +143,15 @@ my @ge = map { $_->[2] } @fields;
 my @sp = map { $_->[1] } @fields;
 my @st = map { $_->[0] } @fields;
 
-my $ge_of = MyUtil::abbr_most( [ List::MoreUtils::PP::uniq(@ge) ], 1,            "Yes" );
-my $sp_of = MyUtil::abbr_most( [ List::MoreUtils::PP::uniq(@sp) ], $min_species, "Yes" );
+my $ge_of = MyUtil::abbr_most( [ List::MoreUtils::PP::uniq(@ge) ], 1, "Yes" );
+my $sp_of =
+  MyUtil::abbr_most( [ List::MoreUtils::PP::uniq(@sp) ], $min_species, "Yes" );
 
 for my $i ( 0 .. $count - 1 ) {
     my $spacer = $tight ? '' : '_';
-    my $ge_sp  = join $spacer, grep { defined $_ and length $_ } $ge_of->{ $ge[$i] },
-        $sp_of->{ $sp[$i] };
+    my $ge_sp  = join $spacer,
+      grep { defined $_ and length $_ } $ge_of->{ $ge[$i] },
+      $sp_of->{ $sp[$i] };
     my $organism = join "_", grep { defined $_ and length $_ } $ge_sp, $st[$i];
 
     print join( ",", @{ $rows[$i] }, $organism ), "\n";
