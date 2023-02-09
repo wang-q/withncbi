@@ -125,6 +125,8 @@ while ( my $line = <> ) {
         $strain =~ s/\bvar\b//gi;
         $strain =~ s/\bgroup\b//gi;
         $strain =~ s/\bvariant\b//gi;
+        $strain =~ s/\bgenomovar\b//gi;
+        $strain =~ s/\bgenomosp\b//gi;
     }
 
     s/\W+/_/g for ( $strain, $species, $genus );
