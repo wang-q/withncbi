@@ -46,10 +46,22 @@ abbr_name.pl - Abbreviate strain scientific names.
     Homo sapiens,Homo,Hsap
     Homo erectus,Homo,Here
 
-    $ echo -e 'Homo\nHomo\n' |
+    $ echo -e 'Homo sapiens,Homo\nHomo erectus,Homo\n' |
+        perl abbr_name.pl -s ',' -c "1,2,2"
+    Homo sapiens,Homo,H_sap
+    Homo erectus,Homo,H_ere
+
+    $ echo -e 'Homo\nHomo\nGorilla\n' |
         perl abbr_name.pl -s ',' -c "1,1,1"
-    Homo sapiens,Homo,Hsap
-    Homo erectus,Homo,Here
+    Homo,Homo
+    Homo,Homo
+    Gorilla,Gorilla
+
+    $ echo -e 'Homo sapiens,Homo\nCandida albicans,Candida\n[Candida] auris,[Candida]\n[Candida] haemuloni,Candida/Metschnikowiaceae\n[Candida] boidinii,Ogataea\n' |
+        perl abbr_name.pl -s ',' -c "1,1,2"
+    Homo,Homo
+    Homo,Homo
+     8	5476	Candida albicans	64
 
     $ echo -e 'Homo sapiens sapiens,Homo sapiens,Homo\nHomo erectus,Homo erectus,Homo\n' |
         perl abbr_name.pl -s ',' -c "1,2,3" --tight
@@ -90,28 +102,35 @@ while ( my $line = <> ) {
     s/"|'//g for @row;
 
     my ( $strain, $species, $genus ) = @row[@columns];
-    if ( $genus eq $species ) {
-        my @O = split /\s+/, $strain;    # Organism
-        if ( scalar @O >= 2 ) {
-            $genus   = shift @O;
-            $species = shift @O;
-            $strain  = join "-", @O;
-        }
-        else {
-            warn "Parsing strain [$strain] error.\n";
+    my $is_normal = 0;
+
+    if ( $genus ne $species ) {
+
+        # not like [Candida]
+        if ( $genus =~ /^\w/ ) {
+
+            # $species starts with $genus
+            if ( rindex( $species, $genus, 0 ) == 0 ) {
+
+                # $strain starts with $species
+                if ( rindex( $strain, $species, 0 ) == 0 ) {
+                    $strain =~ s/^\Q$species\E ?//;
+
+                    $species =~ s/^\Q$genus\E //;
+
+                    $is_normal = 1;
+                }
+            }
         }
     }
+    # do not abbr species parts
     else {
-        # $strain starts with $species
-        if ( rindex( $strain, $species, 0 ) == 0 ) {
-            $strain  =~ s/^\Q$species\E ?//;
-            $species =~ s/^\Q$genus\E //;
-        }
-
-        # irregular species names
-        else {
-            $strain  =~ s/^\Q$genus\E ?//;
-            $species =~ s/^\Q$genus\E //;
+        if ( $genus =~ /^\w/ ) {
+            if (rindex($strain, $genus, 0) == 0) {
+                $strain =~ s/^\Q$genus\E ?//;
+                $species = '';
+                $is_normal = 1;
+            }
         }
     }
 
@@ -139,29 +158,35 @@ while ( my $line = <> ) {
     s/_$//    for ( $strain, $species, $genus );
     s/^_//    for ( $strain, $species, $genus );
 
-    push @fields, [ $strain, $species, $genus ];
+    push @fields, [ $strain, $species, $genus, $is_normal ];
 
     push @rows, \@row;
 }
 
 my $count = scalar @fields;
 
-my @ge = map { $_->[2] } @fields;
-my @sp = map { $_->[1] } @fields;
-my @st = map { $_->[0] } @fields;
+my @ge = map { $_->[3] ? $_->[2] : () } @fields;
+my @sp = map { $_->[3] ? $_->[1] : () } @fields;
 
 my $ge_of = MyUtil::abbr_most( [ List::MoreUtils::PP::uniq(@ge) ], 1, "Yes" );
 my $sp_of =
   MyUtil::abbr_most( [ List::MoreUtils::PP::uniq(@sp) ], $min_species, "Yes" );
 
 for my $i ( 0 .. $count - 1 ) {
-    my $spacer = $tight ? '' : '_';
-    my $ge_sp  = join $spacer,
-      grep { defined $_ and length $_ } $ge_of->{ $ge[$i] },
-      $sp_of->{ $sp[$i] };
-    my $organism = join "_", grep { defined $_ and length $_ } $ge_sp, $st[$i];
+    if ( $fields[$i]->[3] ) {
 
-    print join( ",", @{ $rows[$i] }, $organism ), "\n";
+        my $spacer = $tight ? '' : '_';
+        my $ge_sp  = join $spacer,
+          grep { defined $_ and length $_ } $ge_of->{ $ge[$i] },
+          $sp_of->{ $sp[$i] };
+        my $organism = join "_", grep { defined $_ and length $_ } $ge_sp,
+          $fields[$i]->[0];
+
+        print join( ",", @{ $rows[$i] }, $organism ), "\n";
+    }
+    else {
+        print join( ",", @{ $rows[$i] }, $fields[$i]->[0] ), "\n";
+    }
 }
 
 exit;
