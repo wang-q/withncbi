@@ -177,8 +177,8 @@ for my $i ( 0 .. $count - 1 ) {
 
         my $spacer = $tight ? '' : '_';
         my $ge_sp  = join $spacer,
-          grep { defined $_ and length $_ } $ge_of->{ $ge[$i] },
-          $sp_of->{ $sp[$i] };
+          grep { defined $_ and length $_ } $ge_of->{ $fields[$i]->[2] },
+          $sp_of->{ $fields[$i]->[1] };
         my $organism = join "_", grep { defined $_ and length $_ } $ge_sp,
           $fields[$i]->[0];
 
