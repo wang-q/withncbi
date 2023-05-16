@@ -38,23 +38,28 @@ abbr_name.pl - Abbreviate strain scientific names.
 
     $ echo -e 'Homo sapiens,Homo\nHomo erectus,Homo\n' |
         perl abbr_name.pl -s ',' -c "1,1,2"
-    H_sap
-    H_ere
+    Homo sapiens,Homo,H_sap
+    Homo erectus,Homo,H_ere
 
     $ echo -e 'Homo sapiens,Homo\nHomo erectus,Homo\n' |
         perl abbr_name.pl -s ',' -c "1,1,2" --tight
-    Hsap
-    Here
+    Homo sapiens,Homo,Hsap
+    Homo erectus,Homo,Here
+
+    $ echo -e 'Homo\nHomo\n' |
+        perl abbr_name.pl -s ',' -c "1,1,1"
+    Homo sapiens,Homo,Hsap
+    Homo erectus,Homo,Here
 
     $ echo -e 'Homo sapiens sapiens,Homo sapiens,Homo\nHomo erectus,Homo erectus,Homo\n' |
         perl abbr_name.pl -s ',' -c "1,2,3" --tight
-    Hsap_sapiens
-    Here
+    Homo sapiens sapiens,Homo sapiens,Homo,Hsap_sapiens
+    Homo erectus,Homo erectus,Homo,Here
 
     $ echo -e 'Legionella pneumophila subsp. pneumophila str. Philadelphia 1\nLeptospira interrogans serovar Copenhageni str. Fiocruz L1-130\n' |
         perl abbr_name.pl -s ',' -m 0 -c "1,1,1" --shortsub
-    Hsap_sapiens
-    Here
+    Legionella pneumophila subsp. pneumophila str. Philadelphia 1,Leg_pneumophila_pneumophila_Philadelphia_1
+    Leptospira interrogans serovar Copenhageni str. Fiocruz L1-130,Lep_interrogans_Copenhageni_Fiocruz_L1_130
 
 =cut
 
