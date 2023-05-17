@@ -51,22 +51,24 @@ abbr_name.pl - Abbreviate strain scientific names.
     Homo sapiens,Homo,H_sap
     Homo erectus,Homo,H_ere
 
-    $ echo -e 'Homo\nHomo\nGorilla\n' |
-        perl abbr_name.pl -s ',' -c "1,1,1"
-    Homo,Homo
-    Homo,Homo
-    Gorilla,Gorilla
-
-    $ echo -e 'Homo sapiens,Homo\nCandida albicans,Candida\n[Candida] auris,[Candida]\n[Candida] haemuloni,Candida/Metschnikowiaceae\n[Candida] boidinii,Ogataea\n' |
-        perl abbr_name.pl -s ',' -c "1,1,2"
-    Homo,Homo
-    Homo,Homo
-     8	5476	Candida albicans	64
-
     $ echo -e 'Homo sapiens sapiens,Homo sapiens,Homo\nHomo erectus,Homo erectus,Homo\n' |
         perl abbr_name.pl -s ',' -c "1,2,3" --tight
     Homo sapiens sapiens,Homo sapiens,Homo,Hsap_sapiens
     Homo erectus,Homo erectus,Homo,Here
+
+    $ echo -e 'Homo\nHomo\nGorilla\n' |
+        perl abbr_name.pl -s ',' -c "1,1,1"
+    Homo,H
+    Homo,H
+    Gorilla,G
+
+    $ echo -e 'Homo sapiens,Homo\nCandida albicans,Candida\n[Candida] auris,[Candida]\n[Candida] haemuloni,Candida/Metschnikowiaceae\n[Candida] boidinii,Ogataea\n' |
+        perl abbr_name.pl -s ',' -c "1,1,2"
+    Homo sapiens,Homo,H_sap
+    Candida albicans,Candida,C_alb
+    [Candida] auris,[Candida],Candida_auris
+    [Candida] haemuloni,Candida/Metschnikowiaceae,Candida_haemuloni
+    [Candida] boidinii,Ogataea,Candida_boidinii
 
     $ echo -e 'Legionella pneumophila subsp. pneumophila str. Philadelphia 1\nLeptospira interrogans serovar Copenhageni str. Fiocruz L1-130\n' |
         perl abbr_name.pl -s ',' -m 0 -c "1,1,1" --shortsub
