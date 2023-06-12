@@ -12,7 +12,7 @@
 
 ## NCBI RefSeq
 
-```bash
+```shell
 mkdir -p ~/data/plasmid
 cd ~/data/plasmid
 
@@ -42,7 +42,7 @@ gzip -dcf RefSeq/*.genomic.fna.gz > RefSeq/plasmid.fa
 
 ## MinHash to get non-redundant plasmids
 
-```bash
+```shell
 mkdir ~/data/plasmid/nr
 cd ~/data/plasmid/nr
 
@@ -126,7 +126,7 @@ rm -fr job
 
 ## Grouping by MinHash
 
-```bash
+```shell
 mkdir ~/data/plasmid/grouping
 cd ~/data/plasmid/grouping
 
@@ -333,7 +333,7 @@ wc -l next.tsv
 
 * Split sequences
 
-```bash
+```shell
 mkdir ~/data/plasmid/GENOMES
 mkdir ~/data/plasmid/taxon
 
@@ -387,7 +387,7 @@ find ../GENOMES -maxdepth 2 -mindepth 2 -type f -name "*.fa" | sort |
 
 * `prepseq`
 
-```bash
+```shell
 cd ~/data/plasmid/
 
 cat taxon/group_target.tsv |
@@ -404,7 +404,7 @@ cat taxon/group_target.tsv |
 
 * Check outliers of lengths
 
-```bash
+```shell
 cd ~/data/plasmid/
 
 cat taxon/*.sizes | cut -f 1 | wc -l
@@ -445,7 +445,7 @@ cat taxon/*.sizes | cut -f 2 | paste -sd+ | bc
 
 * Rsync to hpcc
 
-```bash
+```shell
 rsync -avP \
     ~/data/plasmid/ \
     wangq@202.119.37.251:data/plasmid
@@ -456,7 +456,7 @@ rsync -avP \
 
 ## Plasmid: run
 
-```bash
+```shell
 cd ~/data/plasmid/
 
 cat taxon/group_target.tsv |
