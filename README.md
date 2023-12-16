@@ -60,7 +60,7 @@ Use `.fq` over `.fastq`
 
 [jrunlist](https://github.com/egateam/jrunlist)
 
-## Blocked fasta files
+## Block fasta files
 
 Examples in [`example.fas`](https://github.com/wang-q/App-Fasops/blob/master/t/example.fas)
 
@@ -76,7 +76,7 @@ TCATCAGTTGGCAAACCGTTA
 
 ```
 
-![blocked-fasta-files](doc/blocked-fasta-files.png)
+![block-fasta-files](doc/block-fasta-files.png)
 
 [App::Fasops](https://github.com/wang-q/App-Fasops)
 
